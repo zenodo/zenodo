@@ -18,12 +18,7 @@
 WebStyle templates. Customize the look of pages of CDS Invenio
 """
 
-import time
 import cgi
-import traceback
-import urllib
-import sys
-import string
 
 from invenio.config import \
      CFG_SITE_LANG, \
@@ -35,16 +30,10 @@ from invenio.config import \
      CFG_VERSION, \
      CFG_WEBSTYLE_INSPECT_TEMPLATES, \
      CFG_WEBSTYLE_TEMPLATE_SKIN
-from invenio.messages import gettext_set_language, language_list_long
-from invenio.urlutils import make_canonical_urlargd, create_html_link
+from invenio.messages import gettext_set_language, is_language_rtl
 from invenio.dateutils import convert_datecvs_to_datestruct, \
                               convert_datestruct_to_dategui
-from invenio.bibformat import format_record
-from invenio.webuser import collect_user_info, isUserSubmitter, \
-     isUserReferee
-from invenio import template
 from invenio.webstyle_templates import Template as InvenioTemplate
-websearch_templates = template.load('websearch')
 
 class Template(InvenioTemplate):
     def tmpl_pageheader(self, req, ln=CFG_SITE_LANG, headertitle="",
@@ -128,7 +117,7 @@ template function generated it.
 <head>
  <title>%(headertitle)s - %(sitename)s</title>
  <link rev="made" href="mailto:%(sitesupportemail)s" />
- <link rel="stylesheet" href="%(cssurl)s/img/invenio%(cssskin)s.css" type="text/css" />
+ <link rel="stylesheet" href="%(cssurl)s/css/invenio%(cssskin)s.css" type="text/css" />
  <link rel="alternate" type="application/rss+xml" title="%(sitename)s RSS" href="%(rssurl)s" />
  <link rel="search" type="application/opensearchdescription+xml" href="%(siteurl)s/opensearchdescription" title="%(sitename)s" />
  <link rel="unapi-server" type="application/xml" title="unAPI" href="%(unAPIurl)s" />

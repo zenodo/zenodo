@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(IMGDIR)
 	$(INSTALL) -m 664 $(IMGFILES) $(IMGDIR)
 
 clean:

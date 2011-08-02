@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(BFODIR)
 	$(INSTALL) -m 664 $(BFOFILES) $(BFODIR)
 
 clean:

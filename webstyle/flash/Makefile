@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(FLASHDIR)
 	$(INSTALL) -m 664 $(FLASHFILES) $(FLASHDIR)
 
 clean:

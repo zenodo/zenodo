@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(LIBDIR)
 	$(INSTALL) -m 664 $(LIBFILES) $(LIBDIR)
 
 clean:

@@ -14,6 +14,8 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(LIBDIR)
+	$(INSTALL) -d $(JSDIR)
 	$(INSTALL) -m 664 $(LIBFILES) $(LIBDIR)
 	$(INSTALL) -m 664 $(JSFILES) $(JSDIR)
 

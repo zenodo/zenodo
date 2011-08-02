@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(BFTDIR)
 	$(INSTALL) -m 664 $(BFTFILES) $(BFTDIR)
 
 clean:

@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(BSTDIR)
 	$(INSTALL) -m 664 $(BSTFILES) $(BSTDIR)
 
 clean:

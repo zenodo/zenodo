@@ -272,7 +272,7 @@ color: #6E5907;
 }
 .headerboxbodylogo a, .headerboxbodylogo a:visited{
    padding-left: 220px;
-   background: transparent url(openaire_logo.jpeg) no-repeat top left;
+   background: transparent url(/img/openaire_logo.jpeg) no-repeat top left;
    color: #5E83A3;
    font-size: 20px;
    font-weight: bold;
@@ -290,7 +290,7 @@ color: #6E5907;
 .home .headerboxbodylogo a, .home .headerboxbodylogo a:visited{
    margin-left: 5px;
    padding-left: 220px;
-   background: transparent url(openaire_logo.jpeg) no-repeat top left;
+   background: transparent url(/img/openaire_logo.jpeg) no-repeat top left;
    height: 100px;
    line-height: 3em;
    font-size: 26px;
@@ -1355,7 +1355,7 @@ input[disabled], input[disabled="true"]{
 }
 
 ul.bsk_export_as_list{
-   list-style-image: url(arrow_link-icon-15x11-right.gif) ;
+   list-style-image: url(/img/arrow_link-icon-15x11-right.gif) ;
    padding-left: 1em;
    margin:0.05em;
 }
@@ -1896,7 +1896,7 @@ dd{
    padding:2px;
 }
 .cmtfilesblock a{
-   background:url(file-icon-text-12x16.gif) no-repeat;
+   background:url(/img/file-icon-text-12x16.gif) no-repeat;
    padding-left: 14px;
    margin-left: 2px;
 }
@@ -2776,7 +2776,7 @@ ul.detailedrecordtabs{
 
 /* Actions in mini-panel of detailed record view*/
 ul.detailedrecordactions{
-   list-style-image: url(arrow_link-icon-15x11-right.gif) ;
+   list-style-image: url(/img/arrow_link-icon-15x11-right.gif) ;
    padding-left: 1em;
    text-align:left;
    margin:0.05em;
@@ -2801,24 +2801,24 @@ ul.detailedrecordactions{
    clear:none;
    width:auto;
    text-align:left;
-   background:url(star_empty-icon-30x30.gif) no-repeat;
+   background:url(/img/star_empty-icon-30x30.gif) no-repeat;
 }
 #detailedrecordminipanelreview div.star:hover{
-   background-image:url(star-icon-30x30.gif) !important;
+   background-image:url(/img/star-icon-30x30.gif) !important;
 }
 #detailedrecordminipanelreview:hover div.full, #detailedrecordminipanelreview:hover div.half{
-   background-image:url(star_empty-icon-30x30.gif) ;
+   background-image:url(/img/star_empty-icon-30x30.gif) ;
 }
 #detailedrecordminipanelreview div.full{
-   background-image:url(star-icon-30x30.gif) ;
+   background-image:url(/img/star-icon-30x30.gif) ;
 }
 #detailedrecordminipanelreview div.half{
-   background-image:url(star_half-icon-30x30.gif) ;
+   background-image:url(/img/star_half-icon-30x30.gif) ;
 }
 
 /* Short reminder displayed as sheet of paper in detailed record pages */
 #detailedrecordshortreminder {
-   background: #fff url(paper-texture-128x128.gif) repeat top left;
+   background: #fff url(/img/paper-texture-128x128.gif) repeat top left;
    margin: 10px 10px 0px 10px;
    padding:4px;
    border-bottom: 1px solid #CCC;
@@ -2834,7 +2834,7 @@ ul.detailedrecordactions{
    top:-15px;
    height:72px;
    width:72px;
-   background: transparent url(paper_clip-72x72.gif) no-repeat top left;
+   background: transparent url(/img/paper_clip-72x72.gif) no-repeat top left;
 }
 #detailedrecordshortreminder #HB{
    position:relative;
@@ -2932,7 +2932,7 @@ text-decoration:underline;
     height:100%;
     padding-right:5px;
     margin-right:10px;
-    background: transparent url(list_sep_blue.gif) no-repeat left center;
+    background: transparent url(/img/list_sep_blue.gif) no-repeat left center;
 
 }
 #bibcircmenu li.hassubmenu{
@@ -2940,13 +2940,13 @@ text-decoration:underline;
 }
 #bibcircmenu li.hassubmenu a{
     padding-right:12px;
-    background: transparent url(drop_down_menu_arrow_down.gif) no-repeat right center;
+    background: transparent url(/img/drop_down_menu_arrow_down.gif) no-repeat right center;
 }
 #bibcircmenu li.on.hassubmenu a{
-    background: transparent url(drop_down_menu_arrow_down_w.gif) no-repeat right center;
+    background: transparent url(/img/drop_down_menu_arrow_down_w.gif) no-repeat right center;
 }
 #bibcircmenu li.on {
-    background: #eee url(list_sep_grey.gif) no-repeat left center;
+    background: #eee url(/img/list_sep_grey.gif) no-repeat left center;
     height:100%;
 }
 #bibcircmenu li a img {
@@ -3160,10 +3160,10 @@ div.subtitle {
 .menu .hassubmenu a {
         /*display: inline-block; /* Necessary on IE */
 	padding-right:12px;
-	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
+	background: transparent url(/img/drop_down_menu_arrow_down_b.gif) no-repeat right center;
 }
 .menu .on.hassubmenu a {
-	background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;
+	background: transparent url(/img/drop_down_menu_arrow_down_b.gif) no-repeat right center;
 }
 .menu .on {
 	height:100%;
@@ -3224,11 +3224,11 @@ div.subtitle {
 /* Override/Customize rollover menus in some cases*/
 .menu .headermoduleboxbody .hassubmenu a {
 	/*background: transparent url(drop_down_menu_arrow_down_lb.gif) no-repeat right center;*/
-        background-image:url(drop_down_menu_arrow_down_lb.gif)
+        background-image:url(/img/drop_down_menu_arrow_down_lb.gif)
 }
 .menu .headermoduleboxbody .hassubmenu a.header:hover {
 	/*background: transparent url(drop_down_menu_arrow_down_b.gif) no-repeat right center;*/
-        background-image:url(drop_down_menu_arrow_down_b.gif)
+        background-image:url(/img/drop_down_menu_arrow_down_b.gif)
 }
 
 .snippetbox {
@@ -3239,136 +3239,3 @@ div.subtitle {
 }
 
 /* end of invenio.css */
-img {
-    border-style: none;
-}
-
-div.OpenAIRE div.metadata {
-    height: 100%;
-    float: left;
-    border-style : none none none solid;
-    border-width : medium medium medium 2em;
-    border-left-color : #FFC0C0;
-    padding-left : 2em;
-  }
-
-div.OpenAIRE fieldset {
-    margin: 2px;
-    float: left;
-}
-
-div.OpenAIRE div.header div {
-    float: left;
-  }
-
-
-div.OpenAIRE div.file {
-    word-wrap: break-word;
-  }
-
-
-div.clear {
-    float: none;
-    clear: both;
-  }
-
-
-.mandatory:after {
-    content: url("/img/asterisk.png");
-  }
-
-
-div.OpenAIRE div.error {
-    background : #FFC0C0 url('/img/iconcross.gif') no-repeat center left;
-    font : inherit bolder medium sans-serif;
-    padding : 4px 4px 4px 20px;
-    border : #ff0000;
-    -moz-border-radius : 4px;
-    border-radius : 4px;
-  }
-
-
-div.OpenAIRE div.warning {
-    background : #FFFFC0 url('/img/warning.png') no-repeat center left;
-    font : bolder inherit sans-serif;
-    padding : 4px 4px 4px 20px;
-    border : #ffff00;
-    border-radius : 4px;
-  }
-
-div.OpenAIRE tr td.error {
-    background : #FFC0C0 url('/img/iconcross.gif') no-repeat center center;
-    font : inherit bolder medium sans-serif;
-    padding : 4px 4px 4px 20px;
-    border : #ff0000;
-    -moz-border-radius : 4px;
-    border-radius : 4px;
-  }
-
-
-div.OpenAIRE tr td.warning {
-  background : #FFFFC0 url('/img/warning.png') no-repeat center center;
-  font : bolder inherit sans-serif;
-  padding : 4px 4px 4px 20px;
-  border : #ffff00;
-  border-radius : 4px;
-  }
-
-
-div.OpenAIRE tr td.empty{
-    background : #FFFFC0 url('/img/wb-notes.png') no-repeat center center;
-    font : bolder inherit sans-serif;
-    padding : 4px 4px 4px 20px;
-    border : #ffff00;
-    border-radius : 4px;
-  }
-
-div.OpenAIRE tr td.ok {
-  background : #C0FFC0 url('/img/okay.gif') no-repeat center center;
-  font : bolder inherit sans-serif;
-  padding : 4px 4px 4px 20px;
-  border : #ffff00;
-  border-radius : 4px;
-  }
-
-
-div.OpenAIRE label {
-    font-style: italic;
-    font-weight: bolder;
-  }
-
-
-div.OpenAIRE .ok {
-    background : #C0FFC0;
-    font : bolder inherit sans-serif;
-    padding : 4px;
-    border : #00c000;
-    -moz-border-radius : 4px;
-    border-radius : 4px;
-  }
-
-
-.ui-autocomplete {
-    max-height: 200px;
-    overflow-y: auto;
-  }
-
-
-span.tooltip {
-    border-bottom: 1px dotted;
-    cursor: pointer;
-  }
-
-
-.publication_information, .selectedproject, div.file {
-    display: inline;
-    border-bottom: 1px dotted;
-    cursor: pointer;
-  }
-
-
-select:focus, input[type="text"]:focus, textarea:focus {
-    background: #FFFF99;
-    border: #FFFF99 dotted;
-  }
-

@@ -181,7 +181,7 @@ jQuery(document).ready(function(){
         return ajaxGateway(this, 'verify_field');
     });
     jQuery('#project').autocomplete({
-        source: gSite + "/kb/export?kbname=projects&format=jquery&limit=20&ln=" + gLn,
+        source: gSite + "/kb/export?kbname=projects&format=json&limit=20&ln=" + gLn,
         focus: function(event, ui) {
             jQuery('#projectid').val(ui.item.label);
             return false;

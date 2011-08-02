@@ -12,6 +12,7 @@ test:
 	@echo "Nothing to test."
 
 install:
+	$(INSTALL) -d $(JSDIR)
 	$(INSTALL) -m 664 $(JSFILES) $(JSDIR)
 
 clean:

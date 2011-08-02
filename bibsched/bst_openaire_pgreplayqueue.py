@@ -25,7 +25,7 @@ from invenio.errorlib import register_exception
 from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
 from invenio.intbitset import intbitset
 
-def bst_OpenAIRE_pgreplayqueue():
+def bst_openaire_pgreplayqueue():
     replayqueue = intbitset(run_sql("SELECT id FROM pgreplayqueue"))
     for queryid in replayqueue:
         query, param = loads(decompress(run_sql("SELECT query FROM pgreplayqueue WHERE id=%s", (queryid, ))[0][0]))

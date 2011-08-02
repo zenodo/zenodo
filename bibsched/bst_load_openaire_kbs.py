@@ -161,7 +161,7 @@ def load_kbs(cfg, run_sql, in_task=False):
             continue
 
 
-def bst_load_OpenAIRE_kbs(journals=True):
+def bst_load_openaire_kbs(journals=True):
     load_kbs(CFG_DNET_KBS, dnet_run_sql, in_task=True)
     if journals:
         load_kbs(CFG_JOURNAL_KBS, none_run_sql, in_task=True)

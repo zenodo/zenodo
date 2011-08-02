@@ -3,7 +3,7 @@ include config.mk
 #
 # Note that local makefile configurations can be defined in config-local.mk to override config.mk
 
-SUBDIRS = bibformat bibknowledge bibsched miscutil openaire websession webstyle
+SUBDIRS = bibformat bibsched miscutil openaire websession webstyle
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
