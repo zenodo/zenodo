@@ -1,0 +1,26 @@
+<name>Default HTML brief</name>
+<description>Brief HTML format.</description>
+
+<strong><BFE_TITLE_BRIEF highlight="no"/></strong>
+<BFE_AUTHORS limit="4" prefix=" / " extension=" ;<em> et al</em> " highlight="no"/>
+
+<BFE_ADDITIONAL_REPORT_NUMBERS
+prefix = '<small class="quicknote"> ['
+suffix="]</small> "
+separator="] [" link="no"/>
+
+<BFE_PRIMARY_REPORT_NUMBER
+prefix = '<small class="quicknote"> ['
+suffix="]</small> " />
+
+<BFE_ABSTRACT limit="1" prefix="<br /><small>" suffix="</small>"
+highlight="no" contextual="no"/>
+
+<BFE_FIELD tag="536__a" prefix="<small>", instances_separator=', ' suffix="</small>" />
+
+<BFE_FIELD tag="542__l" prefix="<small>" suffix="</small>" />
+
+<BFE_PUBLI_INFO prefix="<br /><small>Published in <strong>" suffix="</strong></small>" />
+<BFE_DOI prefix="<small>" suffix="</small>" />
+
+<BFE_FULLTEXT prefix='<br /><small>' style="note" show_icons="yes" suffix="</small>" />
