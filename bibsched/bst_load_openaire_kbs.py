@@ -87,8 +87,8 @@ CFG_DNET_KBS = {
 }
 
 CFG_ADDITIONAL_ENTRIES = {
-    'json_projects': ('502084', '502084', 'http://cordis.europa.eu/search/index.cfm?fuseaction=proj.document&PJ_RCN=8373729', 'POLYMOD', '', '2008-08-31', '2004-09-01', 'Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases', ''),
-    'projects': ('502084', 'POLYMOD - Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases (502084)'),
+    'json_projects': (('502084', '502084', 'http://cordis.europa.eu/search/index.cfm?fuseaction=proj.document&PJ_RCN=8373729', 'POLYMOD', '', '2008-08-31', '2004-09-01', 'Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases', ''), ),
+    'projects': (('502084', 'POLYMOD - Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases (502084)'), ),
 }
 
 def none_run_sql(query):
