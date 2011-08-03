@@ -86,6 +86,11 @@ CFG_DNET_KBS = {
     'institutes': "SELECT legal_name, legal_name FROM organizations",
 }
 
+CFG_ADDITIONAL_ENTRIES = {
+    'json_projects': ('502084', '502084', 'http://cordis.europa.eu/search/index.cfm?fuseaction=proj.document&PJ_RCN=8373729', 'POLYMOD', '', '2008-08-31', '2004-09-01', 'Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases', ''),
+    'projects': ('502084', 'POLYMOD - Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases (502084)'),
+}
+
 def none_run_sql(query):
     return eval(query)
 
@@ -103,6 +108,8 @@ def load_kbs(cfg, run_sql, in_task=False):
             if kb.startswith('json_'):
                 encoder = ComplexEncoder()
                 mapping, description = run_sql(query, with_desc=True)
+                if kb in CFG_ADDITIONAL_ENTRIES:
+                    mapping += CFG_ADDITIONAL_ENTRIES[kb]
                 if not in_task:
                     print "mapping:", len(mapping)
                 column_counter = {}
@@ -167,4 +174,4 @@ def bst_load_openaire_kbs(journals=True):
         load_kbs(CFG_JOURNAL_KBS, none_run_sql, in_task=True)
 
 if __name__ == '__main__':
-    bst_load_OpenAIRE_kbs(journals=True)
+    bst_load_openaire_kbs(journals=True)
