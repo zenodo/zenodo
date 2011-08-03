@@ -81,14 +81,14 @@ CFG_DNET_KBS = {
     #""",
     'json_projects': """SELECT projectid,grant_agreement_number,ec_project_website,acronym,call_identifier,end_date,start_date,title,fundedby FROM projects""",
     'projects': """SELECT grant_agreement_number, COALESCE(acronym, title) || ' - ' || COALESCE(title, acronym) || ' (' || grant_agreement_number || ')' FROM projects""",
-    'project_subjects': "SELECT project, project_subject FROM projects_projectsubjects",
+    #'project_subjects': "SELECT project, project_subject FROM projects_projectsubjects",
     'languages': "SELECT languageid, name FROM languages",
     'institutes': "SELECT legal_name, legal_name FROM organizations",
 }
 
 CFG_ADDITIONAL_ENTRIES = {
-    'json_projects': (('502084', '502084', 'http://cordis.europa.eu/search/index.cfm?fuseaction=proj.document&PJ_RCN=8373729', 'POLYMOD', '', '2008-08-31', '2004-09-01', 'Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases', ''), ),
-    'projects': (('502084', 'POLYMOD - Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases (502084)'), ),
+    'json_projects': [('502084', '502084', 'http://cordis.europa.eu/search/index.cfm?fuseaction=proj.document&PJ_RCN=8373729', 'POLYMOD', '', datetime.date(2008, 8, 31), datetime.date(2004, 9, 1), 'Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases', 'FP6')],
+    'projects': [('502084', 'POLYMOD - Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases (502084)')],
 }
 
 def none_run_sql(query):
@@ -110,6 +110,8 @@ def load_kbs(cfg, run_sql, in_task=False):
                 mapping, description = run_sql(query, with_desc=True)
                 if kb in CFG_ADDITIONAL_ENTRIES:
                     mapping += CFG_ADDITIONAL_ENTRIES[kb]
+                    if not in_task:
+                        print CFG_ADDITIONAL_ENTRIES[kb]
                 column_counter = {}
                 new_description = []
                 for column in description[1:]:
@@ -124,12 +126,12 @@ def load_kbs(cfg, run_sql, in_task=False):
                 mapping = run_sql(query)
                 if kb in CFG_ADDITIONAL_ENTRIES:
                     mapping += CFG_ADDITIONAL_ENTRIES[kb]
+                    if not in_task:
+                        print CFG_ADDITIONAL_ENTRIES[kb]
                 if not in_task:
                     print "mapping:", len(mapping)
                 if kb == 'projects':
-                    mapping = list(mapping)
-                    mapping.append(('000000', 'NO PROJECT'))
-                    mapping = tuple(mapping)
+                    mapping += [('000000', 'NO PROJECT')]
             original_keys = set([key[0] for key in get_kbr_keys(kb)])
             if not in_task:
                 print "original_keys before:", len(original_keys)
@@ -168,10 +170,11 @@ def load_kbs(cfg, run_sql, in_task=False):
             continue
 
 
-def bst_load_openaire_kbs(journals=True):
-    load_kbs(CFG_DNET_KBS, dnet_run_sql, in_task=True)
+def bst_load_openaire_kbs(journals=True, in_task=True):
+    load_kbs(CFG_DNET_KBS, dnet_run_sql, in_task=in_task)
     if journals:
-        load_kbs(CFG_JOURNAL_KBS, none_run_sql, in_task=True)
+        load_kbs(CFG_JOURNAL_KBS, none_run_sql, in_task=in_task)
 
 if __name__ == '__main__':
-    bst_load_openaire_kbs(journals=True)
+    bst_load_openaire_kbs(journals=True, in_task=False)
+
