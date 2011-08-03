@@ -110,8 +110,6 @@ def load_kbs(cfg, run_sql, in_task=False):
                 mapping, description = run_sql(query, with_desc=True)
                 if kb in CFG_ADDITIONAL_ENTRIES:
                     mapping += CFG_ADDITIONAL_ENTRIES[kb]
-                if not in_task:
-                    print "mapping:", len(mapping)
                 column_counter = {}
                 new_description = []
                 for column in description[1:]:
@@ -124,6 +122,8 @@ def load_kbs(cfg, run_sql, in_task=False):
                 description = new_description
             else:
                 mapping = run_sql(query)
+                if kb in CFG_ADDITIONAL_ENTRIES:
+                    mapping += CFG_ADDITIONAL_ENTRIES[kb]
                 if not in_task:
                     print "mapping:", len(mapping)
                 if kb == 'projects':
