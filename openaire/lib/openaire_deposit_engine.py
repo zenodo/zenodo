@@ -688,6 +688,8 @@ class OpenAIREPublication(object):
             subfields.append(('y', year))
         if self._metadata.get('issue'):
             subfields.append(('n', self._metadata['issue']))
+        if self._metadata.get('volume'):
+            subfields.append(('v', self._metadata['volume']))
         if self._metadata.get('pages'):
             subfields.append(('c', self._metadata['pages']))
         if subfields:
