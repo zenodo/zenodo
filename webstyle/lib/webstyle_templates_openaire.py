@@ -126,6 +126,7 @@ template function generated it.
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
+ <script type="text/javascript" src="%(siteurl)s/js/jquery-1.5.2.min.js"></script>
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
