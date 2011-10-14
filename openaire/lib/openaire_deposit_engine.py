@@ -752,21 +752,21 @@ def _check_authors(metadata, ln, _):
         if row:
             if not RE_AUTHOR_ROW.match(row):
                 if not ',' in row:
-                    errors.append(_("""<strong>"%(row)s"</strong? is not a well formatted authorship (correct format is <em>"Last Names, First Names"</em> or <em>"Last Names, First Names: Affiliation"<em> but a <em>","</em> separating <em>"Last Names"</em> and <em>"First Names"</em> does not seem to exist).""" % {"row": escape(row)}))
+                    errors.append(_("""<strong>"%(row)s"</strong? is not a well formatted authorship (correct format is <em>"Last Names, First Names"</em> or <em>"Last Names, First Names: Affiliation"<em> but a <em>","</em> separating <em>"Last Names"</em> and <em>"First Names"</em> does not seem to exist).""" % {"row": escape(row.encode('UTF8'))}))
                 else:
-                    errors.append(_("""<strong>"%(row)s"</strong> is not a well formatted authorship (correct format is <em>"Last Names, First Names"</em> or <em>"Last Names, First Names: Affiliation"</em>).""" % {"row": escape(row)}))
+                    errors.append(_("""<strong>"%(row)s"</strong> is not a well formatted authorship (correct format is <em>"Last Names, First Names"</em> or <em>"Last Names, First Names: Affiliation"</em>).""" % {"row": escape(row.encode('UTF8'))}))
             if not ':' in row:
-                warnings.append(_("""You have not specified an affiliation for <strong>"%(row)s"</strong> but an affiliation is recommended.""" % {"row": escape(row)}))
+                warnings.append(_("""You have not specified an affiliation for <strong>"%(row)s"</strong> but an affiliation is recommended.""" % {"row": escape(row.encode('UTF8'))}))
                 if row.islower():
-                    warnings.append(_("""It seems that the author name <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"row": escape(row)})
+                    warnings.append(_("""It seems that the author name <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"row": escape(row.encode('UTF8'))})
             else:
                 name, affiliation = row.split(":", 1)
                 if name.islower():
-                    warnings.append(_("""It seems that the author name <strong>"%(name)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"name": escape(name), "row": escape(row)})
+                    warnings.append(_("""It seems that the author name <strong>"%(name)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"name": escape(name.encode('UTF8')), "row": escape(row.encode('UTF8'))})
                 if affiliation.islower():
-                    warnings.append(_("""It seems that the affiliation <strong>"%(affiliation)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"affiliation": escape(affiliation), "row": escape(row)})
+                    warnings.append(_("""It seems that the affiliation <strong>"%(affiliation)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"affiliation": escape(affiliation.encode('UTF8')), "row": escape(row.encode('UTF8'))})
                 if name.isupper():
-                    warnings.append(_("""It seems that the author name <strong>"%(name)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all upper case. Was this intentional?""") % {"name": escape(name), "row": escape(row)})
+                    warnings.append(_("""It seems that the author name <strong>"%(name)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all upper case. Was this intentional?""") % {"name": escape(name.encode('UTF8')), "row": escape(row.encode('UTF8'))})
     if errors:
         return ('authors', 'error', errors)
     elif warnings:
