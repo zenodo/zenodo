@@ -126,7 +126,7 @@ template function generated it.
  <meta http-equiv="Content-Language" content="%(ln)s" />
  <meta name="description" content="%(description)s" />
  <meta name="keywords" content="%(keywords)s" />
- <script type="text/javascript" src="%(siteurl)s/js/jquery-1.5.2.min.js"></script>
+ <script type="text/javascript" src="%(siteurl)s/js/%(jquery)s"></script>
  %(metaheaderadd)s
 </head>
 <body%(body_css_classes)s lang="%(ln_iso_639_a)s"%(rtl_direction)s>
@@ -231,7 +231,8 @@ template function generated it.
           'msg_help' : _("Help"),
           'languagebox' : self.tmpl_language_selection_box(req, ln),
           'unAPIurl' : cgi.escape('%s/unapi' % CFG_SITE_URL),
-          'inspect_templates_message' : inspect_templates_message
+          'inspect_templates_message' : inspect_templates_message,
+          'jquery': "/edit/" in req.uri and "jquery.min.js" or "jquery-1.5.2.min.js"
         }
         return out
 
