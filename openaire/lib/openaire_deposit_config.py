@@ -36,7 +36,7 @@ def CFG_ACCESS_RIGHTS(ln):
 
 CFG_METADATA_FIELDS = ('title', 'original_title', 'authors', 'abstract',
     'original_abstract', 'language', 'access_rights', 'embargo_date',
-    'publication_date', 'journal_title', 'volume', 'pages', 'issue', 'keywords', 'notes')
+    'publication_date', 'journal_title', 'volume', 'pages', 'issue', 'keywords', 'notes', 'doi')
 
 CFG_METADATA_STATES = ('ok', 'error', 'warning', 'empty')
 CFG_PUBLICATION_STATES = ('initialized', 'edited', 'submitted', 'pendingapproval', 'approved', 'rejected')
