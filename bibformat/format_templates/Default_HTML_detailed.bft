@@ -48,8 +48,8 @@ note_suffix="</span></span> </small>"
 suffix="<br />" />
 
 <BFE_PUBLI_INFO prefix="<br /><br /><strong>Published in: </strong>"/><br />
-<BFE_DATE prefix='<strong>Publishing date: </strong><span itemtype="datePublished">' suffix="</span><br />" />
-<BFE_DOI prefix='<small><strong>DOI: </strong><span itemprop="doi">' suffix="</span> </small><br />" />
+<BFE_DATE prefix='<strong>Publication date: </strong><span itemtype="datePublished">' suffix="</span><br />" />
+<BFE_DOI prefix='<br /><small><strong>DOI: </strong><span itemprop="doi">' suffix="</span> </small><br />" />
 
 <BFE_PLOTS width="200px" caption="no"/>
 
