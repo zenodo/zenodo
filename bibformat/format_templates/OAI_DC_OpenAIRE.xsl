@@ -96,6 +96,14 @@
     <dc:identifier>
       <xsl:value-of select="fn:eval_bibformat(controlfield[@tag='001'],'&lt;BFE_SERVER_INFO var=&quot;recurl&quot;>')" />
     </dc:identifier>
+    <xsl:for-each select="datafield[@tag=024 and @ind1=7]">
+      <xsl:if test="subfield[@code='2'] = 'DOI'">
+        <dc:identifier>
+          doi:<xsl:value-of select="subfield[@code='a']" />
+        </dc:identifier>
+      </xsl:if>
+    </xsl:for-each>
+
 <!--    <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
       <dc:identifier>
         <xsl:value-of select="subfield[@code='u']"/>
