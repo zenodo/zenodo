@@ -74,7 +74,7 @@ def CFG_ACCESS_RIGHTS(ln):
 
 CFG_METADATA_FIELDS = ('title', 'original_title', 'authors', 'abstract',
     'original_abstract', 'language', 'access_rights', 'embargo_date',
-    'publication_date', 'journal_title', 'volume', 'pages', 'issue', 'keywords')
+    'publication_date', 'journal_title', 'volume', 'pages', 'issue', 'keywords', 'doi')
 
 CFG_METADATA_STATES = ('ok', 'error', 'warning', 'empty')
 CFG_PUBLICATION_STATES = ('initialized', 'edited', 'submitted', 'pendingapproval', 'approved', 'rejected')
@@ -694,6 +694,12 @@ class OpenAIREPublication(object):
             subfields.append(('c', self._metadata['pages']))
         if subfields:
             record_add_field(rec, '909', 'C', '4', subfields=subfields)
+        if self._metadata.get('doi'):
+            doi = self._metadata('doi').strip()
+            if doi.lower().startswith('doi:'):
+                doi = doi[len('doi:'):]
+            if doi:
+                record_add_field(rec, '024', '7', subfields=[('a', doi), ('2', 'DOI')])
         return record_xml_output(rec)
 
     ln = property(get_ln)
@@ -813,6 +819,15 @@ def _check_pages(metadata, ln, _):
     if pages and not RE_PAGES.match(pages):
         return ('pages', 'error', [_("The pages are not specified correctly")])
 
+_RE_DOI = re.compile("(doi:)?10.\d+/.*", re.I)
+def _check_doi(metadata, ln, _):
+    doi = metadata.get('doi', '').strip()
+    if doi:
+        if not _RE_DOI.match(doi):
+            return ('doi', 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"')])
+    else:
+        return ('doi', 'warning', [_("If possible, please provide the digital object identifier (DOI) assigned by the publisher to your publication.")])
+
 CFG_METADATA_FIELDS_CHECKS = {
     'title': _check_title,
     'original_title': _check_original_title,
@@ -823,5 +838,6 @@ CFG_METADATA_FIELDS_CHECKS = {
     'embargo_date': _check_embargo_date,
     'publication_date': _check_publication_date,
     'pages': _check_pages,
+    'doi': _check_doi,
 }
 

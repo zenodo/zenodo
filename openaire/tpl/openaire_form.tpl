@@ -114,7 +114,7 @@
                     <div id="error_publication_date_%(id)s" class="error">%(error_publication_date_value)s</div>
                     <div id="warning_publication_date_%(id)s" class="warning">%(warning_publication_date_value)s</div>
                 </div>
-               <div>
+                <div>
                     <img title="%(journal_title_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="journal_title_%(id)s">%(journal_title_label)s
                     </label>
@@ -122,6 +122,15 @@
                     <input type="text" name="journal_title_%(id)s" id="journal_title_%(id)s" value="%(journal_title_value)s" size="75" class="journal_title" />
                     <div id="error_journal_title_%(id)s" class="error">%(error_journal_title_value)s</div>
                     <div id="warning_journal_title_%(id)s" class="warning">%(warning_journal_title_value)s</div>
+                </div>
+                <div>
+                    <img title="%(doi_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="doi_%(id)s">%(doi_label)s
+                    </label>
+                    <br />
+                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" />
+                    <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
+                    <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
                 </div>
                 <div>
                     <img title="%(volume_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
