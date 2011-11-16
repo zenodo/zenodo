@@ -819,14 +819,14 @@ def _check_pages(metadata, ln, _):
     if pages and not RE_PAGES.match(pages):
         return ('pages', 'error', [_("The pages are not specified correctly")])
 
-_RE_DOI = re.compile("(doi:)?10.\d+/.*", re.I)
+_RE_DOI = re.compile("(doi:)?10\.\d+/.*", re.I)
 def _check_doi(metadata, ln, _):
     doi = metadata.get('doi', '').strip()
     if doi:
         if not _RE_DOI.match(doi):
             return ('doi', 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"')])
     else:
-        return ('doi', 'warning', [_("If possible, please provide the digital object identifier (DOI) assigned by the publisher to your publication.")])
+        return ('doi', 'warning', [_("If possible, please provide the digital object identifier (DOI) assigned by the publisher to your publication")])
 
 CFG_METADATA_FIELDS_CHECKS = {
     'title': _check_title,

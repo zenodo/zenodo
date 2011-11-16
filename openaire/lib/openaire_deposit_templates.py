@@ -228,7 +228,7 @@ class Template:
         values["publication_information_label"] = escape(_("Publication information"))
         values["journal_title_tooltip"] = escape(_("""<p>Start typing part of the name of the journal where you published your publication, and, when possible, it will be automatically completed against a list of known journal titles.</p><p><em>Note that the journal title list has been retrieved from the freely available resource in the <a href="http://www.ncbi.nlm.nih.gov/entrez/citmatch_help.html#JournalLists" target="_blank"><strong>Entrez</strong></a> database.</p>"""), True)
         values['journal_title_label'] = escape(_("Journal title"))
-        values["doi_tooltip"] = escape(_("""<p>The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of your publication, as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>."""))
+        values["doi_tooltip"] = escape(_("""<p>The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of your publication, as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>."""), True)
         values["doi_label"] = escape(_("DOI"))
         values['publication_date_label'] = escape(_("Publication date"))
         values['publication_date_tooltip'] = escape(_("This is the official publication date of your document. It's format is <pre>YYYY/MM/DD</pre> such as in <pre>2010/12/25</pre>"""))

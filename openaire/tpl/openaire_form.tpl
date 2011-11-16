@@ -128,7 +128,7 @@
                     <label for="doi_%(id)s">%(doi_label)s
                     </label>
                     <br />
-                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" />
+                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" placeholder="10.1234/foo-bar" pattern="(doi:)?10\.\d+/.*"/>
                     <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
                     <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
                 </div>
