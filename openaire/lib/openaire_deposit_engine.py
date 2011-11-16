@@ -824,7 +824,7 @@ def _check_doi(metadata, ln, _):
     doi = metadata.get('doi', '').strip()
     if doi:
         if not _RE_DOI.match(doi):
-            return ('doi', 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"')])
+            return ('doi', 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"' % escape(doi, True))])
     else:
         return ('doi', 'warning', [_("If possible, please provide the digital object identifier (DOI) assigned by the publisher to your publication")])
 
