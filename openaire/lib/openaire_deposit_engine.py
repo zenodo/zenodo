@@ -695,7 +695,7 @@ class OpenAIREPublication(object):
         if subfields:
             record_add_field(rec, '909', 'C', '4', subfields=subfields)
         if self._metadata.get('doi'):
-            doi = self._metadata('doi').strip()
+            doi = self._metadatai['doi'].strip()
             if doi.lower().startswith('doi:'):
                 doi = doi[len('doi:'):]
             if doi:
