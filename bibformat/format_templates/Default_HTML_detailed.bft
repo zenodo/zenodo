@@ -36,7 +36,7 @@ keyword_suffix="</small>" />
 
 <!-- BEGIN OpenAIRE specific -->
 
-<BFE_FIELD tag="536__a" prefix='<br /><small><strong>Funded by project(s): </strong></small><small><span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' instances_separator='</span></span>, <span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' suffix="</span></span></small>" />
+<BFE_FIELD escape="0" tag="536__a" prefix='<br /><small><strong>Funded by project(s): </strong></small><small><span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' instances_separator='</span></span>, <span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' suffix="</span></span></small>" />
 
 <BFE_OPENAIRE_ACCESS_RIGHTS prefix='<br /><small itemprop="rights">' suffix="</small>" />
 
