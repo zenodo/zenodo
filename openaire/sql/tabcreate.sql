@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS OpenAIREauthorships (
   KEY (uid, publicationid),
   KEY (uid, authorship),
   KEY (authorship)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS OpenAIREkeywords (
   uid int(15) NOT NULL,
@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS OpenAIREkeywords (
   KEY (uid, publicationid),
   KEY (uid, keyword),
   KEY (keyword)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 
 CREATE TABLE IF NOT EXISTS eupublication (
@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS eupublication (
   KEY (projectid),
   KEY (uid),
   KEY (id_bibrec)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 CREATE TABLE IF NOT EXISTS pgreplayqueue (
   id int(15) unsigned NOT NULL auto_increment,
@@ -54,6 +54,6 @@ CREATE TABLE IF NOT EXISTS pgreplayqueue (
   first_try datetime NOT NULL default '0000-00-00',
   last_try datetime NOT NULL default '0000-00-00',
   PRIMARY KEY (id)
-) TYPE=MyISAM;
+) ENGINE=MyISAM;
 
 -- end of file
