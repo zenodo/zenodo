@@ -36,7 +36,7 @@ from base64 import encodestring
 from cgi import escape
 
 from invenio.bibdocfile import generic_path2bidocfile
-from invenio.bibedit_utils import json_unicode_to_utf8
+from invenio.jsonutils import json_unicode_to_utf8
 from invenio.webpage import page as invenio_page
 from invenio.webinterface_handler import wash_urlargd
 from invenio.webuser import session_param_set, session_param_get, collect_user_info, get_email
