@@ -3192,10 +3192,10 @@ div.subtitle {
 	display:none;
 	position: absolute;
 	background-image:none;
-	top: 1em;
-	left: 0;
-        z-index: 99;
-        text-align: left;
+	top: 1.5em;
+	left: -1.1em;
+    z-index: 99;
+    text-align: left;
 }
 .menu ul.subsubmenu li {
 	display:list-item !important;
