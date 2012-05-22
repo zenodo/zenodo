@@ -272,8 +272,8 @@ template function generated it.
 %(pagefooteradd)s
 <!-- replaced page footer -->
  <div class="pagefooterstripeleft">
-  <img style="margin: 3px; float: left;" alt="fp7-capacities" src="/img/fp7-capacities_tr.png" height="45" width="58">
-  <img style="margin: 3px; float: left;" alt="e_infrastructures" src="/img/einfrastructure_sm.png" height="32" width="87">
+  <img style="margin: 3px; float: left;" alt="fp7-capacities" src="/img/fp7_sm.png" height="46" width="60">
+  <img style="margin: 3px; float: left;" alt="e_infrastructures" src="/img/einfra_sm.png" height="33" width="90">
   %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
   <br />
   %(msg_poweredby)s <a class="footer" href="http://invenio-software.org/">Invenio</a> v%(version)s
