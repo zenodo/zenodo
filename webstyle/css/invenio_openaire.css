@@ -274,29 +274,21 @@ color: #6E5907;
    padding-left: 220px;
    background: transparent url(/img/openaire_logo.jpeg) no-repeat top left;
    color: #5E83A3;
-   font-size: 20px;
+   font-size: 26px;
    font-weight: bold;
    font-variant: small-caps;
-   letter-spacing: 3px;
+   letter-spacing: 2px;
    padding-bottom: 6px;
    float: left;
    clear: none;
+   margin-left: 5px;
    margin-top: 5px;
    margin-bottom: 5px;
    text-decoration: none;
    height: 100px;
+   line-height: 3em;
 }
 
-.home .headerboxbodylogo a, .home .headerboxbodylogo a:visited{
-   margin-left: 5px;
-   padding-left: 220px;
-   background: transparent url(/img/openaire_logo.jpeg) no-repeat top left;
-   height: 100px;
-   line-height: 3em;
-   font-size: 26px;
-   letter-spacing: 2px;
-   text-decoration: none;
-}
 .headermodulebox {
    color: #fff;
    background: transparent;
