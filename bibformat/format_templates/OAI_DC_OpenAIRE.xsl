@@ -142,5 +142,10 @@
     <dc:type>
       info:eu-repo/semantics/article
     </dc:type>
+    <xsl:for-each select="datafield[@tag=856 and @ind1=0]">
+      <dc:contributor>
+        info:openaire/account/<xsl:value-of select="subfield[@code='i']"/>
+      </dc:contributor>
+    </xsl:for-each>
   </xsl:template>
 </xsl:stylesheet>
