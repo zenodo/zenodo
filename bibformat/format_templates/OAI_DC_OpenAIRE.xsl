@@ -147,5 +147,10 @@
         <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_EMAIL />&quot;)" />
       </dc:contributor>
     </xsl:if>
+    <xsl:if test="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_FULLNAME />&quot;)">
+      <dc:contributor>
+        <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_FULLNAME />&quot;)" />
+      </dc:contributor>
+    </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
