@@ -12,9 +12,7 @@ for recid in recids:
         email = email.split()[-1][1:-1].strip()
     user_info = collect_user_info(get_uid_from_email(email))
     name = user_info.get("external_fullname", user_info.get("nickname", ""))
-    if name.strip():
-            email = "%s <%s>" % (name.strip(), email)
     external_id = user_info.get("external_id", "")
-    record_add_field(rec, '856', ind1='0', subfields=[('f', email), ('i', external_id)])
+    record_add_field(rec, '856', ind1='0', subfields=[('f', email), ('y', name)])
     print record_xml_output(rec)
 print "</collection>"

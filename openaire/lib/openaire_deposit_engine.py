@@ -656,16 +656,15 @@ class OpenAIREPublication(object):
                     subfields.append(('a', project_description))
                 subfields.append(('c', str(projectid)))
                 record_add_field(rec, '536', subfields=subfields)
+        
         user_info = collect_user_info(self.uid)
         if "email" in user_info:
             email = user_info["email"]
         else:
             email = get_email(self.uid)
-        name = user_info.get("external_fullname", user_info.get("nickname", ""))
-        if name.strip():
-            email = "%s <%s>" % (name.strip(), email)
-        external_id = user_info.get("external_id", "") ## ID in OpenAIRE
-        record_add_field(rec, '856', ind1='0', subfields=[('f', email), ('i', external_id)])
+        name = user_info.get("external_fullname", user_info.get("nickname", "")).strip()
+        record_add_field(rec, '856', ind1='0', subfields=[('f', email), ('y', name)])
+        
         if self._metadata.get('embargo_date'):
             record_add_field(rec, '942', subfields=[('a', self._metadata['embargo_date'])])
         fft_status = ''
