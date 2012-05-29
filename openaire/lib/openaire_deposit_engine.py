@@ -661,13 +661,11 @@ class OpenAIREPublication(object):
             email = user_info["email"]
         else:
             email = get_email(self.uid)
-        if "nickname" in user_info:
-            nickname = user_info["nickname"]
-        else:
-            nickname = ""
-        if nickname.strip():
-            email = "%s <%s>" % (nickname.strip(), email)
-        record_add_field(rec, '856', ind1='0', subfields=[('f', email)])
+        name = user_info.get("external_fullname", user_info.get("nickname", ""))
+        if name.strip():
+            email = "%s <%s>" % (name.strip(), email)
+        external_id = user_info.get("external_id", "") ## ID in OpenAIRE
+        record_add_field(rec, '856', ind1='0', subfields=[('f', email), ('i', external_id)])
         if self._metadata.get('embargo_date'):
             record_add_field(rec, '942', subfields=[('a', self._metadata['embargo_date'])])
         fft_status = ''
