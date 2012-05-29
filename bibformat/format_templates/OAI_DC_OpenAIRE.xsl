@@ -142,10 +142,10 @@
     <dc:type>
       info:eu-repo/semantics/article
     </dc:type>
-    <xsl:for-each select="datafield[@tag=856 and @ind1=0]">
+    <xsl:if test="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_EMAIL />&quot;)">
       <dc:contributor>
-        info:openaire/account/<xsl:value-of select="subfield[@code='i']"/>
+        <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_EMAIL />&quot;)" />
       </dc:contributor>
-    </xsl:for-each>
+    </xsl:if>
   </xsl:template>
 </xsl:stylesheet>
