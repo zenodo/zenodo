@@ -320,7 +320,7 @@ class Template:
     def tmpl_upload_publications(self, projectid, project_information, session, style, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
         data = {
-                'noflash_description': escape(_("It looks like you have not installed a recent version of the %(x_fmt_open)sFlash plugin (minimum 9.0.24)%(x_fmt_close)s or that you are using %(x_fmt_open)sGoogle Chrome%(x_fmt_close)s or %(x_fmt_open)sChromium%(x_fmt_close)s. You will be therefore able to upload only one publication at a time.")) % {
+                'noflash_description': escape(_("It looks like you have not installed a recent version of the %(x_fmt_open)sFlash plugin (minimum 9.0.24)%(x_fmt_close)s or that you are using %(x_fmt_open)sGoogle Chrome 10.x/11.x%(x_fmt_close)s or %(x_fmt_open)sChromium 10.x/11.x%(x_fmt_close)s. You will be therefore able to upload only one publication at a time.")) % {
                     'x_fmt_open': "<strong>",
                     'x_fmt_close': "</strong>",
                 },
@@ -370,7 +370,7 @@ class Template:
             </div>
             <script type="text/javascript">// <![CDATA[
                 if (swfobject.hasFlashPlayerVersion("9.0.24") &&
-                        navigator.userAgent.search('Chrom(e|ium)/') < 0) { // There is a bug in Chrom(e|ium)
+                        navigator.userAgent.search('Chromium/1(1|0)') < 0) { // There is a bug in Chrom(e|iumt) 10.x/11.x
                     jQuery('#noFlash').hide();
                     jQuery('#yesFlash').show();
                 } else {
