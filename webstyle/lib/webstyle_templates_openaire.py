@@ -287,11 +287,9 @@ template function generated it.
  </div>
 <!-- replaced page footer -->
 </div>
-<script type="text/javascript" src="/js/awstats_misc_tracker.js"></script>
-<noscript><img src="/js/awstats_misc_tracker.js?nojs=y" height=0 width=0 border=0 style="display: none"></noscript>
 <!-- Piwik -->
 <script type="text/javascript">
-var pkBaseURL = (("https:" == document.location.protocol) ? "https://gronik.icm.edu.pl/piwik/" : "http://gronik.icm.edu.pl/piwik/");
+var pkBaseURL = (("https:" == document.location.protocol) ? "https://analytics.openaire.eu/" : "http://analytics.openaire.eu/");
 document.write(unescape("%%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%%3E%%3C/script%%3E"));
 </script><script type="text/javascript">
 try {
@@ -299,7 +297,7 @@ var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", 2);
 piwikTracker.trackPageView();
 piwikTracker.enableLinkTracking();
 } catch( err ) {}
-</script><noscript><p><img src="http://gronik.icm.edu.pl/piwik/piwik.php?idsite=2" style="border:0" alt="" /></p></noscript>
+</script><noscript><p><img src="https://analytics.openaire.eu/piwik.php?idsite=2" style="border:0" alt="" /></p></noscript>
 <!-- End Piwik Tag -->
 </body>
 </html>
