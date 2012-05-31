@@ -1,4 +1,25 @@
 #!/usr/bin/env python
+## This file is part of Invenio.
+## Copyright (C) 2010, 2011, 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+"""
+Tasklets to import/update knowledge base of journal names and 
+FP7 projects.
+"""
 
 from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
 from invenio.dbquery import run_sql
@@ -171,6 +192,9 @@ def load_kbs(cfg, run_sql, in_task=False):
 
 
 def bst_load_openaire_kbs(journals=True, in_task=True):
+    """
+    Tasklet to load knowledge bases (journals and FP7 projects).
+    """
     load_kbs(CFG_DNET_KBS, dnet_run_sql, in_task=in_task)
     if journals:
         load_kbs(CFG_JOURNAL_KBS, none_run_sql, in_task=in_task)

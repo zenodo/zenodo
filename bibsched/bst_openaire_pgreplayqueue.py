@@ -18,7 +18,6 @@
 from marshal import loads
 from zlib import decompress
 
-
 from invenio.dbquery import run_sql
 from invenio.dnetutils import dnet_run_sql
 from invenio.errorlib import register_exception
@@ -26,6 +25,11 @@ from invenio.bibtask import write_message, task_update_progress, task_sleep_now_
 from invenio.intbitset import intbitset
 
 def bst_openaire_pgreplayqueue():
+    """
+    Execute a failed D-NET query.
+    
+    See invenio.dnetutils.dnet_save_query_into_pgreplayqueue for further info.
+    """
     replayqueue = intbitset(run_sql("SELECT id FROM pgreplayqueue"))
     for queryid in replayqueue:
         query, param = loads(decompress(run_sql("SELECT query FROM pgreplayqueue WHERE id=%s", (queryid, ))[0][0]))

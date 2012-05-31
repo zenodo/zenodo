@@ -15,6 +15,11 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+"""
+WebSession templates which customizes the look and feel of
+the user info box.
+"""
+
 from cgi import escape
 from base64 import encodestring
 
@@ -26,7 +31,9 @@ from invenio.messages import gettext_set_language
 class Template(DefaultTemplate):
     def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
         """
-        Displays the user block
+        Displays the user block. 
+        
+        Generates a URL to login via OpenAIRE portal (robot login).
 
         Parameters:
 
