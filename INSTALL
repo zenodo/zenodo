@@ -1,0 +1,24 @@
+OpenAIRE INSTALLATION
+=====================
+
+About
+=====
+
+This document specifies how to build, customize, and install the OpenAIRE
+overlay onto of Invenio. Basically you install Invenio as usual and afterwards
+you install OpenAIRE.
+
+After installing be sure to run:
+
+	inveniocfg --update-all
+	inveniocfg --create-tables 
+
+Before installing the OpenAIRE overlay create a file config-local.mk in the
+root of OpenAIRE (see config.mk for further details). Afterwards, install 
+the overlay:
+
+	make 
+	make install
+	
+	inveniocfg --update-all
+	inveniocfg --reset-all
