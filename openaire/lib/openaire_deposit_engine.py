@@ -44,13 +44,13 @@ from invenio.bibformat_elements.bfe_fulltext import sort_alphanumerically
 from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL, CFG_OPENAIRE_CURATORS
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.jsonutils import json_unicode_to_utf8
 from invenio.mailutils import send_email
 from invenio.messages import gettext_set_language
-from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, CFG_METADATA_STATES, CFG_PUBLICATION_STATES
+from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, CFG_METADATA_STATES, CFG_PUBLICATION_STATES
 from invenio.openaire_deposit_utils import wash_form, simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, strip_publicationid
 from invenio.search_engine import record_empty
 from invenio.urlutils import create_url
