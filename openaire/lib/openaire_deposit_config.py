@@ -24,7 +24,11 @@ from invenio.messages import gettext_set_language
 CFG_OPENAIRE_PROJECT_INFORMATION_KB = 'json_projects'
 CFG_OPENAIRE_PROJECT_DESCRIPTION_KB = 'projects'
 CFG_OPENAIRE_DEPOSIT_PATH = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, 'OpenAIRE')
-CFG_OPENAIRE_CURATORS = [x.strip() for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")] if MAIN_CFG_OPENAIRE_CURATORS.strip() else []
+
+if MAIN_CFG_OPENAIRE_CURATORS.strip():
+    CFG_OPENAIRE_CURATORS = [x.strip() for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
+else:
+    CFG_OPENAIRE_CURATORS = [] 
 
 def CFG_ACCESS_RIGHTS(ln):
     _ = gettext_set_language(ln)
