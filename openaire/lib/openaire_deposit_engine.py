@@ -15,12 +15,17 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+from base64 import encodestring
+from cgi import escape
+import copy
+import datetime
 import os
+import re
 import shutil
+import sys
 import tempfile
 import time
-import datetime
-import sys
+
 if sys.hexversion < 0x2060000:
     try:
         import simplejson as json
@@ -30,80 +35,49 @@ if sys.hexversion < 0x2060000:
         pass
 else:
     import json
-import re
-import copy
-from base64 import encodestring
-from cgi import escape
 
-from invenio.bibdocfile import generic_path2bidocfile
-from invenio.jsonutils import json_unicode_to_utf8
-from invenio.webpage import page as invenio_page
-from invenio.webinterface_handler import wash_urlargd
-from invenio.webuser import session_param_set, session_param_get, collect_user_info, get_email
+
 from invenio import template
-from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
-from invenio.websearch_webcoll import mymkdir
-from invenio.dbquery import run_sql
-from invenio.bibtask import task_low_level_submission
-from invenio.bibrecord import record_add_field, record_xml_output
-from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
-from invenio.search_engine import record_empty
-from invenio.openaire_deposit_utils import wash_form, simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, strip_publicationid
-from invenio.urlutils import create_url
+from invenio.bibdocfile import generic_path2bidocfile
 from invenio.bibformat import format_record
-from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_MANDATORY_PROJECTS
-from invenio.mailutils import send_email
-from invenio.errorlib import register_exception
 from invenio.bibformat_elements.bfe_fulltext import sort_alphanumerically
+from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
+from invenio.bibrecord import record_add_field, record_xml_output
+from invenio.bibtask import task_low_level_submission
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
+from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception
+from invenio.jsonutils import json_unicode_to_utf8
+from invenio.mailutils import send_email
+from invenio.messages import gettext_set_language
+from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, CFG_METADATA_STATES, CFG_PUBLICATION_STATES
+from invenio.openaire_deposit_utils import wash_form, simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, strip_publicationid
+from invenio.search_engine import record_empty
+from invenio.urlutils import create_url
+from invenio.webinterface_handler import wash_urlargd
+from invenio.webpage import page as invenio_page
+from invenio.websearch_webcoll import mymkdir
 from invenio.websubmit_functions.Report_Number_Generation import create_reference
+from invenio.webuser import session_param_set, session_param_get, collect_user_info, get_email
 
 RE_AUTHOR_ROW = re.compile(u'^\w{2,}(\s+\w{2,})*\s*,\s*(\w{2,}|\w\.)(\s+\w{1,}|\s+\w\.)*\s*(:\s*\w{2,}.*)?$', re.U)
 RE_PAGES = re.compile('\d+(-\d+)?')
+_RE_SPACES = re.compile(r'\s+')
+
+openaire_deposit_templates = template.load('openaire_deposit')
 
 def _(foo):
     return foo
 
-def CFG_ACCESS_RIGHTS(ln):
-    _ = gettext_set_language(ln)
-    return {
-        'closedAccess': _("Closed access"),
-        'embargoedAccess': _("Embargoed access"),
-        'restrictedAccess': _("Restricted access"),
-        'openAccess': _("Open access")}
-
-CFG_METADATA_FIELDS = ('title', 'original_title', 'authors', 'abstract',
-    'original_abstract', 'language', 'access_rights', 'embargo_date',
-    'publication_date', 'journal_title', 'volume', 'pages', 'issue', 'keywords', 'doi')
-
-CFG_METADATA_STATES = ('ok', 'error', 'warning', 'empty')
-CFG_PUBLICATION_STATES = ('initialized', 'edited', 'submitted', 'pendingapproval', 'approved', 'rejected')
-
-openaire_deposit_templates = template.load('openaire_deposit')
-
-def portal_page(title, body, navtrail="", description="", keywords="",
-         metaheaderadd="", uid=None,
-         cdspageheaderadd="", cdspageboxlefttopadd="",
-         cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
-         cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
-         language=CFG_SITE_LANG, verbose=1, titleprologue="",
-         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
-         navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True,
-         body_css_classes=None, project_information=None):
-    if req is not None:
-        user_info = collect_user_info(req)
-        username = user_info.get('external_fullname', user_info['email'])
-        invenio_logouturl = "%s/youraccount/robotlogout" % CFG_SITE_SECURE_URL
-    else:
-        username = 'Guest'
-        invenio_logouturl = ''
-    if not CFG_OPENAIRE_PORTAL_URL:
-        portalurl = "http://www.openaire.eu"
-    else:
-        portalurl = CFG_OPENAIRE_PORTAL_URL
-    return openaire_deposit_templates.tmpl_page(title=title, body=body, headers=metaheaderadd, username=username, portalurl=portalurl, return_value=encodestring(invenio_logouturl), ln=language, project_information=project_information)
-
 def get_project_description(projectid):
+    """
+    Get title of an EU project from the knowledge base, using the project
+    id as key.
+    
+    Example::
+    
+        'RIBOSOME MM' - A Synthetic Molecular Machine Capable of Complex Task Performance: Processive Sequence-Selective Synthesis (235491)
+    """
     info = get_kb_mapping(CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, str(projectid))
     if info:
         return info['value']
@@ -111,6 +85,22 @@ def get_project_description(projectid):
         return ''
 
 def get_project_information_from_projectid(projectid):
+    """
+    Get dictionary of EU project information.
+    
+    Example of dictionary::
+    
+        {
+            "fundedby": "CIP-EIP", 
+            "end_date": "2012-08-31", 
+            "title": "Advanced Biotech Cluster platforms for Europe", 
+            "acronym": "ABCEUROPE", 
+            "call_identifier": "EuropeINNOVA-ENT-CIP-09-C-N01S00", 
+            "ec_project_website": null, 
+            "grant_agreement_number": "245628", 
+            "start_date": "2009-09-01"
+        }
+    """
     info = get_kb_mapping(CFG_OPENAIRE_PROJECT_INFORMATION_KB, str(projectid))
     if info:
         return json_unicode_to_utf8(json.loads(info['value']))
@@ -174,7 +164,6 @@ def normalize_authorships(authorships):
         ret.append(authorship)
     return '\n'.join(ret)
 
-_RE_SPACES = re.compile(r'\s+')
 def normalize_acronym(acronym):
     acronym = acronym.replace("-", "_")
     return _RE_SPACES.sub('_', acronym)
@@ -210,6 +199,34 @@ def get_openaire_style(req=None):
         style = 'invenio'
     return style
 
+def portal_page(title, body, navtrail="", description="", keywords="",
+         metaheaderadd="", uid=None,
+         cdspageheaderadd="", cdspageboxlefttopadd="",
+         cdspageboxleftbottomadd="", cdspageboxrighttopadd="",
+         cdspageboxrightbottomadd="", cdspagefooteradd="", lastupdated="",
+         language=CFG_SITE_LANG, verbose=1, titleprologue="",
+         titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], 
+         navmenuid="admin", navtrail_append_title_p=1, of="", 
+         rssurl=CFG_SITE_URL + "/rss", show_title_p=True,
+         body_css_classes=None, project_information=None):
+    """
+    Render template with Portal layout.
+    
+    See also invenio.webpage.page
+    """
+    if req is not None:
+        user_info = collect_user_info(req)
+        username = user_info.get('external_fullname', user_info['email'])
+        invenio_logouturl = "%s/youraccount/robotlogout" % CFG_SITE_SECURE_URL
+    else:
+        username = 'Guest'
+        invenio_logouturl = ''
+    if not CFG_OPENAIRE_PORTAL_URL:
+        portalurl = "http://www.openaire.eu"
+    else:
+        portalurl = CFG_OPENAIRE_PORTAL_URL
+    return openaire_deposit_templates.tmpl_page(title=title, body=body, headers=metaheaderadd, username=username, portalurl=portalurl, return_value=encodestring(invenio_logouturl), ln=language, project_information=project_information)
+
 def page(title, body, navtrail="", description="", keywords="",
          metaheaderadd="", uid=None,
          cdspageheaderadd="", cdspageboxlefttopadd="",
@@ -219,6 +236,9 @@ def page(title, body, navtrail="", description="", keywords="",
          titleepilogue="", secure_page_p=0, req=None, errors=[], warnings=[], navmenuid="admin",
          navtrail_append_title_p=1, of="", rssurl=CFG_SITE_URL+"/rss", show_title_p=True,
          body_css_classes=None, project_information=None):
+    """
+    Render template with the correct style (Portal or Invenio)
+    """
     style = get_openaire_style(req)
     argd = wash_urlargd(req.form, {})
     if not metaheaderadd:
