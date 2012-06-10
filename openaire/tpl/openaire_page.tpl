@@ -170,7 +170,7 @@
                   <div class="box-1">
                     <div class="box-2">
                       <div class="box-3 deepest">
-                        <p></p>
+                        <div style="text-align: center;">Find us on the web</div>
                         <div>
                           <a href="http://www.twitter.com/OpenAIRE_eu" target="_blank"><img
                             src="https://www.openaire.eu/images/stories/social_twitter_box_white_32.png"
@@ -223,7 +223,7 @@
                   <li class="level2 item4 last"><a href="%(portalurl)s/en/open-access/country-information"
                     class="level2 item4 last"><span class="bg">EU Member States</span></a></li>
                 </ul></li>
-              <li class="active level1 item3 parent"><a href="http://www.openaire.eu:8380/dnet-validator-openaire/"
+              <li class="active level1 item3 parent"><a href="%(portalurl)s/en/participate"
                 target="_blank" class="level1 item3 parent active"><span class="bg"><span class="title">Participate</span><span
                     class="subtitle">Deposit, Provide Content</span></span></a>
                 <ul class="level2">
@@ -277,12 +277,12 @@
                 <ul class="level2">
                   <li class="level2 item1 first"><a
                     href="%(portalurl)s/en/component/openaire/claimeddocuments/default/538" class="level2 item1 first"><span
-                      class="bg">Manage Deposits</span></a></li>
+                      class="bg">My Deposits</span></a></li>
                   <li class="level2 item2"><a href="%(portalurl)s/en/myopenaire/my-alerts/view-alerts"
-                    class="level2 item2"><span class="bg">Manage Alerts</span></a></li>
+                    class="level2 item2"><span class="bg">My Alerts</span></a></li>
                   <li class="level2 item3"><a href="%(portalurl)s/en/myopenaire/profile-edit" class="level2 item3"><span
                       class="bg">Edit My Profile</span></a></li>
-                  <li class="level2 item4 last"><a href="%(portalurl)s/en?Itemid=663&amp;option="
+                  <li class="level2 item4 last"><a href="%(portalurl)s/en/newsletter"
                     class="level2 item4 last"><span class="bg">Newsletter</span></a></li>
                 </ul></li>
             </ul>
@@ -357,7 +357,7 @@
                             <div id="breadcrumbs">
                               <span class="breadcrumbs"><a href="%(portalurl)s/">Home</a> <img
                                 src="%(portalurl)s/templates/yoo_level/images/arrow.png" alt="" /> <a
-                                href="%(portalurl)s/en?Itemid=391&option=">Participate</a> <img
+                                href="%(portalurl)s/en/participate">Participate</a> <img
                                 src="%(portalurl)s/templates/yoo_level/images/arrow.png" alt="" /> <a
                                 href="%(portalurl)s/en/component/openaire/ingestion1/default/381">Deposit
                                   Publications</a> %(crumbs)s </span>
