@@ -125,7 +125,7 @@
                       class="level1 item10 first"> <span>Contact us</span>
                     </a></li>
                     <li class="level1 item11"><a
-                      href="%(portalurl)s/en/about-openaire/general-information/objectives" class="level1 item11 last">
+                      href="%(portalurl)s/en/about-openaire/openaire-project/objectives" class="level1 item11 last">
                         <span>About</span>
                     </a></li>
                     <li class="level1 item3 last"><a href="%(portalurl)s/en/newsletter" class="level1 item3 last">
@@ -265,7 +265,7 @@
                       class="bg">EC Resources</span></a></li>
                   <li class="level2 item6"><a href="%(portalurl)s/en/support/links" class="level2 item6"><span
                       class="bg">Related Links</span></a></li>
-                  <li class="level2 item7"><a href="%(portalurl)s/en/support/video" class="level2 item7"><span
+                  <li class="level2 item7"><a href="%(portalurl)s/en/support/video-tutorials" class="level2 item7"><span
                       class="bg">Video Tutorials</span></a></li>
                   <li class="level2 item8 last"><a href="%(portalurl)s/en/support/glossary"
                     class="level2 item8 last"><span class="bg">Glossary</span></a></li>
@@ -279,7 +279,7 @@
                     href="%(portalurl)s/en/component/openaire/claimeddocuments/default/538" class="level2 item1 first"><span
                       class="bg">My Deposits</span></a></li>
                   <li class="level2 item2"><a href="%(portalurl)s/en/myopenaire/my-alerts/view-alerts"
-                    class="level2 item2"><span class="bg">My Alerts</span></a></li>
+                    class="level2 item2"><span class="bg">My Alerts (BETA)</span></a></li>
                   <li class="level2 item3"><a href="%(portalurl)s/en/myopenaire/profile-edit" class="level2 item3"><span
                       class="bg">Edit My Profile</span></a></li>
                   <li class="level2 item4 last"><a href="%(portalurl)s/en/newsletter"
