@@ -7,17 +7,19 @@
         <br />
     </td>
     <td width="35%%" valign="top">
-        <img title="%(access_rights_tooltip)s" class="tooltip mandatory" src="%(site)s/img/help.png" />
-        <select id="access_rights_%(id)s" name="access_rights_%(id)s" class="access_rights">
-            %(access_rights_options)s
-        </select>
-        <div id="error_access_rights_%(id)s" class="error">%(error_embargo_date_value)s</div>
-        <div id="warning_access_rights_%(id)s" class="warning">%(warning_embargo_date_value)s</div>
-        <div id="embargo_date_container_%(id)s">
-            <img title="%(embargo_date_tooltip)s" class="tooltip mandatory" src="%(site)s/img/help.png"/>
-            <input name="embargo_date_%(id)s" type="text" id="embargo_date_%(id)s" value="%(embargo_date_value)s" size="%(embargo_date_size)s" maxlength="10" class="datepicker" />
-            <div id="error_embargo_date_%(id)s" class="error">%(error_embargo_date_value)s</div>
-            <div id="warning_embargo_date_%(id)s" class="warning">%(warning_embargo_date_value)s</div>
+    	<div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_publishedArticle">
+	        <img title="%(access_rights_tooltip)s" class="tooltip mandatory" src="%(site)s/img/help.png" /> 
+	        <select id="access_rights_%(id)s" name="access_rights_%(id)s" class="access_rights">
+	            %(access_rights_options)s
+	        </select> <img src="%(site)s/img/asterisk.png" alt="mandatory">
+	        <div id="error_access_rights_%(id)s" class="error">%(error_embargo_date_value)s</div>
+	        <div id="warning_access_rights_%(id)s" class="warning">%(warning_embargo_date_value)s</div>
+	        <div id="embargo_date_container_%(id)s">
+	            <img title="%(embargo_date_tooltip)s" class="tooltip mandatory" src="%(site)s/img/help.png"/>
+	            <input name="embargo_date_%(id)s" type="text" id="embargo_date_%(id)s" value="%(embargo_date_value)s" size="%(embargo_date_size)s" maxlength="10" class="datepicker" />
+	            <div id="error_embargo_date_%(id)s" class="error">%(error_embargo_date_value)s</div>
+	            <div id="warning_embargo_date_%(id)s" class="warning">%(warning_embargo_date_value)s</div>
+	        </div>
         </div>
     </td>
     <td width="20%%" valign="top">
@@ -29,6 +31,24 @@
     <td colspan="3" valign="top">
         <div id="body_%(id)s" class="body">
             <p><em>%(mandatory_label)s</em></p>
+            <fieldset>
+                <legend>%(publication_type)s</legend>
+                <div>
+	                <img title="%(publication_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                <label class="mandatory">%(publication_type_label)s</label>
+	                <select name="publication_type_%(id)s" id="publication_type_%(id)s" class="publication_type">
+	                        %(publication_type_options)s
+	                </select>
+	                <div id="error_publication_type_%(id)s" class="error">%(error_publication_type_value)s</div>
+	                <div id="warning_publication_type_%(id)s" class="warning">%(warning_publication_type_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_data">
+	                <img title="%(accept_cc0_license_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                <input type="checkbox" value="yes" name="accept_cc0_license_%(id)s" id="accept_cc0_license_%(id)s" class="accept_cc0_license" /> %(accept_cc0_license_label)s <a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="%(site)s/img/cc-zero.png" /></a>
+	                <div id="error_accept_cc0_license_%(id)s" class="error">%(error_accept_cc0_license_value)s</div>
+	                <div id="warning_accept_cc0_license_%(id)s" class="warning">%(warning_accept_cc0_license_value)s</div>
+	            </div>
+            </fieldset>
             <fieldset>
                 <legend>%(projects_information_label)s</legend>
                 <img title="%(projects_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
@@ -114,41 +134,65 @@
                     <div id="error_publication_date_%(id)s" class="error">%(error_publication_date_value)s</div>
                     <div id="warning_publication_date_%(id)s" class="warning">%(warning_publication_date_value)s</div>
                 </div>
-                <div>
-                    <img title="%(journal_title_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-                    <label for="journal_title_%(id)s">%(journal_title_label)s
-                    </label>
-                    <br />
-                    <input type="text" name="journal_title_%(id)s" id="journal_title_%(id)s" value="%(journal_title_value)s" size="75" class="journal_title" />
-                    <div id="error_journal_title_%(id)s" class="error">%(error_journal_title_value)s</div>
-                    <div id="warning_journal_title_%(id)s" class="warning">%(warning_journal_title_value)s</div>
-                </div>
-                <div>
-                    <img title="%(doi_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-                    <label for="doi_%(id)s">%(doi_label)s
-                    </label>
-                    <br />
-                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" placeholder="10.1234/foo-bar" pattern="(doi:)?10\.\d+/.*"/>
-                    <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
-                    <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
-                </div>
-                <div>
-                    <img title="%(volume_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-                    <label for="volume_%(id)s">%(volume_label)s</label>
-                    <input name="volume_%(id)s" type="text" id="volume_%(id)s" value="%(volume_value)s" size="4" class="volume" />
-                    <img title="%(issue_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-                    <label for="issue_%(id)s">%(issue_label)s</label>
-                    <input name="issue_%(id)s" type="text" id="issue_%(id)s" value="%(issue_value)s" size="4" class="issue" />
-                    <img title="%(pages_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-                    <label for="pages_%(id)s">%(pages_label)s</label>
-                    <input name="pages_%(id)s" type="text" id="pages_%(id)s" value="%(pages_value)s" size="8" class="pages" />
-                    <div id="error_volume_%(id)s" class="error">%(error_volume_value)s</div>
-                    <div id="warning_volume_%(id)s" class="warning">%(warning_volume_value)s</div>
-                    <div id="error_issue_%(id)s" class="error">%(error_issue_value)s</div>
-                    <div id="warning_issue_%(id)s" class="warning">%(warning_issue_value)s</div>
-                    <div id="error_pages_%(id)s" class="error">%(error_pages_value)s</div>
-                    <div id="warning_pages_%(id)s" class="warning">%(warning_pages_value)s</div>
-                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_publishedArticle">
+	                <div>
+	                    <img title="%(journal_title_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="journal_title_%(id)s">%(journal_title_label)s
+	                    </label>
+	                    <br />
+	                    <input type="text" name="journal_title_%(id)s" id="journal_title_%(id)s" value="%(journal_title_value)s" size="75" class="journal_title" />
+	                    <div id="error_journal_title_%(id)s" class="error">%(error_journal_title_value)s</div>
+	                    <div id="warning_journal_title_%(id)s" class="warning">%(warning_journal_title_value)s</div>
+	                </div>
+	                <div>
+	                    <img title="%(doi_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="doi_%(id)s">%(doi_label)s
+	                    </label>
+	                    <br />
+	                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" placeholder="10.1234/foo-bar" pattern="(doi:)?10\.\d+/.*"/>
+	                    <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
+	                    <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
+	                </div>
+	                <div>
+	                    <img title="%(volume_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="volume_%(id)s">%(volume_label)s</label>
+	                    <input name="volume_%(id)s" type="text" id="volume_%(id)s" value="%(volume_value)s" size="4" class="volume" />
+	                    <img title="%(issue_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="issue_%(id)s">%(issue_label)s</label>
+	                    <input name="issue_%(id)s" type="text" id="issue_%(id)s" value="%(issue_value)s" size="4" class="issue" />
+	                    <img title="%(pages_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="pages_%(id)s">%(pages_label)s</label>
+	                    <input name="pages_%(id)s" type="text" id="pages_%(id)s" value="%(pages_value)s" size="8" class="pages" />
+	                    <div id="error_volume_%(id)s" class="error">%(error_volume_value)s</div>
+	                    <div id="warning_volume_%(id)s" class="warning">%(warning_volume_value)s</div>
+	                    <div id="error_issue_%(id)s" class="error">%(error_issue_value)s</div>
+	                    <div id="warning_issue_%(id)s" class="warning">%(warning_issue_value)s</div>
+	                    <div id="error_pages_%(id)s" class="error">%(error_pages_value)s</div>
+	                    <div id="warning_pages_%(id)s" class="warning">%(warning_pages_value)s</div>
+	                </div>
+	            </div>
+	            <div class="typebox_%(id)s typebox_%(id)s_report">
+	            	<div>
+	                    <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="report_pages_no_%(id)s">%(report_pages_no_label)s
+	                    </label>
+	                    <br />
+	                    <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="75" class="report_pages_no" />
+	                    <div id="error_report_pages_no_%(id)s" class="error">%(error_report_pages_no_value)s</div>
+	                    <div id="warning_report_pages_no_%(id)s" class="warning">%(warning_report_pages_no_value)s</div>
+	                </div>
+	            </div>
+	            <div class="typebox_%(id)s typebox_%(id)s_data">
+	            	<div>
+	                    <img title="%(related_publications_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="related_publications_%(id)s">%(related_publications_label)s
+	                    </label>
+	                    <br />
+	                    <textarea name="related_publications_%(id)s" id="related_publications_%(id)s" cols="60" rows="5" class="related_publications">%(related_publications_value)s</textarea>
+	                    <div id="error_related_publications_%(id)s" class="error">%(error_related_publications_value)s</div>
+	                    <div id="warning_related_publications_%(id)s" class="warning">%(warning_related_publications_value)s</div>
+	                </div>
+	            </div>
             </fieldset>
             <fieldset>
                 <legend>%(other_information_label)s</legend>
@@ -178,11 +222,14 @@
 </tr>
 <script type="text/javascript">// <![CDATA[
     jQuery(document).ready(function(){
+        /* Show/hide access rights */
         jQuery('#access_rights_%(id)s').bind('change', {
             from_id: '#access_rights_%(id)s',
             to_id: '#embargo_date_container_%(id)s'
         }, update_embargo_date);
         jQuery('#access_rights_%(id)s').trigger('change');
+        
+        /* Show/hide original language box */
         jQuery('#language_%(id)s').bind('change', {
             from_id: '#language_%(id)s',
             to_id: '#original_language_container_%(id)s'
@@ -193,6 +240,17 @@
                 to_id: '#original_language_container_%(id)s'
             }
         });
+        
+        /* Show/hide specific information box */
+        jQuery('#publication_type_%(id)s').bind('change', {
+            from_id: '#publication_type_%(id)s',
+            to_class_prefix: '.typebox_%(id)s_',
+            to_class: '.typebox_%(id)s'
+        }, update_specific_information);
+        
+        jQuery('#publication_type_%(id)s').trigger('change');
+		
+        
         jQuery('#save_%(id)s').click(function(event){
             var element = this;
             ajaxGateway(element, 'save');

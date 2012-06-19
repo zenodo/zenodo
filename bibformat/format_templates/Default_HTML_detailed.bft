@@ -39,7 +39,8 @@ keyword_suffix="</small>" />
 <BFE_FIELD escape="0" tag="536__a" prefix='<br /><small><strong>Funded by project(s): </strong></small><small><span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' instances_separator='</span></span>, <span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' suffix="</span></span></small>" />
 
 <BFE_OPENAIRE_ACCESS_RIGHTS prefix='<br /><small itemprop="rights">' suffix="</small>" />
-
+<BFE_PAGINATION prefix="<br/><small><strong>Pages:</strong> " suffix="</small>" default="" escape="" />
+<BFE_FIELD prefix="<br /><small><strong>Published in: </strong>" suffix="</small>" default="" escape="0" output_pattern="<a href='http://dx.doi.org/%(a)s'>%(a)s</a>" extension="" instances_separator=", " subfields_separator=" " tag="773__a" limit=""/>
 <!-- END OpenAIRE specific -->
 
 <BFE_NOTES

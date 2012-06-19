@@ -61,6 +61,25 @@ function update_language(event){
     }
 }
 
+function update_specific_information(event){
+	show_obj_class = event.data.to_class_prefix + jQuery(event.data.from_id).val()
+	
+	// Hide all other boxes (with class .specific_info_container_<id>)
+	jQuery(event.data.to_class).each(function(index) {
+	    if (!jQuery(this).hasClass(show_obj_class.substring(1))) {
+			jQuery(this).hide('slow');
+			jQuery(this).children('input').attr("disabled", "disabled");
+		}
+	});
+	jQuery(event.data.to_class + " input").attr("disabled", "disabled");
+	
+	// Show the desired boxes (e.g. .container_<id>_publishedArticle), if not
+	// already shown.
+	
+	jQuery(show_obj_class + " input").removeAttr("disabled");
+	jQuery(show_obj_class).removeAttr("disabled").show('slow');
+}
+
 function elaborateAjaxGateway(results, textStatus, XMLHttpRequest){
     var errors = results.errors;
     var warnings = results.warnings;
@@ -96,10 +115,8 @@ function elaborateAjaxGateway(results, textStatus, XMLHttpRequest){
             jQuery(hiddens[query]).hide('slow');
         }
     }
-    if (appends.length > 0) {
-        for (query in appends) {
-            jQuery(query).append(appends[query]);
-        }
+    for (query in appends) {
+        jQuery(query).append(appends[query]);
     }
     if (showns.length > 0) {
         for (query in showns) {
@@ -115,7 +132,16 @@ function elaborateAjaxGateway(results, textStatus, XMLHttpRequest){
 function getPublicationMetadata(publicationid){
     var ret = {};
     jQuery('#body_row_' + publicationid + ' input').each(function(){
-        ret[this.id] = this.value;
+    	if (jQuery(this).attr("type") == "checkbox"){
+    		// Checkboxes sends null if not checked. 
+    		if( jQuery(this).attr("checked") ) {
+    			ret[this.id] = this.value;
+    		} else {
+    			ret[this.id] = null;
+    		}
+    	} else {
+    		ret[this.id] = this.value;
+    	}
     });
     jQuery('#body_row_' + publicationid + ' select').each(function(){
         ret[this.id] = this.value;
@@ -124,7 +150,16 @@ function getPublicationMetadata(publicationid){
         ret[this.id] = this.value;
     });
     jQuery('#header_row_' + publicationid + ' input').each(function(){
-        ret[this.id] = this.value;
+    	if (jQuery(this).attr("type") == "checkbox"){
+    		// Checkboxes sends null if not checked. 
+    		if( jQuery(this).attr("checked") ) {
+    			ret[this.id] = this.value;
+    		} else {
+    			ret[this.id] = null;
+    		}
+    	} else {
+    		ret[this.id] = this.value;
+    	}
     });
     jQuery('#header_row_' + publicationid + ' select').each(function(){
         ret[this.id] = this.value;
@@ -175,6 +210,9 @@ function clone(obj) {
 /* Initialization */
 jQuery(document).ready(function(){
     jQuery('div.OpenAIRE input:text,div.OpenAIRE textarea,div.OpenAIRE select').focusout(function(){
+        return ajaxGateway(this, 'verify_field');
+    });
+    jQuery('div.OpenAIRE input:checkbox').change(function(){
         return ajaxGateway(this, 'verify_field');
     });
     jQuery('div.OpenAIRE select').select(function(){

@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## This file is part of Invenio.
 ## Copyright (C) 2010, 2011, 2012 CERN.
 ##
@@ -15,27 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-include ../../config.mk
--include ../../config-local.mk
-
-CSSFILES = *.css
-PNGFILES = *.png
-
-CSSDIR = $(WEBDIR)/css/
-PNGDIR = $(WEBDIR)/css/images/
-
-all:
-	@echo "Done."
-
-test:
-	@echo "Nothing to test."
-
-install:
-	$(INSTALL) -d $(CSSDIR)
-	$(INSTALL) -d $(PNGDIR)
-	$(INSTALL) -m 664 $(CSSFILES) $(CSSDIR)
-	$(INSTALL) -m 664 $(PNGFILES) $(PNGDIR)
-
-clean:
-	@rm -f *.orig *~
-	@echo "Done."
+__import__('pkg_resources').declare_namespace(__name__)

@@ -19,6 +19,7 @@ highlight="no" contextual="no"/>
 <BFE_FIELD tag="536__a" prefix="<small>", instances_separator=', ' suffix="</small>" />
 
 <BFE_FIELD tag="542__l" prefix="<small>" suffix="</small>" />
+<BFE_PAGINATION prefix="<small>(" suffix=" pages)</small>" default="" escape="" />
 
 <BFE_PUBLI_INFO prefix="<br /><small>Published in <strong>" suffix="</strong></small>" />
 <BFE_DOI prefix="<small>" suffix="</small>" />

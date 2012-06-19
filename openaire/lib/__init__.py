@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ## This file is part of Invenio.
 ## Copyright (C) 2010, 2011, 2012 CERN.
 ##
@@ -15,23 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-include ../../config.mk
--include ../../config-local.mk
-
-JSFILES = *.js
-
-JSDIR = $(WEBDIR)/js/
-
-all:
-	@echo "Done."
-
-test:
-	@echo "Nothing to test."
-
-install:
-	$(INSTALL) -d $(JSDIR)
-	$(INSTALL) -m 664 $(JSFILES) $(JSDIR)
-
-clean:
-	@rm -f *.orig *~
-	@echo "Done."
+__import__('pkg_resources').declare_namespace(__name__)

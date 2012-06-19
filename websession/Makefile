@@ -18,20 +18,24 @@
 include ../config.mk
 -include ../config-local.mk
 
-LIBFILES = *.py
-
-LIBDIR = $(PREFIX)/lib/python/invenio/
-
-all:
+all: sdist
 	@echo "Done."
+
+sdist:
+	$(PYTHON) setup.py $(SDIST_ARGS)
 
 test:
 	@echo "Nothing to test."
 
-install:
-	$(INSTALL) -d $(LIBDIR)
-	$(INSTALL) -m 664 $(LIBFILES) $(LIBDIR)
+develop:
+	$(PIP_DEVELOP) .
+
+install: 
+	$(PIP_INSTALL) dist/*.tar.gz
+
+uninstall:
+	$(PIP_UNINSTALL) openaire-websession
 
 clean:
-	@rm -f *.orig *~
+	@rm -Rf dist/ *.egg-info/ build/
 	@echo "Done."

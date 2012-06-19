@@ -18,21 +18,24 @@
 include ../config.mk
 -include ../config-local.mk
 
-SUBDIRS = css flash img js lib
+all: sdist
+	@echo "Done."
 
-all:
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
-	@echo "Done.  Please run make test now."
+sdist:
+	$(PYTHON) setup.py $(SDIST_ARGS)
 
 test:
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make test && cd .. ;)
-	@echo "Done.  Please run make install now."
+	@echo "Nothing to test."
+
+develop:
+	$(PIP_DEVELOP) .
 
 install:
-	@echo "Installing new code and support files..."
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
+	$(PIP_INSTALL) dist/*.tar.gz
+
+uninstall:
+	$(PIP_UNINSTALL) openaire-webstyle
 
 clean:
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make clean && cd .. ;)
-	@rm -f *.orig *~
+	@rm -Rf dist/ *.egg-info/ build/
 	@echo "Done."
