@@ -24,19 +24,20 @@ COLLECTION_TREE = {
     'name' : 'OpenAIRE Orphan Record Repository', 'query' : '',
     'children' : [
         {
-            'name' : 'Articles & Preprints',
+            'name' : 'Articles & Reports',
             'query' : '',
             'children' : [
                 { 'name' : 'Published Articles', 'query' : 'collection:"OPENAIRE"', 'children' : [] },
-                { 'name' : 'Preprints', 'query' : 'collection:"PREPRINTS"', 'children' : [] },
+                { 'name' : 'Reports', 'query' : 'collection:"REPORTS"', 'children' : [] },
             ]
         },
         {
-            'name' : 'Books & Reports', 'query' : '',
-            'children' : [
-                { 'name' : 'Books', 'query' : 'collection:"BOOKS"', 'children' : [] },
-                { 'name' : 'Reports', 'query' : 'collection:"REPORTS"', 'children' : [] },
-            ]
+            'name' : 'Data sets', 'query' : 'collection:"DATA"',
+            'children' : []
+            #'children' : [
+            #    { 'name' : 'Books', 'query' : 'collection:"BOOKS"', 'children' : [] },
+            #    { 'name' : 'Reports', 'query' : 'collection:"REPORTS"', 'children' : [] },
+            #]
         },
     ]
 }
