@@ -18,24 +18,20 @@
 include ../config.mk
 -include ../config-local.mk
 
-all: sdist
-	@echo "Done."
+BSTFILES = lib/bibsched_tasklets/bst_*.py
 
-sdist:
-	$(PYTHON) setup.py $(SDIST_ARGS)
+BSTDIR = $(PREFIX)/lib/python/invenio/bibsched_tasklets/
+
+all:
+	@echo "Done."
 
 test:
 	@echo "Nothing to test."
 
-develop:
-	$(PIP_DEVELOP) .
-
-install: 
-	$(PIP_INSTALL) dist/*.tar.gz
-
-uninstall:
-	$(PIP_UNINSTALL) openaire-bibsched
+install:
+	$(INSTALL) -d $(BSTDIR)
+	$(INSTALL) -m 664 $(BSTFILES) $(BSTDIR)
 
 clean:
-	@rm -Rf dist/ *.egg-info/ build/
+	@rm -f *.orig *~
 	@echo "Done."

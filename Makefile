@@ -45,12 +45,7 @@ install:
 	@echo "Done.  You may want to copy $(ETCDIR)/invenio-local.conf-example to $(ETCDIR)/invenio-local.conf, edit commented parts, run inveniocfg --update-all --reset-all and restart Apache now."
 	@echo "To install database changes, run 'make install-dbchanges'."
 
-uninstall:
-	@echo "Uninstalling new code and support files..."
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make uninstall && cd .. ;)
-
 clean:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make clean && cd .. ;)
 	@rm -f *.orig *~
 	@echo "Done."
-

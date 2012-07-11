@@ -15,24 +15,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-include ../config.mk
--include ../config-local.mk
+include ../../config.mk
+-include ../../config-local.mk
 
-SUBDIRS = css flash img js lib
+IMGFILES = *.png *.jpeg
+
+IMGDIR = $(WEBDIR)/img/
 
 all:
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
-	@echo "Done.  Please run make test now."
+	@echo "Done."
 
 test:
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make test && cd .. ;)
-	@echo "Done.  Please run make install now."
+	@echo "Nothing to test."
 
 install:
-	@echo "Installing new code and support files..."
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make install && cd .. ;)
+	$(INSTALL) -d $(IMGDIR)
+	$(INSTALL) -m 664 $(IMGFILES) $(IMGDIR)
 
 clean:
-	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make clean && cd .. ;)
 	@rm -f *.orig *~
 	@echo "Done."
