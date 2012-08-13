@@ -984,7 +984,7 @@ class OpenAIREPublication(object):
          # Firerole
         fft_status = ''
         if self._metadata['access_rights'] == 'embargoedAccess':
-            fft_status = 'firerole: allow after "%s"\nallow any' % self._metadata['embargo_date']
+            fft_status = 'firerole: deny until "%s"\nallow any' % self._metadata['embargo_date']
         elif self._metadata['access_rights'] in ('closedAccess', 'restrictedAccess'):
             fft_status = 'status: %s' % self._metadata['access_rights']
         
