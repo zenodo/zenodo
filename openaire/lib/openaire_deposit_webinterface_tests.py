@@ -20,12 +20,17 @@
 TODO: Strong dependency on Werkzeug and json
 """
 
-from StringIO import StringIO 
+from StringIO import StringIO
+from tempfile import mkstemp
 import json
 import os
 import re
 import unittest
 
+from invenio.bibrecord import record_add_field, record_xml_output
+from invenio.bibtask import task_low_level_submission
+from invenio.config import CFG_PREFIX
+from invenio.dbquery import run_sql
 from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
 from invenio.openaire_deposit_config import CFG_METADATA_FIELDS
 from invenio.openaire_deposit_engine import OpenAIREPublication
@@ -35,7 +40,7 @@ from invenio.openaire_deposit_webinterface import \
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.testutils_clients import RequestFactory, TestClient, JSONResponse
 from invenio.webuser import get_nickname
-from invenio.dbquery import run_sql
+
 
 # TODO: only works in 2.7
 
@@ -76,7 +81,7 @@ class AjaxGatewayTest(unittest.TestCase):
     
     test_full_submit = True
     """ Set to True if you want to test full submission. By default this
-    is not enabled, since it will polute your installation.
+    is not enabled, since it will pollute your installation.
     """
     
     
@@ -194,6 +199,21 @@ class AjaxGatewayTest(unittest.TestCase):
             self.assertEqual(error, '', msg="Save unsuccessful - %s error: %s" % (field, error))
         self.assertPublicationMetadata( pub_id, fixture )
     
+    def approve_record(self, recid):
+        """ Approve a record to make it publicly available """
+        # Make MARCXML to approve record
+        rec = {}
+        record_add_field(rec, '001', controlfield_value=str(recid))
+        record_add_field(rec, '980', subfields=[('a', 'OPENAIRE')])
+        output = "<collection>%s</collection>" % record_xml_output(rec)
+        
+        # Upload MARCXML
+        run_sql("TRUNCATE schTASK") # Ensures we run bibupload
+        (hdl, marcxml_path) = mkstemp(suffix=".xml", text=True)
+        open(marcxml_path, 'w').write(output)
+        task_low_level_submission('bibupload', 'openaire', '-c', marcxml_path, '-P5')
+        os.system("%s/bin/bibupload 1" % CFG_PREFIX)
+    
     #
     # Assert methods
     #
@@ -209,6 +229,10 @@ class AjaxGatewayTest(unittest.TestCase):
             if field == 'projects':
                 continue
             real_val = metadata.get(field,None)
+            if field == 'related_publications':
+                # Remove "doi:" and filter out blank strings.
+                real_val = real_val.split("\n")
+                expected_val = filter( lambda x: x, map( lambda x: x[4:] if x.startswith("doi:") else x, expected_val.split("\n"))) 
             self.assertEqual(real_val, expected_val, "Field %s: expected %s but got %s" % (field, expected_val, real_val))
     
     # ================================
@@ -223,6 +247,7 @@ class AjaxGatewayTest(unittest.TestCase):
         
         self.client = TestClient(response_wrapper=JSONResponse)
         self.client.login(uname,'')
+        self.client_noauth = TestClient(response_wrapper=JSONResponse)
         self.pub = OpenAIREPublication(self.user_id)
         self.pub_id = self.pub.publicationid
         
@@ -368,9 +393,18 @@ class AjaxGatewayTest(unittest.TestCase):
             from invenio.config import CFG_PREFIX
             os.system("%s/bin/bibupload 1" % CFG_PREFIX)
             
-            # Check if record is reachable (admin logged in).
-            res = self.client.get("/record/%s" % rec_id)
+            # Approve record so it's publicly available.
+            self.approve_record( rec_id )
+            
+            # Check if record is reachable
+            res = self.client_noauth.get("/record/%s" % rec_id)
             self.assertEqual(res.status_code, 200)
+            
+            res = self.client_noauth.get("/record/%s/files/%s_%s_file.pdf" % (rec_id, type, style))
+            if fixture['access_rights'] in ["embargoAccess", "closedAccess"]:
+                self.assertEqual(res.status_code, 302) # Restricted access.
+            else:
+                self.assertEqual(res.status_code, 200)
         
         # Remove submission again
         self.clear_publications('0', style=style)
