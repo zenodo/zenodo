@@ -56,4 +56,13 @@ CREATE TABLE IF NOT EXISTS pgreplayqueue (
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
 
+CREATE TABLE IF NOT EXISTS dbmigrations (
+  id int(15) unsigned NOT NULL auto_increment,
+  module varchar(255) NOT NULL,
+  migration varchar(255) NOT NULL,
+  applied DATETIME NOT NULL,
+  PRIMARY KEY (id),
+  KEY (migration)
+) ENGINE=MyISAM;
+
 -- end of file
