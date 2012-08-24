@@ -212,7 +212,12 @@ class AjaxGatewayTest(unittest.TestCase):
         (hdl, marcxml_path) = mkstemp(suffix=".xml", text=True)
         open(marcxml_path, 'w').write(output)
         task_low_level_submission('bibupload', 'openaire', '-c', marcxml_path, '-P5')
-        os.system("%s/bin/bibupload 1" % CFG_PREFIX)
+        task_low_level_submission('bibindex', 'openaire')
+        task_low_level_submission('webcoll', 'openaire')
+        os.system("%s/bin/bibupload 1 > /dev/null" % CFG_PREFIX)
+        os.system("%s/bin/bibindex 2 > /dev/null" % CFG_PREFIX)
+        os.system("%s/bin/webcoll 3 > /dev/null" % CFG_PREFIX)
+        
     
     #
     # Assert methods
@@ -400,8 +405,8 @@ class AjaxGatewayTest(unittest.TestCase):
             res = self.client_noauth.get("/record/%s" % rec_id)
             self.assertEqual(res.status_code, 200)
             
-            res = self.client_noauth.get("/record/%s/files/%s_%s_file.pdf" % (rec_id, type, style))
-            if fixture['access_rights'] in ["embargoAccess", "closedAccess"]:
+            res = self.client_noauth.get("/record/%s/files/%s_%s_file.pdf" % (rec_id, type.lower(), style.lower()))
+            if fixture['access_rights'] in ["embargoedAccess", "closedAccess"]:
                 self.assertEqual(res.status_code, 302) # Restricted access.
             else:
                 self.assertEqual(res.status_code, 200)
