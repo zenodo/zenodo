@@ -6,3 +6,16 @@ tags
 .settings
 .pydevproject
 .project
+*.egg-info
+bibformat/dist
+bibsched/dist
+miscutil/dist
+openaire/dist
+websession/dist
+webstyle/dist
+bibformat/build
+bibsched/build
+miscutil/build
+openaire/build
+websession/build
+webstyle/build

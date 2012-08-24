@@ -18,7 +18,7 @@
 include ../config.mk
 -include ../config-local.mk
 
-LIBFILES = *.py
+LIBFILES = lib/*.py
 
 LIBDIR = $(PREFIX)/lib/python/invenio/
 

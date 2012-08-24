@@ -29,5 +29,9 @@ LIBDIR = $(PREFIX)/lib
 WEBDIR = $(PREFIX)/var/www
 
 INSTALL = install -g apache -m 775
+PIP_INSTALL = pip install -U --force-reinstall
+PIP_UNINSTALL = pip uninstall -y
+PIP_DEVELOP = pip install -e
+SDIST_ARGS = sdist
 
 PYTHON = /usr/bin/python

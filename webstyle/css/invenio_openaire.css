@@ -1082,6 +1082,10 @@ a.langinfo:hover {
    color: #603;
    background: transparent;
 }
+.error {
+   color: #f00;
+   background: transparent;
+}
 .light {
    color: #ccc;
    background: transparent;
@@ -3231,3 +3235,4 @@ div.subtitle {
 }
 
 /* end of invenio.css */
+

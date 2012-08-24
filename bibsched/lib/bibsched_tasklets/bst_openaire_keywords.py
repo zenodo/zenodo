@@ -29,7 +29,7 @@ from invenio.dbquery import run_sql
 def add_missing_keywords( uid, publicationid, missing_keywords ):
     if uid and publicationid and missing_keywords:
         for keyword in missing_keywords.keys():
-            # Write message: 
+            write_message("Inserting missing keyword '%s'" % keyword) 
             run_sql("INSERT INTO OpenAIREkeywords(uid, publicationid, keyword) VALUES (%s, %s, %s)", (uid, publicationid, keyword))
 
 
@@ -75,14 +75,13 @@ def bst_openaire_keywords():
                 current_keywords = dict([(x[0],1) for x in run_sql("SELECT value FROM bibrec_bib65x JOIN bib65x ON id=id_bibxxx WHERE id_bibrec=%s AND tag='6531_a' ORDER BY id_bibrec, field_number", (recid,))])
             else:
                 pub = OpenAIREPublication(uid, publicationid=pubid)
-                current_keywords = dict([(x,1) for x in normalize_keywords(pub._metadata.get('keywords')).splitlines()])
+                current_keywords = dict([(x,1) for x in normalize_keywords(pub._metadata.get('keywords','')).splitlines()])
         
         # Check if keyword is in the current list of keywords.
         if keyword not in current_keywords:
             # If not, remove it.
-            # Write message: print "DELETING %s FROM %s" % (keyword, pubid)
+            write_message("Removing keyword '%s'" % keyword)
             res = run_sql("DELETE FROM OpenAIREkeywords WHERE keyword=%s AND publicationid=%s", (keyword, pubid))
-            print res
         else:
             del current_keywords[keyword] # Remove from dictionary, so we know if all keywords
 

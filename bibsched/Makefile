@@ -18,7 +18,7 @@
 include ../config.mk
 -include ../config-local.mk
 
-BSTFILES = *.py
+BSTFILES = lib/bibsched_tasklets/bst_*.py
 
 BSTDIR = $(PREFIX)/lib/python/invenio/bibsched_tasklets/
 

@@ -1,5 +1,5 @@
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011 CERN.
+## Copyright (C) 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -28,30 +28,36 @@ if sys.hexversion < 0x2060000:
 else:
     import json
 
-from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.messages import gettext_set_language
-from invenio.webuser import collect_user_info, session_param_get, session_param_set
-from invenio.urlutils import redirect_to_url, make_canonical_urlargd
-from invenio.session import get_session
+from invenio.access_control_engine import acc_authorize_action
+from invenio.bibknowledge import get_kbr_keys
 from invenio.config import CFG_SITE_URL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
+from invenio.messages import gettext_set_language
 from invenio.openaire_deposit_engine import page, get_project_information, \
     OpenAIREPublication, wash_form, get_exisiting_projectids_for_uid, \
     get_all_projectsids, get_favourite_authorships_for_user, \
     get_all_publications_for_project, upload_file, get_openaire_style, \
     get_favourite_keywords_for_user, get_project_acronym
 from invenio.openaire_deposit_utils import simple_metadata2namespaced_metadata
-from invenio.access_control_engine import acc_authorize_action
-from invenio.bibknowledge import get_kbr_keys
+from invenio.session import get_session
 from invenio.urlutils import create_url
+from invenio.urlutils import redirect_to_url, make_canonical_urlargd
+from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
 from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_BAD_REQUEST, HTTP_UNAUTHORIZED
+from invenio.webuser import collect_user_info, session_param_get, session_param_set
 import invenio.template
 
 openaire_deposit_templates = invenio.template.load('openaire_deposit')
 
 class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
-    _exports = ['', 'uploadifybackend', 'sandbox', 'checkmetadata', 'ajaxgateway', 'checksinglefield', 'getfile', 'authorships', 'keywords', 'portalproxy']
+    _exports = [
+        '', 'uploadifybackend', 'sandbox', 'checkmetadata',
+        'ajaxgateway', 'checksinglefield', 'getfile',
+        'authorships', 'keywords', 'portalproxy'
+    ]
 
     def portalproxy(self, req, form):
+        """
+        """
         argd_query = wash_urlargd(form, {
             'option': (str, ''),
             'tmpl': (str, ''),
@@ -76,6 +82,21 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         return ""
 
     def index(self, req, form):
+        """
+        Main submission page installed on /deposit (hack in Invenio source) with the 
+        following features:
+        
+          * Two different themes/skins (for portal and for invenio)
+          * Upload new file to start a publication submission.
+          * Enter metadata for publication(s) related to a project
+          
+        URL parameters:
+         * style: Theme/skin to use - "invenio" or "portal"
+         * projectid: Work on publications for this project
+         * delete: Delete file and publication
+         * plus: ?
+         * upload: Upload new file (without Uploadify backend)
+        """
         argd = wash_urlargd(form, {
             'projectid': (int, -1),
             'delete': (str, ''),
@@ -87,6 +108,8 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             'upload': (str, '')})
 
         _ = gettext_set_language(argd['ln'])
+        
+        # Check if user is authorized to deposit publications 
         user_info = collect_user_info(req)
         auth_code, auth_message = acc_authorize_action(user_info, 'submit', doctype='OpenAIRE')
         if auth_code:
@@ -99,11 +122,13 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
                         req.unparsed_uri),
                     "ln" : argd['ln']}, {})))
             else:
-                return page(req=req, body=_("You are not authorized to use OpenAIRE deposition."), title=_("Authorization failure"))
+                return page(req=req, body=_("You are not authorized to use OpenAIRE deposition."), title=_("Authorization failure"), navmenuid="submit")
 
+        # Get parameters
         projectid = argd['projectid']
         plus = argd['plus']
         style = get_openaire_style(req)
+        
         if plus == -1:
             try:
                 plus = bool(session_param_get(req, 'plus'))
@@ -114,14 +139,17 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             plus = bool(plus)
             session_param_set(req, 'plus', plus)
 
+        # Check projectid
         all_project_ids = get_all_projectsids()
 
         if projectid not in all_project_ids:
             projectid = -1
 
         uid = user_info['uid']
+        
+        ## Perform file upload (if needed)
         if argd['upload']:
-            ## Perform the upload
+            
             if projectid < 0:
                 projectid = 0
             upload_file(form, uid, projectid)
@@ -175,9 +203,12 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
                 body += openaire_deposit_templates.tmpl_focus_on_project(existing_projects=projects, ln=argd['ln'])
 
         title = _('Orphan Repository')
-        return page(body=body, title=title, req=req, project_information=get_project_acronym(projectid))
+        return page(body=body, title=title, req=req, project_information=get_project_acronym(projectid), navmenuid="submit")
 
     def uploadifybackend(self, req, form):
+        """
+        File upload via Uploadify (flash) backend.
+        """
         argd = wash_urlargd(form, {'session': (str, ''), 'projectid': (int, -1)})
         _ = gettext_set_language(argd['ln'])
         session = argd['session']
@@ -193,6 +224,9 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         return "1"
 
     def getfile(self, req, form):
+        """
+        Download file for a submission which is currently in progress.
+        """
         argd = wash_urlargd(form, {'publicationid': (str, ''), 'fileid': (str, '')})
         uid = collect_user_info(req)['uid']
         publicationid = argd['publicationid']
@@ -202,6 +236,9 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         return fulltext.stream(req)
 
     def sandbox(self, req, form):
+        """
+        TOOD: Document
+        """
         body = """
 <div id="projects_%(publicationid)s">
 
@@ -210,6 +247,12 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         return page(title='sandbox', body=body, req=req)
 
     def authorships(self, req, form):
+        """
+        Return list of authors used for auto-completion 
+        in the authors field.
+        
+        Return response as JSON. 
+        """
         argd = wash_urlargd(form, {'publicationid': (str, ''), 'term': (str, '')})
         user_info = collect_user_info(req)
         uid = user_info['uid']
@@ -230,6 +273,12 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         return json.dumps([])
 
     def keywords(self, req, form):
+        """
+        Return list of keywords used for auto-completion 
+        in keywords field.
+        
+        Return response as JSON. 
+        """
         argd = wash_urlargd(form, {'publicationid': (str, ''), 'term': (str, '')})
         user_info = collect_user_info(req)
         uid = user_info['uid']
@@ -242,11 +291,19 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         return json.dumps([])
 
     def ajaxgateway(self, req, form):
+        """
+        """
         argd = wash_urlargd(form, {'projectid': (str, ''), 'publicationid': (str, ''), 'action': (str, ''), 'current_field': (str, '')})
+        
+        # Get parameters
         action = argd['action']
         publicationid = argd['publicationid']
         projectid = argd['projectid']
+        
+        # Check if action is supported
         assert(action in ('save', 'verify_field', 'submit', 'unlinkproject', 'linkproject'))
+        
+        # JSON return dictionary
         out = {
             'errors': {},
             'warnings': {},
@@ -256,7 +313,9 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             'appends': {},
             'hiddens': [],
             'showns': [],
+            'action' : action,
         }
+        
         if action == 'verify_field':
             current_field = argd['current_field']
             assert(current_field)

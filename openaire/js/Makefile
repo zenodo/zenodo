@@ -1,7 +1,9 @@
 include ../../config.mk
 -include ../../config-local.mk
 
-TPLFILES = *.tpl
+JSFILES = *.js
+
+JSDIR = $(PREFIX)/var/www/js/
 
 all:
 	@echo "Done."
@@ -10,8 +12,8 @@ test:
 	@echo "Nothing to test."
 
 install:
-	$(INSTALL) -d $(ETCDIR)
-	$(INSTALL) -m 664 $(TPLFILES) $(ETCDIR)
+	$(INSTALL) -d $(JSDIR)
+	$(INSTALL) -m 664 $(JSFILES) $(JSDIR)
 
 clean:
 	@rm -f *.orig *~

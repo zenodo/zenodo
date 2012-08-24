@@ -1,7 +1,7 @@
 include ../config.mk
 -include ../config-local.mk
 
-SUBDIRS = lib sql tpl
+SUBDIRS = lib sql tpl js
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)

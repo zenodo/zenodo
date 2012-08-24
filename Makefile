@@ -49,4 +49,3 @@ clean:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make clean && cd .. ;)
 	@rm -f *.orig *~
 	@echo "Done."
-

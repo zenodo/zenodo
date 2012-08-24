@@ -1,7 +1,7 @@
 include ../config.mk
 -include ../config-local.mk
 
-SUBDIRS = elements format_templates output_formats
+SUBDIRS = lib format_templates output_formats
 
 all:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make all && cd .. ;)
