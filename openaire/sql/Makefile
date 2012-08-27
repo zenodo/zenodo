@@ -8,7 +8,7 @@ test:
 	@echo "Nothing to test."
 
 install:
-	$(BINDIR)/dbexec < tabcreate.sql
+	@echo "Done."
 
 clean:
 	@rm -f *.orig *~

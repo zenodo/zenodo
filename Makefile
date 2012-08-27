@@ -45,6 +45,9 @@ install:
 	@echo "Done.  You may want to copy $(ETCDIR)/invenio-local.conf-example to $(ETCDIR)/invenio-local.conf, edit commented parts, run inveniocfg --update-all --reset-all and restart Apache now."
 	@echo "To install database changes, run 'make install-dbchanges'."
 
+install-tables:
+	$(BINDIR)/dbexec < openaire/sql/tabcreate.sql
+
 clean:
 	$(foreach SUBDIR, $(SUBDIRS), cd $(SUBDIR) && make clean && cd .. ;)
 	@rm -f *.orig *~
