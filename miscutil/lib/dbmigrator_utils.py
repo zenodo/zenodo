@@ -136,6 +136,12 @@ class Migrator(object):
                      graph_outgoing[edge] = []
                 graph_outgoing[edge].append(mod.id)
         
+        # Check for missing dependencies
+        for node_id, depends_on in graph_incoming.items():
+            for d in depends_on:
+                if d not in graph_incoming:
+                    raise Exception("Migration %s depends on an unknown migration %s" % (node_id, d))
+        
         # Nodes with no incoming edges
         start_nodes = filter(lambda x: len(graph_incoming[x]) == 0, graph_incoming.keys())
         topo_order = []
