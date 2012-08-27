@@ -387,7 +387,7 @@ class AjaxGatewayTest(unittest.TestCase):
         if submit:
             run_sql("TRUNCATE schTASK") # Ensures we run bibupload 
             res = self.client.post("/deposit/ajaxgateway", data=self.action_submit(data=fixture, override_pubid=pub_id, projectid=self.project_id))
-            self.assertIn("This is a preview of the submitted publication/data set. If approved, it will be available at ", res.json['appends']['#submitted_publications'])
+            self.assertIn("This is a preview of the submitted publication. If approved, it will be available at ", res.json['appends']['#submitted_publications'])
             
             # Get record id
             m = re.search("/record/(\d+)\"", res.json['appends']['#submitted_publications'] )

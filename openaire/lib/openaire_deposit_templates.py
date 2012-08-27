@@ -97,9 +97,9 @@ class Template:
             """ % {'select_project_title': select_project_title}
         if existing_projects:
             if selected_project:
-                select_project_description = escape(_("This is the list of other projects for which you have already deposited (or begun to deposit) at least one publication or data set. Click on any project to focus on its publications and data sets:"))
+                select_project_description = escape(_("This is the list of other projects for which you have already deposited (or begun to deposit) at least one publication. Click on any project to focus on its publications:"))
             else:
-                select_project_description = escape(_("This is the list of projects for which you have already deposited (or begun a deposit) at least one publication or data set. Click on any project to focus on its publications and data sets:"))
+                select_project_description = escape(_("This is the list of projects for which you have already deposited (or begun a deposit) at least one publication. Click on any project to focus on its publications:"))
             out += """<p>%(select_project_description)s<br />%(existing_projects)s.</p>""" % {
                 'select_project_description': select_project_description,
                 'existing_projects': ', '.join(existing_projects)
@@ -143,7 +143,7 @@ class Template:
             </div>
             """ % {
                 'focus_on_project_title': _("Focus on a project"),
-                'select_project_description': escape(_("This is the list of projects for which you have already deposited (or begun a deposit) at least one publication or data set. Click on any project to focus on its publications and data sets:")),
+                'select_project_description': escape(_("This is the list of projects for which you have already deposited (or begun a deposit) at least one publication. Click on any project to focus on its publications:")),
                 'existing_projects': ', '.join(existing_projects),
             }
         return out
@@ -185,7 +185,7 @@ class Template:
             <p>%(description)s</p>
             <div class="note">%(body)s</div>
             """ % {
-                'description': escape(_("This is a preview of the submitted publication/data set. If approved, it will be available at %(url)s.")) % {
+                'description': escape(_("This is a preview of the submitted publication. If approved, it will be available at %(url)s.")) % {
                     "url": """<a href="%(site)s/record/%(recid)s" alt="%(the_record)s">%(site)s/record/%(recid)s</a>""" % {
                         'site': escape(CFG_SITE_URL, True),
                         'recid': recid,
@@ -379,8 +379,8 @@ class Template:
                     'x_fmt_open': "<strong>",
                     'x_fmt_close': "</strong>",
                 },
-                'upload_publications': escape(_("Upload New Publications or Data Sets")),
-                'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications and/or data sets.")) % {
+                'upload_publications': escape(_("Upload New Publications")),
+                'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications.")) % {
                     'x_fmt_open': "<strong>",
                     'x_fmt_close': "</strong>",
                     'upload': escape(_("Upload")),
@@ -689,12 +689,12 @@ class Template:
         //]]> </script>
         """
         if projectid:
-            description = escape(_('These are the publications/data sets you are depositing for the project %s')) % (project_information)
+            description = escape(_('These are the publications you are depositing for the project %s')) % (project_information)
         else:
-            description = escape(_('These are the publications/data sets you are depositing for which you have not yet associated any project.'))
+            description = escape(_('These are the publications you are depositing for which you have not yet associated any project.'))
         data = {
-            'submitted_publications_title': escape(_("Successfully submitted publications/data sets")),
-            'title': escape(_('Your Current Publications/Data Sets')),
+            'submitted_publications_title': escape(_("Successfully submitted publications")),
+            'title': escape(_('Your Current Publications')),
             'selected_project_title': escape(_("Selected Project")),
             'projectid': projectid,
             'change_project_label': escape(_('change project'), True),
