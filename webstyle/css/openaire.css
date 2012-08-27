@@ -1,0 +1,132 @@
+img {
+    border-style: none;
+}
+
+div.OpenAIRE div.metadata {
+    height: 100%;
+    float: left;
+    border-style : none none none solid;
+    border-width : medium medium medium 2em;
+    border-left-color : #FFC0C0;
+    padding-left : 2em;
+  }
+
+div.OpenAIRE fieldset {
+    margin: 2px;
+}
+
+div.OpenAIRE div.header div {
+    float: left;
+  }
+
+
+div.OpenAIRE div.file {
+    word-wrap: break-word;
+  }
+
+
+div.clear {
+    float: none;
+    clear: both;
+  }
+
+
+.mandatory:after {
+    content: url("/img/asterisk.png");
+  }
+
+
+div.OpenAIRE div.error {
+    background : #FFC0C0 url('/img/iconcross.gif') no-repeat center left;
+    font : inherit bolder medium sans-serif;
+    padding : 4px 4px 4px 20px;
+    border : #ff0000;
+    -moz-border-radius : 4px;
+    border-radius : 4px;
+  }
+
+
+div.OpenAIRE div.warning {
+    background : #FFFFC0 url('/img/warning.png') no-repeat center left;
+    font : bolder inherit sans-serif;
+    padding : 4px 4px 4px 20px;
+    border : #ffff00;
+    border-radius : 4px;
+  }
+
+div.OpenAIRE tr td.error {
+    background : #FFC0C0 url('/img/iconcross.gif') no-repeat center center;
+    font : inherit bolder medium sans-serif;
+    padding : 4px 4px 4px 20px;
+    border : #ff0000;
+    -moz-border-radius : 4px;
+    border-radius : 4px;
+  }
+
+
+div.OpenAIRE tr td.warning {
+  background : #FFFFC0 url('/img/warning.png') no-repeat center center;
+  font : bolder inherit sans-serif;
+  padding : 4px 4px 4px 20px;
+  border : #ffff00;
+  border-radius : 4px;
+  }
+
+
+div.OpenAIRE tr td.empty{
+    background : #FFFFC0 url('/img/wb-notes.png') no-repeat center center;
+    font : bolder inherit sans-serif;
+    padding : 4px 4px 4px 20px;
+    border : #ffff00;
+    border-radius : 4px;
+  }
+
+div.OpenAIRE tr td.ok {
+  background : #C0FFC0 url('/img/okay.gif') no-repeat center center;
+  font : bolder inherit sans-serif;
+  padding : 4px 4px 4px 20px;
+  border : #ffff00;
+  border-radius : 4px;
+  }
+
+
+div.OpenAIRE label {
+    font-style: italic;
+    font-weight: bolder;
+  }
+
+
+div.OpenAIRE .ok {
+    background : #C0FFC0;
+    font : bolder inherit sans-serif;
+    padding : 4px;
+    border : #00c000;
+    -moz-border-radius : 4px;
+    border-radius : 4px;
+  }
+
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+
+span.tooltip {
+    border-bottom: 1px dotted;
+    cursor: pointer;
+  }
+
+
+.publication_information, .selectedproject, div.file {
+    display: inline;
+    border-bottom: 1px dotted;
+    cursor: pointer;
+  }
+
+
+select:focus, input[type="text"]:focus, textarea:focus {
+    background: #FFFF99;
+    border: #FFFF99 dotted;
+  }
+

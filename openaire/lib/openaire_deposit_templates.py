@@ -57,8 +57,9 @@ class Template:
                 var gSite = "%(site)s";
                 var gLn = "%(ln)s";
             // ]]></script>
-            <link type="text/css" href="%(site)s/css/jquery-ui-1.8.14.custom.css" rel="Stylesheet" />
-            <link type="text/css" href="%(site)s/css/uploadify.css" rel="Stylesheet" />
+            <link type="text/css" href="%(site)s/css/jquery-ui-1.8.14.custom.css" rel="stylesheet" />
+            <link type="text/css" href="%(site)s/css/uploadify.css" rel="stylesheet" />
+            <link type="text/css" href="%(site)s/css/openaire.css" rel="stylesheet" />
             <script type="text/javascript" src="%(site)s/js/jquery-1.5.2.min.js"></script>
             <script type="text/javascript" src="%(site)s/js/jquery-ui-1.8.14.custom.min.js"></script>
             <script type="text/javascript" src="%(site)s/js/jquery.uploadify.v2.1.4.min.js"></script>
@@ -198,7 +199,6 @@ class Template:
 
     def tmpl_form(self, publicationid, projectid, projects_information, publication_information, fulltext_information, form=None, metadata_status='empty', warnings=None, errors=None, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
-        mandatory_mark = {"x_asterisk": """<img src="%s/img/asterisk.png" alt="mandatory" />""" % CFG_SITE_URL}
         values = dict(CFG_OPENAIRE_FORM_TEMPLATE_PLACEMARKS)
         values['id'] = publicationid
         if form:
@@ -209,17 +209,17 @@ class Template:
         values['fulltext_information'] = fulltext_information
         values['projects_information'] = projects_information
         values['site'] = CFG_SITE_URL
-        values['mandatory_label'] = escape(_("The symbol %(x_asterisk)s means the field is mandatory.")) % mandatory_mark
-        values['language_label'] = escape(_("Document language %(x_asterisk)s")) % mandatory_mark
+        values['mandatory_label'] = escape(_("The symbol %(x_asterisk)s means the field is mandatory.")) % {"x_asterisk": """<img src="%s/img/asterisk.png" alt="mandatory" />""" % CFG_SITE_URL}
+        values['language_label'] = escape(_("Document language"))
         values['language_tooltip'] = escape(_("<p>Choose the language that was used to write your document.</p><p>Note that if your document was written in a language different than English you will be able to optionally enter the title and the abstract in their original language.</p>"))
-        values['title_label'] = escape(_("English title %(x_asterisk)s")) % mandatory_mark
+        values['title_label'] = escape(_("English title"))
         values['title_tooltip'] = escape(_("The full title of yor publication in English"))
         values['original_title_label'] = escape(_("Original language title"))
         values['original_title_tooltip'] = escape(_("The full title of your publication in its original language"))
-        values['authors_label'] = escape(_("Author(s) %(x_asterisk)s")) % mandatory_mark
+        values['authors_label'] = escape(_("Author(s)")) 
         values['authors_tooltip'] = escape(_("<p>Please enter one author per line in the form: <pre>Surname, First Names: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
         values['authors_hint'] = escape(_("Doe, John: Example institution"))
-        values['abstract_label'] = escape(_("English abstract %(x_asterisk)s")) % mandatory_mark 
+        values['abstract_label'] = escape(_("English abstract")) 
         values['abstract_tooltip'] = escape(_("<p>This is the abstract (i.e. the summary) of your publication, in English.</p><p>Note that, in case of a scientific publication, you can use LaTeX formulas, such as <pre>$\\frac{x^2}{y^3}$</pre> that will be correctly rendered when viewed with a typical browser.</p>"))
         values['english_language_label'] = escape(_("English information"))
         values['original_language_label'] = escape(_("Original language information"))
@@ -230,7 +230,7 @@ class Template:
         values['journal_title_label'] = escape(_("Journal title"))
         values["doi_tooltip"] = escape(_("""<p>The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of your publication, as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
         values["doi_label"] = escape(_("DOI"))
-        values['publication_date_label'] = escape(_("Publication date %(x_asterisk)s")) % mandatory_mark
+        values['publication_date_label'] = escape(_("Publication date"))
         values['publication_date_tooltip'] = escape(_("This is the official publication date of your document. It's format is <pre>YYYY/MM/DD</pre> such as in <pre>2010/12/25</pre>"""))
         values['volume_label'] = escape(_("Volume"))
         values['volume_tooltip'] = escape(_("The volume part of the publication information, which is typically a number."))
@@ -255,7 +255,7 @@ class Template:
         values['embargo_date_size'] = len(values['embargo_date_hint'])
         values['publication_information'] = publication_information
         values['projects_information_label'] = escape(_("Projects information"))
-        values['projects_description'] = escape(_("List of projects linked with this publication %(x_asterisk)s")) % mandatory_mark
+        values['projects_description'] = escape(_("List of projects linked with this publication"))
         values['projects_tooltip'] = escape(_("""<p>This is the list of projects that are associated with this publications.</p><p>Click on the small %(trash_icon)s in order to unlink the corresponding project.</p><p>Start typing a <em>project acronym</em>, a <em>project title</em> or a <em>grant agreement number</em>, choose a project from the menu that will appear and click on the small %(plus_icon)s in order to link a new project to your publication.</p>""") % {
             'trash_icon': """<img src="%s/img/smallbin.gif" alt="Unlink project" />""" % CFG_SITE_URL,
             'plus_icon': """<img src="%s/img/add.png" alt="link project" />""" % CFG_SITE_URL
@@ -272,14 +272,14 @@ class Template:
         values['accept_cc0_license_tooltip'] = ""
         
         values['publication_type'] = escape(_("""Document information"""), True)
-        values['publication_type_label'] = escape(_("""Type of publication/data %(x_asterisk)s"""), True) % mandatory_mark
+        values['publication_type_label'] = escape(_("""Type of publication/data"""), True)
         values['publication_type_tooltip'] = escape(_("""This is the type of publication you are depositing. Different publications have different types of publications have different fields to complete."""), True)
         values['publication_type_options'] = self.tmpl_publication_type_options(values.get('publication_type_value',None), ln)
         
         values['report_pages_no_label'] = escape(_("""Number of pages"""), True)
         values['report_pages_no_tooltip'] = escape(_("""This is the number of pages in report"""), True)
         
-        values['related_publications_label'] = escape(_("""DOIs for associated publications (one per lone) %(x_asterisk)s"""), True) % mandatory_mark
+        values['related_publications_label'] = escape(_("""DOIs for associated publications (one per line)"""), True)
         values['related_publications_tooltip'] = escape(_("""The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of associated publications as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
         
         if warnings:
