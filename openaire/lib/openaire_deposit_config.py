@@ -109,6 +109,6 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
     _ = gettext_set_language(ln)
     return {
         'publishedArticle': _("Published article"),
-        'data': _("Data set"),
-        'report': _("Report"),
+        #'data': _("Data set"),
+        #'report': _("Report"),
     }

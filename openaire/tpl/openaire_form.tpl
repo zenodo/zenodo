@@ -31,7 +31,7 @@
     <td colspan="3" valign="top">
         <div id="body_%(id)s" class="body">
             <p><em>%(mandatory_label)s</em></p>
-            <fieldset>
+            <fieldset style="display: None;">
                 <legend>%(publication_type)s</legend>
                 <div>
 	                <img title="%(publication_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
