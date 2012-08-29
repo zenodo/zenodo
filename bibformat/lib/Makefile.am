@@ -1,5 +1,6 @@
+##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,23 +16,12 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-include ../../config.mk
--include ../../config-local.mk
+pylibdir = $(libdir)/python/invenio
 
-FLASHFILES = *.swf
+pylib_DATA = *.py
 
-FLASHDIR = $(WEBDIR)/flash/
+SUBDIRS = bibformat_elements
 
-all:
-	@echo "Done."
+EXTRA_DIST = $(pylib_DATA)
 
-test:
-	@echo "Nothing to test."
-
-install:
-	$(INSTALL) -d $(FLASHDIR)
-	$(INSTALL) -m 664 $(FLASHFILES) $(FLASHDIR)
-
-clean:
-	@rm -f *.orig *~
-	@echo "Done."
+CLEANFILES = *~ *.pyc *.tmp

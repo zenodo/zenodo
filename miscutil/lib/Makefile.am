@@ -1,5 +1,6 @@
+##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,23 +16,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-include ../config.mk
--include ../config-local.mk
+pylibdir = $(libdir)/python/invenio
 
-BSTFILES = lib/bibsched_tasklets/bst_*.py
+pylib_DATA = *.py
 
-BSTDIR = $(PREFIX)/lib/python/invenio/bibsched_tasklets/
+EXTRA_DIST = $(pylib_DATA)
 
-all:
-	@echo "Done."
-
-test:
-	@echo "Nothing to test."
-
-install:
-	$(INSTALL) -d $(BSTDIR)
-	$(INSTALL) -m 664 $(BSTFILES) $(BSTDIR)
-
-clean:
-	@rm -f *.orig *~
-	@echo "Done."
+CLEANFILES = *~ *.pyc *.tmp

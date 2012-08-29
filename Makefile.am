@@ -14,24 +14,17 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+#
 
-include ../../config.mk
--include ../../config-local.mk
+confignicedir = $(sysconfdir)/build
+confignice_SCRIPTS=config.nice
 
-LIBFILES = bibformat_elements/*.py
+SUBDIRS = bibformat bibsched miscutil openaire websession webstyle
 
-LIBDIR = $(PREFIX)/lib/python/invenio/bibformat_elements/
+EXTRA_DIST = config.nice.in config.rpath
 
-all:
-	@echo "Done."
+install-tables:
+	${prefix}/bin/dbexec < $(top_srcdir)/openaire/sql/tabcreate.sql 
 
-test:
-	@echo "Nothing to test."
-
-install:
-	$(INSTALL) -d $(LIBDIR)
-	$(INSTALL) -m 664 $(LIBFILES) $(LIBDIR)
-
-clean:
-	@rm -f *.orig *~
-	@echo "Done."
+CLEANFILES = *~ *.pyc *.tmp

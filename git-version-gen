@@ -1,5 +1,7 @@
+#!/bin/sh
+##
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,23 +17,26 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-include ../../config.mk
--include ../../config-local.mk
+v=`git describe --always --abbrev=4 HEAD 2>/dev/null`
+nl='
+'
 
-BFOFILES = *.bfo
+if test -n "$v"
+then
+    : # use $v
+else
+    v=UNKNOWN
+fi
 
-BFODIR = $(PREFIX)/etc/bibformat/output_formats/
+git update-index --refresh > /dev/null 2>&1
+dirty=`sh -c 'git diff-index --name-only HEAD' 2>/dev/null` || dirty=
+case "$dirty" in
+    '') ;;
+    *) # Append the suffix only if there isn't one already.
+	case $v in
+	  *-dirty) ;;
+	  *) v="$v-dirty" ;;
+	esac ;;
+esac
 
-all:
-	@echo "Done."
-
-test:
-	@echo "Nothing to test."
-
-install:
-	$(INSTALL) -d $(BFODIR)
-	$(INSTALL) -m 664 $(BFOFILES) $(BFODIR)
-
-clean:
-	@rm -f *.orig *~
-	@echo "Done."
+echo "$v" | tr -d "$nl"

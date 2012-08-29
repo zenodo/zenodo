@@ -1,0 +1,11 @@
+OpenAIRE NEWS
+=============
+
+Please refer to our source code repository in order to see detailed
+ChangeLog.
+
+git clone http://invenio-software.org/repo/openaire
+git checkout maint
+git log
+
+- end of file -
