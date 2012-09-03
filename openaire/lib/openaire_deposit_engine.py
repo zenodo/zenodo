@@ -59,8 +59,7 @@ from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_WEBSUBMIT_STORAGEDIR, \
-    CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL, \
-    CFG_OPENAIRE_CURATORS
+    CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.jsonutils import json_unicode_to_utf8
@@ -70,7 +69,8 @@ from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
 from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, \
     CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, \
     CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, \
-    CFG_METADATA_STATES, CFG_PUBLICATION_STATES, CFG_OPENAIRE_PUBLICATION_TYPES
+    CFG_METADATA_STATES, CFG_PUBLICATION_STATES, CFG_OPENAIRE_PUBLICATION_TYPES, \
+    CFG_OPENAIRE_CURATORS
 from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
@@ -560,7 +560,7 @@ class OpenAIREPublication(object):
         send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a Publication into OpenAIRE"), content=content)
         bibedit_url = CFG_SITE_URL + "/record/edit/#state=edit&recid=%s" % self.recid
         content = openaire_deposit_templates.tmpl_curators_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, bibedit_url=bibedit_url)
-        send_email(CFG_SITE_ADMIN_EMAIL, CFG_OPENAIRE_CURATORS, "Publication in OpenAIRE needs your approval", content=content)
+        send_email(CFG_SITE_ADMIN_EMAIL, ", ".join(CFG_OPENAIRE_CURATORS), "Publication in OpenAIRE needs your approval", content=content)
 
     def get_projects_information(self, global_projectid=None):
         """
