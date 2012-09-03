@@ -1,5 +1,5 @@
 <tr class="header odd" id="header_row_%(id)s">
-    <td width="5%%" id="status_%(id)s" rowspan="2" class="%(status)s"></td>
+    <td width="5%%" id="status_%(id)s" rowspan="2" class="%(status)s"><span id="status_msg_%(id)s" class="status_msg">%(collapse_label)s</span></td>
     <td width="40%%" valign="top">
         %(publication_information)s
         <br />
@@ -268,6 +268,11 @@
         });
         jQuery('#edit_metadata_%(id)s,#status_%(id)s').click(function(){
             jQuery('#body_%(id)s').toggle();
+            if(jQuery('#status_msg_%(id)s').html() == "%(collapse_label)s") {
+                jQuery('#status_msg_%(id)s').html("%(expand_label)s")
+            } else {
+                jQuery('#status_msg_%(id)s').html("%(collapse_label)s")
+            }
             return false;
         });
         jQuery('#journal_title_%(id)s').autocomplete({

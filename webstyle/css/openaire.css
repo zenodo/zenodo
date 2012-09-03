@@ -79,6 +79,8 @@ div.OpenAIRE tr td.empty{
     padding : 4px 4px 4px 20px;
     border : #ffff00;
     border-radius : 4px;
+    vertical-align: bottom; 
+    cursor: pointer;
   }
 
 div.OpenAIRE tr td.ok {
@@ -130,3 +132,6 @@ select:focus, input[type="text"]:focus, textarea:focus {
     border: #FFFF99 dotted;
   }
 
+.status_msg {
+    font-size: 11px;
+}

@@ -209,6 +209,8 @@ class Template:
         values['fulltext_information'] = fulltext_information
         values['projects_information'] = projects_information
         values['site'] = CFG_SITE_URL
+        values['collapse_label'] = escape(_("click to collapse"))
+        values['expand_label'] = escape(_("click to expand"))
         values['mandatory_label'] = escape(_("The symbol %(x_asterisk)s means the field is mandatory.")) % {"x_asterisk": """<img src="%s/img/asterisk.png" alt="mandatory" />""" % CFG_SITE_URL}
         values['language_label'] = escape(_("Document language"))
         values['language_tooltip'] = escape(_("<p>Choose the language that was used to write your document.</p><p>Note that if your document was written in a language different than English you will be able to optionally enter the title and the abstract in their original language.</p>"))
