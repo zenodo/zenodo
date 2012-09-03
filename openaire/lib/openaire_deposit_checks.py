@@ -99,9 +99,9 @@ def _check_authors(metadata, ln, _):
         if row:
             if not _RE_AUTHOR_ROW.match(row):
                 if not ',' in row:
-                    errors.append(_("""<strong>"%(row)s"</strong? is not a well formatted authorship (correct format is <em>"Last Names, First Names"</em> or <em>"Last Names, First Names: Affiliation"<em> but a <em>","</em> separating <em>"Last Names"</em> and <em>"First Names"</em> does not seem to exist).""" % {"row": escape(row.encode('UTF8'))}))
+                    errors.append(_("""<strong>"%(row)s"</strong> is missing a comma separating last name and first name. The format is <em>"Last name, First name: Institution (optional)"</em>.""" % {"row": escape(row.encode('UTF8'))}))
                 else:
-                    errors.append(_("""<strong>"%(row)s"</strong> is not a well formatted authorship (correct format is <em>"Last Names, First Names"</em> or <em>"Last Names, First Names: Affiliation"</em>).""" % {"row": escape(row.encode('UTF8'))}))
+                    errors.append(_("""<strong>"%(row)s"</strong> is not a well-formatted authorship. The format is <em>"Last name, First name: Institution (optional)"</em>.""" % {"row": escape(row.encode('UTF8'))}))
             if not ':' in row:
                 warnings.append(_("""You have not specified an affiliation for <strong>"%(row)s"</strong> but an affiliation is recommended.""" % {"row": escape(row.encode('UTF8'))}))
                 if row.islower():

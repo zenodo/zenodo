@@ -217,7 +217,7 @@ class Template:
         values['original_title_label'] = escape(_("Original language title"))
         values['original_title_tooltip'] = escape(_("The full title of your publication in its original language"))
         values['authors_label'] = escape(_("Author(s)")) 
-        values['authors_tooltip'] = escape(_("<p>Please enter one author per line in the form: <pre>Surname, First Names: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
+        values['authors_tooltip'] = escape(_("<p>Please enter one author per line in the form: <pre>Last name, First Name: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
         values['authors_hint'] = escape(_("Doe, John: Example institution"))
         values['abstract_label'] = escape(_("English abstract")) 
         values['abstract_tooltip'] = escape(_("<p>This is the abstract (i.e. the summary) of your publication, in English.</p><p>Note that, in case of a scientific publication, you can use LaTeX formulas, such as <pre>$\\frac{x^2}{y^3}$</pre> that will be correctly rendered when viewed with a typical browser.</p>"))
