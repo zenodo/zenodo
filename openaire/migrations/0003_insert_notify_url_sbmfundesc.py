@@ -17,12 +17,13 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.dbmigrator_utils import DbMigration, run_sql_ignore, run_tabcreate
+from invenio.inveniocfg_migrate import InvenioMigration, run_sql_ignore
 from invenio.dbquery import run_sql
 
-class Migration( DbMigration ):
+class Migration( InvenioMigration ):
     """ New Notify_URL function in sbmALLFUNCDESCR and sbmFUNDESC """
-    depends_on = ['baseline','0002_add_aiduserinputlog_userid']
+    depends_on = ['baseline',]
+    repository = 'invenio_oa'
     
     def forward(self):
         run_sql("INSERT INTO sbmALLFUNCDESCR VALUES ('Notify_URL','Access URL, possibly to post content')")

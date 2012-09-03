@@ -98,13 +98,13 @@ AC_CONFIG_FILES([config.nice  \
      miscutil/bin/Makefile \
      miscutil/Makefile \
      miscutil/lib/Makefile \
-     miscutil/bin/dbmigrator \
+     miscutil/bin/inveniomigrate \
      openaire/js/Makefile \
      openaire/sql/Makefile \
      openaire/Makefile \
      openaire/lib/Makefile \
-     openaire/lib/migrations/Makefile \
-     openaire/tpl/Makefile
+     openaire/tpl/Makefile \
+     openaire/migrations/Makefile \
      websession/Makefile \
      websession/lib/Makefile \
      webstyle/js/Makefile \

@@ -21,9 +21,10 @@ from invenio.dbmigrator_utils import DbMigration, run_sql_ignore, run_tabcreate
 from invenio.dbquery import run_sql
 
 class Migration( DbMigration ):
-    """ Adding field userid to aidUSERINPUTLOG """
-    depends_on = ['baseline','0001_add_session_expiry_index']
+    """ Baseline for OpenAIRE """
+    repository = 'openaire'
+    depends_on = []
     
     def forward(self):
-        run_sql("ALTER TABLE aidUSERINPUTLOG ADD COLUMN userid int AFTER timestamp")
-        run_sql("ALTER TABLE aidUSERINPUTLOG ADD KEY `userid-b` (userid)")
+        """ Do nothing (just record baseline) """
+        pass

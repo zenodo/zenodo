@@ -17,14 +17,33 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.dbmigrator_utils import DbMigration, run_sql_ignore, run_tabcreate
+from invenio.inveniocfg_migrate import InvenioMigration, run_sql_ignore
 from invenio.dbquery import run_sql
 
-class Migration( DbMigration ):
-    """ Baseline for Invenio """
-    
-    depends_on = []
-    
+class Migration( InvenioMigration ):
+    """ Create table bibdocfsinfo """
+    depends_on = ['baseline',]
+    repository = 'invenio_oa'
+
     def forward(self):
-        """ Do nothing (just record baseline) """
-        pass
+        run_sql("""
+CREATE TABLE IF NOT EXISTS bibdocfsinfo (
+  id_bibdoc mediumint(9) unsigned NOT NULL,
+  version tinyint(4) unsigned NOT NULL,
+  format varchar(50) NOT NULL,
+  last_version boolean NOT NULL,
+  cd datetime NOT NULL,
+  md datetime NOT NULL,
+  checksum char(32) NOT NULL,
+  filesize bigint(15) unsigned NOT NULL,
+  mime varchar(100) NOT NULL,
+  master_format varchar(50) NULL default NULL,
+  PRIMARY KEY (id_bibdoc, version, format),
+  KEY (last_version),
+  KEY (format),
+  KEY (cd),
+  KEY (md),
+  KEY (filesize),
+  KEY (mime)
+) ENGINE=MyISAM""")
+

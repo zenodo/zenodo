@@ -30,4 +30,6 @@ config.sub
 config.status
 config.guess
 config.nice
+config.log
 dbmigrator
+inveniomigrate
