@@ -1,7 +1,7 @@
-#!@PYTHON@
+# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2010, 2011 CERN.
+## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,15 +17,23 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-Database migration CLI tool.
-"""
+from invenio.inveniocfg_migrate import InvenioMigration, run_sql_ignore
+from invenio.dbquery import run_sql
 
-try:
-    from invenio.dbmigrator import main
-except ImportError, e:
-    print "Error: %s" % e
-    import sys
-    sys.exit(1)
-
-main()
+class Migration( InvenioMigration ):
+    """ Create table webapikey """
+    depends_on = ['baseline',]
+    repository = 'invenio_oa'
+    
+    def forward(self):
+        run_sql("""
+CREATE TABLE IF NOT EXISTS webapikey (
+  id varchar(150) NOT NULL,
+  secret varchar(150) NOT NULL,
+  id_user int(15) NOT NULL,
+  status varchar(25) NOT NULL default 'OK',
+  description varchar(255) default NULL,
+  PRIMARY KEY (id),
+  KEY (id_user),
+  KEY (status)
+) ENGINE=MyISAM;""")

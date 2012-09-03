@@ -17,12 +17,21 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.dbmigrator_utils import DbMigration, run_sql_ignore, run_tabcreate
+from invenio.inveniocfg_migrate import InvenioMigration, run_sql_ignore
 from invenio.dbquery import run_sql
 
-class Migration( DbMigration ):
-    """ Add session_expiry index to session table """
-    depends_on = ['baseline']
+class Migration( InvenioMigration ):
+    """ Create table wapCACHE """
+    
+    depends_on = ['baseline',]
+    repository = 'invenio_oa'
     
     def forward(self):
-        run_sql("ALTER TABLE session ADD KEY session_expiry (session_expiry)")
+        run_sql("""
+CREATE TABLE IF NOT EXISTS userEXT (
+  id varbinary(255) NOT NULL,
+  method varchar(50) NOT NULL,
+  id_user int(15) unsigned NOT NULL,
+  PRIMARY KEY (id, method),
+  UNIQUE KEY (id_user, method)
+) ENGINE=MyISAM;""")

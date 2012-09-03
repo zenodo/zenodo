@@ -35,7 +35,6 @@ CREATE TABLE IF NOT EXISTS OpenAIREkeywords (
   KEY (keyword)
 ) ENGINE=MyISAM;
 
-
 CREATE TABLE IF NOT EXISTS eupublication (
   publicationid varchar(255) NOT NULL,
   projectid int(15) NOT NULL,
@@ -56,13 +55,15 @@ CREATE TABLE IF NOT EXISTS pgreplayqueue (
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS dbmigrations (
+CREATE TABLE IF NOT EXISTS migrations (
   id int(15) unsigned NOT NULL auto_increment,
-  module varchar(255) NOT NULL,
+  repository varchar(255) NOT NULL,
   migration varchar(255) NOT NULL,
   applied DATETIME NOT NULL,
   PRIMARY KEY (id),
-  KEY (migration)
+  UNIQUE KEY (migration)
 ) ENGINE=MyISAM;
+
+INSERT INTO migrations (repository, migration, applied) VALUES ('openaire','oa_baseline',NOW());
 
 -- end of file

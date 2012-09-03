@@ -18,12 +18,12 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """
-Database migration command-line tool
+Invenio migration command-line tool
 
-python dbmigrator.py --create-migration=~/src/openaire/openaire/migrations/
-python dbmigrator.py --migration-history
-python dbmigrator.py --migrate-show
-python dbmigrator.py --migrate
+  inveniomigrate --migrate-create=~/src/invenio/modules/miscutil/migrations/
+  inveniomigrate --migrate-history
+  inveniomigrate --migrate-show
+  inveniomigrate --migrate
 
 Recommendations for writing migrations:
 
@@ -45,153 +45,116 @@ import sys
 
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 
-MIGRATION_TEMPLATE = """# -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-
-from invenio.dbmigrator_utils import DbMigration, run_sql_ignore, run_tabcreate
-from invenio.dbquery import run_sql
-
-class Migration( DbMigration ):
-    \"\"\" Short description of migration \"\"\"
-    
-    module = ''
-    \"\"\" Module name (leave empty if Invenio) \"\"\"
-    
-    depends_on = ['baseline']
-    \"\"\" Every migration must depend on at least one previous migration \"\"\"
-    
-    def forward(self):
-        \"\"\" Put your run_sql queries here \"\"\"
-        pass
-"""
-
-
-def migration_id():
-    """ Generate a new migration id. """
-    return ''.join(random.choice(string.ascii_lowercase + string.digits) for x in range(6))
-
-
-def cli_cmd_migrate():
-    """ Command for running applying migrations """
+def cli_cmd_migrate(conf):
+    """ Command for applying migrations """
     try:
-        from invenio.dbmigrator_utils import InvenioMigrator
-                
+        from invenio.inveniocfg_migrate import InvenioMigrator
+
         migrator = InvenioMigrator()
         migrations = migrator.get_migrations()
-        
+
         if not migrations:
             print ">>> All migrations have been applied."
-            sys.exit(0)
-        
+            return
+
         print ">>> Following migrations will be applied:"
-        
+
         for m in migrations:
             print ">>> * %s%s" % (m.id, m.get_doc())
-        
-        wait_for_user(wrap_text_in_a_box("""WARNING: You are going to migrate your database!"""))
-        
+
+        wait_for_user(wrap_text_in_a_box(
+            """WARNING: You are going to migrate your installation!"""))
+
         for m in migrations:
             print ">>> Applying %s%s" % (m.id, m.get_doc())
             try:
                 migrator.apply(m)
             except Exception, e:
-                ">>> Migration of %s failed. Your database is in an inconsistent state. Please manually review the migration and resolve inconsistencies." % m.id
+                ">>> Migration of %s failed. Your installation is in an"
+                " inconsistent state. Please manually review the migration "
+                "and resolve inconsistencies." % m.id
                 print e.message
                 sys.exit(1)
-        
+
         print ">>> Migration completed successfully."
     except Exception, e:
         print e.message
         sys.exit(1)
 
-
-def cli_cmd_migrate_show():
+def cli_cmd_migrate_show(conf):
     """ Command for showing migrations ready to be applied """
     try:
-        from invenio.dbmigrator_utils import InvenioMigrator
-                
+        from invenio.inveniocfg_migrate import InvenioMigrator
+
         migrator = InvenioMigrator()
         migrations = migrator.get_migrations()
-        
+
         if not migrations:
             print ">>> All migrations have been applied."
-            sys.exit(0)
-        
+            return
+
         print ">>> Following migrations are ready to be applied:"
-        
+
         for m in migrations:
             print ">>> * %s%s" % (m.id, m.get_doc())
     except Exception, e:
-        print e.message
+        print e
         sys.exit(1)
 
-
-def cli_cmd_migration_history():
+def cli_cmd_migrate_history(conf):
     """ Command for showing all migrations already applied. """
     try:
-        from invenio.dbmigrator_utils import InvenioMigrator
-                
+        from invenio.inveniocfg_migrate import InvenioMigrator
+
         migrator = InvenioMigrator()
         migrations = migrator.get_history()
-        
+
         if not migrations:
             print ">>> No migrations have been applied."
-            sys.exit(0)
-        
+            return
+
         print ">>> Following migrations have been applied:"
-        
+
         for m_id, applied in migrations:
             print ">>> * %s (%s)" % (m_id, applied)
     except Exception, e:
-        print e.message
+        print e
         sys.exit(1)
 
-
-def cli_cmd_create_migration(path):
+def cli_cmd_migrate_create(conf, path):
     """
-    Create a new migration with a unique id (for developers).
+    Create a new migration (for developers).
     """
     try:
+        from invenio.inveniocfg_migrate import MIGRATION_TEMPLATE
+
+        if not path:
+            srcdir = os.getenv('CFG_INVENIO_SRCDIR', None)
+            if srcdir:
+                path = os.path.join(srcdir, 'modules/miscutil/migrations/')
         path = os.path.expandvars(os.path.expanduser(path))
-        
+
         if not os.path.exists(path):
             raise Exception("Path does not exists: %s" % path)
         if not os.path.isdir(path):
             raise Exception("Path is not a directory: %s" % path)
-        
-        i = 0
-        while True:
-            migration_file = os.path.join(path, "%s_migration.py" % migration_id())
-            if not os.path.exists( migration_file ):
-                break
-            elif i > 100:
-                raise Exception("Could not generate unique migration id.")
-            i += 1
-        
-        # `Write migration template
-        f = open(migration_file,'w')
+
+        # Generate migration filename
+        migration_file = os.path.join(path,
+            "m%s_rename_me.py" % date.today().strftime("%Y%m%d"))
+
+        if os.path.exists(migration_file):
+            raise Exception("Could not generate migration - %s already exists."
+                % migration_file)
+
+        # `Write migration template file
+        f = open(migration_file, 'w')
         f.write(MIGRATION_TEMPLATE)
         f.close()
-        
+
         print ">>> Created new migration %s" % migration_file
     except Exception, e:
-        print e.message
+        print e
         sys.exit(1)
 
 
@@ -232,11 +195,11 @@ def prepare_option_parser():
     parser = OptionParser( option_class=InvenioOption, description="Invenio database migration CLI tool", formatter=IndentedHelpFormatter(max_help_position=31) )
     
     migrate_options = OptionGroup(parser, "Options to migrate your installation")
-    migrate_options.add_option( "", "--migrate", dest='actions', const='migrate', action="append_const", help="apply migrations" )
-    migrate_options.add_option( "", "--migrate-show", dest='actions', const='migrate-show', action="append_const", help="show migrations to be applied" )
-    migrate_options.add_option( "", "--migration-history", dest='actions', const='migration-history', action="append_const", help="show all migrations already applied" )
-    migrate_options.add_option( "", "--create-migration", dest='actions', metavar='DIR', const='create-migration', action="store_append_const", help="create a new migration (for developers)" )
-    parser.add_option_group( migrate_options )
+    migrate_options.add_option("", "--migrate", dest='actions', const='migrate', action="append_const", help="apply migrations")
+    migrate_options.add_option("", "--migrate-show", dest='actions', const='migrate-show', action="append_const", help="show migrations ready to be applied")
+    migrate_options.add_option("", "--migrate-history", dest='actions', const='migrate-history', action="append_const", help="show history of applied migrations")
+    migrate_options.add_option("", "--migrate-create", dest='actions', metavar='DIR', const='migrate-create', action="store_append_const", help="create a new migration (for developers)")
+    parser.add_option_group(migrate_options)
     
     parser.add_option('--yes-i-know', action='store_true', dest='yes-i-know', help='use with care!')
     
@@ -259,15 +222,20 @@ def main(*cmd_args):
         print """ERROR: Please specify a command.  Please see '--help'."""
         sys.exit(1)
     
+    conf = None
+    
     for action in actions:
         if action == 'migrate':
-            cli_cmd_migrate()
+                cli_cmd_migrate(conf)
         elif action == 'migrate-show':
-            cli_cmd_migrate_show()
-        elif action == 'migration-history':
-            cli_cmd_migration_history()
-        elif action == 'create-migration':
-            cli_cmd_create_migration(getattr(options, 'create_migration', None))
+            cli_cmd_migrate_show(conf)
+        elif action == 'migrate-history':
+            cli_cmd_migrate_history(conf)
+        elif action == 'migrate-create':
+            cli_cmd_migrate_create(conf, getattr(options, 'migrate_create', None))
+        else:
+            print "ERROR: Unknown command", action
+            sys.exit(1)
 
 if __name__ == '__main__':
     main()
