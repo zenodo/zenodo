@@ -37,7 +37,7 @@ def _check_title(metadata, ln, _):
     title = metadata.get('title', '')
     title = title.strip()
     if not title:
-        return ('title', 'error', [_('The title field of the Publication is mandatory but is currently empty')])
+        return ('title', 'error', [_('The title field of the publication is mandatory but is currently empty')])
     elif title:
         title = title.decode('UTF8')
         uppers = 0
@@ -45,9 +45,9 @@ def _check_title(metadata, ln, _):
             if c.isupper():
                 uppers += 1
         if 1.0 * uppers / len(title) > 0.75:
-            return ('title', 'warning', [_('The title field of the Publication seems to be written all in UPPERCASE')])
+            return ('title', 'warning', [_('The title field of the publication seems to be written all in UPPERCASE')])
         elif title.islower():
-            return ('title', 'warning', [_('The title field of the Publication seems to be written all in lowercase. Was this intentional?')])
+            return ('title', 'warning', [_('The title field of the publication seems to be written all in lowercase. Was this intentional?')])
 
 
 def _check_original_title(metadata, ln, _):
@@ -59,7 +59,7 @@ def _check_original_title(metadata, ln, _):
             if c.isupper():
                 uppers += 1
         if 1.0 * uppers / len(title) > 0.75:
-            return ('original_title', 'warning', [_('The original title field of the Publication seems to be written all in UPPERCASE')])
+            return ('original_title', 'warning', [_('The original title field of the publication seems to be written all in UPPERCASE')])
 
 def _check_keywords(metadata, ln, _):
     keywords = metadata.get('keywords', '')
@@ -91,7 +91,7 @@ def _check_authors(metadata, ln, _):
     authors = metadata.get('authors', '')
     authors = authors.decode('UTF8')
     if not authors.strip():
-        return ('authors', 'error', [_('The authorship of the Publication is a mandatory field but is currently empty')])
+        return ('authors', 'error', [_('The authorship of the publication is a mandatory field but is currently empty')])
     errors = []
     warnings = []
     for row in authors.split('\n'):
@@ -123,19 +123,19 @@ def _check_authors(metadata, ln, _):
 def _check_abstract(metadata, ln, _):
     abstract = metadata.get('abstract', '')
     if not abstract.strip():
-        return ('abstract', 'error', [_('The abstract of the Publication is a mandatory field but is currently empty')])
+        return ('abstract', 'error', [_('The abstract of the publication is a mandatory field but is currently empty')])
 
 
 def _check_language(metadata, ln, _):
     language = metadata.get('language', '')
     if not language.strip():
-        return ('language', 'error', [_('The language of the Publication is a mandatory field but is currently empty')])
+        return ('language', 'error', [_('The language of the publication is a mandatory field but is currently empty')])
 
 
 def _check_access_rights(metadata, ln, _):
     access_rights = metadata.get('access_rights', '')
     if not access_rights in CFG_ACCESS_RIGHTS(ln):
-        return ('access_rights', 'error', [_('The access rights field of the Publication is not set to one of the expected values')])
+        return ('access_rights', 'error', [_('The access rights field of the publication is not set to one of the expected values')])
 
 
 def _check_embargo_date(metadata, ln, _):
@@ -143,11 +143,11 @@ def _check_embargo_date(metadata, ln, _):
     embargo_date = metadata.get('embargo_date', '')
     if access_rights == 'embargoedAccess':
         if not embargo_date:
-            return ('embargo_date', 'error', [_('The embargo end date is mandatory when the Access rights field of the Publication is set to Embargo access')])
+            return ('embargo_date', 'error', [_('The embargo end date is mandatory when the Access rights field of the publication is set to Embargo access')])
         try:
             time.strptime(embargo_date, '%Y-%m-%d')
         except ValueError:
-            return ('embargo_date', 'error', [_('The access rights of the Publication is set to Embargo access but a valid embargo end date is not set (correct format is YYYY-MM-DD)')])
+            return ('embargo_date', 'error', [_('The access rights of the publication is set to Embargo access but a valid embargo end date is not set (correct format is YYYY-MM-DD)')])
 
 
 def _check_publication_date(metadata, ln, _):
@@ -187,7 +187,7 @@ def _check_doi(metadata, ln, _):
 def _check_publication_type(metadata, ln, _):
     publication_type = metadata.get('publication_type', '')
     if not publication_type in CFG_OPENAIRE_PUBLICATION_TYPES(ln):
-        return ('publication_type', 'error', [_('The document type field of the Publication is not set to one of the expected values')])
+        return ('publication_type', 'error', [_('The document type field of the publication is not set to one of the expected values')])
 
 
 def _check_accept_cc0_license(metadata, ln, _):
