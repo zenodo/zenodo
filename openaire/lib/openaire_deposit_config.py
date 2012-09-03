@@ -17,10 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.config import CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL, \
-    CFG_OPENAIRE_CURATORS as MAIN_CFG_OPENAIRE_CURATORS
-from invenio.messages import gettext_set_language
 import os
+from invenio.messages import gettext_set_language
+from invenio.config import CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL
+
+try:
+    from invenio.config import CFG_OPENAIRE_CURATORS as MAIN_CFG_OPENAIRE_CURATORS
+except ImportError:
+    MAIN_CFG_OPENAIRE_CURATORS = ""
 
 CFG_OPENAIRE_PROJECT_INFORMATION_KB = 'json_projects'
 """ Name of knowledge base for storing EU project information (JSON dictionary). """
