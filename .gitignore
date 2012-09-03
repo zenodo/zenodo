@@ -19,3 +19,15 @@ miscutil/build
 openaire/build
 websession/build
 webstyle/build
+Makefile
+Makefile.in
+aclocal.m4
+autom4te.cache
+missing
+install-sh
+configure
+config.sub
+config.status
+config.guess
+config.nice
+dbmigrator
