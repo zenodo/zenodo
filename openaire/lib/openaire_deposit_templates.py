@@ -388,11 +388,20 @@ class Template:
 
         @see: tmpl_generic_options
         """
-        from invenio.openaire_deposit_engine import CFG_OPENAIRE_PUBLICATION_TYPES
+        from invenio.openaire_deposit_engine import CFG_OPENAIRE_PUBLICATION_TYPES, \
+            CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
+        
         _ = gettext_set_language(ln)
+        
+        items = CFG_OPENAIRE_PUBLICATION_TYPES(ln).items()
+        items.sort()
+        
+        if not selected_value:
+            selected_value = CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
+        
         return self.tmpl_generic_options(
             _("Select publication type"),
-            CFG_OPENAIRE_PUBLICATION_TYPES(ln).items(),
+            items,
             selected_value,
             ln=CFG_SITE_LANG,
         )

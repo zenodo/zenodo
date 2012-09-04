@@ -85,8 +85,7 @@ States for a in-progress submission.
 CFG_OPENAIRE_CURATORS = []
 """ List of curator email addresses. """
 if MAIN_CFG_OPENAIRE_CURATORS.strip():
-    CFG_OPENAIRE_CURATORS = [x.strip(
-    ) for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
+    CFG_OPENAIRE_CURATORS = [x.strip() for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
 
 
 def CFG_ACCESS_RIGHTS(ln):
@@ -105,16 +104,27 @@ def CFG_ACCESS_RIGHTS(ln):
     }
 
 
+CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE = 'publishedArticle'
+
 def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
     """
     Publication types
-
+    
     @param ln: Language for human readable version of publication types.
-    @return: Dictionary with type ids as keys and type titles as values.
+    @return: Dictionary with type ids as keys and type titles as values. 
     """
     _ = gettext_set_language(ln)
     return {
         'publishedArticle': _("Published article"),
+        'preprint': _("Preprint"),
+        'report': _("Report"),
+        'thesis': _("Thesis"),
+        'workingPaper': _("Working paper"),
+        # Dataset
+        'book': _("Book"),
+        'periodicalContribution': _("Periodical contribution"),
+        'conferenceContribution': _("Conference contribution"),
+        'generalTalk': _("General talk"),
+        'patent': _("Patent"),
         #'data': _("Data set"),
-        #'report': _("Report"),
     }

@@ -70,7 +70,7 @@ from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB,
     CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, \
     CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, \
     CFG_METADATA_STATES, CFG_PUBLICATION_STATES, CFG_OPENAIRE_PUBLICATION_TYPES, \
-    CFG_OPENAIRE_CURATORS
+    CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
 from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
