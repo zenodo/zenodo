@@ -165,35 +165,56 @@ def cli_cmd_migrate_create(conf, path):
 
 def prepare_option_parser():
     """Parse the command line options."""
+
     class InvenioOption(Option):
         """
         Option class that implements the action 'store_append_const' which will
-        
+
         1) append <const> to list in options.<dest>
         2) take a value and store in options.<const>
-        
+
         Useful for e.g. appending a const to an actions list, while also taking an option
         value and storing it.
-        
+
         This ensures that we can run actions in the order they are given on the command-line.
+
+        Python 2.4 compatibility note: *append_const* action is not available in
+        Python 2.4, so it is implemented here, together with the new action
+        *store_append_const*.
         """
-        ACTIONS = Option.ACTIONS + ("store_append_const",)
-        STORE_ACTIONS = Option.STORE_ACTIONS + ("store_append_const",)
+        ACTIONS = Option.ACTIONS + ("store_append_const","append_const")
+        STORE_ACTIONS = Option.STORE_ACTIONS + ("store_append_const","append_const")
         TYPED_ACTIONS = Option.TYPED_ACTIONS + ("store_append_const",)
         ALWAYS_TYPED_ACTIONS = Option.ALWAYS_TYPED_ACTIONS + ("store_append_const",)
-        CONST_ACTIONS = Option.CONST_ACTIONS + ("store_append_const",)
-        
+        CONST_ACTIONS = getattr(Option,'CONST_ACTIONS',()) + ("store_append_const","append_const")
+
         def take_action(self, action, dest, opt, value, values, parser):
             if action == "store_append_const":
                 # Combination of 'store' and 'append_const' actions
                 values.ensure_value(dest, []).append(self.const)
                 value_dest = self.const.replace('-', '_')
                 setattr(values, value_dest, value)
+            elif action == "append_const" and not hasattr(Option,'CONST_ACTIONS'):
+                values.ensure_value(dest, []).append(self.const)
             else:
                 Option.take_action(self, action, dest, opt, value, values, parser)
-        
+
+        def _check_const(self):
+            if self.action not in self.CONST_ACTIONS and self.const is not None:
+                raise OptionError(
+                    "'const' must not be supplied for action %r" % self.action,
+                    self)
+
+        CHECK_METHODS = [Option._check_action,
+                     Option._check_type,
+                     Option._check_choice,
+                     Option._check_dest,
+                     _check_const,
+                     Option._check_nargs,
+                     Option._check_callback]
+
     parser = OptionParser( option_class=InvenioOption, description="Invenio database migration CLI tool", formatter=IndentedHelpFormatter(max_help_position=31) )
-    
+
     migrate_options = OptionGroup(parser, "Options to migrate your installation")
     migrate_options.add_option("", "--migrate", dest='actions', const='migrate', action="append_const", help="apply migrations")
     migrate_options.add_option("", "--migrate-show", dest='actions', const='migrate-show', action="append_const", help="show migrations ready to be applied")

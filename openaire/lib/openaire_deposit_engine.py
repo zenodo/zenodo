@@ -839,7 +839,10 @@ class OpenAIREPublication(object):
         # Authors
         authors = self.authors
         for (i, (name, affil)) in enumerate(authors):
-            field_no = '100' if i == 0 else '700'
+            if i == 0:
+                field_no = '100'
+            else:
+                field_no = '700'
             subfields = [('a', name),]
             if affil:
                 subfields.append(('u', affil))
