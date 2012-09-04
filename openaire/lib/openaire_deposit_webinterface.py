@@ -36,7 +36,7 @@ from invenio.openaire_deposit_engine import page, get_project_information, \
     OpenAIREPublication, wash_form, get_exisiting_projectids_for_uid, \
     get_all_projectsids, get_favourite_authorships_for_user, \
     get_all_publications_for_project, upload_file, get_openaire_style, \
-    get_favourite_keywords_for_user, get_project_acronym
+    get_favourite_keywords_for_user, get_project_acronym, UploadError
 from invenio.openaire_deposit_utils import simple_metadata2namespaced_metadata
 from invenio.session import get_session
 from invenio.urlutils import create_url
@@ -149,10 +149,12 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         
         ## Perform file upload (if needed)
         if argd['upload']:
-            
             if projectid < 0:
                 projectid = 0
-            upload_file(form, uid, projectid)
+            try:
+                upload_file(form, uid, projectid)
+            except UploadError, e:
+                return page(req=req, body=unicode(e), title=_("File upload error"), navmenuid="submit")
 
         if projectid < 0:
             selected_project = None

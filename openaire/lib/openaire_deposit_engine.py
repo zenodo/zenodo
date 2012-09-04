@@ -353,10 +353,18 @@ def get_project_information(uid, projectid, deletable, linked, ln, style, global
     existing_publications = run_sql("SELECT count(*) FROM eupublication WHERE uid=%s AND projectid=%s", (uid, projectid))
     return openaire_deposit_templates.tmpl_project_information(global_projectid=global_projectid, projectid=projectid, ln=ln, existing_publications=existing_publications[0][0], deletable=deletable, linked=linked, publicationid=publicationid, style=style, **project_information)
 
+class UploadError( Exception ):
+    """ Exception used to signal a file upload error. """
+    pass
+
 def upload_file(form, uid, projectid=0, field='Filedata'):
     """
     """
+    if field not in form:
+        raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
     afile = form[field]
+    if not afile.filename:
+        raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
     publication = OpenAIREPublication(uid)
     publication.link_project(projectid)
     publication.add_a_fulltext(afile.file.name, afile.filename)
