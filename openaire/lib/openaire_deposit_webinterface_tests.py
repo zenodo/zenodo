@@ -68,6 +68,30 @@ class SubmissionRegressionTest(unittest.TestCase):
         response = self.client.get("/deposit", query_string={ 'projectid' : '246686', 'ln' : 'en', 'style' : 'invenio'})
         self.assertEqual( response.status_code, 200 )
 
+    def test_noflash_nofileupload(self):
+        """
+        Test that hitting "Upload" without attaching a file does not
+        result in a Internal Server Error
+        """
+        response = self.client.post(
+            "/deposit",
+            query_string={ 'projectid' : '0', 'ln' : 'en', 'style' : 'invenio'},
+            data = {
+                'upload': 'Upload',
+                'Filedata': (StringIO(''), ''),
+            }
+        )
+        self.assertNotEqual( response.status_code, 500 )
+        response = self.client.post(
+            "/deposit",
+            query_string={ 'projectid' : '0', 'ln' : 'en', 'style' : 'invenio'},
+            data = {
+                'upload': 'Upload',
+                'Filedata': (StringIO(''), ''),
+            }
+        )
+        self.assertNotEqual( response.status_code, 500 )
+
 
 class AjaxGatewayTest(unittest.TestCase):
     """
