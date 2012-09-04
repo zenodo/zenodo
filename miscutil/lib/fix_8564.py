@@ -40,7 +40,14 @@ def main():
         # Get record information 
         touched = False
         file_links = get_fieldvalues(recid, "8564_u")
-        new_file_links = map(lambda x: x.replace(from_base, to_base) if x.startswith(from_base) else x, file_links)
+
+        def replace_link(x): 
+            if x.startswith(from_base):
+                return x.replace(from_base, to_base)
+            else:
+                return x
+        
+        new_file_links = map(replace_link, file_links)
         
         # Print correcting to record
         rec = {}

@@ -128,11 +128,16 @@ class AjaxGatewayTest(unittest.TestCase):
         for field in CFG_METADATA_FIELDS:
             form['%s_%s' % (field, pub_id)] = ''
         
+        if current_field:
+            current_field_pub_id = ('%s_%s' % (current_field, pub_id))
+        else:
+            current_field_pub_id = ''
+        
         form.update({
             'projectid': projectid,
             'publicationid': pub_id,
             'action': action,
-            'current_field' : ('%s_%s' % (current_field, pub_id)) if current_field else '',
+            'current_field' : current_field_pub_id,
             'save_%s' % pub_id : "Save+publication",
             'submit_%s' % pub_id : "Submit+publication",
             
@@ -261,7 +266,12 @@ class AjaxGatewayTest(unittest.TestCase):
             if field == 'related_publications':
                 # Remove "doi:" and filter out blank strings.
                 real_val = real_val.split("\n")
-                expected_val = filter( lambda x: x, map( lambda x: x[4:] if x.startswith("doi:") else x, expected_val.split("\n"))) 
+                def _map_func(x):
+                    if x.startswith("doi:"):
+                        return x[4:]
+                    else:
+                        return x
+                expected_val = filter( lambda x: x, map( _map_func, expected_val.split("\n"))) 
             self.assertEqual(real_val, expected_val, "Field %s: expected %s but got %s" % (field, expected_val, real_val))
     
     # ================================
