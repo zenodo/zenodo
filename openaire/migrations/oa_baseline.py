@@ -17,10 +17,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.dbmigrator_utils import DbMigration, run_sql_ignore, run_tabcreate
+from invenio.inveniocfg_migrate import InvenioMigration, run_sql_ignore
 from invenio.dbquery import run_sql
 
-class Migration( DbMigration ):
+class Migration( InvenioMigration ):
     """ Baseline for OpenAIRE """
     repository = 'openaire'
     depends_on = []
