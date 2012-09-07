@@ -33,10 +33,10 @@ from md5 import md5
 ## $ cat apache.log  apache-ssl.log | grep "GET /record/" | grep 200 | gzip > ~/eu.log.gz
 
 ## Generate this locally to OpenAIRE with:
-## from invenio.search_engine import get_collection_reclist, CFG_SITE_NAME
-## eu_recids = get_collection_reclist(CFG_SITE_NAME)
+from invenio.search_engine import get_collection_reclist, CFG_SITE_NAME
+eu_recids = get_collection_reclist(CFG_SITE_NAME)
 
-eu_recids = intbitset([9, 10, 19, 23, 24, 25, 26, 773, 774, 778, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 789, 790, 791, 792, 793, 794, 795, 796, 799, 800, 802, 803, 804, 805, 806, 808, 809, 810, 811, 812, 813, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 828, 829, 830, 832, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 858, 861, 875, 877, 878, 879, 882])
+#eu_recids = intbitset(eu_recids = [9, 10, 19, 23, 24, 25, 26, 773, 774, 778, 779, 780, 781, 782, 783, 784, 785, 786, 787, 788, 789, 790, 791, 792, 793, 794, 795, 796, 799, 800, 802, 803, 804, 805, 806, 808, 809, 810, 811, 812, 813, 817, 818, 819, 820, 821, 822, 823, 824, 825, 826, 828, 829, 830, 832, 834, 835, 836, 837, 838, 839, 840, 841, 842, 843, 844, 845, 846, 847, 848, 849, 850, 851, 858, 861, 875, 877, 878, 879, 882, 884, 885, 887, 888, 889, 890, 891, 892, 893, 894, 899, 900, 901, 902, 903, 905, 906, 907, 912, 913, 914, 915, 923, 925, 928, 930, 931, 932, 934])
 
 ## This are from CDS
 ## To obtain the recids from CDS fire up ipython
