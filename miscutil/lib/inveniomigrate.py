@@ -42,6 +42,7 @@ import os
 import random
 import string
 import sys
+from datetime import date
 
 from invenio.textutils import wrap_text_in_a_box, wait_for_user
 
