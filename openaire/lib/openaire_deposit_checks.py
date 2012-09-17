@@ -33,6 +33,7 @@ _RE_AUTHOR_ROW = re.compile(u'^\w{2,}(\s+\w{2,})*\s*,\s*(\w{2,}|\w\.)(\s+\w{1,}|
 _RE_PAGES = re.compile('\d+(-\d+)?')
 _RE_DOI = re.compile("(doi:)?10\.\d+(.\d+)*/.*", re.I)
 
+
 def _check_title(metadata, ln, _):
     title = metadata.get('title', '')
     title = title.strip()
@@ -61,6 +62,7 @@ def _check_original_title(metadata, ln, _):
         if 1.0 * uppers / len(title) > 0.75:
             return ('original_title', 'warning', [_('The original title field of the publication seems to be written all in UPPERCASE')])
 
+
 def _check_keywords(metadata, ln, _):
     keywords = metadata.get('keywords', '')
     keywords = keywords.decode('UTF8')
@@ -80,9 +82,9 @@ def _check_keywords(metadata, ln, _):
                     elif c == "-":
                         count_dash += 1
                         if count_dash >= 2:
-                            warn=True
+                            warn = True
                             break
-                
+
                 if warn:
                     return ('keywords', 'warning', [_('Please ensure that you have only one keyword/phrase per line.')])
 
@@ -197,24 +199,24 @@ def _check_accept_cc0_license(metadata, ln, _):
         if accept != 'yes':
             return ('accept_cc0_license', 'error', [_("You must agree to release your data under CC0.")])
 
+
 def _check_related_publications(metadata, ln, _):
     publication_type = metadata.get('publication_type', '')
     if publication_type == 'data':
         pubs = metadata.get('related_publications', '')
         pubs = pubs.decode('UTF8')
-        
+
         found = False
         for doi in pubs.splitlines():
             doi = doi.strip()
             if doi:
                 if _RE_DOI.match(doi):
-                    found = True 
+                    found = True
                 else:
                     return ('related_publications', 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"' % escape(doi, True))])
-        
+
         if not found:
             return ('related_publications', 'error', [_('You must provide at least one DOI.')])
- 
 
 
 CFG_METADATA_FIELDS_CHECKS = {
@@ -230,9 +232,9 @@ CFG_METADATA_FIELDS_CHECKS = {
     'doi': _check_doi,
     'publication_type': _check_publication_type,
     'report_pages_no': _check_pages_no,
-    'keywords' : _check_keywords,
-    'accept_cc0_license' : _check_accept_cc0_license,
-    'related_publications' : _check_related_publications,
+    'keywords': _check_keywords,
+    'accept_cc0_license': _check_accept_cc0_license,
+    'related_publications': _check_related_publications,
 }
 """
 Dictionary of metadata field validator functions.

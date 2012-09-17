@@ -39,61 +39,62 @@ CFG_OPENAIRE_MANDATORY_PROJECTS = True
 """ Determine if EU FP7 project metadata is required. """
 
 CFG_METADATA_FIELDS = (
-    'title', 
-    'original_title', 
-    'authors', 
+    'title',
+    'original_title',
+    'authors',
     'abstract',
-    'original_abstract', 
-    'language', 
-    'access_rights', 
+    'original_abstract',
+    'language',
+    'access_rights',
     'embargo_date',
-    'publication_date', 
-    'journal_title', 
-    'volume', 
-    'pages', 
+    'publication_date',
+    'journal_title',
+    'volume',
+    'pages',
     'issue',
-    'keywords', 
-    'notes', 
+    'keywords',
+    'notes',
     'doi',
     'publication_type',
     'report_pages_no',
     'accept_cc0_license',
     'related_publications',
 )
-""" 
+"""
 List of metadata fields, used in eg washing of URL parameters.
 """
 
 CFG_METADATA_STATES = ('ok', 'error', 'warning', 'empty')
-""" 
-Field states used during form validation. 
+"""
+Field states used during form validation.
 TODO: Unused?
 """
 
 CFG_PUBLICATION_STATES = (
-    'initialized', 
-    'edited', 
-    'submitted', 
-    'pendingapproval', 
-    'approved', 
+    'initialized',
+    'edited',
+    'submitted',
+    'pendingapproval',
+    'approved',
     'rejected'
 )
 """
-States for a in-progress submission. 
+States for a in-progress submission.
 """
 
 CFG_OPENAIRE_CURATORS = []
 """ List of curator email addresses. """
 if MAIN_CFG_OPENAIRE_CURATORS.strip():
-    CFG_OPENAIRE_CURATORS = [x.strip() for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
+    CFG_OPENAIRE_CURATORS = [x.strip(
+    ) for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
 
 
 def CFG_ACCESS_RIGHTS(ln):
     """
     Access rights for publication.
-    
+
     @param ln: Language for human readable version of access right.
-    @return: Dictionary with access right ids as keys and access right titles as values. 
+    @return: Dictionary with access right ids as keys and access right titles as values.
     """
     _ = gettext_set_language(ln)
     return {
@@ -103,12 +104,13 @@ def CFG_ACCESS_RIGHTS(ln):
         'openAccess': _("Open access")
     }
 
+
 def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
     """
     Publication types
-    
+
     @param ln: Language for human readable version of publication types.
-    @return: Dictionary with type ids as keys and type titles as values. 
+    @return: Dictionary with type ids as keys and type titles as values.
     """
     _ = gettext_set_language(ln)
     return {

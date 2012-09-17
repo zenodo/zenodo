@@ -48,6 +48,7 @@ import invenio.template
 
 openaire_deposit_templates = invenio.template.load('openaire_deposit')
 
+
 class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
     _exports = [
         '', 'uploadifybackend', 'sandbox', 'checkmetadata',
@@ -83,13 +84,13 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
 
     def index(self, req, form):
         """
-        Main submission page installed on /deposit (hack in Invenio source) with the 
+        Main submission page installed on /deposit (hack in Invenio source) with the
         following features:
-        
+
           * Two different themes/skins (for portal and for invenio)
           * Upload new file to start a publication submission.
           * Enter metadata for publication(s) related to a project
-          
+
         URL parameters:
          * style: Theme/skin to use - "invenio" or "portal"
          * projectid: Work on publications for this project
@@ -108,19 +109,20 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             'upload': (str, '')})
 
         _ = gettext_set_language(argd['ln'])
-        
-        # Check if user is authorized to deposit publications 
+
+        # Check if user is authorized to deposit publications
         user_info = collect_user_info(req)
-        auth_code, auth_message = acc_authorize_action(user_info, 'submit', doctype='OpenAIRE')
+        auth_code, auth_message = acc_authorize_action(
+            user_info, 'submit', doctype='OpenAIRE')
         if auth_code:
             if user_info['guest'] == '1':
                 return redirect_to_url(req, "%s/youraccount/login%s" % (
                     CFG_SITE_SECURE_URL,
-                        make_canonical_urlargd({
-                    'referer' : "%s%s" % (
-                        CFG_SITE_URL,
-                        req.unparsed_uri),
-                    "ln" : argd['ln']}, {})))
+                                       make_canonical_urlargd({
+                                                              'referer': "%s%s" % (
+                                                              CFG_SITE_URL,
+                                                              req.unparsed_uri),
+                                                              "ln": argd['ln']}, {})))
             else:
                 return page(req=req, body=_("You are not authorized to use OpenAIRE deposition."), title=_("Authorization failure"), navmenuid="submit")
 
@@ -128,7 +130,7 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         projectid = argd['projectid']
         plus = argd['plus']
         style = get_openaire_style(req)
-        
+
         if plus == -1:
             try:
                 plus = bool(session_param_get(req, 'plus'))
@@ -146,7 +148,7 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             projectid = -1
 
         uid = user_info['uid']
-        
+
         ## Perform file upload (if needed)
         if argd['upload']:
             if projectid < 0:
@@ -170,12 +172,15 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         body = ""
         if projectid >= 0:
             ## There is a project on which we are working good!
-            publications = get_all_publications_for_project(uid, projectid, ln=argd['ln'], style=style)
+            publications = get_all_publications_for_project(
+                uid, projectid, ln=argd['ln'], style=style)
             if argd['publicationid'] in publications:
                 if argd['addproject'] in all_project_ids:
-                    publications[argd['publicationid']].link_project(argd['linkproject'])
+                    publications[argd['publicationid']
+                                 ].link_project(argd['linkproject'])
                 if argd['delproject'] in all_project_ids:
-                    publications[argd['publicationid']].unlink_project(argd['unlinkproject'])
+                    publications[argd['publicationid']
+                                 ].unlink_project(argd['unlinkproject'])
             if argd['delete'] and argd['delete'] in publications:
                 ## there was a request to delete a publication
                 publications[argd['delete']].delete()
@@ -202,7 +207,8 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid(), style=style, ln=argd['ln'])
             projects = [get_project_information(uid, projectid_, deletable=False, ln=argd['ln'], style=style, linked=True) for projectid_ in get_exisiting_projectids_for_uid(user_info['uid']) if projectid_ != projectid]
             if projects:
-                body += openaire_deposit_templates.tmpl_focus_on_project(existing_projects=projects, ln=argd['ln'])
+                body += openaire_deposit_templates.tmpl_focus_on_project(
+                    existing_projects=projects, ln=argd['ln'])
 
         title = _('Orphan Repository')
         return page(body=body, title=title, req=req, project_information=get_project_acronym(projectid), navmenuid="submit")
@@ -211,7 +217,8 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         """
         File upload via Uploadify (flash) backend.
         """
-        argd = wash_urlargd(form, {'session': (str, ''), 'projectid': (int, -1)})
+        argd = wash_urlargd(
+            form, {'session': (str, ''), 'projectid': (int, -1)})
         _ = gettext_set_language(argd['ln'])
         session = argd['session']
         get_session(req=req, sid=session)
@@ -229,7 +236,8 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
         """
         Download file for a submission which is currently in progress.
         """
-        argd = wash_urlargd(form, {'publicationid': (str, ''), 'fileid': (str, '')})
+        argd = wash_urlargd(
+            form, {'publicationid': (str, ''), 'fileid': (str, '')})
         uid = collect_user_info(req)['uid']
         publicationid = argd['publicationid']
         fileid = argd['fileid']
@@ -250,12 +258,13 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
 
     def authorships(self, req, form):
         """
-        Return list of authors used for auto-completion 
+        Return list of authors used for auto-completion
         in the authors field.
-        
-        Return response as JSON. 
+
+        Return response as JSON.
         """
-        argd = wash_urlargd(form, {'publicationid': (str, ''), 'term': (str, '')})
+        argd = wash_urlargd(
+            form, {'publicationid': (str, ''), 'term': (str, '')})
         user_info = collect_user_info(req)
         uid = user_info['uid']
         req.content_type = 'application/json'
@@ -269,19 +278,21 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             name, institute = term.split(':', 1)
             institute = institute.strip()
             if len(institute) > 1:
-                institutes = [row[0] for row in get_kbr_keys('institutes', searchkey=institute, searchtype='s')]
+                institutes = [row[0] for row in get_kbr_keys(
+                    'institutes', searchkey=institute, searchtype='s')]
                 institutes.sort()
                 return json.dumps(["%s: %s" % (name, institute) for institute in institutes[:100]])
         return json.dumps([])
 
     def keywords(self, req, form):
         """
-        Return list of keywords used for auto-completion 
+        Return list of keywords used for auto-completion
         in keywords field.
-        
-        Return response as JSON. 
+
+        Return response as JSON.
         """
-        argd = wash_urlargd(form, {'publicationid': (str, ''), 'term': (str, '')})
+        argd = wash_urlargd(
+            form, {'publicationid': (str, ''), 'term': (str, '')})
         user_info = collect_user_info(req)
         uid = user_info['uid']
         req.content_type = 'application/json'
@@ -295,16 +306,18 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
     def ajaxgateway(self, req, form):
         """
         """
-        argd = wash_urlargd(form, {'projectid': (str, ''), 'publicationid': (str, ''), 'action': (str, ''), 'current_field': (str, '')})
-        
+        argd = wash_urlargd(form, {'projectid': (str, ''), 'publicationid': (
+            str, ''), 'action': (str, ''), 'current_field': (str, '')})
+
         # Get parameters
         action = argd['action']
         publicationid = argd['publicationid']
         projectid = argd['projectid']
-        
+
         # Check if action is supported
-        assert(action in ('save', 'verify_field', 'submit', 'unlinkproject', 'linkproject'))
-        
+        assert(action in (
+            'save', 'verify_field', 'submit', 'unlinkproject', 'linkproject'))
+
         # JSON return dictionary
         out = {
             'errors': {},
@@ -315,9 +328,9 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             'appends': {},
             'hiddens': [],
             'showns': [],
-            'action' : action,
+            'action': action,
         }
-        
+
         if action == 'verify_field':
             current_field = argd['current_field']
             assert(current_field)
@@ -325,18 +338,22 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             out["errors"], out["warnings"] = OpenAIREPublication.static_check_metadata(metadata, publicationid, check_only_field=current_field, ln=argd['ln'])
         else:
             user_info = collect_user_info(req)
-            auth_code, auth_message = acc_authorize_action(user_info, 'submit', doctype='OpenAIRE')
+            auth_code, auth_message = acc_authorize_action(
+                user_info, 'submit', doctype='OpenAIRE')
             assert(auth_code == 0)
             uid = user_info['uid']
-            publication = OpenAIREPublication(uid, publicationid, ln=argd['ln'])
+            publication = OpenAIREPublication(
+                uid, publicationid, ln=argd['ln'])
             if action == 'unlinkproject':
                 publication.unlink_project(projectid)
-                out["substitutions"]["#projectsbox_%s" % publicationid] = publication.get_projects_information()
+                out["substitutions"]["#projectsbox_%s" %
+                                     publicationid] = publication.get_projects_information()
                 publication.check_projects()
                 out["errors"], out["warnings"] = simple_metadata2namespaced_metadata(publication.errors, publicationid), simple_metadata2namespaced_metadata(publication.warnings, publicationid)
             elif action == 'linkproject':
                 publication.link_project(projectid)
-                out["substitutions"]["#projectsbox_%s" % publicationid] = publication.get_projects_information()
+                out["substitutions"]["#projectsbox_%s" %
+                                     publicationid] = publication.get_projects_information()
                 publication.check_projects()
                 out["errors"], out["warnings"] = simple_metadata2namespaced_metadata(publication.errors, publicationid), simple_metadata2namespaced_metadata(publication.warnings, publicationid)
             else:
@@ -344,15 +361,18 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
                 publication.check_metadata()
                 publication.check_projects()
                 out["errors"], out["warnings"] = simple_metadata2namespaced_metadata(publication.errors, publicationid), simple_metadata2namespaced_metadata(publication.warnings, publicationid)
-                if "".join(out["errors"].values()).strip(): #FIXME bad hack, we need a cleaner way to discover if there are errors
+                if "".join(out["errors"].values()).strip():  # FIXME bad hack, we need a cleaner way to discover if there are errors
                     out['addclasses']['#status_%s' % publicationid] = 'error'
-                    out['delclasses']['#status_%s' % publicationid] = 'warning ok empty'
+                    out['delclasses']['#status_%s' %
+                                      publicationid] = 'warning ok empty'
                 elif "".join(out["warnings"].values()).strip():
                     out['addclasses']['#status_%s' % publicationid] = 'warning'
-                    out['delclasses']['#status_%s' % publicationid] = 'error ok empty'
+                    out['delclasses']['#status_%s' %
+                                      publicationid] = 'error ok empty'
                 else:
                     out['addclasses']['#status_%s' % publicationid] = 'ok'
-                    out['delclasses']['#status_%s' % publicationid] = 'warning error empty'
+                    out['delclasses']['#status_%s' %
+                                      publicationid] = 'warning error empty'
 
                 if action == 'save':
                     out["substitutions"]['#publication_information_%s' % publicationid] = publication.get_publication_information()
