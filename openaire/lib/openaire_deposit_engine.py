@@ -18,7 +18,6 @@
 """
 Deposit engine for OpenAIRE
 
-
 Adding new fields
 =================
 Following steps are necessary to add a new field:
@@ -26,8 +25,25 @@ Following steps are necessary to add a new field:
   * openaire_deposit_config.py: Add to CFG_METADATA_FIELDS
   * openaire_deposit_checks.py: Add _check_field method and update CFG in bottom.
   * openaire_deposit_templates.py: Add to tmpl_form, and perhaps add more methods
-  * openaire_deposit_tpl/openaire_form.tpl: Add HTML input fields.
+  * openaire_form.tpl: Add HTML input fields.
   * openaire_deposit_engine.py: Adapt getmarcxml() to make use of new field data.
+
+  ... tests ...
+
+Adding new publication types
+=============================
+Following steps are necessary to add a new publication type:
+
+  * Update metadata schema (Google Docs)
+  * openaire_deposit_config.py: Add to CFG_OPENAIRE_PUBLICATION_TYPES
+  * openaire_deposit_config.py: Add to CFG_OPENAIRE_CC0_PUBLICATION_TYPES if needed.
+  * openaire_deposit_config.py: Add to CFG_METADATA_FIELDS_PER_TYPE if needed
+  * openaire_deposit_engine.py: Add OpenAIREPublication._<type>_record
+  * openaire_deposit_engine.py: Modify OpenAIREPublication._append_type_fields
+  * openaire_deposit_engine_tests.py: Add test, test_<type>()
+  * openaire_deposit_fixtures.py: Add fixture FIXTURES and MARC_FIXTURES
+  * openaire_deposit_webinterface_tests.py: Modify test_submission()
+  * openaire_form.tpl: Add <div class="typebox_%(id)s typebox_%(id)s_publishedArticle"> with fields.
 """
 
 from base64 import encodestring
@@ -69,8 +85,9 @@ from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
 from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, \
     CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, \
     CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, \
-    CFG_METADATA_STATES, CFG_PUBLICATION_STATES, CFG_OPENAIRE_PUBLICATION_TYPES, \
-    CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
+    CFG_PUBLICATION_STATES, CFG_OPENAIRE_PUBLICATION_TYPES, \
+    CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE, \
+    CFG_METADATA_FIELDS_GROUPS
 from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
@@ -202,38 +219,52 @@ def normalize_authorships(authorships):
     return '\n'.join(ret)
 
 
+def normalize_authorship(authorship):
+    """
+    Normalize an author line, according to the pattern: "<name>: <affiliation>"
+    """
+    authorship = authorship.split(':', 1)
+    if len(authorship) == 2:
+        name, affiliation = authorship
+        name = ', '.join(item.strip() for item in name.split(','))
+        affiliation = affiliation.strip()
+        authorship = '%s: %s' % (name, affiliation)
+    else:
+        authorship = authorship[0].strip()
+    return authorship
+
+
 def normalize_acronym(acronym):
-    """
-    """
+    """ Normalize an acronym """
     acronym = acronym.replace("-", "_")
     return _RE_SPACES.sub('_', acronym)
 
 
-def normalize_keywords(keywords):
-    """
-    """
-    ret = []
-    for keyword in keywords.splitlines():
-        keyword = _RE_SPACES.sub(' ', keyword)
-        if keyword and keyword not in ret:
-            ret.append(keyword)
-    ret.sort()
-    return '\n'.join(ret)
-
-
 def normalize_doi(doi_str):
+    """ Normalize a DOI, by stripping away a 'doi:'-prefix """
     if doi_str.lower().startswith('doi:'):
         doi_str = doi_str[len('doi:'):]
     doi_str.strip()
     return doi_str
 
 
-def normalize_related_publications(pubs):
+def normalize_text(text):
+    """ Normalize a single-line string, but removing double spaces. """
+    return _RE_SPACES.sub(' ', text)
+
+
+def normalize_multivalue_field(val, sort=False, func=normalize_text):
+    """
+    Normalize a multivalue field (e.g a text-box with a value per line. Each
+    value will be normalized by the `func` and possible sorted if requested.
+    """
     ret = []
-    for doi_str in pubs.splitlines():
-        doi = normalize_doi(doi_str)
-        if doi and doi not in ret:
-            ret.append(doi)
+    for text in val.splitlines():
+        text = func(text)
+        if text and text not in ret:
+            ret.append(text)
+    if sort:
+        ret.sort()
     return '\n'.join(ret)
 
 
@@ -662,18 +693,24 @@ class OpenAIREPublication(object):
         _ = gettext_set_language(self.ln)
         self.errors, self.warnings = self.static_check_metadata(
             self._metadata, ln=self.ln)
+
         if self._metadata.get('authors') and not self.errors.get('authors'):
-            self._metadata['authors'] = normalize_authorships(
-                self._metadata['authors'])
+            self._metadata['authors'] = normalize_multivalue_field(
+                self._metadata['authors'], func=normalize_authorship)
             update_favourite_authorships_for_user(
                 self.uid, self.publicationid, self._metadata['authors'])
+
         if self._metadata.get('keywords') and not self.errors.get('keywords'):
-            self._metadata['keywords'] = normalize_keywords(
-                self._metadata['keywords'])
+            self._metadata['keywords'] = normalize_multivalue_field(
+                self._metadata['keywords'], sort=True)
             update_favourite_keywords_for_user(
                 self.uid, self.publicationid, self._metadata['keywords'])
+
         if self._metadata.get('related_publications', '') and not self.errors.get('related_publications', ''):
-            self._metadata['related_publications'] = normalize_related_publications(self.metadata.get('related_publications', ''))
+            self._metadata['related_publications'] = normalize_multivalue_field(self.metadata.get('related_publications', ''), func=normalize_doi)
+
+        if self._metadata.get('extra_report_numbers', '') and not self.errors.get('extra_report_numbers', ''):
+            self._metadata['extra_report_numbers'] = normalize_multivalue_field(self.metadata.get('extra_report_numbers', ''))
 
     def static_check_metadata(metadata, publicationid=None, check_only_field=None, ln=CFG_SITE_LANG):
         """
@@ -863,6 +900,9 @@ class OpenAIREPublication(object):
         """
         return copy.deepcopy(self._metadata)
 
+    # ===============================
+    # Record generation
+    # ===============================
     def get_marcxml(self):
         """
         Get MARCXML for this publication
@@ -970,102 +1010,126 @@ class OpenAIREPublication(object):
                 record_add_field(
                     rec, '024', '7', subfields=[('a', doi), ('2', 'DOI')])
 
-        # Publication Type (defaults to publishedArticle, since old
-        # submission before these changes wouldn't have a publication_type.
-        publication_type = self._metadata.get(
-            'publication_type', 'publishedArticle')
-
         # Collection
         record_add_field(rec, '980', subfields=[('a', 'PROVISIONAL')])
 
-        if publication_type == 'publishedArticle':
-            rec = self._published_article_record(rec)
-        elif publication_type == 'report':
-            rec = self._report_record(rec)
-        elif publication_type == 'data':
-            rec = self._data_record(rec)
-        return rec
+        # =========================
+        # Publication type specific
+        # =========================
 
-    def _data_record(self, rec):
-        """
-        Specific MARC for a data record
-        """
-        # Access right
-        record_add_field(rec, '542', subfields=[('l', 'openAccess')])
+        # Publication Type (defaults to publishedArticle, since old
+        # submission before these changes wouldn't have a publication_type.
+        pubtype = self._metadata.get('publication_type', 'publishedArticle')
+        field_groups = CFG_METADATA_FIELDS_GROUPS[pubtype]
+
+        # Journal
+        if 'JOURNAL' in field_groups:
+            if self._metadata.get('journal_title'):
+                subfields.append(('p', self._metadata['journal_title']))
+            if self._metadata.get('publication_date'):
+                year = self._metadata['publication_date'][:4]
+                subfields.append(('y', year))
+            if self._metadata.get('issue'):
+                subfields.append(('n', self._metadata['issue']))
+            if self._metadata.get('volume'):
+                subfields.append(('v', self._metadata['volume']))
+            if self._metadata.get('pages'):
+                subfields.append(('c', self._metadata['pages']))
+            if subfields:
+                record_add_field(rec, '909', 'C', '4', subfields=subfields)
+
+        # Access rights (open/closed access + embargo date
+        if 'ACCESS_RIGHTS' in field_groups:
+            # Access right
+            record_add_field(rec, '542', subfields=[('l',
+                             self._metadata['access_rights'])])
+
+            # Embargo date
+            if self._metadata.get('embargo_date'):
+                record_add_field(rec, '942', subfields=[(
+                    'a', self._metadata['embargo_date'])])
+
+            # Firerole
+            fft_status = ''
+            if self._metadata['access_rights'] == 'embargoedAccess':
+                fft_status = 'firerole: deny until "%s"\nallow any' % self._metadata['embargo_date']
+            elif self._metadata['access_rights'] in ('closedAccess', 'restrictedAccess'):
+                fft_status = 'status: %s' % self._metadata['access_rights']
+
+            # Fulltext
+            for key, fulltext in self.fulltexts.iteritems():
+                subfields = [('a', fulltext.fullpath)]
+                if fft_status:
+                    subfields.append(('r', fft_status))
+                record_add_field(rec, 'FFT', subfields=subfields)
+
+        # CC0 and data set
+        if 'CC0' in field_groups and not 'ACCESS_RIGHTS' in field_groups:
+            # Access rights
+            record_add_field(rec, '542', subfields=[('l', 'openAccess')])
+
+            # Data file (no access restriction required)
+            for key, fulltext in self.fulltexts.items():
+                subfields = [('a', fulltext.fullpath), ('d', 'Data')]
+                record_add_field(rec, 'FFT', subfields=subfields)
+
+        # ISBN
+        if 'ISBN' in field_groups:
+            if self._metadata.get('isbn'):
+                record_add_field(rec, '020', '', '', subfields=[
+                                 ('a', self._metadata.get('isbn')), ])
 
         # Related publications
-        for doi in self.related_publications:
-            record_add_field(rec, '773', subfields=[('a', doi), ])
+        if 'RELATED_PUBLICATIONS' in field_groups:
+            # Related publications
+            for doi in self.related_publications:
+                record_add_field(rec, '773', subfields=[('a', doi), ])
 
-        # Data file (no access restriction required)
-        for key, fulltext in self.fulltexts.iteritems():
-            subfields = [('a', fulltext.fullpath), ('d', 'Data')]
-            record_add_field(rec, 'FFT', subfields=subfields)
+        # Number of pages
+        if 'PAGES_NO' in field_groups:
+            # Number of pages
+            if self._metadata.get('report_pages_no'):
+                record_add_field(rec, '300', '', '', subfields=[(
+                    'a', self._metadata.get('report_pages_no')), ])
+
+        # Report numbers and report type
+        if 'REPORT' in field_groups:
+            # Report numbers
+            if self._metadata.get('extra_report_numbers'):
+                for report_num in self._metadata['extra_report_numbers'].splitlines():
+                    report_num = report_num.strip()
+                    if report_num:
+                        record_add_field(
+                            rec, '088', '', '', subfields=[('a', report_num)])
+
+            # Report type
+            if self._metadata.get('report_type'):
+                record_add_field(rec, '980', '', '', subfields=[('b', "REPORT_%s" % self._metadata.get('report_type').upper()), ])
+
+        # Imprint (place: publisher. year.)
+        if 'IMPRINT' in field_groups:
+            # Place and Publisher
+            place = self._metadata.get('place', '')
+            publisher = self._metadata.get('publisher', '')
+
+            if place or publisher:
+                subfields = []
+                if place:
+                    subfields.append(('a', self._metadata.get('place')))
+                if publisher:
+                    subfields.append(('b', self._metadata.get('publisher')))
+                if self._metadata.get('publication_date'):
+                    year = self._metadata['publication_date'][:4]
+                    subfields.append(('c', year))
+                # Note publication date is record in 260__$c, from which the
+                # publication year can be computed
+                record_add_field(rec, '260', '', '', subfields=subfields)
 
         return rec
 
-    def _report_record(self, rec):
-        """
-        Specific MARC for a report record
-        """
-        if self._metadata.get('report_pages_no'):
-            record_add_field(rec, '300', '', '', subfields=[(
-                'a', self._metadata.get('report_pages_no')), ])
-
-        rec = self._record_access_rights(rec)
-        rec = self._record_fulltext(rec)
-        return rec
-
-    def _published_article_record(self, rec):
-        """
-        Specific MARC for a published article record
-        """
-        subfields = []
-        # Journal
-        if self._metadata.get('journal_title'):
-            subfields.append(('p', self._metadata['journal_title']))
-        if self._metadata.get('publication_date'):
-            year = self._metadata['publication_date'][:4]
-            subfields.append(('y', year))
-        if self._metadata.get('issue'):
-            subfields.append(('n', self._metadata['issue']))
-        if self._metadata.get('volume'):
-            subfields.append(('v', self._metadata['volume']))
-        if self._metadata.get('pages'):
-            subfields.append(('c', self._metadata['pages']))
-        if subfields:
-            record_add_field(rec, '909', 'C', '4', subfields=subfields)
-
-        rec = self._record_access_rights(rec)
-        rec = self._record_fulltext(rec)
-        return rec
-
-    def _record_access_rights(self, rec):
-        # Access right
-        record_add_field(
-            rec, '542', subfields=[('l', self._metadata['access_rights'])])
-        # Embargo date
-        if self._metadata.get('embargo_date'):
-            record_add_field(
-                rec, '942', subfields=[('a', self._metadata['embargo_date'])])
-        return rec
-
-    def _record_fulltext(self, rec):
-         # Firerole
-        fft_status = ''
-        if self._metadata['access_rights'] == 'embargoedAccess':
-            fft_status = 'firerole: deny until "%s"\nallow any' % self._metadata['embargo_date']
-        elif self._metadata['access_rights'] in ('closedAccess', 'restrictedAccess'):
-            fft_status = 'status: %s' % self._metadata['access_rights']
-
-        # Fulltext
-        for key, fulltext in self.fulltexts.iteritems():
-            subfields = [('a', fulltext.fullpath)]
-            if fft_status:
-                subfields.append(('r', fft_status))
-            record_add_field(rec, 'FFT', subfields=subfields)
-        return rec
-
+    # ==========
+    # Properties
+    # ==========
     ln = property(get_ln)
     status = property(get_status, set_status)
     md = property(get_md)

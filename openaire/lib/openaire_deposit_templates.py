@@ -21,8 +21,11 @@ import os
 import re
 from cgi import escape as cgi_escape
 
+
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_ETCDIR, CFG_VERSION
 from invenio.messages import gettext_set_language
+from invenio.openaire_deposit_config import CFG_OPENAIRE_CC0_PUBLICATION_TYPES, \
+    CFG_OPENAIRE_PUBLICATION_TYPES_KEYS
 from invenio.textutils import nice_size
 
 CFG_OPENAIRE_PAGE_TEMPLATE = open(
@@ -224,7 +227,7 @@ class Template:
         values['original_title_label'] = escape(_("Original language title"))
         values['original_title_tooltip'] = escape(
             _("The full title of your publication in its original language"))
-        values['authors_label'] = escape(_("Author(s)"))
+        values['authors_label'] = escape(_("Author(s) (one per line)"))
         values['authors_tooltip'] = escape(_("<p>Please enter one author per line in the form: <pre>Last name, First Name: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
         values['authors_hint'] = escape(_("Doe, John: Example institution"))
         values['abstract_label'] = escape(_("English abstract"))
@@ -242,7 +245,7 @@ class Template:
         values["doi_tooltip"] = escape(_("""<p>The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of your publication, as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
         values["doi_label"] = escape(_("DOI"))
         values['publication_date_label'] = escape(_("Publication date"))
-        values['publication_date_tooltip'] = escape(_("This is the official publication date of your document. It's format is <pre>YYYY/MM/DD</pre> such as in <pre>2010/12/25</pre>"""))
+        values['publication_date_tooltip'] = escape(_("This is the official publication date of your document. It's format is <pre>YYYY-MM-DD</pre> such as in <pre>2010-12-25</pre>"""))
         values['volume_label'] = escape(_("Volume"))
         values['volume_tooltip'] = escape(_("The volume part of the publication information, which is typically a number."))
         values['issue_label'] = escape(_("Issue"))
@@ -258,6 +261,8 @@ class Template:
         values['status_ok_label'] = escape(_('Metadata are OK!'))
         values['submit_label'] = escape(_('Submit this publication'))
         values['form_status'] = 'error'  # FIXME metadata_status
+        values['access_rights_classes'] = self.tmpl_access_rights_classes(
+            publicationid)
         values['access_rights_options'] = self.tmpl_access_rights_options(
             values.get('access_rights_value', ''), ln=ln)
         values['access_rights_tooltip'] = escape(_("This is the kind of access rights associated with your publication."))
@@ -289,10 +294,9 @@ class Template:
         values['accept_cc0_license_label'] = escape(_("""I understand that by submitting data to OpenAIRE Orphan Record Repository, I am agreeing to release it under the terms of the %(cc0)s waiver. All authors of the data have agreed to the terms of this waiver."""), True) % {'cc0' : '<a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero (CC0)</a>'}
         values['accept_cc0_license_tooltip'] = ""
 
-        values['publication_type'] = escape(_(
-            """Document information"""), True)
+        values['publication_type'] = escape(_("""Type"""), True)
         values['publication_type_label'] = escape(
-            _("""Type of publication/data"""), True)
+            _("""Type of submission"""), True)
         values['publication_type_tooltip'] = escape(_("""This is the type of publication you are depositing. Different publications have different types of publications have different fields to complete."""), True)
         values['publication_type_options'] = self.tmpl_publication_type_options(values.get('publication_type_value', None), ln)
 
@@ -304,6 +308,28 @@ class Template:
         values['related_publications_label'] = escape(
             _("""DOIs for associated publications (one per line)"""), True)
         values['related_publications_tooltip'] = escape(_("""The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of associated publications as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
+
+        values['publisher_label'] = escape(_("""Publisher"""), True)
+        values['publisher_tooltip'] = escape(_(""""""), True)
+
+        values['place_label'] = escape(_("""Place"""), True)
+        values['place_tooltip'] = escape(
+            _("""Place of publication, e.g '<i>City, Country</i>'"""), True)
+
+        values['report_type_label'] = escape(_("""Report type"""), True)
+        values['report_type_tooltip'] = escape(_(""""""), True)
+        values['report_type_options'] = self.tmpl_report_type_options(
+            values.get('report_type_value', None), ln)
+
+        values['extra_report_numbers_label'] = escape(
+            _("""Report numbers (one per line)"""), True)
+        values['extra_report_numbers_tooltip'] = escape(_(""""""), True)
+
+        values['identifiers_information_label'] = escape(
+            _("""Identifier(s) information"""), True)
+
+        values['isbn_label'] = escape(_("""ISBN"""), True)
+        values['isbn_tooltip'] = escape(_("""A valid ISBN-10 (e.g. 0-06-251587-X) or ISBN-13 number (e.g. 978-0062515872) if available."""), True)
 
         if warnings:
             for key, value in warnings.iteritems():
@@ -382,29 +408,67 @@ class Template:
             ln=CFG_SITE_LANG,
         )
 
+    def tmpl_type_options(self, text, selected_value, types, default, ln=CFG_SITE_LANG):
+        items = types(ln).items()
+        items.sort()
+
+        if not selected_value:
+            selected_value = default
+
+        return self.tmpl_generic_options(
+            text,
+            items,
+            selected_value,
+            ln=CFG_SITE_LANG,
+        )
+
     def tmpl_publication_type_options(self, selected_value, ln=CFG_SITE_LANG):
         """
         Options for publication types drop-down
 
         @see: tmpl_generic_options
         """
-        from invenio.openaire_deposit_engine import CFG_OPENAIRE_PUBLICATION_TYPES, \
-            CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
-        
         _ = gettext_set_language(ln)
-        
-        items = CFG_OPENAIRE_PUBLICATION_TYPES(ln).items()
-        items.sort()
-        
-        if not selected_value:
-            selected_value = CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
-        
-        return self.tmpl_generic_options(
-            _("Select publication type"),
-            items,
-            selected_value,
-            ln=CFG_SITE_LANG,
-        )
+
+        from invenio.openaire_deposit_config import CFG_OPENAIRE_PUBLICATION_TYPES, \
+            CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE
+
+        return self.tmpl_type_options(
+            _("Select publication type"), selected_value,
+            CFG_OPENAIRE_PUBLICATION_TYPES, CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE)
+
+    def tmpl_report_type_options(self, selected_value, ln=CFG_SITE_LANG):
+        """
+        Options for publication types drop-down
+
+        @see: tmpl_generic_options
+        """
+        _ = gettext_set_language(ln)
+
+        from invenio.openaire_deposit_config import CFG_OPENAIRE_REPORT_TYPES, \
+            CFG_OPENAIRE_DEFAULT_REPORT_TYPE
+
+        return self.tmpl_type_options(_("Select report type"), selected_value,
+                                      CFG_OPENAIRE_REPORT_TYPES, CFG_OPENAIRE_DEFAULT_REPORT_TYPE)
+
+    def tmpl_access_rights_classes(self, publicationid):
+        """
+        Generate string of CSS classes used to enable/disable
+        access rights options for a given publication type.
+
+        Example of return value::
+          "typebox_fgsEsd2_report typebox_fgsEsd2_publishedArticle"
+
+        Output is controlled via the two configuration variables::
+
+         * CFG_OPENAIRE_PUBLICATION_TYPES_KEYS
+         * CFG_OPENAIRE_CC0_PUBLICATION_TYPES
+        """
+        classes = []
+        for field in CFG_OPENAIRE_PUBLICATION_TYPES_KEYS:
+            if field not in CFG_OPENAIRE_CC0_PUBLICATION_TYPES:
+                classes.append("typebox_%s_%s" % (publicationid, field))
+        return " ".join(classes)
 
     def tmpl_upload_publications(self, projectid, project_information, session, style, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)

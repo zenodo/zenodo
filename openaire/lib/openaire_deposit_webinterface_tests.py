@@ -322,7 +322,7 @@ class AjaxGatewayTest(unittest.TestCase):
         self.assertNotEqual(
             res.json['errors']['publication_type_%s' % self.pub_id], '')
 
-        # Publication type
+        # Report pages no
         res = self.client.post("/deposit/ajaxgateway", data=self.action_verify_field('report_pages_no', '6545'))
         self.assertEqual(
             res.json['errors']['report_pages_no_%s' % self.pub_id], '')
@@ -330,7 +330,7 @@ class AjaxGatewayTest(unittest.TestCase):
         self.assertNotEqual(
             res.json['errors']['report_pages_no_%s' % self.pub_id], '')
 
-        # Publication type
+        # Keywords
         res = self.client.post("/deposit/ajaxgateway", data=self.action_verify_field('keywords', 'multiline\nkeywords'))
         self.assertEqual(res.json['errors']['keywords_%s' % self.pub_id], '')
         self.assertEqual(res.json['warnings']['keywords_%s' % self.pub_id], '')

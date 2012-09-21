@@ -25,8 +25,20 @@ import re
 import time
 
 from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS, \
-    CFG_OPENAIRE_PUBLICATION_TYPES
+    CFG_OPENAIRE_PUBLICATION_TYPES, CFG_OPENAIRE_REPORT_TYPES
+from invenio.validators import is_isbn, is_all_uppercase, is_probably_list
 
+
+def explode_values(val, check_func, stop_on_error=True):
+    """ """
+    errors = []
+    warnings = []
+
+    for row in val.splitlines():
+        row = row.strip()
+        errs, warns = check_func(row)
+        if stop_on_error and errs:
+            return
 
 # Regular expressions
 _RE_AUTHOR_ROW = re.compile(u'^\w{2,}(\s+\w{2,})*\s*,\s*(\w{2,}|\w\.)(\s+\w{1,}|\s+\w\.)*\s*(:\s*\w{2,}.*)?$', re.U)
@@ -41,11 +53,7 @@ def _check_title(metadata, ln, _):
         return ('title', 'error', [_('The title field of the publication is mandatory but is currently empty')])
     elif title:
         title = title.decode('UTF8')
-        uppers = 0
-        for c in title:
-            if c.isupper():
-                uppers += 1
-        if 1.0 * uppers / len(title) > 0.75:
+        if is_all_uppercase(title):
             return ('title', 'warning', [_('The title field of the publication seems to be written all in UPPERCASE')])
         elif title.islower():
             return ('title', 'warning', [_('The title field of the publication seems to be written all in lowercase. Was this intentional?')])
@@ -55,11 +63,7 @@ def _check_original_title(metadata, ln, _):
     title = metadata.get('original_title', '')
     title = title.decode('UTF8')
     if title:
-        uppers = 0
-        for c in title:
-            if c.isupper():
-                uppers += 1
-        if 1.0 * uppers / len(title) > 0.75:
+        if is_all_uppercase(title):
             return ('original_title', 'warning', [_('The original title field of the publication seems to be written all in UPPERCASE')])
 
 
@@ -69,24 +73,8 @@ def _check_keywords(metadata, ln, _):
     if keywords:
         for keyword in keywords.splitlines():
             keyword = keyword.strip()
-            if keyword:
-                count_dash = 0
-                warn = False
-                for c in keyword:
-                    if c == ";":
-                        warn = True
-                        break
-                    elif c == ",":
-                        warn = True
-                        break
-                    elif c == "-":
-                        count_dash += 1
-                        if count_dash >= 2:
-                            warn = True
-                            break
-
-                if warn:
-                    return ('keywords', 'warning', [_('Please ensure that you have only one keyword/phrase per line.')])
+            if is_probably_list(keyword):
+                return ('keywords', 'warning', [_('Please ensure that you have only one keyword/phrase per line.')])
 
 
 def _check_authors(metadata, ln, _):
@@ -96,7 +84,7 @@ def _check_authors(metadata, ln, _):
         return ('authors', 'error', [_('The authorship of the publication is a mandatory field but is currently empty')])
     errors = []
     warnings = []
-    for row in authors.split('\n'):
+    for row in authors.splitlines():
         row = row.strip()
         if row:
             if not _RE_AUTHOR_ROW.match(row):
@@ -219,6 +207,27 @@ def _check_related_publications(metadata, ln, _):
             return ('related_publications', 'error', [_('You must provide at least one DOI.')])
 
 
+def _check_report_type(metadata, ln, _):
+    report_type = metadata.get('report_type', '')
+    if not report_type in CFG_OPENAIRE_REPORT_TYPES(ln):
+        return ('report_type', 'error', [_('The report type field of the publication is not set to one of the expected values')])
+
+
+def _check_extra_report_numbers(metadata, ln, _):
+    val = metadata.get('extra_report_numbers', '')
+    val = val.decode('UTF8')
+    for row in val.splitlines():
+        row = row.strip()
+        if is_probably_list(row):
+            return ('extra_report_numbers', 'warning', [_('Please ensure that you have only one report number per line.')])
+
+
+def _check_isbn(metadata, ln, _):
+    val = metadata.get('isbn', '').strip()
+    if val and not is_isbn(val.strip()):
+        return ('isbn', 'error', [_('\'%s\' is not a valid ISBN-10 or ISBN-13 number.' % val)])
+
+
 CFG_METADATA_FIELDS_CHECKS = {
     'title': _check_title,
     'original_title': _check_original_title,
@@ -235,6 +244,11 @@ CFG_METADATA_FIELDS_CHECKS = {
     'keywords': _check_keywords,
     'accept_cc0_license': _check_accept_cc0_license,
     'related_publications': _check_related_publications,
+    #'publisher' : _check_publisher,
+    #'place' : _check_place,
+    'report_type': _check_report_type,
+    'extra_report_numbers': _check_extra_report_numbers,
+    'isbn': _check_isbn,
 }
 """
 Dictionary of metadata field validator functions.

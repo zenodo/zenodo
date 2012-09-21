@@ -129,7 +129,6 @@ span.tooltip {
 
 select:focus, input[type="text"]:focus, textarea:focus {
     background: #FFFF99;
-    border: #FFFF99 dotted;
   }
 
 .status_msg {

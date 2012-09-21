@@ -7,7 +7,7 @@
         <br />
     </td>
     <td width="35%%" valign="top">
-    	<div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_publishedArticle">
+    	<div class="typebox_%(id)s %(access_rights_classes)s">
 	        <img title="%(access_rights_tooltip)s" class="tooltip mandatory" src="%(site)s/img/help.png" /> 
 	        <select id="access_rights_%(id)s" name="access_rights_%(id)s" class="access_rights">
 	            %(access_rights_options)s
@@ -32,7 +32,7 @@
         <div id="body_%(id)s" class="body">
             <p><em>%(mandatory_label)s</em></p>
             <fieldset>
-                <legend>%(publication_type)s</legend>
+                <!--<legend>%(publication_type)s</legend>-->
                 <div>
 	                <img title="%(publication_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
 	                <label class="mandatory">%(publication_type_label)s</label>
@@ -126,6 +126,28 @@
             </fieldset>
             <div class="clear"></div>
             <fieldset>
+                <legend>%(identifiers_information_label)s</legend>
+                <div>
+                    <img title="%(doi_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="doi_%(id)s">%(doi_label)s
+                    </label>
+                    <br />
+                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" placeholder="10.1234/foo-bar" pattern="(doi:)?10\.\d+/.*"/>
+                    <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
+                    <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_report">
+                    <img title="%(isbn_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="isbn_%(id)s">%(isbn_label)s
+                    </label>
+                    <br />
+                    <input type="text" name="isbn_%(id)s" id="isbn_%(id)s" value="%(isbn_value)s" size="75" class="isbn" placeholder="e.g. 0-06-251587-X" />
+                    <div id="error_isbn_%(id)s" class="error">%(error_isbn_value)s</div>
+                    <div id="warning_isbn_%(id)s" class="warning">%(warning_isbn_value)s</div>
+                </div>
+            </fieldset>
+            <div class="clear"></div>
+            <fieldset>
                 <legend>%(publication_information_label)s</legend>
                 <div>
                     <img title="%(publication_date_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
@@ -143,15 +165,6 @@
 	                    <input type="text" name="journal_title_%(id)s" id="journal_title_%(id)s" value="%(journal_title_value)s" size="75" class="journal_title" />
 	                    <div id="error_journal_title_%(id)s" class="error">%(error_journal_title_value)s</div>
 	                    <div id="warning_journal_title_%(id)s" class="warning">%(warning_journal_title_value)s</div>
-	                </div>
-	                <div>
-	                    <img title="%(doi_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="doi_%(id)s">%(doi_label)s
-	                    </label>
-	                    <br />
-	                    <input type="text" name="doi_%(id)s" id="doi_%(id)s" value="%(doi_value)s" size="75" class="doi" placeholder="10.1234/foo-bar" pattern="(doi:)?10\.\d+/.*"/>
-	                    <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
-	                    <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
 	                </div>
 	                <div>
 	                    <img title="%(volume_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
@@ -172,14 +185,41 @@
 	                </div>
 	            </div>
 	            <div class="typebox_%(id)s typebox_%(id)s_report">
-	            	<div>
-	                    <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="report_pages_no_%(id)s">%(report_pages_no_label)s
-	                    </label>
+	                <div>
+	                    <img title="%(report_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="report_type_%(id)s" class="mandatory">%(report_type_label)s</label>
+	                    <select name="report_type_%(id)s" id="report_type_%(id)s" class="report_type">
+	                        %(report_type_options)s
+	                    </select>
 	                    <br />
-	                    <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="75" class="report_pages_no" />
+	                    <div id="error_report_type_%(id)s" class="error">%(error_report_type_value)s</div>
+	                    <div id="warning_report_type_%(id)s" class="warning">%(warning_report_type_value)s</div>
+	                </div>
+	                <div>
+	                    <img title="%(publisher_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="publisher_%(id)s">%(publisher_label)s</label>
+	                    <input type="text" name="publisher_%(id)s" id="publisher_%(id)s" value="%(publisher_value)s" size="15" class="publisher" />
+	                    <img title="%(place_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="place_%(id)s">%(place_label)s</label>
+	                    <input type="text" name="place_%(id)s" id="place_%(id)s" value="%(place_value)s" size="15" class="place" />
+	                    <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="report_pages_no_%(id)s">%(report_pages_no_label)s</label>
+	                    <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="4" class="report_pages_no" />
+	                    <br />
+	                    <div id="error_publisher_%(id)s" class="error">%(error_publisher_value)s</div>
+	                    <div id="warning_publisher_%(id)s" class="warning">%(warning_publisher_value)s</div>
+	                    <div id="error_place_%(id)s" class="error">%(error_place_value)s</div>
+	                    <div id="warning_place_%(id)s" class="warning">%(warning_place_value)s</div>
 	                    <div id="error_report_pages_no_%(id)s" class="error">%(error_report_pages_no_value)s</div>
 	                    <div id="warning_report_pages_no_%(id)s" class="warning">%(warning_report_pages_no_value)s</div>
+	                </div>
+	                <div>
+	                    <img title="%(extra_report_numbers_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+	                    <label for="extra_report_numbers_%(id)s">%(extra_report_numbers_label)s</label>
+	                    <br />
+	                    <textarea name="extra_report_numbers_%(id)s" id="extra_report_numbers_%(id)s" cols="60" rows="5" class="extra_report_numbers">%(extra_report_numbers_value)s</textarea>
+	                    <div id="error_extra_report_numbers_%(id)s" class="error">%(error_extra_report_numbers_value)s</div>
+	                    <div id="warning_extra_report_numbers_%(id)s" class="warning">%(warning_extra_report_numbers_value)s</div>
 	                </div>
 	            </div>
 	            <div class="typebox_%(id)s typebox_%(id)s_data">

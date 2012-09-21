@@ -38,6 +38,69 @@ CFG_OPENAIRE_DEPOSIT_PATH = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, 'OpenAIRE')
 CFG_OPENAIRE_MANDATORY_PROJECTS = True
 """ Determine if EU FP7 project metadata is required. """
 
+CFG_METADATA_STATES = ('ok', 'error', 'warning', 'empty')
+"""
+Field states used during form validation.
+
+Note: Currently unused in code, but useful for defining which strings might be
+returned as metadata status.
+"""
+
+CFG_PUBLICATION_STATES = (
+    'initialized',
+    'edited',
+    'submitted',
+    'pendingapproval',
+    'approved',
+    'rejected'
+)
+"""
+States for a in-progress submission.
+"""
+
+CFG_OPENAIRE_CURATORS = []
+""" List of curator email addresses. """
+if MAIN_CFG_OPENAIRE_CURATORS.strip():
+    CFG_OPENAIRE_CURATORS = [x.strip(
+    ) for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
+
+# =================
+# Publication types
+# =================
+
+
+def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
+    """
+    Publication types
+
+    @param ln: Language for human readable version of publication types.
+    @return: Dictionary with type ids as keys and type titles as values.
+    """
+    _ = gettext_set_language(ln)
+
+    return {
+        'publishedArticle': _("Published article"),
+        'preprint': _("Preprint"),
+        'report': _("Report"),
+        'thesis': _("Thesis"),
+        'workingPaper': _("Working paper"),
+        'book': _("Book"),
+        'periodicalContribution': _("Periodical contribution"),
+        'conferenceContribution': _("Conference contribution"),
+        'generalTalk': _("General talk"),
+        'patent': _("Patent"),
+        'data': _("Data set"),
+    }
+
+CFG_OPENAIRE_PUBLICATION_TYPES_KEYS = CFG_OPENAIRE_PUBLICATION_TYPES(
+    'en').keys()
+CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE = 'publishedArticle'
+CFG_OPENAIRE_CC0_PUBLICATION_TYPES = ['data', ]
+
+# ===============
+# Metadata fields
+# ===============
+
 CFG_METADATA_FIELDS = (
     'title',
     'original_title',
@@ -59,33 +122,53 @@ CFG_METADATA_FIELDS = (
     'report_pages_no',
     'accept_cc0_license',
     'related_publications',
+    'publisher',
+    'place',
+    'report_type',
+    'extra_report_numbers',
+    'isbn',
 )
-"""
-List of metadata fields, used in eg washing of URL parameters.
-"""
+""" List of metadata fields, used in eg washing of URL parameters. """
 
-CFG_METADATA_STATES = ('ok', 'error', 'warning', 'empty')
-"""
-Field states used during form validation.
-TODO: Unused?
-"""
-
-CFG_PUBLICATION_STATES = (
-    'initialized',
-    'edited',
-    'submitted',
-    'pendingapproval',
-    'approved',
-    'rejected'
+CFG_METADATA_FIELDS_COMMON = (
+    'publication_type',
+    'authors',
+    'title',
+    'abstract',
+    'language',
+    'original_title',
+    'original_abstract',
+    'publication_date',
+    'keywords',
+    'notes',
+    'doi',
+    # TODO: Where is project?
 )
+""" List of metadata fields, common to all types of publications """
+
+CFG_METADATA_FIELDS_GROUPS = {
+    'publishedArticle': ['ACCESS_RIGHTS', 'JOURNAL', ],
+    'preprint': [],
+    'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN', ],
+    'thesis': [],
+    'workingPaper': [],
+    'book': [],
+    'periodicalContribution': [],
+    'conferenceContribution': [],
+    'generalTalk': [],
+    'patent': [],
+    'data': ['CC0', 'RELATED_PUBLICATIONS'],
+}
 """
-States for a in-progress submission.
+Mapping of publication type to grouping of fields.
+
+A group of fields can e.g. be JOURNAL for representing journal_title, volume,
+pages and issue. This is used in the engine to generate MARC.
 """
 
-CFG_OPENAIRE_CURATORS = []
-""" List of curator email addresses. """
-if MAIN_CFG_OPENAIRE_CURATORS.strip():
-    CFG_OPENAIRE_CURATORS = [x.strip() for x in MAIN_CFG_OPENAIRE_CURATORS.split(",")]
+# =======================
+# Controlled vocabularies
+# =======================
 
 
 def CFG_ACCESS_RIGHTS(ln):
@@ -102,29 +185,35 @@ def CFG_ACCESS_RIGHTS(ln):
         'restrictedAccess': _("Restricted access"),
         'openAccess': _("Open access")
     }
+CFG_ACCESS_RIGHTS_KEYS = CFG_ACCESS_RIGHTS('en').keys()
+CFG_DEFAULT_ACCESS_RIGHTS = 'closedAccess'
 
 
-CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE = 'publishedArticle'
-
-def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
+def CFG_OPENAIRE_REPORT_TYPES(ln):
     """
-    Publication types
-    
-    @param ln: Language for human readable version of publication types.
-    @return: Dictionary with type ids as keys and type titles as values. 
+    Report types
     """
     _ = gettext_set_language(ln)
     return {
-        'publishedArticle': _("Published article"),
-        'preprint': _("Preprint"),
-        'report': _("Report"),
-        'thesis': _("Thesis"),
-        'workingPaper': _("Working paper"),
-        # Dataset
-        'book': _("Book"),
-        'periodicalContribution': _("Periodical contribution"),
-        'conferenceContribution': _("Conference contribution"),
-        'generalTalk': _("General talk"),
-        'patent': _("Patent"),
-        #'data': _("Data set"),
+        'projectDeliverable': _("Project deliverable"),
+        'other': _("Other"),
     }
+
+CFG_OPENAIRE_REPORT_TYPES_KEYS = CFG_OPENAIRE_REPORT_TYPES('en').keys()
+CFG_OPENAIRE_DEFAULT_REPORT_TYPE = 'other'
+
+
+def CFG_OPENAIRE_CONFERENCE_TYPES(ln):
+    """
+    Conference contribution types
+    """
+    _ = gettext_set_language(ln)
+    return {
+        'proceedingArticle': _("Proceedings article"),
+        'poster': _("Poster"),
+        'conferencePaper': _("Conference paper"),
+        'conferencePaper': _("Conference talk"),
+    }
+
+CFG_OPENAIRE_CONFERENCE_TYPES_KEYS = CFG_OPENAIRE_CONFERENCE_TYPES('en').keys()
+CFG_OPENAIRE_DEFAULT_CONFERENCE_TYPE = 'proceedingArticle'
