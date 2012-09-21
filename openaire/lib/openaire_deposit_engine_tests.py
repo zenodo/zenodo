@@ -18,7 +18,10 @@
 """
 """
 from StringIO import StringIO
-import json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 import os
 import re
 import unittest
@@ -58,8 +61,9 @@ class DOIRegressionTest(unittest.TestCase):
 
 
 class EngineTest(unittest.TestCase):
-    user_id = 1
+    user_id = None
     project_id = '283595'
+    
 
     def record_marc_output(self, rec):
         """
@@ -113,6 +117,11 @@ class EngineTest(unittest.TestCase):
     # Tests
     #
     def setUp(self):
+        if self.user_id == None:
+            res = run_sql("SELECT id FROM user WHERE nickname='admin'")
+            assert(len(res) == 1, "Couldn't find admin user")
+            self.user_id = int(res[0][0])
+                
         self.pub = OpenAIREPublication(self.user_id)
         self.pub_id = self.pub.publicationid
 

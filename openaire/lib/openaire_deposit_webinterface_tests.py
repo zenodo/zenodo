@@ -22,7 +22,10 @@ TODO: Strong dependency on Werkzeug and json
 
 from StringIO import StringIO
 from tempfile import mkstemp
-import json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 import os
 import re
 import unittest
@@ -99,7 +102,7 @@ class AjaxGatewayTest(unittest.TestCase):
     Testing of AJAX Gateway
     """
 
-    user_id = 1
+    user_id = None
     """ User for which we want to add publications. """
 
     project_id = '283595'
@@ -283,6 +286,11 @@ class AjaxGatewayTest(unittest.TestCase):
         """
         Create test client, login with the given user and create a new publication.
         """
+        if self.user_id == None:
+            res = run_sql("SELECT id FROM user WHERE nickname='admin'")
+            assert(len(res) == 1, "Couldn't find admin user")
+            self.user_id = int(res[0][0])
+            
         uname = get_nickname(self.user_id)
         self.assertEqual(uname, "admin")
 

@@ -33,7 +33,10 @@ Which method to use?
 from invenio.webinterface_handler_wsgi import SimulatedModPythonRequest
 from werkzeug.test import Client, EnvironBuilder
 from werkzeug.wrappers import BaseResponse
-import json
+try:
+    import json
+except ImportError:
+    import simplejson as json
 
 class RequestFactory(object):
     """
@@ -146,7 +149,6 @@ class TestClient(Client):
             'referer' : '',
             'p_un' : username,
             'p_pw' : password,
-            'remember_me' : '',
             'action' : 'login'
         }
         return self.post('/youraccount/login', data=data)
