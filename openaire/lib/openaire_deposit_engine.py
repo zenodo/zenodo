@@ -1024,6 +1024,7 @@ class OpenAIREPublication(object):
 
         # Journal
         if 'JOURNAL' in field_groups:
+            subfields = []
             if self._metadata.get('journal_title'):
                 subfields.append(('p', self._metadata['journal_title']))
             if self._metadata.get('publication_date'):
