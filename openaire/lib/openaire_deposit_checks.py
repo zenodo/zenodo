@@ -218,7 +218,7 @@ def _check_extra_report_numbers(metadata, ln, _):
     val = val.decode('UTF8')
     for row in val.splitlines():
         row = row.strip()
-        if is_probably_list(row):
+        if is_probably_list(row, separators=[';', ',']):
             return ('extra_report_numbers', 'warning', [_('Please ensure that you have only one report number per line.')])
 
 

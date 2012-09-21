@@ -73,12 +73,11 @@ def is_all_uppercase(val):
         return False
 
 
-def is_probably_list(val):
+def is_probably_list(val, separators=[';','-',',']):
     """ Returns true if string looks like a list - e.g. a, b, c, or a; b; c;"""
     if val:
         LIMIT = 2
-        counts = {';': 0, '-': 0, ',': 0, }
-        separators = counts.keys()
+        counts = dict([(x, 0) for x in separators])
         warn = False
         for c in val:
             for sep in separators:
