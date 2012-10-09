@@ -456,6 +456,7 @@ class OpenAIREPublication(object):
     def __init__(self, uid, publicationid=None, ln=CFG_SITE_LANG, style='invenio'):
         """
         """
+        self.__deleted = False
         self._metadata = {}
         self._metadata['__uid__'] = uid
         self._metadata['__publicationid__'] = publicationid
@@ -489,7 +490,6 @@ class OpenAIREPublication(object):
         self.errors = {}
         self._initialize_storage()
         self._load()
-        self.__deleted = False
 
     def __del__(self):
         """
