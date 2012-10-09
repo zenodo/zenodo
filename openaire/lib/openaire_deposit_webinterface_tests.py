@@ -28,7 +28,7 @@ except ImportError:
     import simplejson as json
 import os
 import re
-import unittest
+import unittest2 as unittest
 
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission

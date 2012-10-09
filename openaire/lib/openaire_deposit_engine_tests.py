@@ -24,7 +24,7 @@ except ImportError:
     import simplejson as json
 import os
 import re
-import unittest
+import unittest2 as unittest
 
 from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS, _RE_DOI
 from invenio.openaire_deposit_config import CFG_METADATA_FIELDS
