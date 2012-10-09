@@ -22,7 +22,7 @@ made in the records.
 """
 
 from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
-from invenio.openaire_deposit_engine import OpenAIREPublication, normalize_keywords
+from invenio.openaire_deposit_engine import OpenAIREPublication, normalize_multivalue_field
 from invenio.intbitset import intbitset
 from invenio.dbquery import run_sql
 
@@ -75,7 +75,7 @@ def bst_openaire_keywords():
                 current_keywords = dict([(x[0],1) for x in run_sql("SELECT value FROM bibrec_bib65x JOIN bib65x ON id=id_bibxxx WHERE id_bibrec=%s AND tag='6531_a' ORDER BY id_bibrec, field_number", (recid,))])
             else:
                 pub = OpenAIREPublication(uid, publicationid=pubid)
-                current_keywords = dict([(x,1) for x in normalize_keywords(pub._metadata.get('keywords','')).splitlines()])
+                current_keywords = dict([(x,1) for x in normalize_multivalue_field(pub._metadata.get('keywords',''), sort=True).splitlines()])
         
         # Check if keyword is in the current list of keywords.
         if keyword not in current_keywords:
