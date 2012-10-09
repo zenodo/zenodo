@@ -61,10 +61,9 @@
             <fieldset>
                 <div>
                     <img title="%(authors_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-                    <label for="authors_%(id)s" class="mandatory">%(authors_label)s
-                    </label>
-                    <br />
-                    <textarea name="authors_%(id)s" id="authors_%(id)s" cols="60" rows="5" class="authors">%(authors_value)s</textarea>
+                    <label for="authors_%(id)s" class="mandatory">%(authors_label)s</label><br />
+                    <textarea name="authors_%(id)s" id="authors_%(id)s" cols="60" rows="5" class="authors" placeholder="%(authors_placeholder)s">%(authors_value)s</textarea>
+                    
                     <div id="error_authors_%(id)s" class="error">%(error_authors_value)s</div>
                     <div id="warning_authors_%(id)s" class="warning">%(warning_authors_value)s</div>
                 </div>

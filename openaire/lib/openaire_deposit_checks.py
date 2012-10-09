@@ -104,6 +104,8 @@ def _check_authors(metadata, ln, _):
                     warnings.append(_("""It seems that the affiliation <strong>"%(affiliation)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"affiliation": escape(affiliation.encode('UTF8')), "row": escape(row.encode('UTF8'))})
                 if name.isupper():
                     warnings.append(_("""It seems that the author name <strong>"%(name)s"</strong> for the authorship <strong>"%(row)s"</strong> has been written all upper case. Was this intentional?""") % {"name": escape(name.encode('UTF8')), "row": escape(row.encode('UTF8'))})
+                if ':' in affiliation:
+                    warnings.append(_("""Please ensure you only have one author per line.""") % {"name": escape(name.encode('UTF8')), "row": escape(row.encode('UTF8'))})
     if errors:
         return ('authors', 'error', errors)
     elif warnings:
