@@ -210,10 +210,12 @@ def _check_related_publications(metadata, ln, _):
 
 
 def _check_report_type(metadata, ln, _):
-    report_type = metadata.get('report_type', '')
-    if not report_type in CFG_OPENAIRE_REPORT_TYPES(ln):
-        return ('report_type', 'error', [_('The report type field of the publication is not set to one of the expected values')])
-
+    publication_type = metadata.get('publication_type', '')
+    if publication_type == 'report':
+        report_type = metadata.get('report_type', '')
+        if not report_type in CFG_OPENAIRE_REPORT_TYPES(ln):
+            return ('report_type', 'error', [_('The report type field of the publication is not set to one of the expected values')])
+    
 
 def _check_extra_report_numbers(metadata, ln, _):
     val = metadata.get('extra_report_numbers', '')
