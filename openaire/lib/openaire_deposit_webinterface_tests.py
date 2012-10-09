@@ -487,7 +487,7 @@ class AjaxGatewayTest(unittest.TestCase):
         """
         Test a complete submission
         """
-        for type in ['publishedArticle', ]:
+        for type in ['publishedArticle', 'report']:
             for style in ['invenio', 'portal']:
                 self._submit(type, style, submit=self.test_full_submit)
 

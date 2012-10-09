@@ -80,16 +80,16 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
 
     return {
         'publishedArticle': _("Published article"),
-        'preprint': _("Preprint"),
+        #'preprint': _("Preprint"),
         'report': _("Report"),
-        'thesis': _("Thesis"),
-        'workingPaper': _("Working paper"),
-        'book': _("Book"),
-        'periodicalContribution': _("Periodical contribution"),
-        'conferenceContribution': _("Conference contribution"),
-        'generalTalk': _("General talk"),
-        'patent': _("Patent"),
-        'data': _("Data set"),
+        #'thesis': _("Thesis"),
+        #'workingPaper': _("Working paper"),
+        #'book': _("Book"),
+        #'periodicalContribution': _("Periodical contribution"),
+        #'conferenceContribution': _("Conference contribution"),
+        #'generalTalk': _("General talk"),
+        #'patent': _("Patent"),
+        #'data': _("Data set"),
     }
 
 CFG_OPENAIRE_PUBLICATION_TYPES_KEYS = CFG_OPENAIRE_PUBLICATION_TYPES(

@@ -64,7 +64,12 @@ FIXTURES = {
         'keywords': 'Keyword 1\nKeyword 2',
         'notes': 'Test notes',
         'report_pages_no': '6',
+        'isbn': '0-06-251587-X',
         'related_publications': '10.1016.12.31/nature.S0735-1097(98)2000/12/31/34:7-7\n\ndoi:10.1000/123456',
+        'report_type': 'other',
+        'publisher' : 'CERN',
+        'place' : 'Geneva',
+        'extra_report_numbers' : 'OPENAIRE-VIGGO',
     },
     'data': {
         'accept_cc0_license': 'yes',
@@ -124,11 +129,14 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 """
 
 MARC_FIXTURES['report'] = """
+020   $$a0-06-251587-X
 RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 041   $$aeng
+088   $$aOPENAIRE-VIGGO
 100   $$aBégin, Marc Elian$$uSIXSQ SARL
 245   $$aRelease of StratusLab 2.0 Beta
 260   $$c2012-05-02
+260   $$aGeneva$$bCERN$$c2012
 300   $$a6
 500   $$aTest notes
 520   $$aStratusLab uses agile software development methodologies, specifically Scrum, to produce public beta releases every six to eight weeks. Each release builds on the previous ones to provide additional features or more robust implementations of services. This document describes the latest 2.0 beta release, called v1.4, as stepping stone towards the final 2.0 production release in May 2012.
@@ -138,6 +146,7 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 6531  $$aKeyword 2
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
+980   $$bREPORT_OTHER
 980   $$aREPORTS
 """
 
