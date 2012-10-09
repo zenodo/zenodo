@@ -20,20 +20,25 @@
 from invenio.openaire_deposit_config import CFG_METADATA_FIELDS
 from invenio.webinterface_handler import wash_urlargd
 
+
 def wash_form(form, publicationid=None):
     if publicationid is None:
         return wash_urlargd(form, dict([(field, (str, None)) for field in CFG_METADATA_FIELDS]))
     else:
         return wash_urlargd(form, dict([('%s_%s' % (field, publicationid), (str, None)) for field in CFG_METADATA_FIELDS]))
 
+
 def strip_publicationid(fieldname, publicationid):
     return fieldname[:-len("_%s" % publicationid)]
+
 
 def add_publicationid(fieldname, publicationid):
     return "%s_%s" % (fieldname, publicationid)
 
+
 def namespaced_metadata2simple_metadata(namespaced_metadata, publicationid):
     return dict((strip_publicationid(key, publicationid), value) for key, value in namespaced_metadata.iteritems() if key.endswith('_%s' % publicationid))
+
 
 def simple_metadata2namespaced_metadata(simple_metadata, publicationid):
     return dict((add_publicationid(key, publicationid), value) for key, value in simple_metadata.iteritems())

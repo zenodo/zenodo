@@ -25,14 +25,18 @@ from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_ETCDIR, CFG_VERSION
 from invenio.messages import gettext_set_language
 from invenio.textutils import nice_size
 
-CFG_OPENAIRE_PAGE_TEMPLATE = open(os.path.join(CFG_ETCDIR, 'openaire_page.tpl')).read()
-CFG_OPENAIRE_FORM_TEMPLATE = open(os.path.join(CFG_ETCDIR, 'openaire_form.tpl')).read()
+CFG_OPENAIRE_PAGE_TEMPLATE = open(
+    os.path.join(CFG_ETCDIR, 'openaire_page.tpl')).read()
+CFG_OPENAIRE_FORM_TEMPLATE = open(
+    os.path.join(CFG_ETCDIR, 'openaire_form.tpl')).read()
+
 
 def escape(value, *args, **argd):
     """Always cast to string as to avoid None values."""
     if value is None:
         value = ''
     return cgi_escape(str(value), *args, **argd)
+
 
 def prepare4js(data):
     """
@@ -49,6 +53,8 @@ def prepare4js(data):
 
 RE_PLACEMARKS = re.compile(r'%\((?P<placemark>\w+)\)s')
 CFG_OPENAIRE_FORM_TEMPLATE_PLACEMARKS = dict((placemark, '') for placemark in RE_PLACEMARKS.findall(CFG_OPENAIRE_FORM_TEMPLATE))
+
+
 class Template:
     def tmpl_headers(self, ln):
         return """
@@ -73,7 +79,6 @@ class Template:
             // ]]></script>
             <script type="text/javascript" src="%(site)s/js/openaire_deposit_engine.js?v3"></script>
             """ % {'site': CFG_SITE_URL, 'ln': ln}
-
 
     def tmpl_choose_project(self, existing_projects=None, selected_project=None, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
@@ -125,10 +130,10 @@ class Template:
             </p>
             </div>
             """ % {
-                'noscript_description': escape(_("Enter the grant agreement number for the project you wish to select: ")),
-                'yesscript_description': escape(_("Start typing the project title or acronym or the grant agreement number for the project you wish to select: ")),
-                'submit': escape(_("Select project"), True)
-            }
+            'noscript_description': escape(_("Enter the grant agreement number for the project you wish to select: ")),
+            'yesscript_description': escape(_("Start typing the project title or acronym or the grant agreement number for the project you wish to select: ")),
+            'submit': escape(_("Select project"), True)
+        }
         return out
 
     def tmpl_focus_on_project(self, existing_projects=None, ln=CFG_SITE_LANG):
@@ -143,12 +148,11 @@ class Template:
                 <p>%(select_project_description)s<br />%(existing_projects)s.</p>
             </div>
             """ % {
-                'focus_on_project_title': _("Focus on a project"),
-                'select_project_description': escape(_("This is the list of projects for which you have already deposited (or begun a deposit) at least one publication. Click on any project to focus on its publications:")),
-                'existing_projects': ', '.join(existing_projects),
-            }
+            'focus_on_project_title': _("Focus on a project"),
+            'select_project_description': escape(_("This is the list of projects for which you have already deposited (or begun a deposit) at least one publication. Click on any project to focus on its publications:")),
+            'existing_projects': ', '.join(existing_projects),
+        }
         return out
-
 
     def tmpl_select_a_project(self, existing_projects=None, plus=False, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
@@ -161,7 +165,7 @@ class Template:
                 </form>
             """ % {
                 'explanation': escape(_("If the publications you wish to deposit do not belong"
-                    " to any FP7 EU Project, just click the following button.")),
+                                        " to any FP7 EU Project, just click the following button.")),
                 'no_project': escape(_("No project"), True),
             }
         else:
@@ -174,11 +178,11 @@ class Template:
             </form>
             %(openaire_plus)s
             """ % {
-                'select_a_project_label': escape(_("Your projects")),
-                'choose_a_project': self.tmpl_choose_project(existing_projects=existing_projects, ln=ln),
-                'select_label': escape(_("Select"), True),
-                'openaire_plus': openaire_plus
-            }
+            'select_a_project_label': escape(_("Your projects")),
+            'choose_a_project': self.tmpl_choose_project(existing_projects=existing_projects, ln=ln),
+            'select_label': escape(_("Select"), True),
+            'openaire_plus': openaire_plus
+        }
 
     def tmpl_publication_preview(self, body, recid, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
@@ -186,16 +190,15 @@ class Template:
             <p>%(description)s</p>
             <div class="note">%(body)s</div>
             """ % {
-                'description': escape(_("This is a preview of the submitted publication. If approved, it will be available at %(url)s.")) % {
-                    "url": """<a href="%(site)s/record/%(recid)s" alt="%(the_record)s">%(site)s/record/%(recid)s</a>""" % {
-                        'site': escape(CFG_SITE_URL, True),
-                        'recid': recid,
-                        'the_record': escape(_("The record"), True),
-                    },
+            'description': escape(_("This is a preview of the submitted publication. If approved, it will be available at %(url)s.")) % {
+                "url": """<a href="%(site)s/record/%(recid)s" alt="%(the_record)s">%(site)s/record/%(recid)s</a>""" % {
+                    'site': escape(CFG_SITE_URL, True),
+                    'recid': recid,
+                    'the_record': escape(_("The record"), True),
                 },
-                'body': body,
-            }
-
+            },
+            'body': body,
+        }
 
     def tmpl_form(self, publicationid, projectid, projects_information, publication_information, fulltext_information, form=None, metadata_status='empty', warnings=None, errors=None, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
@@ -204,7 +207,8 @@ class Template:
         if form:
             for key, value in form.iteritems():
                 if key.endswith('_%s' % publicationid):
-                    values['%s_value' % key[:-len('_%s' % publicationid)]] = escape(value, True)
+                    values['%s_value' % key[:-len(
+                        '_%s' % publicationid)]] = escape(value, True)
         values['edit_metadata_label'] = escape(_("Edit"))
         values['fulltext_information'] = fulltext_information
         values['projects_information'] = projects_information
@@ -215,19 +219,24 @@ class Template:
         values['language_label'] = escape(_("Document language"))
         values['language_tooltip'] = escape(_("<p>Choose the language that was used to write your document.</p><p>Note that if your document was written in a language different than English you will be able to optionally enter the title and the abstract in their original language.</p>"))
         values['title_label'] = escape(_("English title"))
-        values['title_tooltip'] = escape(_("The full title of yor publication in English"))
+        values['title_tooltip'] = escape(
+            _("The full title of yor publication in English"))
         values['original_title_label'] = escape(_("Original language title"))
-        values['original_title_tooltip'] = escape(_("The full title of your publication in its original language"))
-        values['authors_label'] = escape(_("Author(s)")) 
+        values['original_title_tooltip'] = escape(
+            _("The full title of your publication in its original language"))
+        values['authors_label'] = escape(_("Author(s)"))
         values['authors_tooltip'] = escape(_("<p>Please enter one author per line in the form: <pre>Last name, First Name: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
         values['authors_hint'] = escape(_("Doe, John: Example institution"))
-        values['abstract_label'] = escape(_("English abstract")) 
+        values['abstract_label'] = escape(_("English abstract"))
         values['abstract_tooltip'] = escape(_("<p>This is the abstract (i.e. the summary) of your publication, in English.</p><p>Note that, in case of a scientific publication, you can use LaTeX formulas, such as <pre>$\\frac{x^2}{y^3}$</pre> that will be correctly rendered when viewed with a typical browser.</p>"))
         values['english_language_label'] = escape(_("English information"))
-        values['original_language_label'] = escape(_("Original language information"))
-        values['original_abstract_label'] = escape(_("Original language abstract"))
+        values['original_language_label'] = escape(
+            _("Original language information"))
+        values['original_abstract_label'] = escape(
+            _("Original language abstract"))
         values['original_abstract_tooltip'] = escape(_("<p>This is the abstract (i.e. the summary) of your publication, in its original language.</p><p>Note that, in case of a scientific publication, you can use LaTeX formulas, such as <pre>$\\frac{x^2}{y^3}$</pre> that will be correctly rendered when viewed with a typical browser.</p>"))
-        values["publication_information_label"] = escape(_("Additional information"))
+        values["publication_information_label"] = escape(
+            _("Additional information"))
         values["journal_title_tooltip"] = escape(_("""<p>Start typing part of the name of the journal where you published your publication, and, when possible, it will be automatically completed against a list of known journal titles.</p><p><em>Note that the journal title list has been retrieved from the freely available resource in the <a href="http://www.ncbi.nlm.nih.gov/entrez/citmatch_help.html#JournalLists" target="_blank"><strong>Entrez</strong></a> database.</p>"""), True)
         values['journal_title_label'] = escape(_("Journal title"))
         values["doi_tooltip"] = escape(_("""<p>The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of your publication, as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
@@ -241,70 +250,83 @@ class Template:
         values['pages_label'] = escape(_("Pages"))
         values['pages_tooltip'] = escape(_("The pages part of the publication information, which is typically a range of number of the form <pre>123-456</pre>."))
         values['remove_label'] = escape(_("Remove"))
-        values['remove_confirm'] = escape(_("Are you sure you want to permanently remove this publication?"))
-        values['status_warning_label'] = escape(_('Metadata have some warnings'))
+        values['remove_confirm'] = escape(_(
+            "Are you sure you want to permanently remove this publication?"))
+        values['status_warning_label'] = escape(_(
+            'Metadata have some warnings'))
         values['status_error_label'] = escape(_('Metadata have some errors!'))
         values['status_ok_label'] = escape(_('Metadata are OK!'))
         values['submit_label'] = escape(_('Submit this publication'))
-        values['form_status'] = 'error' ## FIXME metadata_status
-        values['access_rights_options'] = self.tmpl_access_rights_options(values.get('access_rights_value', ''), ln=ln)
+        values['form_status'] = 'error'  # FIXME metadata_status
+        values['access_rights_options'] = self.tmpl_access_rights_options(
+            values.get('access_rights_value', ''), ln=ln)
         values['access_rights_tooltip'] = escape(_("This is the kind of access rights associated with your publication."))
         values['embargo_date_hint'] = escape(_("End of the embargo"), True)
         values['embargo_date_tooltip'] = escape(_("Enter here the date when the embargo period for this publication will be over."), True)
-        values['language_options'] = self.tmpl_language_options(values.get('language_value', 'eng'), ln)
+        values['language_options'] = self.tmpl_language_options(
+            values.get('language_value', 'eng'), ln)
         values['save_label'] = escape(_('Save publication'))
         values['submit_label'] = escape(_('Submit publication'))
         values['embargo_date_size'] = len(values['embargo_date_hint'])
         values['publication_information'] = publication_information
-        values['projects_information_label'] = escape(_("Projects information"))
-        values['projects_description'] = escape(_("List of projects linked with this publication"))
+        values['projects_information_label'] = escape(_(
+            "Projects information"))
+        values['projects_description'] = escape(
+            _("List of projects linked with this publication"))
         values['projects_tooltip'] = escape(_("""<p>This is the list of projects that are associated with this publications.</p><p>Click on the small %(trash_icon)s in order to unlink the corresponding project.</p><p>Start typing a <em>project acronym</em>, a <em>project title</em> or a <em>grant agreement number</em>, choose a project from the menu that will appear and click on the small %(plus_icon)s in order to link a new project to your publication.</p>""") % {
             'trash_icon': """<img src="%s/img/smallbin.gif" alt="Unlink project" />""" % CFG_SITE_URL,
             'plus_icon': """<img src="%s/img/add.png" alt="link project" />""" % CFG_SITE_URL
         }, True)
         values['other_information_label'] = escape(_("Other information"))
         values['keywords_tooltip'] = escape(_("""<p>List of key-words or key-phrases describing this publication.</p><p>Enter an item per line.</p>"""), True)
-        values['keywords_label'] = escape(_("Key-words or key-phrases (one per line)."), True)
+        values['keywords_label'] = escape(
+            _("Key-words or key-phrases (one per line)."), True)
         values['notes_tooltip'] = escape(_("""Enter here any further information you wish to associate with this document."""), True)
         values["notes_label"] = escape(_("""Notes"""))
         values['status'] = metadata_status
         values['projectid'] = projectid
-        
+
         values['accept_cc0_license_label'] = escape(_("""I understand that by submitting data to OpenAIRE Orphan Record Repository, I am agreeing to release it under the terms of the %(cc0)s waiver. All authors of the data have agreed to the terms of this waiver."""), True) % {'cc0' : '<a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero (CC0)</a>'}
         values['accept_cc0_license_tooltip'] = ""
-        
-        values['publication_type'] = escape(_("""Document information"""), True)
-        values['publication_type_label'] = escape(_("""Type of publication/data"""), True)
+
+        values['publication_type'] = escape(_(
+            """Document information"""), True)
+        values['publication_type_label'] = escape(
+            _("""Type of publication/data"""), True)
         values['publication_type_tooltip'] = escape(_("""This is the type of publication you are depositing. Different publications have different types of publications have different fields to complete."""), True)
-        values['publication_type_options'] = self.tmpl_publication_type_options(values.get('publication_type_value',None), ln)
-        
-        values['report_pages_no_label'] = escape(_("""Number of pages"""), True)
-        values['report_pages_no_tooltip'] = escape(_("""This is the number of pages in report"""), True)
-        
-        values['related_publications_label'] = escape(_("""DOIs for associated publications (one per line)"""), True)
+        values['publication_type_options'] = self.tmpl_publication_type_options(values.get('publication_type_value', None), ln)
+
+        values['report_pages_no_label'] = escape(_(
+            """Number of pages"""), True)
+        values['report_pages_no_tooltip'] = escape(
+            _("""This is the number of pages in report"""), True)
+
+        values['related_publications_label'] = escape(
+            _("""DOIs for associated publications (one per line)"""), True)
         values['related_publications_tooltip'] = escape(_("""The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of associated publications as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
-        
+
         if warnings:
             for key, value in warnings.iteritems():
                 if key.endswith('_%s' % publicationid):
-                    values['warning_%s_value' % key[:-len('_%s' % publicationid)]] = value
+                    values['warning_%s_value' % key[:-
+                                                    len('_%s' % publicationid)]] = value
         if errors:
             for key, value in errors.iteritems():
                 if key.endswith('_%s' % publicationid):
-                    values['error_%s_value' % key[:-len('_%s' % publicationid)]] = value
+                    values['error_%s_value' % key[:-
+                                                  len('_%s' % publicationid)]] = value
 
         return CFG_OPENAIRE_FORM_TEMPLATE % values
-
 
     def tmpl_generic_options(self, name, options, selected_value, ln=CFG_SITE_LANG):
         """
         Generic function for generating a list of option-tags.
-        
+
         @param name: Text in first option which will be disabled or None if no text should be shown.
         @param options: A list of (option key, option name)-tuples
         @param selected_value: Option key of the selected option, or none if unselected.
-        @param ln: Language value 
-        @return: str, The list of options rendered as HTML options-tags.  
+        @param ln: Language value
+        @return: str, The list of options rendered as HTML options-tags.
         """
         out = ""
         if name:
@@ -325,15 +347,15 @@ class Template:
     def tmpl_access_rights_options(self, selected_access_right, ln=CFG_SITE_LANG):
         """
         Options for access rights drop-down
-        
+
         @see: tmpl_generic_options
         """
         from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
         access_rights = CFG_ACCESS_RIGHTS(ln)
         _ = gettext_set_language(ln)
-        
-        return self.tmpl_generic_options( 
-            _("Select access rights"), 
+
+        return self.tmpl_generic_options(
+            _("Select access rights"),
             access_rights.items(),
             selected_access_right,
             ln=CFG_SITE_LANG,
@@ -342,62 +364,63 @@ class Template:
     def tmpl_language_options(self, selected_language='eng', ln=CFG_SITE_LANG):
         """
         Options for document language drop-down
-        
+
         @see: tmpl_generic_options
         """
         # Load languages from knowledge base
         from invenio.bibknowledge import get_kb_mappings
-        languages = [(mapping['key'], mapping['value']) for mapping in get_kb_mappings('languages')]
-        
+        languages = [(mapping['key'], mapping['value'])
+                     for mapping in get_kb_mappings('languages')]
+
         if not selected_language:
             selected_language = 'eng'
-        
-        return self.tmpl_generic_options( 
-            None, 
+
+        return self.tmpl_generic_options(
+            None,
             languages,
             selected_language,
             ln=CFG_SITE_LANG,
         )
-    
+
     def tmpl_publication_type_options(self, selected_value, ln=CFG_SITE_LANG):
         """
         Options for publication types drop-down
-        
+
         @see: tmpl_generic_options
         """
         from invenio.openaire_deposit_engine import CFG_OPENAIRE_PUBLICATION_TYPES
         _ = gettext_set_language(ln)
-        return self.tmpl_generic_options( 
-            _("Select publication type"), 
+        return self.tmpl_generic_options(
+            _("Select publication type"),
             CFG_OPENAIRE_PUBLICATION_TYPES(ln).items(),
             selected_value,
             ln=CFG_SITE_LANG,
         )
-    
+
     def tmpl_upload_publications(self, projectid, project_information, session, style, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
         data = {
-                'noflash_description': escape(_("It looks like you have not installed a recent version of the %(x_fmt_open)sFlash plugin (minimum 9.0.24)%(x_fmt_close)s or that you are using %(x_fmt_open)sGoogle Chrome 10.x/11.x%(x_fmt_close)s or %(x_fmt_open)sChromium 10.x/11.x%(x_fmt_close)s. You will be therefore able to upload only one publication at a time.")) % {
-                    'x_fmt_open': "<strong>",
-                    'x_fmt_close': "</strong>",
-                },
-                'upload_publications': escape(_("Upload New Publications")),
-                'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications.")) % {
-                    'x_fmt_open': "<strong>",
-                    'x_fmt_close': "</strong>",
-                    'upload': escape(_("Upload")),
-                },
-                'site': CFG_SITE_URL,
-                'projectid': projectid,
-                'session': session,
+            'noflash_description': escape(_("It looks like you have not installed a recent version of the %(x_fmt_open)sFlash plugin (minimum 9.0.24)%(x_fmt_close)s or that you are using %(x_fmt_open)sGoogle Chrome 10.x/11.x%(x_fmt_close)s or %(x_fmt_open)sChromium 10.x/11.x%(x_fmt_close)s. You will be therefore able to upload only one publication at a time.")) % {
+                'x_fmt_open': "<strong>",
+                'x_fmt_close': "</strong>",
+            },
+            'upload_publications': escape(_("Upload New Publications")),
+            'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications.")) % {
+                'x_fmt_open': "<strong>",
+                'x_fmt_close': "</strong>",
                 'upload': escape(_("Upload")),
-                'begin_upload': escape(_("Begin upload")),
-                'cancel_upload': escape(_("Cancel upload")),
-                'buttontext': _("Upload"),
-                'ln': ln,
-                'filedescription': _("Publications"),
-                'style': style
-            }
+            },
+            'site': CFG_SITE_URL,
+            'projectid': projectid,
+            'session': session,
+            'upload': escape(_("Upload")),
+            'begin_upload': escape(_("Begin upload")),
+            'cancel_upload': escape(_("Cancel upload")),
+            'buttontext': _("Upload"),
+            'ln': ln,
+            'filedescription': _("Publications"),
+            'style': style
+        }
         if projectid > 0:
             data['upload_publications_description2'] = escape(_("These publications will initially be associated with the project %(project_information)s.")) % {
                 'project_information': project_information
@@ -465,21 +488,20 @@ class Template:
             // ]]></script>
             </div>""" % data
 
-
     def tmpl_publication_information(self, publicationid, title, authors, abstract, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
         authors = authors.strip().splitlines()
         if not title:
             title = _("Title not yet defined")
         data = {
-                'title_label': escape(_("Title")),
-                'authors_label': len(authors) != 1 and escape(_("Author(s)")) or escape(_("Author")),
-                'abstract_label': escape(_("Abstract")),
-                'title': escape(title),
-                'authors': "<br />".join([escape(author) for author in authors]),
-                'abstract': escape(abstract).replace('\n', '<br />'),
-                'id': escape(publicationid, True)
-            }
+            'title_label': escape(_("Title")),
+            'authors_label': len(authors) != 1 and escape(_("Author(s)")) or escape(_("Author")),
+            'abstract_label': escape(_("Abstract")),
+            'title': escape(title),
+            'authors': "<br />".join([escape(author) for author in authors]),
+            'abstract': escape(abstract).replace('\n', '<br />'),
+            'id': escape(publicationid, True)
+        }
         data['body'] = """<div id="publication_information_%(id)s" class="publication_information">%(title)s</div>""" % data
         prepare4js(data)
         return """
@@ -514,7 +536,8 @@ class Template:
                         tooltip.content = {
                             'text': '<table><tbody><tr><td align="right"><strong>%(js_acronym_label)s:<strong></td><td align="left">%(js_acronym)s</td></tr><tr><td align="right"><strong>%(js_title_label)s:<strong></td><td align="left">%(js_title)s</td></tr><tr><td align="right"><strong>%(js_grant_agreement_number_label)s:<strong></td><td align="left">%(js_grant_agreement_number)s</td></tr>%(ec_project_website_row)s<tr><td align="right"><strong>%(js_start_date_label)s:<strong></td><td align="left">%(js_start_date)s</td></tr><tr><td align="right"><strong>%(js_end_date_label)s:<strong></td><td align="left">%(js_end_date)s</td></tr><tr><td align="right"><strong>%(js_fundedby_label)s:<strong></td><td align="left">%(js_fundedby)s</td></tr><tr><td align="right"><strong>%(js_call_identifier_label)s:<strong></td><td align="left">%(js_call_identifier)s</td></tr><tbody></table>'
                         };
-                        jQuery('#project_%(js_id)s_%(js_publicationid)s').qtip(tooltip);
+                        jQuery('#project_%(js_id)s_%(js_publicationid)s').qtip(
+                            tooltip);
                     });
                 // ]]></script>"""
         if deletable:
@@ -569,7 +592,6 @@ class Template:
 
         return out % data
 
-
     def tmpl_projects_box(self, publicationid, associated_projects, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
 
@@ -603,26 +625,33 @@ class Template:
                         }).autocomplete({
                         source: gSite + "/kb/export?kbname=projects&format=jquery&limit=20&ln=" + gLn,
                         focus: function(event, ui) {
-                            jQuery('#linkproject_%(js_id)s').val(ui.item.label);
+                            jQuery(
+                                '#linkproject_%(js_id)s').val(ui.item.label);
                             return false;
                         },
                         select: function(event, ui) {
-                            jQuery('#linkproject_%(js_id)s').val(ui.item.label);
-                            jQuery('#linkproject_%(js_id)s_hidden').val(ui.item.value);
+                            jQuery(
+                                '#linkproject_%(js_id)s').val(ui.item.label);
+                            jQuery('#linkproject_%(js_id)s_hidden').val(
+                                ui.item.value);
                             var data = {};
-                            data.projectid = jQuery('#linkproject_%(js_id)s_hidden').val();
+                            data.projectid = jQuery(
+                                '#linkproject_%(js_id)s_hidden').val();
                             data.publicationid = "%(js_id)s";
                             data.action = "linkproject";
-                            jQuery.post(gSite + '/deposit/ajaxgateway', data, elaborateAjaxGateway, "json");
+                            jQuery.post(gSite + '/deposit/ajaxgateway',
+                                        data, elaborateAjaxGateway, "json");
                             return false;
                         }
                     });
                     jQuery("#projectsbox_submit_%(js_id)s").click(function(){
                         var data = {};
-                        data.projectid = jQuery('#linkproject_%(js_id)s_hidden').val();
+                        data.projectid = jQuery(
+                            '#linkproject_%(js_id)s_hidden').val();
                         data.publicationid = "%(js_id)s";
                         data.action = "linkproject";
-                        jQuery.post(gSite + '/deposit/ajaxgateway', data, elaborateAjaxGateway, "json");
+                        jQuery.post(gSite + '/deposit/ajaxgateway',
+                                    data, elaborateAjaxGateway, "json");
                         return false;
                     });
                 });
@@ -720,26 +749,26 @@ class Template:
         data = prepare4js(data)
         return out % data
 
-
     def tmpl_fulltext_information(self, filename, publicationid, download_url, md5, mimetype, format, size, ln=CFG_SITE_LANG):
         _ = gettext_set_language(ln)
         filename = filename.decode('utf8')
-        filename = ''.join(["%s<br />" % escape(filename[i:i+30].encode('utf8')) for i in xrange(0, len(filename), 30)])
+        filename = ''.join(["%s<br />" % escape(filename[i:i + 30].encode(
+            'utf8')) for i in xrange(0, len(filename), 30)])
         data = {
-                'file_label': escape(_('file')),
-                'id': escape(publicationid, True),
-                'filename': filename,
-                'filename_label': escape(_("Name")),
-                'download_url': escape(download_url, True),
-                'mimetype': escape(mimetype, True),
-                'mimetype_label': escape(_("Mimetype")),
-                'format': escape(format),
-                'format_label': escape(_("Format")),
-                'size_label': escape(_("Size")),
-                'size': escape(nice_size(size)),
-                'checksum_label': escape(_("MD5 Checksum")),
-                'md5': escape(md5),
-            }
+            'file_label': escape(_('file')),
+            'id': escape(publicationid, True),
+            'filename': filename,
+            'filename_label': escape(_("Name")),
+            'download_url': escape(download_url, True),
+            'mimetype': escape(mimetype, True),
+            'mimetype_label': escape(_("Mimetype")),
+            'format': escape(format),
+            'format_label': escape(_("Format")),
+            'size_label': escape(_("Size")),
+            'size': escape(nice_size(size)),
+            'checksum_label': escape(_("MD5 Checksum")),
+            'md5': escape(md5),
+        }
         prepare4js(data)
         return """
             %(file_label)s: <div class="file" id="file_%(id)s"><em>%(filename)s</em></div>
@@ -759,9 +788,9 @@ class Template:
             crumbs = """\
 <img src="%(portalurl)s/templates/yoo_level/images/arrow.png" alt="" />
 %(to_orphan_repository)s""" % {
-    'portalurl': portalurl,
-    'to_orphan_repository': escape(_("to orphan repository"))
-}
+                'portalurl': portalurl,
+                'to_orphan_repository': escape(_("to orphan repository"))
+            }
         else:
             crumbs = """\
 <img src="%(portalurl)s/templates/yoo_level/images/arrow.png" alt="" />
@@ -769,12 +798,11 @@ class Template:
 <img src="%(portalurl)s/templates/yoo_level/images/arrow.png" alt="" />
 %(project_information)s
 """ % {
-    'portalurl': portalurl,
-    'to_orphan_repository': escape(_("to orphan repository")),
-    'ln': ln,
-    'project_information': project_information
-}
-
+                'portalurl': portalurl,
+                'to_orphan_repository': escape(_("to orphan repository")),
+                'ln': ln,
+                'project_information': project_information
+            }
 
         return CFG_OPENAIRE_PAGE_TEMPLATE % {
             'headers': headers,
@@ -808,11 +836,11 @@ assigned to your document:
 If you wish to deposit other documents, please visit:
     <%(site)s/deposit>
 """) % {
-        'title': title,
-        'authors': ', '.join(authors),
-        'url': url,
-        'site': CFG_SITE_URL,
-        'report_numbers': ', '.join(report_numbers)
+            'title': title,
+            'authors': ', '.join(authors),
+            'url': url,
+            'site': CFG_SITE_URL,
+            'report_numbers': ', '.join(report_numbers)
         }
 
     def tmpl_curators_email_body(self, title, authors, url, bibedit_url):
@@ -832,8 +860,8 @@ and change its collection definition (tag 980__a) from PROVISIONAL to OPENAIRE.
 In order to reject it change its collection definition (tag 980__a) from
 PROVISIONAL to REJECTED.
 """ % {
-        'title': title,
-        'authors': ', '.join(authors),
-        'url': url,
-        'bibedit_url': bibedit_url
+            'title': title,
+            'authors': ', '.join(authors),
+            'url': url,
+            'bibedit_url': bibedit_url
         }
