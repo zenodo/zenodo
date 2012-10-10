@@ -89,7 +89,7 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
         #'conferenceContribution': _("Conference contribution"),
         #'generalTalk': _("General talk"),
         #'patent': _("Patent"),
-        #'data': _("Data set"),
+        'data': _("Dataset"),
     }
 
 CFG_OPENAIRE_PUBLICATION_TYPES_KEYS = CFG_OPENAIRE_PUBLICATION_TYPES(

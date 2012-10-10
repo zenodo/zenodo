@@ -292,7 +292,7 @@ class Template:
         values['status'] = metadata_status
         values['projectid'] = projectid
 
-        values['accept_cc0_license_label'] = escape(_("""I understand that by submitting data to OpenAIRE Orphan Record Repository, I am agreeing to release it under the terms of the %(cc0)s waiver. All authors of the data have agreed to the terms of this waiver."""), True) % {'cc0' : '<a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero (CC0)</a>'}
+        values['accept_cc0_license_label'] = escape(_("""I understand that by submitting a dataset to OpenAIRE Orphan Record Repository, I am agreeing to release it under the terms of the %(cc0)s waiver. All authors of the data have agreed to the terms of this waiver."""), True) % {'cc0' : '<a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero (CC0)</a>'}
         values['accept_cc0_license_tooltip'] = ""
 
         values['publication_type'] = escape(_("""Type"""), True)
