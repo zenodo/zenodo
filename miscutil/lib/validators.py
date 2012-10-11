@@ -61,6 +61,15 @@ def is_isbn(val):
     return is_isbn10(val) or is_isbn13(val)
 
 
+def is_issn(val):
+    """ Test if argument is an ISSN number """
+    val = val.replace("-", "").replace(" ", "")
+    if len(val) != 8:
+        return False
+    r = sum([(8 - i) * (_convert_x_to_10(x)) for i, x in enumerate(val)])
+    return not (r % 11)
+
+
 def is_all_uppercase(val):
     """ Returns true if more than 75% of the characters are upper-case """
     uppers = 0
