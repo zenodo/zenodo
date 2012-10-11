@@ -284,9 +284,9 @@ class Template:
             'plus_icon': """<img src="%s/img/add.png" alt="link project" />""" % CFG_SITE_URL
         }, True)
         values['other_information_label'] = escape(_("Other information"))
-        values['keywords_tooltip'] = escape(_("""<p>List of key-words or key-phrases describing this publication.</p><p>Enter an item per line.</p>"""), True)
+        values['keywords_tooltip'] = escape(_("""<p>List of keywords or key-phrases describing this publication.</p><p>Enter an item per line.</p>"""), True)
         values['keywords_label'] = escape(
-            _("Key-words or key-phrases (one per line)."), True)
+            _("Keywords or key-phrases (one per line)."), True)
         values['notes_tooltip'] = escape(_("""Enter here any further information you wish to associate with this document."""), True)
         values["notes_label"] = escape(_("""Notes"""))
         values['status'] = metadata_status
