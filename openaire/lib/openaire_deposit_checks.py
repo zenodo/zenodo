@@ -45,6 +45,9 @@ _RE_AUTHOR_ROW = re.compile(u'^\w{2,}(\s+\w{2,})*\s*,\s*(\w{2,}|\w\.)(\s+\w{1,}|
 _RE_PAGES = re.compile('\d+(-\d+)?')
 _RE_DOI = re.compile("(doi:)?10\.\d+(.\d+)*/.*", re.I)
 
+def _get_publication_type(metadata):
+    """ Get the publication type of the currently deposited """
+    return metadata.get('publication_type', '')
 
 def _check_title(metadata, ln, _):
     title = metadata.get('title', '')
@@ -131,15 +134,17 @@ def _check_access_rights(metadata, ln, _):
 
 
 def _check_embargo_date(metadata, ln, _):
-    access_rights = metadata.get('access_rights', '')
-    embargo_date = metadata.get('embargo_date', '')
-    if access_rights == 'embargoedAccess':
-        if not embargo_date:
-            return ('embargo_date', 'error', [_('The embargo end date is mandatory when the Access rights field of the publication is set to Embargo access')])
-        try:
-            time.strptime(embargo_date, '%Y-%m-%d')
-        except ValueError:
-            return ('embargo_date', 'error', [_('The access rights of the publication is set to Embargo access but a valid embargo end date is not set (correct format is YYYY-MM-DD)')])
+    publication_type = _get_publication_type(metadata)
+    if publication_type != 'data':
+        access_rights = metadata.get('access_rights', '')
+        embargo_date = metadata.get('embargo_date', '')
+        if access_rights == 'embargoedAccess':
+            if not embargo_date:
+                return ('embargo_date', 'error', [_('The embargo end date is mandatory when the access rights field of the publication is set to embargoed access')])
+            try:
+                time.strptime(embargo_date, '%Y-%m-%d')
+            except ValueError:
+                return ('embargo_date', 'error', [_('The access rights of the publication is set to embargo access but a valid embargo end date is not set (correct format is YYYY-MM-DD)')])
 
 
 def _check_publication_date(metadata, ln, _):
