@@ -122,11 +122,13 @@ CFG_METADATA_FIELDS = (
     'report_pages_no',
     'accept_cc0_license',
     'related_publications',
+    'related_datasets',
     'publisher',
     'place',
     'report_type',
     'extra_report_numbers',
     'isbn',
+    'dataset_publisher',
 )
 """ List of metadata fields, used in eg washing of URL parameters. """
 
@@ -147,9 +149,10 @@ CFG_METADATA_FIELDS_COMMON = (
 """ List of metadata fields, common to all types of publications """
 
 CFG_METADATA_FIELDS_GROUPS = {
-    'publishedArticle': ['ACCESS_RIGHTS', 'JOURNAL', ],
+    'publishedArticle': ['ACCESS_RIGHTS', 'JOURNAL', 'RELATED_DATA'],
     'preprint': [],
-    'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN', ],
+    'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN', 
+               'RELATED_DATA'],
     'thesis': [],
     'workingPaper': [],
     'book': [],
@@ -157,7 +160,7 @@ CFG_METADATA_FIELDS_GROUPS = {
     'conferenceContribution': [],
     'generalTalk': [],
     'patent': [],
-    'data': ['CC0', 'RELATED_PUBLICATIONS'],
+    'data': ['CC0', 'DATASET', 'RELATED_PUBS'],
 }
 """
 Mapping of publication type to grouping of fields.
@@ -183,7 +186,8 @@ def CFG_ACCESS_RIGHTS(ln):
         'closedAccess': _("Closed access"),
         'embargoedAccess': _("Embargoed access"),
         'restrictedAccess': _("Restricted access"),
-        'openAccess': _("Open access")
+        'openAccess': _("Open access"),
+        'cc0': _("Creative Commons Zero (CC0)"),
     }
 CFG_ACCESS_RIGHTS_KEYS = CFG_ACCESS_RIGHTS('en').keys()
 CFG_DEFAULT_ACCESS_RIGHTS = 'closedAccess'

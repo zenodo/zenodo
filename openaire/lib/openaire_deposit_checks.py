@@ -26,7 +26,8 @@ import time
 
 from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS, \
     CFG_OPENAIRE_PUBLICATION_TYPES, CFG_OPENAIRE_REPORT_TYPES
-from invenio.validators import is_isbn, is_all_uppercase, is_probably_list
+from invenio.validators import is_isbn, is_all_uppercase, is_probably_list, \
+    is_issn
 
 
 def explode_values(val, check_func, stop_on_error=True):
@@ -96,7 +97,7 @@ def _check_authors(metadata, ln, _):
                 else:
                     errors.append(_("""<strong>"%(row)s"</strong> is not a well-formatted authorship. The format is <em>"Last name, First name: Institution (optional)"</em>.""" % {"row": escape(row.encode('UTF8'))}))
             if not ':' in row:
-                warnings.append(_("""You have not specified an affiliation for <strong>"%(row)s"</strong> but an affiliation is recommended.""" % {"row": escape(row.encode('UTF8'))}))
+                warnings.append(_("""You have not specified an affiliation for <strong>"%(row)s"</strong> but an affiliation is recommended. The format is <em>"Last name, First name: Institution (optional)"</em>.""" % {"row": escape(row.encode('UTF8'))}))
                 if row.islower():
                     warnings.append(_("""It seems that the author name <strong>"%(row)s"</strong> has been written all lower case. Was this intentional?""") % {"row": escape(row.encode('UTF8'))})
             else:
@@ -182,36 +183,36 @@ def _check_doi(metadata, ln, _):
 
 
 def _check_publication_type(metadata, ln, _):
-    publication_type = metadata.get('publication_type', '')
+    publication_type = _get_publication_type(metadata)
     if not publication_type in CFG_OPENAIRE_PUBLICATION_TYPES(ln):
         return ('publication_type', 'error', [_('The document type field of the publication is not set to one of the expected values')])
 
 
 def _check_accept_cc0_license(metadata, ln, _):
-    publication_type = metadata.get('publication_type', '')
+    publication_type = _get_publication_type(metadata)
     if publication_type == 'data':
         accept = metadata.get('accept_cc0_license', '')
         if accept != 'yes':
             return ('accept_cc0_license', 'error', [_("You must agree to release your data under CC0.")])
 
 
+def _check_related_dois(field, metadata, ln, _):
+    dois = metadata.get(field, '')
+    dois = dois.decode('UTF8')
+
+    for doi in dois.splitlines():
+        doi = doi.strip()
+        if doi:
+            if not _RE_DOI.match(doi):
+                return (field, 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"' % escape(doi, True))])
+
+
 def _check_related_publications(metadata, ln, _):
-    publication_type = metadata.get('publication_type', '')
-    if publication_type == 'data':
-        pubs = metadata.get('related_publications', '')
-        pubs = pubs.decode('UTF8')
+    return _check_related_dois('related_publications', metadata, ln, _)
 
-        found = False
-        for doi in pubs.splitlines():
-            doi = doi.strip()
-            if doi:
-                if _RE_DOI.match(doi):
-                    found = True
-                else:
-                    return ('related_publications', 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"' % escape(doi, True))])
 
-        if not found:
-            return ('related_publications', 'error', [_('You must provide at least one DOI.')])
+def _check_related_datasets(metadata, ln, _):
+    return _check_related_dois('related_publications', metadata, ln, _)
 
 
 def _check_report_type(metadata, ln, _):
@@ -220,7 +221,7 @@ def _check_report_type(metadata, ln, _):
         report_type = metadata.get('report_type', '')
         if not report_type in CFG_OPENAIRE_REPORT_TYPES(ln):
             return ('report_type', 'error', [_('The report type field of the publication is not set to one of the expected values')])
-    
+
 
 def _check_extra_report_numbers(metadata, ln, _):
     val = metadata.get('extra_report_numbers', '')
@@ -235,6 +236,12 @@ def _check_isbn(metadata, ln, _):
     val = metadata.get('isbn', '').strip()
     if val and not is_isbn(val.strip()):
         return ('isbn', 'error', [_('\'%s\' is not a valid ISBN-10 or ISBN-13 number.' % val)])
+
+
+def _check_issn(metadata, ln, _):
+    val = metadata.get('issn', '').strip()
+    if val and not is_issn(val.strip()):
+        return ('issn', 'error', [_('\'%s\' is not a valid ISSN number.' % val)])
 
 
 CFG_METADATA_FIELDS_CHECKS = {
@@ -253,11 +260,13 @@ CFG_METADATA_FIELDS_CHECKS = {
     'keywords': _check_keywords,
     'accept_cc0_license': _check_accept_cc0_license,
     'related_publications': _check_related_publications,
+    'related_datasets': _check_related_datasets,
     #'publisher' : _check_publisher,
     #'place' : _check_place,
     'report_type': _check_report_type,
     'extra_report_numbers': _check_extra_report_numbers,
     'isbn': _check_isbn,
+    'issn': _check_issn,
 }
 """
 Dictionary of metadata field validator functions.

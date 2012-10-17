@@ -212,6 +212,8 @@ class Template:
                 if key.endswith('_%s' % publicationid):
                     values['%s_value' % key[:-len(
                         '_%s' % publicationid)]] = escape(value, True)
+        else:
+            values['dataset_publisher_value'] = 'OpenAIRE Orphan Record Repository'
         values['edit_metadata_label'] = escape(_("Edit"))
         values['fulltext_information'] = fulltext_information
         values['projects_information'] = projects_information
@@ -227,7 +229,7 @@ class Template:
         values['original_title_label'] = escape(_("Original language title"))
         values['original_title_tooltip'] = escape(
             _("The full title of your publication in its original language"))
-        values['authors_label'] = escape(_("Author(s)"))
+        values['authors_label'] = escape(_("Author(s), one per line"))
         values['authors_placeholder'] = _("Family name, First name: Affiliation (one author per line)")
         values['authors_tooltip'] = escape(_("<p>Please enter one author per line in the form: <pre>Last name, First Name: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
         values['authors_hint'] = escape(_("Doe, John: Example institution"))
@@ -307,8 +309,12 @@ class Template:
             _("""This is the number of pages in report"""), True)
 
         values['related_publications_label'] = escape(
-            _("""DOIs for associated publications (one per line)"""), True)
-        values['related_publications_tooltip'] = escape(_("""The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier of associated publications as provided by the publisher.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
+            _("""DOIs of publications using this dataset"""), True)
+        values['related_publications_tooltip'] = escape(_("""The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier (provided by publisher) of publications which is using this dataset as a source of information.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
+
+        values['related_datasets_label'] = escape(
+            _("""DOIs of datasets used by this publication"""), True)
+        values['related_datasets_tooltip'] = escape(_("""The <a href="http://www.doi.org/" target="_blank" alt="DOI">DOI</a> identifier (provided by publisher) of datasets which is used by this publication as source of information.</p><p>E.g.: <em>10.1007/s00248-011-9855-2</em></p>"""), True)
 
         values['publisher_label'] = escape(_("""Publisher"""), True)
         values['publisher_tooltip'] = escape(_(""""""), True)
@@ -331,6 +337,12 @@ class Template:
 
         values['isbn_label'] = escape(_("""ISBN"""), True)
         values['isbn_tooltip'] = escape(_("""A valid ISBN-10 (e.g. 0-06-251587-X) or ISBN-13 number (e.g. 978-0062515872) if available."""), True)
+
+        values['dataset_publisher_label'] = escape(_("""Dataset publisher"""), True)
+        values['dataset_publisher_tooltip'] = escape(_("""The name of the entity that holds, archives, publishes, prints, distributes, releases, issues, or produces the dataset. This will be used to formulate the citation, so consider the prominence of the role."""), True)
+
+        values['related_publications_legend_label'] = escape(_("""Related publications"""))
+        values['related_datasets_legend_label'] = escape(_("""Related datasets"""))
 
         if warnings:
             for key, value in warnings.iteritems():
@@ -379,6 +391,7 @@ class Template:
         """
         from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
         access_rights = CFG_ACCESS_RIGHTS(ln)
+        del access_rights['cc0']
         _ = gettext_set_language(ln)
 
         return self.tmpl_generic_options(

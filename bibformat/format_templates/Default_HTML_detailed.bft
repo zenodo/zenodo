@@ -40,7 +40,8 @@ keyword_suffix="</small>" />
 
 <BFE_OPENAIRE_ACCESS_RIGHTS prefix='<br /><small itemprop="rights">' suffix="</small>" />
 <BFE_PAGINATION prefix="<br/><small><strong>Pages:</strong> " suffix="</small>" default="" escape="" />
-<BFE_FIELD prefix="<br /><small><strong>Published in: </strong>" suffix="</small>" default="" escape="0" output_pattern="<a href='http://dx.doi.org/%(a)s'>%(a)s</a>" extension="" instances_separator=", " subfields_separator=" " tag="773__a" limit=""/>
+<BFE_OPENAIRE_RELATED_DOIS title='Related publications' type='pub' prefix='<br /><small>' suffix="</small>" />
+<BFE_OPENAIRE_RELATED_DOIS title='Related datasets' type='data' prefix='<br /><small>' suffix="</small>" />
 <!-- END OpenAIRE specific -->
 
 <BFE_NOTES

@@ -183,55 +183,53 @@
 	                    <div id="warning_pages_%(id)s" class="warning">%(warning_pages_value)s</div>
 	                </div>
 	            </div>
-	            <div class="typebox_%(id)s typebox_%(id)s_report">
-	                <div>
-	                    <img title="%(report_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="report_type_%(id)s" class="mandatory">%(report_type_label)s</label>
-	                    <select name="report_type_%(id)s" id="report_type_%(id)s" class="report_type">
-	                        %(report_type_options)s
-	                    </select>
-	                    <br />
-	                    <div id="error_report_type_%(id)s" class="error">%(error_report_type_value)s</div>
-	                    <div id="warning_report_type_%(id)s" class="warning">%(warning_report_type_value)s</div>
-	                </div>
-	                <div>
-	                    <img title="%(publisher_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="publisher_%(id)s">%(publisher_label)s</label>
-	                    <input type="text" name="publisher_%(id)s" id="publisher_%(id)s" value="%(publisher_value)s" size="15" class="publisher" />
-	                    <img title="%(place_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="place_%(id)s">%(place_label)s</label>
-	                    <input type="text" name="place_%(id)s" id="place_%(id)s" value="%(place_value)s" size="15" class="place" />
-	                    <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="report_pages_no_%(id)s">%(report_pages_no_label)s</label>
-	                    <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="4" class="report_pages_no" />
-	                    <br />
-	                    <div id="error_publisher_%(id)s" class="error">%(error_publisher_value)s</div>
-	                    <div id="warning_publisher_%(id)s" class="warning">%(warning_publisher_value)s</div>
-	                    <div id="error_place_%(id)s" class="error">%(error_place_value)s</div>
-	                    <div id="warning_place_%(id)s" class="warning">%(warning_place_value)s</div>
-	                    <div id="error_report_pages_no_%(id)s" class="error">%(error_report_pages_no_value)s</div>
-	                    <div id="warning_report_pages_no_%(id)s" class="warning">%(warning_report_pages_no_value)s</div>
-	                </div>
-	                <div>
-	                    <img title="%(extra_report_numbers_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="extra_report_numbers_%(id)s">%(extra_report_numbers_label)s</label>
-	                    <br />
-	                    <textarea name="extra_report_numbers_%(id)s" id="extra_report_numbers_%(id)s" cols="60" rows="5" class="extra_report_numbers">%(extra_report_numbers_value)s</textarea>
-	                    <div id="error_extra_report_numbers_%(id)s" class="error">%(error_extra_report_numbers_value)s</div>
-	                    <div id="warning_extra_report_numbers_%(id)s" class="warning">%(warning_extra_report_numbers_value)s</div>
-	                </div>
-	            </div>
-	            <div class="typebox_%(id)s typebox_%(id)s_data">
-	            	<div>
-	                    <img title="%(related_publications_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
-	                    <label for="related_publications_%(id)s">%(related_publications_label)s
-	                    </label>
-	                    <br />
-	                    <textarea name="related_publications_%(id)s" id="related_publications_%(id)s" cols="60" rows="5" class="related_publications">%(related_publications_value)s</textarea>
-	                    <div id="error_related_publications_%(id)s" class="error">%(error_related_publications_value)s</div>
-	                    <div id="warning_related_publications_%(id)s" class="warning">%(warning_related_publications_value)s</div>
-	                </div>
-	            </div>
+                <div class="typebox_%(id)s typebox_%(id)s_report">
+                    <img title="%(report_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="report_type_%(id)s" class="mandatory">%(report_type_label)s</label>
+                    <select name="report_type_%(id)s" id="report_type_%(id)s" class="report_type">
+                        %(report_type_options)s
+                    </select>
+                    <br />
+                    <div id="error_report_type_%(id)s" class="error">%(error_report_type_value)s</div>
+                    <div id="warning_report_type_%(id)s" class="warning">%(warning_report_type_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_report">
+                    <img title="%(publisher_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="publisher_%(id)s">%(publisher_label)s</label>
+                    <input type="text" name="publisher_%(id)s" id="publisher_%(id)s" value="%(publisher_value)s" size="15" class="publisher" />
+                    <img title="%(place_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="place_%(id)s">%(place_label)s</label>
+                    <input type="text" name="place_%(id)s" id="place_%(id)s" value="%(place_value)s" size="15" class="place" />
+                    <br />
+                    <div id="error_publisher_%(id)s" class="error">%(error_publisher_value)s</div>
+                    <div id="warning_publisher_%(id)s" class="warning">%(warning_publisher_value)s</div>
+                    <div id="error_place_%(id)s" class="error">%(error_place_value)s</div>
+                    <div id="warning_place_%(id)s" class="warning">%(warning_place_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_report">
+                    <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="report_pages_no_%(id)s">%(report_pages_no_label)s</label>
+                    <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="4" class="report_pages_no" />
+                    <br />
+                    <div id="error_report_pages_no_%(id)s" class="error">%(error_report_pages_no_value)s</div>
+                    <div id="warning_report_pages_no_%(id)s" class="warning">%(warning_report_pages_no_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_report">
+                    <img title="%(extra_report_numbers_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="extra_report_numbers_%(id)s">%(extra_report_numbers_label)s</label>
+                    <br />
+                    <textarea name="extra_report_numbers_%(id)s" id="extra_report_numbers_%(id)s" cols="60" rows="5" class="extra_report_numbers">%(extra_report_numbers_value)s</textarea>
+                    <div id="error_extra_report_numbers_%(id)s" class="error">%(error_extra_report_numbers_value)s</div>
+                    <div id="warning_extra_report_numbers_%(id)s" class="warning">%(warning_extra_report_numbers_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_data">
+                    <img title="%(dataset_publisher_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="dataset_publisher_%(id)s">%(dataset_publisher_label)s</label>
+                    <input type="text" name="dataset_publisher_%(id)s" id="dataset_publisher_%(id)s" value="%(dataset_publisher_value)s" size="50" class="dataset_publisher" />
+                    <br />
+                    <div id="error_dataset_publisher_%(id)s" class="error">%(error_dataset_publisher_value)s</div>
+                    <div id="warning_dataset_publisher_%(id)s" class="warning">%(warning_dataset_publisher_value)s</div>
+                </div>
             </fieldset>
             <fieldset>
                 <legend>%(other_information_label)s</legend>
@@ -254,6 +252,32 @@
                     <div id="warning_notes_%(id)s" class="warning">%(warning_notes_value)s</div>
                 </div>
             </fieldset>
+            <div class="typebox_%(id)s typebox_%(id)s_data">
+                <fieldset>
+                    <legend>%(related_publications_legend_label)s</legend>
+                       <div>
+                            <img title="%(related_publications_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                            <label for="related_publications_%(id)s">%(related_publications_label)s</label>
+                            <br />
+                            <textarea name="related_publications_%(id)s" id="related_publications_%(id)s" cols="60" rows="5" class="related_publications" placeholder="10.1234/foo.bar (one per line)">%(related_publications_value)s</textarea>
+                            <div id="error_related_publications_%(id)s" class="error">%(error_related_publications_value)s</div>
+                            <div id="warning_related_publications_%(id)s" class="warning">%(warning_related_publications_value)s</div>
+                        </div>
+                </fieldset>
+            </div>
+            <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_publishedArticle">
+                <fieldset>
+                    <legend>%(related_datasets_legend_label)s</legend>
+                       <div>
+                            <img title="%(related_datasets_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                            <label for="related_datasets_%(id)s">%(related_datasets_label)s</label>
+                            <br />
+                            <textarea name="related_datasets_%(id)s" id="related_datasets_%(id)s" cols="60" rows="5" class="related_datasets" placeholder="10.1234/foo.bar (one per line)">%(related_datasets_value)s</textarea>
+                            <div id="error_related_datasets_%(id)s" class="error">%(error_related_datasets_value)s</div>
+                            <div id="warning_related_datasets_%(id)s" class="warning">%(warning_related_datasets_value)s</div>
+                        </div>
+                </fieldset>
+            </div>
             <div class="clear"></div>
             <input type="submit" value="%(save_label)s" name="save_%(id)s" id="save_%(id)s"/><input type="submit" value="%(submit_label)s" name="submit_%(id)s" id="submit_%(id)s"/>
         </div>

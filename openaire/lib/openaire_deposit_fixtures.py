@@ -42,7 +42,8 @@ FIXTURES = {
         'keywords': 'Herring\nblue whiting\ncompetition\ninteraction\nmackerel\ntemperature',  # Alphabetic order (otherwise assert will fail)
         'notes': 'Test notes',
         'report_pages_no': '6',
-        'related_publications': '10.1016.12.31/nature.S0735-1097(98)2000/12/31/34:7-7\n\ndoi:10.1000/123456',
+        'related_publications': '10.1234/pub\ndoi:10.1234/pub2',
+        'related_datasets': '10.1000/data\n10.1000/data2',
     },
     'report': {
         'access_rights': 'openAccess',
@@ -65,16 +66,17 @@ FIXTURES = {
         'notes': 'Test notes',
         'report_pages_no': '6',
         'isbn': '0-06-251587-X',
-        'related_publications': '10.1016.12.31/nature.S0735-1097(98)2000/12/31/34:7-7\n\ndoi:10.1000/123456',
+        'related_publications': '10.1234/pub\ndoi:10.1234/pub2',
+        'related_datasets': '10.1000/data\n10.1000/data2',
         'report_type': 'other',
         'publisher' : 'CERN',
         'place' : 'Geneva',
         'extra_report_numbers' : 'OPENAIRE-VIGGO',
     },
     'data': {
-        'accept_cc0_license': 'yes',
-        'access_rights': 'closedAccess',
-        'embargo_date': '',
+        'accept_cc0_license': 'yes',    
+        'access_rights': 'embargoedAccess',
+        'embargo_date': '', # Set to empty on purpose (to check if access_rights is considered for data 
         'authors': 'Nielsen, Lars Holm: CERN',
         'title': 'Anonymised Invenio Usage Logs',
         'abstract': 'This is some brand new data.',
@@ -92,10 +94,11 @@ FIXTURES = {
         'keywords': 'Keyword 1\nKeyword 2',
         'notes': 'Test notes',
         'report_pages_no': '6',
-        'related_publications': '10.1016.12.31/nature.S0735-1097(98)2000/12/31/34:7-7\n\ndoi:10.1000/123456',
+        'related_publications': '10.1234/pub\ndoi:10.1234/pub2',
+        'related_datasets': '10.1000/data\n10.1000/data2',
+        'dataset_publisher': 'Dryad Digital Repository',
     },
 }
-
 
 MARC_FIXTURES = {}
 MARC_FIXTURES['publishedArticle'] = """
@@ -121,6 +124,8 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 700   $$aJane Arge, Jacobsen$$uFaroe Marine Research Institute, Tórshavn, Faroe Islands
 700   $$aÓskarsson, Guđmundur$$uMarine Research Institute, Reykjavik, Iceland
 700   $$aNøttestad, Leif$$uInstitute of Marine Research, Bergen, Norway
+773   $$a10.1000/data$$ndata
+773   $$a10.1000/data2$$ndata
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 909C4 $$pMarine Biology Research$$y2012$$n5-6$$v8$$c420-441
 942   $$a2012-12-24
@@ -144,6 +149,8 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 542   $$lopenAccess
 6531  $$aKeyword 1
 6531  $$aKeyword 2
+773   $$a10.1000/data$$ndata
+773   $$a10.1000/data2$$ndata
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
 980   $$bREPORT_OTHER
@@ -156,14 +163,15 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 100   $$aNielsen, Lars Holm$$uCERN
 245   $$aAnonymised Invenio Usage Logs
 260   $$c2012-05-02
+260   $$bDryad Digital Repository$$c2012
 500   $$aTest notes
 520   $$aThis is some brand new data.
 536   $$aOPENAIREPLUS - 2nd-Generation Open Access Infrastructure for Research in Europe (283595)$$c283595
-542   $$lopenAccess
+542   $$lcc0
 6531  $$aKeyword 1
 6531  $$aKeyword 2
-773   $$a10.1016.12.31/nature.S0735-1097(98)2000/12/31/34:7-7
-773   $$a10.1000/123456
+773   $$a10.1234/pub$$npub
+773   $$a10.1234/pub2$$npub
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
 980   $$aDATA

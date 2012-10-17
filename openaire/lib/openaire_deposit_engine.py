@@ -709,6 +709,9 @@ class OpenAIREPublication(object):
         if self._metadata.get('related_publications', '') and not self.errors.get('related_publications', ''):
             self._metadata['related_publications'] = normalize_multivalue_field(self.metadata.get('related_publications', ''), func=normalize_doi)
 
+        if self._metadata.get('related_datasets', '') and not self.errors.get('related_datasets', ''):
+            self._metadata['related_datasets'] = normalize_multivalue_field(self.metadata.get('related_datasets', ''), func=normalize_doi)
+
         if self._metadata.get('extra_report_numbers', '') and not self.errors.get('extra_report_numbers', ''):
             self._metadata['extra_report_numbers'] = normalize_multivalue_field(self.metadata.get('extra_report_numbers', ''))
 
@@ -883,16 +886,22 @@ class OpenAIREPublication(object):
             authors.append((name, affil))
         return authors
 
-    def get_related_publications(self):
+    def get_related_dois(self, field):
         """
-        Get list of DOIs for related publications
+        Get list of DOIs for related field
         """
         pubs = []
-        for doi_str in [doi.strip() for doi in self._metadata.get('related_publications', '').splitlines() if doi.strip()]:
+        for doi_str in [doi.strip() for doi in self._metadata.get(field, '').splitlines() if doi.strip()]:
             doi = normalize_doi(doi_str)
             if doi:
                 pubs.append(doi_str)
         return pubs
+
+    def get_related_publications(self):
+        return self.get_related_dois('related_publications')
+
+    def get_related_datasets(self):
+        return self.get_related_dois('related_datasets')
 
     def get_metadata(self):
         """
@@ -1067,7 +1076,7 @@ class OpenAIREPublication(object):
         # CC0 and data set
         if 'CC0' in field_groups and not 'ACCESS_RIGHTS' in field_groups:
             # Access rights
-            record_add_field(rec, '542', subfields=[('l', 'openAccess')])
+            record_add_field(rec, '542', subfields=[('l', 'cc0')])
 
             # Data file (no access restriction required)
             for key, fulltext in self.fulltexts.items():
@@ -1080,11 +1089,30 @@ class OpenAIREPublication(object):
                 record_add_field(rec, '020', '', '', subfields=[
                                  ('a', self._metadata.get('isbn')), ])
 
-        # Related publications
-        if 'RELATED_PUBLICATIONS' in field_groups:
+
+        if 'RELATED_PUBS' in field_groups:
             # Related publications
             for doi in self.related_publications:
-                record_add_field(rec, '773', subfields=[('a', doi), ])
+                record_add_field(rec, '773', subfields=[('a', doi), ('n','pub')])
+
+        # Related datasets
+        if 'RELATED_DATA' in field_groups:
+            for doi in self.related_datasets:
+                record_add_field(rec, '773', subfields=[('a', doi), ('n','data')])
+
+        # Dataset publisher
+        if 'DATASET' in field_groups:
+            dataset_publisher = self._metadata.get('dataset_publisher')
+            if dataset_publisher:
+                subfields = [('b', dataset_publisher)]
+
+                if self._metadata.get('publication_date'):
+                    year = self._metadata['publication_date'][:4]
+                    subfields.append(('c', year))
+
+                # Note publication date is record in 260__$c, from which the
+                # publication year can be computed
+                record_add_field(rec, '260', '', '', subfields=subfields)
 
         # Number of pages
         if 'PAGES_NO' in field_groups:
@@ -1147,4 +1175,5 @@ class OpenAIREPublication(object):
     report_numbers = property(get_report_numbers)
     authors = property(get_authors)
     related_publications = property(get_related_publications)
+    related_datasets = property(get_related_datasets)
     style = property(get_style)
