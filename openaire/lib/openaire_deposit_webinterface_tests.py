@@ -16,16 +16,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-"""
-TODO: Strong dependency on Werkzeug and json
-"""
-
-from StringIO import StringIO
-from tempfile import mkstemp
 try:
     import json
 except ImportError:
     import simplejson as json
+
+from StringIO import StringIO
+from tempfile import mkstemp
+import binascii
 import os
 import re
 import unittest2 as unittest
@@ -37,15 +35,13 @@ from invenio.dbquery import run_sql
 from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
 from invenio.openaire_deposit_config import CFG_METADATA_FIELDS
 from invenio.openaire_deposit_engine import OpenAIREPublication
-from invenio.openaire_deposit_fixtures import FIXTURES
+from invenio.openaire_deposit_fixtures import FIXTURES, FILE_FIXTURES
 from invenio.openaire_deposit_webinterface import \
     WebInterfaceOpenAIREDepositPages
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.testutils_clients import RequestFactory, TestClient, JSONResponse
 from invenio.webuser import get_nickname
 
-
-# TODO: only works in 2.7
 
 class SubmissionRegressionTest(unittest.TestCase):
     # ================================
@@ -193,6 +189,17 @@ class AjaxGatewayTest(unittest.TestCase):
     #
     # Utility methods
     #
+    def get_file_fixture(self, type, style):
+        """
+        Retrieve file fixture for publication type if it exists, or generate a
+        PDF on the file.
+        """
+        if type in FILE_FIXTURES:
+            name, base64_file = FILE_FIXTURES[type]
+            return (StringIO(binascii.a2b_base64(base64_file)), name)
+        else:
+            return (StringIO(self.make_stringio_pdf("Type: %s Style: %s" % (type, style))), '%s_%s_file.pdf' % (type.lower(), style))
+
     def make_stringio_pdf(self, text):
         """
         Generate a PDF which includes the text given as parameter to this function.
@@ -427,10 +434,11 @@ class AjaxGatewayTest(unittest.TestCase):
         self.clear_publications(self.project_id, style=style)
 
         # Simple file upload
+        (file_stringio, filename) = self.get_file_fixture(type, style)
         resp = self.client.post(
             "/deposit",
             query_string={'style': style, 'ln': 'en', 'projectid': '0'},
-            data={'Filedata': (StringIO(self.make_stringio_pdf("Type: %s Style: %s" % (type, style))), '%s_%s_file.pdf' % (type.lower(), style)), 'upload': 'Upload'},
+            data={'Filedata': (file_stringio, filename), 'upload': 'Upload'},
         )
         self.assertEqual(resp.status_code, 200)
         pub_ids = self.get_publications_for_project('0', style=style)
@@ -472,8 +480,8 @@ class AjaxGatewayTest(unittest.TestCase):
             res = self.client_noauth.get("/record/%s" % rec_id)
             self.assertEqual(res.status_code, 200)
 
-            res = self.client_noauth.get("/record/%s/files/%s_%s_file.pdf" % (
-                rec_id, type.lower(), style.lower()))
+            res = self.client_noauth.get("/record/%s/files/%s" % (
+                rec_id, filename))
             if fixture['access_rights'] in ["embargoedAccess", "closedAccess"]:
                 self.assertEqual(res.status_code, 302)  # Restricted access.
             else:
@@ -487,7 +495,7 @@ class AjaxGatewayTest(unittest.TestCase):
         """
         Test a complete submission
         """
-        for type in ['publishedArticle', 'report']:
+        for type in ['publishedArticle', 'report','data']:
             for style in ['invenio', 'portal']:
                 self._submit(type, style, submit=self.test_full_submit)
 
