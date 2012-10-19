@@ -236,7 +236,7 @@ def _check_related_dois(field, metadata, ln, _, title):
                 if doi.startswith("doi:"):
                     doi = doi[4:]
                 if main_doi == doi:
-                    return (field, 'error', [_('The provided DOI "%s" must not be identical to the DOI provided as identifier of the %s"' % (escape(doi, True), title))])
+                    return (field, 'error', [_('The provided DOI "%s" must not be identical to the DOI provided as identifier of the %s' % (escape(doi, True), title))])
 
 
 def _check_related_publications(metadata, ln, _):
