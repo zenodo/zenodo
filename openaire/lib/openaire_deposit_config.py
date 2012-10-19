@@ -78,22 +78,22 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
     """
     _ = gettext_set_language(ln)
 
-    return {
-        'publishedArticle': _("Published article"),
+    return [
+        ('publishedArticle', _("Published article")),
         #'preprint': _("Preprint"),
-        'report': _("Report"),
-        #'thesis': _("Thesis"),
+        ('report', _("Report")),
+        ('thesis', _("Thesis")),
         #'workingPaper': _("Working paper"),
         #'book': _("Book"),
         #'periodicalContribution': _("Periodical contribution"),
         #'conferenceContribution': _("Conference contribution"),
         #'generalTalk': _("General talk"),
         #'patent': _("Patent"),
-        'data': _("Dataset"),
-    }
+        ('data', _("Dataset")),
+    ]
 
-CFG_OPENAIRE_PUBLICATION_TYPES_KEYS = CFG_OPENAIRE_PUBLICATION_TYPES(
-    'en').keys()
+CFG_OPENAIRE_PUBLICATION_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_PUBLICATION_TYPES(
+    'en')]
 CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE = 'publishedArticle'
 CFG_OPENAIRE_CC0_PUBLICATION_TYPES = ['data', ]
 
@@ -126,9 +126,12 @@ CFG_METADATA_FIELDS = (
     'publisher',
     'place',
     'report_type',
+    'thesis_type',
     'extra_report_numbers',
     'isbn',
     'dataset_publisher',
+    'supervisors',
+    'university',
 )
 """ List of metadata fields, used in eg washing of URL parameters. """
 
@@ -153,7 +156,7 @@ CFG_METADATA_FIELDS_GROUPS = {
     'preprint': [],
     'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN', 
                'RELATED_DATA'],
-    'thesis': [],
+    'thesis': ['ACCESS_RIGHTS','PAGES_NO','RELATED_DATA','THESIS', 'IMPRINT'],
     'workingPaper': [],
     'book': [],
     'periodicalContribution': [],
@@ -182,14 +185,14 @@ def CFG_ACCESS_RIGHTS(ln):
     @return: Dictionary with access right ids as keys and access right titles as values.
     """
     _ = gettext_set_language(ln)
-    return {
-        'closedAccess': _("Closed access"),
-        'embargoedAccess': _("Embargoed access"),
-        'restrictedAccess': _("Restricted access"),
-        'openAccess': _("Open access"),
-        'cc0': _("Creative Commons Zero (CC0)"),
-    }
-CFG_ACCESS_RIGHTS_KEYS = CFG_ACCESS_RIGHTS('en').keys()
+    return [
+        ('closedAccess', _("Closed access")),
+        ('embargoedAccess', _("Embargoed access")),
+        ('restrictedAccess', _("Restricted access")),
+        ('openAccess', _("Open access")),
+        ('cc0', _("Creative Commons Zero (CC0)")),
+    ]
+CFG_ACCESS_RIGHTS_KEYS = [x[0] for x in CFG_ACCESS_RIGHTS('en')]
 CFG_DEFAULT_ACCESS_RIGHTS = 'closedAccess'
 
 
@@ -198,13 +201,27 @@ def CFG_OPENAIRE_REPORT_TYPES(ln):
     Report types
     """
     _ = gettext_set_language(ln)
-    return {
-        'projectDeliverable': _("Project deliverable"),
-        'other': _("Other"),
-    }
+    return [
+        ('projectDeliverable', _("Project deliverable")),
+        ('other', _("Other")),
+    ]
 
-CFG_OPENAIRE_REPORT_TYPES_KEYS = CFG_OPENAIRE_REPORT_TYPES('en').keys()
+CFG_OPENAIRE_REPORT_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_REPORT_TYPES('en')]
 CFG_OPENAIRE_DEFAULT_REPORT_TYPE = 'other'
+
+def CFG_OPENAIRE_THESIS_TYPES(ln):
+    """
+    Report types
+    """
+    _ = gettext_set_language(ln)
+    return [
+        ('bachelorThesis', _("Bachelor thesis")),
+        ('masterThesis', _("Master thesis")),
+        ('doctoralThesis', _("Doctoral thesis")),
+    ]
+
+CFG_OPENAIRE_THESIS_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_THESIS_TYPES('en')]
+CFG_OPENAIRE_DEFAULT_THESIS_TYPE = 'bachelorThesis'
 
 
 def CFG_OPENAIRE_CONFERENCE_TYPES(ln):
@@ -212,12 +229,12 @@ def CFG_OPENAIRE_CONFERENCE_TYPES(ln):
     Conference contribution types
     """
     _ = gettext_set_language(ln)
-    return {
-        'proceedingArticle': _("Proceedings article"),
-        'poster': _("Poster"),
-        'conferencePaper': _("Conference paper"),
-        'conferencePaper': _("Conference talk"),
-    }
+    return [
+        ('proceedingArticle', _("Proceedings article")),
+        ('poster', _("Poster")),
+        ('conferencePaper', _("Conference paper")),
+        ('conferencePaper', _("Conference talk")),
+    ]
 
-CFG_OPENAIRE_CONFERENCE_TYPES_KEYS = CFG_OPENAIRE_CONFERENCE_TYPES('en').keys()
+CFG_OPENAIRE_CONFERENCE_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_CONFERENCE_TYPES('en')]
 CFG_OPENAIRE_DEFAULT_CONFERENCE_TYPE = 'proceedingArticle'

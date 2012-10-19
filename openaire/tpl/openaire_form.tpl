@@ -69,6 +69,20 @@
                 </div>
             </fieldset>
             <div class="clear"></div>
+
+            <div class="typebox_%(id)s typebox_%(id)s_thesis">
+                <fieldset>
+                    <div>
+                        <img title="%(supervisors_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                        <label for="supervisors_%(id)s">%(supervisors_label)s</label><br />
+                        <textarea name="supervisors_%(id)s" id="supervisors_%(id)s" cols="60" rows="5" class="supervisors" placeholder="%(supervisors_placeholder)s">%(supervisors_value)s</textarea>
+                        <div id="error_supervisors_%(id)s" class="error">%(error_supervisors_value)s</div>
+                        <div id="warning_supervisors_%(id)s" class="warning">%(warning_supervisors_value)s</div>
+                    </div>
+                </fieldset>
+                <div class="clear"></div>
+            </div>
+
             <fieldset>
                 <legend>%(english_language_label)s</legend>
                 <div>
@@ -193,7 +207,25 @@
                     <div id="error_report_type_%(id)s" class="error">%(error_report_type_value)s</div>
                     <div id="warning_report_type_%(id)s" class="warning">%(warning_report_type_value)s</div>
                 </div>
-                <div class="typebox_%(id)s typebox_%(id)s_report">
+                <div class="typebox_%(id)s typebox_%(id)s_thesis">
+                    <img title="%(thesis_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="thesis_type_%(id)s" class="mandatory">%(thesis_type_label)s</label>
+                    <select name="thesis_type_%(id)s" id="thesis_type_%(id)s" class="thesis_type">
+                        %(thesis_type_options)s
+                    </select>
+                    <br />
+                    <div id="error_thesis_type_%(id)s" class="error">%(error_thesis_type_value)s</div>
+                    <div id="warning_thesis_type_%(id)s" class="warning">%(warning_thesis_type_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_thesis">
+                    <img title="%(university_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="university_%(id)s" class="mandatory">%(university_label)s</label>
+                    <input type="text" name="university_%(id)s" id="university_%(id)s" value="%(university_value)s" size="50" class="university" />
+                    <br />
+                    <div id="error_university_%(id)s" class="error">%(error_university_value)s</div>
+                    <div id="warning_university_%(id)s" class="warning">%(warning_university_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_thesis">
                     <img title="%(publisher_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="publisher_%(id)s">%(publisher_label)s</label>
                     <input type="text" name="publisher_%(id)s" id="publisher_%(id)s" value="%(publisher_value)s" size="15" class="publisher" />
@@ -206,7 +238,7 @@
                     <div id="error_place_%(id)s" class="error">%(error_place_value)s</div>
                     <div id="warning_place_%(id)s" class="warning">%(warning_place_value)s</div>
                 </div>
-                <div class="typebox_%(id)s typebox_%(id)s_report">
+                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_thesis">
                     <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="report_pages_no_%(id)s">%(report_pages_no_label)s</label>
                     <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="4" class="report_pages_no" />
@@ -265,7 +297,7 @@
                         </div>
                 </fieldset>
             </div>
-            <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_publishedArticle">
+            <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_publishedArticle typebox_%(id)s_thesis">
                 <fieldset>
                     <legend>%(related_datasets_legend_label)s</legend>
                        <div>

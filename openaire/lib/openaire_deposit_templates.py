@@ -328,9 +328,18 @@ class Template:
         values['report_type_options'] = self.tmpl_report_type_options(
             values.get('report_type_value', None), ln)
 
+        values['thesis_type_label'] = escape(_("""Thesis type"""), True)
+        values['thesis_type_tooltip'] = escape(_(""""""), True)
+        values['thesis_type_options'] = self.tmpl_thesis_type_options(
+            values.get('thesis_type_value', None), ln)
+
         values['extra_report_numbers_label'] = escape(
             _("""Report numbers (one per line)"""), True)
         values['extra_report_numbers_tooltip'] = escape(_(""""""), True)
+
+        values['university_label'] = escape(
+            _("""University"""), True)
+        values['university_tooltip'] = escape(_(""""""), True)
 
         values['identifiers_information_label'] = escape(
             _("""Identifier(s) information"""), True)
@@ -343,6 +352,11 @@ class Template:
 
         values['related_publications_legend_label'] = escape(_("""Related publications"""))
         values['related_datasets_legend_label'] = escape(_("""Related datasets"""))
+
+        values['supervisors_label'] = escape(_("Supervisor(s), one per line"))
+        values['supervisors_placeholder'] = _("Family name, First name: Affiliation (one supervisor per line)")
+        values['supervisors_tooltip'] = escape(_("<p>Please enter one supervisor per line in the form: <pre>Last name, First Name: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
+        values['supervisors_hint'] = escape(_("Doe, John: Example institution"))
 
         if warnings:
             for key, value in warnings.iteritems():
@@ -390,13 +404,12 @@ class Template:
         @see: tmpl_generic_options
         """
         from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
-        access_rights = CFG_ACCESS_RIGHTS(ln)
-        del access_rights['cc0']
+        access_rights = filter(lambda x: x[0] != 'cc0', CFG_ACCESS_RIGHTS(ln))
         _ = gettext_set_language(ln)
 
         return self.tmpl_generic_options(
             _("Select access rights"),
-            access_rights.items(),
+            access_rights,
             selected_access_right,
             ln=CFG_SITE_LANG,
         )
@@ -422,9 +435,12 @@ class Template:
             ln=CFG_SITE_LANG,
         )
 
-    def tmpl_type_options(self, text, selected_value, types, default, ln=CFG_SITE_LANG):
-        items = types(ln).items()
-        items.sort()
+    def tmpl_type_options(self, text, selected_value, types, default,
+                          ln=CFG_SITE_LANG, sort=True):
+        items = types(ln)
+
+        if sort:
+            items.sort()
 
         if not selected_value:
             selected_value = default
@@ -464,6 +480,21 @@ class Template:
 
         return self.tmpl_type_options(_("Select report type"), selected_value,
                                       CFG_OPENAIRE_REPORT_TYPES, CFG_OPENAIRE_DEFAULT_REPORT_TYPE)
+
+    def tmpl_thesis_type_options(self, selected_value, ln=CFG_SITE_LANG):
+        """
+        Options for publication types drop-down
+
+        @see: tmpl_generic_options
+        """
+        _ = gettext_set_language(ln)
+
+        from invenio.openaire_deposit_config import CFG_OPENAIRE_THESIS_TYPES, \
+            CFG_OPENAIRE_DEFAULT_THESIS_TYPE
+
+        return self.tmpl_type_options(_("Select thesis type"), selected_value,
+                    CFG_OPENAIRE_THESIS_TYPES, CFG_OPENAIRE_DEFAULT_THESIS_TYPE,
+                    sort=False)
 
     def tmpl_access_rights_classes(self, publicationid):
         """

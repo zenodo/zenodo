@@ -239,7 +239,7 @@ jQuery(document).ready(function(){
             return split(term).pop();
         }
 
-        jQuery('textarea.authors').keydown(function(event) {
+        jQuery('textarea.authors, textarea.supervisors').keydown(function(event) {
             /* Thanks to: http://forum.jquery.com/topic/autocomplete-changing-key-bindings */
             var isOpen = jQuery( this ).autocomplete( "widget" ).is( ":visible" );
             var keyCode = jQuery.ui.keyCode;

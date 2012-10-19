@@ -21,7 +21,7 @@ import cgi
 import time
 
 from invenio.config import CFG_SITE_URL
-from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
+from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS
 from invenio.messages import gettext_set_language
 
 def format_element(bfo):
@@ -52,7 +52,7 @@ def format_element(bfo):
     return ret % {
         'x_fmt_s': "<strong>",
         'x_fmt_e': "</strong>",
-        'access': CFG_ACCESS_RIGHTS(ln)[access_rights],
+        'access': dict(CFG_ACCESS_RIGHTS(ln))[access_rights],
         'cc0link' : """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="%s/img/cc-zero.png"></a>""" % CFG_SITE_URL,
         'embargo': embargo,
         'email': email

@@ -26,7 +26,7 @@ Following steps are necessary to add a new field:
   * openaire_deposit_checks.py: Add _check_field method and update CFG in bottom.
   * openaire_deposit_templates.py: Add to tmpl_form, and perhaps add more methods
   * openaire_form.tpl: Add HTML input fields.
-  * openaire_deposit_engine.py: Adapt getmarcxml() to make use of new field data.
+  * openaire_deposit_engine.py: Adapt get_record() to make use of new field data.
 
   ... tests ...
 
@@ -37,9 +37,8 @@ Following steps are necessary to add a new publication type:
   * Update metadata schema (Google Docs)
   * openaire_deposit_config.py: Add to CFG_OPENAIRE_PUBLICATION_TYPES
   * openaire_deposit_config.py: Add to CFG_OPENAIRE_CC0_PUBLICATION_TYPES if needed.
-  * openaire_deposit_config.py: Add to CFG_METADATA_FIELDS_PER_TYPE if needed
-  * openaire_deposit_engine.py: Add OpenAIREPublication._<type>_record
-  * openaire_deposit_engine.py: Modify OpenAIREPublication._append_type_fields
+  * openaire_deposit_config.py: Add to CFG_METADATA_FIELDS_GROUPS if needed
+  * openaire_deposit_engine.py: Modufy OpenAIREPublication.get_record()
   * openaire_deposit_engine_tests.py: Add test, test_<type>()
   * openaire_deposit_fixtures.py: Add fixture FIXTURES and MARC_FIXTURES
   * openaire_deposit_webinterface_tests.py: Modify test_submission()
@@ -629,7 +628,7 @@ class OpenAIREPublication(object):
         """
         _ = gettext_set_language(self.ln)
         content = openaire_deposit_templates.tmpl_confirmation_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, report_numbers=self.report_numbers, ln=self.ln)
-        send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a Publication into OpenAIRE"), content=content)
+        send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a publication into OpenAIRE"), content=content)
         bibedit_url = CFG_SITE_URL + \
             "/record/edit/#state=edit&recid=%s" % self.recid
         content = openaire_deposit_templates.tmpl_curators_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, bibedit_url=bibedit_url)
@@ -699,6 +698,12 @@ class OpenAIREPublication(object):
                 self._metadata['authors'], func=normalize_authorship)
             update_favourite_authorships_for_user(
                 self.uid, self.publicationid, self._metadata['authors'])
+
+        if self._metadata.get('supervisors') and not self.errors.get('supervisors'):
+            self._metadata['supervisors'] = normalize_multivalue_field(
+                self._metadata['supervisors'], func=normalize_authorship)
+            update_favourite_authorships_for_user(
+                self.uid, self.publicationid, self._metadata['supervisors'])
 
         if self._metadata.get('keywords') and not self.errors.get('keywords'):
             self._metadata['keywords'] = normalize_multivalue_field(
@@ -870,12 +875,12 @@ class OpenAIREPublication(object):
         """
         return "%s/record/%s" % (CFG_SITE_URL, self.recid)
 
-    def get_authors(self):
+    def get_names(self, field):
         """
         Get authors as as a list of 2-tuples (name, affiliation).
         """
-        authors = []
-        for author_str in [author.strip() for author in self._metadata['authors'].split('\n') if author.strip()]:
+        names = []
+        for author_str in [author.strip() for author in self._metadata[field].splitlines() if author.strip()]:
             if ':' in author_str:
                 name, affil = author_str.split(':', 1)
                 name = name.strip()
@@ -883,8 +888,20 @@ class OpenAIREPublication(object):
             else:
                 name = author_str.strip()
                 affil = None
-            authors.append((name, affil))
-        return authors
+            names.append((name, affil))
+        return names
+
+    def get_authors(self):
+        """
+        Get authors as as a list of 2-tuples (name, affiliation).
+        """
+        return self.get_names('authors')
+
+    def get_supervisors(self):
+        """
+        Get supervisors as as a list of 2-tuples (name, affiliation).
+        """
+        return self.get_names('supervisors')
 
     def get_related_dois(self, field):
         """
@@ -1083,6 +1100,24 @@ class OpenAIREPublication(object):
                 subfields = [('a', fulltext.fullpath), ('d', 'Data')]
                 record_add_field(rec, 'FFT', subfields=subfields)
 
+        # THESIS
+        if 'THESIS' in field_groups:
+            # Supervisors
+            supervisors = self.supervisors
+            for (name, affil) in supervisors:
+                subfields = [('a', name), ('4', 'ths')]
+                if affil:
+                    subfields.append(('u', affil))
+                record_add_field(rec, '700', subfields=subfields)
+
+            record_add_field(rec, '502', '', '', subfields=[
+                                 ('c', self._metadata.get('university')),
+                                 ('b', self._metadata.get('thesis_type')) ])
+
+            record_add_field(rec, '980', '', '', subfields=[
+                ('b', self._metadata.get('thesis_type').upper()),
+                ])
+
         # ISBN
         if 'ISBN' in field_groups:
             if self._metadata.get('isbn'):
@@ -1174,6 +1209,7 @@ class OpenAIREPublication(object):
     year = property(get_year)
     report_numbers = property(get_report_numbers)
     authors = property(get_authors)
+    supervisors = property(get_supervisors)
     related_publications = property(get_related_publications)
     related_datasets = property(get_related_datasets)
     style = property(get_style)
