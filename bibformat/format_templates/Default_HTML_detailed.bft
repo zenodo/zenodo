@@ -34,7 +34,7 @@ prefix="<br /><small><strong>Keyword(s): </strong></small>"
 keyword_prefix='<small itemprop="keywords">'
 keyword_suffix="</small>" />
 
-<BFE_AUTHORS relator_code_pattern='ths$' prefix='<small><strong>Supervisor(s):</strong> ' separator=',' suffix='</small>' limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix=' (' affiliation_suffix=")"/>
+<BFE_AUTHORS relator_code_pattern='ths$' prefix='<br /><small><strong>Supervisor(s):</strong> ' separator=',' suffix='</small>' limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix=' (' affiliation_suffix=")"/>
 <BFE_OPENAIRE_UNIVERSITY prefix="<br /><small><strong>Thesis:</strong> " suffix="</small>" />
 <!-- BEGIN OpenAIRE specific -->
 
