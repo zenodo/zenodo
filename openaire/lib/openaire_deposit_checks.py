@@ -231,12 +231,12 @@ def _check_related_dois(field, metadata, ln, _, title):
         doi = doi.strip()
         if doi:
             if not _RE_DOI.match(doi):
-                return (field, 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"' % (escape(doi, True), title))])
+                return (field, 'error', [_('The provided DOI is not correctly typed: you entered "%s" but it should look similar to "10.1234/foo-bar"' % escape(doi, True))])
             elif main_doi:
                 if doi.startswith("doi:"):
                     doi = doi[4:]
                 if main_doi == doi:
-                    return (field, 'error', [_('The provided DOI "%s" must not be identical to the one provided as identifier of the %s"' % (escape(doi, True), title))])
+                    return (field, 'error', [_('The provided DOI "%s" must not be identical to the DOI provided as identifier of the %s"' % (escape(doi, True), title))])
 
 
 def _check_related_publications(metadata, ln, _):
@@ -244,7 +244,7 @@ def _check_related_publications(metadata, ln, _):
 
 
 def _check_related_datasets(metadata, ln, _):
-    return _check_related_dois('related_publications', metadata, ln, _, _("publication"))
+    return _check_related_dois('related_datasets', metadata, ln, _, _("publication"))
 
 
 def _check_type(metadata, ln, _, pubtype, allowed_values):
