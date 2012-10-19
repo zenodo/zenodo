@@ -102,6 +102,37 @@ FIXTURES = {
         'related_datasets': '10.1000/data\n10.1000/data2',
         'dataset_publisher': 'Dryad Digital Repository',
     },
+    'thesis': {
+        'title': 'My thesis',
+        'original_title': '',
+        'doi': '10.1234/foo.bar',
+        'isbn': '',
+        'publication_date': '2012-10-11',
+        'journal_title': '',
+        'volume': '',
+        'issue': '',
+        'pages': '',
+        'university': 'Roskilde University',
+        'publisher': 'Roskilde University',
+        'place': 'Roskilde, Denmark',
+        'report_pages_no': '60',
+        'dataset_publisher': 'OpenAIRE Orphan Record Repository',
+        'publication_type': 'thesis',
+        'language': 'eng',
+        'report_type': 'other',
+        'thesis_type': 'doctoralThesis',
+        'authors': 'Nielsen, Lars Holm: CERN',
+        'supervisors': 'Smith, T.: CERN',
+        'abstract': 'With some abstract',
+        'original_abstract': '',
+        'extra_report_numbers': '',
+        'keywords': 'Keyword 1\nKeyword 2',
+        'notes': 'Bla bla bla',
+        'related_publications': '',
+        'related_datasets': '10.1234/data1\ndoi:10.1234/data2',
+        'embargo_date': '',
+        'access_rights': 'restrictedAccess',
+    }
 }
 
 MARC_FIXTURES = {}
@@ -179,4 +210,28 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
 980   $$aDATA
+"""
+
+MARC_FIXTURES['thesis'] = """
+0247  $$a10.1234/foo.bar$$2DOI
+RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
+041   $$aeng
+100   $$aNielsen, Lars Holm$$uCERN
+245   $$aMy thesis
+260   $$c2012-10-11
+260   $$aRoskilde, Denmark$$bRoskilde University$$c2012
+300   $$a60
+500   $$aBla bla bla
+502   $$cRoskilde University$$bdoctoralThesis
+520   $$aWith some abstract
+536   $$aOPENAIREPLUS - 2nd-Generation Open Access Infrastructure for Research in Europe (283595)$$c283595
+542   $$lrestrictedAccess
+6531  $$aKeyword 1
+6531  $$aKeyword 2
+700   $$aSmith, T.$$4ths$$uCERN
+773   $$a10.1234/data1$$ndata
+773   $$a10.1234/data2$$ndata
+8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
+980   $$aPROVISIONAL
+980   $$bDOCTORALTHESIS
 """
