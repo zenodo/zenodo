@@ -20,7 +20,6 @@
 import cgi
 import time
 
-from invenio.config import CFG_SITE_URL
 from invenio.openaire_deposit_config import CFG_OPENAIRE_THESIS_TYPES
 from invenio.messages import gettext_set_language
 

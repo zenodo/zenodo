@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2008, 2009, 2010, 2011, 2012 CERN.
+## Copyright (C) 2011, 2012 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,21 +16,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from invenio.inveniocfg_migrate import InvenioMigration, run_sql_ignore
-from invenio.dbquery import run_sql
+pylibdir = $(libdir)/python/invenio/upgrades
 
-class Migration( InvenioMigration ):
-    """ Create table wapCACHE """
-    
-    depends_on = ['baseline',]
-    repository = 'invenio_oa'
-    
-    def forward(self):
-        run_sql("""
-CREATE TABLE IF NOT EXISTS userEXT (
-  id varbinary(255) NOT NULL,
-  method varchar(50) NOT NULL,
-  id_user int(15) unsigned NOT NULL,
-  PRIMARY KEY (id, method),
-  UNIQUE KEY (id_user, method)
-) ENGINE=MyISAM;""")
+pylib_DATA = *.py
+
+EXTRA_DIST = $(pylib_DATA)
+
+CLEANFILES = *~ *.pyc *.tmp

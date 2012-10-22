@@ -78,12 +78,12 @@ def format_element(bfo, limit, separator=' ; ',
 
             if print_links.lower() == "yes":
                 if link_author_pages == "no":
-                    author['a'] = '<a href="' + CFG_SITE_URL + \
+                    author['a'] = '<a href="' +  \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                   '&amp;ln=' + bfo.lang + \
                                   '">' + escape(author['a']) + '</a>'
                 else:
-                    author['a'] = '<a rel="author" href="' + CFG_SITE_URL + \
+                    author['a'] = '<a rel="author" href="' + \
                                   '/author/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \

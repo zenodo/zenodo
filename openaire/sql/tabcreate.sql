@@ -55,15 +55,6 @@ CREATE TABLE IF NOT EXISTS pgreplayqueue (
   PRIMARY KEY (id)
 ) ENGINE=MyISAM;
 
-CREATE TABLE IF NOT EXISTS migrations (
-  id int(15) unsigned NOT NULL auto_increment,
-  repository varchar(255) NOT NULL,
-  migration varchar(255) NOT NULL,
-  applied DATETIME NOT NULL,
-  PRIMARY KEY (id),
-  UNIQUE KEY (migration)
-) ENGINE=MyISAM;
-
-INSERT INTO migrations (repository, migration, applied) VALUES ('openaire','oa_baseline',NOW());
+INSERT INTO upgrade (upgrade, applied) VALUES ('openaire_initial', NOW());
 
 -- end of file

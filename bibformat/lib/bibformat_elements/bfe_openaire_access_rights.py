@@ -53,7 +53,7 @@ def format_element(bfo):
         'x_fmt_s': "<strong>",
         'x_fmt_e': "</strong>",
         'access': dict(CFG_ACCESS_RIGHTS(ln))[access_rights],
-        'cc0link' : """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="%s/img/cc-zero.png"></a>""" % CFG_SITE_URL,
+        'cc0link' : """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="/img/cc-zero.png"></a>""",
         'embargo': embargo,
         'email': email
     }

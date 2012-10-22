@@ -95,16 +95,14 @@ AC_CONFIG_FILES([config.nice  \
      bibsched/Makefile \
      bibsched/lib/Makefile \
      bibsched/lib/bibsched_tasklets/Makefile \
-     miscutil/bin/Makefile \
      miscutil/Makefile \
      miscutil/lib/Makefile \
-     miscutil/bin/inveniomigrate \
      openaire/js/Makefile \
      openaire/sql/Makefile \
      openaire/Makefile \
      openaire/lib/Makefile \
      openaire/tpl/Makefile \
-     openaire/migrations/Makefile \
+     openaire/upgrades/Makefile \
      websession/Makefile \
      websession/lib/Makefile \
      webstyle/js/Makefile \
