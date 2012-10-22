@@ -53,10 +53,10 @@ def _get_publication_type(metadata):
     return metadata.get('publication_type', '')
 
 
-def _check_text(metadata, ln, _, field):
+def _check_text(metadata, ln, _, field, mandatory=True):
     title = metadata.get(field, '')
     title = title.strip()
-    if not title:
+    if mandatory and not title:
         return (field, 'error', [_('The field is mandatory but is currently empty')])
     elif title:
         title = title.decode('UTF8')
@@ -71,7 +71,7 @@ def _check_title(metadata, ln, _):
 
 
 def _check_university(metadata, ln, _):
-    return _check_text(metadata, ln, _, 'university')
+    return _check_text(metadata, ln, _, 'university', mandatory=(_get_publication_type(metadata) == 'thesis'))
 
 
 def _check_original_title(metadata, ln, _):
