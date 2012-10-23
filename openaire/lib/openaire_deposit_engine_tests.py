@@ -153,8 +153,11 @@ class EngineTest(unittest.TestCase):
     def test_data(self):
         self._test_pubtype('data')
 
-    def test_data(self):
+    def test_thesis(self):
         self._test_pubtype('thesis')
+
+    def test_book(self):
+        self._test_pubtype('book')
 
 #
 # Create test suite

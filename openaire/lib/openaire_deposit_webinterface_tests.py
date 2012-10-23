@@ -33,7 +33,8 @@ from invenio.bibtask import task_low_level_submission
 from invenio.config import CFG_PREFIX
 from invenio.dbquery import run_sql
 from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
-from invenio.openaire_deposit_config import CFG_METADATA_FIELDS
+from invenio.openaire_deposit_config import CFG_METADATA_FIELDS, \
+    CFG_OPENAIRE_CC0_PUBLICATION_TYPES
 from invenio.openaire_deposit_engine import OpenAIREPublication
 from invenio.openaire_deposit_fixtures import FIXTURES, FILE_FIXTURES
 from invenio.openaire_deposit_webinterface import \
@@ -273,9 +274,9 @@ class AjaxGatewayTest(unittest.TestCase):
             if field == 'projects':
                 continue
             real_val = metadata.get(field, None)
-            if field == 'related_publications':
+            if field in ['related_publications','related_datasets']:
                 # Remove "doi:" and filter out blank strings.
-                real_val = real_val.split("\n")
+                real_val = filter(lambda x: x, real_val.split("\n"))
 
                 def _map_func(x):
                     if x.startswith("doi:"):
@@ -482,7 +483,9 @@ class AjaxGatewayTest(unittest.TestCase):
 
             res = self.client_noauth.get("/record/%s/files/%s" % (
                 rec_id, filename))
-            if fixture['access_rights'] in ["embargoedAccess", "closedAccess"]:
+            if fixture["access_rights"] in ["embargoedAccess", \
+                       "restrictedAccess", "closedAccess"] and \
+                       type not in CFG_OPENAIRE_CC0_PUBLICATION_TYPES:
                 self.assertEqual(res.status_code, 302)  # Restricted access.
             else:
                 self.assertEqual(res.status_code, 200)
@@ -491,14 +494,20 @@ class AjaxGatewayTest(unittest.TestCase):
         self.clear_publications('0', style=style)
         self.clear_publications(self.project_id, style=style)
 
-    def test_submission(self):
-        """
-        Test a complete submission
-        """
-        for type in ['publishedArticle', 'report','data']:
-            for style in ['invenio', 'portal']:
-                self._submit(type, style, submit=self.test_full_submit)
+    def test_submission_published_article(self):
+        self._submit('publishedArticle', 'portal', submit=self.test_full_submit)
 
+    def test_submission_report(self):
+        self._submit('report', 'invenio', submit=self.test_full_submit)
+
+    def test_submission_data(self):
+        self._submit('data', 'portal', submit=self.test_full_submit)
+
+    def test_submission_thesis(self):
+        self._submit('thesis', 'invenio', submit=self.test_full_submit)
+
+    def test_submission_book(self):
+        self._submit('book', 'portal', submit=self.test_full_submit)
 
 #
 # Create test suite
