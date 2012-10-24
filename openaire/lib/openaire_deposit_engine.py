@@ -38,7 +38,7 @@ Following steps are necessary to add a new publication type:
   * openaire_deposit_config.py: Add to CFG_OPENAIRE_PUBLICATION_TYPES
   * openaire_deposit_config.py: Add to CFG_OPENAIRE_CC0_PUBLICATION_TYPES if needed.
   * openaire_deposit_config.py: Add to CFG_METADATA_FIELDS_GROUPS if needed
-  * openaire_deposit_engine.py: Modufy OpenAIREPublication.get_record()
+  * openaire_deposit_engine.py: Modify OpenAIREPublication.get_record()
   * openaire_deposit_engine_tests.py: Add test, test_<type>()
   * openaire_deposit_fixtures.py: Add fixture FIXTURES and MARC_FIXTURES
   * openaire_deposit_webinterface_tests.py: Modify test_submission()

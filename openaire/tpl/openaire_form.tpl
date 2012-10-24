@@ -149,7 +149,7 @@
                     <div id="error_doi_%(id)s" class="error">%(error_doi_value)s</div>
                     <div id="warning_doi_%(id)s" class="warning">%(warning_doi_value)s</div>
                 </div>
-                <div class="typebox_%(id)s typebox_%(id)s_report">
+                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_book">
                     <img title="%(isbn_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="isbn_%(id)s">%(isbn_label)s
                     </label>
@@ -225,7 +225,7 @@
                     <div id="error_university_%(id)s" class="error">%(error_university_value)s</div>
                     <div id="warning_university_%(id)s" class="warning">%(warning_university_value)s</div>
                 </div>
-                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_thesis">
+                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_thesis typebox_%(id)s_book">
                     <img title="%(publisher_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="publisher_%(id)s">%(publisher_label)s</label>
                     <input type="text" name="publisher_%(id)s" id="publisher_%(id)s" value="%(publisher_value)s" size="15" class="publisher" />
@@ -238,7 +238,7 @@
                     <div id="error_place_%(id)s" class="error">%(error_place_value)s</div>
                     <div id="warning_place_%(id)s" class="warning">%(warning_place_value)s</div>
                 </div>
-                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_thesis">
+                <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_thesis typebox_%(id)s_book">
                     <img title="%(report_pages_no_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="report_pages_no_%(id)s">%(report_pages_no_label)s</label>
                     <input type="text" name="report_pages_no_%(id)s" id="report_pages_no_%(id)s" value="%(report_pages_no_value)s" size="4" class="report_pages_no" />
@@ -297,7 +297,7 @@
                         </div>
                 </fieldset>
             </div>
-            <div class="typebox_%(id)s typebox_%(id)s_report typebox_%(id)s_publishedArticle typebox_%(id)s_thesis">
+            <div class="typebox_%(id)s typebox_%(id)s_book typebox_%(id)s_report typebox_%(id)s_publishedArticle typebox_%(id)s_thesis">
                 <fieldset>
                     <legend>%(related_datasets_legend_label)s</legend>
                        <div>
