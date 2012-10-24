@@ -85,6 +85,7 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
         ('thesis', _("Thesis")),
         #('workingPaper', _("Working paper")),
         ('book', _("Book")),
+        ('bookpart', _("Book chapter/part of book")),
         #('periodicalContribution', _("Periodical contribution")),
         #('conferenceContribution', _("Conference contribution")),
         #('generalTalk', _("General talk")),
@@ -132,6 +133,8 @@ CFG_METADATA_FIELDS = (
     'dataset_publisher',
     'supervisors',
     'university',
+    'book_title',
+    'book_pages',
 )
 """ List of metadata fields, used in eg washing of URL parameters. """
 
@@ -159,6 +162,7 @@ CFG_METADATA_FIELDS_GROUPS = {
     'thesis': ['ACCESS_RIGHTS','PAGES_NO', 'RELATED_DATA','THESIS', 'IMPRINT'],
     'workingPaper': [],
     'book': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'IMPRINT', 'ISBN'],
+    'bookpart': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'BOOKPART'],
     'periodicalContribution': [],
     'conferenceContribution': [],
     'generalTalk': [],
@@ -169,7 +173,8 @@ CFG_METADATA_FIELDS_GROUPS = {
 Mapping of publication type to grouping of fields.
 
 A group of fields can e.g. be JOURNAL for representing journal_title, volume,
-pages and issue. This is used in the engine to generate MARC.
+pages and issue. This is used in the engine to generate MARC. Each group
+is used to switch on/off part of the MARC generation.
 """
 
 # =======================

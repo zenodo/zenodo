@@ -1124,6 +1124,28 @@ class OpenAIREPublication(object):
                 record_add_field(rec, '020', '', '', subfields=[
                                  ('a', self._metadata.get('isbn')), ])
 
+        # Book
+        if 'BOOKPART' in field_groups:
+            subfields = [('t', self._metadata.get('book_title')), ('n', 'bookpart')]
+
+            if self._metadata.get('book_pages'):
+                subfields.append(('g', self._metadata.get('book_pages')))
+
+            if self._metadata.get('publisher'):
+                subfields.append(('b', self._metadata.get('publisher')))
+
+            if self._metadata.get('place'):
+                subfields.append(('a', self._metadata.get('place')))
+
+            if self._metadata.get('isbn'):
+                subfields.append(('z', self._metadata.get('isbn')))
+
+            if self._metadata.get('publication_date'):
+                year = self._metadata['publication_date'][:4]
+                subfields.append(('c', year))
+
+            record_add_field(rec, '773', '', '', subfields=subfields)
+
 
         if 'RELATED_PUBS' in field_groups:
             # Related publications

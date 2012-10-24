@@ -159,6 +159,9 @@ class EngineTest(unittest.TestCase):
     def test_book(self):
         self._test_pubtype('book')
 
+    def test_bookpart(self):
+        self._test_pubtype('bookpart')
+
 #
 # Create test suite
 #

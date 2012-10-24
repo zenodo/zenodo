@@ -341,6 +341,14 @@ class Template:
             _("""University"""), True)
         values['university_tooltip'] = escape(_(""""""), True)
 
+        values['book_title_label'] = escape(
+            _("""Book title"""), True)
+        values['book_title_tooltip'] = escape(_(""""""), True)
+
+        values['book_pages_label'] = escape(
+            _("""Pages"""), True)
+        values['book_pages_tooltip'] = escape(_(""""""), True)
+
         values['identifiers_information_label'] = escape(
             _("""Identifier(s) information"""), True)
 
