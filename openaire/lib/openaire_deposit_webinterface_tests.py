@@ -509,6 +509,9 @@ class AjaxGatewayTest(unittest.TestCase):
     def test_submission_book(self):
         self._submit('book', 'portal', submit=self.test_full_submit)
 
+    def test_submission_bookpart(self):
+        self._submit('bookpart', 'portal', submit=self.test_full_submit)
+
 #
 # Create test suite
 #

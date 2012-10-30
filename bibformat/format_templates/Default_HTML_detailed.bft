@@ -52,6 +52,7 @@ note_suffix="</span></span> </small>"
 suffix="<br />" />
 
 <BFE_PUBLI_INFO prefix="<br /><br /><strong>Published in: </strong>"/><br />
+<BFE_OPENAIRE_PUBLISHED_IN_BOOK prefix="<br /><br /><strong>Published in: </strong>"/><br />
 <BFE_DATE prefix='<strong>Publication date: </strong><span itemtype="datePublished">' suffix="</span><br />" date_format="%Y-%m-%d" />
 <BFE_DOI prefix='<br /><small><strong>DOI: </strong><span itemprop="doi">' suffix="</span> </small><br />" />
 

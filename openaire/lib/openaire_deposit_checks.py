@@ -74,6 +74,10 @@ def _check_university(metadata, ln, _):
     return _check_text(metadata, ln, _, 'university', mandatory=(_get_publication_type(metadata) == 'thesis'))
 
 
+def _check_book_title(metadata, ln, _):
+    return _check_text(metadata, ln, _, 'book_title', mandatory=(_get_publication_type(metadata) == 'bookpart'))
+
+
 def _check_original_title(metadata, ln, _):
     title = metadata.get('original_title', '')
     title = title.decode('UTF8')
@@ -177,10 +181,14 @@ def _check_publication_date(metadata, ln, _):
         return ('publication_date', 'error', [_('The publication date is not correctly typed (correct format is YYYY-MM-DD)')])
 
 
-def _check_pages(metadata, ln, _):
-    pages = metadata.get('pages', '').strip()
+def _check_pages(metadata, ln, _, field='pages'):
+    pages = metadata.get(field, '').strip()
     if pages and not _RE_PAGES.match(pages):
         return ('pages', 'error', [_("The pages are not specified correctly")])
+
+
+def _check_book_pages(metadata, ln, _):
+    return _check_pages(metadata, ln, _, field='book_part')
 
 
 def _check_pages_no(metadata, ln, _):
@@ -310,6 +318,8 @@ CFG_METADATA_FIELDS_CHECKS = {
     'issn': _check_issn,
     'supervisors': _check_supervisors,
     'university': _check_university,
+    'book_title': _check_book_title,
+    'book_pages': _check_book_pages,
 }
 """
 Dictionary of metadata field validator functions.
