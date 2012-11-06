@@ -27,6 +27,7 @@ Following steps are necessary to add a new field:
   * openaire_deposit_templates.py: Add to tmpl_form, and perhaps add more methods
   * openaire_form.tpl: Add HTML input fields.
   * openaire_deposit_engine.py: Adapt get_record() to make use of new field data.
+  * Default_HTML_detailed.bft: Ensure field is displayed on submitted records
 
   ... tests ...
 
@@ -1210,6 +1211,32 @@ class OpenAIREPublication(object):
                 # Note publication date is record in 260__$c, from which the
                 # publication year can be computed
                 record_add_field(rec, '260', '', '', subfields=subfields)
+
+        # Meeting/conferences (type, title, acronym, dates, town, country, URL
+        if 'MEETING' in field_groups:
+            meeting_values = [
+                ('a', self._metadata.get('meeting_title', '')),
+                ('g', self._metadata.get('meeting_acronym', '')),
+                ('d', self._metadata.get('meeting_dates', '')),
+                ('c', self._metadata.get('meeting_town', '')),
+                ('w', self._metadata.get('meeting_country', '')),
+            ]
+
+            subfields = []
+            for code, val in meeting_values:
+                if val:
+                    subfields.append((code, val))
+            record_add_field(rec, '711', '', '', subfields=subfields)
+
+            meeting_url = self._metadata.get('meeting_url', '')
+            if meeting_url:
+                record_add_field(rec, '8564', '', '', subfields=[
+                                    ('u', meeting_url),('y','Meeting website')])
+
+            # Contribution type (paper, poster, lecture, ...)
+            contribution_type = self._metadata.get('contribution_type', '')
+            if contribution_type:
+                record_add_field(rec, '980', '', '', subfields=[('b', "MEETING_%s" % contribution_type.upper()), ])
 
         return rec
 

@@ -198,6 +198,46 @@ FIXTURES = {
         'embargo_date': '',
         'access_rights': 'openAccess',
     },
+    'conferenceContribution': {
+        'title': 'Managing astronomy outreach web content',
+        'original_title': '',
+        'doi': '10.1234/foo.bar2',
+        'isbn': '0-06-251587-X',
+        'publication_date': '2012-11-11',
+        'journal_title': '',
+        'volume': '',
+        'issue': '',
+        'pages': '',
+        'book_pages': '123-456',
+        'book_title': 'My Book',
+        'university': 'Roskilde University',
+        'publisher': 'CERN',
+        'place': 'Geneva, CH',
+        'report_pages_no': '300',
+        'dataset_publisher': 'OpenAIRE Orphan Record Repository',
+        'publication_type': 'conferenceContribution',
+        'contribution_type': 'talk',
+        'language': 'eng',
+        'report_type': 'other',
+        'thesis_type': 'doctoralThesis',
+        'authors': 'Nielsen, Lars Holm: CERN\nKaplun, Samuele: CERN',
+        'supervisors': 'Smith, T.: CERN',
+        'abstract': 'With some abstract',
+        'original_abstract': '',
+        'extra_report_numbers': '',
+        'keywords': 'Keyword 1\nKeyword 2',
+        'notes': 'Bla bla bla',
+        'related_publications': '',
+        'related_datasets': '10.1234/data1\ndoi:10.1234/data2',
+        'embargo_date': '',
+        'access_rights': 'openAccess',
+        'meeting_title' : 'Communicating Astronomy with the Public 2010',
+        'meeting_acronym' : 'CAP2010',
+        'meeting_dates' : '15-19 March 2010',
+        'meeting_town' : 'Cape Town',
+        'meeting_country' : 'South Africa',
+        'meeting_url' : 'http://www.communicatingastronomy.org/cap2010/',
+    },
 }
 
 MARC_FIXTURES = {}
@@ -346,4 +386,27 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
 980   $$bBOOKS
+"""
+
+MARC_FIXTURES['conferenceContribution'] = """
+0247  $$a10.1234/foo.bar2$$2DOI
+RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
+041   $$aeng
+100   $$aNielsen, Lars Holm$$uCERN
+245   $$aManaging astronomy outreach web content
+260   $$c2012-11-11
+500   $$aBla bla bla
+520   $$aWith some abstract
+536   $$aOPENAIREPLUS - 2nd-Generation Open Access Infrastructure for Research in Europe (283595)$$c283595
+542   $$lopenAccess
+6531  $$aKeyword 1
+6531  $$aKeyword 2
+700   $$aKaplun, Samuele$$uCERN
+711   $$aCommunicating Astronomy with the Public 2010$$gCAP2010$$d15-19 March 2010$$cCape Town$$wSouth Africa
+773   $$a10.1234/data1$$ndata
+773   $$a10.1234/data2$$ndata
+8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
+8564   $$uhttp://www.communicatingastronomy.org/cap2010/$$yMeeting website
+980   $$aPROVISIONAL
+980   $$bMEETING_TALK
 """

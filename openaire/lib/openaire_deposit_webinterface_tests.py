@@ -39,6 +39,7 @@ from invenio.openaire_deposit_engine import OpenAIREPublication
 from invenio.openaire_deposit_fixtures import FIXTURES, FILE_FIXTURES
 from invenio.openaire_deposit_webinterface import \
     WebInterfaceOpenAIREDepositPages
+from invenio.textutils import wash_for_xml
 from invenio.testutils import make_test_suite, run_test_suite
 from invenio.testutils_clients import RequestFactory, TestClient, JSONResponse
 from invenio.webuser import get_nickname
@@ -273,6 +274,7 @@ class AjaxGatewayTest(unittest.TestCase):
         for field, expected_val in expected_metadata.items():
             if field == 'projects':
                 continue
+            expected_val = wash_for_xml(expected_val)
             real_val = metadata.get(field, None)
             if field in ['related_publications','related_datasets']:
                 # Remove "doi:" and filter out blank strings.
@@ -511,6 +513,9 @@ class AjaxGatewayTest(unittest.TestCase):
 
     def test_submission_bookpart(self):
         self._submit('bookpart', 'portal', submit=self.test_full_submit)
+
+    def test_submission_conference(self):
+        self._submit('conferenceContribution', 'portal', submit=self.test_full_submit)
 
 #
 # Create test suite

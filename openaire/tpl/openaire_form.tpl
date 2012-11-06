@@ -207,6 +207,16 @@
                     <div id="error_report_type_%(id)s" class="error">%(error_report_type_value)s</div>
                     <div id="warning_report_type_%(id)s" class="warning">%(warning_report_type_value)s</div>
                 </div>
+                <div class="typebox_%(id)s typebox_%(id)s_conferenceContribution">
+                    <img title="%(contribution_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="contribution_type_%(id)s" class="mandatory">%(contribution_type_label)s</label>
+                    <select name="contribution_type_%(id)s" id="contribution_type_%(id)s" class="contribution_type">
+                        %(contribution_type_options)s
+                    </select>
+                    <br />
+                    <div id="error_contribution_type_%(id)s" class="error">%(error_contribution_type_value)s</div>
+                    <div id="warning_contribution_type_%(id)s" class="warning">%(warning_contribution_type_value)s</div>
+                </div>
                 <div class="typebox_%(id)s typebox_%(id)s_thesis">
                     <img title="%(thesis_type_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
                     <label for="thesis_type_%(id)s" class="mandatory">%(thesis_type_label)s</label>
@@ -277,6 +287,49 @@
                     <br />
                     <div id="error_dataset_publisher_%(id)s" class="error">%(error_dataset_publisher_value)s</div>
                     <div id="warning_dataset_publisher_%(id)s" class="warning">%(warning_dataset_publisher_value)s</div>
+                </div>
+                <div class="typebox_%(id)s typebox_%(id)s_conferenceContribution">
+                    <img title="%(meeting_title_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="meeting_title_%(id)s">%(meeting_title_label)s</label><br />
+                    <input type="text" name="meeting_title_%(id)s" id="meeting_title_%(id)s" value="%(meeting_title_value)s" size="50" class="meeting_title" />
+                    <br />
+                    <div id="error_meeting_title_%(id)s" class="error">%(error_meeting_title_value)s</div>
+                    <div id="warning_meeting_title_%(id)s" class="warning">%(warning_meeting_title_value)s</div>
+
+                    <img title="%(meeting_acronym_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="meeting_acronym_%(id)s">%(meeting_acronym_label)s</label><br />
+                    <input type="text" name="meeting_acronym_%(id)s" id="meeting_acronym_%(id)s" value="%(meeting_acronym_value)s" size="50" class="meeting_acronym" />
+                    <br />
+                    <div id="error_meeting_acronym_%(id)s" class="error">%(error_meeting_acronym_value)s</div>
+                    <div id="warning_meeting_acronym_%(id)s" class="warning">%(warning_meeting_acronym_value)s</div>
+
+                    <img title="%(meeting_dates_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="meeting_dates_%(id)s">%(meeting_dates_label)s</label><br />
+                    <input type="text" name="meeting_dates_%(id)s" id="meeting_dates_%(id)s" value="%(meeting_dates_value)s" size="50" class="meeting_dates" />
+                    <br />
+                    <div id="error_meeting_dates_%(id)s" class="error">%(error_meeting_dates_value)s</div>
+                    <div id="warning_meeting_dates_%(id)s" class="warning">%(warning_meeting_dates_value)s</div>
+
+                    <img title="%(meeting_town_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="meeting_town_%(id)s">%(meeting_town_label)s</label><br />
+                    <input type="text" name="meeting_town_%(id)s" id="meeting_town_%(id)s" value="%(meeting_town_value)s" size="50" class="meeting_town" />
+                    <br />
+                    <div id="error_meeting_town_%(id)s" class="error">%(error_meeting_town_value)s</div>
+                    <div id="warning_meeting_town_%(id)s" class="warning">%(warning_meeting_town_value)s</div>
+
+                    <img title="%(meeting_country_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="meeting_country_%(id)s">%(meeting_country_label)s</label><br />
+                    <input type="text" name="meeting_country_%(id)s" id="meeting_country_%(id)s" value="%(meeting_country_value)s" size="50" class="meeting_country" />
+                    <br />
+                    <div id="error_meeting_country_%(id)s" class="error">%(error_meeting_country_value)s</div>
+                    <div id="warning_meeting_country_%(id)s" class="warning">%(warning_meeting_country_value)s</div>
+
+                    <img title="%(meeting_url_tooltip)s" class="tooltip" src="%(site)s/img/help.png" />
+                    <label for="meeting_url_%(id)s">%(meeting_url_label)s</label><br />
+                    <input type="text" name="meeting_url_%(id)s" id="meeting_url_%(id)s" value="%(meeting_url_value)s" size="50" class="meeting_url" />
+                    <br />
+                    <div id="error_meeting_url_%(id)s" class="error">%(error_meeting_url_value)s</div>
+                    <div id="warning_meeting_url_%(id)s" class="warning">%(warning_meeting_url_value)s</div>
                 </div>
             </fieldset>
             <fieldset>

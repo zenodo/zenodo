@@ -87,7 +87,7 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
         ('book', _("Book")),
         ('bookpart', _("Book chapter/part of book")),
         #('periodicalContribution', _("Periodical contribution")),
-        #('conferenceContribution', _("Conference contribution")),
+        ('conferenceContribution', _("Conference contribution")),
         #('generalTalk', _("General talk")),
         #('patent', _("Patent")),
         ('data', _("Dataset")),
@@ -135,6 +135,14 @@ CFG_METADATA_FIELDS = (
     'university',
     'book_title',
     'book_pages',
+    'contribution_type',
+    'meeting_title',
+    'meeting_acronym',
+    'meeting_dates',
+    'meeting_town',
+    'meeting_country',
+    'meeting_country',
+    'meeting_url',
 )
 """ List of metadata fields, used in eg washing of URL parameters. """
 
@@ -164,7 +172,7 @@ CFG_METADATA_FIELDS_GROUPS = {
     'book': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'IMPRINT', 'ISBN'],
     'bookpart': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'BOOKPART'],
     'periodicalContribution': [],
-    'conferenceContribution': [],
+    'conferenceContribution': ['ACCESS_RIGHTS', 'RELATED_DATA', 'MEETING'],
     'generalTalk': [],
     'patent': [],
     'data': ['CC0', 'DATASET', 'RELATED_PUBS'],
@@ -238,7 +246,7 @@ def CFG_OPENAIRE_CONFERENCE_TYPES(ln):
         ('proceedingArticle', _("Proceedings article")),
         ('poster', _("Poster")),
         ('conferencePaper', _("Conference paper")),
-        ('conferencePaper', _("Conference talk")),
+        ('conferenceTalk', _("Conference talk")),
     ]
 
 CFG_OPENAIRE_CONFERENCE_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_CONFERENCE_TYPES('en')]

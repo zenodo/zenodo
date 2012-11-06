@@ -162,6 +162,9 @@ class EngineTest(unittest.TestCase):
     def test_bookpart(self):
         self._test_pubtype('bookpart')
 
+    def test_conference(self):
+        self._test_pubtype('conferenceContribution')
+
 #
 # Create test suite
 #
