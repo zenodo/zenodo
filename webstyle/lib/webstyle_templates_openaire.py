@@ -283,6 +283,7 @@ template function generated it.
   %(msg_maintainedby)s <a class="footer" href="mailto:%(sitesupportemail)s">%(sitesupportemail)s</a>
   <br />
   %(msg_lastupdated)s
+  </div>
  </div>
  <div class="pagefooterstriperight">
   %(languagebox)s
