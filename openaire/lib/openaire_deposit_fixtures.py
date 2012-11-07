@@ -104,7 +104,7 @@ FIXTURES = {
         'university': 'Roskilde University',
     },
     'thesis': {
-        'title': 'My thesis',
+        'title': 'My\x01 thesis', # Test with illegal XML character (control character) 
         'original_title': '',
         'doi': '10.1234/foo.bar',
         'isbn': '',
@@ -197,7 +197,7 @@ FIXTURES = {
         'related_datasets': '10.1234/data1\ndoi:10.1234/data2',
         'embargo_date': '',
         'access_rights': 'openAccess',
-    }
+    },
 }
 
 MARC_FIXTURES = {}
