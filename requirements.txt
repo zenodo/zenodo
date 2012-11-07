@@ -1,0 +1,2 @@
+# Generated from {{reqfile}} and written to {{reqpath}}
+psycopg2
