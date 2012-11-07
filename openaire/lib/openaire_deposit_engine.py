@@ -91,6 +91,7 @@ from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
 from invenio.search_engine import record_empty
+from invenio.textutils import wash_for_xml
 from invenio.urlutils import create_url
 from invenio.webinterface_handler import wash_urlargd
 from invenio.webpage import page as invenio_page
@@ -585,8 +586,7 @@ class OpenAIREPublication(object):
             touched = False
             for key, value in namespaced_metadata2simple_metadata(self._metadata['__form__'], self.publicationid).iteritems():
                 if value is not None:
-                    self._metadata[key] = value.decode(
-                        'utf8', 'ignore').encode('utf8', 'ignore')
+                    self._metadata[key] = wash_for_xml(value)
                     touched = True
             if touched:
                 if self.status == 'initialized':
