@@ -366,7 +366,7 @@
                         </div>
                 </fieldset>
             </div>
-            <div class="typebox_%(id)s typebox_%(id)s_book typebox_%(id)s_bookpart typebox_%(id)s_report typebox_%(id)s_publishedArticle typebox_%(id)s_thesis">
+            <div class="typebox_%(id)s typebox_%(id)s_book typebox_%(id)s_bookpart typebox_%(id)s_report typebox_%(id)s_publishedArticle typebox_%(id)s_thesis typebox_%(id)s_preprint typebox_%(id)s_workingPaper">
                 <fieldset>
                     <legend>%(related_datasets_legend_label)s</legend>
                        <div>

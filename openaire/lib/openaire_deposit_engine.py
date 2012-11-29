@@ -1049,6 +1049,9 @@ class OpenAIREPublication(object):
         pubtype = self._metadata.get('publication_type', 'publishedArticle')
         field_groups = CFG_METADATA_FIELDS_GROUPS[pubtype]
 
+        if 'COLLECTION' in field_groups:
+            record_add_field(rec, '980', subfields=[('b', pubtype.upper())])
+
         # Journal
         if 'JOURNAL' in field_groups:
             subfields = []
@@ -1065,6 +1068,7 @@ class OpenAIREPublication(object):
                 subfields.append(('c', self._metadata['pages']))
             if subfields:
                 record_add_field(rec, '909', 'C', '4', subfields=subfields)
+            record_add_field(rec, '980', subfields=[('b', 'OPENAIRE')])
 
         # Access rights (open/closed access + embargo date
         if 'ACCESS_RIGHTS' in field_groups:

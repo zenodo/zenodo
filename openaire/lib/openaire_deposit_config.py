@@ -80,10 +80,10 @@ def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
 
     return [
         ('publishedArticle', _("Published article")),
-        #('preprint', _("Preprint")),
+        ('preprint', _("Preprint")),
         ('report', _("Report")),
         ('thesis', _("Thesis")),
-        #('workingPaper', _("Working paper")),
+        ('workingPaper', _("Working paper")),
         ('book', _("Book")),
         ('bookpart', _("Book chapter/part of book")),
         #('periodicalContribution', _("Periodical contribution")),
@@ -164,18 +164,20 @@ CFG_METADATA_FIELDS_COMMON = (
 
 CFG_METADATA_FIELDS_GROUPS = {
     'publishedArticle': ['ACCESS_RIGHTS', 'JOURNAL', 'RELATED_DATA'],
-    'preprint': [],
+    'preprint': ['ACCESS_RIGHTS', 'RELATED_DATA', 'COLLECTION'],
     'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN', 
-               'RELATED_DATA'],
+               'RELATED_DATA',],
     'thesis': ['ACCESS_RIGHTS','PAGES_NO', 'RELATED_DATA','THESIS', 'IMPRINT'],
-    'workingPaper': [],
-    'book': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'IMPRINT', 'ISBN'],
-    'bookpart': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'BOOKPART'],
+    'workingPaper': ['ACCESS_RIGHTS', 'RELATED_DATA', 'COLLECTION'],
+    'book': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'IMPRINT', 'ISBN',
+             'COLLECTION'],
+    'bookpart': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'BOOKPART',
+                 'COLLECTION'],
     'periodicalContribution': [],
-    'conferenceContribution': ['ACCESS_RIGHTS', 'RELATED_DATA', 'MEETING'],
+    'conferenceContribution': ['ACCESS_RIGHTS', 'RELATED_DATA', 'MEETING',],
     'generalTalk': [],
     'patent': [],
-    'data': ['CC0', 'DATASET', 'RELATED_PUBS'],
+    'data': ['CC0', 'DATASET', 'RELATED_PUBS', 'COLLECTION'],
 }
 """
 Mapping of publication type to grouping of fields.

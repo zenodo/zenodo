@@ -176,6 +176,12 @@ class EngineTest(unittest.TestCase):
     def test_conference(self):
         self._test_pubtype('conferenceContribution')
 
+    def test_preprint(self):
+        self._test_pubtype('preprint')
+
+    def test_workingpaper(self):
+        self._test_pubtype('workingPaper')
+
 #
 # Create test suite
 #

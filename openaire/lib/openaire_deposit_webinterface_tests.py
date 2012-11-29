@@ -517,6 +517,12 @@ class AjaxGatewayTest(unittest.TestCase):
     def test_submission_conference(self):
         self._submit('conferenceContribution', 'portal', submit=self.test_full_submit)
 
+    def test_submission_preprint(self):
+        self._submit('preprint', 'portal', submit=self.test_full_submit)
+
+    def test_submission_workingpaper(self):
+        self._submit('workingPaper', 'portal', submit=self.test_full_submit)
+
 #
 # Create test suite
 #
