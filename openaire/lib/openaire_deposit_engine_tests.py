@@ -105,7 +105,18 @@ class EngineTest(unittest.TestCase):
             rm_func, [x.strip() for x in expected_marc.split('\n')])
         marc_list = filter(rm_func, [x.strip() for x in marc.split('\n')])
 
-        for l1, l2 in zip(expected_marc_list, marc_list):
+        i = 0
+        for i in range(0, max(len(expected_marc_list), len(marc_list))):
+            try:
+                l1 = expected_marc_list[i]
+            except IndexError:
+                l1 = ''
+            try:
+                l2 = marc_list[i]
+            except IndexError:
+                l2 = ''
+            i += 1
+
             if l1.startswith("RE:"):
                 if not re.match(l1[3:], l2):
                     raise AssertionError("%s doesn't match %s" % (l1, l2))
@@ -161,6 +172,15 @@ class EngineTest(unittest.TestCase):
 
     def test_bookpart(self):
         self._test_pubtype('bookpart')
+
+    def test_conference(self):
+        self._test_pubtype('conferenceContribution')
+
+    def test_preprint(self):
+        self._test_pubtype('preprint')
+
+    def test_workingpaper(self):
+        self._test_pubtype('workingPaper')
 
 #
 # Create test suite

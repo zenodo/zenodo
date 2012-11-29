@@ -104,7 +104,7 @@ FIXTURES = {
         'university': 'Roskilde University',
     },
     'thesis': {
-        'title': 'My thesis',
+        'title': 'My\x01 thesis', # Test with illegal XML character (control character) 
         'original_title': '',
         'doi': '10.1234/foo.bar',
         'isbn': '',
@@ -197,7 +197,93 @@ FIXTURES = {
         'related_datasets': '10.1234/data1\ndoi:10.1234/data2',
         'embargo_date': '',
         'access_rights': 'openAccess',
-    }
+    },
+    'conferenceContribution': {
+        'title': 'Managing astronomy outreach web content',
+        'original_title': '',
+        'doi': '10.1234/foo.bar2',
+        'isbn': '0-06-251587-X',
+        'publication_date': '2012-11-11',
+        'journal_title': '',
+        'volume': '',
+        'issue': '',
+        'pages': '',
+        'book_pages': '123-456',
+        'book_title': 'My Book',
+        'university': 'Roskilde University',
+        'publisher': 'CERN',
+        'place': 'Geneva, CH',
+        'report_pages_no': '300',
+        'dataset_publisher': 'OpenAIRE Orphan Record Repository',
+        'publication_type': 'conferenceContribution',
+        'contribution_type': 'talk',
+        'language': 'eng',
+        'report_type': 'other',
+        'thesis_type': 'doctoralThesis',
+        'authors': 'Nielsen, Lars Holm: CERN\nKaplun, Samuele: CERN',
+        'supervisors': 'Smith, T.: CERN',
+        'abstract': 'With some abstract',
+        'original_abstract': '',
+        'extra_report_numbers': '',
+        'keywords': 'Keyword 1\nKeyword 2',
+        'notes': 'Bla bla bla',
+        'related_publications': '',
+        'related_datasets': '10.1234/data1\ndoi:10.1234/data2',
+        'embargo_date': '',
+        'access_rights': 'openAccess',
+        'meeting_title' : 'Communicating Astronomy with the Public 2010',
+        'meeting_acronym' : 'CAP2010',
+        'meeting_dates' : '15-19 March 2010',
+        'meeting_town' : 'Cape Town',
+        'meeting_country' : 'South Africa',
+        'meeting_url' : 'http://www.communicatingastronomy.org/cap2010/',
+    },
+    'preprint': {
+        'access_rights': 'embargoedAccess',
+        'embargo_date': '2012-12-24',
+        'authors': 'Kjell, Utne: Institute of Marine Research, Bergen, Norway\nGeir, Huse: Institute of Marine Research, Bergen, Norway\nGeir, Ottersen: Institute of Marine Research, Oslo, Norway\nVladimir, Zabavnikov: Remote Sensing Laboratory, Knipovich Polar Research Institute of Marine Fisheries and Oceanography (PINRO), Murmansk, Russia\nJane Arge, Jacobsen: Faroe Marine Research Institute, Tórshavn, Faroe Islands\nÓskarsson, Guđmundur: Marine Research Institute, Reykjavik, Iceland\nNøttestad, Leif: Institute of Marine Research, Bergen, Norway',
+        'title': 'Horizontal distribution and overlap of planktivorous fish stocks in the Norwegian Sea during summers 1995–2006',
+        'abstract': 'The Norwegian Sea harbours several large pelagic fish stocks, which use the area for feeding during the summer. The period 1995–2006 had some of the highest biomass of pelagic fish feeding in the Norwegian Sea on record. Here we address the horizontal distribution and overlap between herring, blue whiting and mackerel in this period during the summers using a combination of acoustic, trawl and LIDAR data. A newly developed temperature atlas for the Norwegian Sea is used to present the horizontal fish distributions in relation to temperature. The centre of gravity of the herring distribution changed markedly several times during the investigated period. Blue whiting feeding habitat expanded in a northwestern direction until 2003, corresponding with an increase in abundance. Strong year classes of mackerel in 2001 and 2002 and increasing temperatures throughout the period resulted in an increased amount of mackerel in the Norwegian Sea. Mackerel was generally found in waters warmer than 8°C, while herring and blue whiting were mainly found in water masses between 2 and 8°C. The horizontal overlap between herring and mackerel was low, while blue whiting had a large horizontal overlap with both herring and mackerel. The changes in horizontal distribution and overlap between the species are explained by increasing stock sizes, increasing water temperature and spatially changing zooplankton densities in the Norwegian Sea.',
+        'language': 'eng',
+        'original_title': '',
+        'original_abstract': '',
+        'publication_type': 'preprint',
+        'projects': '283595',
+        'publication_date': '2012-04-25',
+        'journal_title': 'Marine Biology Research',
+        'doi': '10.1080/17451000.2011.640937',
+        'volume': '8',
+        'issue': '5-6',
+        'pages': '420-441',
+        'keywords': 'Herring\nblue whiting\ncompetition\ninteraction\nmackerel\ntemperature',  # Alphabetic order (otherwise assert will fail)
+        'notes': 'Test notes',
+        'report_pages_no': '6',
+        'related_publications': '10.1234/pub\ndoi:10.1234/pub2',
+        'related_datasets': '10.1000/data\n10.1000/data2',
+    },
+    'workingPaper': {
+        'access_rights': 'embargoedAccess',
+        'embargo_date': '2012-12-24',
+        'authors': 'Kjell, Utne: Institute of Marine Research, Bergen, Norway\nGeir, Huse: Institute of Marine Research, Bergen, Norway\nGeir, Ottersen: Institute of Marine Research, Oslo, Norway\nVladimir, Zabavnikov: Remote Sensing Laboratory, Knipovich Polar Research Institute of Marine Fisheries and Oceanography (PINRO), Murmansk, Russia\nJane Arge, Jacobsen: Faroe Marine Research Institute, Tórshavn, Faroe Islands\nÓskarsson, Guđmundur: Marine Research Institute, Reykjavik, Iceland\nNøttestad, Leif: Institute of Marine Research, Bergen, Norway',
+        'title': 'Horizontal distribution and overlap of planktivorous fish stocks in the Norwegian Sea during summers 1995–2006',
+        'abstract': 'The Norwegian Sea harbours several large pelagic fish stocks, which use the area for feeding during the summer. The period 1995–2006 had some of the highest biomass of pelagic fish feeding in the Norwegian Sea on record. Here we address the horizontal distribution and overlap between herring, blue whiting and mackerel in this period during the summers using a combination of acoustic, trawl and LIDAR data. A newly developed temperature atlas for the Norwegian Sea is used to present the horizontal fish distributions in relation to temperature. The centre of gravity of the herring distribution changed markedly several times during the investigated period. Blue whiting feeding habitat expanded in a northwestern direction until 2003, corresponding with an increase in abundance. Strong year classes of mackerel in 2001 and 2002 and increasing temperatures throughout the period resulted in an increased amount of mackerel in the Norwegian Sea. Mackerel was generally found in waters warmer than 8°C, while herring and blue whiting were mainly found in water masses between 2 and 8°C. The horizontal overlap between herring and mackerel was low, while blue whiting had a large horizontal overlap with both herring and mackerel. The changes in horizontal distribution and overlap between the species are explained by increasing stock sizes, increasing water temperature and spatially changing zooplankton densities in the Norwegian Sea.',
+        'language': 'eng',
+        'original_title': '',
+        'original_abstract': '',
+        'publication_type': 'workingPaper',
+        'projects': '283595',
+        'publication_date': '2012-04-25',
+        'journal_title': 'Marine Biology Research',
+        'doi': '10.1080/17451000.2011.640937',
+        'volume': '8',
+        'issue': '5-6',
+        'pages': '420-441',
+        'keywords': 'Herring\nblue whiting\ncompetition\ninteraction\nmackerel\ntemperature',  # Alphabetic order (otherwise assert will fail)
+        'notes': 'Test notes',
+        'report_pages_no': '6',
+        'related_publications': '10.1234/pub\ndoi:10.1234/pub2',
+        'related_datasets': '10.1000/data\n10.1000/data2',
+    },
 }
 
 MARC_FIXTURES = {}
@@ -230,7 +316,7 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 909C4 $$pMarine Biology Research$$y2012$$n5-6$$v8$$c420-441
 942   $$a2012-12-24
 980   $$aPROVISIONAL
-980   $$aOPENAIRE
+980   $$bOPENAIRE
 """
 
 MARC_FIXTURES['report'] = """
@@ -254,7 +340,6 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
 980   $$bREPORT_OTHER
-980   $$aREPORTS
 """
 
 MARC_FIXTURES['data'] = """
@@ -274,7 +359,7 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 773   $$a10.1234/pub2$$npub
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
-980   $$aDATA
+980   $$bDATA
 """
 
 MARC_FIXTURES['thesis'] = """
@@ -322,7 +407,7 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 773   $$a10.1234/data2$$ndata
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
-980   $$bBOOKS
+980   $$bBOOK
 """
 
 MARC_FIXTURES['bookpart'] = """
@@ -345,5 +430,90 @@ RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
 773   $$a10.1234/data2$$ndata
 8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
 980   $$aPROVISIONAL
-980   $$bBOOKS
+980   $$bBOOKPART
+"""
+
+MARC_FIXTURES['conferenceContribution'] = """
+0247  $$a10.1234/foo.bar2$$2DOI
+RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
+041   $$aeng
+100   $$aNielsen, Lars Holm$$uCERN
+245   $$aManaging astronomy outreach web content
+260   $$c2012-11-11
+500   $$aBla bla bla
+520   $$aWith some abstract
+536   $$aOPENAIREPLUS - 2nd-Generation Open Access Infrastructure for Research in Europe (283595)$$c283595
+542   $$lopenAccess
+6531  $$aKeyword 1
+6531  $$aKeyword 2
+700   $$aKaplun, Samuele$$uCERN
+711   $$aCommunicating Astronomy with the Public 2010$$gCAP2010$$d15-19 March 2010$$cCape Town$$wSouth Africa
+773   $$a10.1234/data1$$ndata
+773   $$a10.1234/data2$$ndata
+8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
+8564   $$uhttp://www.communicatingastronomy.org/cap2010/$$yMeeting website
+980   $$aPROVISIONAL
+980   $$bMEETING_TALK
+"""
+
+MARC_FIXTURES['preprint'] = """
+0247  $$a10.1080/17451000.2011.640937$$2DOI
+RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
+041   $$aeng
+100   $$aKjell, Utne$$uInstitute of Marine Research, Bergen, Norway
+245   $$aHorizontal distribution and overlap of planktivorous fish stocks in the Norwegian Sea during summers 1995–2006
+260   $$c2012-04-25
+500   $$aTest notes
+520   $$aThe Norwegian Sea harbours several large pelagic fish stocks, which use the area for feeding during the summer. The period 1995–2006 had some of the highest biomass of pelagic fish feeding in the Norwegian Sea on record. Here we address the horizontal distribution and overlap between herring, blue whiting and mackerel in this period during the summers using a combination of acoustic, trawl and LIDAR data. A newly developed temperature atlas for the Norwegian Sea is used to present the horizontal fish distributions in relation to temperature. The centre of gravity of the herring distribution changed markedly several times during the investigated period. Blue whiting feeding habitat expanded in a northwestern direction until 2003, corresponding with an increase in abundance. Strong year classes of mackerel in 2001 and 2002 and increasing temperatures throughout the period resulted in an increased amount of mackerel in the Norwegian Sea. Mackerel was generally found in waters warmer than 8°C, while herring and blue whiting were mainly found in water masses between 2 and 8°C. The horizontal overlap between herring and mackerel was low, while blue whiting had a large horizontal overlap with both herring and mackerel. The changes in horizontal distribution and overlap between the species are explained by increasing stock sizes, increasing water temperature and spatially changing zooplankton densities in the Norwegian Sea.
+536   $$aOPENAIREPLUS - 2nd-Generation Open Access Infrastructure for Research in Europe (283595)$$c283595
+542   $$lembargoedAccess
+6531  $$aHerring
+6531  $$ablue whiting
+6531  $$acompetition
+6531  $$ainteraction
+6531  $$amackerel
+6531  $$atemperature
+700   $$aGeir, Huse$$uInstitute of Marine Research, Bergen, Norway
+700   $$aGeir, Ottersen$$uInstitute of Marine Research, Oslo, Norway
+700   $$aVladimir, Zabavnikov$$uRemote Sensing Laboratory, Knipovich Polar Research Institute of Marine Fisheries and Oceanography (PINRO), Murmansk, Russia
+700   $$aJane Arge, Jacobsen$$uFaroe Marine Research Institute, Tórshavn, Faroe Islands
+700   $$aÓskarsson, Guđmundur$$uMarine Research Institute, Reykjavik, Iceland
+700   $$aNøttestad, Leif$$uInstitute of Marine Research, Bergen, Norway
+773   $$a10.1000/data$$ndata
+773   $$a10.1000/data2$$ndata
+8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
+942   $$a2012-12-24
+980   $$aPROVISIONAL
+980   $$bPREPRINT
+"""
+
+MARC_FIXTURES['workingPaper'] = """
+0247  $$a10.1080/17451000.2011.640937$$2DOI
+RE:037   \$\$aOpenAIRE-OPENAIREPLUS-2012-[0-9]+$
+041   $$aeng
+100   $$aKjell, Utne$$uInstitute of Marine Research, Bergen, Norway
+245   $$aHorizontal distribution and overlap of planktivorous fish stocks in the Norwegian Sea during summers 1995–2006
+260   $$c2012-04-25
+500   $$aTest notes
+520   $$aThe Norwegian Sea harbours several large pelagic fish stocks, which use the area for feeding during the summer. The period 1995–2006 had some of the highest biomass of pelagic fish feeding in the Norwegian Sea on record. Here we address the horizontal distribution and overlap between herring, blue whiting and mackerel in this period during the summers using a combination of acoustic, trawl and LIDAR data. A newly developed temperature atlas for the Norwegian Sea is used to present the horizontal fish distributions in relation to temperature. The centre of gravity of the herring distribution changed markedly several times during the investigated period. Blue whiting feeding habitat expanded in a northwestern direction until 2003, corresponding with an increase in abundance. Strong year classes of mackerel in 2001 and 2002 and increasing temperatures throughout the period resulted in an increased amount of mackerel in the Norwegian Sea. Mackerel was generally found in waters warmer than 8°C, while herring and blue whiting were mainly found in water masses between 2 and 8°C. The horizontal overlap between herring and mackerel was low, while blue whiting had a large horizontal overlap with both herring and mackerel. The changes in horizontal distribution and overlap between the species are explained by increasing stock sizes, increasing water temperature and spatially changing zooplankton densities in the Norwegian Sea.
+536   $$aOPENAIREPLUS - 2nd-Generation Open Access Infrastructure for Research in Europe (283595)$$c283595
+542   $$lembargoedAccess
+6531  $$aHerring
+6531  $$ablue whiting
+6531  $$acompetition
+6531  $$ainteraction
+6531  $$amackerel
+6531  $$atemperature
+700   $$aGeir, Huse$$uInstitute of Marine Research, Bergen, Norway
+700   $$aGeir, Ottersen$$uInstitute of Marine Research, Oslo, Norway
+700   $$aVladimir, Zabavnikov$$uRemote Sensing Laboratory, Knipovich Polar Research Institute of Marine Fisheries and Oceanography (PINRO), Murmansk, Russia
+700   $$aJane Arge, Jacobsen$$uFaroe Marine Research Institute, Tórshavn, Faroe Islands
+700   $$aÓskarsson, Guđmundur$$uMarine Research Institute, Reykjavik, Iceland
+700   $$aNøttestad, Leif$$uInstitute of Marine Research, Bergen, Norway
+773   $$a10.1000/data$$ndata
+773   $$a10.1000/data2$$ndata
+8560  $$flars.holm.nielsen@cern.ch$$yLars Holm Nielsen
+942   $$a2012-12-24
+980   $$aPROVISIONAL
+980   $$bWORKINGPAPER
 """

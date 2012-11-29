@@ -272,9 +272,10 @@ template function generated it.
 <div class="pagefooter">
 %(pagefooteradd)s
 <!-- replaced page footer -->
- <div class="pagefooterstripeleft">
-  <img style="margin: 3px; float: left;" alt="fp7-capacities" src="/img/fp7_sm.png" height="46" width="60">
-  <img style="margin: 3px; float: left;" alt="e_infrastructures" src="/img/einfra_sm.png" height="33" width="90">
+ <div class="pagefooterstripeleft" style="padding-top: 10px;">
+  <img style="margin-left: 10px; margin-right: 10px; float: left;" alt="fp7-capacities" src="/img/fp7_sm.png" height="46" width="60">
+  <img style="margin-right: 10px; margin-top: 5px; float: left;" alt="e_infrastructures" src="/img/einfra_sm.png" height="33" width="90">
+  <div style="float: left; margin-bottom: 10px;">
   %(sitename)s&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/?ln=%(ln)s">%(msg_search)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/submit?ln=%(ln)s">%(msg_submit)s</a>&nbsp;::&nbsp;<a class="footer" href="%(sitesecureurl)s/youraccount/display?ln=%(ln)s">%(msg_personalize)s</a>&nbsp;::&nbsp;<a class="footer" href="%(siteurl)s/help/%(langlink)s">%(msg_help)s</a>
   <br />
   %(msg_poweredby)s <a class="footer" href="http://invenio-software.org/">Invenio</a> v%(version)s
@@ -282,6 +283,7 @@ template function generated it.
   %(msg_maintainedby)s <a class="footer" href="mailto:%(sitesupportemail)s">%(sitesupportemail)s</a>
   <br />
   %(msg_lastupdated)s
+  </div>
  </div>
  <div class="pagefooterstriperight">
   %(languagebox)s

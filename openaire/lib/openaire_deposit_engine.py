@@ -27,6 +27,7 @@ Following steps are necessary to add a new field:
   * openaire_deposit_templates.py: Add to tmpl_form, and perhaps add more methods
   * openaire_form.tpl: Add HTML input fields.
   * openaire_deposit_engine.py: Adapt get_record() to make use of new field data.
+  * Default_HTML_detailed.bft: Ensure field is displayed on submitted records
 
   ... tests ...
 
@@ -91,6 +92,7 @@ from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
 from invenio.search_engine import record_empty
+from invenio.textutils import wash_for_xml
 from invenio.urlutils import create_url
 from invenio.webinterface_handler import wash_urlargd
 from invenio.webpage import page as invenio_page
@@ -585,8 +587,7 @@ class OpenAIREPublication(object):
             touched = False
             for key, value in namespaced_metadata2simple_metadata(self._metadata['__form__'], self.publicationid).iteritems():
                 if value is not None:
-                    self._metadata[key] = value.decode(
-                        'utf8', 'ignore').encode('utf8', 'ignore')
+                    self._metadata[key] = wash_for_xml(value)
                     touched = True
             if touched:
                 if self.status == 'initialized':
@@ -1048,6 +1049,9 @@ class OpenAIREPublication(object):
         pubtype = self._metadata.get('publication_type', 'publishedArticle')
         field_groups = CFG_METADATA_FIELDS_GROUPS[pubtype]
 
+        if 'COLLECTION' in field_groups:
+            record_add_field(rec, '980', subfields=[('b', pubtype.upper())])
+
         # Journal
         if 'JOURNAL' in field_groups:
             subfields = []
@@ -1064,6 +1068,7 @@ class OpenAIREPublication(object):
                 subfields.append(('c', self._metadata['pages']))
             if subfields:
                 record_add_field(rec, '909', 'C', '4', subfields=subfields)
+            record_add_field(rec, '980', subfields=[('b', 'OPENAIRE')])
 
         # Access rights (open/closed access + embargo date
         if 'ACCESS_RIGHTS' in field_groups:
@@ -1210,6 +1215,32 @@ class OpenAIREPublication(object):
                 # Note publication date is record in 260__$c, from which the
                 # publication year can be computed
                 record_add_field(rec, '260', '', '', subfields=subfields)
+
+        # Meeting/conferences (type, title, acronym, dates, town, country, URL
+        if 'MEETING' in field_groups:
+            meeting_values = [
+                ('a', self._metadata.get('meeting_title', '')),
+                ('g', self._metadata.get('meeting_acronym', '')),
+                ('d', self._metadata.get('meeting_dates', '')),
+                ('c', self._metadata.get('meeting_town', '')),
+                ('w', self._metadata.get('meeting_country', '')),
+            ]
+
+            subfields = []
+            for code, val in meeting_values:
+                if val:
+                    subfields.append((code, val))
+            record_add_field(rec, '711', '', '', subfields=subfields)
+
+            meeting_url = self._metadata.get('meeting_url', '')
+            if meeting_url:
+                record_add_field(rec, '8564', '', '', subfields=[
+                                    ('u', meeting_url),('y','Meeting website')])
+
+            # Contribution type (paper, poster, lecture, ...)
+            contribution_type = self._metadata.get('contribution_type', '')
+            if contribution_type:
+                record_add_field(rec, '980', '', '', subfields=[('b', "MEETING_%s" % contribution_type.upper()), ])
 
         return rec
 

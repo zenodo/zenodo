@@ -366,6 +366,23 @@ class Template:
         values['supervisors_tooltip'] = escape(_("<p>Please enter one supervisor per line in the form: <pre>Last name, First Name: Institution</pre> Note that the <em>institution</em> is optional although recommended.</p><p>Example of valid entries are:<ul><li>John, Doe: Example institution</li><li>Jane Doe</li></ul></p>"), True)
         values['supervisors_hint'] = escape(_("Doe, John: Example institution"))
 
+        values['meeting_title_label'] = escape(("""Meeting title"""), True)
+        values['meeting_title_tooltip'] = escape(_(""""""), True)
+        values['meeting_acronym_label'] = escape(("""Meeting acronym"""), True)
+        values['meeting_acronym_tooltip'] = escape(_(""""""), True)
+        values['meeting_dates_label'] = escape(("""Meeting dates"""), True)
+        values['meeting_dates_tooltip'] = escape(_(""""""), True)
+        values['meeting_town_label'] = escape(("""Meeting town"""), True)
+        values['meeting_town_tooltip'] = escape(_(""""""), True)
+        values['meeting_country_label'] = escape(("""Meeting country"""), True)
+        values['meeting_country_tooltip'] = escape(_(""""""), True)
+        values['meeting_url_label'] = escape(("""Meeting website"""), True)
+        values['meeting_url_tooltip'] = escape(_(""""""), True)
+        values['contribution_type_label'] = escape(("""Type of contribution"""), True)
+        values['contribution_type_tooltip'] = escape(_(""""""), True)
+        values['contribution_type_options'] = self.tmpl_conference_type_options(
+            values.get('contribution_type_value', None), ln)
+
         if warnings:
             for key, value in warnings.iteritems():
                 if key.endswith('_%s' % publicationid):
@@ -488,6 +505,22 @@ class Template:
 
         return self.tmpl_type_options(_("Select report type"), selected_value,
                                       CFG_OPENAIRE_REPORT_TYPES, CFG_OPENAIRE_DEFAULT_REPORT_TYPE)
+
+
+    def tmpl_conference_type_options(self, selected_value, ln=CFG_SITE_LANG):
+        """
+        Options for publication types drop-down
+
+        @see: tmpl_generic_options
+        """
+        _ = gettext_set_language(ln)
+
+        from invenio.openaire_deposit_config import CFG_OPENAIRE_CONFERENCE_TYPES, \
+            CFG_OPENAIRE_DEFAULT_CONFERENCE_TYPE
+
+        return self.tmpl_type_options(_("Select conference type"), selected_value,
+                                      CFG_OPENAIRE_CONFERENCE_TYPES, CFG_OPENAIRE_DEFAULT_CONFERENCE_TYPE)
+
 
     def tmpl_thesis_type_options(self, selected_value, ln=CFG_SITE_LANG):
         """
