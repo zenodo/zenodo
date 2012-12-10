@@ -506,7 +506,6 @@ class Template:
         return self.tmpl_type_options(_("Select report type"), selected_value,
                                       CFG_OPENAIRE_REPORT_TYPES, CFG_OPENAIRE_DEFAULT_REPORT_TYPE)
 
-
     def tmpl_conference_type_options(self, selected_value, ln=CFG_SITE_LANG):
         """
         Options for publication types drop-down
@@ -520,7 +519,6 @@ class Template:
 
         return self.tmpl_type_options(_("Select conference type"), selected_value,
                                       CFG_OPENAIRE_CONFERENCE_TYPES, CFG_OPENAIRE_DEFAULT_CONFERENCE_TYPE)
-
 
     def tmpl_thesis_type_options(self, selected_value, ln=CFG_SITE_LANG):
         """
@@ -564,7 +562,8 @@ class Template:
                 'x_fmt_close': "</strong>",
             },
             'upload_publications': escape(_("Upload New Publications")),
-            'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications.")) % {
+            'upload_publications_dropbox': escape(_("or, upload a file directly from your DropBox:")),
+            'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications:")) % {
                 'x_fmt_open': "<strong>",
                 'x_fmt_close': "</strong>",
                 'upload': escape(_("Upload")),
@@ -599,13 +598,31 @@ class Template:
                 </form>
             </div>
             <div id="yesFlash">
-                <form action="%(site)s/deposit/?ln=%(ln)s&style=%(style)s" method="POST">
-                    <p>%(upload_publications_description)s %(upload_publications_description2)s</p>
-                    <input id="fileInput" name="file" type="file" />
-                    <input type="reset" value="%(cancel_upload)s" id="cancel_upload"/>
-                    <input type="hidden" value="%(projectid)s" name="projectid" />
-                    <input type="hidden" value="%(session)s" name="session" />
-                </form>
+                <div>
+                    <form action="%(site)s/deposit/?ln=%(ln)s&style=%(style)s" method="POST">
+                        <p>%(upload_publications_description)s %(upload_publications_description2)s</p>
+                        <input id="fileInput" name="file" type="file" />
+                        <input type="reset" value="%(cancel_upload)s" id="cancel_upload"/>
+                        <input type="hidden" value="%(projectid)s" name="projectid" />
+                        <input type="hidden" value="%(session)s" name="session" />
+                    </form>
+                </div>
+                <div id="dropboxUpload">
+                    <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="72dpqrjvx71mqyu"></script>
+                    <form id="dropbox-upload-form" action="%(site)s/deposit/?ln=%(ln)s&style=%(style)s" method="POST">
+                        <p>%(upload_publications_dropbox)s</p>
+                        <input type="dropbox-chooser" name="FileURL" style="visibility: hidden;" data-link-type="direct" id="db-chooser"/>
+                        <input type="hidden" value="%(projectid)s" name="projectid" />
+                        <input type="hidden" value="%(session)s" name="session" />
+                        <input type="hidden" name="dropbox" value="Upload" />
+                        <script type="text/javascript">
+                        document.getElementById("db-chooser").addEventListener("DbxChooserSuccess",
+                            function(e) {
+                                $("#dropbox-upload-form").submit()
+                            }, false);
+                        </script>
+                    </form>
+                </div>
             </div>
             <script type="text/javascript">// <![CDATA[
                 if (swfobject.hasFlashPlayerVersion("9.0.24") &&
