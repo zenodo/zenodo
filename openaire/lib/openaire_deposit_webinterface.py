@@ -36,7 +36,8 @@ from invenio.openaire_deposit_engine import page, get_project_information, \
     OpenAIREPublication, wash_form, get_exisiting_projectids_for_uid, \
     get_all_projectsids, get_favourite_authorships_for_user, \
     get_all_publications_for_project, upload_file, get_openaire_style, \
-    get_favourite_keywords_for_user, get_project_acronym, UploadError
+    get_favourite_keywords_for_user, get_project_acronym, UploadError, \
+    upload_url
 from invenio.openaire_deposit_utils import simple_metadata2namespaced_metadata
 from invenio.session import get_session
 from invenio.urlutils import create_url
@@ -106,7 +107,8 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             'linkproject': (int, -1),
             'unlinkproject': (int, -1),
             'style': (str, None),
-            'upload': (str, '')})
+            'upload': (str, ''),
+            'dropbox': (str, '')})
 
         _ = gettext_set_language(argd['ln'])
 
@@ -155,6 +157,13 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
                 projectid = 0
             try:
                 upload_file(form, uid, projectid)
+            except UploadError, e:
+                return page(req=req, body=unicode(e), title=_("File upload error"), navmenuid="submit")
+        elif argd['dropbox']:
+            if projectid < 0:
+                projectid = 0
+            try:
+                upload_url(form, uid, projectid)
             except UploadError, e:
                 return page(req=req, body=unicode(e), title=_("File upload error"), navmenuid="submit")
 

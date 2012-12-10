@@ -94,6 +94,21 @@ class SubmissionRegressionTest(unittest.TestCase):
         )
         self.assertNotEqual(response.status_code, 500)
 
+    def test_url_upload(self):
+        """
+        Test file upload via URL
+        """
+        response = self.client.post(
+            "/deposit",
+            query_string={'projectid': '0', 'ln': 'en', 'style': 'invenio'},
+            data={
+                'dropbox': 'Upload',
+                'FileURL': 'https://www.dropbox.com/static/images/logo.png',
+            }
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue("File upload error" not in response.data)
+
 
 class AjaxGatewayTest(unittest.TestCase):
     """

@@ -68,7 +68,7 @@ else:
     import json
 
 from invenio import template
-from invenio.bibdocfile import generic_path2bidocfile
+from invenio.bibdocfile import generic_path2bidocfile, download_external_url
 from invenio.bibformat import format_record
 from invenio.bibformat_elements.bfe_fulltext import sort_alphanumerically
 from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
@@ -408,6 +408,22 @@ def get_project_information(uid, projectid, deletable, linked, ln, style, global
 class UploadError(Exception):
     """ Exception used to signal a file upload error. """
     pass
+
+
+def upload_url(form, uid, projectid=0, field='FileURL'):
+    if field not in form:
+        raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
+    afileurl = form[field]
+    if not afileurl.startswith("https://www.dropbox.com/"):
+        raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
+    try:
+        uploaded_file = download_external_url(afileurl)
+    except StandardError:
+        raise UploadError(_("A problem occurred when trying to download the file from DropBox. Please click back button and try uploading the file without using DropBox."))
+
+    publication = OpenAIREPublication(uid)
+    publication.link_project(projectid)
+    publication.add_a_fulltext(uploaded_file, os.path.basename(afileurl))
 
 
 def upload_file(form, uid, projectid=0, field='Filedata'):
