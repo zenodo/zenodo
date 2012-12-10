@@ -611,7 +611,7 @@ class Template:
                     <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="72dpqrjvx71mqyu"></script>
                     <form id="dropbox-upload-form" action="%(site)s/deposit/?ln=%(ln)s&style=%(style)s" method="POST">
                         <p>%(upload_publications_dropbox)s</p>
-                        <input type="dropbox-chooser" name="FileURL" style="visibility: hidden;" data-link-type="directLink" id="db-chooser"/>
+                        <input type="dropbox-chooser" name="FileURL" style="visibility: hidden;" data-link-type="direct" id="db-chooser"/>
                         <input type="hidden" value="%(projectid)s" name="projectid" />
                         <input type="hidden" value="%(session)s" name="session" />
                         <input type="hidden" name="dropbox" value="Upload" />
