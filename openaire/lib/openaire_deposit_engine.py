@@ -414,7 +414,7 @@ def upload_url(form, uid, projectid=0, field='FileURL'):
     if field not in form:
         raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
     afileurl = form[field]
-    if not afileurl.startswith("https://www.dropbox.com/"):
+    if not afileurl.startswith("https://dl.dropbox.com/"):
         raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
     try:
         uploaded_file = download_external_url(afileurl)
