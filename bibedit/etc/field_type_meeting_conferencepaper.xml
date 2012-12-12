@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Type: Meeting conference paper -->
+<!-- BibEdit-Field-Template-Description: Type: Meeting conference paper -->
+<record>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">MEETING_CONFERENCEPAPER</subfield>
+  </datafield>
+</record>

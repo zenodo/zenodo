@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Keyword -->
+<!-- BibEdit-Field-Template-Description: Keyword -->
+<record>
+  <datafield tag="653" ind1="1" ind2=" ">
+    <subfield code="a">VOLATILE:Keyword</subfield>
+  </datafield>
+</record>

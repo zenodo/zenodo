@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Type: Thesis doctoral -->
+<!-- BibEdit-Field-Template-Description: Type: Thesis doctoral -->
+<record>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">DOCTORALTHESIS</subfield>
+  </datafield>
+</record>

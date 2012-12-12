@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: ISBN -->
+<!-- BibEdit-Field-Template-Description: ISBN -->
+<record>
+  <datafield tag="020" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:ISBN</subfield>
+  </datafield>
+</record>

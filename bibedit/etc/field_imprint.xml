@@ -1,0 +1,9 @@
+<!-- BibEdit-Field-Template-Name: Imprint (books/reports) -->
+<!-- BibEdit-Field-Template-Description: Imprint (books/reports) -->
+<record>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:City, Country</subfield>
+    <subfield code="b">VOLATILE:Publisher</subfield>
+    <subfield code="c">VOLATILE:Year</subfield>
+  </datafield>
+</record>

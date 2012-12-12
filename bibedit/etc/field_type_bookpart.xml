@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Type: Book part -->
+<!-- BibEdit-Field-Template-Description: Type: Book part -->
+<record>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">BOOKPART</subfield>
+  </datafield>
+</record>

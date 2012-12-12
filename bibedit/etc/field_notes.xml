@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Notes -->
+<!-- BibEdit-Field-Template-Description: Notes -->
+<record>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:Notes</subfield>
+  </datafield>
+</record>

@@ -1,0 +1,8 @@
+<!-- BibEdit-Field-Template-Name: Meeting website -->
+<!-- BibEdit-Field-Template-Description: Meeting website -->
+<record>
+  <datafield tag="856" ind1="4" ind2=" ">
+    <subfield code="u">VOLATILE:URL</subfield>
+    <subfield code="y">Meeting website</subfield>
+  </datafield>
+</record>

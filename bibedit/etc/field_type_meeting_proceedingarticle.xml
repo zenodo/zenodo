@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Type: Meeting proceedings article -->
+<!-- BibEdit-Field-Template-Description: Type: Meeting proceedings article -->
+<record>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">MEETING_PROCEEDINGARTICLE</subfield>
+  </datafield>
+</record>

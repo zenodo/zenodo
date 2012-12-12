@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Extra report number -->
+<!-- BibEdit-Field-Template-Description: Extra report number -->
+<record>
+  <datafield tag="088" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:Extra report number</subfield>
+  </datafield>
+</record>

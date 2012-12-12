@@ -1,0 +1,8 @@
+<!-- BibEdit-Field-Template-Name: Related dataset -->
+<!-- BibEdit-Field-Template-Description: Related dataset -->
+<record>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:DOI</subfield>
+    <subfield code="n">data</subfield>
+  </datafield>
+</record>
