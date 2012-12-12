@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Access right: Closed access -->
+<!-- BibEdit-Field-Template-Description: Access right: Closed access -->
+<record>
+  <datafield tag="542" ind1=" " ind2=" ">
+    <subfield code="l">closedAccess</subfield>
+  </datafield>
+</record>

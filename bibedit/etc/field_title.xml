@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Title -->
+<!-- BibEdit-Field-Template-Description: Title -->
+<record>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:Title</subfield>
+  </datafield>
+</record>

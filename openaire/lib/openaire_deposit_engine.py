@@ -28,6 +28,7 @@ Following steps are necessary to add a new field:
   * openaire_form.tpl: Add HTML input fields.
   * openaire_deposit_engine.py: Adapt get_record() to make use of new field data.
   * Default_HTML_detailed.bft: Ensure field is displayed on submitted records
+  * bibedit/etc/field_<name>.xml: Add field template for BibEdit.
 
   ... tests ...
 
@@ -44,6 +45,7 @@ Following steps are necessary to add a new publication type:
   * openaire_deposit_fixtures.py: Add fixture FIXTURES and MARC_FIXTURES
   * openaire_deposit_webinterface_tests.py: Modify test_submission()
   * openaire_form.tpl: Add <div class="typebox_%(id)s typebox_%(id)s_publishedArticle"> with fields.
+  * bibedit/etc/field_type_<name>.xml: Add field template for BibEdit for the new type.
 """
 
 from base64 import encodestring
@@ -74,7 +76,7 @@ from invenio.bibformat_elements.bfe_fulltext import sort_alphanumerically
 from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_WEBSUBMIT_STORAGEDIR, \
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
     CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
@@ -84,10 +86,8 @@ from invenio.messages import gettext_set_language
 from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
 from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, \
     CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, \
-    CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_ACCESS_RIGHTS, CFG_METADATA_FIELDS, \
-    CFG_PUBLICATION_STATES, CFG_OPENAIRE_PUBLICATION_TYPES, \
-    CFG_OPENAIRE_CURATORS, CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE, \
-    CFG_METADATA_FIELDS_GROUPS
+    CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_METADATA_FIELDS, CFG_PUBLICATION_STATES, \
+    CFG_OPENAIRE_CURATORS, CFG_METADATA_FIELDS_GROUPS
 from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
@@ -706,7 +706,6 @@ class OpenAIREPublication(object):
     def check_metadata(self):
         """
         """
-        _ = gettext_set_language(self.ln)
         self.errors, self.warnings = self.static_check_metadata(
             self._metadata, ln=self.ln)
 
@@ -1133,7 +1132,7 @@ class OpenAIREPublication(object):
 
             record_add_field(rec, '502', '', '', subfields=[
                                  ('c', self._metadata.get('university')),
-                                 ('b', self._metadata.get('thesis_type')) ])
+                                 ('b', self._metadata.get('thesis_type'))])
 
             record_add_field(rec, '980', '', '', subfields=[
                 ('b', self._metadata.get('thesis_type').upper()),
@@ -1167,16 +1166,15 @@ class OpenAIREPublication(object):
 
             record_add_field(rec, '773', '', '', subfields=subfields)
 
-
         if 'RELATED_PUBS' in field_groups:
             # Related publications
             for doi in self.related_publications:
-                record_add_field(rec, '773', subfields=[('a', doi), ('n','pub')])
+                record_add_field(rec, '773', subfields=[('a', doi), ('n', 'pub')])
 
         # Related datasets
         if 'RELATED_DATA' in field_groups:
             for doi in self.related_datasets:
-                record_add_field(rec, '773', subfields=[('a', doi), ('n','data')])
+                record_add_field(rec, '773', subfields=[('a', doi), ('n', 'data')])
 
         # Dataset publisher
         if 'DATASET' in field_groups:
@@ -1251,7 +1249,7 @@ class OpenAIREPublication(object):
             meeting_url = self._metadata.get('meeting_url', '')
             if meeting_url:
                 record_add_field(rec, '8564', '', '', subfields=[
-                                    ('u', meeting_url),('y','Meeting website')])
+                                    ('u', meeting_url), ('y', 'Meeting website')])
 
             # Contribution type (paper, poster, lecture, ...)
             contribution_type = self._metadata.get('contribution_type', '')

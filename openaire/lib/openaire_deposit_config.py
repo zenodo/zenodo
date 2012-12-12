@@ -19,7 +19,7 @@
 
 import os
 from invenio.messages import gettext_set_language
-from invenio.config import CFG_WEBSUBMIT_STORAGEDIR, CFG_SITE_ADMIN_EMAIL
+from invenio.config import CFG_WEBSUBMIT_STORAGEDIR
 
 try:
     from invenio.config import CFG_OPENAIRE_CURATORS as MAIN_CFG_OPENAIRE_CURATORS
@@ -72,6 +72,9 @@ if MAIN_CFG_OPENAIRE_CURATORS.strip():
 def CFG_OPENAIRE_PUBLICATION_TYPES(ln):
     """
     Publication types
+
+    If you add/edit a publication type, please remember to add/edit the
+    corresponding BibEdit field template in bibedit/etc/field_type_*.xml.
 
     @param ln: Language for human readable version of publication types.
     @return: Dictionary with type ids as keys and type titles as values.
@@ -165,16 +168,16 @@ CFG_METADATA_FIELDS_COMMON = (
 CFG_METADATA_FIELDS_GROUPS = {
     'publishedArticle': ['ACCESS_RIGHTS', 'JOURNAL', 'RELATED_DATA'],
     'preprint': ['ACCESS_RIGHTS', 'RELATED_DATA', 'COLLECTION'],
-    'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN', 
-               'RELATED_DATA',],
-    'thesis': ['ACCESS_RIGHTS','PAGES_NO', 'RELATED_DATA','THESIS', 'IMPRINT'],
+    'report': ['ACCESS_RIGHTS', 'PAGES_NO', 'REPORT', 'IMPRINT', 'ISBN',
+               'RELATED_DATA', ],
+    'thesis': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'THESIS', 'IMPRINT'],
     'workingPaper': ['ACCESS_RIGHTS', 'RELATED_DATA', 'COLLECTION'],
     'book': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'IMPRINT', 'ISBN',
              'COLLECTION'],
     'bookpart': ['ACCESS_RIGHTS', 'PAGES_NO', 'RELATED_DATA', 'BOOKPART',
                  'COLLECTION'],
     'periodicalContribution': [],
-    'conferenceContribution': ['ACCESS_RIGHTS', 'RELATED_DATA', 'MEETING',],
+    'conferenceContribution': ['ACCESS_RIGHTS', 'RELATED_DATA', 'MEETING', ],
     'generalTalk': [],
     'patent': [],
     'data': ['CC0', 'DATASET', 'RELATED_PUBS', 'COLLECTION'],
@@ -196,6 +199,9 @@ def CFG_ACCESS_RIGHTS(ln):
     """
     Access rights for publication.
 
+    If you add/edit a access right, please remember to add/edit the
+    corresponding BibEdit field template in bibedit/etc/field_accessrights_*.xml.
+
     @param ln: Language for human readable version of access right.
     @return: Dictionary with access right ids as keys and access right titles as values.
     """
@@ -214,6 +220,9 @@ CFG_DEFAULT_ACCESS_RIGHTS = 'closedAccess'
 def CFG_OPENAIRE_REPORT_TYPES(ln):
     """
     Report types
+
+    If you add/edit a report type, please remember to add/edit the
+    corresponding BibEdit field template in bibedit/etc/field_type_report_*.xml.
     """
     _ = gettext_set_language(ln)
     return [
@@ -224,9 +233,14 @@ def CFG_OPENAIRE_REPORT_TYPES(ln):
 CFG_OPENAIRE_REPORT_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_REPORT_TYPES('en')]
 CFG_OPENAIRE_DEFAULT_REPORT_TYPE = 'other'
 
+
 def CFG_OPENAIRE_THESIS_TYPES(ln):
     """
     Report types
+
+    If you add/edit a thesis type, please remember to add/edit the
+    corresponding BibEdit field template in bibedit/etc/field_type_thesis_*.xml
+    and bibedit/etc/field_thesis_*.xml.
     """
     _ = gettext_set_language(ln)
     return [
@@ -242,6 +256,9 @@ CFG_OPENAIRE_DEFAULT_THESIS_TYPE = 'bachelorThesis'
 def CFG_OPENAIRE_CONFERENCE_TYPES(ln):
     """
     Conference contribution types
+
+    If you add/edit a conference type, please remember to add/edit the
+    corresponding BibEdit field template in bibedit/etc/field_type_meeting_*.xml
     """
     _ = gettext_set_language(ln)
     return [

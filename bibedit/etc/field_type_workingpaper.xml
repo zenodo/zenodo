@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Type: Working paper -->
+<!-- BibEdit-Field-Template-Description: Type: Working paper -->
+<record>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">WORKINGPAPER</subfield>
+  </datafield>
+</record>

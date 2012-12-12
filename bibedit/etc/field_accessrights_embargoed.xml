@@ -1,0 +1,10 @@
+<!-- BibEdit-Field-Template-Name: Access right: Embargoed access -->
+<!-- BibEdit-Field-Template-Description: Access right: Embargoed access -->
+<record>
+  <datafield tag="542" ind1=" " ind2=" ">
+    <subfield code="l">embargoedAccess</subfield>
+  </datafield>
+  <datafield tag="942" ind1=" " ind2=" ">
+    <subfield code="a">VOLATILE:2012-08-23</subfield>
+  </datafield>
+</record>

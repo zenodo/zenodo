@@ -1,0 +1,7 @@
+<!-- BibEdit-Field-Template-Name: Type: Report project deliverable -->
+<!-- BibEdit-Field-Template-Description: Type: Report project deliverable -->
+<record>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">REPORT_PROJECTDELIVERABLE</subfield>
+  </datafield>
+</record>
