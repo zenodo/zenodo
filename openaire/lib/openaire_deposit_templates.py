@@ -428,7 +428,7 @@ class Template:
 
         @see: tmpl_generic_options
         """
-        from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
+        from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS
         access_rights = filter(lambda x: x[0] != 'cc0', CFG_ACCESS_RIGHTS(ln))
         _ = gettext_set_language(ln)
 
