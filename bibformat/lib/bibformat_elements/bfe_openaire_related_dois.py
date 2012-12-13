@@ -17,11 +17,8 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import cgi
-import time
-
-from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
 from invenio.messages import gettext_set_language
+
 
 def format_element(bfo, title='Related DOIs', type=None):
     ln = bfo.lang

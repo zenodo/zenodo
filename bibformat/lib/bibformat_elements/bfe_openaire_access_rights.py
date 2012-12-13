@@ -23,6 +23,7 @@ import time
 from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS
 from invenio.messages import gettext_set_language
 
+
 def format_element(bfo):
     ln = bfo.lang
     _ = gettext_set_language(ln)
@@ -47,15 +48,15 @@ def format_element(bfo):
     elif access_rights == 'cc0':
         ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: To the extent possible under law, the authors have waived all copyright and related or neighbouring rights to this data. %(cc0link)s")
 
-
     return ret % {
         'x_fmt_s': "<strong>",
         'x_fmt_e': "</strong>",
         'access': dict(CFG_ACCESS_RIGHTS(ln))[access_rights],
-        'cc0link' : """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="/img/cc-zero.png"></a>""",
+        'cc0link': """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="/img/cc-zero.png"></a>""",
         'embargo': embargo,
         'email': email
     }
+
 
 def escape_values(bfo):
     """
