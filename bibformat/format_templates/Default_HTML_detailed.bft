@@ -6,8 +6,12 @@ prefix='<div style="padding-left:10px;padding-right:10px">'
 suffix='</div><hr/>'/>
 
 <div style="padding-left:10px;padding-right:10px">
+<div style="float:right;"><BFE_OPENAIRE_ALTMETRIC badgetype='donut' popover='left' details='left'/></div>
 <BFE_TITLE prefix='<center><big><big><strong itemprop="name">' separator="<br /><br />" suffix="</strong></big></big></center>" />
 <p align="center">
+
+
+
 <BFE_AUTHORS relator_code_pattern='$' prefix='<span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">' separator='</span></span> ; <span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">' suffix="</span></span><br />" limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix='<small> (<span itemscope itemtype="http://schema.org/Organization">' affiliation_suffix="</span>)</small>"/>
 <BFE_ADDRESSES />
 <BFE_AFFILIATION />
