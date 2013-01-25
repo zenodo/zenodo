@@ -294,7 +294,7 @@ class Template:
         values['status'] = metadata_status
         values['projectid'] = projectid
 
-        values['accept_cc0_license_label'] = escape(_("""I understand that by submitting a dataset to OpenAIRE Orphan Record Repository, I am agreeing to release it under the terms of the %(cc0)s waiver. All authors of the data have agreed to the terms of this waiver."""), True) % {'cc0' : '<a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero (CC0)</a>'}
+        values['accept_cc0_license_label'] = escape(_("""I understand that by submitting a dataset to OpenAIRE Orphan Record Repository, I am agreeing to release it under the terms of the %(cc0)s waiver. All authors of the data have agreed to the terms of this waiver."""), True) % {'cc0': '<a href="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero (CC0)</a>'}
         values['accept_cc0_license_tooltip'] = ""
 
         values['publication_type'] = escape(_("""Type"""), True)
@@ -561,7 +561,6 @@ class Template:
                 'x_fmt_open': "<strong>",
                 'x_fmt_close': "</strong>",
             },
-            'delay_warning': escape(_("NOTE: Between 22. December to 6. January approval of new submissions may take up to one week due to the holiday period.")),
             'upload_publications': escape(_("Upload New Publications")),
             'upload_publications_dropbox': escape(_("or, upload a file directly from your DropBox:")),
             'upload_publications_description': escape(_("Click on %(x_fmt_open)s%(upload)s%(x_fmt_close)s to start uploading one or more publications:")) % {
@@ -625,7 +624,6 @@ class Template:
                     </form>
                 </div>
             </div>
-            <p>%(delay_warning)s</p>
             <script type="text/javascript">// <![CDATA[
                 if (swfobject.hasFlashPlayerVersion("9.0.24") &&
                         navigator.userAgent.search('Chromium/1(1|0)') < 0) { // There is a bug in Chrom(e|iumt) 10.x/11.x
