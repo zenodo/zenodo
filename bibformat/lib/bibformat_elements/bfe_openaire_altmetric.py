@@ -17,40 +17,20 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import cgi
-import time
 
-from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
-from invenio.messages import gettext_set_language
+def format_element(bfo, badgetype='donut', popover='', details=''):
+    doi = bfo.field('0247_a')
 
-def format_element(bfo, title='Related DOIs', type=None):
-    ln = bfo.lang
-    _ = gettext_set_language(ln)
+    if doi:
+        if popover:
+            popover = " data-badge-popover='%s'" % popover
+        if details:
+            details = " data-badge-details='%s'" % details
 
-    related_dois = bfo.fields('773__')
-    related_doi_str = []
-
-    for field in related_dois:
-        # Remove DOIs not of this type
-        if type:
-            try:
-                if field['n'] != type:
-                    continue
-            except KeyError:
-                continue
-        related_doi_str.append(field['a'])
-
-    if not related_doi_str:
+        return "<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>" \
+        "<div class='altmetric-embed' data-badge-type='%s'%s%s data-doi=\"%s\"></div>" % (badgetype, popover, details, doi)
+    else:
         return ""
-
-    related_doi_str = ", ".join(["<a href=\"http://dx.doi.org/%(doi)s\">%(doi)s</a>" % {'doi': x} for x in related_doi_str])
-
-    return "%(x_fmt_s)s%(title)s%(x_fmt_e)s: %(related_doi_str)s" % {
-        'x_fmt_s': "<strong>",
-        'x_fmt_e': "</strong>",
-        'title': _(title),
-        'related_doi_str': related_doi_str,
-    }
 
 
 def escape_values(bfo):

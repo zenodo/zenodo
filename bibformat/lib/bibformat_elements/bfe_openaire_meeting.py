@@ -17,8 +17,16 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
+import cgi
+import time
+
+#from invenio.openaire_deposit_config import CFG_OPENAIRE_THESIS_TYPES
+from invenio.messages import gettext_set_language
 
 def format_element(bfo):
+    ln = bfo.lang
+    _ = gettext_set_language(ln)
+
     info = bfo.field('711__')
 
     if not info:

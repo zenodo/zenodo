@@ -19,18 +19,16 @@
 
 import urllib
 
-
 def format_element(bfo):
     """
     Prints the OpenAIRE user URL (used in OAI-PMH response).
     """
-    email_encoded = urllib.quote_plus(bfo.field('8560_f').strip())
-
+    email_encoded = urllib.quote_plus( bfo.field('8560_f').strip() )
+    
     if email_encoded:
         return "info:openaire/email/%s" % email_encoded
     else:
-        return ""
-
+        return "" 
 
 def escape_values(bfo):
     """
