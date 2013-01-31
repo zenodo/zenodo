@@ -24,39 +24,46 @@ Run as::
   bibupload -c output.xml
 """
 
-from invenio.search_engine import search_pattern, get_fieldvalues
-from invenio.bibrecord import record_add_field, record_xml_output
-
-def main():
-    # 
-    from_base = 'http://openaire.cern.ch/'
-    to_base = 'http://localhost:4000/'
-    
-    # All records
-    recids = search_pattern(p="0->Z", f="8564_u")
-    
-    print "<collection>"
-    for recid in recids:
-        # Get record information 
-        touched = False
-        file_links = get_fieldvalues(recid, "8564_u")
-
-        def replace_link(x): 
+def replace_link_func(from_base, to_base):
+    def replace_link(x):
             if x.startswith(from_base):
                 return x.replace(from_base, to_base)
             else:
                 return x
-        
-        new_file_links = map(replace_link, file_links)
-        
+
+    return replace_link
+
+
+def main():
+    from invenio.flaskshell import *
+    from invenio.search_engine import search_pattern, get_fieldvalues
+    from invenio.bibrecord import record_add_field, record_xml_output
+
+    print "TEST"
+    import sys
+    sys.exit(0)
+    from_base = 'http://openaire.cern.ch/'
+    to_base = 'http://localhost:4000/'
+
+    # All records
+    recids = search_pattern(p="0->Z", f="8564_u")
+
+    print "<collection>"
+    for recid in recids:
+        # Get record information
+        touched = False
+        file_links = get_fieldvalues(recid, "8564_u")
+
+        new_file_links = map(replace_link_func(from_base, to_base), file_links)
+
         # Print correcting to record
         rec = {}
         record_add_field(rec, "001", controlfield_value=str(recid))
-        for old_link,new_link in zip(file_links, new_file_links):
+        for old_link, new_link in zip(file_links, new_file_links):
             if old_link != new_link:
-                touched = True 
+                touched = True
             record_add_field(rec, '856', ind1='4', subfields=[('u', new_link)])
-        
+
         if touched:
             print record_xml_output(rec)
     print "</collection>"
