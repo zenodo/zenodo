@@ -101,6 +101,28 @@ CFG_OPENAIRE_PUBLICATION_TYPES_KEYS = [x[0] for x in CFG_OPENAIRE_PUBLICATION_TY
 CFG_OPENAIRE_DEFAULT_PUBLICATION_TYPE = 'publishedArticle'
 CFG_OPENAIRE_CC0_PUBLICATION_TYPES = ['data', ]
 
+
+def CFG_OPENAIRE_PUBTYPE_MAP(ln):
+    _ = gettext_set_language(ln)
+
+    return [
+        ('OPENAIRE', _("Published article")),
+        ('PREPRINT', _("Preprint")),
+        ('REPORT_PROJECTDELIVERABLE', _("Report")),
+        ('REPORT_OTHER', _("Report")),
+        ('BACHELORTHESIS', _("Thesis")),
+        ('MASTERTHESIS', _("Thesis")),
+        ('DOCTORALTHESIS', _("Thesis")),
+        ('WORKINGPAPER', _("Working paper")),
+        ('BOOK', _("Book")),
+        ('BOOKPART', _("Part of book")),
+        ('MEETING_PROCEEDINGARTICLE', _("Proceedings article")),
+        ('MEETING_POSTER', _("Poster")),
+        ('MEETING_CONFERENCEPAPER', _("Conference paper")),
+        ('MEETING_CONFERENCETALK', _("Talk")),
+        ('DATA', _("Dataset")),
+    ]
+
 # ===============
 # Metadata fields
 # ===============

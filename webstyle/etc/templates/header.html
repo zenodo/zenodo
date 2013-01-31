@@ -1,0 +1,55 @@
+<form action="{{ url_for('youraccount.login') }}" method="POST" class="form-inline">
+  <header class="gradient">
+    <div class="container headerbg">
+      <div class="container">
+        <div class="row">
+          <div class="span3">
+            <a href="{{ url_for('search.index') }}"><img src="{{ url_for('static', filename='img/zenodo.png') }}" style="padding-top: 80px;" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"/></a>
+          </div>
+          <div class="span9 pull-right">
+            <h1 style="padding-top: 70px; color: #00488c; font-size: 60px; line-height: 60px; text-align:right;">Research. Shared.</h1>
+          </div>
+        </div>
+      </div>
+      <div class="container" style="height:37px;">
+        <ul class="nav nav-tabs">
+          {%- for item in menu|sort(attribute='order') recursive %}
+          {%- if item.children -%}
+          <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">{{ item.title|safe }}<b class="caret"></b></a>
+            <ul class="dropdown-menu">{{ loop(item.children.itervalues()|sort(attribute='order')) }}</ul>
+          </li>
+          {%- else -%}
+          <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+          {%- endif %}
+          {%- endfor %}
+          <li class="dropdown pull-right">
+              {% if current_user.is_guest %}
+                <input id="referer" name="referer" type="hidden" value="{{ request.url if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else '/' }}" />
+                <input id="remember" name="remember" type="hidden" value="y">
+                <input name="nickname" type="text" class="input-small" placeholder="{{ _("Email") }}" />
+                <input name="password" type="password" class="input-small" placeholder="{{ _("Password") }}" />
+                <button name="submit" type="submit" class="btn">{{ _("Sign in") }}</button>
+                
+              {% else %}
+                <button class="btn dropdown-toggle" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }} <span class="caret"></span>&nbsp;</button>
+                <ul class="dropdown-menu">
+                  <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
+                  <li class="divider"></li>
+                  {% if current_user.is_guest %}
+                  <li><a href="{{ url_for('youraccount.login', referer=request.url) }}">
+                    <i class="icon icon-lock"></i> {{ _("Login") }}
+                  </a></li>
+                  {% else %}
+                  <li><a href="{{ url_for('youraccount.logout') }}">
+                    <i class="icon icon-off"></i> {{ _("Logout") }}
+                  </a></li>
+                  {% endif %}
+                </ul>
+              {% endif %}
+          </li>
+        </ul>
+      </div>
+    </div>
+  </header>
+</form>

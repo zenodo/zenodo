@@ -1,3 +1,170 @@
+.headerbg {
+  background-image: url('../img/header.png'); 
+  background-repeat: 
+  no-repeat;
+}
+
+#footer > .container {
+  padding-top: 60px;
+}
+
+header {
+  background-color: #0067c9;
+}
+
+header .container .row {
+  height: 200px;
+}
+
+header .container .nav {
+  margin-bottom: 0;
+}
+
+header .container .nav a, footer a {
+  color: #ffffff;
+}
+
+footer a:hover {
+  color: #bbbbbb;
+}
+
+header .container .nav a:hover {
+  color: #000000;
+}
+
+header .container .nav .active a {
+  color: #000000;
+}
+
+header .container .nav .active a:hover {
+  color: #000000;
+}
+
+header .container .nav li {
+  margin-right: 5px;
+}
+
+.focuson li {
+  margin-left: 5px;
+  margin-bottom: 20px;
+}
+
+.focuson a {
+  font-size: 17.5px;
+  font-weight: 300;
+}
+
+/*  
+rsync -av . openaire-dev:/opt/invenio/var/www/zenodo/
+----------------------- Stick footer ----------------------- */
+html,
+body {
+  height: 100%;
+}
+
+/* Wrapper for page content to push down footer */
+#wrap {
+  min-height: 100%;
+  height: auto !important;
+  height: 100%;
+  /* Negative indent footer by it's height */
+  margin: 0 auto -220px;
+}
+
+/* Set the fixed height of the footer here */
+#push,
+#footer {
+  height: 220px;
+}
+
+#push {
+  margin-top: 60px;
+}
+
+#footer {
+  background-color: #0067c9;
+}
+
+/* Lastly, apply responsive CSS fixes as necessary */
+@media (max-width: 767px) {
+  #footer {
+    margin-left: -20px;
+    margin-right: -20px;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+}
+
+/* --------------- */
+
+.navbar { 
+  margin-bottom: 0;
+}
+
+.affix {
+  top: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  font-weight: 400; 
+}
+
+footer .partners > a {
+  margin-left: 10px;
+}
+
+header, footer {
+  color: #fff;
+}
+
+header .nav .dropdown-menu a{
+  color: #000;
+}
+
+h1, h2, h3 {
+  font-weight: 100; 
+}
+
+.media a.pull-left {
+  text-align: center;
+}
+
+.searchbox {
+  margin-top: 20px;
+}
+
+.signup {
+  margin-left: 20px;
+}
+
+.gradient {
+    /* IE10 Consumer Preview */ 
+  background-image: -ms-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
+
+  /* Mozilla Firefox */ 
+  background-image: -moz-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
+
+  /* Opera */ 
+  background-image: -o-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
+
+  /* Webkit (Safari/Chrome 10) */ 
+  background-image: -webkit-gradient(radial, left top, 0, left top, 994, color-stop(0, #0047A8), color-stop(1, #2BBCFF));
+
+  /* Webkit (Chrome 11+) */ 
+  background-image: -webkit-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
+
+  /* W3C Markup, IE10 Release Preview */ 
+  background-image: radial-gradient(circle farthest-corner at left top, #0047A8 0%, #2BBCFF 100%);
+}
+
+.accordion-heading .caret {
+  margin-top: 8px;
+  margin-left: 5px;
+}
+
+
+/* ============ LEGACY ============ */
 img {
     border-style: none;
 }

@@ -211,9 +211,9 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
                 else:
                     submitted_publications += publication.get_publication_preview()
             body += openaire_deposit_templates.tmpl_add_publication_data_and_submit(projectid, forms, submitted_publications, project_information=upload_to_project_information, ln=argd['ln'])
-            body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid(), style=style, ln=argd['ln'])
+            body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid, style=style, ln=argd['ln'])
         else:
-            body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid(), style=style, ln=argd['ln'])
+            body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid, style=style, ln=argd['ln'])
             projects = [get_project_information(uid, projectid_, deletable=False, ln=argd['ln'], style=style, linked=True) for projectid_ in get_exisiting_projectids_for_uid(user_info['uid']) if projectid_ != projectid]
             if projects:
                 body += openaire_deposit_templates.tmpl_focus_on_project(

@@ -23,7 +23,8 @@ import time
 from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS
 from invenio.messages import gettext_set_language
 
-def format_element(bfo):
+
+def format_element(bfo, as_label=False, only_restrictions=False):
     ln = bfo.lang
     _ = gettext_set_language(ln)
     access_rights = bfo.field('542__l')
@@ -32,30 +33,49 @@ def format_element(bfo):
         embargo = bfo.field('942__a')
         if embargo <= time.strftime("%Y-%m-%d"):
             access_rights = 'openAccess'
+        embargo = time.strftime("%d %B %Y", time.strptime(embargo, "%Y-%m-%d"))
 
     submitter = bfo.field('8560_f')
     email = """<a href="mailto:%s">%s</a>""" % (cgi.escape(submitter, True), cgi.escape(submitter))
+    access = dict(CFG_ACCESS_RIGHTS(ln))[access_rights]
 
-    if access_rights == 'embargoedAccess':
-        ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: this document will be available as Open Access after %(embargo)s.")
-    elif access_rights == 'closedAccess':
-        ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is close.")
-    elif access_rights == 'openAccess':
-        ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is open.")
-    elif access_rights == 'restrictedAccess':
-        ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is open but with some restrictions. To access the document, please contact %(email)s.")
-    elif access_rights == 'cc0':
-        ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: To the extent possible under law, the authors have waived all copyright and related or neighbouring rights to this data. %(cc0link)s")
+    if only_restrictions:
+        if access_rights == 'embargoedAccess':
+            return """<dt>Embargoed</dt><dd>Files available as <span class="label label-success">Open Access</span> after %s</dd>""" % embargo
+        elif access_rights == 'restrictedAccess':
+            return """<dt>Restricted access</dt><dd>Please contact %s to access the files.</dd>""" % email
+    elif as_label:
+        if access_rights == 'embargoedAccess':
+            return """<span class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</span>""" % (embargo, _(access))
+        elif access_rights == 'closedAccess':
+            return """<span class="label label-important">%s</span>""" % _(access)
+        elif access_rights == 'openAccess':
+            return """<span class="label label-success">%s</span>""" % _(access)
+        elif access_rights == 'restrictedAccess':
+            return """<span class="label label-warning">%s</span>""" % _(access)
+        elif access_rights == 'cc0':
+            return """<span class="label label-success">%s</span>""" % _(access)
+    else:
+        if access_rights == 'embargoedAccess':
+            ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: this document will be available as Open Access after %(embargo)s.")
+        elif access_rights == 'closedAccess':
+            ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is close.")
+        elif access_rights == 'openAccess':
+            ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is open.")
+        elif access_rights == 'restrictedAccess':
+            ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is open but with some restrictions. To access the document, please contact %(email)s.")
+        elif access_rights == 'cc0':
+            ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: To the extent possible under law, the authors have waived all copyright and related or neighbouring rights to this data. %(cc0link)s")
 
+        return ret % {
+            'x_fmt_s': "<strong>",
+            'x_fmt_e': "</strong>",
+            'access': access,
+            'cc0link': """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="/img/cc-zero.png"></a>""",
+            'embargo': embargo,
+            'email': email
+        }
 
-    return ret % {
-        'x_fmt_s': "<strong>",
-        'x_fmt_e': "</strong>",
-        'access': dict(CFG_ACCESS_RIGHTS(ln))[access_rights],
-        'cc0link' : """<a href="http://creativecommons.org/publicdomain/zero/1.0/"><img src="/img/cc-zero.png"></a>""",
-        'embargo': embargo,
-        'email': email
-    }
 
 def escape_values(bfo):
     """

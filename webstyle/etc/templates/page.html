@@ -1,0 +1,125 @@
+{%- set guest = current_user.is_guest -%}
+{%- set usealerts = current_user['precached_usealerts'] -%}
+{%- set usemessages = current_user['precached_usemessages'] -%}
+{%- set usebaskets = current_user['precached_usebaskets'] -%}
+{%- set useloans = current_user['precached_useloans'] -%}
+{%- set usegroups = current_user['precached_usegroups'] -%}
+{%- set viewsubmissions = current_user['precached_viewsubmissions'] -%}
+{%- set useapprove = current_user['precached_useapprove'] -%}
+{%- set useadmin = current_user['precached_useadmin'] -%}
+{%- set usestats = current_user['precached_usestats'] -%}
+{%- set viewclaimlink = current_user['precached_viewclaimlink'] -%}
+{%- set usepaperclaim = current_user['precached_usepaperclaim'] -%}
+{%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
+<!DOCTYPE html>
+<html lang="{{ ln|safe }}" {% if is_language_rtl %}dir="rtl"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <title>{{ title+' | ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="Content-Language" content="{{ g.ln|safe }}" />
+  <meta name="description" content="{{ description }}" />
+  <meta name="keywords" content="{{ keywords }}" />
+  <meta name="author" content="">
+  <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
+  <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
+  <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
+  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
+  {%- js 'js/bootstrap.min.js' -%}
+  {%- js 'js/holder.js' -%}
+  {%- js 'js/jquery.tokeninput.js' -%}
+  {%- js "js/websearch_typeahead.js" -%}
+  {%- js "js/bootstrap-select.js" -%}
+  {%- css 'css/bootstrap.css' -%}
+  {%- css 'css/bootstrap-responsive.min.css' -%}
+  {%- css 'css/token-input.css' -%}
+  {%- css 'css/token-input-facebook.css' -%}
+  {%- css 'css/custom.css' -%}
+  {%- css 'css/font-awesome.min.css' -%}
+  {%- assets get_css_bundle() -%}
+    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
+  {%- endassets -%}
+  <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
+  {%- block css -%}{%- endblock css -%}
+  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
+  <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+  {% for size in [144, 114, 72, 57] %}{% set icon_name = 'apple-touch-icon-%d-precomposed.png'|format(size) -%}
+  <link rel="apple-touch-icon-precomposed" sizes="{{ size }}x{{ size }}" href="{{ url_for('static', filename=icon_name) }}">
+  {% endfor -%}
+  {% block header %}{{ metaheaderadd|safe }}{% endblock header -%}
+</head>
+<body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}">
+  <div id="wrap">
+    {% block headerbox %}{% include 'header.html' %}{% endblock headerbox %}
+    <div class="container">
+      {% block breadcrumb %}{% if breadcrumbs|length > 1 %}
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb">
+            {% for breadcrumb in breadcrumbs %}{% if loop.last %}
+            <li class="active">{{ breadcrumb[0] }}</li>
+            {% else %}
+            <li>{% set url_args = breadcrumb[2] or {} %}<a href="{{ url_for(breadcrumb[1], **url_args) }}" class="navtrail">{{ breadcrumb[0] }}</a> <span class="divider">/</span></li>
+            {% endif %}
+            {% endfor %}
+          </ul>
+        </div>
+      </div>
+      {% endif %}{% endblock breadcrumb %}
+
+      {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
+
+      {% block title %}
+      {% if title %}
+      <div class="row">
+        <div class="span12">
+          <div class="page-header"><h1>{{ title }}</h1></div>
+        </div>
+      </div>
+      {% endif %}
+      {% endblock title %}
+      {% block messages %}
+      <div class="row">
+        <div class="span12">
+          {% for category, msg in get_flashed_messages(with_categories=true) %}
+            <div class="alert alert-{{ category }}">
+              <a class="close" data-dismiss="alert" href="#">×</a>
+              {{ msg }}
+            </div>
+          {% endfor %}  
+        </div>
+      </div>
+      {% endblock messages %}
+      {% block body %}{{ body }}{% endblock body %}
+      <div id="push"></div>
+    </div>
+  </div>
+
+  <div class="container">
+    {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
+  </div>
+  {%- include 'footer.html' -%}
+  <script src="http://code.jquery.com/jquery-latest.js"></script>
+  {% assets get_js_bundle() %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+  <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+  {% block javascript %}{% endblock javascript %}
+  <script type="text/javascript">
+  /* TODO: Move to page for detail record */
+  $('#affix-outer').height($('#navbar').height())
+  $('#author_affiliations_link').click(function() {
+    $('#authors_short').toggle('slow', function() {
+      if ($('#author_affiliations_link').html() == "(hide affiliations)") {
+        $('#author_affiliations_link').html("(show affiliations)");
+      } else {
+        $('#author_affiliations_link').html("(hide affiliations)");  
+      }
+    });
+    $('#authors_long').toggle('slow', function() {});
+  });
+  </script>
+</body>
+</html>

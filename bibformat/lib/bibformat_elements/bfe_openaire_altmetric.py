@@ -18,17 +18,22 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-def format_element(bfo, badgetype='donut', popover='', details=''):
+def format_element(bfo, badgetype='donut', popover='', details='', css_class='', no_script=False):
     doi = bfo.field('0247_a')
 
     if doi:
         if popover:
-            popover = " data-badge-popover='%s'" % popover
+            popover = " data-badge-popover=\"%s\"" % popover
         if details:
-            details = " data-badge-details='%s'" % details
+            details = " data-badge-details=\"%s\"" % details
+        if css_class:
+            css_class = " %s" % css_class
 
-        return "<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>" \
-        "<div class='altmetric-embed' data-badge-type='%s'%s%s data-doi=\"%s\"></div>" % (badgetype, popover, details, doi)
+        if no_script:
+            return """<div class="altmetric-embed%s" data-badge-type="%s"%s%s data-doi="%s"></div>""" % (css_class, badgetype, popover, details, doi)
+        else:
+            return "<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>" \
+            "<div class='altmetric-embed%s' data-badge-type='%s'%s%s data-doi=\"%s\"></div>" % (css_class, badgetype, popover, details, doi)
     else:
         return ""
 

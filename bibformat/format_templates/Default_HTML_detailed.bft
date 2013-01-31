@@ -1,71 +1,35 @@
 <name>Default HTML detailed</name>
-<description>This is the default HTML detailed format.</description>
-<div itemscope itemtype="ScholarlyArticle">
-<BFE_TOPBANNER
-prefix='<div style="padding-left:10px;padding-right:10px">'
-suffix='</div><hr/>'/>
+<description></description>
 
-<div style="padding-left:10px;padding-right:10px">
-<div style="float:right;"><BFE_OPENAIRE_ALTMETRIC badgetype='donut' popover='left' details='left'/></div>
-<BFE_TITLE prefix='<center><big><big><strong itemprop="name">' separator="<br /><br />" suffix="</strong></big></big></center>" />
-<p align="center">
+<p><BFE_DATE date_format="%d %B %Y" /> <span class="pull-right"><BFE_OPENAIRE_PUBTYPE as_label="1" /> <BFE_OPENAIRE_ACCESS_RIGHTS as_label="1" /></span></p>
+<h1 itemprop="name"><BFE_TITLE /></h1>
 
-
-
-<BFE_AUTHORS relator_code_pattern='$' prefix='<span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">' separator='</span></span> ; <span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">' suffix="</span></span><br />" limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix='<small> (<span itemscope itemtype="http://schema.org/Organization">' affiliation_suffix="</span>)</small>"/>
-<BFE_ADDRESSES />
-<BFE_AFFILIATION />
-<BFE_DATE prefix='<br /><span itemprop="dateCreated"' suffix="</span><br />"/>
-<BFE_PUBLISHER prefix='<small itemprop="publisher">' suffix="</small>"/>
-<BFE_PLACE prefix='<small itemprop="place">' suffix="</small>"/>
-<BFE_ISBN prefix='<br />ISBN: <span itemprop="isbn">' suffix="</span>" />
+<p id="authors_short">
+<BFE_AUTHORS relator_code_pattern="$" limit="25" interactive="yes" print_affiliations="no"
+ />
 </p>
+<p id="authors_long" class="hide">
+<BFE_AUTHORS relator_code_pattern="$" limit="25" interactive="yes" print_affiliations="yes" 
+separator="<br />"
+affiliation_prefix="<br /><small>"
+affiliation_suffix="</small>"
+/>
+</p>
+<p><small><a href="#" class="muted" id="author_affiliations_link">(show affliations)</a></small></p>
 
-<p style="margin-left: 15%; width: 70%">
-
-<BFE_ABSTRACT
-prefix_en='<small><strong>Abstract: </strong><span itemprop="description">'
-prefix_fr='<small><strong>Résumé: </strong><span itemprop="description">'
-suffix_en="</span></small><br />"
-suffix_fr="</span></small><br />"
+<BFE_AUTHORS 
+    relator_code_pattern='ths$' 
+    prefix='<p id="supervisors_short"><strong>Supervisor(s):</strong><br>' 
+    suffix='</p>'
+    limit="25"
+    interactive="yes"
+    print_affiliations="no"
 />
 
-<BFE_SUBJECT prefix="<br /><small><strong>Subject(s): </strong></small><small>" separator="</small><small>"
-suffix="</small>" />
-
-<BFE_KEYWORDS
-prefix="<br /><small><strong>Keyword(s): </strong></small>"
-keyword_prefix='<small itemprop="keywords">'
-keyword_suffix="</small>" />
-
-<BFE_AUTHORS relator_code_pattern='ths$' prefix='<br /><small><strong>Supervisor(s):</strong> ' separator=',' suffix='</small>' limit="25" interactive="yes" print_affiliations="yes" affiliation_prefix=' (' affiliation_suffix=")"/>
-<BFE_OPENAIRE_UNIVERSITY prefix="<br /><small><strong>Thesis:</strong> " suffix="</small>" />
-<BFE_OPENAIRE_MEETING prefix="<br /><small><strong>Meeting:</strong> " suffix="</small>" />
-<!-- BEGIN OpenAIRE specific -->
-
-<BFE_FIELD escape="0" tag="536__a" prefix='<br /><small><strong>Funded by project(s): </strong></small><small><span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' instances_separator='</span></span>, <span itemprop="contributor" itemscope itemtype="http://schema.org/Organization"><span itemprop="description">' suffix="</span></span></small>" />
-
-<BFE_OPENAIRE_ACCESS_RIGHTS prefix='<br /><small itemprop="rights">' suffix="</small>" />
-<BFE_PAGINATION prefix="<br/><small><strong>Pages:</strong> " suffix="</small>" default="" escape="" />
-<BFE_OPENAIRE_RELATED_DOIS title='Related publications' type='pub' prefix='<br /><small>' suffix="</small>" />
-<BFE_OPENAIRE_RELATED_DOIS title='Related datasets' type='data' prefix='<br /><small>' suffix="</small>" />
-<!-- END OpenAIRE specific -->
+<p><BFE_ABSTRACT highlight="yes" /></p>
 
 <BFE_NOTES
-note_prefix='<br /><small><strong>Note: </strong><span itemprop="comment" itemscope itemtype="http://schema.org/UserComments"><span itemprop="description">'
-note_suffix="</span></span> </small>"
-suffix="<br />" />
+    prefix='<div class="alert">'
+    suffix='</div>'
+/>
 
-<BFE_PUBLI_INFO prefix="<br /><br /><strong>Published in: </strong>"/><br />
-<BFE_OPENAIRE_PUBLISHED_IN_BOOK prefix="<br /><br /><strong>Published in: </strong>"/><br />
-<BFE_DATE prefix='<strong>Publication date: </strong><span itemtype="datePublished">' suffix="</span><br />" date_format="%Y-%m-%d" />
-<BFE_DOI prefix='<br /><small><strong>DOI: </strong><span itemprop="doi">' suffix="</span> </small><br />" />
-
-<BFE_PLOTS width="200px" caption="no"/>
-
-</div>
-
-<BFE_ADDTHIS />
-
-<BFE_APPEARS_IN_COLLECTIONS prefix="<p style='margin-left: 10px;'><em>The record appears in these collections:</em><br />" suffix="</p>">
-</div>

@@ -1,0 +1,69 @@
+<footer id="footer" >
+  <div class="container">
+    <div class="row">
+      <div class="span2">
+        {%- if footermenu_left -%}
+        <ul>
+        {%- for item in footermenu_left|sort(attribute='order') recursive -%}
+        {%- if item.children -%}
+          <li>
+            <a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a>
+            <ul >{{ loop(item.children.values()|sort(attribute='order')) }}</ul>
+          </li>
+        {%- else -%}
+          <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+        {%- endif -%}
+        {%- endfor -%}
+        </ul>
+        {%- endif -%}
+      </div>
+      <div class="span2">
+        {%- if footermenu_right -%}
+        <ul>
+        {%- for item in footermenu_right|sort(attribute='order') recursive -%}
+        {%- if item.children -%}
+          <li>
+            <a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a>
+            <ul >{{ loop(item.children.values()|sort(attribute='order')) }}</ul>
+          </li>
+        {%- else -%}
+          <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+        {%- endif -%}
+        {%- endfor -%}
+        </ul>
+        {%- endif -%}
+      </div>
+      <div class="span2 offset1">
+        <p><small>{{ _("Powered by") }}:</small></p>
+        <a href="http://invenio-software.org"><img src="{{ url_for('static', filename='img/logo_white.png') }}" width="100px" /></a>
+      </div>
+      <div class="span5"><span class="pull-right partners">
+        <a href="http://www.openaire.eu"><img src="{{ url_for('static', filename='img/openaire.png') }}" height="60px" /></a>
+        <a href="http://cern.ch"><img src="{{ url_for('static', filename='img/cern.png') }}" height="60px" /></a>
+        <a href="http://cordis.europa.eu/projects/rcn/100079_en.html"><img src="{{ url_for('static', filename='img/fp7.png') }}" height="60px"/></a>
+        <a href="http://cordis.europa.eu/fp7/ict/e-infrastructure/"><img src="{{ url_for('static', filename='img/e-infra.png') }}" height="60px" /></a></span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="span12" style="text-align: center;">
+        <p><small>
+          {%- for item in footermenu_bottom|sort(attribute='order') recursive -%}<a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a>{% if not loop.last%} | {% endif %}{%- endfor -%}
+      </div>
+    </div>
+  </div>
+</footer>
+{#
+  v{{ config.CFG_VERSION }}
+
+{{ config["CFG_SITE_NAME_INTL"][g.ln] }}
+
+{% if lastupdated %}
+      {{ _("Last updated") }}: {{ lastupdated|invenio_format_date }}
+  {% endif %}
+  {% if config.CFG_LANGUAGE_LIST_LONG %}
+          {{ _("This site is also available in the following languages:") }} <br />
+          {% for (lang, lang_namelong) in config.CFG_LANGUAGE_LIST_LONG %}
+              &nbsp; <a href="?ln={{ lang }}" class="langinfo">{{ lang_namelong|safe }}</a>
+          {% endfor %}
+      {% endif %}
+#}

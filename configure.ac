@@ -91,6 +91,8 @@ AC_CONFIG_FILES([config.nice  \
      bibedit/etc/Makefile \
      bibformat/Makefile \
      bibformat/lib/Makefile \
+     bibformat/etc/Makefile \
+     bibformat/etc/templates/Makefile \
      bibformat/lib/bibformat_elements/Makefile \
      bibformat/output_formats/Makefile \
      bibformat/format_templates/Makefile \
@@ -100,19 +102,28 @@ AC_CONFIG_FILES([config.nice  \
      miscutil/Makefile \
      miscutil/lib/Makefile \
      openaire/js/Makefile \
+     openaire/etc/Makefile \
+     openaire/etc/templates/Makefile \
      openaire/sql/Makefile \
      openaire/Makefile \
      openaire/lib/Makefile \
      openaire/tpl/Makefile \
      openaire/upgrades/Makefile \
+     websearch/Makefile \
+     websearch/etc/Makefile \
+     websearch/etc/templates/Makefile \
      websession/Makefile \
      websession/lib/Makefile \
      webstyle/js/Makefile \
      webstyle/css/Makefile \
+     webstyle/css/images/Makefile \
      webstyle/Makefile \
      webstyle/lib/Makefile \
+     webstyle/font/Makefile \
      webstyle/img/Makefile \
      webstyle/flash/Makefile \
+     webstyle/etc/Makefile \
+     webstyle/etc/templates/Makefile \
      ])
 
 ## Finally, write output files:

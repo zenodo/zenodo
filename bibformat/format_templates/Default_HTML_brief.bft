@@ -1,27 +1,18 @@
 <name>Default HTML brief</name>
-<description>Brief HTML format.</description>
+<description></description>
 
-<strong><BFE_TITLE_BRIEF highlight="no"/></strong>
-<BFE_AUTHORS limit="4" prefix=" / " extension=" ;<em> et al</em> " highlight="no"/>
-
-<BFE_ADDITIONAL_REPORT_NUMBERS
-prefix = '<small class="quicknote"> ['
-suffix="]</small> "
-separator="] [" link="no"/>
-
-<BFE_PRIMARY_REPORT_NUMBER
-prefix = '<small class="quicknote"> ['
-suffix="]</small> " />
-
-<BFE_ABSTRACT limit="1" prefix="<br /><small>" suffix="</small>"
-highlight="no" contextual="no"/>
-
-<BFE_FIELD tag="536__a" prefix="<small>", instances_separator=', ' suffix="</small>" />
-
-<BFE_FIELD tag="542__l" prefix="<small>" suffix="</small>" />
-<BFE_PAGINATION prefix="<small>(" suffix=" pages)</small>" default="" escape="" />
-
-<BFE_PUBLI_INFO prefix="<br /><small>Published in <strong>" suffix="</strong></small>" />
-<BFE_DOI prefix="<small>" suffix="</small>" />
-
-<BFE_FULLTEXT prefix='<br /><small>' style="note" show_icons="yes" suffix="</small>" />
+<div class="media htmlbrief">
+    <a class="pull-left" href="<BFE_RECORD_URL />">
+        <img class="media-object img-rounded" data-src="holder.js/90x125"/>
+        <BFE_OPENAIRE_ALTMETRIC badgetype='donut' popover='left' no_script='1' prefix="<br>" />
+    </a>
+    <div class="media-body">
+        <span class="label label-info"><BFE_CREATION_DATE date_format="%d %M %Y" /></span>
+        <BFE_OPENAIRE_PUBTYPE as_label="1" />
+        <BFE_OPENAIRE_ACCESS_RIGHTS as_label="1" />
+        <br/>
+        <h4 class="media-heading muted_a"><a href="<BFE_RECORD_URL />"><BFE_TITLE_BRIEF highlight="no"/></a></h4>
+        <p><BFE_AUTHORS limit="4" extension="; <em> et al</em> " highlight="no"/></p>
+        <p class="muted_a"><a href="<BFE_RECORD_URL />"><BFE_ABSTRACT limit="1" highlight="no" contextual="no" /></a></p>
+    </div>
+</div>

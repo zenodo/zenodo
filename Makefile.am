@@ -20,7 +20,7 @@
 confignicedir = $(sysconfdir)/build
 confignice_SCRIPTS=config.nice
 
-SUBDIRS = bibedit bibformat bibsched miscutil openaire websession webstyle
+SUBDIRS = bibedit bibformat bibsched miscutil openaire websearch websession webstyle
 
 EXTRA_DIST = config.nice.in config.rpath
 

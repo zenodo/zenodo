@@ -1,0 +1,144 @@
+{% from "_formhelpers.html" import render_filter_form with context %}
+{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form  with context %}
+{% extends "page.html" %}
+
+{% set title = None %}
+
+{%- set portalboxes = dict() -%}
+{%- for k,l in collection.portalboxes_ln|groupby('position') -%}
+  {%- do portalboxes.update({k:l}) -%}
+{%- endfor -%}
+
+
+{% block title %}{{ portalboxes.tp }}{{ super() }}{{ portalboxes.te }}{% endblock %}
+
+
+
+{% macro collection_records(collection) %}
+
+{{ search_form(collection) }}
+
+<div class="row websearch">
+  <div class="span8">
+    <div class="container">
+      <div class="row">
+        <div class="span4"><h1>Recent</h1></div>
+        <div class="span4">
+          <div class="btn-group pull-right">
+            <button class="btn active"><i class="icon-time"></i> Recent</button>
+            <button class="btn"><i class="icon-eye-open"></i> Viewed</button>
+            <button class="btn"><i class="icon-share"></i> Cited</button>
+          </div>
+        </div>
+      </div>
+      {% if collection.is_restricted %} 
+      <div class="row">
+        <div class="span8">
+          <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
+        </div>
+      </div>        
+      {% else %}
+        {% if collection.reclist %}
+        {% for recid in collection.reclist[-10:]|reverse %}
+          <div class="row">
+            <div class="span8">
+              {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+              {% if not loop.last %}<hr />{% endif %}
+            </div>
+          </div>
+        {% endfor %}
+        {% endif %}
+      {% endif %}
+    </div>
+  </div>
+  <div class="span4">
+      <div class="well">
+        <button class="btn btn-warning btn-large signup pull-right">Sign Up</button>
+        <h4>New to Zenodo?</h4>
+        <ul>
+          <li><strong>Share or publish :</strong> We give a DOI to everything</li>
+          <li><strong>Use:</strong> Dedicated to Open Access</li>
+          <li><strong>Funding:</strong> We send your result to funding agencies</li>
+          <li><strong>Curation:</strong> ...</li>
+        </ul>
+      </div>
+
+      {# portalboxes left top is not supported #}
+      {{ portalbox_sidebar(portalboxes.rt, class="well") }}
+  </div>
+</div>
+
+
+  
+
+
+
+
+
+
+
+  {#
+
+
+<p>
+                  <a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">
+                    {{ _("View") }}
+                  </a>
+                   -
+                  <a href="{{ url_for('.search', p="recid:%d" % recid, rm='wrd', ln=ln) }}">
+                    {{ _("Similar records") }}
+                  </a>
+</p>
+
+{% if collection.collection_children_r %}
+      <div class="span{{ '4' if collection.collection_children_v else '8' }} collection clearfix">
+      <h4>{{ _("Narrow by collections") }}</h4>
+        {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
+      </div>
+  {% else %}
+      <div class="span{{ '4' if collection.collection_children_v else '8' }}">
+      </div>
+  {% endif %}
+
+
+  {{ portalbox_sidebar(portalboxes.lt, class="span2") }}
+
+    {% if collection.collection_children_v %}
+    <div class="span4 collection clearfix">
+      <h4>{{ _("Focus on") }}</h4>
+      {{ collection_tree(collection.collection_children_v, limit=2, class="nav nav-list clearfix") }}
+
+      {{ search_also(collection.externalcollections_2) }}
+    </div>
+  {% elif collection.externalcollections_2 %}
+      <div class="span2">
+        {{ search_also(collection.externalcollections_2) }}
+      </div>
+  {% endif %}
+
+  
+
+  #}
+{% endmacro %}
+
+
+
+{% block body %}
+  {% if collection.is_restricted %}
+    {{ collection_records(collection) }}
+  {% else %}
+    {% dyncache 24*60*60, collection.name %}
+      {{ collection_records(collection) }}
+    {% endcache %}
+  {% endif %}
+{% endblock %}
+
+
+
+{% block javascript %}
+  <script>
+  (function($) {
+    $('[rel=tooltip]').tooltip();
+  })(jQuery);
+  </script>
+{% endblock javascript %}

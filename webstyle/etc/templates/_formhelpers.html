@@ -1,0 +1,129 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{#
+## See http://flask.pocoo.org/docs/patterns/wtforms/
+#}
+{% macro render_field(field, show_error_list=True) %}
+  {%- if field.name == "csrf_token" or field.type == 'HiddenField' -%}
+  {{ field(**kwargs)|safe }}
+  {%- else -%}
+  <div class="control-group {% if show_error_list and field.errors %} error{% endif %}">
+    {{ field.label(class="control-label") }}
+    <div class="controls">
+    {{ field(**kwargs)|safe }}
+    {% if show_error_list and field.errors %}
+      {% for error in field.errors %}
+      <span class="help-inline">{{ error }}</span>
+      {% endfor %}
+    {% endif %}
+    </div>
+  </div>
+  {%- endif -%}
+{% endmacro %}
+
+
+{#
+## See https://github.com/sublee/flask-autoindex/blob/master/flaskext/autoindex/templates/__autoindex__/macros.html
+#}
+{% macro th(key, label, args='', colspan=1) %}
+  <th class="{{ key }}" colspan="{{ colspan }}">
+    {% set sort_by = request.args.get('sort_by') %}
+    {% set order = request.args.get('order', 'asc') %}
+    {%- if sort_by == key and order == 'asc' -%}
+      <a href="?sort_by={{ key }}&amp;order=desc{{ args }}">{{ label }}</a>
+    {%- else -%}
+      <a href="?sort_by={{ key }}{{ args }}">{{ label }}</a>
+    {%- endif -%}
+    {%- if sort_by == key -%}
+      {%- if order == 'asc' -%}
+        <span>&nbsp;<small>v</small></span>
+      {%- elif order == 'desc' -%}
+        <span>&nbsp;&#94;</span>
+      {%- endif -%}
+    {%- endif -%}
+  </th>
+{% endmacro %}
+
+{#
+## Field input wrapper.
+#}
+{% macro _filter_element(field) %}
+  <div class="input-append filter_element">
+    {{ field }}<span class="add-on remove-field" onclick="$(this).parent().remove()">
+      <i class="icon-minus"></i>
+    </span>
+  </div>
+{% endmacro %}
+
+{#
+## Renders multiple input fields and clickable (jQuery)
+## elements for dynamic field manipulation.
+#}
+{% macro filter_field(field) %}
+<div class="control-group">
+  {{ field.label(class="control-label") }}
+  <div class="controls">
+    <div class="span6 paste">
+    {% if field.raw_data %}
+    {% for i in range(field.raw_data|count) %}
+      {{ _filter_element(field) }}
+    {% endfor %}
+    {% else %}
+    {{ _filter_element(field) }}
+    {% endif %}
+    </div>
+    <span class="pull-right btn btn-primary add-field" onclick="$('#field_copy_{{ field.id }}').children().clone().appendTo($(this).siblings('.paste'));">
+      <i class="icon-plus icon-white"></i>
+    </span>
+  </div>
+</div>
+{% endmacro %}
+
+{% macro filter_copy_element(field) %}
+  <div id="field_copy_{{ field.id }}" class="copy" style="display:none;">
+    {{ _filter_element(field) }}
+  </div>
+{% endmacro %}
+
+{% macro render_filter_form(form) %}
+<form {{ kwargs|xmlattr }}>
+  {{ form.csrf_token }}
+  {{ form.sort_by }}
+  {{ form.order }}
+  <fieldset>
+  <legend>{{ _("Filter") }}</legend>
+  {% for field in form %}
+    {% if not field.name in ['csrf_token', 'sort_by', 'order'] %}
+      {{ filter_field(field) }}
+    {% endif %}
+  {% endfor %}
+  <hr/>
+  <div class="pull-right">
+    <input type="submit" class="btn btn-primary"  value="{{ _("Filter") }}" />
+    <input type="reset" class="btn" value="{{ _("Reset") }}" />
+  </div>
+  </fieldset>
+</form>
+  {% for field in form %}
+    {% if not field.name in ['csrf', 'sort_by', 'order'] %}
+      {{ filter_copy_element(field) }}
+    {% endif %}
+  {% endfor %}
+{% endmacro %}
+
