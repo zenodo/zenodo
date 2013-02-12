@@ -26,6 +26,7 @@
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
+  {%- js 'js/jquery.min.js' -%}
   {%- js 'js/bootstrap.min.js' -%}
   {%- js 'js/holder.js' -%}
   {%- js 'js/jquery.tokeninput.js' -%}
@@ -103,7 +104,6 @@
     {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
   </div>
   {%- include 'footer.html' -%}
-  <script src="http://code.jquery.com/jquery-latest.js"></script>
   {% assets get_js_bundle() %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
   <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
   {% block javascript %}{% endblock javascript %}
