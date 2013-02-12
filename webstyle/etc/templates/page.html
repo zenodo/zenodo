@@ -41,11 +41,11 @@
   {%- assets get_css_bundle() -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {%- endassets -%}
-  <link href='http://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
+  <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
   {%- block css -%}{%- endblock css -%}
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
-    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
   <![endif]-->
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
   {% for size in [144, 114, 72, 57] %}{% set icon_name = 'apple-touch-icon-%d-precomposed.png'|format(size) -%}
