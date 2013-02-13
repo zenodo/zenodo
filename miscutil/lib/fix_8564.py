@@ -23,6 +23,11 @@ Run as::
   python fix_8560.py > output.xml
   bibupload -c output.xml
 """
+from invenio.flaskshell import *
+from invenio.search_engine import search_pattern, get_fieldvalues
+from invenio.bibrecord import record_add_field, record_xml_output
+from invenio import config
+
 
 def replace_link_func(from_base, to_base):
     def replace_link(x):
@@ -35,15 +40,8 @@ def replace_link_func(from_base, to_base):
 
 
 def main():
-    from invenio.flaskshell import *
-    from invenio.search_engine import search_pattern, get_fieldvalues
-    from invenio.bibrecord import record_add_field, record_xml_output
-
-    print "TEST"
-    import sys
-    sys.exit(0)
-    from_base = 'http://openaire.cern.ch/'
-    to_base = 'http://localhost:4000/'
+    from_base = 'http://openaire.cern.ch'
+    to_base = config.CFG_SITE_URL
 
     # All records
     recids = search_pattern(p="0->Z", f="8564_u")
