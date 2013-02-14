@@ -103,6 +103,7 @@ AC_CONFIG_FILES([config.nice  \
      miscutil/lib/Makefile \
      openaire/js/Makefile \
      openaire/etc/Makefile \
+     openaire/etc/bibrank/Makefile \
      openaire/etc/templates/Makefile \
      openaire/sql/Makefile \
      openaire/Makefile \
