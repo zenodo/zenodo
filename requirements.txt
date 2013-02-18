@@ -1,2 +1,4 @@
 # Generated from {{reqfile}} and written to {{reqpath}}
 psycopg2
+qrcode==2.4.2
+Pillow==1.1.7

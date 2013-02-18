@@ -2,6 +2,7 @@
 <description></description>
 
 <div class="well">
+  <span class="pull-right" rel="tooltip" title="QR-code for easy mobile access to this page."><BFE_QRCODE width="100" /></span>
   <h4>Share TODO</h4>
   Mendeley, Twitter, Facebook, CiteULike
   <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?url=[CURRENT-PAGE-URL]"><img src="http://www.mendeley.com/graphics/mendeley.png"/></a>
@@ -9,5 +10,5 @@
   <p>
   <BFE_AUTHORS limit="1" extension=" <em>et al</em>" print_links="nanosensors" interactive="no" /> (YEAR). <BFE_TITLE />. <BFE_PUBLI_INFO />. <BFE_DOI />
   </p>
-  <p>Rodríguez Lorenzo <em>et al</em> (2012). Plasmonic nanosensors with inverse sensitivity by means of enzyme-guided crystal growth.</p>
+  
 </div>
