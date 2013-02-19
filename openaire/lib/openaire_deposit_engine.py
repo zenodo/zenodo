@@ -671,7 +671,7 @@ class OpenAIREPublication(object):
         """
         out = ""
         for fulltextid, fulltext in self.fulltexts.iteritems():
-            out += openaire_deposit_templates.tmpl_fulltext_information(filename=fulltext.fullname, publicationid=self.publicationid, download_url=create_url("%s/deposit/getfile" % CFG_SITE_URL, {'publicationid': self.publicationid, 'fileid': fulltextid}), md5=fulltext.checksum, mimetype=fulltext.mime, format=fulltext.format, size=fulltext.size, ln=self.ln)
+            out += openaire_deposit_templates.tmpl_fulltext_information(filename=fulltext.get_full_name(), publicationid=self.publicationid, download_url=create_url("%s/deposit/getfile" % CFG_SITE_URL, {'publicationid': self.publicationid, 'fileid': fulltextid}), md5=fulltext.checksum, mimetype=fulltext.mime, format=fulltext.format, size=fulltext.size, ln=self.ln)
         return out
 
     def get_publication_form(self, current_projectid):
@@ -1041,7 +1041,7 @@ class OpenAIREPublication(object):
         name = user_info.get(
             "external_fullname", user_info.get("nickname", "")).strip()
         record_add_field(
-            rec, '856', ind1='0', subfields=[('f', email), ('y', name)])
+            rec, '856', ind1='0', subfields=[('f', email.encode('utf8')), ('y', name.encode('utf8'))])
 
         # DOI
         if self._metadata.get('doi'):

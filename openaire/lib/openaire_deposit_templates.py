@@ -25,7 +25,7 @@ from cgi import escape as cgi_escape
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_ETCDIR, CFG_VERSION
 from invenio.messages import gettext_set_language
 from invenio.openaire_deposit_config import CFG_OPENAIRE_CC0_PUBLICATION_TYPES, \
-    CFG_OPENAIRE_PUBLICATION_TYPES_KEYS
+    CFG_OPENAIRE_PUBLICATION_TYPES_KEYS, CFG_ACCESS_RIGHTS
 from invenio.textutils import nice_size
 
 CFG_OPENAIRE_PAGE_TEMPLATE = open(
@@ -428,7 +428,6 @@ class Template:
 
         @see: tmpl_generic_options
         """
-        from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
         access_rights = filter(lambda x: x[0] != 'cc0', CFG_ACCESS_RIGHTS(ln))
         _ = gettext_set_language(ln)
 
