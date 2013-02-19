@@ -56,4 +56,3 @@ def customize_app(app):
     #
     del app.config['menubuilder_map']['main'].children['help']
     del app.config['menubuilder_map']['main'].children['personalize']
-    del app.config['menubuilder_map']['main'].children['webdeposit']
