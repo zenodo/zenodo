@@ -19,9 +19,10 @@
 
 
 def format_element(bfo, badgetype='donut', popover='', details='', css_class='', no_script=False):
+    altmetric_id = bfo.field('035__a')
     doi = bfo.field('0247_a')
 
-    if doi:
+    if altmetric_id and doi:
         if popover:
             popover = " data-badge-popover=\"%s\"" % popover
         if details:
