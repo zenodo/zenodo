@@ -2,10 +2,12 @@
 <description></description>
 
 <div class="media htmlbrief">
-    <a class="pull-left" href="<BFE_RECORD_URL />">
-        <img class="media-object img-rounded" data-src="holder.js/90x125"/>
+    <span class="pull-left">
+        <BFE_ICON />
+    </span>
+    <span class="pull-right">
         <BFE_OPENAIRE_ALTMETRIC badgetype='donut' popover='left' no_script='1' prefix="<br>" />
-    </a>
+    </span>
     <div class="media-body">
         <span class="label label-info"><BFE_CREATION_DATE date_format="%d %M %Y" /></span>
         <BFE_OPENAIRE_PUBTYPE as_label="1" />
