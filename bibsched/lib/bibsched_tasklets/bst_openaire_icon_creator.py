@@ -22,7 +22,7 @@
 import os
 from invenio.flaskshell import *
 from invenio.dbquery import run_sql
-from invenio.bibdocfile import BibDoc
+from invenio.bibdocfile import BibDoc, InvenioBibDocFileError
 from invenio.websubmit_icon_creator import create_icon, \
     InvenioWebSubmitIconCreatorError
 from invenio.errorlib import register_exception
@@ -66,8 +66,13 @@ def bst_openaire_icon_creator():
                                            (file_path, str(e)),
                                            alert_admin=False)
 
-                    if os.path.exists(icon_path):
-                        d.add_icon(icon_path)
+                    try:
+                        if os.path.exists(icon_path):
+                            d.add_icon(icon_path)
+                    except InvenioBibDocFileError, e:
+                        register_exception(prefix='Icon %s for file %s could not be added to document: %s' % \
+                                           (icon_path, f, str(e)),
+                                           alert_admin=False)
 
 
 if __name__ == '__main__':
