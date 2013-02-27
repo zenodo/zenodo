@@ -19,7 +19,7 @@
 {#
 ## See http://flask.pocoo.org/docs/patterns/wtforms/
 #}
-{% macro render_field(field, show_error_list=True) %}
+{% macro render_field(field, show_error_list=True, show_description=True) %}
   {%- if field.name == "csrf_token" or field.type == 'HiddenField' -%}
   {{ field(**kwargs)|safe }}
   {%- else -%}
@@ -27,6 +27,9 @@
     {{ field.label(class="control-label") }}
     <div class="controls">
     {{ field(**kwargs)|safe }}
+    {% if show_description and field.description %}
+      <div class="help"><small>{{ field.description }}</small></div>
+    {% endif %}
     {% if show_error_list and field.errors %}
       {% for error in field.errors %}
       <span class="help-inline">{{ error }}</span>
