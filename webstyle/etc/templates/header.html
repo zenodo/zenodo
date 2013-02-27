@@ -4,9 +4,9 @@
       <div class="container">
         <div class="row">
           <div class="span3">
-            <a href="{{ url_for('search.index') }}"><img src="{{ url_for('static', filename='img/zenodo.png') }}" style="padding-top: 80px;" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"/></a>
+            <a href="{{ url_for('search.index') }}"><img id="logoimg" src="{{ url_for('static', filename='img/zenodo.png') }}" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"/></a>
           </div>
-          <div class="span9 pull-right">
+          <div class="span9 pull-right hidden-phone">
             <h1 style="padding-top: 70px; color: #00488c; font-size: 60px; line-height: 60px; text-align:right;">Research. Shared.</h1>
           </div>
         </div>
@@ -31,8 +31,8 @@
                 <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}" />
                 {%- endif %}
                 <input id="remember" name="remember" type="hidden" value="y">
-                <input name="nickname" type="text" class="input-small" placeholder="{{ _("Email") }}" />
-                <input name="password" type="password" class="input-small" placeholder="{{ _("Password") }}" />
+                <input name="nickname" type="text" class="input-small hidden-phone" placeholder="{{ _("Email") }}" />
+                <input name="password" type="password" class="input-small hidden-phone" placeholder="{{ _("Password") }}" />
                 <button name="submit" type="submit" class="btn">{{ _("Sign in") }}</button>
                 
               {% else %}

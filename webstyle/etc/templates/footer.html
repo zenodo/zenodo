@@ -1,5 +1,5 @@
 <footer id="footer" >
-  <div class="container">
+  <div class="container phone-margin">
     <div class="row">
       <div class="span2">
         {%- if footermenu_left -%}
@@ -33,11 +33,11 @@
         </ul>
         {%- endif -%}
       </div>
-      <div class="span2 offset1">
+      <div class="span2 offset1 hidden-phone">
         <p><small>{{ _("Powered by") }}:</small></p>
         <a href="http://invenio-software.org"><img src="{{ url_for('static', filename='img/logo_white.png') }}" width="100px" /></a>
       </div>
-      <div class="span5"><span class="pull-right partners">
+      <div class="span5"><span class="pull-right partners hidden-phone">
         <a href="http://www.openaire.eu"><img src="{{ url_for('static', filename='img/openaire.png') }}" height="60px" /></a>
         <a href="http://cern.ch"><img src="{{ url_for('static', filename='img/cern.png') }}" height="60px" /></a>
         <a href="http://cordis.europa.eu/projects/rcn/100079_en.html"><img src="{{ url_for('static', filename='img/fp7.png') }}" height="60px"/></a>

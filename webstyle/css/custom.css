@@ -1,3 +1,8 @@
+#logoimg {
+    padding-top: 80px;
+}
+
+
 .rmlink {
   color: #000;
 }
@@ -280,3 +285,40 @@ h1, h2, h3 {
 }
 
 .comments hr { margin: 0px;}
+
+
+.altmetric-embed {
+    padding-left: 20px;
+}
+
+.altmetric-popover-content {
+    background-color: transparent!important;
+}
+
+/* Adjust for phones */
+@media (max-width: 767px) {
+    body {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    #logoimg {
+        padding-left: 20px;
+    }
+
+    .phone-margin {
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+
+    /* Wrapper for page content to push down footer */
+    #wrap {
+      margin: 0 auto -350px;
+    }
+
+    /* Set the fixed height of the footer here */
+    #push,
+    #footer {
+      height: 350px;
+    }
+}

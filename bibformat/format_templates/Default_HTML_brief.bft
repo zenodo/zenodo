@@ -2,10 +2,10 @@
 <description></description>
 
 <div class="media htmlbrief">
-    <span class="pull-left">
+    <span class="pull-left hidden-phone">
         <BFE_ICON />
     </span>
-    <span class="pull-right">
+    <span class="pull-right hidden-phone">
         <BFE_OPENAIRE_ALTMETRIC badgetype='donut' popover='left' no_script='1' prefix="<br>" />
     </span>
     <div class="media-body">

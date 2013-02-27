@@ -56,7 +56,7 @@
 <body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}">
   <div id="wrap">
     {% block headerbox %}{% include 'header.html' %}{% endblock headerbox %}
-    <div class="container">
+    <div class="container phone-margin">
       {% block breadcrumb %}{% if breadcrumbs|length > 1 %}
       <div class="row">
         <div class="span12">
@@ -100,7 +100,7 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container phone-margin">
     {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
   </div>
   {%- include 'footer.html' -%}
