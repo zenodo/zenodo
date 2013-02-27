@@ -22,7 +22,7 @@ from invenio.bibdocfile import BibRecDocs
 from invenio.config import CFG_SITE_URL
 
 template_icon = Template("""
-<a href="{{CFG_SITE_URL}}/record/{{bfo.recID}}">
+<a href="/record/{{bfo.recID}}">
 <img class="media-object img-rounded" width="90" src="{{icon.get_url()}}" />
 </a>
 """)
