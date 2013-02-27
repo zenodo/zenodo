@@ -105,8 +105,8 @@
     
     {%- if current_user.is_guest -%}
     <div class="well">
-      <a href="{{ url_for("openaire.signup") }}" class="btn btn-warning btn-large signup pull-right">{{ _("Sign Up") }}</a>
-      <h4>{{ _("New to Zenodo?") }}</h4>
+      <a href="{{ url_for("youraccount.register") }}" class="btn btn-warning btn-large signup pull-right">{{ _("Sign Up") }}</a>
+      <h4>{{ _("New to ZENODO?") }}</h4>
       <p>{{ _("Read more about") }} <a href="{{ url_for("openaire.features") }}">{{ _("features and benefits") }}</a>.</p>
     </div>
     {%- endif -%}
