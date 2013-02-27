@@ -19,7 +19,7 @@
 """BibFormat element - QR code generator
 """
 
-from invenio.config import CFG_SITE_URL, CFG_WEBDIR, CFG_SITE_RECORD
+from invenio.config import CFG_SITE_SECURE_URL, CFG_WEBDIR, CFG_SITE_RECORD
 import os
 
 try:
@@ -56,12 +56,14 @@ def format_element(bfo, width="100"):
     if not HAS_QR:
         return ""
 
+    width = int(width)
+
     bibrec_id = bfo.control_field("001")
-    link = "%s/%s/%s" % (CFG_SITE_URL, CFG_SITE_RECORD, bibrec_id)
+    link = "%s/%s/%s" % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, bibrec_id)
     hash_val = _get_record_hash(link)
 
     filename = "%s_%s.png" % (bibrec_id, hash_val)
-    filename_url = "%s/img/qrcodes/%s" % (CFG_SITE_URL, filename)
+    filename_url = "/img/qrcodes/%s" % filename
     filename_path = os.path.join(CFG_WEBDIR, "img/qrcodes/%s" % filename)
 
     if not os.path.exists(filename_path):
@@ -69,6 +71,8 @@ def format_element(bfo, width="100"):
             os.makedirs(os.path.dirname(filename_path))
 
         img = qrcode.make(link)
+        img._img = img._img.convert("RGBA")
+        img._img = img._img.resize((width, width), Image.ANTIALIAS)
         img.save(filename_path, "PNG")
 
     return """<img src="%s" width="%s" alt="QR-code for easy mobile access" />""" % (filename_url, width)
