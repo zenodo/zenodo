@@ -17,23 +17,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-import cgi
-import time
-
-from invenio.openaire_deposit_engine import CFG_ACCESS_RIGHTS
-from invenio.messages import gettext_set_language
 
 def format_element(bfo):
     """
-    Generate a line similar to below (used for chapters to include the book 
+    Generate a line similar to below (used for chapters to include the book
     they are part of):
-    
+
     Book title. Place: Publisher (Year). pages. ISBN: XXXXX
     """
-    
-    ln = bfo.lang
-    _ = gettext_set_language(ln)
-
     book = filter(lambda x: 'bookpart' == x.get('n', ''), bfo.fields('773__'))
 
     if len(book) != 1:
@@ -48,7 +39,7 @@ def format_element(bfo):
     isbn = book.get('z', '')
 
     ret = ["%(title)s"]
-    
+
     if place and publisher:
         ret.append("%(place)s: %(publisher)s (%(year)s)")
     elif place:

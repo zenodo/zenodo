@@ -1,0 +1,4 @@
+<name>Default HTML References</name>
+<description>Outputs the references of a record</description>
+
+<BFE_REFERENCES default="<em>No references were found for this record.</em>" />

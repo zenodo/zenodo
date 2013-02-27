@@ -1,0 +1,129 @@
+{% extends "page.html" %}
+
+{% block title %}{% endblock %} 
+
+{% block body %}
+<div class="row">
+    <div id="file_container" class="span8">
+        {% if recid %}
+        <div class="alert alert-info">
+            <strong>Submitted</strong> Currently you can not edit already submitted 
+            uploads. We are working on making this possible. In the mean time,
+            drop us an email on <a href="mailto:openaire-support@cern.ch">openaire-support@cern.ch</a>
+        </div>
+        <div class="well" style="text-align: center;">
+            <a href="{{config.CFG_SITE_URL}}/record/{{recid}}">{{config.CFG_SITE_URL}}/record/{{recid}}</a>
+        </div>
+        {% else %}
+        <div class="well">
+            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash"></i> Delete</a>
+            <span class="pull-right">
+                <a class="btn"><i class="icon-file"></i> Save</a>
+                <a class="btn btn-primary"><i class="icon-ok"></i> Submit</a>
+            </span>
+        </div>
+        {% endif %}
+        {% if recid %}
+        
+        {% else %}
+        <h1>New upload</h1>
+        <div class="alert alert-danger" align="center">
+            TODO: FORM
+        </div>
+        {#rendered_form|safe#}
+        <div class="well">
+            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash"></i> Delete</a>
+            <span class="pull-right">
+                <a class="btn"><i class="icon-file"></i> Save</a>
+                <a class="btn btn-primary"><i class="icon-ok"></i> Submit</a>
+            </span>
+        </div>
+        {% endif %}
+        {% if pub.fulltexts %}
+        <div id="selected-files" class="well" >
+        <span class="pull-right"><a class="btn btn-mini" id="pickfiles">Choose files...</a> <a class="btn btn-success btn-mini disabled" id="uploadfiles"><i class="icon-upload"></i> Start upload</a></span>
+        <h4>Files</h4>
+        <table class="table table-striped" id="filelist">
+        <thead>
+            <tr><th>Filename</th><th>Size</th><td></td><td></td></tr>
+        </thead>
+        <tbody>
+            {% for file_id, bdf in pub.fulltexts.items() %}
+            <tr><td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}">{{bdf.get_full_name()}}</a></td><td>{{bdf.get_size()|filesize}}</td><td width="30%"></td><td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}/delete/" class="rmlink" rel="tooltip" title="Delete file"><i class="icon-trash"></i></a></td></tr>
+            {% endfor %}
+        </tbody>
+        </table>
+        <div id="upload-errors"></div>
+        </div>
+        {% endif %}
+    </div>
+    <div class="span4">
+        {% include "openaire_myresearch.html" %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% include "openaire_uploader.html" %}
+<script type="text/javascript">// <![CDATA[
+    jQuery(document).ready(function(){
+        /* Show/hide access rights */
+        jQuery('#access_rights_%(id)s').bind('change', {
+            from_id: '#access_rights_%(id)s',
+            to_id: '#embargo_date_container_%(id)s'
+        }, update_embargo_date);
+        jQuery('#access_rights_%(id)s').trigger('change');
+        
+        /* Show/hide original language box */
+        jQuery('#language_%(id)s').bind('change', {
+            from_id: '#language_%(id)s',
+            to_id: '#original_language_container_%(id)s'
+        }, update_language);
+        update_language({
+            data: {
+                from_id: '#language_%(id)s',
+                to_id: '#original_language_container_%(id)s'
+            }
+        });
+        
+        /* Show/hide specific information box */
+        jQuery('#publication_type_%(id)s').bind('change', {
+            from_id: '#publication_type_%(id)s',
+            to_class_prefix: '.typebox_%(id)s_',
+            to_class: '.typebox_%(id)s'
+        }, update_specific_information);
+        
+        jQuery('#publication_type_%(id)s').trigger('change');
+        
+        
+        jQuery('#save_%(id)s').click(function(event){
+            var element = this;
+            ajaxGateway(element, 'save');
+            event.preventDefault();
+            return 0;
+        });
+        jQuery('#submit_%(id)s').click(function(event){
+            var element = this;
+            ajaxGateway(element, 'submit');
+            event.preventDefault();
+            return 0;
+        });
+        jQuery('#remove_%(id)s').click(function(){
+            return confirm("%(remove_confirm)s");
+        });
+        jQuery('#edit_metadata_%(id)s,#status_%(id)s').click(function(){
+            jQuery('#body_%(id)s').toggle();
+            if(jQuery('#status_msg_%(id)s').html() == "%(collapse_label)s") {
+                jQuery('#status_msg_%(id)s').html("%(expand_label)s")
+            } else {
+                jQuery('#status_msg_%(id)s').html("%(collapse_label)s")
+            }
+            return false;
+        });
+        jQuery('#journal_title_%(id)s').autocomplete({
+            source: "%(site)s/kb/export?kbname=journal_name&amp;format=jquery&amp;ln=%(ln)s&amp;limit=100"
+        });
+//         jQuery('#body_%(id)s').hide();
+    });
+// ]]></script>
+{% endblock %}

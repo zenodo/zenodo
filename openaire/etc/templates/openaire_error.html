@@ -1,0 +1,20 @@
+{% extends "page.html" %}
+
+{% block title %}{% endblock %} 
+
+{% block body %}
+<div class="row">
+    <div class=" offset2 span8">
+        <div class="hero-unit">
+            <h1>Oops! <i class="icon-wrench pull-right"></i> </h1>
+            <p>This was not supposed to happen...</p>
+        {% if error_class == "ValueError" %}
+            <p>{{error}}</p>
+        {% else %}
+            <p>Thanks for noticing this error, </p>
+        {% endif %}
+            <div align="center"><a href="http://cds.cern.ch/record/41330" rel="tooltip" tooltip="Click to learn more about the image"><img class="img-polaroid" src="https://mediastream.cern.ch/MediaArchive/Photo/Public/1971/7101121/7101121/7101121-A5-at-72-dpi.jpg" /></a><br /><small>Image copyright &copy; CERN</small></div>
+        </div>
+    </div>
+</div>
+{% endblock %}

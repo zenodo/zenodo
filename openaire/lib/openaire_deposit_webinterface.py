@@ -37,51 +37,154 @@ from invenio.openaire_deposit_engine import page, get_project_information, \
     get_all_projectsids, get_favourite_authorships_for_user, \
     get_all_publications_for_project, upload_file, get_openaire_style, \
     get_favourite_keywords_for_user, get_project_acronym, UploadError, \
-    upload_url
+    upload_url, get_exisiting_publications_for_uid
 from invenio.openaire_deposit_utils import simple_metadata2namespaced_metadata
 from invenio.session import get_session
-from invenio.urlutils import create_url
 from invenio.urlutils import redirect_to_url, make_canonical_urlargd
 from invenio.webinterface_handler import wash_urlargd, WebInterfaceDirectory
-from invenio.webinterface_handler_config import SERVER_RETURN, HTTP_BAD_REQUEST, HTTP_UNAUTHORIZED
 from invenio.webuser import collect_user_info, session_param_get, session_param_set
 import invenio.template
+from flask import render_template, abort, flash, redirect
 
 openaire_deposit_templates = invenio.template.load('openaire_deposit')
 
 
 class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
     _exports = [
-        '', 'uploadifybackend', 'sandbox', 'checkmetadata',
+        'sandbox', 'checkmetadata',
         'ajaxgateway', 'checksinglefield', 'getfile',
-        'authorships', 'keywords', 'portalproxy'
+        'authorships', 'keywords', 'portalproxy',
     ]
 
-    def portalproxy(self, req, form):
-        """
-        """
-        argd_query = wash_urlargd(form, {
-            'option': (str, ''),
-            'tmpl': (str, ''),
-            'type': (str, ''),
-            'ordering': (str, ''),
-            'searchphrase': (str, ''),
-            'Itemid': (int, 0)
+    def edit(self, req, form):
+        argd = wash_urlargd(form, {
+            'projectid': (int, -1),
+            #'delete': (str, ''),
+            'id': (str, ''),
+            'a': (str, 'edit'),
+            #'linkproject': (int, -1),
+            #'unlinkproject': (int, -1),
+            #style': (str, None),
+            #'upload': (str, ''),
+            #'dropbox': (str, '')
         })
-        argd_post = wash_urlargd(form, {
-            'searchword': (str, '')
+
+        _ = gettext_set_language(argd['ln'])
+
+        # Check if user is authorized to deposit publications
+        user_info = collect_user_info(req)
+        auth_code, auth_message = acc_authorize_action(
+            user_info, 'submit', doctype='OpenAIRE')
+        if auth_code:
+            if user_info['guest'] == '1':
+                return redirect_to_url(req, "%s/youraccount/login%s" % (
+                    CFG_SITE_SECURE_URL,
+                                       make_canonical_urlargd({
+                                                              'referer': "%s%s" % (
+                                                              CFG_SITE_URL,
+                                                              req.unparsed_uri),
+                                                              "ln": argd['ln']}, {})))
+            else:
+                return page(req=req, body=_("You are not authorized to use OpenAIRE deposition."), title=_("Authorization failure"), navmenuid="submit")
+
+        # Validate action
+        action = argd['a']
+        if action not in ['edit', 'save', 'submit', 'delete']:
+            abort(404)
+
+        uid = user_info['uid']
+        if not argd['id']:
+            return redirect("/deposit/")
+
+        try:
+            pub = OpenAIREPublication(uid, publicationid=argd['id'])
+            title = pub.metadata.get('title', 'Untitled')
+        except ValueError:
+            abort(404)
+
+        #
+        # Action handling
+        #
+        if action == 'delete':
+            pub.delete()
+            flash("Upload '%s' was deleted." % title, 'info')
+            return redirect('/deposit/')
+        elif action == 'edit':
+            ctx = {
+                'pub': pub,
+                'title': title,
+                'recid': pub.metadata.get('__recid__', None),
+            }
+
+            ctx['rendered_form'] = openaire_deposit_templates.tmpl_form(
+                pub.metadata['__publicationid__'],
+                -1,
+                "",  # projects_information
+                "",  # publication_information
+                "",  # fulltext_information
+                form=None,
+                metadata_status='empty',
+                warnings=None,
+                errors=None,
+                ln='en',
+            )
+
+        #if action == "edit":
+
+        #elif action == "delete":
+        #    pass
+
+
+
+        # if projectid >= 0:
+        #     ## There is a project on which we are working good!
+        #     publications = get_all_publications_for_project(
+        #         uid, projectid, ln=argd['ln'], style=style)
+        #     if argd['publicationid'] in publications:
+        #         if argd['addproject'] in all_project_ids:
+        #             publications[argd['publicationid']
+        #                          ].link_project(argd['linkproject'])
+        #         if argd['delproject'] in all_project_ids:
+        #             publications[argd['publicationid']
+        #                          ].unlink_project(argd['unlinkproject'])
+        #     if argd['delete'] and argd['delete'] in publications:
+        #         ## there was a request to delete a publication
+        #         publications[argd['delete']].delete()
+        #         del publications[argd['delete']]
+
+        #     forms = ""
+        #     submitted_publications = ""
+        #     for index, (publicationid, publication) in enumerate(publications.iteritems()):
+        #         if req.method.upper() == 'POST':
+        #             publication.merge_form(form, ln=argd['ln'])
+        #         if publication.status == 'edited':
+        #             publication.check_metadata()
+        #             publication.check_projects()
+        #             if 'submit_%s' % publicationid in form and not "".join(publication.errors.values()).strip():
+        #                 ## i.e. if the button submit for the corresponding publication has been pressed...
+        #                 publication.upload_record()
+        #         if publication.status in ('initialized', 'edited'):
+        #             forms += publication.get_publication_form(projectid)
+        #         else:
+        #             submitted_publications += publication.get_publication_preview()
+        #     body += openaire_deposit_templates.tmpl_add_publication_data_and_submit(projectid, forms, submitted_publications, project_information=upload_to_project_information, ln=argd['ln'])
+        #     body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid.encode('utf8'), style=style, ln=argd['ln'])
+        # else:
+
+        ctx.update({
+            'myresearch': get_exisiting_publications_for_uid(uid),
         })
-        if argd_query['option'] == 'com_search' and argd_query['tmpl'] == 'raw' and argd_query['type'] == 'json' and argd_post['searchword']:
-            proxy = urllib2.urlopen("%s/index.php?%s" % (CFG_OPENAIRE_PORTAL_URL, urllib.urlencode(argd_query)), urllib.urlencode(argd_post))
-            content = proxy.read()
-            content = json.loads(content)
-            ## HACK to transform relative URLs into full URLs to the Portal
-            if 'results' in content:
-                for elem in content['results']:
-                    if 'url' in elem and elem['url'].startswith('/'):
-                        elem['url'] = CFG_OPENAIRE_PORTAL_URL + elem['url']
-            return json.dumps(content)
-        return ""
+
+        return render_template("openaire_edit.html",
+            req=req,
+            breadcrumbs=[
+                (_('Home'), ''),
+                (_('Upload'), 'deposit'),
+                (title, ''),
+            ],
+            **ctx
+        ).encode('utf8')
+
 
     def index(self, req, form):
         """
@@ -178,6 +281,7 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             upload_to_projectid = projectid
             upload_to_project_information = selected_project
 
+        ctx = {}
         body = ""
         if projectid >= 0:
             ## There is a project on which we are working good!
@@ -213,46 +317,50 @@ class WebInterfaceOpenAIREDepositPages(WebInterfaceDirectory):
             body += openaire_deposit_templates.tmpl_add_publication_data_and_submit(projectid, forms, submitted_publications, project_information=upload_to_project_information, ln=argd['ln'])
             body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid.encode('utf8'), style=style, ln=argd['ln'])
         else:
-            body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid.encode('utf8'), style=style, ln=argd['ln'])
-            projects = [get_project_information(uid, projectid_, deletable=False, ln=argd['ln'], style=style, linked=True) for projectid_ in get_exisiting_projectids_for_uid(user_info['uid']) if projectid_ != projectid]
-            if projects:
-                body += openaire_deposit_templates.tmpl_focus_on_project(
-                    existing_projects=projects, ln=argd['ln'])
+            ctx.update({
+                'myresearch': get_exisiting_publications_for_uid(uid),
+                'upload_to_projectid': upload_to_projectid,
+                'upload_to_project_information': upload_to_project_information,
 
-        title = _('Orphan Repository')
-        return page(body=body, title=title, req=req, project_information=get_project_acronym(projectid), navmenuid="submit")
+            })
 
-    def uploadifybackend(self, req, form):
-        """
-        File upload via Uploadify (flash) backend.
-        """
-        argd = wash_urlargd(
-            form, {'session': (str, ''), 'projectid': (int, -1)})
-        _ = gettext_set_language(argd['ln'])
-        session = argd['session']
-        get_session(req=req, sid=session)
-        user_info = collect_user_info(req)
-        if user_info['guest'] == '1':
-            raise ValueError(_("This session is invalid"))
-        projectid = argd['projectid']
-        if projectid < 0:
-            projectid = 0
-        uid = user_info['uid']
-        upload_file(form, uid, projectid)
-        return "1"
+        return render_template("openaire_index.html",
+            body=body,
+            title=_('Upload'),
+            req=req,
+            project_information=get_project_acronym(projectid),
+            breadcrumbs=[
+                (_('Home'), ''),
+                (_('Upload'), 'deposit'),
+            ],
+            **ctx
+        ).encode('utf8')
 
-    def getfile(self, req, form):
+    def portalproxy(self, req, form):
         """
-        Download file for a submission which is currently in progress.
         """
-        argd = wash_urlargd(
-            form, {'publicationid': (str, ''), 'fileid': (str, '')})
-        uid = collect_user_info(req)['uid']
-        publicationid = argd['publicationid']
-        fileid = argd['fileid']
-        publication = OpenAIREPublication(uid, publicationid, ln=argd['ln'])
-        fulltext = publication.fulltexts[fileid]
-        return fulltext.stream(req)
+        argd_query = wash_urlargd(form, {
+            'option': (str, ''),
+            'tmpl': (str, ''),
+            'type': (str, ''),
+            'ordering': (str, ''),
+            'searchphrase': (str, ''),
+            'Itemid': (int, 0)
+        })
+        argd_post = wash_urlargd(form, {
+            'searchword': (str, '')
+        })
+        if argd_query['option'] == 'com_search' and argd_query['tmpl'] == 'raw' and argd_query['type'] == 'json' and argd_post['searchword']:
+            proxy = urllib2.urlopen("%s/index.php?%s" % (CFG_OPENAIRE_PORTAL_URL, urllib.urlencode(argd_query)), urllib.urlencode(argd_post))
+            content = proxy.read()
+            content = json.loads(content)
+            ## HACK to transform relative URLs into full URLs to the Portal
+            if 'results' in content:
+                for elem in content['results']:
+                    if 'url' in elem and elem['url'].startswith('/'):
+                        elem['url'] = CFG_OPENAIRE_PORTAL_URL + elem['url']
+            return json.dumps(content)
+        return ""
 
     def sandbox(self, req, form):
         """

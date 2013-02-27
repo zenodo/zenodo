@@ -51,8 +51,14 @@ def customize_app(app):
         """
         return nice_size(value)
 
+    @app.template_filter('timefmt')
+    def timefmt_filter(value, format="%d %b %Y, %H:%M"):
+        import time
+        return time.strftime(format, value)
+
     #
     # Removed unwanted invenio menu items
     #
     del app.config['menubuilder_map']['main'].children['help']
     del app.config['menubuilder_map']['main'].children['personalize']
+    #del app.config['menubuilder_map']['main'].children['webdeposit']

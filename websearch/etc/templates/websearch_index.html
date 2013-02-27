@@ -24,7 +24,7 @@
       <div class="row">
         <div class="span4"><h1>Recent</h1></div>
         <div class="span4">
-          <div class="btn-group pull-right">
+          <div class="btn-group pull-right hide">
             <button class="btn active"><i class="icon-time"></i> Recent</button>
             <button class="btn"><i class="icon-eye-open"></i> Viewed</button>
             <button class="btn"><i class="icon-share"></i> Cited</button>
@@ -53,7 +53,7 @@
   </div>
   <div class="span4">
       <div class="well">
-        <button class="btn btn-warning btn-large signup pull-right">Sign Up</button>
+        <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
         <h4>New to Zenodo?</h4>
         <ul>
           <li><strong>Share or publish :</strong> We give a DOI to everything</li>

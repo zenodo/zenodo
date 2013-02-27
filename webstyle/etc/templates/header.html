@@ -1,4 +1,4 @@
-<form action="{{ url_for('youraccount.login') }}" method="POST" class="form-inline">
+<form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('youraccount.login') }}" method="POST" class="form-inline">
   <header class="gradient">
     <div class="container headerbg">
       <div class="container">
@@ -24,8 +24,12 @@
           {%- endif %}
           {%- endfor %}
           <li class="dropdown pull-right">
-              {% if current_user.is_guest %}
-                <input id="referer" name="referer" type="hidden" value="{{ request.url if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else '/' }}" />
+              {%- if current_user.is_guest %}
+                {%- if form and form.referer %}
+                {{ form.referer }}
+                {%- else %}
+                <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}" />
+                {%- endif %}
                 <input id="remember" name="remember" type="hidden" value="y">
                 <input name="nickname" type="text" class="input-small" placeholder="{{ _("Email") }}" />
                 <input name="password" type="password" class="input-small" placeholder="{{ _("Password") }}" />
@@ -36,15 +40,9 @@
                 <ul class="dropdown-menu">
                   <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
                   <li class="divider"></li>
-                  {% if current_user.is_guest %}
-                  <li><a href="{{ url_for('youraccount.login', referer=request.url) }}">
-                    <i class="icon icon-lock"></i> {{ _("Login") }}
-                  </a></li>
-                  {% else %}
                   <li><a href="{{ url_for('youraccount.logout') }}">
                     <i class="icon icon-off"></i> {{ _("Logout") }}
                   </a></li>
-                  {% endif %}
                 </ul>
               {% endif %}
           </li>

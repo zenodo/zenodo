@@ -25,11 +25,9 @@ affiliation_suffix="</small>"
     interactive="yes"
     print_affiliations="no"
 />
-
 <p><BFE_ABSTRACT highlight="yes" /></p>
 
 <BFE_NOTES
     prefix='<div class="alert">'
     suffix='</div>'
 />
-

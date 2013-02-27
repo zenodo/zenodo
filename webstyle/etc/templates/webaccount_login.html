@@ -1,0 +1,76 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% from "_formhelpers.html" import render_field with context %}
+{% extends "page.html" %}
+{% set title = None %}
+
+{% block body %}
+<div class="container">
+  <div class="row">
+    {%- if current_user.is_guest %}
+    <div class="span8">
+        <div class="hero-unit">
+        <h1>New to ZENODO?</h1>
+        <p>&mdash; sign up for a free account to share your research!</p>
+        <p>
+          <ul>
+          <li><strong>Share or publish :</strong> We give a DOI to everything</li>
+          <li><strong>Use:</strong> Dedicated to Open Access</li>
+          <li><strong>Funding:</strong> We send your result to funding agencies</li>
+          <li><strong>Curation:</strong> ...</li>
+        </ul>
+        </p>
+        <p><a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
+        </p>
+        </div>
+    </div>
+    <div class="span4">
+      <div class="well">
+      <legend>{{ _('Please Sign In') }}</legend>
+      <form action="{{ url_for('.login') }}" method="POST">
+      {{ form.referer }}
+      {{ form.nickname(placeholder=_('Username or email'), class_="span3") }}
+      {{ form.password(placeholder=_('Password'), class_="span3") }}
+      <label class="checkbox">
+        {{ form.remember(class_="checkbox") }} {{ form.remember.label.text }}
+      </label>
+      {{ form.submit(class_="btn btn-info btn-block") }}
+      </form>
+      </div>
+    </div>
+    {%- else %}
+    <div class="span8 offset2">
+        <div class="hero-unit">
+        <h1>Hi {{current_user.nickname}}!</h1>
+        <p>Where do you go from here?</p>
+        <p>
+          <div class="row">
+            <div class="offset1 span5"><a href="{{url_for('deposit.index')}}" class="btn btn-large">Upload</a> <small>Share your research!</small></div>
+          </div>
+        </p>
+        <p>
+          <div class="row">
+            <div class="offset1 span5"><a href="/" class="btn btn-large">Search</a> <small>Read or re-use other researchers data and publications.</small></div>
+          </div>
+        </p>
+        </div>
+    </div>
+    {%- endif %}
+</div>
+{% endblock %}

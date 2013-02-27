@@ -1,0 +1,59 @@
+{% extends "page.html" %}
+{% block css %}
+{{super()}}
+<script src="{{url_for('static', filename="js/jquery.min.js")}}"></script>
+{% endblock %}
+
+
+{% block title %}
+{% if title and show_title_p %}
+<div class="row">
+<div class="span12">
+  <div class="page-header"><h1>{{ title }}</h1></div>
+</div>
+</div>
+{% endif %}
+{% endblock title %}
+
+
+{% block breadcrumb %}
+<div class="row">
+<div class="span12">
+  <ul class="breadcrumb">
+    {{navtrailbox|safe}}
+  </ul>
+</div>
+</div>
+{% endblock breadcrumb %}
+
+
+
+{% block body %}
+<div class="row">
+<div class="span12">
+{{pageheaderadd}}
+<div class="pagebody">
+  <div class="pagebodystripeleft">
+    <div class="pageboxlefttop">{{boxlefttop|safe}}</div>
+    <div class="pageboxlefttopadd">{{boxlefttopadd|safe}}</div>
+    <div class="pageboxleftbottomadd">{{boxleftbottomadd|safe}}</div>
+    <div class="pageboxleftbottom">{{boxleftbottom|safe}}</div>
+  </div>
+  <div class="pagebodystriperight">
+    <div class="pageboxrighttop">{{boxrighttop|safe}}</div>
+    <div class="pageboxrighttopadd">{{boxrighttopadd|safe}}</div>
+    <div class="pageboxrightbottomadd">{{boxrightbottomadd|safe}}</div>
+    <div class="pageboxrightbottom">{{boxrightbottom|safe}}</div>
+  </div>
+  <div class="pagebodystripemiddle">
+    {{titleprologue|safe}}
+    {{title|safe}}
+    {{titleepilogue|safe}}
+    {{body|safe}}
+  </div>
+  <div class="clear"></div>
+</div>
+</div>
+</div>
+{{pagefooteradd}}
+{% endblock %}

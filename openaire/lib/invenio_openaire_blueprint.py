@@ -19,39 +19,47 @@
 
 """OpenAIRE Flask Blueprint"""
 from flask import render_template
-from invenio.webinterface_handler_flask_utils import _, InvenioBlueprint
+from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
 
-blueprint = InvenioBlueprint('openaire', __name__,
+blueprint = InvenioBlueprint('invenio_openaire', __name__,
   url_prefix="",
-  #breadcrumbs=[(_('Comments'),
-  #              'webcomment.subscribtions')],
   menubuilder=[
-    ('main.submit', _('Submit'), 'deposit', 1),
+    ('main.deposit', _('Upload old'), 'deposit', 1),
     ('main.getstarted', _('Get started'), '', 2),
-    ('main.getstarted.features', _('Features'), 'openaire.features', 1),
-    ('main.getstarted.deposit_data', _('Deposit data'), 'openaire.deposit_data', 2),
-    ('main.getstarted.use_data', _('Use data'), 'openaire.use_data', 3),
-    ('main.getstarted.faq', _('FAQ'), 'openaire.faq', 4),
-    ('footermenu_left.about', _('About'), 'openaire.about', 1),
-    ('footermenu_left.contact', _('Contact'), 'openaire.contact', 2),
-    ('footermenu_left.policies', _('Policies'), 'openaire.policies', 3),
-    ('footermenu_left.partners', _('Partners'), 'openaire.partners', 4),
-    ('footermenu_right.features', _('Features'), 'openaire.features', 1),
-    ('footermenu_right.deposit_data', _('Deposit data'), 'openaire.deposit_data', 2),
-    ('footermenu_right.use_data', _('Use data'), 'openaire.use_data', 3),
-    ('footermenu_right.faq', _('FAQ'), 'openaire.faq', 4),
-    ('footermenu_right.api', _('API'), 'openaire.api', 5),
-    ('footermenu_bottom.terms', _('Terms of use'), 'openaire.terms', 1),
-    ('footermenu_bottom.privacy_policy', _('Privacy policy'), 'openaire.privacy_policy', 2),
-    ('footermenu_bottom.support', _('Support/Feedback'), 'openaire.support', 3),
+    ('main.getstarted.features', _('Features'), 'invenio_openaire.features', 1),
+    ('main.getstarted.deposit_data', _('Deposit data'), 'invenio_openaire.deposit_data', 2),
+    ('main.getstarted.use_data', _('Use data'), 'invenio_openaire.use_data', 3),
+    ('main.getstarted.faq', _('FAQ'), 'invenio_openaire.faq', 4),
+    ('footermenu_left.about', _('About'), 'invenio_openaire.about', 1),
+    ('footermenu_left.contact', _('Contact'), 'invenio_openaire.contact', 2),
+    ('footermenu_left.policies', _('Policies'), 'invenio_openaire.policies', 3),
+    ('footermenu_left.partners', _('Partners'), 'invenio_openaire.partners', 4),
+    ('footermenu_right.features', _('Features'), 'invenio_openaire.features', 1),
+    ('footermenu_right.deposit_data', _('Deposit data'), 'invenio_openaire.deposit_data', 2),
+    ('footermenu_right.use_data', _('Use data'), 'invenio_openaire.use_data', 3),
+    ('footermenu_right.faq', _('FAQ'), 'invenio_openaire.faq', 4),
+    ('footermenu_right.api', _('API'), 'invenio_openaire.api', 5),
+    ('footermenu_bottom.terms', _('Terms of use'), 'invenio_openaire.terms', 1),
+    ('footermenu_bottom.privacy_policy', _('Privacy policy'), 'invenio_openaire.privacy_policy', 2),
+    ('footermenu_bottom.support', _('Support/Feedback'), 'invenio_openaire.support', 3),
     ]
 )
+
+#
+# Static pages
+#
 
 
 @blueprint.route('/features', methods=['GET', ])
 @blueprint.invenio_set_breadcrumb(_("Features"))
 def features():
     return render_template('openaire_features.html')
+
+
+@blueprint.route('/signup', methods=['GET', ])
+@blueprint.invenio_set_breadcrumb(_("Sign up"))
+def signup():
+    return render_template('openaire_signup.html')
 
 
 @blueprint.route('/use-data', methods=['GET', ])

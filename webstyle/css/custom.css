@@ -1,3 +1,39 @@
+.rmlink {
+  color: #000;
+}
+.rmlink:hover {
+  color: #666;
+  text-decoration: none;
+}
+
+.hero-unit {
+  font-weight: 300;
+}
+
+#upload {
+  background-color: #fff;
+}
+
+.hero-unit h1 {
+  font-weight: 500;
+}
+
+#upload .row-fluid {
+  margin-top: 40px;
+}
+
+#upload #or, #upload #dropbox, #upload #local {
+  text-align: center;
+}
+
+#upload #or {
+  padding-top: 10px;
+}
+
+#upload #dropbox {
+  padding-top: 10px;
+}
+
 .headerbg {
   background-image: url('../img/header.png'); 
   background-repeat: 

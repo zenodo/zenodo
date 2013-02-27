@@ -53,6 +53,7 @@ from cgi import escape
 import copy
 import datetime
 import os
+import stat
 import re
 import shutil
 import sys
@@ -96,7 +97,7 @@ from invenio.textutils import wash_for_xml
 from invenio.urlutils import create_url
 from invenio.webinterface_handler import wash_urlargd
 from invenio.webpage import page as invenio_page
-from invenio.websearch_webcoll import mymkdir
+from invenio.shellutils import mymkdir
 from invenio.websubmit_functions.Report_Number_Generation import create_reference
 from invenio.webuser import session_param_set, session_param_get, \
     collect_user_info, get_email
@@ -426,17 +427,26 @@ def upload_url(form, uid, projectid=0, field='FileURL'):
     publication.add_a_fulltext(uploaded_file, os.path.basename(afileurl))
 
 
-def upload_file(form, uid, projectid=0, field='Filedata'):
+def upload_file(form, uid, projectid=0, publicationid=None, req_file=None, field='Filedata'):
     """
     """
-    if field not in form:
-        raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
-    afile = form[field]
-    if not afile.filename:
-        raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
-    publication = OpenAIREPublication(uid)
+    from werkzeug import secure_filename
+
+    if req_file:
+        filename = secure_filename(req_file.filename)
+        name = None
+    else:
+        if field not in form:
+            raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
+        afile = form[field]
+        if not afile.filename:
+            raise UploadError(_("It seems like you forgot to select a file to upload. Please click back button to select a file."))
+        name = afile.file.name
+        filename = afile.filename
+
+    publication = OpenAIREPublication(uid, publicationid=publicationid)
     publication.link_project(projectid)
-    publication.add_a_fulltext(afile.file.name, afile.filename)
+    publication.add_a_fulltext(name, filename, req_file=req_file)
 
 
 def get_all_projectsids():
@@ -457,6 +467,36 @@ def get_exisiting_projectids_for_uid(uid):
     return sort_projectsid_by_acronym([row[0] for row in run_sql("SELECT DISTINCT projectid FROM eupublication WHERE uid=%s", (uid,))])
 
 
+def get_exisiting_publications_for_uid(uid):
+    """
+    """
+    pubs = run_sql("SELECT publicationid, id_bibrec FROM eupublication WHERE uid=%s", (uid,))
+    ctx = {
+        'unsubmitted': [],
+        'submitted': [],
+    }
+    for pubid, bibrec in pubs:
+        try:
+            p = OpenAIREPublication(uid, publicationid=pubid)
+            try:
+                title = p.metadata['title']
+            except KeyError:
+                title = "Untitled"
+
+            if bibrec:
+                ctx['submitted'].append({'id': pubid, 'recid': bibrec, 'title': title, 'timestamp': time.localtime(p.metadata['__cd__'])})
+            else:
+                ctx['unsubmitted'].append({'id': pubid, 'recid': None,  'title': title, 'timestamp': time.localtime(p.metadata['__cd__'])})
+        except ValueError:
+            pass
+
+        ctx['submitted'].sort(key=lambda x: x['timestamp'])
+        ctx['unsubmitted'].sort(key=lambda x: x['timestamp'])
+
+    return ctx
+    #return sort_projectsid_by_acronym([row[0] for row in )])
+
+
 def sort_projectsid_by_acronym(projectids):
     """
     """
@@ -465,6 +505,11 @@ def sort_projectsid_by_acronym(projectids):
     decorated_projectsid.sort()
     return [row[1] for row in decorated_projectsid]
 
+
+def mymkdtemp(dir=None, prefix=''):
+    path = tempfile.mkdtemp(dir=dir, prefix=prefix)
+    os.chmod(path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
+    return path
 
 class OpenAIREPublication(object):
     """
@@ -483,7 +528,7 @@ class OpenAIREPublication(object):
             self.status = 'initialized'
             mymkdir(os.path.join(CFG_OPENAIRE_DEPOSIT_PATH, str(uid)))
             while True:
-                self.path = tempfile.mkdtemp(dir=os.path.join(
+                self.path = mymkdtemp(dir=os.path.join(
                     CFG_OPENAIRE_DEPOSIT_PATH, str(uid),), prefix='')
                 publicationid = self._metadata[
                     '__publicationid__'] = os.path.basename(self.path)
@@ -571,15 +616,30 @@ class OpenAIREPublication(object):
                     if not filename.startswith('.'):
                         self.fulltexts[fulltextid] = generic_path2bidocfile(os.path.join(self.fulltext_path, fulltextid, filename))
 
-    def add_a_fulltext(self, original_path, filename):
+    def add_a_fulltext(self, original_path, filename, req_file=None):
         """
         """
-        the_directory = tempfile.mkdtemp(prefix='', dir=self.fulltext_path)
+        the_directory = mymkdtemp(prefix='', dir=self.fulltext_path)
         fulltextid = os.path.basename(the_directory)
         final_path = os.path.join(the_directory, os.path.basename(filename))
-        shutil.copy2(original_path, final_path)
+        if req_file:
+            req_file.save(final_path)
+        else:
+            shutil.copy2(original_path, final_path)
         self.fulltexts[fulltextid] = generic_path2bidocfile(final_path)
         return fulltextid
+
+    def remove_a_fulltext(self, fulltextid):
+        """
+        """
+        if fulltextid in self.fulltexts:
+            fulltext = self.fulltexts[fulltextid]
+            os.remove(fulltext.get_full_path())
+            del self.fulltexts[fulltextid]
+            self.touch()
+            return True
+        return False
+
 
     def _dump(self):
         """
