@@ -26,15 +26,10 @@
     {%- if current_user.is_guest %}
     <div class="span8">
         <div class="hero-unit">
-        <h1>New to ZENODO?</h1>
+        <h1>New to {{config.CFG_SITE_NAME}}?</h1>
         <p>&mdash; sign up for a free account to share your research!</p>
         <p>
-          <ul>
-          <li><strong>Share or publish :</strong> We give a DOI to everything</li>
-          <li><strong>Use:</strong> Dedicated to Open Access</li>
-          <li><strong>Funding:</strong> We send your result to funding agencies</li>
-          <li><strong>Curation:</strong> ...</li>
-        </ul>
+          {% include "zenodo_benefits.html" %}
         </p>
         <p><a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
         </p>

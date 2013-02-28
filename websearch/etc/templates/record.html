@@ -102,15 +102,15 @@
     {%- endif -%}
 
     {{ format_record(recid, of='HDINFO', ln=g.ln)|safe }}
-    
+
     {%- if current_user.is_guest -%}
     <div class="well">
       <a href="{{ url_for("youraccount.register") }}" class="btn btn-warning btn-large signup pull-right">{{ _("Sign Up") }}</a>
-      <h4>{{ _("New to ZENODO?") }}</h4>
-      <p>{{ _("Read more about") }} <a href="{{ url_for("openaire.features") }}">{{ _("features and benefits") }}</a>.</p>
+      <h4>New to {{config.CFG_SITE_NAME}}?</h4>
+      <p>{{ _("Read more about") }} <a href="{{ url_for("features") }}">{{ _("features and benefits") }}</a>.</p>
     </div>
     {%- endif -%}
-    
+
     {{ format_record(recid, of='HDSHAR', ln=g.ln)|safe }}
     {{ format_record(recid, of='HDEXP', ln=g.ln)|safe }}
   </div>

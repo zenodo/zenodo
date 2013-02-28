@@ -54,13 +54,8 @@
   <div class="span4">
       <div class="well">
         <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
-        <h4>New to Zenodo?</h4>
-        <ul>
-          <li><strong>Share or publish :</strong> We give a DOI to everything</li>
-          <li><strong>Use:</strong> Dedicated to Open Access</li>
-          <li><strong>Funding:</strong> We send your result to funding agencies</li>
-          <li><strong>Curation:</strong> ...</li>
-        </ul>
+        <h4>New to {{config.CFG_SITE_NAME}}?</h4>
+        {% include "zenodo_benefits.html" %}
       </div>
 
       {# portalboxes left top is not supported #}
@@ -69,7 +64,7 @@
 </div>
 
 
-  
+
 
 
 
@@ -116,7 +111,7 @@
       </div>
   {% endif %}
 
-  
+
 
   #}
 {% endmacro %}
