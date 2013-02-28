@@ -64,7 +64,7 @@
 
 {% macro render_search_results(recids, collection, pagination, format_record) %}
       <form class="clearfix form-horizontal" name="" action="{{ url_for('search.dispatch') }}" method="post">
-        <span class="btn-group">
+        <span class="btn-group hide">
           <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
                 class="btn">
             <i class="icon icon-check"
@@ -84,7 +84,7 @@
           {%- set r_to = r_to if r_to < r_of else r_of -%}
           {{ _('Showing recods %d to %d out of %d results.') % (r_from, r_to, r_of) }}
         </p>
-        <div class="btn-group pull-right">
+        <div class="btn-group pull-right hide">
 
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-random"></i> {{ _('Sort by') }}
@@ -122,7 +122,7 @@
           </ul>
         </div>
 
-        <div class="btn-group pull-right" style="margin-right: 5px;">
+        <div class="btn-group pull-right hide" style="margin-right: 5px;">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-th"></i> {{ _('Display') }}
             <span class="caret"></span>
@@ -151,7 +151,7 @@
             <div class="row-fluid">
               <div class="span1">
                 <label class="checkbox">
-                  <input type="checkbox" name="recid" value="{{ recid }}" />
+                  <input class="hide" type="checkbox" name="recid" value="{{ recid }}" />
                   <abbr class="unapi-id" title="{{ recid }}"></abbr>
                   {{ loop.index+(pagination.page-1)*rg }}
                 </label>
@@ -161,14 +161,15 @@
                 {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
               </div>
             </div>
+            <hr />
           {%- else -%}
           {{ format_record(recid, of, ln=g.ln) }}
           {%- endif -%}
         {%- endfor -%}
         <hr/>
         <div class="row clearfix">
-          <div class="span10">
-            <span class="pull-left btn-group clearfix">
+          <div class="span10 ">
+            <span class="pull-left btn-group clearfix hide">
             <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
                   class="btn">
               <i class="icon icon-check"
@@ -181,7 +182,7 @@
                  title="{{ _('Add to basket') }}"></i>
             </button>
            </span>
-            <span class="span4">
+            <span class="span4 hide">
               <select name="of" class="span2">
               {%- for i in export_formats -%}
                 <option value="{{ i.code }}"{{ ' selected' if request.args.get('of','hb')==i.code }}>{{ i.name }}</option>

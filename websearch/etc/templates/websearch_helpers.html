@@ -29,14 +29,14 @@
       {%- endif -%}
     {%- endif -%}
 
-    <a class="text-success"
+    <a class="text-success hide"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}v"
        href="{{ url_for('record.metadata', recid=recID) }}">
       {{ _("Detailed record") }}
     </a>
-     -
-    <a class="text-success"
+
+    <a class="text-success hide"
        data-hotkey-action="click"
        data-hotkey-value="g{{ i }}s"
        href="{{ url_for('.search', p=similar, rm='wrd') }}">
@@ -329,7 +329,7 @@
 
 
         <div id="settingsdropdown" class="pull-right btn-group dropdown">
-          <button class="btn dropdown-toggle add-open-permanent" data-target="#settingsdropdown" data-toggle="dropdown">
+          <button class="btn dropdown-toggle add-open-permanent hide" data-target="#settingsdropdown" data-toggle="dropdown">
             <i class="icon-cog"></i>
             <span class="caret"></span>
           </button>
@@ -462,7 +462,7 @@
             {% endif %}
             #}
               <div class="input-prepend input-append">
-                <div class="dropdown add-on">
+                <div class="dropdown add-on hide">
                   <a class="dropdown-toggle"
                      rel="tooltip" title="{{ _('Search Tips and Examples') }}"
                      data-placement="bottom"

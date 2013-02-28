@@ -176,17 +176,17 @@ body {
     , hotkeys = Hotkeys({}) // enable hotkeys
   {%- endif %}
 
-  // side facet list
-  $('#facet_list').affix({
-    offset: {
-      top: function () {
-        var $s = $('#search-box-main'),
-            h = $s.height(),
-            y = $s.offset()['top']
-        return $(window).width() <= 980 ? 328 : h }
-    , bottom: 170
-    }
-  })
+  // // side facet list
+  // $('#facet_list').affix({
+  //   offset: {
+  //     top: function () {
+  //       var $s = $('#search-box-main'),
+  //           h = $s.height(),
+  //           y = $s.offset()['top']
+  //       return $(window).width() <= 980 ? 328 : h }
+  //   , bottom: 170
+  //   }
+  // })
 
   $('#overlay').modal({
       keyboard: false,

@@ -40,8 +40,8 @@
 }
 
 .headerbg {
-  background-image: url('../img/header.png'); 
-  background-repeat: 
+  background-image: url('../img/header.png');
+  background-repeat:
   no-repeat;
 }
 
@@ -104,7 +104,7 @@ header .container .nav li {
   text-decoration: none;
 }
 
-/*  
+/*
 rsync -av . openaire-dev:/opt/invenio/var/www/zenodo/
 ----------------------- Stick footer ----------------------- */
 html,
@@ -147,7 +147,7 @@ body {
 
 /* --------------- */
 
-.navbar { 
+.navbar {
   margin-bottom: 0;
 }
 
@@ -157,7 +157,7 @@ body {
 
 body {
   font-family: 'Roboto', sans-serif;
-  font-weight: 400; 
+  font-weight: 400;
 }
 
 footer .partners > a {
@@ -173,7 +173,7 @@ header .nav .dropdown-menu a{
 }
 
 h1, h2, h3 {
-  font-weight: 100; 
+  font-weight: 100;
 }
 
 .media a.pull-left {
@@ -189,22 +189,22 @@ h1, h2, h3 {
 }
 
 .gradient {
-    /* IE10 Consumer Preview */ 
+    /* IE10 Consumer Preview */
   background-image: -ms-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
 
-  /* Mozilla Firefox */ 
+  /* Mozilla Firefox */
   background-image: -moz-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
 
-  /* Opera */ 
+  /* Opera */
   background-image: -o-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
 
-  /* Webkit (Safari/Chrome 10) */ 
+  /* Webkit (Safari/Chrome 10) */
   background-image: -webkit-gradient(radial, left top, 0, left top, 994, color-stop(0, #0047A8), color-stop(1, #2BBCFF));
 
-  /* Webkit (Chrome 11+) */ 
+  /* Webkit (Chrome 11+) */
   background-image: -webkit-radial-gradient(left top, circle farthest-corner, #0047A8 0%, #2BBCFF 100%);
 
-  /* W3C Markup, IE10 Release Preview */ 
+  /* W3C Markup, IE10 Release Preview */
   background-image: radial-gradient(circle farthest-corner at left top, #0047A8 0%, #2BBCFF 100%);
 }
 
@@ -291,8 +291,12 @@ h1, h2, h3 {
     padding-left: 20px;
 }
 
-.altmetric-popover-content {
+.well .altmetric-popover-content {
     background-color: transparent!important;
+}
+
+#_altmetric_popover_inner {
+    width: auto!important;
 }
 
 /* Adjust for phones */
