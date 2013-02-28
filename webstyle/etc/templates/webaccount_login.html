@@ -40,9 +40,19 @@
       <legend>{{ _('Please Sign In') }}</legend>
       <form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('.login') }}" method="POST">
       {{ form.referer }}
-      {{ form.nickname(placeholder=_('Username or email'), class_="span3") }}
-      {{ form.password(placeholder=_('Password'), class_="span3") }}
-      <label class="checkbox">
+        <div class="control-group{% if form.nickname.errors %} error{% endif %}">
+        {{ form.nickname(placeholder=_('Username or email'), class_="span3") }}
+        {%- if form.nickname.errors %}{% for error in form.nickname.errors %}
+            <span class="help-inline">{{ error }}</span>
+        {%- endfor %}{% endif %}
+        </div>
+        <div class="control-group{% if form.password.errors %} error{% endif %}">
+        {{ form.password(placeholder=_('Password'), class_="span3") }}
+        {%- if form.password.errors %}{% for error in form.password.errors %}
+            <span class="help-inline">{{ error }}</span>
+        {%- endfor %}{% endif %}
+        </div>
+      <label class="checkbox hide">
         {{ form.remember(class_="checkbox") }} {{ form.remember.label.text }}
       </label>
       {{ form.submit(class_="btn btn-info btn-block") }}

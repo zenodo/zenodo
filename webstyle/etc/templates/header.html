@@ -30,13 +30,13 @@
                 {%- else %}
                 <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}" />
                 {%- endif %}
-                <input id="remember" name="remember" type="hidden" value="y">
+                <input id="remember" name="remember" type="hidden" value="n">
                 <input name="nickname" type="text" class="input-small hidden-phone" placeholder="{{ _("Email") }}" />
                 <input name="password" type="password" class="input-small hidden-phone" placeholder="{{ _("Password") }}" />
                 <button name="submit" type="submit" class="btn">{{ _("Sign in") }}</button>
-                
+
               {% else %}
-                <button class="btn dropdown-toggle" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="icon icon-white icon-user"></i> {{ current_user.nickname|default(current_user.email) }} <span class="caret"></span>&nbsp;</button>
+                <button class="btn dropdown-toggle" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="icon icon-white icon-user"></i> {{ current_user.email }} <span class="caret"></span>&nbsp;</button>
                 <ul class="dropdown-menu">
                   <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
                   <li class="divider"></li>

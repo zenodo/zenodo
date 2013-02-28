@@ -22,17 +22,20 @@ the user info box.
 
 from cgi import escape
 from base64 import encodestring
+from flask import render_template, url_for
 
 from invenio.websession_templates import Template as DefaultTemplate
-from invenio.config import CFG_OPENAIRE_PORTAL_URL, CFG_SITE_SECURE_URL
+from invenio.config import CFG_OPENAIRE_PORTAL_URL, CFG_SITE_SECURE_URL, \
+    CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS, CFG_SITE_LANG
 from invenio.urlutils import create_url
 from invenio.messages import gettext_set_language
+
 
 class Template(DefaultTemplate):
     def tmpl_create_userinfobox(self, ln, url_referer, guest, username, submitter, referee, admin, usebaskets, usemessages, usealerts, usegroups, useloans, usestats):
         """
-        Displays the user block. 
-        
+        Displays the user block.
+
         Generates a URL to login via OpenAIRE portal (robot login).
 
         Parameters:
@@ -98,3 +101,27 @@ class Template(DefaultTemplate):
                     'logout' : escape(_("logout")),
                 }
         return out
+
+    def tmpl_account_address_activation_email_body(
+            self, email, address_activation_key, ip_address, ln=CFG_SITE_LANG):
+        """
+        The body of the email that sends email address activation cookie
+        passwords to users.
+        """
+        from urllib import urlencode
+        ctx = {
+            "ip_address": ip_address,
+            "email": email,
+            "activation_link": "%s/youraccount/access?%s" % (
+                CFG_SITE_SECURE_URL,
+                urlencode({
+                    "ln": ln,
+                    "mailcookie": address_activation_key,
+                })
+            ),
+            "days": CFG_WEBSESSION_ADDRESS_ACTIVATION_EXPIRE_IN_DAYS,
+        }
+
+        return render_template(
+            "websession_account_address_activation_email_body.html",
+            **ctx).encode('utf8')
