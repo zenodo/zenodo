@@ -113,7 +113,11 @@ AC_CONFIG_FILES([config.nice  \
      websearch/Makefile \
      websearch/etc/Makefile \
      websearch/etc/templates/Makefile \
+     websearch/lib/Makefile \
+     websearch/lib/websearch_facets/Makefile \
      websession/Makefile \
+     websession/etc/Makefile \
+     websession/etc/templates/Makefile \
      websession/lib/Makefile \
      webstyle/js/Makefile \
      webstyle/css/Makefile \
