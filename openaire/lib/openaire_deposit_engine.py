@@ -484,9 +484,9 @@ def get_exisiting_publications_for_uid(uid):
                 title = "Untitled"
 
             if bibrec:
-                ctx['submitted'].append({'id': pubid, 'recid': bibrec, 'title': title, 'timestamp': time.localtime(p.metadata['__cd__'])})
+                ctx['submitted'].append({'id': pubid, 'recid': bibrec, 'title': title, 'timestamp': time.localtime(p.metadata.get('__cd__', time.time()))})
             else:
-                ctx['unsubmitted'].append({'id': pubid, 'recid': None,  'title': title, 'timestamp': time.localtime(p.metadata['__cd__'])})
+                ctx['unsubmitted'].append({'id': pubid, 'recid': None,  'title': title, 'timestamp': time.localtime(p.metadata.get('__cd__', time.time()))})
         except ValueError:
             pass
 
@@ -626,6 +626,8 @@ class OpenAIREPublication(object):
             req_file.save(final_path)
         else:
             shutil.copy2(original_path, final_path)
+        # Set file permission
+        os.chmod(final_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
         self.fulltexts[fulltextid] = generic_path2bidocfile(final_path)
         return fulltextid
 
