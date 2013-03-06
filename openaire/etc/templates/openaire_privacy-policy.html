@@ -18,6 +18,8 @@
 #}
 {% extends "page.html" %}
 {% block body %}
+<div class="row">
+    <div class="span{{ '8' if config.CFG_PIWIK_URL else '12' }}">
 <h1>Privacy policy</h1>
 
 <p>The {{config.CFG_SITE_NAME}} collaboration does not track, collect or retain personal information from users of {{config.CFG_SITE_NAME}}, except as otherwise provided herein.  In order to enhance {{config.CFG_SITE_NAME}} and monitor traffic, non-personal information such as IP addresses and cookies may be tracked and retained, as well as log files shared in aggregation with other community services (in particular OpenAIREplus partners). User provided information, like corrections of metadata or paper claims, will be integrated into the database without displaying its source and may shared with other services.</p>
@@ -25,4 +27,14 @@
 <p>{{config.CFG_SITE_NAME}} will take all reasonable measures to protect the privacy of its users and to resist service interruptions, intentional attacks, or other events that may compromise the security of the {{config.CFG_SITE_NAME}} website.</p>
 
 <p>If you have any questions about the {{config.CFG_SITE_NAME}} privacy policy, please contact <a href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>.</p>
+</div>
+{% if config.CFG_PIWIK_URL %}
+    <div class="span4">
+        <div class="well">
+        <h2>Web Analytics Opt Out</h2>
+        <iframe frameborder="no" width="100%" height="200px" src="https://{{config.CFG_PIWIK_URL}}/index.php?module=CoreAdminHome&action=optOut&language=en"></iframe>
+        </div>
+    </div>
+{% endif %}
+</div>
 {% endblock %}

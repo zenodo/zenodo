@@ -77,7 +77,7 @@ from invenio.bibformat_elements.bfe_fulltext import sort_alphanumerically
 from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
-from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, \
+from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, \
     CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
@@ -160,9 +160,7 @@ def get_all_publications_for_project(uid, projectid, ln, style):
 def get_favourite_authorships_for_user(uid, publicationid, term='', limit=50):
     """
     """
-    ret = set(run_sql("SELECT DISTINCT authorship FROM OpenAIREauthorships WHERE uid=%s AND publicationid=%s AND authorship LIKE %s ORDER BY authorship LIMIT %s", (uid, publicationid, '%%%s%%' % term, limit)))
-    if len(ret) < limit:
-        ret |= set(run_sql("SELECT DISTINCT authorship FROM OpenAIREauthorships WHERE uid=%s AND authorship LIKE %s ORDER BY authorship LIMIT %s", (uid, '%%%s%%' % term, limit)))
+    ret = set(run_sql("SELECT DISTINCT authorship FROM OpenAIREauthorships WHERE uid=%s AND authorship LIKE %s ORDER BY authorship LIMIT %s", (uid, '%%%s%%' % term, limit)))
     if len(ret) < limit:
         ret |= set(run_sql("SELECT DISTINCT authorship FROM OpenAIREauthorships NATURAL JOIN eupublication WHERE projectid IN (SELECT projectid FROM eupublication WHERE uid=%s AND publicationid=%s) AND authorship LIKE %s ORDER BY authorship LIMIT %s", (uid, publicationid, '%%%s%%' % term, limit)))
     if len(ret) < limit:
@@ -175,9 +173,7 @@ def get_favourite_authorships_for_user(uid, publicationid, term='', limit=50):
 def get_favourite_keywords_for_user(uid, publicationid, term='', limit=50):
     """
     """
-    ret = set(run_sql("SELECT DISTINCT keyword FROM OpenAIREkeywords WHERE uid=%s AND publicationid=%s AND keyword LIKE %s ORDER BY keyword LIMIT %s", (uid, publicationid, '%%%s%%' % term, limit)))
-    if len(ret) < limit:
-        ret |= set(run_sql("SELECT DISTINCT keyword FROM OpenAIREkeywords WHERE uid=%s AND keyword LIKE %s ORDER BY keyword LIMIT %s", (uid, '%%%s%%' % term, limit)))
+    ret = set(run_sql("SELECT DISTINCT keyword FROM OpenAIREkeywords WHERE uid=%s AND keyword LIKE %s ORDER BY keyword LIMIT %s", (uid, '%%%s%%' % term, limit)))
     if len(ret) < limit:
         ret |= set(run_sql("SELECT DISTINCT keyword FROM OpenAIREkeywords NATURAL JOIN eupublication WHERE projectid IN (SELECT projectid FROM eupublication WHERE uid=%s AND publicationid=%s) AND keyword LIKE %s ORDER BY keyword LIMIT %s", (uid, publicationid, '%%%s%%' % term, limit)))
     if len(ret) < limit:
@@ -642,6 +638,9 @@ class OpenAIREPublication(object):
             return True
         return False
 
+    def save(self):
+        if not self.__deleted and self.__touched:
+            self._dump()
 
     def _dump(self):
         """
@@ -657,20 +656,26 @@ class OpenAIREPublication(object):
             os.close(backup_fd)
         json.dump(self._metadata, open(self.metadata_path, 'w'), indent=4)
 
-    def merge_form(self, form, ln=CFG_SITE_LANG):
+    def merge_form(self, form):
         """
         """
         if self.status in ('initialized', 'edited'):
-            self._metadata['__form__'] = wash_form(form, self.publicationid)
+            self._metadata['__form__'] = form
             touched = False
-            for key, value in namespaced_metadata2simple_metadata(self._metadata['__form__'], self.publicationid).iteritems():
+            for key, value in self._metadata['__form__'].items():
                 if value is not None:
-                    self._metadata[key] = wash_for_xml(value)
+                    if isinstance(value, basestring):
+                        self._metadata[key] = wash_for_xml(value)
+                    else:
+                        self._metadata[key] = value
                     touched = True
             if touched:
                 if self.status == 'initialized':
                     self.status = 'edited'
                 self.touch()
+
+    def get_form_values(self):
+        return self.metadata.get('__form__')
 
     def touch(self):
         """
@@ -697,21 +702,21 @@ class OpenAIREPublication(object):
         """
         marcxml_path = os.path.join(self.path, 'marcxml')
         open(marcxml_path, 'w').write(self.marcxml)
-        task_low_level_submission(
-            'bibupload', 'openaire', '-r', marcxml_path, '-P5')
-        self.status = 'submitted'
-        self.send_emails()
+        #task_low_level_submission(
+        #    'bibupload', 'openaire', '-r', marcxml_path, '-P5')
+        #self.status = 'submitted'
+        #self.send_emails()
 
     def send_emails(self):
         """
         """
-        _ = gettext_set_language(self.ln)
         content = openaire_deposit_templates.tmpl_confirmation_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, report_numbers=self.report_numbers, ln=self.ln)
-        send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a publication into OpenAIRE"), content=content)
+        # No email to user anymore
+        #send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a publication into OpenAIRE"), content=content)
         bibedit_url = CFG_SITE_URL + \
             "/record/edit/#state=edit&recid=%s" % self.recid
         content = openaire_deposit_templates.tmpl_curators_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, bibedit_url=bibedit_url)
-        send_email(CFG_SITE_ADMIN_EMAIL, ", ".join(CFG_OPENAIRE_CURATORS), "Publication in OpenAIRE needs your approval", content=content)
+        send_email(CFG_SITE_ADMIN_EMAIL, ", ".join(CFG_OPENAIRE_CURATORS), "Upload in %s needs your curation" % CFG_SITE_NAME, content=content)
 
     def get_projects_information(self, global_projectid=None):
         """

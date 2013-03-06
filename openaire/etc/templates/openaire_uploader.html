@@ -20,7 +20,7 @@ $(function() {
         runtimes : 'gears,html5,flash,silverlight',
         browse_button : 'pickfiles',
         container : 'file_container',
-        max_file_size : '10000mb',
+        max_file_size : '1024mb',
         url : '{{url_for('deposit.upload', pub_id=pub.publicationid) if pub.publicationid else url_for('deposit.upload')}}',
         flash_swf_url : '{{ url_for('static',filename='js/plupload/plupload.flash.swf')}}',
         silverlight_xap_url : '{{ url_for('static',filename='js/plupload/plupload.silverlight.xap')}}',
@@ -38,7 +38,7 @@ $(function() {
         $('#uploadfiles').removeClass("disabled");
         $.each(files, function(i, file) {
             $('#filelist').append(
-                '<tr id="' + file.id + '"><td>' + file.name + '</td><td>' + plupload.formatSize(file.size) 
+                '<tr id="' + file.id + '"><td>' + file.name + '</td><td>' + plupload.formatSize(file.size)
                 + '</td><td width="30%"><div class="progress progress-striped active hide"><div class="bar" style="width: 0%;"></div></div>' + '</td><td><a id="' + file.id + '_rm" class="rmlink"><i class="icon-trash"></i></a></td></tr>');
             $('#'+file.id+'_rm').click(function(e){
                 uploader.removeFile(file);

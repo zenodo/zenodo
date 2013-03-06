@@ -18,18 +18,23 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 """OpenAIRE Flask Blueprint"""
+
 from flask import render_template, abort, request, current_app, flash, \
-    redirect, url_for, send_file
+    redirect, url_for, send_file, jsonify
 import uuid as uuid_mod
 import hashlib
+from wtforms import Field
 from werkzeug import secure_filename
 from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
 from invenio.webuser_flask import current_user
 from invenio.bibdocfile import download_external_url
 from invenio.openaire_deposit_engine import get_exisiting_publications_for_uid,\
     OpenAIREPublication
+from werkzeug.datastructures import MultiDict
 import invenio.template
 import os
+from invenio.openaire_forms import DepositionForm, DepositionFormMapper, PublicationMapper
+import json
 
 blueprint = InvenioBlueprint('deposit', __name__,
     url_prefix="/deposit",
@@ -158,6 +163,51 @@ def getfile(pub_id='', file_id='', action='view'):
         return redirect(url_for('.edit', pub_id=pub.publicationid))
 
 
+@blueprint.route('/check/', methods=['GET', 'POST'])
+@blueprint.invenio_force_https
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+def check():
+    value = request.args.get('value', '')
+    field_name = request.args.get('field', '')
+    if field_name == "":
+        return "{}"
+
+    form = DepositionForm()
+    try:
+        field = form._fields[field_name]
+        field.process(MultiDict({field_name: value}))
+        if field.validate(form):
+            return json.dumps({"error_message": "", "error": 0})
+        else:
+            return json.dumps({"error_message": " ".join(field.errors), "error": 1})
+    except (KeyError, AttributeError, TypeError), e:
+        return json.dumps({"error_message": unicode(e), "error": 0})
+
+
+@blueprint.route('/autocomplete/', methods=['GET', 'POST'])
+@blueprint.invenio_force_https
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+def autocomplete():
+    """
+        Returns a list with of suggestions for the field based on the current value
+    """
+    field = request.args.get('field')
+    term = request.args.get('term')
+    try:
+        limit = int(request.args.get('limit'))
+
+        if limit > 0:
+            form = DepositionForm()
+            field = getattr(form, field)
+            val = field.autocomplete(term, limit)
+            return json.dumps(val)
+    except (AttributeError, ValueError):
+        pass
+    return json.dumps([])
+
+
 @blueprint.route('/edit/<string:pub_id>/', methods=['GET', 'POST'])
 @blueprint.route('/edit/<string:pub_id>/<string:action>/', methods=['GET', 'POST'])
 @blueprint.invenio_force_https
@@ -170,12 +220,12 @@ def edit(pub_id=u'', action=u'edit'):
     """
     uid = current_user.get_id()
 
-    if action not in ['edit', 'save', 'submit', 'delete', 'link', 'unlink']:
+    if action not in ['edit', 'save', 'delete', ]:
         abort(404)
 
     try:
         pub = OpenAIREPublication(uid, publicationid=pub_id)
-        title = pub.metadata.get('title', 'Untitled')
+        title = pub.metadata.get('title', 'Untitled') or 'Untitled'
     except ValueError:
         abort(404)
 
@@ -184,76 +234,66 @@ def edit(pub_id=u'', action=u'edit'):
     #
     ctx = {}
     if action == 'delete':
+        #
+        # Delete action
+        #
         pub.delete()
         flash("Upload '%s' was deleted." % title, 'success')
         return redirect(url_for('.index'))
     elif action == 'edit':
+        #
+        # Edit action
+        #
         ctx = {
             'pub': pub,
-            'title': title,
             'recid': pub.metadata.get('__recid__', None),
-            'rendered_form': openaire_deposit_templates.tmpl_form(
-                pub.metadata['__publicationid__'],
-                -1,
-                "",  # projects_information
-                "",  # publication_information
-                "",  # fulltext_information
-                form=None,
-                metadata_status='empty',
-                warnings=None,
-                errors=None,
-                ln='en',
-            ),
+            'title': title,
         }
+
+        if request.method == 'POST':
+            form = DepositionForm(request.values, crsf_enabled=False)
+            mapper = DepositionFormMapper(pub)
+            pub = mapper.map(form)
+            if form.validate():
+                pub.save()
+                pub.upload_record()
+                return redirect(url_for('deposit.index'))
+            else:
+                pub.save()
+                ctx['form_message'] = "The form was saved, but there were errors. Please see below."
+        else:
+            mapper = PublicationMapper()
+            form = DepositionForm(mapper.map(pub), crsf_enabled=False)
+
+        ctx.update({
+            'form': form,
+        })
+
     elif action == 'save':
-        #if req.method.upper() == 'POST':
-        #             publication.merge_form(form, ln=argd['ln'])
-        abort(400)
-    elif action == 'submit':
-        abort(400)
-    elif action == 'link':
-        #link_project
-        abort(400)
-    elif action == 'unlink':
-        #unlink_project
-        abort(400)
+        #
+        # Save action (AjAX)
+        #
+        if request.method == 'POST':
+            form = DepositionForm(request.values, crsf_enabled=False)
+            mapper = DepositionFormMapper(pub)
+            pub = mapper.map(form)
+            if form.validate():
+                pub.save()
+                return json.dumps({'status': 'success', 'form': 'Successfully saved.'})
+            else:
+                pub.save()
+                errors = dict([(x, '') for x in form._fields.keys()])
+                errors.update(form.errors)
+                return json.dumps({
+                    'status': 'warning',
+                    'form': 'The form was saved, but there were errors. Please see below.',
+                    'fields': errors,
+                })
+        else:
+            abort(405)
 
-    # if projectid >= 0:
-    #     ## There is a project on which we are working good!
-    #     publications = get_all_publications_for_project(
-    #         uid, projectid, ln=argd['ln'], style=style)
-    #     if argd['publicationid'] in publications:
-    #         if argd['addproject'] in all_project_ids:
-    #             publications[argd['publicationid']
-    #                          ].link_project(argd['linkproject'])
-    #         if argd['delproject'] in all_project_ids:
-    #             publications[argd['publicationid']
-    #                          ].unlink_project(argd['unlinkproject'])
-    #     if argd['delete'] and argd['delete'] in publications:
-    #         ## there was a request to delete a publication
-    #         publications[argd['delete']].delete()
-    #         del publications[argd['delete']]
-
-    #     forms = ""
-    #     submitted_publications = ""
-    #     for index, (publicationid, publication) in enumerate(publications.iteritems()):
-    #         if req.method.upper() == 'POST':
-    #             publication.merge_form(form, ln=argd['ln'])
-    #         if publication.status == 'edited':
-    #             publication.check_metadata()
-    #             publication.check_projects()
-    #             if 'submit_%s' % publicationid in form and not "".join(publication.errors.values()).strip():
-    #                 ## i.e. if the button submit for the corresponding publication has been pressed...
-    #                 publication.upload_record()
-    #         if publication.status in ('initialized', 'edited'):
-    #             forms += publication.get_publication_form(projectid)
-    #         else:
-    #             submitted_publications += publication.get_publication_preview()
-    #     body += openaire_deposit_templates.tmpl_add_publication_data_and_submit(projectid, forms, submitted_publications, project_information=upload_to_project_information, ln=argd['ln'])
-    #     body += openaire_deposit_templates.tmpl_upload_publications(projectid=upload_to_projectid, project_information=upload_to_project_information, session=get_session(req).sid.encode('utf8'), style=style, ln=argd['ln'])
-    # else:
-
-    return render_template("openaire_edit.html",
+    return render_template(
+        "openaire_edit.html",
         myresearch=get_exisiting_publications_for_uid(current_user.get_id()),
         **ctx
     )

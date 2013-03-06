@@ -1,3 +1,19 @@
+.jumbotron  {
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+.jumbotron h1 {
+    font-size: 70px;
+    line-height: 90px;
+}
+
+.marketing-bg {
+    background-color: #f5f5f5;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
 #logoimg {
     padding-top: 80px;
 }
@@ -105,7 +121,6 @@ header .container .nav li {
 }
 
 /*
-rsync -av . openaire-dev:/opt/invenio/var/www/zenodo/
 ----------------------- Stick footer ----------------------- */
 html,
 body {
@@ -227,8 +242,20 @@ h1, h2, h3 {
   display: none;
 }
 
+.loader {
+    margin-right: 10px;
+}
+
+.loader img {
+    display: none;
+}
+
 .loading img {
   display: inline;
+}
+
+.loader .loading img {
+    display: inline;
 }
 
 /* =================== INVENIO templates =================*/
@@ -297,6 +324,120 @@ h1, h2, h3 {
 
 #_altmetric_popover_inner {
     width: auto!important;
+}
+
+.field-desc {
+    margin-top: 10px;
+}
+
+#description, #keywords, #creators, #related_identifiers {
+    height: 110px;
+}
+
+.tt-dropdown-menu {
+    z-index:1000;
+}
+
+.in {
+    overflow: visible;
+}
+
+.form-tag {
+    padding: 5px;
+    font-size: 110%;
+    font-weight: 100;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    background-color: #d9edf7;
+}
+
+.form-tag .close {
+    margin-left: 5px;
+    height: 15px;
+}
+
+
+
+.ui-autocomplete {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  z-index: 1000;
+  float: left;
+  display: none;
+  min-width: 160px;
+  width: 160px;
+  padding: 4px 0;
+  margin: 2px 0 0 0;
+  list-style: none;
+  background-color: #ffffff;
+  border-color: #ccc;
+  border-color: rgba(0, 0, 0, 0.2);
+  border-style: solid;
+  border-width: 1px;
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  border-radius: 5px;
+  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  *border-right-width: 2px;
+  *border-bottom-width: 2px;
+}
+
+.ui-menu-item > a.ui-corner-all {
+    display: block;
+    padding: 3px 15px;
+    clear: both;
+    font-weight: normal;
+    line-height: 18px;
+    color: #555555;
+    white-space: nowrap;
+}
+
+.ui-corner-all {
+      overflow: hidden!important;
+      text-overflow: ellipsis!important;
+}
+
+.ui-widget-content .ui-state-focus {
+      color: #ffffff;
+      text-decoration: none;
+      background-color: #0088cc;
+      border-radius: 0px;
+      -webkit-border-radius: 0px;
+      -moz-border-radius: 0px;
+      background-image: none;
+}
+
+.tag-values {
+    margin-left: 0;
+}
+
+.tag {
+    padding: 2px 35px 2px 7px;
+    margin-bottom: 5px;
+    cursor: move;
+}
+
+.help-inline {
+    margin-top: 5px;
+}
+
+.upload-type {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.upload-type li:hover {
+    color: #0088cc;
+}
+
+.upload-type li:hover {
+    color: #0088cc;
 }
 
 /* Adjust for phones */

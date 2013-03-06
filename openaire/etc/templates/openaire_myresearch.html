@@ -6,7 +6,7 @@
 <table class="table table-striped">
 {% for pub in myresearch.unsubmitted %}
 <tr>
-    <td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/">{{pub.title}}</a></td><td>{{pub.timestamp|timefmt}}</td><td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/delete/" class="rmlink" rel="tooltip" title="Delete upload"><i class="icon-trash"></i></a></td>
+    <td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/">{{pub.title if pub.title else 'Untitled'}}</a></td><td>{{pub.timestamp|timefmt}}</td><td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/delete/" class="rmlink" rel="tooltip" title="Delete upload"><i class="icon-trash"></i></a></td>
 </tr>
 {% endfor %}
 </table>
@@ -16,7 +16,7 @@
 <table class="table table-striped">
 {% for pub in myresearch.submitted %}
 <tr>
-<td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/">{{pub.title}}</a></td><td>{{pub.timestamp|timefmt}}</td>
+<td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/">{{pub.title if pub.title else 'Untitled'}}</a></td><td>{{pub.timestamp|timefmt}}</td>
 </tr>
 {% endfor %}
 </table>

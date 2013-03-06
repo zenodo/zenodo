@@ -192,7 +192,7 @@ body {
       keyboard: false,
       backdrop: 'static'
   }).modal('hide');
-
+//
   $('#facet_list').facet({
     button_builder: function(title) {
       return '<a style="cursor:pointer" class="muted"><small>'+title+' ...</small></a> ';
@@ -200,15 +200,18 @@ body {
     row_builder: function(data, name) {
       var title = data[(data.length==3)?2:0],
           counter = data[1]
-      return '<li class="controls" style="display:none">'+
+      return '<li class="controls" style="display:none; white-space: nowrap; overflow: hidden;  text-overflow: ellipsis;">'+
+                 '<small class="muted pull-right">('+counter+')</small>' +
                  '<a class="expandable" style="cursor:pointer" ' +
+                    'rel="tooltip" ' +
+                    'title="'+ title +'" ' +
                     'data-target="#facet_list" ' +
                     'data-facet="toggle" ' +
                     'data-facet-action="+" '+
                     'data-facet-key="' + name + '" '+
                     'data-facet-value="' + data[0] + '">' +
         title +
-        '</a> <small class="muted">('+counter+')</small>' +
+        '</a>' +
         '</li>'
     },
     box_builder: function(name, title) {

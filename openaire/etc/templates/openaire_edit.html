@@ -1,13 +1,15 @@
 {% extends "page.html" %}
 
-{% block title %}{% endblock %} 
+{% from "_formhelpers.html" import render_field with context %}
+
+{% block title %}{% endblock %}
 
 {% block body %}
 <div class="row">
     <div id="file_container" class="span8">
         {% if recid %}
         <div class="alert alert-info">
-            <strong>Submitted</strong> Currently you can not edit already submitted 
+            <strong>Submitted</strong> Currently you can not edit already submitted
             uploads. We are working on making this possible. In the mean time,
             drop us an email on <a href="mailto:openaire-support@cern.ch">openaire-support@cern.ch</a>
         </div>
@@ -15,33 +17,101 @@
             <a href="{{config.CFG_SITE_URL}}/record/{{recid}}">{{config.CFG_SITE_URL}}/record/{{recid}}</a>
         </div>
         {% else %}
+        <div id="form_message">{% if form_message %}<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert">&times;</button>{{form_message}}</div>{% endif %}</div>
         <div class="well">
-            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash"></i> Delete</a>
+            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash icon-white"></i> Delete</a>
             <span class="pull-right">
-                <a class="btn"><i class="icon-file"></i> Save</a>
-                <a class="btn btn-primary"><i class="icon-ok"></i> Submit</a>
+                <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
+                <button class="btn edit-form-save"><i class="icon-file"></i> Save</button>
+                <button class="btn btn-primary edit-form-submit"><i class="icon-ok  icon-white"></i> Submit</button>
             </span>
         </div>
         {% endif %}
         {% if recid %}
-        
+
         {% else %}
         <h1>New upload</h1>
-        <div class="alert alert-danger" align="center">
-            TODO: FORM
+        <form action="." method="POST" id="edit_form" class="form-horizontal">
+        <div class="accordion">
+        {%- for title, fieldnames, conf in form.field_sets %}
+            <div class="accordion-group">
+                {%- if title %}
+                <div class="accordion-heading">
+                    <span class="accordion-toggle muted pull-right">{{conf.state}}</span>
+                    <a class="accordion-toggle" data-toggle="collapse" data-idx="{{loop.index}}" href="#collapse{{loop.index}}">{{title}}{% if conf.state %} {% endif %}</a>
+                </div>
+                {%- endif %}
+                <div id="collapse{{loop.index}}" class="accordion-body collapse{% if conf.classes %} {{conf.classes}}{% endif %}">
+                    <div class="accordion-inner">
+                        {%- if conf.description %}
+                        <p>{{ conf.description|urlize }}</p>
+                        {%- endif %}
+                        <fieldset>
+                        {%- for f in fieldnames %}
+                            {% if f == '-' %}<hr />
+                            {%- else %}
+                            {%- set field = form.get_field_by_name(f) %}
+                            {%- if f == 'upload_type' %}
+                            <div class="upload-type" align="center">
+                                <div class="control-group{% if field.errors %} error{% endif %}">
+                                {{field}}
+                                </div>
+                            </div>
+                            {% if field.errors %}
+                                <div class="alert alert-error" id="error-{{ field.name }}">{% for error in field.errors %}{{ error }}{% if not loop.last %}<br />{% endif %}{% endfor %}</div>
+                            {% else %}
+                                <div class="alert alert-error" id="error-{{ field.name }}" style="display:none;"></div>
+                            {% endif %}
+                            {%- else %}
+                            <div class="control-group field-{{ field.name }}{% if field.errors %} error{% endif %}">
+                                <label class="control-label{{' required' if field.required else ''}}" for="{{field.label.field_id}}">
+                                    {%- if field._icon_html %}
+                                    <span class="" style="margin-right: 5px; margin-top: 5px;">
+                                        {{ field._icon_html|safe }}
+                                    </span>
+                                    {%- endif %}
+                                    {{ field.label.text }}
+                                </label>
+                                <div class="controls">
+                                    {% if form.has_autocomplete(field) %}
+                                    <div id="{{f}}_values" class="span5 tag-values"><ul class="inline"></ul></div>
+                                    {% endif %}
+                                    {%- if field.type == "Date" %}
+                                        {{ field(class_="span2 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
+                                    {%- else %}
+                                        {{ field(class_="span5 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
+                                    {%- endif %}
+                                    {% if field.description %}<p class="muted field-desc"><small>{{field.description|urlize}}</small></p>{% endif %}
+                                    {% if field.errors %}
+                                        <span class="alert alert-error help-inline" id="error-{{ field.name }}">{% for error in field.errors %}{{ error }}{% if not loop.last %}<br />{% endif %}{% endfor %}</span>
+                                    {% else %}
+                                        <span class="alert alert-error help-inline" id="error-{{ field.name }}" style="display:none;"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {%- endif %}
+                            {%- endif %}
+                        {%- endfor %}
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        {%- endfor %}
         </div>
-        {#rendered_form|safe#}
+        </form>
         <div class="well">
-            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash"></i> Delete</a>
+            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash  icon-white"></i> Delete</a>
             <span class="pull-right">
-                <a class="btn"><i class="icon-file"></i> Save</a>
-                <a class="btn btn-primary"><i class="icon-ok"></i> Submit</a>
+                <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
+                <button class="btn edit-form-save"><i class="icon-file"></i> Save</button>
+                <button class="btn btn-primary edit-form-submit"><i class="icon-ok icon-white"></i> Submit</button>
             </span>
         </div>
         {% endif %}
+
         {% if pub.fulltexts %}
         <div id="selected-files" class="well" >
-        <span class="pull-right"><a class="btn btn-mini" id="pickfiles">Choose files...</a> <a class="btn btn-success btn-mini disabled" id="uploadfiles"><i class="icon-upload"></i> Start upload</a></span>
+        <span class="pull-right"><a class="btn btn-mini" id="pickfiles">Choose files...</a> <a class="btn btn-success btn-mini disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a></span>
         <h4>Files</h4>
         <table class="table table-striped" id="filelist">
         <thead>
@@ -65,65 +135,30 @@
 
 {% block javascript %}
 {% include "openaire_uploader.html" %}
-<script type="text/javascript">// <![CDATA[
-    jQuery(document).ready(function(){
-        /* Show/hide access rights */
-        jQuery('#access_rights_%(id)s').bind('change', {
-            from_id: '#access_rights_%(id)s',
-            to_id: '#embargo_date_container_%(id)s'
-        }, update_embargo_date);
-        jQuery('#access_rights_%(id)s').trigger('change');
-        
-        /* Show/hide original language box */
-        jQuery('#language_%(id)s').bind('change', {
-            from_id: '#language_%(id)s',
-            to_id: '#original_language_container_%(id)s'
-        }, update_language);
-        update_language({
-            data: {
-                from_id: '#language_%(id)s',
-                to_id: '#original_language_container_%(id)s'
-            }
-        });
-        
-        /* Show/hide specific information box */
-        jQuery('#publication_type_%(id)s').bind('change', {
-            from_id: '#publication_type_%(id)s',
-            to_class_prefix: '.typebox_%(id)s_',
-            to_class: '.typebox_%(id)s'
-        }, update_specific_information);
-        
-        jQuery('#publication_type_%(id)s').trigger('change');
-        
-        
-        jQuery('#save_%(id)s').click(function(event){
-            var element = this;
-            ajaxGateway(element, 'save');
-            event.preventDefault();
-            return 0;
-        });
-        jQuery('#submit_%(id)s').click(function(event){
-            var element = this;
-            ajaxGateway(element, 'submit');
-            event.preventDefault();
-            return 0;
-        });
-        jQuery('#remove_%(id)s').click(function(){
-            return confirm("%(remove_confirm)s");
-        });
-        jQuery('#edit_metadata_%(id)s,#status_%(id)s').click(function(){
-            jQuery('#body_%(id)s').toggle();
-            if(jQuery('#status_msg_%(id)s').html() == "%(collapse_label)s") {
-                jQuery('#status_msg_%(id)s').html("%(expand_label)s")
-            } else {
-                jQuery('#status_msg_%(id)s').html("%(collapse_label)s")
-            }
-            return false;
-        });
-        jQuery('#journal_title_%(id)s').autocomplete({
-            source: "%(site)s/kb/export?kbname=journal_name&amp;format=jquery&amp;ln=%(ln)s&amp;limit=100"
-        });
-//         jQuery('#body_%(id)s').hide();
-    });
-// ]]></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    // Save/Submit button actions
+    webdeposit_save_button('.edit-form-save', '#edit_form', '#form_message', '{{url_for('deposit.edit')}}/{{pub.publicationid}}/save/')
+    webdeposit_submit_button('.edit-form-submit', '#edit_form')
+    // AJAX Error check
+    webdeposit_input_error_check('#edit_form input, #edit_form textarea, #edit_form select', '{{ url_for("deposit.check") }}')
+    {%- for field in form %}
+    {%- if form.has_field_state_mapping(field) %}
+    // Disable/enable fields based on mapping
+    var {{field.short_name}}_mapping = {{form.get_field_state_mapping(field)|tojson|safe}}
+    webdeposit_field_enabler('input[name={{field.short_name}}]', {{field.short_name}}_mapping, {{ 'true' if field.short_name == 'upload_type' else 'false' }} );
+    {%- endif %}
+    {%- if form.has_autocomplete(field) %}
+    {%- if "<textarea" in field.__html__() %}
+    webdeposit_autocomplete_textarea('{{field.short_name}}', '{{ url_for('deposit.autocomplete') }}?field={{field.short_name}}&limit=10');
+    {%- else %}
+    webdeposit_autocomplete('{{field.short_name}}', '{{ url_for('deposit.autocomplete') }}?field={{field.short_name}}&limit=10');
+    {%- endif %}
+    {%- endif %}
+    {%- endfor %}
+    // Date picker
+    webdeposit_datepicker('#publication_date');
+    webdeposit_datepicker('#embargo_date');
+});
+</script>
 {% endblock %}

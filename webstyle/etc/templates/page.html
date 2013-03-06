@@ -26,18 +26,24 @@
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
+  {%- js "js/hogan.js" -%}
+  {%- js "js/holder.js" -%}
   {%- js 'js/jquery.min.js' -%}
+  {%- js 'js/jquery-ui.custom.min.js' -%}
   {%- js 'js/bootstrap.min.js' -%}
-  {%- js 'js/holder.js' -%}
-  {%- js 'js/jquery.tokeninput.js' -%}
   {%- js "js/websearch_typeahead.js" -%}
   {%- js "js/bootstrap-select.js" -%}
+  {%- js "js/bootstrap-datepicker.js" -%}
+  {%- js "js/typeahead.min.js" -%}
+  {%- js "js/custom.js" -%}
+  {%- css 'css/jquery-ui.custom.css' -%}
   {%- css 'css/bootstrap.css' -%}
   {%- css 'css/bootstrap-responsive.min.css' -%}
-  {%- css 'css/token-input.css' -%}
-  {%- css 'css/token-input-facebook.css' -%}
-  {%- css 'css/custom.css' -%}
+  {%- css 'css/datepicker.css' -%}
+  {%- css 'css/typeahead.min.css' -%}
+  {%- css 'css/typeahead.js-bootstrap.css' -%}
   {%- css 'css/font-awesome.min.css' -%}
+  {%- css 'css/custom.css' -%}
   {%- assets get_css_bundle() -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {%- endassets -%}
@@ -91,7 +97,7 @@
               <a class="close" data-dismiss="alert" href="#">×</a>
               {{ msg }}
             </div>
-          {% endfor %}  
+          {% endfor %}
         </div>
       </div>
       {% endblock messages %}
@@ -106,20 +112,18 @@
   {%- include 'footer.html' -%}
   {% assets get_js_bundle() %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
   <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
-  {% block javascript %}{% endblock javascript %}
+  {% if config.CFG_PIWIK_URL %}
   <script type="text/javascript">
-  /* TODO: Move to page for detail record */
-  $('#affix-outer').height($('#navbar').height())
-  $('#author_affiliations_link').click(function() {
-    $('#authors_short').toggle('slow', function() {
-      if ($('#author_affiliations_link').html() == "(hide affiliations)") {
-        $('#author_affiliations_link').html("(show affiliations)");
-      } else {
-        $('#author_affiliations_link').html("(hide affiliations)");  
-      }
-    });
-    $('#authors_long').toggle('slow', function() {});
-  });
+  var pkBaseURL = (("https:" == document.location.protocol) ? "https://{{config.CFG_PIWIK_URL}}" : "http://{{config.CFG_PIWIK_URL}}");
+  document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
+  </script><script type="text/javascript">
+  try {
+  var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", {{config.CFG_PIWIK_SITE_ID}});
+  piwikTracker.trackPageView();
+  piwikTracker.enableLinkTracking();
+  } catch( err ) {}
   </script>
+  {% endif %}
+  {% block javascript %}{% endblock javascript %}
 </body>
 </html>
