@@ -35,6 +35,7 @@ import invenio.template
 import os
 from invenio.openaire_forms import DepositionForm, DepositionFormMapper, PublicationMapper
 import json
+from invenio.config import CFG_SITE_SUPPORT_EMAIL
 
 blueprint = InvenioBlueprint('deposit', __name__,
     url_prefix="/deposit",
@@ -89,6 +90,11 @@ def upload(pub_id=None):
     afile = request.files['file']
     filename = secure_filename(afile.filename)
     publication = OpenAIREPublication(uid, publicationid=pub_id)
+
+    if publication.status not in ['initialized', 'edited']:
+        flash("You cannot upload new files when your upload has already been submitted!")
+        abort(400)
+
     publication.add_a_fulltext(None, filename, req_file=afile)
 
     return publication.publicationid
@@ -116,9 +122,14 @@ def dropbox_upload(pub_id=None, fileurl=''):
     if not fileurl.startswith("https://dl.dropbox.com/"):
         abort(400)
 
+    publication = OpenAIREPublication(uid)
+    if publication.status not in ['initialized', 'edited']:
+        flash("You cannot upload new files when your upload has already been submitted!")
+        abort(400)
+
     uploaded_file = download_external_url(fileurl)
 
-    publication = OpenAIREPublication(uid)
+
     publication.add_a_fulltext(uploaded_file, secure_filename(os.path.basename(fileurl)))
 
     return redirect(url_for('deposit.edit', pub_id=publication.publicationid))
@@ -153,6 +164,9 @@ def getfile(pub_id='', file_id='', action='view'):
                     attachment_filename=fulltext.get_full_name(),
                     as_attachment=True)
     elif action == 'delete':
+        if pub.status not in ['initialized', 'edited']:
+            flash("You cannot delete files when your upload has already been submitted!")
+            return redirect(url_for('.edit', pub_id=pub.publicationid))
         if len(pub.fulltexts.keys()) > 1:
             if pub.remove_a_fulltext(file_id):
                 flash("File was deleted", category='success')
@@ -237,6 +251,9 @@ def edit(pub_id=u'', action=u'edit'):
         #
         # Delete action
         #
+        if pub.status not in ['initialized', 'edited']:
+            flash("You cannot delete an already submitted upload. Please contact %s if you would like to have it removed!" % CFG_SITE_SUPPORT_EMAIL)
+            return redirect(url_for('.edit', pub_id=pub.publicationid))
         pub.delete()
         flash("Upload '%s' was deleted." % title, 'success')
         return redirect(url_for('.index'))
@@ -251,6 +268,9 @@ def edit(pub_id=u'', action=u'edit'):
         }
 
         if request.method == 'POST':
+            if pub.status not in ['initialized', 'edited']:
+                flash("You cannot edit an already submitted upload. Please contact %s if you would like to make edits!" % CFG_SITE_SUPPORT_EMAIL)
+                return redirect(url_for('.edit', pub_id=pub.publicationid))
             form = DepositionForm(request.values, crsf_enabled=False)
             mapper = DepositionFormMapper(pub)
             pub = mapper.map(form)
@@ -274,6 +294,9 @@ def edit(pub_id=u'', action=u'edit'):
         # Save action (AjAX)
         #
         if request.method == 'POST':
+            if pub.status not in ['initialized', 'edited']:
+                flash("You cannot edit an already submitted upload. Please contact %s if you would like to make edits!" % CFG_SITE_SUPPORT_EMAIL)
+                return redirect(url_for('.edit', pub_id=pub.publicationid))
             form = DepositionForm(request.values, crsf_enabled=False)
             mapper = DepositionFormMapper(pub)
             pub = mapper.map(form)
@@ -297,33 +320,3 @@ def edit(pub_id=u'', action=u'edit'):
         myresearch=get_exisiting_publications_for_uid(current_user.get_id()),
         **ctx
     )
-
-
-# @blueprint.route('/sandbox')
-# def sandbox():
-#     abort(405)
-
-
-# @blueprint.route('/checkmetadata')
-# def checkmetadata():
-#     abort(405)
-
-
-# @blueprint.route('/ajaxgateway')
-# def ajaxgateway():
-#     abort(405)
-
-
-# @blueprint.route('/checksinglefield')
-# def checksinglefield():
-#     abort(405)
-
-
-# @blueprint.route('/authorships')
-# def authorships():
-#     abort(405)
-
-
-# @blueprint.route('/keywords')
-# def keywords():
-#     abort(405)
