@@ -190,6 +190,19 @@ def strip_doi(data):
     return data
 
 
+def splitchar_list(c):
+    def _inner(data):
+        if isinstance(data, basestring):
+            newdata = []
+            for item in data.split(c):
+                if item.strip():
+                    newdata.append(item.strip().encode('utf8'))
+            return newdata
+        else:
+            return data
+    return _inner
+
+
 def splitlines_list(data):
     if isinstance(data, basestring):
         newdata = []
@@ -241,12 +254,12 @@ class DepositionForm(Form):
             'state': 'recommended',
             'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency now!' % CFG_SITE_NAME,
         }),
-        ('Related work', [
+        ('Related datasets/publications', [
             'related_identifiers',
         ], {
-            'classes': 'in',
-            'state':
-            'recommended',
+            'classes': '',
+            'state': 'recommended',
+            'description': 'Specify the Digital Object Identifiers (DOIs) of e.g. datasets referenced by your upload or e.g. publications referencing your upload:'
         }),
         ('Journal', [
             'journal_title', 'journal_volume', 'journal_issue',
@@ -275,11 +288,13 @@ class DepositionForm(Form):
     ]
 
     field_placeholders = {
-        'doi': 'e.g. 10.1234/foo.bar',
+        'doi': 'e.g. 10.1234/foo.bar...',
         'creators': 'Family name, First name: Affiliation (one author per line)',
+        'supervisors': 'Family name, First name: Affiliation (one supervisor per line)',
         'keywords': 'One keyword per line...',
         'funding_source': 'Start typing a grant number, name or abbreviation...',
         'license': 'Start typing a license name or abbreviation...',
+        'related_identifiers': 'e.g. 10.1234/foo.bar (one DOI per line)...',
     }
 
     field_state_mapping = {
@@ -301,9 +316,16 @@ class DepositionForm(Form):
         },
     }
 
+    field_icons = {
+        'thesis_university': 'building',
+    }
+
     #
     # Methods
     #
+    def get_field_icon(self, name):
+        return self.field_icons.get(name, '')
+
     def get_field_by_name(self, name):
         try:
             return self._fields[name]
@@ -452,17 +474,22 @@ class DepositionForm(Form):
     #
     funding_source = fields.FundingField(
         label="Grants",
-        description="Note, a human %s curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay up to 1 working day before your upload is available in OpenAIRE." % CFG_SITE_NAME
+        description="Note, a human %s curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay up to 1 working day before your upload is available in OpenAIRE." % CFG_SITE_NAME,
+        filters=[
+            splitchar_list(","),
+        ]
     )
 
     #
     # Related work
     #
     related_identifiers = fields.RelatedIdentifiersField(
+        label="Related identifiers",
         filters=[
             splitlines_list,
             map_func(strip_doi),
         ],
+        description="Format: e.g. 10.1234/foo.bar (one DOI per line)."
     )  # List identifier, rel type
 
     #
@@ -492,7 +519,11 @@ class DepositionForm(Form):
         validators=[validators.optional()],
         description="Format: Family name, First name: Affiliation (one supervisor per line)"
     )
-    thesis_university = wtf.TextField()
+    thesis_university = wtf.TextField(
+        label='Awarding University',
+        validators=[validators.optional()],
+    )
+    thesis_university._icon_html = '<i class="icon-building"></i>',
 
     #
     # Conference
@@ -502,3 +533,7 @@ class DepositionForm(Form):
     conference_dates = wtf.TextField()
     conference_place = wtf.TextField()
     conference_url = wtf.TextField()
+
+
+#DepostionForm.thesis_university._icon_html = '<i class="icon-building"></i>'
+#DepostionForm._fields['thesis_university']._icon_html = '<i class="icon-building"></i>'

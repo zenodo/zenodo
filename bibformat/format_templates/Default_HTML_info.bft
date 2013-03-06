@@ -83,5 +83,9 @@
         prefix='<dt>Collections:</dt><dd>'
         suffix='</dd>'
     />
+    <BFE_OPENAIRE_LICENSE
+        prefix='<dt>License (for files)</dt><dd>'
+        suffix='</dd>'
+    />
   </dl>
 </div>

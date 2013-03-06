@@ -23,13 +23,16 @@ from invenio.openaire_deposit_config import CFG_OPENAIRE_PUBTYPE_MAP
 def format_element(bfo, as_label=False):
     ln = bfo.lang
     collection = bfo.field('980__a')
-    if not collection:
-        collection = bfo.field('980__b')
+    subcollection = bfo.field('980__b')
+
+    name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
+    if subcollection:
+        name = "%s: %s" % (name, dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection])
 
     if as_label:
-        return """<span class="label label-inverse">%s</span>""" % dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
+        return """<span class="label label-inverse">%s</span>""" % name
     else:
-        return dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
+        return name
 
 
 def escape_values(bfo):

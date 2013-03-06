@@ -60,7 +60,9 @@ function extractLast(term) {
     return split(term).pop();
 }
 
-function webdeposit_autocomplete(selector, remote_url) {
+var autocomplete_tag_fields = [];
+
+function webdeposit_autocomplete(selector, remote_url, with_tags) {
     $('input.'+selector).autocomplete({
         source: function( request, response ) {
             $.ajax({
@@ -77,11 +79,19 @@ function webdeposit_autocomplete(selector, remote_url) {
             });
         },
         select: function( e, ui ) {
-            $('#'+selector+'_values ul').append(tag_template.render(ui.item));
-            $('input.'+selector).val("");
+            if (with_tags) {
+                existing_ids = $.map( $('#'+selector+'_values li'), function(e){ return $(e).data('tagId').toString(); } );
+                if(existing_ids.indexOf(ui.item.value) == -1){
+                    $('#'+selector+'_values ul').append(tag_template.render(ui.item));
+                }
+                $('input.'+selector).val("");
+            }
             e.preventDefault();
         }
     });
+    if (with_tags) {
+        autocomplete_tag_fields.push(selector);
+    }
     $('#'+selector+'_values ul').sortable();
     $('#'+selector+'_values ul').disableSelection();
 }
@@ -159,6 +169,10 @@ function webdeposit_field_enabler(selector, mapping, trigger_all) {
 
 function webdeposit_submit_button(selector, form_selector) {
     $(selector).click(function(e){
+        autocomplete_tag_fields.forEach(function(e){
+            $("input."+e).css("color","white");
+            $("input."+e).val(($.map( $('#'+e+'_values li'), function(e){ return $(e).data('tagId').toString(); } )).toString());
+        });
         $(form_selector).submit();
         e.preventDefault();
     });
@@ -167,6 +181,13 @@ function webdeposit_submit_button(selector, form_selector) {
 function webdeposit_save_button(selector, form_selector, message_selector, url) {
     $(selector).click(function(e){
         $(".loader").addClass("loading");
+        // Compute value of tag autocomplete fields
+        var textcolor = null;
+        autocomplete_tag_fields.forEach(function(e){
+            textcolor = $("input."+e).css("color");
+            $("input."+e).css("color","white");
+            $("input."+e).val(($.map( $('#'+e+'_values li'), function(e){ return $(e).data('tagId').toString(); } )).toString());
+        });
         $.ajax({
             url: url,
             type: 'POST',
@@ -199,6 +220,11 @@ function webdeposit_save_button(selector, form_selector, message_selector, url) 
         }).fail(function(data) {
             $(message_selector).html(alert_template.render({state: 'error', 'message': 'The form could not be saved, due to communication problem with the server.' }));
             $(".loader").removeClass("loading");
+        });
+        // Resetvalue of tag autocomplete fields (can be done as soon as request have been made)
+        autocomplete_tag_fields.forEach(function(e){
+            $("input."+e).val("");
+            $("input."+e).css("color",textcolor);
         });
         e.preventDefault();
     });

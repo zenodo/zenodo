@@ -20,11 +20,12 @@
 """OpenAIRE Flask Blueprint"""
 
 from flask import render_template, abort, request, current_app, flash, \
-    redirect, url_for, send_file, jsonify
+    redirect, url_for, send_file, jsonify, g
 import uuid as uuid_mod
 import hashlib
 from wtforms import Field
 from werkzeug import secure_filename
+from invenio.bibformat import format_record
 from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
 from invenio.webuser_flask import current_user
 from invenio.bibdocfile import download_external_url
@@ -50,6 +51,10 @@ blueprint = InvenioBlueprint('deposit', __name__,
 openaire_deposit_templates = invenio.template.load('openaire_deposit')
 
 
+def is_editable(pub):
+    return pub.status in ['initialized', 'edited']
+
+
 # - Wash url arg
 # - check redirect to login on guest
 # - check error message for logged in user not authorized
@@ -64,7 +69,8 @@ def index():
     """
     Index page with uploader and list of existing depositions
     """
-    return render_template("openaire_index.html",
+    return render_template(
+        "openaire_index.html",
         title=_('Upload'),
         myresearch=get_exisiting_publications_for_uid(current_user.get_id()),
         pub=None,
@@ -91,7 +97,7 @@ def upload(pub_id=None):
     filename = secure_filename(afile.filename)
     publication = OpenAIREPublication(uid, publicationid=pub_id)
 
-    if publication.status not in ['initialized', 'edited']:
+    if not is_editable(publication):
         flash("You cannot upload new files when your upload has already been submitted!")
         abort(400)
 
@@ -123,13 +129,11 @@ def dropbox_upload(pub_id=None, fileurl=''):
         abort(400)
 
     publication = OpenAIREPublication(uid)
-    if publication.status not in ['initialized', 'edited']:
+    if not is_editable(publication):
         flash("You cannot upload new files when your upload has already been submitted!")
         abort(400)
 
     uploaded_file = download_external_url(fileurl)
-
-
     publication.add_a_fulltext(uploaded_file, secure_filename(os.path.basename(fileurl)))
 
     return redirect(url_for('deposit.edit', pub_id=publication.publicationid))
@@ -164,7 +168,7 @@ def getfile(pub_id='', file_id='', action='view'):
                     attachment_filename=fulltext.get_full_name(),
                     as_attachment=True)
     elif action == 'delete':
-        if pub.status not in ['initialized', 'edited']:
+        if not is_editable(pub):
             flash("You cannot delete files when your upload has already been submitted!")
             return redirect(url_for('.edit', pub_id=pub.publicationid))
         if len(pub.fulltexts.keys()) > 1:
@@ -240,8 +244,16 @@ def edit(pub_id=u'', action=u'edit'):
     try:
         pub = OpenAIREPublication(uid, publicationid=pub_id)
         title = pub.metadata.get('title', 'Untitled') or 'Untitled'
+        editable = is_editable(pub)
     except ValueError:
         abort(404)
+
+    # All POST requests change the publication, and are not allowed if the
+    # publication is not editable anymore.
+    if request.method == 'POST':
+        if not editable:
+            flash("You cannot edit an already submitted upload. Please contact %s if you would like to make changes!" % CFG_SITE_SUPPORT_EMAIL)
+            return redirect(url_for('.edit', pub_id=pub.publicationid))
 
     #
     # Action handling
@@ -251,7 +263,7 @@ def edit(pub_id=u'', action=u'edit'):
         #
         # Delete action
         #
-        if pub.status not in ['initialized', 'edited']:
+        if not editable:
             flash("You cannot delete an already submitted upload. Please contact %s if you would like to have it removed!" % CFG_SITE_SUPPORT_EMAIL)
             return redirect(url_for('.edit', pub_id=pub.publicationid))
         pub.delete()
@@ -265,38 +277,36 @@ def edit(pub_id=u'', action=u'edit'):
             'pub': pub,
             'recid': pub.metadata.get('__recid__', None),
             'title': title,
+            'is_editable': editable,
         }
 
         if request.method == 'POST':
-            if pub.status not in ['initialized', 'edited']:
-                flash("You cannot edit an already submitted upload. Please contact %s if you would like to make edits!" % CFG_SITE_SUPPORT_EMAIL)
-                return redirect(url_for('.edit', pub_id=pub.publicationid))
             form = DepositionForm(request.values, crsf_enabled=False)
             mapper = DepositionFormMapper(pub)
             pub = mapper.map(form)
+
             if form.validate():
                 pub.save()
                 pub.upload_record()
-                return redirect(url_for('deposit.index'))
+                ctx['record_hd'] = format_record(recID=pub.recid, xml_record=pub.marcxml, ln=g.ln, of='hd')
+                ctx['record_hdinfo'] = format_record(recID=pub.recid, xml_record=pub.marcxml, ln=g.ln, of='HDINFO')
+                ctx['is_editable'] = False
             else:
                 pub.save()
                 ctx['form_message'] = "The form was saved, but there were errors. Please see below."
-        else:
+        elif editable:
             mapper = PublicationMapper()
             form = DepositionForm(mapper.map(pub), crsf_enabled=False)
-
-        ctx.update({
-            'form': form,
-        })
+            ctx['form'] = form
+        else:
+            ctx['record_hd'] = format_record(recID=pub.recid, xml_record=pub.marcxml, ln=g.ln, of='hd')
+            ctx['record_hdinfo'] = format_record(recID=pub.recid, xml_record=pub.marcxml, ln=g.ln, of='HDINFO')
 
     elif action == 'save':
         #
         # Save action (AjAX)
         #
         if request.method == 'POST':
-            if pub.status not in ['initialized', 'edited']:
-                flash("You cannot edit an already submitted upload. Please contact %s if you would like to make edits!" % CFG_SITE_SUPPORT_EMAIL)
-                return redirect(url_for('.edit', pub_id=pub.publicationid))
             form = DepositionForm(request.values, crsf_enabled=False)
             mapper = DepositionFormMapper(pub)
             pub = mapper.map(form)

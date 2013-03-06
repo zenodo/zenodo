@@ -29,10 +29,10 @@ def format_element(bfo, as_label=False, only_restrictions=False):
     _ = gettext_set_language(ln)
     access_rights = bfo.field('542__l')
     embargo = ''
-    if access_rights == 'embargoedAccess':
+    if access_rights in ('embargoedAccess', 'embargoed'):
         embargo = bfo.field('942__a')
         if embargo <= time.strftime("%Y-%m-%d"):
-            access_rights = 'openAccess'
+            access_rights = 'open'
         embargo = time.strftime("%d %B %Y", time.strptime(embargo, "%Y-%m-%d"))
 
     submitter = bfo.field('8560_f')
@@ -40,29 +40,29 @@ def format_element(bfo, as_label=False, only_restrictions=False):
     access = dict(CFG_ACCESS_RIGHTS(ln))[access_rights]
 
     if only_restrictions:
-        if access_rights == 'embargoedAccess':
+        if access_rights in ('embargoedAccess', 'embargoed'):
             return """<dt>Embargoed</dt><dd>Files available as <span class="label label-success">Open Access</span> after %s</dd>""" % embargo
-        elif access_rights == 'restrictedAccess':
+        elif access_rights in ('restricteDaccess', 'restricted'):
             return """<dt>Restricted access</dt><dd>Please contact %s to access the files.</dd>""" % email
     elif as_label:
-        if access_rights == 'embargoedAccess':
+        if access_rights in ('embargoedAccess', 'embargoed'):
             return """<span class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</span>""" % (embargo, _(access))
-        elif access_rights == 'closedAccess':
+        elif access_rights in ('closeDaccess', 'closed'):
             return """<span class="label label-important">%s</span>""" % _(access)
-        elif access_rights == 'openAccess':
+        elif access_rights in ('openAccess', 'open'):
             return """<span class="label label-success">%s</span>""" % _(access)
-        elif access_rights == 'restrictedAccess':
+        elif access_rights in ('restricteDaccess', 'restricted'):
             return """<span class="label label-warning">%s</span>""" % _(access)
         elif access_rights == 'cc0':
             return """<span class="label label-success">%s</span>""" % _(access)
     else:
-        if access_rights == 'embargoedAccess':
+        if access_rights in ('embargoedAccess', 'embargoed'):
             ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: this document will be available as Open Access after %(embargo)s.")
-        elif access_rights == 'closedAccess':
+        elif access_rights in ('closeDaccess', 'closed'):
             ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is close.")
-        elif access_rights == 'openAccess':
+        elif access_rights in ('openAccess', 'open'):
             ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is open.")
-        elif access_rights == 'restrictedAccess':
+        elif access_rights in ('restricteDaccess', 'restricted'):
             ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: the access to this document is open but with some restrictions. To access the document, please contact %(email)s.")
         elif access_rights == 'cc0':
             ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: To the extent possible under law, the authors have waived all copyright and related or neighbouring rights to this data. %(cc0link)s")

@@ -3,12 +3,22 @@
 
 <div class="well">
   <span class="pull-right hidden-phone" rel="tooltip" title="QR-code for easy mobile access to this page."><BFE_QRCODE width="100" /></span>
-  <h4>Share TODO</h4>
-  Mendeley, Twitter, Facebook, CiteULike
-  <a title="Add this article to your Mendeley library" href="http://www.mendeley.com/import/?url=[CURRENT-PAGE-URL]"><img src="https://www.mendeley.com/graphics/mendeley.png"/></a>
-  <h4>Cite as TODO</h4>
+  <h4>Share </h4>
+  <!-- AddThis Button BEGIN -->
+<div class="addthis_toolbox addthis_default_style addthis_32x32_style">
+<a class="addthis_button_mendeley"></a>
+<a class="addthis_button_citeulike"></a>
+<a class="addthis_button_twitter"></a>
+<a class="addthis_button_preferred_1"></a>
+<a class="addthis_button_preferred_2"></a>
+<a class="addthis_button_compact"></a>
+</div>
+<script type="text/javascript">var addthis_config = {"data_track_addressbar":true};</script>
+<script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>
+<!-- AddThis Button END -->
+  <h4>Cite as </h4>
   <p>
-  <BFE_AUTHORS limit="1" extension=" <em>et al</em>" print_links="nanosensors" interactive="no" /> (YEAR). <BFE_TITLE />. <BFE_PUBLI_INFO />. <BFE_DOI />
+  <BFE_AUTHORS limit="1" extension=" <em>et al</em>" print_links="nanosensors" interactive="no" /> (<BFE_YEAR />). <BFE_TITLE />. <BFE_PUBLI_INFO />. <BFE_DOI />
   </p>
-  
+
 </div>

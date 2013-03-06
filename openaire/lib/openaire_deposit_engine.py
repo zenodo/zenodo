@@ -108,6 +108,13 @@ _ = lambda x: x
 _RE_SPACES = re.compile(r'\s+')
 
 
+def get_license_description(licenseid):
+    info = get_kb_mapping("licenses", str(licenseid))
+    if info:
+        return json.loads(info['value'])
+    else:
+        return None
+
 def get_project_description(projectid):
     """
     Get title of an EU project from the knowledge base, using the project
@@ -479,7 +486,7 @@ def get_exisiting_publications_for_uid(uid):
             except KeyError:
                 title = "Untitled"
 
-            if bibrec:
+            if p.status not in ['initialized', 'edited']:
                 ctx['submitted'].append({'id': pubid, 'recid': bibrec, 'title': title, 'timestamp': time.localtime(p.metadata.get('__cd__', time.time()))})
             else:
                 ctx['unsubmitted'].append({'id': pubid, 'recid': None,  'title': title, 'timestamp': time.localtime(p.metadata.get('__cd__', time.time()))})
@@ -702,10 +709,10 @@ class OpenAIREPublication(object):
         """
         marcxml_path = os.path.join(self.path, 'marcxml')
         open(marcxml_path, 'w').write(self.marcxml)
-        #task_low_level_submission(
-        #    'bibupload', 'openaire', '-r', marcxml_path, '-P5')
-        #self.status = 'submitted'
-        #self.send_emails()
+        task_low_level_submission(
+            'bibupload', 'openaire', '-r', marcxml_path, '-P5')
+        self.status = 'submitted'
+        self.send_emails()
 
     def send_emails(self):
         """
@@ -1027,79 +1034,14 @@ class OpenAIREPublication(object):
         """
         rec = {}
 
+        # =================
+        # System information
+        # =================
+
         # Record ID
         record_add_field(rec, '001', controlfield_value=str(self.recid))
 
-        # Report number
-        report_numbers = self.report_numbers
-        if report_numbers:
-            record_add_field(rec, '037', subfields=[('a', report_numbers[0])])
-            for report_number in report_numbers[1:]:
-                record_add_field(rec, '088', subfields=[('a', report_number)])
-
-        # Authors
-        authors = self.authors
-        for (i, (name, affil)) in enumerate(authors):
-            if i == 0:
-                field_no = '100'
-            else:
-                field_no = '700'
-            subfields = [('a', name), ]
-            if affil:
-                subfields.append(('u', affil))
-            record_add_field(rec, field_no, subfields=subfields)
-
-        # Language
-        record_add_field(
-            rec, '041', subfields=[('a', self._metadata['language'])])
-
-        # Title
-        record_add_field(
-            rec, '245', subfields=[('a', self._metadata['title'])])
-
-        # Original title
-        if self._metadata.get('original_title'):
-            record_add_field(rec, '246', subfields=[('a',
-                             self._metadata['original_title'])])
-
-        # Abstract
-        record_add_field(
-            rec, '520', subfields=[('a', self._metadata['abstract'])])
-
-        # Original abstract
-        if self._metadata.get('original_abstract'):
-            record_add_field(rec, '560', subfields=[('a',
-                             self._metadata['original_abstract'])])
-
-        # Notes
-        if self._metadata.get('notes'):
-            record_add_field(
-                rec, '500', subfields=[('a', self._metadata['notes'])])
-
-        # Keywords
-        if self._metadata.get('keywords'):
-            for keyword in self._metadata['keywords'].splitlines():
-                keyword.strip()
-                if keyword:
-                    record_add_field(
-                        rec, '653', ind1="1", subfields=[('a', keyword)])
-
-        # Publication date
-        if self._metadata.get('publication_date'):
-            record_add_field(rec, '260', subfields=[('c',
-                             self._metadata['publication_date'])])
-
-        # ProjectID
-        for projectid in self.projectids:
-            if projectid:
-                subfields = []
-                project_description = get_project_description(projectid)
-                if project_description:
-                    subfields.append(('a', project_description))
-                subfields.append(('c', str(projectid)))
-                record_add_field(rec, '536', subfields=subfields)
-
-        # Submitter
+        # Owner of record (can edit/view the record)
         user_info = collect_user_info(self.uid)
         if "email" in user_info:
             email = user_info["email"]
@@ -1110,186 +1052,213 @@ class OpenAIREPublication(object):
         record_add_field(
             rec, '856', ind1='0', subfields=[('f', email.encode('utf8')), ('y', name.encode('utf8'))])
 
-        # DOI
-        if self._metadata.get('doi'):
-            doi = self._metadata['doi'].strip()
-            if doi.lower().startswith('doi:'):
-                doi = doi[len('doi:'):]
-            if doi:
-                record_add_field(
-                    rec, '024', '7', subfields=[('a', doi), ('2', 'DOI')])
+        # =================
+        # Access right
+        # =================
+        # Access rights (open, closed, embargoed, restricted date
+        access_right = self._metadata['access_right']
+        record_add_field(rec, '542', subfields=[('l', access_right)])
 
-        # Collection
-        record_add_field(rec, '980', subfields=[('a', 'PROVISIONAL')])
+        # Embargo date
+        if access_right == 'embargoed':
+            record_add_field(rec, '942', subfields=[
+                ('a', self._metadata['embargo_date'])
+            ])
 
-        # =========================
-        # Publication type specific
-        # =========================
+        # =================
+        # Type of file(s)
+        # =================
+        # Upload type - 980__a: type, b: subtype
+        upload_type = self._metadata.get('upload_type')
+        subfields = [('a', upload_type), ]
 
-        # Publication Type (defaults to publishedArticle, since old
-        # submission before these changes wouldn't have a publication_type.
-        pubtype = self._metadata.get('publication_type', 'publishedArticle')
-        field_groups = CFG_METADATA_FIELDS_GROUPS[pubtype]
+        if upload_type == "publication":
+            subfields.append(('b', self._metadata.get('publication_type')))
+        elif upload_type == "image":
+            subfields.append(('b', self._metadata.get('image_type')))
+        record_add_field(rec, '980', subfields=subfields)
 
-        if 'COLLECTION' in field_groups:
-            record_add_field(rec, '980', subfields=[('b', pubtype.upper())])
+        # =================
+        # Files
+        # =================
+        # Generate firerole
+        fft_status = []
+        if access_right == 'open':
+            # Access to everyone
+            fft_status = [
+                'allow any',
+            ]
+        elif access_right == 'embargoed':
+            # Access to submitted, Deny everyone else until embargo date,
+            # then allow all
+            fft_status = [
+                'allow email "%s"' % email,
+                'deny until "%s"' % self._metadata['embargo_date'],
+                'allow any',
+            ]
+        elif access_right in ('closed', 'restricted',):
+            # Access to submitter, deny everyone else
+            fft_status = [
+                'allow email %s' % email,
+                'deny all',
+            ]
+        fft_status = "firerole: %s" % "\n".join(fft_status)
 
-        # Journal
-        if 'JOURNAL' in field_groups:
+        # FFT-tag (file uploads)
+        for key, fulltext in self.fulltexts.items():
+            record_add_field(rec, 'FFT', subfields=[
+                ('a', fulltext.fullpath),
+                #('d', 'some description') # TODO
+                #('t', 'Type'), # TODO
+                ('r', fft_status),
+            ])
+
+        # =================
+        # License
+        # =================
+        license = self._metadata.get('license', '')
+        if license:
+            license_info = get_license_description(license)
             subfields = []
-            if self._metadata.get('journal_title'):
-                subfields.append(('p', self._metadata['journal_title']))
+            if license_info:
+                subfields.append(('a', license_info['title']),)
+                subfields.append(('u', license_info['url']),)
+            else:
+                subfields.append(('a', license,))
+            record_add_field(rec, '540', subfields=subfields)
+
+            # Add identifier for license
+            if license_info:
+                record_add_field(rec, '650', ind1="1", ind2="7", subfields=[
+                    ('a', license),
+                    ('2', 'opendefinition.org'),
+                ])
+
+        # =================
+        # Basic information
+        # =================
+        # DOI
+        doi = self._metadata.get('doi')
+        if doi:
+            record_add_field(
+                rec, '024', '7', subfields=[('a', doi), ('2', 'DOI')])
+
+        # Publication date
+        record_add_field(rec, '260', subfields=[
+            ('c', self._metadata['publication_date'])
+        ])
+
+        # Title
+        record_add_field(
+            rec, '245', subfields=[('a', self._metadata['title'])])
+
+        # Creators
+        creators = self._metadata['creators']
+        for (i, (name, affil)) in enumerate(creators):
+            if i == 0:
+                field_no = '100'
+            else:
+                field_no = '700'
+            subfields = [('a', name), ]
+            if affil:
+                subfields.append(('u', affil))
+            record_add_field(rec, field_no, subfields=subfields)
+
+        # Description
+        record_add_field(
+            rec, '520', subfields=[('a', self._metadata['description'])])
+
+        # ProjectID
+        for projectid in self._metadata['funding_source']:
+            if projectid:
+                subfields = []
+                project_description = get_project_description(projectid)
+                if project_description:
+                    subfields.append(('a', project_description))
+                subfields.append(('c', str(projectid)))
+                record_add_field(rec, '536', subfields=subfields)
+
+       # Keywords
+        if self._metadata.get('keywords'):
+            for keyword in self._metadata['keywords']:
+                if keyword:
+                    record_add_field(
+                        rec, '653', ind1="1", subfields=[('a', keyword)])
+
+        # Notes
+        if self._metadata.get('notes'):
+            record_add_field(
+                rec, '500', subfields=[('a', self._metadata['notes'])])
+
+        # =================
+        # Related datasets/publications
+        # =================
+        #
+        if self._metadata.get('related_identifiers'):
+            for doi in self._metadata.get('related_identifiers'):
+                record_add_field(rec, '773', subfields=[('a', doi), ])
+                #record_add_field(rec, '773', subfields=[('a', doi), ('n', 'type???')])
+
+        # =================
+        # Journal
+        # =================
+        # Journal (only add if Journal title is specified)
+        subfields = []
+        if self._metadata.get('journal_title'):
+            subfields.append(('p', self._metadata['journal_title']))
             if self._metadata.get('publication_date'):
                 year = self._metadata['publication_date'][:4]
                 subfields.append(('y', year))
-            if self._metadata.get('issue'):
-                subfields.append(('n', self._metadata['issue']))
-            if self._metadata.get('volume'):
-                subfields.append(('v', self._metadata['volume']))
-            if self._metadata.get('pages'):
-                subfields.append(('c', self._metadata['pages']))
+            if self._metadata.get('journal_issue'):
+                subfields.append(('n', self._metadata['journal_issue']))
+            if self._metadata.get('journal_volume'):
+                subfields.append(('v', self._metadata['journal_volume']))
+            if self._metadata.get('journal_pages'):
+                subfields.append(('c', self._metadata['journal_pages']))
             if subfields:
                 record_add_field(rec, '909', 'C', '4', subfields=subfields)
-            record_add_field(rec, '980', subfields=[('b', 'OPENAIRE')])
 
-        # Access rights (open/closed access + embargo date
-        if 'ACCESS_RIGHTS' in field_groups:
-            # Access right
-            record_add_field(rec, '542', subfields=[('l',
-                             self._metadata['access_rights'])])
+        # =================
+        # Book/chapter/report
+        # =================
+        # Book section (comsume publiser, place, isbn)
+        if self._metadata.get('partof_title'):
+            subfields = [('t', self._metadata.get('partof_title')), ('n', 'bookpart')]
 
-            # Embargo date
-            if self._metadata.get('embargo_date'):
-                record_add_field(rec, '942', subfields=[(
-                    'a', self._metadata['embargo_date'])])
+            if self._metadata.get('partof_pages'):
+                subfields.append(('g', self._metadata.get('partof_pages')))
 
-            # Firerole
-            fft_status = ''
-            if self._metadata['access_rights'] == 'embargoedAccess':
-                fft_status = 'firerole: deny until "%s"\nallow any' % self._metadata['embargo_date']
-            elif self._metadata['access_rights'] in ('closedAccess', 'restrictedAccess'):
-                fft_status = 'status: %s' % self._metadata['access_rights']
-
-            # Fulltext
-            for key, fulltext in self.fulltexts.iteritems():
-                subfields = [('a', fulltext.fullpath)]
-                if fft_status:
-                    subfields.append(('r', fft_status))
-                record_add_field(rec, 'FFT', subfields=subfields)
-
-        # CC0 and data set
-        if 'CC0' in field_groups and not 'ACCESS_RIGHTS' in field_groups:
-            # Access rights
-            record_add_field(rec, '542', subfields=[('l', 'cc0')])
-
-            # Data file (no access restriction required)
-            for key, fulltext in self.fulltexts.items():
-                subfields = [('a', fulltext.fullpath), ('d', 'Data')]
-                record_add_field(rec, 'FFT', subfields=subfields)
-
-        # THESIS
-        if 'THESIS' in field_groups:
-            # Supervisors
-            supervisors = self.supervisors
-            for (name, affil) in supervisors:
-                subfields = [('a', name), ('4', 'ths')]
-                if affil:
-                    subfields.append(('u', affil))
-                record_add_field(rec, '700', subfields=subfields)
-
-            record_add_field(rec, '502', '', '', subfields=[
-                                 ('c', self._metadata.get('university')),
-                                 ('b', self._metadata.get('thesis_type'))])
-
-            record_add_field(rec, '980', '', '', subfields=[
-                ('b', self._metadata.get('thesis_type').upper()),
-                ])
-
-        # ISBN
-        if 'ISBN' in field_groups:
-            if self._metadata.get('isbn'):
-                record_add_field(rec, '020', '', '', subfields=[
-                                 ('a', self._metadata.get('isbn')), ])
-
-        # Book
-        if 'BOOKPART' in field_groups:
-            subfields = [('t', self._metadata.get('book_title')), ('n', 'bookpart')]
-
-            if self._metadata.get('book_pages'):
-                subfields.append(('g', self._metadata.get('book_pages')))
-
-            if self._metadata.get('publisher'):
+            if self._metadata.get('imprint_publisher'):
                 subfields.append(('b', self._metadata.get('publisher')))
 
-            if self._metadata.get('place'):
+            if self._metadata.get('imprint_place'):
                 subfields.append(('a', self._metadata.get('place')))
 
-            if self._metadata.get('isbn'):
-                subfields.append(('z', self._metadata.get('isbn')))
+            if self._metadata.get('imprint_isbn'):
+                subfields.append(('z', self._metadata.get('imprint_isbn')))
 
-            if self._metadata.get('publication_date'):
-                year = self._metadata['publication_date'][:4]
+            if self._metadata.get('partof_year'):
+                year = self._metadata['partof_year'][:4]
                 subfields.append(('c', year))
 
             record_add_field(rec, '773', '', '', subfields=subfields)
+        else:
+            # ISBN
+            if self._metadata.get('imprint_isbn'):
+                record_add_field(rec, '020', '', '', subfields=[
+                    ('a', self._metadata.get('imprint_isbn')),
+                ])
 
-        if 'RELATED_PUBS' in field_groups:
-            # Related publications
-            for doi in self.related_publications:
-                record_add_field(rec, '773', subfields=[('a', doi), ('n', 'pub')])
-
-        # Related datasets
-        if 'RELATED_DATA' in field_groups:
-            for doi in self.related_datasets:
-                record_add_field(rec, '773', subfields=[('a', doi), ('n', 'data')])
-
-        # Dataset publisher
-        if 'DATASET' in field_groups:
-            dataset_publisher = self._metadata.get('dataset_publisher')
-            if dataset_publisher:
-                subfields = [('b', dataset_publisher)]
-
-                if self._metadata.get('publication_date'):
-                    year = self._metadata['publication_date'][:4]
-                    subfields.append(('c', year))
-
-                # Note publication date is record in 260__$c, from which the
-                # publication year can be computed
-                record_add_field(rec, '260', '', '', subfields=subfields)
-
-        # Number of pages
-        if 'PAGES_NO' in field_groups:
-            # Number of pages
-            if self._metadata.get('report_pages_no'):
-                record_add_field(rec, '300', '', '', subfields=[(
-                    'a', self._metadata.get('report_pages_no')), ])
-
-        # Report numbers and report type
-        if 'REPORT' in field_groups:
-            # Report numbers
-            if self._metadata.get('extra_report_numbers'):
-                for report_num in self._metadata['extra_report_numbers'].splitlines():
-                    report_num = report_num.strip()
-                    if report_num:
-                        record_add_field(
-                            rec, '088', '', '', subfields=[('a', report_num)])
-
-            # Report type
-            if self._metadata.get('report_type'):
-                record_add_field(rec, '980', '', '', subfields=[('b', "REPORT_%s" % self._metadata.get('report_type').upper()), ])
-
-        # Imprint (place: publisher. year.)
-        if 'IMPRINT' in field_groups:
-            # Place and Publisher
-            place = self._metadata.get('place', '')
-            publisher = self._metadata.get('publisher', '')
+            # Publisher, Place
+            place = self._metadata.get('imprint_place', '')
+            publisher = self._metadata.get('imprint_publisher', '')
 
             if place or publisher:
                 subfields = []
                 if place:
-                    subfields.append(('a', self._metadata.get('place')))
+                    subfields.append(('a', place))
                 if publisher:
-                    subfields.append(('b', self._metadata.get('publisher')))
+                    subfields.append(('b', publisher))
                 if self._metadata.get('publication_date'):
                     year = self._metadata['publication_date'][:4]
                     subfields.append(('c', year))
@@ -1297,31 +1266,89 @@ class OpenAIREPublication(object):
                 # publication year can be computed
                 record_add_field(rec, '260', '', '', subfields=subfields)
 
-        # Meeting/conferences (type, title, acronym, dates, town, country, URL
-        if 'MEETING' in field_groups:
+        # =================
+        # Thesis
+        # =================
+        # Supervisors
+        supervisors = self._metadata.get('thesis_supervisors')
+        for (name, affil) in supervisors:
+            subfields = [('a', name), ('4', 'ths')]
+            if affil:
+                subfields.append(('u', affil))
+            record_add_field(rec, '700', subfields=subfields)
+
+        # University
+        if self._metadata.get('thesis_university'):
+            record_add_field(rec, '502', '', '', subfields=[
+                ('c', self._metadata.get('thesis_university')),
+                #('b', self._metadata.get('thesis_type'))
+            ])
+
+        # =================
+        # Conference
+        # =================
+        # Meeting/conferences (type, title, acronym, dates, town, country, CFG_SITE_URL
+        conference_title = self._metadata.get('conference_title', '')
+        conference_acronym = self._metadata.get('conference_acronym', '')
+        conference_dates = self._metadata.get('conference_dates', '')
+        conference_place = self._metadata.get('conference_place', '')
+        conference_title = self._metadata.get('conference_title', '')
+        conference_url = self._metadata.get('conference_url', '')
+
+        if conference_title or conference_acronym or conference_url:
             meeting_values = [
-                ('a', self._metadata.get('meeting_title', '')),
-                ('g', self._metadata.get('meeting_acronym', '')),
-                ('d', self._metadata.get('meeting_dates', '')),
-                ('c', self._metadata.get('meeting_town', '')),
-                ('w', self._metadata.get('meeting_country', '')),
+                ('a', conference_title),
+                ('g', conference_acronym),
+                ('d', conference_dates),
+                ('c', conference_place),
             ]
 
             subfields = []
             for code, val in meeting_values:
                 if val:
                     subfields.append((code, val))
-            record_add_field(rec, '711', '', '', subfields=subfields)
+            if subfields:
+                record_add_field(rec, '711', '', '', subfields=subfields)
 
-            meeting_url = self._metadata.get('meeting_url', '')
-            if meeting_url:
+            if conference_url:
                 record_add_field(rec, '8564', '', '', subfields=[
-                                    ('u', meeting_url), ('y', 'Meeting website')])
+                    ('u', conference_url), ('y', 'Conference website')
+                ])
 
-            # Contribution type (paper, poster, lecture, ...)
-            contribution_type = self._metadata.get('contribution_type', '')
-            if contribution_type:
-                record_add_field(rec, '980', '', '', subfields=[('b', "MEETING_%s" % contribution_type.upper()), ])
+        # =================
+        # Old left
+        # =================
+        # # Dataset publisher
+        # if 'DATASET' in field_groups:
+        #     dataset_publisher = self._metadata.get('dataset_publisher')
+        #     if dataset_publisher:
+        #         subfields = [('b', dataset_publisher)]
+
+        #         if self._metadata.get('publication_date'):
+        #             year = self._metadata['publication_date'][:4]
+        #             subfields.append(('c', year))
+
+        #         # Note publication date is record in 260__$c, from which the
+        #         # publication year can be computed
+        #         record_add_field(rec, '260', '', '', subfields=subfields)
+
+        # # Number of pages
+        # if 'PAGES_NO' in field_groups:
+        #     # Number of pages
+        #     if self._metadata.get('report_pages_no'):
+        #         record_add_field(rec, '300', '', '', subfields=[(
+        #             'a', self._metadata.get('report_pages_no')), ])
+        ## Language
+        #record_add_field(
+        #    rec, '041', subfields=[('a', self._metadata['language'])])
+        ## Original title
+        #if self._metadata.get('original_title'):
+        #    record_add_field(rec, '246', subfields=[('a',
+        #                     self._metadata['original_title'])])
+        ## Original abstract
+        #if self._metadata.get('original_abstract'):
+        #    record_add_field(rec, '560', subfields=[('a',
+        #                     self._metadata['original_abstract'])])
 
         return rec
 

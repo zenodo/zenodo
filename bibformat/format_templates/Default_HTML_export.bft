@@ -10,6 +10,5 @@
     <a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xn?ln=<BFE_CLIENT_INFO var='ln'/>">NLM</a>,
     <a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xw?ln=<BFE_CLIENT_INFO var='ln'/>">RefWorks</a></li>
     <a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/hm?ln=<BFE_CLIENT_INFO var='ln'/>">MARC</a>,
-    <a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xm?ln=<BFE_CLIENT_INFO var='ln'/>">MARCXML</a>,
+    <a href="<BFE_SERVER_INFO var='CFG_SITE_URL'/><BFE_SERVER_INFO var='CFG_SITE_RECORD'/>/<BFE_RECORD_ID/>/export/xm?ln=<BFE_CLIENT_INFO var='ln'/>">MARCXML</a>
 </div>
-            

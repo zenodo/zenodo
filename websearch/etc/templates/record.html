@@ -50,7 +50,6 @@
             <thead>
               <tr class="">
                 <th>Name</th>
-                <th>Type</th>
                 <th>Date</th>
                 <th>Size</th>
                 <th></th>
@@ -60,7 +59,6 @@
               {%- for file in files.list_latest_files(list_hidden=False) if not file.is_icon() and file.is_restricted(current_user)[0] == 0 -%}
                 <tr class="">
                   <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
-                  <td>{{_("Fulltext")}}{% if file.get_subformat() %} ({{ file.get_subformat()|upper }}){% endif %}</td>
                   <td>{{ file.md.strftime('%d %b %Y') }}</td>
                   <td>{{ file.size|filesize }}</td>
                   <td><span class="pull-right"><button class="btn preview-link" data-url="{{file.get_url()}}"><i class="icon-eye-open"></i> {{_("Preview")}}</button> <a class="btn" href="{{file.get_url()}}"><i class="icon-download"></i> {{_("Download")}}</a></span></td>

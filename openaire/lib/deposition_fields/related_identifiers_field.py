@@ -48,7 +48,7 @@ def doi_list_validator(form, field):
 
 class RelatedIdentifiersField(TextAreaField):
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-bar-code"></i>'
+        self._icon_html = '<i class="icon-barcode"></i>'
         kwargs['validators'] = [doi_list_validator]
         super(RelatedIdentifiersField, self).__init__(**kwargs)
 

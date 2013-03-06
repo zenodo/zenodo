@@ -5,17 +5,36 @@
 {% block title %}{% endblock %}
 
 {% block body %}
+{% if is_editable %}
+<!-- Modal -->
+<div id="submitModal" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Are you sure you want to submit?</h3>
+  </div>
+  <div class="modal-body">
+    <ul>
+        <li>Editing after you have submitted your upload is not possible.</li>
+        <li>Your upload will be <strong>publicly available</strong> immediately after you submit &mdash; uploaded files are only publicly available if you have chosen Open Access and/or Embargoed Access (subject to the embargo date).</li>
+    </ul>
+    <p><small class="muted">We are working on making editing possible after you have submitted, and plan to launch the feature in May.</small></p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary edit-form-submit">Submit</button>
+  </div>
+</div>
+{% endif %}
 <div class="row">
     <div id="file_container" class="span8">
-        {% if recid %}
-        <div class="alert alert-info">
-            <strong>Submitted</strong> Currently you can not edit already submitted
-            uploads. We are working on making this possible. In the mean time,
-            drop us an email on <a href="mailto:openaire-support@cern.ch">openaire-support@cern.ch</a>
-        </div>
+        {% if not is_editable %}
         <div class="well" style="text-align: center;">
-            <a href="{{config.CFG_SITE_URL}}/record/{{recid}}">{{config.CFG_SITE_URL}}/record/{{recid}}</a>
+            Public URL: <a href="{{config.CFG_SITE_URL}}/record/{{recid}}">{{config.CFG_SITE_URL}}/record/{{recid}}</a>
         </div>
+        <div class="alert alert-info">
+            <p><strong><i class="icon-ban-circle"></i> Editing:</strong> This upload can no longer be edited, as it has been submitted. If you wish to make changes, please email us at <a href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>. We are working on allowing you to edit your submissions and plan to release the feature in end-May.</p>
+        </div>
+
         {% else %}
         <div id="form_message">{% if form_message %}<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert">&times;</button>{{form_message}}</div>{% endif %}</div>
         <div class="well">
@@ -23,12 +42,13 @@
             <span class="pull-right">
                 <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
                 <button class="btn edit-form-save"><i class="icon-file"></i> Save</button>
-                <button class="btn btn-primary edit-form-submit"><i class="icon-ok  icon-white"></i> Submit</button>
+                <button data-target="#submitModal" data-toggle="modal" role="button" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit</a>
             </span>
         </div>
         {% endif %}
-        {% if recid %}
-
+        {% if not is_editable %}
+        {{record_hd|safe}}
+        {{record_hdinfo|safe}}
         {% else %}
         <h1>New upload</h1>
         <form action="." method="POST" id="edit_form" class="form-horizontal">
@@ -38,7 +58,7 @@
                 {%- if title %}
                 <div class="accordion-heading">
                     <span class="accordion-toggle muted pull-right">{{conf.state}}</span>
-                    <a class="accordion-toggle" data-toggle="collapse" data-idx="{{loop.index}}" href="#collapse{{loop.index}}">{{title}}{% if conf.state %} {% endif %}</a>
+                    <a class="accordion-toggle" data-toggle="collapse" data-idx="{{loop.index}}" href="#collapse{{loop.index}}">{{title}} <b class="caret"></b></a>
                 </div>
                 {%- endif %}
                 <div id="collapse{{loop.index}}" class="accordion-body collapse{% if conf.classes %} {{conf.classes}}{% endif %}">
@@ -65,16 +85,16 @@
                             {%- else %}
                             <div class="control-group field-{{ field.name }}{% if field.errors %} error{% endif %}">
                                 <label class="control-label{{' required' if field.required else ''}}" for="{{field.label.field_id}}">
-                                    {%- if field._icon_html %}
+                                    {%- if field._icon_html or form.get_field_icon(f) %}
                                     <span class="" style="margin-right: 5px; margin-top: 5px;">
-                                        {{ field._icon_html|safe }}
+                                        {% if form.get_field_icon(f) %}<i class="icon-{{ form.get_field_icon(f) }}"></i>{% else %}{{ field._icon_html|safe }}{% endif %}
                                     </span>
                                     {%- endif %}
                                     {{ field.label.text }}
                                 </label>
                                 <div class="controls">
                                     {% if form.has_autocomplete(field) %}
-                                    <div id="{{f}}_values" class="span5 tag-values"><ul class="inline"></ul></div>
+                                    <div id="{{f}}_values" class="span5 tag-values"><ul class="unstyled">{% if f == "funding_source" %}{% for tag in field.get_tags() %}<li class="alert alert-info tag" data-tag-id="{{tag.grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{tag.label}}</li>{% endfor %}{% endif %}</ul></div>
                                     {% endif %}
                                     {%- if field.type == "Date" %}
                                         {{ field(class_="span2 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
@@ -104,14 +124,14 @@
             <span class="pull-right">
                 <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
                 <button class="btn edit-form-save"><i class="icon-file"></i> Save</button>
-                <button class="btn btn-primary edit-form-submit"><i class="icon-ok icon-white"></i> Submit</button>
+                <button data-target="#submitModal" data-toggle="modal" role="button" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit</a>
             </span>
         </div>
         {% endif %}
 
         {% if pub.fulltexts %}
         <div id="selected-files" class="well" >
-        {% if not recid %}<span class="pull-right"><a class="btn btn-mini" id="pickfiles">Choose files...</a> <a class="btn btn-success btn-mini disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a></span>{% endif %}
+        {% if is_editable %}<span class="pull-right"><a class="btn btn-mini" id="pickfiles">Choose files...</a> <a class="btn btn-success btn-mini disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a></span>{% endif %}
         <h4>Files</h4>
         <table class="table table-striped" id="filelist">
         <thead>
@@ -119,7 +139,7 @@
         </thead>
         <tbody>
             {% for file_id, bdf in pub.fulltexts.items() %}
-            <tr><td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}">{{bdf.get_full_name()}}</a></td><td>{{bdf.get_size()|filesize}}</td><td width="30%"></td>{% if not recid %}<td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}/delete/" class="rmlink" rel="tooltip" title="Delete file"><i class="icon-trash"></i></a>{% endif %}</td></tr>
+            <tr><td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}">{{bdf.get_full_name()}}</a></td><td>{{bdf.get_size()|filesize}}</td><td width="30%"></td>{% if is_editable %}<td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}/delete/" class="rmlink" rel="tooltip" title="Delete file"><i class="icon-trash"></i></a>{% endif %}</td></tr>
             {% endfor %}
         </tbody>
         </table>
@@ -134,7 +154,7 @@
 {% endblock %}
 
 {% block javascript %}
-{% if not recid %}
+{% if is_editable %}
 {% include "openaire_uploader.html" %}
 <script type="text/javascript">
 $(document).ready(function() {
@@ -153,7 +173,7 @@ $(document).ready(function() {
     {%- if "<textarea" in field.__html__() %}
     webdeposit_autocomplete_textarea('{{field.short_name}}', '{{ url_for('deposit.autocomplete') }}?field={{field.short_name}}&limit=10');
     {%- else %}
-    webdeposit_autocomplete('{{field.short_name}}', '{{ url_for('deposit.autocomplete') }}?field={{field.short_name}}&limit=10');
+    webdeposit_autocomplete('{{field.short_name}}', '{{ url_for('deposit.autocomplete') }}?field={{field.short_name}}&limit=10', {{ 'true' if field.short_name == 'funding_source' else 'false' }});
     {%- endif %}
     {%- endif %}
     {%- endfor %}

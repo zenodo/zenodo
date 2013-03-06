@@ -18,9 +18,9 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from wtforms.validators import Required
+from wtforms.validators import Required, ValidationError
 from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
-from invenio.bibknowledge import get_kb_mappings
+from invenio.bibknowledge import get_kb_mappings, get_kb_mapping
 import json
 
 
@@ -34,6 +34,16 @@ def _kb_transform(val):
     return data
 
 
+def kb_list_validator(kb_name):
+    def _inner(form, field):
+        if isinstance(field.data, list):
+            for item in field.data:
+                val = get_kb_mapping(kb_name=kb_name, key=item, default=None)
+                if val is None:
+                    raise ("%s is not a valid grant agreement number.")
+    return _inner
+
+
 class FundingField(TextField, JsonCookerMixinBuilder('journal')):
 
     def __init__(self, **kwargs):
@@ -45,10 +55,26 @@ class FundingField(TextField, JsonCookerMixinBuilder('journal')):
             for v in kwargs.get("validators"):
                 if type(v) is Required:
                     self.required = True
+
+        kwargs['validators'] = [kb_list_validator("json_projects")]
         super(FundingField, self).__init__(**kwargs)
 
-    def pre_validate(self, form):
-        return dict(error=0, error_message='')
+    def _value(self):
+        # Input value field should be left blank, since values are displayed as
+        # tags
+        return ""
+
+    def get_tags(self):
+        if isinstance(self.data, list):
+            projects = filter(
+                lambda x: x is not None,
+                map(
+                    lambda x: _kb_transform(get_kb_mapping(kb_name="json_projects", key=x, default={})),
+                    self.data
+                )
+            )
+            return projects
+        return []
 
     def autocomplete(self, term, limit):
         if not term:

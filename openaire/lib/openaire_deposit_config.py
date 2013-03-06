@@ -121,6 +121,29 @@ def CFG_OPENAIRE_PUBTYPE_MAP(ln):
         ('MEETING_CONFERENCEPAPER', _("Conference paper")),
         ('MEETING_CONFERENCETALK', _("Talk")),
         ('DATA', _("Dataset")),
+        ('publication', _("Publication")),
+        ('poster', _("Poster")),
+        ('presentation', _("Presentation")),
+        ('dataset', _("Dataset")),
+        ('image', _("image")),
+        ('video', _("Video/Audio")),
+        ('book', 'Book'),
+        ('section', 'Book section'),
+        ('conferencepaper', 'Conference paper'),
+        ('article', 'Journal article'),
+        ('patent', 'Patent'),
+        ('preprint', 'Preprint'),
+        ('report', 'Report'),
+        ('thesis', 'Thesis'),
+        ('technicalnote', 'Technical note'),
+        ('workingpaper', 'Working paper'),
+        ('other', 'Other'),
+        ('figure', 'Figure'),
+        ('plot', 'Plot'),
+        ('drawing', 'Drawing'),
+        ('diagram', 'Diagram'),
+        ('photo', 'Photo'),
+        ('other', 'Other'),
     ]
 
 # ===============
@@ -234,6 +257,10 @@ def CFG_ACCESS_RIGHTS(ln):
         ('restrictedAccess', _("Restricted access")),
         ('openAccess', _("Open access")),
         ('cc0', _("Creative Commons Zero (CC0)")),
+        ('closed', _("Closed access")),
+        ('embargoed', _("Embargoed access")),
+        ('restricted', _("Restricted access")),
+        ('open', _("Open access")),
     ]
 CFG_ACCESS_RIGHTS_KEYS = [x[0] for x in CFG_ACCESS_RIGHTS('en')]
 CFG_DEFAULT_ACCESS_RIGHTS = 'closedAccess'
