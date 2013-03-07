@@ -36,7 +36,7 @@ import invenio.template
 import os
 from invenio.openaire_forms import DepositionForm, DepositionFormMapper, PublicationMapper
 import json
-from invenio.config import CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
 
 blueprint = InvenioBlueprint('deposit', __name__,
     url_prefix="/deposit",
@@ -288,12 +288,12 @@ def edit(pub_id=u'', action=u'edit'):
             if form.validate():
                 pub.save()
                 pub.upload_record()
-                ctx['record_hd'] = format_record(recID=pub.recid, xml_record=pub.marcxml, ln=g.ln, of='hd')
-                ctx['record_hdinfo'] = format_record(recID=pub.recid, xml_record=pub.marcxml, ln=g.ln, of='HDINFO')
-                ctx['is_editable'] = False
+                flash("Upload was successfully submitted - it may take up 5 minutes before it has been fully integrated into %s." % CFG_SITE_NAME, category='success')
+                return redirect(url_for('.index'))
             else:
                 pub.save()
                 ctx['form_message'] = "The form was saved, but there were errors. Please see below."
+
         elif editable:
             mapper = PublicationMapper()
             form = DepositionForm(mapper.map(pub), crsf_enabled=False)
