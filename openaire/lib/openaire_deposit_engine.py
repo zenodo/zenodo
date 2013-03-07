@@ -1099,7 +1099,7 @@ class OpenAIREPublication(object):
         elif access_right in ('closed', 'restricted',):
             # Access to submitter, deny everyone else
             fft_status = [
-                'allow email %s' % email,
+                'allow email "%s"' % email,
                 'deny all',
             ]
         fft_status = "firerole: %s" % "\n".join(fft_status)
