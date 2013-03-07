@@ -63,7 +63,7 @@ def is_editable(pub):
 @blueprint.route('/', methods=['GET', 'POST'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 @blueprint.invenio_errorpage(template='openaire_error.html', exc_list=(ValueError,))
 def index():
     """
@@ -80,7 +80,7 @@ def index():
 @blueprint.route('/upload', methods=['POST', 'GET'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 @blueprint.invenio_wash_urlargd({'pub_id': (unicode, None)})
 def upload(pub_id=None):
     """
@@ -109,7 +109,7 @@ def upload(pub_id=None):
 @blueprint.route('/upload/dropbox', methods=['POST'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 @blueprint.invenio_wash_urlargd({'pub_id': (unicode, None), 'fileurl': (unicode, '')})
 def dropbox_upload(pub_id=None, fileurl=''):
     """
@@ -143,7 +143,7 @@ def dropbox_upload(pub_id=None, fileurl=''):
 @blueprint.route('/getfile/<string:pub_id>/<string:file_id>/<string:action>/', methods=['GET'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 def getfile(pub_id='', file_id='', action='view'):
     """
     View for stream file or deleting it.
@@ -184,7 +184,7 @@ def getfile(pub_id='', file_id='', action='view'):
 @blueprint.route('/check/', methods=['GET', 'POST'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 def check():
     value = request.args.get('value', '')
     field_name = request.args.get('field', '')
@@ -206,7 +206,7 @@ def check():
 @blueprint.route('/autocomplete/', methods=['GET', 'POST'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 def autocomplete():
     """
         Returns a list with of suggestions for the field based on the current value
@@ -230,7 +230,7 @@ def autocomplete():
 @blueprint.route('/edit/<string:pub_id>/<string:action>/', methods=['GET', 'POST'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='OpenAIRE')
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
 @blueprint.invenio_set_breadcrumb('Edit')
 def edit(pub_id=u'', action=u'edit'):
     """
