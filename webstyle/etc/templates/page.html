@@ -27,21 +27,21 @@
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
   {%- js "js/hogan.js" -%}
-  {%- js "js/holder.js" -%}
   {%- js 'js/jquery.min.js' -%}
   {%- js 'js/jquery-ui.custom.min.js' -%}
   {%- js 'js/bootstrap.min.js' -%}
-  {%- js "js/websearch_typeahead.js" -%}
   {%- js "js/bootstrap-select.js" -%}
   {%- js "js/bootstrap-datepicker.js" -%}
-  {%- js "js/typeahead.min.js" -%}
+  {%- js 'js/jquery.tokeninput.js' -%}
+  {%- js "js/websearch_typeahead.js" -%}
+  {%- js "js/holder.js" -%}
   {%- js "js/custom.js" -%}
   {%- css 'css/jquery-ui.custom.css' -%}
   {%- css 'css/bootstrap.css' -%}
   {%- css 'css/bootstrap-responsive.min.css' -%}
+  {%- css 'css/token-input.css' -%}
+  {%- css 'css/token-input-facebook.css' -%}
   {%- css 'css/datepicker.css' -%}
-  {%- css 'css/typeahead.min.css' -%}
-  {%- css 'css/typeahead.js-bootstrap.css' -%}
   {%- css 'css/font-awesome.min.css' -%}
   {%- css 'css/custom.css' -%}
   {%- assets get_css_bundle() -%}

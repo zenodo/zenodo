@@ -33,6 +33,7 @@ collection_mapping = {
     'MEETING_CONFERENCEPAPER': ('publication', 'conferencepaper'),
     'MEETING_POSTER': ('poster', ''),
     'MEETING_PROCEEDINGSARTICLE': ('publication', 'conferencepaper'),
+    'MEETING_PROCEEDINGARTICLE': ('publication', 'conferencepaper'),
     'OPENAIRE': ('publication', 'article'),
     'REPORT_OTHER': ('publication', 'report'),
     'REPORT_PROJECTDELIVERABLE': ('publication', 'report'),

@@ -38,7 +38,7 @@
               {% else %}
                 <button class="btn dropdown-toggle" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="icon icon-white icon-user"></i> {{ current_user.email }} <span class="caret"></span>&nbsp;</button>
                 <ul class="dropdown-menu">
-                  <li><a href="{{ url_for('youraccount.display') }}">{{ _("Personalize") }}</a></li>
+                  <li><a href="/youraccount/edit">{{ _("Profile") }}</a></li>
                   <li class="divider"></li>
                   <li><a href="{{ url_for('youraccount.logout') }}">
                     <i class="icon icon-off"></i> {{ _("Logout") }}
