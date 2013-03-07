@@ -712,12 +712,12 @@ class OpenAIREPublication(object):
         task_low_level_submission(
             'bibupload', 'openaire', '-r', marcxml_path, '-P5')
         self.status = 'submitted'
-        self.send_emails()
+        #self.send_emails()
 
     def send_emails(self):
         """
         """
-        content = openaire_deposit_templates.tmpl_confirmation_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, report_numbers=self.report_numbers, ln=self.ln)
+        content = openaire_deposit_templates.tmpl_confirmation_email_body(title=self._metadata['title'], authors=self._metadata['creators'], url=self.url, report_numbers=self.report_numbers, ln=self.ln)
         # No email to user anymore
         #send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a publication into OpenAIRE"), content=content)
         bibedit_url = CFG_SITE_URL + \
