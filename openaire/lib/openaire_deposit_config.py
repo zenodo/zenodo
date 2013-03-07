@@ -116,7 +116,7 @@ def CFG_OPENAIRE_PUBTYPE_MAP(ln):
         ('WORKINGPAPER', _("Working paper")),
         ('BOOK', _("Book")),
         ('BOOKPART', _("Part of book")),
-        ('MEETING_PROCEEDINGARTICLE', _("Proceedings article")),
+        ('MEETING_PROCEEDINGSARTICLE', _("Proceedings article")),
         ('MEETING_POSTER', _("Poster")),
         ('MEETING_CONFERENCEPAPER', _("Conference paper")),
         ('MEETING_CONFERENCETALK', _("Talk")),

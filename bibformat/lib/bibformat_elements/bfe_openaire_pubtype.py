@@ -27,7 +27,8 @@ def format_element(bfo, as_label=False):
 
     name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
     if subcollection:
-        name = "%s: %s" % (name, dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection])
+        #name = "%s: %s" % (name, dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection])
+        name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection]
 
     if as_label:
         return """<span class="label label-inverse">%s</span>""" % name
