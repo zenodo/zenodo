@@ -290,11 +290,15 @@ class DepositionForm(Form):
     field_placeholders = {
         'doi': 'e.g. 10.1234/foo.bar...',
         'creators': 'Family name, First name: Affiliation (one author per line)',
-        'supervisors': 'Family name, First name: Affiliation (one supervisor per line)',
+        'thesis_supervisors': 'Family name, First name: Affiliation (one supervisor per line)',
         'keywords': 'One keyword per line...',
         'funding_source': 'Start typing a grant number, name or abbreviation...',
         'license': 'Start typing a license name or abbreviation...',
         'related_identifiers': 'e.g. 10.1234/foo.bar (one DOI per line)...',
+        'conference_dates': 'e.g 21-22 November 2012...',
+        'conference_place': 'e.g city, country...',
+        'imprint_place': 'e.g city, country...',
+        'imprint_isbn': 'e.g 0-06-251587-X',
     }
 
     field_state_mapping = {
@@ -496,20 +500,19 @@ class DepositionForm(Form):
     # Journal
     #
     journal_title = fields.JournalField()
-    journal_volume = wtf.TextField()
-    journal_issue = wtf.TextField()
-    journal_pages = wtf.TextField()
+    journal_volume = wtf.TextField(label="Volume")
+    journal_issue = wtf.TextField(label="Issue")
+    journal_pages = wtf.TextField(label="Pages")
 
     #
     # Book/report/chapter
     #
-    partof_title = wtf.TextField()
-    partof_pages = wtf.TextField()
-    partof_year = wtf.TextField()
+    partof_title = wtf.TextField(label="Book title", description="Title of the book or report which this upload is part of.")
+    partof_pages = wtf.TextField(label="Pages")
 
-    imprint_isbn = wtf.TextField()
-    imprint_publisher = wtf.TextField()
-    imprint_place = wtf.TextField()
+    imprint_isbn = wtf.TextField(label="ISBN")
+    imprint_publisher = wtf.TextField(label="Publisher")
+    imprint_place = wtf.TextField(label="Place")
 
     #
     # Thesis
@@ -529,10 +532,10 @@ class DepositionForm(Form):
     # Conference
     #
     conference_title = wtf.TextField()
-    conference_acronym = wtf.TextField()
-    conference_dates = wtf.TextField()
-    conference_place = wtf.TextField()
-    conference_url = wtf.TextField()
+    conference_acronym = wtf.TextField(label="Acronym")
+    conference_dates = wtf.TextField(label="Dates")
+    conference_place = wtf.TextField(label="Place")
+    conference_url = wtf.TextField(label="Website")
 
 
 #DepostionForm.thesis_university._icon_html = '<i class="icon-building"></i>'
