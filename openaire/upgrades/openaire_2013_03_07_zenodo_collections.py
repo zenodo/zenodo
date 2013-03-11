@@ -26,13 +26,13 @@ depends_on = ['openaire_2013_03_07_zenodo_migration']
 
 
 collections = [
-    (1, 'ZENODO', 'collection:0->Z AND NOT collection:PROVISIONAL AND NOT collection:PENDING AND NOT collection:SPAM AND NOT collection:REJECTED AND NOT collection:DARK'),
-    (2, 'Publications', 'collection:publication'),
-    (3, 'Posters', 'collection:poster'),
-    (4, 'Presentations', 'collection:presenation'),
-    (5, 'Datasets', 'collection:dataset'),
-    (6, 'Images', 'collection:image'),
-    (7, 'Videos/Audio', 'collection:video'),
+    (1, 'ZENODO', '980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (2, 'Publications', '980:publication'),
+    (3, 'Posters', '980:poster'),
+    (4, 'Presentations', '980:presenation'),
+    (5, 'Datasets', '980:dataset'),
+    (6, 'Images', '980:image'),
+    (7, 'Videos/Audio', '980:video'),
 
     (8, 'Books', '980__b:book'),
     (9, 'Book sections', '980__bsection'),
@@ -53,13 +53,13 @@ collections = [
     (24, 'Photos', '980__b:photo'),
     (25, 'Other images', '980__b:other'),
 
-    (26, 'Open Access', '(542__l:open OR 542__l:embargoed) AND collection:0->Z AND NOT collection:PROVISIONAL AND NOT collection:PENDING AND NOT collection:SPAM AND NOT collection:REJECTED AND NOT collection:DARK'),
-    (27, 'Closed Access', '(542__l:closed OR 542__l:restricted) AND collection:0->Z AND NOT collection:PROVISIONAL AND NOT collection:PENDING AND NOT collection:SPAM AND NOT collection:REJECTED AND NOT collection:DARK'),
+    (26, 'Open Access', '(542__l:open OR 542__l:embargoed) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (27, 'Closed Access', '(542__l:closed OR 542__l:restricted) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
 
-    (28, 'Hidden', 'collection:PROVISIONAL OR collection:PENDING OR collection:SPAM OR collection:REJECTED OR collection:DARK'),
+    (28, 'Hidden', '980:PROVISIONAL OR 980:PENDING OR 980:SPAM OR 980:REJECTED OR 980:DARK'),
 
-    (29, 'Curated', 'collection:curated AND NOT collection:PROVISIONAL AND NOT collection:PENDING AND NOT collection:SPAM AND NOT collection:REJECTED AND NOT collection:DARK'),
-    (30, 'Uncurated', 'collection:0->Z AND NOT collection:curated AND NOT collection:PROVISIONAL AND NOT collection:PENDING AND NOT collection:SPAM AND NOT collection:REJECTED AND NOT collection:DARK'),
+    (29, 'Curated', '980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (30, 'Uncurated', '980:0->Z AND NOT 980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
 ]
 
 relations = [
