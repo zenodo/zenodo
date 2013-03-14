@@ -11,8 +11,19 @@
 {%- set viewclaimlink = current_user['precached_viewclaimlink'] -%}
 {%- set usepaperclaim = current_user['precached_usepaperclaim'] -%}
 {%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
+{%- js "js/hogan.js" -%}
+{%- js 'js/jquery.min.js' -%}
+{%- js 'js/jquery-ui.custom.min.js' -%}
+{%- js 'js/bootstrap.min.js' -%}
+{%- js "js/bootstrap-select.js" -%}
+{%- js "js/bootstrap-datepicker.js" -%}
+{%- js 'js/jquery.tokeninput.js' -%}
+{%- js "js/websearch_typeahead.js" -%}
+{%- js "js/holder.js" -%}
+{%- js "js/custom.js" -%}
+{%- if not no_pageheader -%}
 <!DOCTYPE html>
-<html lang="{{ ln|safe }}" {% if is_language_rtl %}dir="rtl"{% endif %}>
+<html{% if ln %} lang="{{ ln|safe }}"{% endif %}{% if is_language_rtl %} dir="rtl"{% endif %}>
 <head>
   <meta charset="utf-8">
   <title>{{ title+' | ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
@@ -26,16 +37,6 @@
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
-  {%- js "js/hogan.js" -%}
-  {%- js 'js/jquery.min.js' -%}
-  {%- js 'js/jquery-ui.custom.min.js' -%}
-  {%- js 'js/bootstrap.min.js' -%}
-  {%- js "js/bootstrap-select.js" -%}
-  {%- js "js/bootstrap-datepicker.js" -%}
-  {%- js 'js/jquery.tokeninput.js' -%}
-  {%- js "js/websearch_typeahead.js" -%}
-  {%- js "js/holder.js" -%}
-  {%- js "js/custom.js" -%}
   {%- css 'css/jquery-ui.custom.css' -%}
   {%- css 'css/bootstrap.css' -%}
   {%- css 'css/bootstrap-responsive.min.css' -%}
@@ -77,7 +78,8 @@
         </div>
       </div>
       {% endif %}{% endblock breadcrumb %}
-
+{%- endif -%}
+{%- if not no_pagebody -%}
       {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
 
       {% block title %}
@@ -102,6 +104,8 @@
       </div>
       {% endblock messages %}
       {% block body %}{{ body }}{% endblock body %}
+{%- endif -%}
+{%- if not no_pagefooter -%}
       <div id="push"></div>
     </div>
   </div>
@@ -127,3 +131,4 @@
   {% block javascript %}{% endblock javascript %}
 </body>
 </html>
+{%- endif -%}

@@ -68,3 +68,19 @@ class Template(InvenioTemplate):
 
     def tmpl_page(self, req, **kwargs):
         return render_template("legacy_page.html", **kwargs).encode('utf8')
+
+    def tmpl_pageheader(self, req, **kwargs):
+        return render_template(
+            "legacy_page.html",
+            no_pagebody=True,
+            no_pagefooter=True,
+            **kwargs
+        ).encode('utf8')
+
+    def tmpl_pagefooter(self, req, **kwargs):
+        return render_template(
+            "legacy_page.html",
+            no_pagebody=True,
+            no_pageheader=True,
+            **kwargs
+        ).encode('utf8')
