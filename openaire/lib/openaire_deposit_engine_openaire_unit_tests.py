@@ -26,7 +26,8 @@ import os
 import re
 import unittest2 as unittest
 
-from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS, _RE_DOI
+from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS, \
+    _RE_DOI, _RE_AUTHOR_ROW, _check_authors
 from invenio.openaire_deposit_config import CFG_METADATA_FIELDS
 from invenio.openaire_deposit_engine import OpenAIREPublication
 from invenio.openaire_deposit_fixtures import FIXTURES, MARC_FIXTURES
@@ -60,10 +61,42 @@ class DOIRegressionTest(unittest.TestCase):
                 _RE_DOI.match(doi), "Incorrectly matched %s as DOI" % doi)
 
 
+class AuthorCheckRegressionTest(unittest.TestCase):
+    validnames = """Lastname, Firstname
+Lastname,Firstname
+Lastname, First name
+Lastname,First name
+Lastname, I. N.
+Lastname, I.N.
+Lastname, IN
+Lastname, I.
+Lastname, First-name A.
+Lastname, A.First-name
+Lastname, IN.
+Lastname, I
+Lastname,I
+van der Lastname,I
+Last-name and more,I."""
+
+    def test_author_regexp(self):
+        failed = []
+        for l in self.validnames.splitlines():
+            m = _RE_AUTHOR_ROW.match(l)
+            if not m:
+                failed.append(l)
+        self.assertEqual(failed, [])
+
+    def test_author_name_check(self):
+        (field, state, messages) = _check_authors(
+            {'authors': self.validnames}, 'en', lambda x: x
+        )
+        self.assertNotEqual(state, "error", unicode(messages))
+
+
 class EngineTest(unittest.TestCase):
     user_id = None
     project_id = '283595'
-    
+
 
     def record_marc_output(self, rec):
         """
@@ -132,7 +165,7 @@ class EngineTest(unittest.TestCase):
             res = run_sql("SELECT id FROM user WHERE nickname='admin'")
             assert(len(res) == 1, "Couldn't find admin user")
             self.user_id = int(res[0][0])
-                
+
         self.pub = OpenAIREPublication(self.user_id)
         self.pub_id = self.pub.publicationid
 
@@ -185,7 +218,7 @@ class EngineTest(unittest.TestCase):
 #
 # Create test suite
 #
-TEST_SUITE = make_test_suite(DOIRegressionTest, EngineTest)
+TEST_SUITE = make_test_suite(DOIRegressionTest, AuthorCheckRegressionTest, EngineTest)
 
 if __name__ == "__main__":
     run_test_suite(TEST_SUITE)

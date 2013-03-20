@@ -43,7 +43,7 @@ def explode_values(val, check_func, stop_on_error=True):
             return
 
 # Regular expressions
-_RE_AUTHOR_ROW = re.compile(u'^\w{2,}(\s+\w{2,})*\s*,\s*(\w{2,}|\w\.)(\s+\w{1,}|\s+\w\.)*\s*(:\s*\w{2,}.*)?$', re.U)
+_RE_AUTHOR_ROW = re.compile(u'^\w{2,}((\s+|[-]{1})\w{2,})*\s*,\s*(\w{1,}|\w{1}\.)((\s*|[-]{1})(\w{1,}|\w{1}\.))*\s*(:\s*\w{2,}.*)?$', re.U)
 _RE_PAGES = re.compile('\d+(-\d+)?')
 _RE_DOI = re.compile("(doi:)?10\.\d+(.\d+)*/.*", re.I)
 
