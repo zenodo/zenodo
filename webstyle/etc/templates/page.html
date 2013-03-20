@@ -11,6 +11,15 @@
 {%- set viewclaimlink = current_user['precached_viewclaimlink'] -%}
 {%- set usepaperclaim = current_user['precached_usepaperclaim'] -%}
 {%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
+{%- css 'css/jquery-ui.custom.css' -%}
+{%- css 'css/bootstrap.css' -%}
+{%- css 'css/bootstrap-responsive.min.css' -%}
+{%- css 'css/token-input.css' -%}
+{%- css 'css/token-input-facebook.css' -%}
+{%- css 'css/datepicker.css' -%}
+{%- css 'css/font-awesome.min.css' -%}
+{%- css 'css/custom.css' -%}
+{# FIXME CFG_WEBSTYLE_TEMPLATE_SKIN #}
 {%- js "js/hogan.js" -%}
 {%- js 'js/jquery.min.js' -%}
 {%- js 'js/jquery-ui.custom.min.js' -%}
@@ -36,19 +45,12 @@
   <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
-  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
-  {%- css 'css/jquery-ui.custom.css' -%}
-  {%- css 'css/bootstrap.css' -%}
-  {%- css 'css/bootstrap-responsive.min.css' -%}
-  {%- css 'css/token-input.css' -%}
-  {%- css 'css/token-input-facebook.css' -%}
-  {%- css 'css/datepicker.css' -%}
-  {%- css 'css/font-awesome.min.css' -%}
-  {%- css 'css/custom.css' -%}
+  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />=
   {%- assets get_css_bundle() -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {%- endassets -%}
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
+  {% block _top_assets %}{% endblock _top_assets %}
   {%- block css -%}{%- endblock css -%}
   <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
   <!--[if lt IE 9]>
@@ -78,10 +80,9 @@
         </div>
       </div>
       {% endif %}{% endblock breadcrumb %}
+      {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
 {%- endif -%}
 {%- if not no_pagebody -%}
-      {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
-
       {% block title %}
       {% if title %}
       <div class="row">
@@ -114,8 +115,11 @@
     {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
   </div>
   {%- include 'footer.html' -%}
+  {% block _bottom_assets %}
   {% assets get_js_bundle() %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% endblock %}
   <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+  {% block javascript %}{% endblock javascript %}
   {% if config.CFG_PIWIK_URL %}
   <script type="text/javascript">
   var pkBaseURL = (("https:" == document.location.protocol) ? "https://{{config.CFG_PIWIK_URL}}" : "http://{{config.CFG_PIWIK_URL}}");
@@ -128,7 +132,6 @@
   } catch( err ) {}
   </script>
   {% endif %}
-  {% block javascript %}{% endblock javascript %}
 </body>
 </html>
 {%- endif -%}

@@ -1,6 +1,0 @@
-{% for breadcrumb in breadcrumbs %}{% if loop.last %}
-<li class="active">{{ breadcrumb[0] }}</li>
-{% else %}
-<li><a href="{{ breadcrumb[1] }}" class="navtrail">{{ breadcrumb[0] }}</a> <span class="divider">/</span></li>
-{% endif %}
-{% endfor %}
