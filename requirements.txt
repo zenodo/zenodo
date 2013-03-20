@@ -4,3 +4,6 @@ qrcode==2.4.2
 Pillow==1.7.8
 altmetric
 beautifulsoup4
+
+# Development related - rpdb2 needs to be installed in venv.
+https://winpdb.googlecode.com/files/winpdb-1.4.8.tar.gz
