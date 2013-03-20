@@ -20,5 +20,6 @@
   <p>
   <BFE_AUTHORS limit="1" extension=" <em>et al</em>" print_links="nanosensors" interactive="no" /> (<BFE_YEAR />). <BFE_TITLE />. <BFE_PUBLI_INFO />. <BFE_DOI />
   </p>
+  <p><small>Further citation formats: <a href="http://crosscite.org/citeproc/">DOI Citation Formatter</a>.</small></p>
 
 </div>

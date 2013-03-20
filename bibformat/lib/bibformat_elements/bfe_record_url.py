@@ -18,16 +18,24 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-from invenio.config import CFG_SITE_RECORD
+from invenio.config import CFG_SITE_RECORD, CFG_SITE_URL, CFG_SITE_SECURE_URL
 
 
-def format_element(bfo, with_ln="yes"):
+def format_element(bfo, with_ln="yes", absolute="no", secure="no"):
     """
     Prints the record URL.
 
     @param with_ln: if "yes" include "ln" attribute in the URL
     """
-    url = ("/%s/" % CFG_SITE_RECORD) + bfo.control_field('001')
+
+    base = ''
+    if absolute.lower() == "yes":
+        if secure.lower() == "yes":
+            base = CFG_SITE_SECURE_URL
+        else:
+            base = CFG_SITE_URL
+
+    url = ("%s/%s/" % (base, CFG_SITE_RECORD)) + bfo.control_field('001')
 
     if with_ln.lower() == "yes":
         url += "?ln=" + bfo.lang
