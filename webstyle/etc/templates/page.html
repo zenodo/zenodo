@@ -19,7 +19,6 @@
 {%- css 'css/datepicker.css' -%}
 {%- css 'css/font-awesome.min.css' -%}
 {%- css 'css/custom.css' -%}
-{# FIXME CFG_WEBSTYLE_TEMPLATE_SKIN #}
 {%- js "js/hogan.js" -%}
 {%- js 'js/jquery.min.js' -%}
 {%- js 'js/jquery-ui.custom.min.js' -%}
@@ -45,7 +44,7 @@
   <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
-  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />=
+  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
   {%- assets get_css_bundle() -%}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {%- endassets -%}
