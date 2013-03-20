@@ -26,10 +26,8 @@
   <ul class="">
   {%- for c in viewsimilarity[:5] -%}
   <li>
-    <span class="pull-right muted"><small>({{ c[1] }})</small></span>
     {{ format_record(c[0], 'hs', ln=g.ln)|safe }}</li>
   {%- endfor -%}
   </ul>
 {%- endif -%}
-{{downloadgraph|safe}}
 {% endblock %}
