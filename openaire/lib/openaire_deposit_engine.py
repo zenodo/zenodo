@@ -708,9 +708,10 @@ class OpenAIREPublication(object):
         """
         """
         marcxml_path = os.path.join(self.path, 'marcxml')
+        main_coll, sub_coll = self.get_collection_name()
         open(marcxml_path, 'w').write(self.marcxml)
-        task_low_level_submission(
-            'bibupload', 'openaire', '-r', marcxml_path, '-P5')
+        task_low_level_submission('bibupload', 'openaire', '-r', marcxml_path, '-P5', '-I1')
+        task_low_level_submission('webcoll', '-f', '-r', '-c', main_coll, '-P5', '-I1')
         self.status = 'submitted'
         #self.send_emails()
 
@@ -1025,6 +1026,15 @@ class OpenAIREPublication(object):
         """
         return record_xml_output(self.get_record())
 
+    def get_collection_name(self):
+        upload_type = self._metadata.get('upload_type')
+
+        if upload_type == "publication":
+            return (upload_type, self._metadata.get('publication_type'))
+        elif upload_type == "image":
+            return (upload_type, self._metadata.get('image_type'))
+        return (upload_type, None)
+
     def get_record(self):
         """
         Generate MARC record for publication
@@ -1069,13 +1079,10 @@ class OpenAIREPublication(object):
         # Type of file(s)
         # =================
         # Upload type - 980__a: type, b: subtype
-        upload_type = self._metadata.get('upload_type')
-        subfields = [('a', upload_type), ]
-
-        if upload_type == "publication":
-            subfields.append(('b', self._metadata.get('publication_type')))
-        elif upload_type == "image":
-            subfields.append(('b', self._metadata.get('image_type')))
+        main_coll, sub_coll = self.get_collection_name()
+        subfields = [('a', main_coll), ]
+        if sub_coll:
+            subfields.append(('b', sub_coll))
         record_add_field(rec, '980', subfields=subfields)
 
         # =================
@@ -1196,8 +1203,7 @@ class OpenAIREPublication(object):
         #
         if self._metadata.get('related_identifiers'):
             for doi in self._metadata.get('related_identifiers'):
-                record_add_field(rec, '773', subfields=[('a', doi), ])
-                #record_add_field(rec, '773', subfields=[('a', doi), ('n', 'type???')])
+                record_add_field(rec, '773', subfields=[('a', doi), ('n', 'DOI')])
 
         # =================
         # Journal
