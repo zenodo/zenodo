@@ -64,6 +64,12 @@ _RE_AUTHOR_ROW = re.compile(u'^\w{2,}(\s+\w{2,})*\s*,\s*(\w{2,}|\w\.)(\s+\w{1,}|
 #         return (field, 'warning', warnings)
 
 
+def force_unicode(x):
+    if isinstance(x, str):
+        return x.decode('utf8')
+    return x
+
+
 class AuthorField(TextAreaField, JsonCookerMixinBuilder('author')):
 
     def __init__(self, **kwargs):
@@ -91,9 +97,11 @@ class AuthorField(TextAreaField, JsonCookerMixinBuilder('author')):
                 self.data = valuelist[0]
 
     def _value(self):
+        if isinstance(self.data, str):
+            self.data = self.data.decode('utf8')
         if self.data:
             if isinstance(self.data, list):
-                return text_type("\n".join(["%s: %s" % (x[0], x[1]) for x in self.data]))
+                return text_type("\n".join(map(lambda x: "%s: %s" % (force_unicode(x[0]), force_unicode(x[1])) if x[1] else force_unicode(x[0]), self.data)))
             else:
                 return text_type(self.data)
         else:
