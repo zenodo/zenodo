@@ -14,6 +14,15 @@ $(document).ready(function(){
         });
         $('#authors_long').toggle('slow', function() {});
     });
+
+    /* Open/close menu on hoover */
+    $('ul.nav li.dropdown').hover(function() {
+        $(this).find('.dropdown-menu').stop(true, true).show();
+        $(this).addClass('open');
+    }, function() {
+        $(this).find('.dropdown-menu').stop(true, true).hide();
+        $(this).removeClass('open');
+    });
 });
 
 function webdeposit_input_error_check(selector, url) {
