@@ -76,7 +76,7 @@ from invenio.bibformat import format_record
 from invenio.bibformat_elements.bfe_fulltext import sort_alphanumerically
 from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
 from invenio.bibrecord import record_add_field, record_xml_output
-from invenio.bibtask import task_low_level_submission
+from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, \
     CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
 from invenio.dbquery import run_sql
@@ -707,11 +707,13 @@ class OpenAIREPublication(object):
     def upload_record(self):
         """
         """
+        sequenceid = bibtask_allocate_sequenceid()
+
         marcxml_path = os.path.join(self.path, 'marcxml')
         main_coll, sub_coll = self.get_collection_name()
         open(marcxml_path, 'w').write(self.marcxml)
-        task_low_level_submission('bibupload', 'openaire', '-r', marcxml_path, '-P5', '-I1')
-        task_low_level_submission('webcoll', '-f', '-r', '-c', main_coll, '-P5', '-I1')
+        task_low_level_submission('bibupload', 'openaire', '-r', marcxml_path, '-P5', '-I', str(sequenceid))
+        task_low_level_submission('webcoll', 'openaire', '-f', '-P5', '-I', str(sequenceid))
         self.status = 'submitted'
         #self.send_emails()
 
@@ -1128,8 +1130,8 @@ class OpenAIREPublication(object):
             license_info = get_license_description(license)
             subfields = []
             if license_info:
-                subfields.append(('a', license_info['title']),)
-                subfields.append(('u', license_info['url']),)
+                subfields.append(('a', license_info['title'].encode('utf8')),)
+                subfields.append(('u', license_info['url'].encode('utf8')),)
             else:
                 subfields.append(('a', license,))
             record_add_field(rec, '540', subfields=subfields)
