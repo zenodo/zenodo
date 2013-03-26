@@ -46,15 +46,15 @@ def format_element(bfo, as_label=False, only_restrictions=False):
             return """<dt>Restricted access</dt><dd>Please contact %s to access the files.</dd>""" % email
     elif as_label:
         if access_rights in ('embargoedAccess', 'embargoed'):
-            return """<span class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</span>""" % (embargo, _(access))
+            return """<a href="/search?p=542__l:embargoed" class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</a>""" % (embargo, _(access))
         elif access_rights in ('closeDaccess', 'closed'):
-            return """<span class="label label-important">%s</span>""" % _(access)
+            return """<a href="/search?p=542__l:closed" class="label label-important">%s</a>""" % _(access)
         elif access_rights in ('openAccess', 'open'):
-            return """<span class="label label-success">%s</span>""" % _(access)
+            return """<a href="/search?p=542__l:open" class="label label-success">%s</a>""" % _(access)
         elif access_rights in ('restricteDaccess', 'restricted'):
-            return """<span class="label label-warning">%s</span>""" % _(access)
+            return """<a href="/search?p=542__l:restricted" class="label label-warning">%s</a>""" % _(access)
         elif access_rights == 'cc0':
-            return """<span class="label label-success">%s</span>""" % _(access)
+            return """<a class="label label-success">%s</a>""" % _(access)
     else:
         if access_rights in ('embargoedAccess', 'embargoed'):
             ret = _("%(x_fmt_s)s%(access)s%(x_fmt_e)s: this document will be available as Open Access after %(embargo)s.")

@@ -26,12 +26,14 @@ def format_element(bfo, as_label=False):
     subcollection = bfo.field('980__b')
 
     name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
+    query = "980__a:%s" % collection
     if subcollection:
         #name = "%s: %s" % (name, dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection])
         name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection]
+        query = "980__b:%s" % subcollection
 
     if as_label:
-        return """<span class="label label-inverse">%s</span>""" % name
+        return """<a href="/search?p=%s" class="label label-inverse">%s</a>""" % (query, name)
     else:
         return name
 
