@@ -292,8 +292,8 @@ def edit(pub_id=u'', action=u'edit'):
                 return redirect(url_for('.index'))
             else:
                 pub.save()
+                ctx['form'] = form
                 ctx['form_message'] = "The form was saved, but there were errors. Please see below."
-
         elif editable:
             mapper = PublicationMapper()
             form = DepositionForm(mapper.map(pub), crsf_enabled=False)
