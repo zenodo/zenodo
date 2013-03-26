@@ -26,13 +26,13 @@ depends_on = ['openaire_2013_03_07_zenodo_migration']
 
 
 collections = [
-    (1, 'ZENODO', '980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
-    (2, 'Publications', '980:publication'),
-    (3, 'Posters', '980:poster'),
-    (4, 'Presentations', '980:presenation'),
-    (5, 'Datasets', '980:dataset'),
-    (6, 'Images', '980:image'),
-    (7, 'Videos/Audio', '980:video'),
+    (1, 'ZENODO', '980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
+    (2, 'Publications', '980__a:publication'),
+    (3, 'Posters', '980__a:poster'),
+    (4, 'Presentations', '980__a:presenation'),
+    (5, 'Datasets', '980__a:dataset'),
+    (6, 'Images', '980__a:image'),
+    (7, 'Videos/Audio', '980__a:video'),
 
     (8, 'Books', '980__b:book'),
     (9, 'Book sections', '980__bsection'),
