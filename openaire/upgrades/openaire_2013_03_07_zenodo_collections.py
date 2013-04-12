@@ -32,7 +32,7 @@ collections = [
     (4, 'Presentations', '980__a:presenation'),
     (5, 'Datasets', '980__a:dataset'),
     (6, 'Images', '980__a:image'),
-    (7, 'Videos/Audio', '980__a:video'),
+    (7, 'Videos & Audio', '980__a:video'),
 
     (8, 'Books', '980__b:book'),
     (9, 'Book sections', '980__bsection'),
