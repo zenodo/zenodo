@@ -153,30 +153,3 @@ def escape_values(bfo):
     should be escaped.
     """
     return 0
-
-
-
-
-prefix='' separator='</span></span> ; <span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name">' suffix="</span></span><br />"affiliation_prefix='<small> (<span itemscope itemtype="http://schema.org/Organization">' affiliation_suffix="</span>)</small>"
-
-
-
-<BFE_OPENAIRE_AUTHORS relator_code_pattern="$" limit="25" interactive="yes" print_affiliations="yes" />
-
-
-<p id="authors_short">
-  <a href="#">Rodríguez Lorenzo, Laura</a>; <a href="#">de la Rica, Roberto</a>; <a href="#">Álvarez Puebla, Ramón</a>; <a href="#">Liz Marzán, Luis</a>; <a href="#">Stevens, Molly</a>
-</p>
-<p id="authors_long" class="hide">
-  <a href="#">Rodríguez Lorenzo, Laura</a><br />
-  <small>Departamento de Quimica Fisica and Unidad Asociada CSIC, Universidade de Vigo, 36310, Vigo (Spain)</small><br/>
-  <a href="#">de la Rica, Roberto</a><br />
-  <small>Department of Materials, Department of Bioengineering and Institute for Biomedical Engineering, Imperial College London, Exhibition Road, London, SW7 2AZ (UK)</small><br />
-  <a href="#">Álvarez Puebla, Ramón</a><br />
-  <small>Departamento de Quimica Fisica and Unidad Asociada CSIC, Universidade de Vigo, 36310, Vigo (Spain)</small><br />
-  <a href="#">Liz Marzán, Luis</a><br />
-  <small>Departamento de Quimica Fisica and Unidad Asociada CSIC Universidade de Vigo, 36310, Vigo (Spain)</small><br />
-  <a href="#">Stevens, Molly</a><br />
-  <small>Department of Materials, Department of Bioengineering and Institute for Biomedical Engineering, Imperial College London, Exhibition Road, London, SW7 2AZ (UK)</small><br>
-</p>
-<p><small><a href="#" class="muted" id="author_affiliations_link">(show affliations)</a></small></p>
