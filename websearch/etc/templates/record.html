@@ -60,7 +60,7 @@
                 <tr class="">
                   <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
                   <td>{{ file.md.strftime('%d %b %Y') }}</td>
-                  <td>{{ file.size|filesize }}</td>
+                  <td>{{ file.size|filesizeformat }}</td>
                   <td><span class="pull-right"><button class="btn preview-link" data-url="{{file.get_url()}}"><i class="icon-eye-open"></i> {{_("Preview")}}</button> <a class="btn" href="{{file.get_url()}}"><i class="icon-download"></i> {{_("Download")}}</a></span></td>
                 </tr>
               {%- endfor -%}

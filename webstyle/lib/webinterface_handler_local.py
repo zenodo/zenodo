@@ -43,8 +43,8 @@ def customize_app(app):
         return dict(footermenu_left=left, footermenu_right=right,
             footermenu_bottom=bottom)
 
-    @app.template_filter('filesize')
-    def filesize_filter(value):
+    @app.template_filter('filesizeformat')
+    def filesizeformat_filter(value):
         """
         Jinja2 filesizeformat filters is broken in Jinja2 up to v2.7, so
         let's implement our own.
