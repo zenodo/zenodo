@@ -112,9 +112,9 @@ exclude-result-prefixes="marc fn dc invenio">
         <!-- 7. Contributor -->
         <contributors>
             <xsl:for-each select="datafield[@tag=536]">
-                <contributor>
+                <contributor contributorType="Funder">
                     <contributorName>European Commission</contributorName>
-                    <nameIdentifier nameIdentifierType="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
+                    <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
                 </contributor>
             </xsl:for-each>
         </contributors>
@@ -176,11 +176,13 @@ exclude-result-prefixes="marc fn dc invenio">
         </alternateIdentifiers>
         <!-- 12 RelatedIdentifier -->
         <!-- 13 Size -->
-        <sizes>
-            <xsl:for-each select="datafield[@tag=300]">
-                <size><xsl:value-of select="subfield[@code='a']"/> pages</size>
-            </xsl:for-each>
-        </sizes>
+        <xsl:if test="datafield[@tag=300]">
+            <sizes>
+                <xsl:for-each select="datafield[@tag=300]">
+                    <size><xsl:value-of select="subfield[@code='a']"/> pages</size>
+                </xsl:for-each>
+            </sizes>
+        </xsl:if>
         <!-- 14 Format -->
         <!-- 15 Version -->
         <!-- 16 Rights -->
