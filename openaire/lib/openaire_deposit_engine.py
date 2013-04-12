@@ -1237,10 +1237,10 @@ class OpenAIREPublication(object):
                 subfields.append(('g', self._metadata.get('partof_pages')))
 
             if self._metadata.get('imprint_publisher'):
-                subfields.append(('b', self._metadata.get('publisher')))
+                subfields.append(('b', self._metadata.get('imprint_publisher')))
 
             if self._metadata.get('imprint_place'):
-                subfields.append(('a', self._metadata.get('place')))
+                subfields.append(('a', self._metadata.get('imprint_place')))
 
             if self._metadata.get('imprint_isbn'):
                 subfields.append(('z', self._metadata.get('imprint_isbn')))
