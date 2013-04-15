@@ -1,4 +1,0 @@
-<name>Actions HTML detailed</name>
-<description>Output the various actions available on a record</description>
-
-<BFE_EDIT_RECORD css_class="btn" /> <BFE_EDIT_FILES css_class="btn" /> <BFE_SWORD_PUSH css_class="btn" />

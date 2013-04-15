@@ -15,6 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-SUBDIRS = format_templates
+templatesdir = $(sysconfdir)-local/templates/format_templates
+
+templates_DATA = *.tpl
+
+EXTRA_DIST = $(templates_DATA)
 
 CLEANFILES = *~ *.tmp

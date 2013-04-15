@@ -1,8 +1,6 @@
-<name>Default HTML share</name>
-<description></description>
 
 <div class="well">
-  <span class="pull-right hidden-phone" rel="tooltip" title="QR-code for easy mobile access to this page."><BFE_QRCODE width="100" /></span>
+  <span class="pull-right hidden-phone" rel="tooltip" title="QR-code for easy mobile access to this page.">{{ bfe_qrcode(bfo, width="100") }}</span>
   <h4>Share </h4>
   <!-- AddThis Button BEGIN -->
 <div class="addthis_toolbox addthis_default_style addthis_32x32_style">
@@ -18,7 +16,7 @@
 <!-- AddThis Button END -->
   <h4>Cite as </h4>
   <p>
-  <BFE_AUTHORS limit="1" extension=" <em>et al</em>" print_links="nanosensors" interactive="no" /> (<BFE_YEAR />). <BFE_TITLE />. <BFE_PUBLI_INFO />. <BFE_DOI />
+  {{ bfe_authors(bfo, limit="1", extension=" <em>et al</em>", print_links="nanosensors", interactive="no") }} ({{ bfe_year(bfo, ) }}). {{ bfe_title(bfo, ) }}. {{ bfe_publi_info(bfo, ) }}. {{ bfe_doi(bfo, ) }}
   </p>
   <p><small>Further citation formats: <a href="http://crosscite.org/citeproc/">DOI Citation Formatter</a>.</small></p>
 

@@ -17,7 +17,7 @@
 
 etcdir = $(sysconfdir)/bibformat/format_templates
 
-etc_DATA = *.bft *.xsl
+etc_DATA = *.xsl
 
 EXTRA_DIST = $(etc_DATA)
 

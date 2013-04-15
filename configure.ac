@@ -93,6 +93,7 @@ AC_CONFIG_FILES([config.nice  \
      bibformat/lib/Makefile \
      bibformat/etc/Makefile \
      bibformat/etc/templates/Makefile \
+     bibformat/etc/templates/format_templates/Makefile \
      bibformat/lib/bibformat_elements/Makefile \
      bibformat/output_formats/Makefile \
      bibformat/format_templates/Makefile \
