@@ -714,6 +714,7 @@ class OpenAIREPublication(object):
         open(marcxml_path, 'w').write(self.marcxml)
         task_low_level_submission('bibupload', 'openaire', '-r', marcxml_path, '-P5', '-I', str(sequenceid))
         task_low_level_submission('webcoll', 'openaire', '-f', '-P5', '-I', str(sequenceid))
+        task_low_level_submission('bibtasklet', 'openaire', '-T', 'bst_openaire_new_upload', '-a', 'recid=%s' % self.recid, '-P5', '-I', str(sequenceid))
         self.status = 'submitted'
         #self.send_emails()
 

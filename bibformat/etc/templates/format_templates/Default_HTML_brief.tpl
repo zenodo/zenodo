@@ -1,7 +1,7 @@
 
 <div class="media htmlbrief">
     <span class="pull-left hidden-phone">
-        {{ bfe_icon(bfo, ) }}
+        {{ bfe_icon(bfo, subformat_re='icon-90') }}
     </span>
     <span class="pull-right hidden-phone">
         {{ bfe_openaire_altmetric(bfo, badgetype='donut', popover='left', no_script='1', prefix="<br>") }}

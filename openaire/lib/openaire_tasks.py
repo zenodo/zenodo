@@ -1,0 +1,230 @@
+## This file is part of Invenio.
+## Copyright (C) 2010, 2011, 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+
+from __future__ import absolute_import
+
+from celery import chain
+import os
+import re
+from tempfile import mkstemp
+import time
+
+from invenio.bibdocfile import BibDoc, BibRecDocs, InvenioBibDocFileError
+from invenio.bibrecord import record_add_field, record_xml_output
+from invenio.bibtask import task_low_level_submission
+from invenio.celery import celery
+from invenio.config import CFG_TMPDIR
+from invenio.dbquery import run_sql
+from invenio.errorlib import register_exception
+from invenio.search_engine import search_pattern, get_fieldvalues
+from invenio.websubmit_icon_creator import create_icon, \
+    InvenioWebSubmitIconCreatorError
+
+try:
+    from altmetric import Altmetric, AltmetricHTTPException
+except ImportError, e:
+    register_exception(
+        prefix='Altmetric module not installed: %s' % str(e),
+        alert_admin=False
+    )
+
+
+ICON_SIZE = "90"
+ICON_SUBFORMAT = 'icon-%s' % ICON_SIZE
+ICON_FILEFORMAT = "png"
+MAX_RECORDS = 100
+
+
+def open_temp_file(prefix):
+    """
+    Create a temporary file to write MARC XML in
+    """
+    # Prepare to save results in a tmp file
+    (fd, filename) = mkstemp(
+        dir=CFG_TMPDIR,
+        prefix='prefix_' + time.strftime("%Y%m%d_%H%M%S_", time.localtime())
+    )
+    file_out = os.fdopen(fd, "w")
+
+    return (file_out, filename)
+
+
+def bibupload(record=None, collection=None, file_prefix="", mode="-c"):
+    """
+    General purpose function that will write a MARCXML file and call bibupload
+    on it.
+    """
+    if collection is None and record is None:
+        return
+
+    (file_out, filename) = open_temp_file(file_prefix)
+
+    file_out.write("<collection>")
+    if collection is not None:
+        file_out.write("<collection>")
+        tot = 0
+        for rec in collection:
+            file_out.write(record_xml_output(rec))
+            tot += 1
+            if tot == MAX_RECORDS:
+                file_out.write("</collection>")
+                file_out.close()
+                task_low_level_submission('bibupload', 'openaire', mode, filename, '-n')
+
+                (file_out, filename) = open_temp_file(file_prefix)
+                file_out.write("<collection>")
+                tot = 0
+        file_out.write("</collection>")
+    elif record is not None:
+        tot = 1
+        file_out.write(record_xml_output(record))
+
+    file_out.close()
+    if tot > 0:
+        task_low_level_submission('bibupload', 'openaire', mode, filename, '-n')
+
+
+#
+# Tasks
+#
+@celery.task(ignore_result=True)
+def openaire_create_icon(docid=None, recid=None, reformat=True):
+    """
+    Celery task to create an icon for all documents in a given record or for
+    just a specific document.
+    """
+    if recid:
+        docs = BibRecDocs(recid).list_bibdocs()
+    else:
+        docs = [BibDoc(docid)]
+
+    # Celery task will fail if BibDoc does not exists (on purpose ;-)
+    for d in docs:
+        if not d.get_icon(subformat_re=re.compile(ICON_SUBFORMAT)):
+            for f in d.list_latest_files():
+                if not f.is_icon():
+                    file_path = f.get_full_path()
+                    try:
+                        filename = os.path.splitext(
+                            os.path.basename(file_path)
+                        )[0]
+                        (icon_dir, icon_name) = create_icon(
+                            {'input-file': file_path,
+                             'icon-name': "icon-%s" % filename,
+                             'multipage-icon': False,
+                             'multipage-icon-delay': 0,
+                             'icon-scale': ICON_SIZE,
+                             'icon-file-format': ICON_FILEFORMAT,
+                             'verbosity': 0})
+                        icon_path = os.path.join(icon_dir, icon_name)
+                    except InvenioWebSubmitIconCreatorError, e:
+                        register_exception(
+                            prefix='Icon for file %s could not be created: %s' % (file_path, str(e)),
+                            alert_admin=False
+                        )
+
+                    try:
+                        if os.path.exists(icon_path):
+                            d.add_icon(icon_path, subformat=ICON_SUBFORMAT)
+                            recid_list = ",".join([x['recid'] for x in d.bibrec_links])
+                            task_low_level_submission('bibreformat', 'openaire', '-i', recid_list)
+
+                    except InvenioBibDocFileError, e:
+                        register_exception(
+                            prefix='Icon %s for file %s could not be added to document: %s' % (icon_path, f, str(e)),
+                            alert_admin=False
+                        )
+
+
+@celery.task(ignore_result=True)
+def openaire_check_icons():
+    """
+    Task to run a check of documents with out icons.
+    """
+    docs = run_sql("""
+        SELECT f.id_bibdoc
+        FROM bibdocfsinfo AS f
+        LEFT OUTER JOIN (
+            SELECT DISTINCT id_bibdoc, 1
+            FROM bibdocfsinfo
+            WHERE format LIKE '%;icon' AND last_version=1
+        ) AS i ON i.id_bibdoc=f.id_bibdoc
+        WHERE i.id_bibdoc is null
+    """)
+
+    for docid, in docs:
+        opeanire_create_icon.delay(docid=docid)
+
+
+@celery.task(ignore_result=True)
+def openaire_altmetric_check_all():
+    """
+    Retrieve Altmetric information for all records
+    """
+    # Records with DOI
+    recids = search_pattern(p="0->Z", f="0247_a")
+
+    # Do not parallelize tasks to not overload Altmetric
+    MAX_RECORDS
+    subtasks = []
+    for i in xrange(0, len(recids), MAX_RECORDS):
+        subtasks.append(openaire_altmetric_update.s(recids[i:i+MAX_RECORDS]))
+
+    chain.apply_async()
+
+
+@celery.task(ignore_result=True)
+def openaire_altmetric_update(recids, upload=True):
+    """
+    Retrieve Altmetric information for a record.
+    """
+    a = Altmetric()
+
+    records = []
+    for recid in recids:
+        try:
+            # Check if we already have an Altmetric id
+            sysno_inst = get_fieldvalues(recid, "035__9")
+            if ['Altmetric'] in sysno_inst:
+                continue
+
+            doi_val = get_fieldvalues(recid, "0247_a")[0]
+            json_res = a.doi(doi_val)
+
+            rec = {}
+            record_add_field(rec, "001", controlfield_value=str(recid))
+
+            if json_res:
+                record_add_field(rec, '035', subfields=[
+                    ('a', str(json_res['altmetric_id'])),
+                    ('9', 'Altmetric')
+                ])
+
+            records.append(rec)
+        except AltmetricHTTPException, e:
+            register_exception(
+                prefix='Altmetric error (status code %s): %s' % (e.status_code, str(e)),
+                alert_admin=False
+            )
+
+    if upload and records:
+        if len(records) == 1:
+            bibupload(record=records[0], file_prefix="altmetric")
+        else:
+            bibupload(collection=records, file_prefix="altmetric")
+
+    return records

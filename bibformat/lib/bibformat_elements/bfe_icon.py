@@ -20,6 +20,7 @@
 from jinja2 import Template
 from invenio.bibdocfile import BibRecDocs
 from invenio.config import CFG_SITE_URL
+import re
 
 template_icon = Template("""
 <a href="/record/{{bfo.recID}}">
@@ -30,14 +31,17 @@ template_icon = Template("""
 # prefix="<br>" / -->
 
 
-def format_element(bfo, template='record_hb.html', **kwargs):
+def format_element(bfo, template='record_hb.html', subformat_re='icon.*', **kwargs):
     bibarchive = BibRecDocs(bfo.recID)
     docs = bibarchive.list_bibdocs()
     if len(docs) > 0:
         doc = docs[0]
-        icon = doc.get_icon()
+        icon = doc.get_icon(subformat_re=re.compile(subformat_re))
         if not icon:
-            return ""
+            icon = doc.get_icon()
+            if not icon:
+                return ""
+
         else:
             ctx = {
                 'icon': icon,
