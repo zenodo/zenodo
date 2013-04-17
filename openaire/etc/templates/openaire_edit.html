@@ -139,7 +139,7 @@
         </thead>
         <tbody>
             {% for file_id, bdf in pub.fulltexts.items() %}
-            <tr><td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}">{{bdf.get_full_name()}}</a></td><td>{{bdf.get_size()|filesize}}</td><td width="30%"></td>{% if is_editable %}<td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}/delete/" class="rmlink" rel="tooltip" title="Delete file"><i class="icon-trash"></i></a>{% endif %}</td></tr>
+            <tr><td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}">{{bdf.get_full_name()}}</a></td><td>{{bdf.get_size()|filesizeformat}}</td><td width="30%"></td>{% if is_editable %}<td><a href="{{url_for('deposit.getfile')}}/{{pub.publicationid}}/{{file_id}}/delete/" class="rmlink" rel="tooltip" title="Delete file"><i class="icon-trash"></i></a>{% endif %}</td></tr>
             {% endfor %}
         </tbody>
         </table>
