@@ -24,7 +24,7 @@ from wtforms.widgets import HTMLString, RadioInput
 __all__ = ['UploadTypeField']
 
 UPLOAD_TYPES = [
-    ('publication', 'Publication', [], 'book'),
+    ('publication', 'Publication', [], 'file-alt'),
     ('poster', 'Poster', [], 'columns'),
     ('presentation', 'Presentation', [], 'group'),
     ('dataset', 'Dataset', [], 'table'),
