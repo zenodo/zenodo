@@ -22,20 +22,31 @@ from invenio.openaire_deposit_config import CFG_OPENAIRE_PUBTYPE_MAP
 
 def format_element(bfo, as_label=False):
     ln = bfo.lang
-    collection = bfo.field('980__a')
-    subcollection = bfo.field('980__b')
+    collections = bfo.fields('980__')
 
-    name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
-    query = "980__a:%s" % collection
-    if subcollection:
-        #name = "%s: %s" % (name, dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection])
-        name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection]
-        query = "980__b:%s" % subcollection
+    # Loop over collection identifiers. First 980 entry that has a publication
+    # type in subfield a is used. Subfield b denotes a subtype.
+    #
+    # Other non-publication type 980 entries include user collection identifiers,
+    # and ZENODO specific identifiers like "curated".
+    for c in collections:
+        try:
+            collection = c.get('a')
+            subcollection = c.get('b', None)
 
-    if as_label:
-        return """<a href="/search?p=%s" class="label label-inverse">%s</a>""" % (query, name)
-    else:
-        return name
+            name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
+            query = "980__a:%s" % collection
+
+            if subcollection:
+                name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection]
+                query = "980__b:%s" % subcollection
+
+            if as_label:
+                return """<a href="/search?p=%s" class="label label-inverse">%s</a>""" % (query, name)
+            else:
+                return name
+        except KeyError:
+            pass
 
 
 def escape_values(bfo):
