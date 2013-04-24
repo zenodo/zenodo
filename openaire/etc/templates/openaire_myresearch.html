@@ -14,7 +14,7 @@
 {% if myresearch.submitted %}
 <h4>Submitted</h4>
 <table class="table table-striped">
-{% for pub in myresearch.submitted %}
+{% for pub in myresearch.submitted|reverse %}
 <tr>
 <td><a href="{{url_for('deposit.edit')}}/{{pub.id}}/">{{pub.title if pub.title else 'Untitled'}}</a></td><td>{{pub.timestamp|timefmt}}</td>
 </tr>
