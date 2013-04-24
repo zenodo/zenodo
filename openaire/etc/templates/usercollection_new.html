@@ -1,0 +1,122 @@
+{% extends "page.html" %}
+
+{% from "_formhelpers.html" import render_field with context %}
+
+{% block title %}{% endblock %}
+
+{% block body %}
+<div class="row">
+    <div id="file_container" class="span8">
+        <h1>{{ _("New collection") if is_new else _("Edit collection") }}</h1>
+        {% if not is_new %}
+        <div class="alert alert-info">
+            <a href="{{usercollection.collection_url}}" class="btn"><i class="icon-eye-open"></i> View</a>
+            <a href="{{usercollection.collection_provisional_url}}" class="btn"><i class="icon-check"></i> Curate</a>
+            Direct Upload link
+        </div>
+        {% endif %}
+        <form action="." method="POST" id="edit_form" class="form-horizontal">
+        <div class="accordion">
+        {%- for title, fieldnames, conf in form.field_sets %}
+            <div class="accordion-group">
+                {%- if title %}
+                <div class="accordion-heading">
+                    <span class="accordion-toggle muted pull-right">{{conf.state}}</span>
+                    <a class="accordion-toggle" data-toggle="collapse" data-idx="{{loop.index}}" href="#collapse{{loop.index}}">{{title}} <b class="caret"></b></a>
+                </div>
+                {%- endif %}
+                <div id="collapse{{loop.index}}" class="accordion-body collapse{% if conf.classes %} {{conf.classes}}{% endif %}">
+                    <div class="accordion-inner">
+                        {%- if conf.description %}
+                        <p>{{ conf.description|urlize }}</p>
+                        {%- endif %}
+                        {% if not is_new %}
+                        <div class="control-group field-identifier">
+                                <label class="control-label" for="identifier">
+                                    <span class="" style="margin-right: 5px; margin-top: 5px;">
+                                        <i class="icon-barcode"></i>
+                                    </span>
+                                    Identifier
+                                </label>
+                                <div class="controls">
+                                    <input class="span5" type="text" disabled value="{{usercollection.id}}">
+                                    <p class="muted field-desc"><small>The identifier cannot be changed after creation of the collection.</small></p>
+                                </div>
+                            </div>
+                        {% endif %}
+                        <fieldset>
+                        {%- for f in fieldnames %}
+                            {% if f == '-' %}<hr />
+                            {%- else %}
+                            {%- set field = form.get_field_by_name(f) %}
+                            {% if field %}
+                            {%- if f == 'upload_type' %}
+                            <div class="upload-type" align="center">
+                                <div class="control-group{% if field.errors %} error{% endif %}">
+                                {{field}}
+                                </div>
+                            </div>
+                            {% if field.errors %}
+                                <div class="alert alert-error" id="error-{{ field.name }}">{% for error in field.errors %}{{ error }}{% if not loop.last %}<br />{% endif %}{% endfor %}</div>
+                            {% else %}
+                                <div class="alert alert-error" id="error-{{ field.name }}" style="display:none;"></div>
+                            {% endif %}
+                            {%- else %}
+                            <div class="control-group field-{{ field.name }}{% if field.errors %} error{% endif %}">
+                                <label class="control-label{{' required' if field.required else ''}}" for="{{field.label.field_id}}">
+                                    {%- if field._icon_html or form.get_field_icon(f) %}
+                                    <span class="" style="margin-right: 5px; margin-top: 5px;">
+                                        {% if form.get_field_icon(f) %}<i class="icon-{{ form.get_field_icon(f) }}"></i>{% else %}{{ field._icon_html|safe }}{% endif %}
+                                    </span>
+                                    {%- endif %}
+                                    {{ field.label.text }}
+                                </label>
+                                <div class="controls">
+                                    {% if form.has_autocomplete(field) %}
+                                    <div id="{{f}}_values" class="span5 tag-values"><ul class="unstyled">{% if f == "funding_source" %}{% for tag in field.get_tags() %}<li class="alert alert-info tag" data-tag-id="{{tag.grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{tag.label}}</li>{% endfor %}{% endif %}</ul></div>
+                                    {% endif %}
+                                    {%- if field.type == "Date" %}
+                                        {{ field(class_="span2 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
+                                    {%- else %}
+                                        {{ field(class_="span5 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
+                                    {%- endif %}
+                                    {% if field.description %}<p class="muted field-desc"><small>{{field.description|urlize}}</small></p>{% endif %}
+                                    {% if field.errors %}
+                                        <span class="alert alert-error help-inline" id="error-{{ field.name }}">{% for error in field.errors %}{{ error }}{% if not loop.last %}<br />{% endif %}{% endfor %}</span>
+                                    {% else %}
+                                        <span class="alert alert-error help-inline" id="error-{{ field.name }}" style="display:none;"></span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {%- endif %}
+                            {%- endif %}
+                            {%- endif %}
+                        {%- endfor %}
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        {%- endfor %}
+        </div>
+        <div class="well">
+            <a class="btn btn-danger pull-left{% if is_new %} hide{% endif %}" href="{{url_for('deposit.edit')}}/delete/"><i class="icon-trash  icon-white"></i> Delete</a>
+            <span class="pull-right">
+                <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
+                <button type="submit" class="btn btn-primary edit-form-submit"><i class="icon-ok  icon-white"></i> {% if is_new %}Create{% else %}Save{% endif %}</a>
+            </span>
+        </div>
+        </form>
+    </div>
+    <div class="span4">
+        {% if not is_new %}
+        <div class="well" style="text-align: center;">
+<a href="{{usercollection.collection_url}}" class="btn"><i class="icon-eye-open"></i> View</a> <a href="{{usercollection.collection_provisional_url}}" class="btn"><i class="icon-check"></i> Curate</a>
+    </div>
+        {% endif %}
+        {% include "usercollection_mycollections.html" %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{% endblock %}

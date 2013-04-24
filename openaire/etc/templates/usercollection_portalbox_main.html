@@ -1,0 +1,19 @@
+<small class="muted">User collection</small>
+<h4>{{usercollection.title}}</h4>
+<hr>
+{% if usercollection.has_logo %}<img src="{{usercollection.logo_url}}" class="pull-right" style="padding: 2px;">{% endif %}
+
+{%- if usercollection.description %}
+<p>{{usercollection.description}}</p>
+{%- endif %}
+{% if usercollection.page %}<a href="#" class="pull-right">Read more</a><br>{% endif %}
+
+<hr>
+
+<dl>
+    <dt>Title:</dt><dd>{{usercollection.title}}</dd>
+    <dt>Curated by:</dt><dd><a href="javascript:alert(" link="" to="" search="" or="" send="" message?");"="">Erdmann, Christopher</a><br>Harvard-Smithsonian Center for Astrophysics</dd>
+    <dt>Curation policy:</dt><dd>{% if usercollection.curation_policy %}{{usercollection.curation_policy}}{% else %}Not specified{% endif %}</dd>
+    <dt>Created:</dt><dd>{{usercollection.created}}</dd>
+    <dt>Harvesting API:</dt><dd><a href="{{usercollection.oai_url}}">OAI-PMH Interface</a></dd>
+</dl>
