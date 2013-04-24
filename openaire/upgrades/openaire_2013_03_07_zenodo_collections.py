@@ -27,39 +27,42 @@ depends_on = ['openaire_2013_03_07_zenodo_migration']
 
 collections = [
     (1, 'ZENODO', '980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
-    (2, 'Publications', '980__a:publication'),
-    (3, 'Posters', '980__a:poster'),
-    (4, 'Presentations', '980__a:presenation'),
-    (5, 'Datasets', '980__a:dataset'),
-    (6, 'Images', '980__a:image'),
-    (7, 'Videos & Audio', '980__a:video'),
+    (2, 'publications', '980__a:publication'),
+    (3, 'posters', '980__a:poster'),
+    (4, 'presentations', '980__a:presenation'),
+    (5, 'datasets', '980__a:dataset'),
+    (6, 'images', '980__a:image'),
+    (7, 'videos', '980__a:video'),
 
-    (8, 'Books', '980__b:book'),
-    (9, 'Book sections', '980__bsection'),
-    (10, 'Conference papers', '980__b:conferencepaper'),
-    (11, 'Journal articles', '980__b:article'),
-    (12, 'Patents', '980__b:patent'),
-    (13, 'Preprints', '980__b:preprint'),
-    (14, 'Reports', '980__b:report'),
-    (15, 'Theses', '980__b:thesis'),
-    (16, 'Technical notes', '980__b:technicalnote'),
-    (17, 'Working papers', '980__b:workingpaper'),
-    (18, 'Other publications', '980__b:other'),
+    (8, 'books', '980__b:book'),
+    (9, 'book-sections', '980__bsection'),
+    (10, 'conference-papers', '980__b:conferencepaper'),
+    (11, 'journal-articles', '980__b:article'),
+    (12, 'patents', '980__b:patent'),
+    (13, 'preprints', '980__b:preprint'),
+    (14, 'reports', '980__b:report'),
+    (15, 'theses', '980__b:thesis'),
+    (16, 'technical-notes', '980__b:technicalnote'),
+    (17, 'working-papers', '980__b:workingpaper'),
+    (18, 'other-publications', '980__b:other'),
 
-    (20, 'Figures', '980__b:figure'),
-    (21, 'Plots', '980__b:plot'),
-    (22, 'Drawings', '980__b:drawing'),
-    (23, 'Diagrams', '980__b:diagram'),
-    (24, 'Photos', '980__b:photo'),
-    (25, 'Other images', '980__b:other'),
+    (20, 'figures', '980__b:figure'),
+    (21, 'plots', '980__b:plot'),
+    (22, 'drawings', '980__b:drawing'),
+    (23, 'diagrams', '980__b:diagram'),
+    (24, 'photos', '980__b:photo'),
+    (25, 'other-images', '980__b:other'),
 
-    (26, 'Open Access', '(542__l:open OR 542__l:embargoed) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
-    (27, 'Closed Access', '(542__l:closed OR 542__l:restricted) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (26, 'open', '(542__l:open OR 542__l:embargoed) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (27, 'closed', '(542__l:closed OR 542__l:restricted) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
 
-    (28, 'Hidden', '980:PROVISIONAL OR 980:PENDING OR 980:SPAM OR 980:REJECTED OR 980:DARK'),
+    (28, 'hidden', '980:PROVISIONAL OR 980:PENDING OR 980:SPAM OR 980:REJECTED OR 980:DARK'),
 
-    (29, 'Curated', '980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
-    (30, 'Uncurated', '980:0->Z AND NOT 980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (29, 'curated', '980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (30, 'uncurated', '980:0->Z AND NOT 980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+
+    # FIXME: Perhaps use no DB query at all.
+    (31, 'user-collections', '980__a:user_*'),
 ]
 
 relations = [
@@ -97,7 +100,7 @@ relations = [
 ]
 
 accargs = (
-    (10, 'collection', 'Hidden'),
+    (10, 'collection', 'hidden'),
     (11, 'categ', '*'),
     (12, 'doctype', 'ZENODO'),
     (13, 'act', '*'),
@@ -153,6 +156,7 @@ names = [
     (28, 'en', 'ln', 'Hidden'),
     (29, 'en', 'ln', 'Curated'),
     (30, 'en', 'ln', 'Uncurated'),
+    (31, 'en', 'ln', 'User Collections'),
 ]
 
 
