@@ -23,7 +23,7 @@ Run as::
   python fix_8560.py > output.xml
   bibupload -c output.xml
 """
-from invenio.flaskshell import db
+from invenio.flaskshell import app
 from invenio.search_engine import search_pattern, get_fieldvalues
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.webuser import collect_user_info, get_uid_from_email
