@@ -29,19 +29,7 @@
       {%- endif -%}
     {%- endif -%}
 
-    <a class="text-success hide"
-       data-hotkey-action="click"
-       data-hotkey-value="g{{ i }}v"
-       href="{{ url_for('record.metadata', recid=recID) }}">
-      {{ _("Detailed record") }}
-    </a>
-
-    <a class="text-success hide"
-       data-hotkey-action="click"
-       data-hotkey-value="g{{ i }}s"
-       href="{{ url_for('.search', p=similar, rm='wrd') }}">
-      {{ _("Similar records") }}
-    </a>
+    <ul class="pager pull-right"><li><a class="text-success hide" data-hotkey-action="click" data-hotkey-value="g{{ i }}v" href="{{ url_for('record.metadata', recid=recID) }}">{{ _('View')}}</a></li></ul>
 
   {# Citations link #}
   {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}

@@ -18,18 +18,27 @@
 
 {{ search_form(collection) }}
 
-<div class="row websearch">
+{% if collection.id != 1%}
+<div class="row">
+    <div class="span12">
+        <h1>{{collection.name_ln}}</h1>
+    </div>
+</div>
+{% endif %}
+<div class="row websearch clearfix">
   <div class="span8">
     <div class="container">
-      <div class="row">
-        <div class="span4"><h1>Recent</h1></div>
-        <div class="span4">
-          <div class="btn-group pull-right hide">
-            <button class="btn active"><i class="icon-time"></i> Recent</button>
-            <button class="btn"><i class="icon-eye-open"></i> Viewed</button>
-            <button class="btn"><i class="icon-share"></i> Cited</button>
-          </div>
+    {% if collection.collection_children_r %}
+        <div class="row">
+            <div class="span8 collection clearfix">
+                <h4>{{ _("Subcollections:") }}</h4>
+                {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
+            </div>
         </div>
+    {% endif %}
+
+      <div class="row">
+        <div class="span4"><h2>Recent</h2></div>
       </div>
       {% if collection.is_restricted %}
       <div class="row">
@@ -41,38 +50,40 @@
         {% if collection.reclist %}
         {% for recid in collection.reclist[-10:]|reverse %}
           <div class="row">
-            <div class="span8">
-              {{ format_record(recid, 'hb', ln=g.ln)|safe }}
-              {% if not loop.last %}<hr />{% endif %}
+            <div class="span8 record-list-elem">
+                <ul class="pager pull-right"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">{{ _('View')}}</a></li></ul>
+                {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+                {% if not loop.last %}<hr />{% endif %}
             </div>
           </div>
         {% endfor %}
+        {% if collection.reclist|length > 10 %}
+        <div class="row">
+            <div class="span8">
+                <ul class="pager">
+                <li><a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}">{{ _('View all')}}  &rarr;</a></li>
+                </ul>
+            </div>
+        </div>
+        {% endif %}
         {% endif %}
       {% endif %}
     </div>
   </div>
   <div class="span4">
+      {# portalboxes left top is not supported #}
+      {{ portalbox_sidebar(portalboxes.rt, class="well") }}
+      {% if collection.id == 1%}
       <div class="well">
         <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
         <h4>New to {{config.CFG_SITE_NAME}}?</h4>
         {% include "zenodo_benefits.html" %}
       </div>
-
-      {# portalboxes left top is not supported #}
-      {{ portalbox_sidebar(portalboxes.rt, class="well") }}
+      {% endif %}
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-  {#
+{#
 
 
 <p>
@@ -122,8 +133,8 @@
   {% if collection.is_restricted %}
     {{ collection_records(collection) }}
   {% else %}
-    {% dyncache 24*60*60, collection.name %}
-      {{ collection_records(collection) }}
+    {% zenodocache 24*60*60, collection.name, g.ln %}
+    {{ collection_records(collection) }}
     {% endcache %}
   {% endif %}
 {% endblock %}

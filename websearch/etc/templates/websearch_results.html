@@ -29,7 +29,7 @@
   {%- else -%}
     {%- set hash_tag = '' -%}
   {%- endif -%}
-  <div style="margin:0px;" class="pagination pull-right">
+  <div style="margin:0px;" class="pagination" align="center">
     <ul>
       <li{{ ' class="disabled"'|safe if not pagination.has_prev }}>
         {%- do args.update({'jrec': 1}) -%}
@@ -63,6 +63,7 @@
 
 
 {% macro render_search_results(recids, collection, pagination, format_record) %}
+    {% if collection.id != 1 %}<h1>{{collection.name_ln}}</h1>{% endif %}
       <form class="clearfix form-horizontal" name="" action="{{ url_for('search.dispatch') }}" method="post">
         <span class="btn-group hide">
           <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
@@ -143,7 +144,7 @@
         </div>
 
 
-        <hr/>
+        <hr />
 
         {%- set of = request.values.get('of', 'hb') -%}
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
@@ -164,9 +165,10 @@
             <hr />
           {%- else -%}
           {{ format_record(recid, of, ln=g.ln) }}
+          {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
           {%- endif -%}
         {%- endfor -%}
-        <hr/>
+
         <div class="row clearfix">
           <div class="span10 ">
             <span class="pull-left btn-group clearfix hide">
@@ -194,7 +196,6 @@
                  title="{{ _('Export') }}"></i> {{ _('Export') }}
              </button>
             </span>
-
             {{ render_search_pagination(pagination) }}
           </div>
         </div>

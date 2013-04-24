@@ -21,9 +21,11 @@
 {% block title %}{% endblock title %}
 
 {% block body %}
+{% set formattedrecord = format_record(recid, of='hd', ln=g.ln)|safe %}
 <div class="row">
+  {%- if formattedrecord %}
   <div class="span8">
-    {{ format_record(recid, of='hd', ln=g.ln)|safe }}
+    {{formattedrecord}}
     <div class="accordion" id="record_detail">
       <div class="accordion-group" id="preview">
         <div class="accordion-heading">
@@ -112,6 +114,14 @@
     {{ format_record(recid, of='HDSHAR', ln=g.ln)|safe }}
     {{ format_record(recid, of='HDEXP', ln=g.ln)|safe }}
   </div>
+  {%- else %}
+  <div class="offset3 span6">
+    <div class="alert alert-warning">
+        <h3>New record</h3>
+        <p>This record was just uploaded, and will be available here shortly.</p>
+    </div>
+  </div>
+  {%- endif %}
 </div>
 {% endblock %}
 
