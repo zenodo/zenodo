@@ -18,6 +18,8 @@
 from __future__ import absolute_import
 
 from celery import chain
+from celery.utils.log import get_task_logger
+
 import os
 import re
 from tempfile import mkstemp
@@ -43,6 +45,10 @@ except ImportError, e:
     )
 
 
+# Setup logger
+logger = get_task_logger(__name__)
+
+
 ICON_SIZE = "90"
 ICON_SUBFORMAT = 'icon-%s' % ICON_SIZE
 ICON_FILEFORMAT = "png"
@@ -59,6 +65,7 @@ def open_temp_file(prefix):
         prefix='prefix_' + time.strftime("%Y%m%d_%H%M%S_", time.localtime())
     )
     file_out = os.fdopen(fd, "w")
+    logger.debug("Created temporary file %s" % filename)
 
     return (file_out, filename)
 
@@ -83,6 +90,7 @@ def bibupload(record=None, collection=None, file_prefix="", mode="-c"):
             if tot == MAX_RECORDS:
                 file_out.write("</collection>")
                 file_out.close()
+                logger.debug("Submitting bibupload %s -n %s" % (mode, filename))
                 task_low_level_submission('bibupload', 'openaire', mode, filename, '-n')
 
                 (file_out, filename) = open_temp_file(file_prefix)
@@ -95,6 +103,7 @@ def bibupload(record=None, collection=None, file_prefix="", mode="-c"):
 
     file_out.close()
     if tot > 0:
+        logger.debug("Submitting bibupload %s -n %s" % (mode, filename))
         task_low_level_submission('bibupload', 'openaire', mode, filename, '-n')
 
 
@@ -114,14 +123,19 @@ def openaire_create_icon(docid=None, recid=None, reformat=True):
 
     # Celery task will fail if BibDoc does not exists (on purpose ;-)
     for d in docs:
+        logger.debug("Checking document %s" % d)
         if not d.get_icon(subformat_re=re.compile(ICON_SUBFORMAT)):
+            logger.debug("Document has no icon")
             for f in d.list_latest_files():
+                logger.debug("Checking file %s" % f)
                 if not f.is_icon():
+                    logger.debug("File not an icon")
                     file_path = f.get_full_path()
                     try:
                         filename = os.path.splitext(
                             os.path.basename(file_path)
                         )[0]
+                        logger.info("Creating icon from file %s" % file_path)
                         (icon_dir, icon_name) = create_icon(
                             {'input-file': file_path,
                              'icon-name': "icon-%s" % filename,
@@ -132,6 +146,7 @@ def openaire_create_icon(docid=None, recid=None, reformat=True):
                              'verbosity': 0})
                         icon_path = os.path.join(icon_dir, icon_name)
                     except InvenioWebSubmitIconCreatorError, e:
+                        logger.warning('Icon for file %s could not be created: %s' % (file_path, str(e)))
                         register_exception(
                             prefix='Icon for file %s could not be created: %s' % (file_path, str(e)),
                             alert_admin=False
@@ -139,11 +154,13 @@ def openaire_create_icon(docid=None, recid=None, reformat=True):
 
                     try:
                         if os.path.exists(icon_path):
+                            logger.debug("Adding icon %s to document" % icon_path)
                             d.add_icon(icon_path, subformat=ICON_SUBFORMAT)
-                            recid_list = ",".join([x['recid'] for x in d.bibrec_links])
+                            recid_list = ",".join([str(x['recid']) for x in d.bibrec_links])
                             task_low_level_submission('bibreformat', 'openaire', '-i', recid_list)
 
                     except InvenioBibDocFileError, e:
+                        logger.warning('Icon %s for file %s could not be added to document: %s' % (icon_path, f, str(e)))
                         register_exception(
                             prefix='Icon %s for file %s could not be added to document: %s' % (icon_path, f, str(e)),
                             alert_admin=False
@@ -167,7 +184,7 @@ def openaire_check_icons():
     """)
 
     for docid, in docs:
-        opeanire_create_icon.delay(docid=docid)
+        openaire_create_icon.delay(docid=docid)
 
 
 @celery.task(ignore_result=True)
@@ -181,6 +198,7 @@ def openaire_altmetric_check_all():
     # Do not parallelize tasks to not overload Altmetric
     MAX_RECORDS
     subtasks = []
+    logger.debug("Checking Altmetric for %s records" % len(recids))
     for i in xrange(0, len(recids), MAX_RECORDS):
         subtasks.append(openaire_altmetric_update.s(recids[i:i+MAX_RECORDS]))
 
@@ -192,10 +210,12 @@ def openaire_altmetric_update(recids, upload=True):
     """
     Retrieve Altmetric information for a record.
     """
+    logger.debug("Checking Altmetric for recids %s" % recids)
     a = Altmetric()
 
     records = []
     for recid in recids:
+        logger.debug("Checking Altmetric for recid %s" % recid)
         try:
             # Check if we already have an Altmetric id
             sysno_inst = get_fieldvalues(recid, "035__9")
@@ -203,7 +223,9 @@ def openaire_altmetric_update(recids, upload=True):
                 continue
 
             doi_val = get_fieldvalues(recid, "0247_a")[0]
+            logger.debug("Found DOI %s" % doi_val)
             json_res = a.doi(doi_val)
+            logger.debug("Altmetric response: %s" % json_res)
 
             rec = {}
             record_add_field(rec, "001", controlfield_value=str(recid))
@@ -213,13 +235,16 @@ def openaire_altmetric_update(recids, upload=True):
                     ('a', str(json_res['altmetric_id'])),
                     ('9', 'Altmetric')
                 ])
-
-            records.append(rec)
+                records.append(rec)
         except AltmetricHTTPException, e:
+            logger.warning('Altmetric error for recid %s with DOI %s (status code %s): %s' % (recid, doi_val, e.status_code, str(e)))
             register_exception(
                 prefix='Altmetric error (status code %s): %s' % (e.status_code, str(e)),
                 alert_admin=False
             )
+        except IndexError:
+            logger.debug("No DOI found")
+            pass
 
     if upload and records:
         if len(records) == 1:
