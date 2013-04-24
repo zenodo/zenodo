@@ -13,7 +13,7 @@
       </div>
       <div class="container" style="height:37px;">
         <ul class="nav nav-tabs">
-          {%- for item in menu|sort(attribute='order') recursive %}
+          {%- for item in config.menubuilder_map.main.children.itervalues()|sort(attribute='order') if item.display() recursive %}
           {%- if item.children -%}
           <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">{{ item.title|safe }}<b class="caret"></b></a>

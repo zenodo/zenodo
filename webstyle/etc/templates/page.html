@@ -11,27 +11,27 @@
 {%- set viewclaimlink = current_user['precached_viewclaimlink'] -%}
 {%- set usepaperclaim = current_user['precached_usepaperclaim'] -%}
 {%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
-{%- css 'css/jquery-ui.custom.css' -%}
-{%- css 'css/bootstrap.css' -%}
-{%- css 'css/bootstrap-responsive.min.css' -%}
-{%- css 'css/token-input.css' -%}
-{%- css 'css/token-input-facebook.css' -%}
-{%- css 'css/datepicker.css' -%}
-{%- css 'css/font-awesome.min.css' -%}
-{%- css 'css/custom.css' -%}
-{%- js "js/hogan.js" -%}
-{%- js 'js/jquery.min.js' -%}
-{%- js 'js/jquery-ui.custom.min.js' -%}
-{%- js 'js/bootstrap.min.js' -%}
-{%- js "js/bootstrap-select.js" -%}
-{%- js "js/bootstrap-datepicker.js" -%}
-{%- js 'js/jquery.tokeninput.js' -%}
-{%- js "js/websearch_typeahead.js" -%}
-{%- js "js/holder.js" -%}
-{%- js "js/custom.js" -%}
+{%- css 'css/jquery-ui.custom.css', '00-invenio' -%}
+{%- css 'css/bootstrap.css', '00-invenio' -%}
+{%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
+{%- css 'css/token-input.css', '00-invenio' -%}
+{%- css 'css/token-input-facebook.css', '00-invenio' -%}
+{%- css 'css/datepicker.css', '00-invenio' -%}
+{%- css 'css/font-awesome.min.css', '00-invenio' -%}
+{%- css 'css/custom.css', '00-invenio' -%}
+{%- js "js/hogan.js", '00-invenio' -%}
+{%- js 'js/jquery.min.js', '00-invenio' -%}
+{%- js 'js/jquery-ui.custom.min.js', '00-invenio' -%}
+{%- js 'js/bootstrap.min.js', '00-invenio' -%}
+{%- js "js/bootstrap-select.js", '00-invenio' -%}
+{%- js "js/bootstrap-datepicker.js", '00-invenio' -%}
+{%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
+{%- js "js/websearch_typeahead.js", '00-invenio' -%}
+{%- js "js/holder.js", '00-invenio' -%}
+{%- js "js/custom.js", '00-invenio' -%}
 {%- if not no_pageheader -%}
 <!DOCTYPE html>
-<html{% if ln %} lang="{{ ln|safe }}"{% endif %}{% if is_language_rtl %} dir="rtl"{% endif %}>
+<html{% if ln %} lang="{{ ln|safe }}"{% endif %}{% if is_language_rtl(g.ln) %} dir="rtl"{% endif %}>
 <head>
   <meta charset="utf-8">
   <title>{{ title+' | ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
@@ -45,9 +45,11 @@
   <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
   <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
   <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
-  {%- assets get_css_bundle() -%}
+  {% for bundle in get_css_bundle(iterate=True) %}
+  {% assets bundle %}
     <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
   {%- endassets -%}
+  {% endfor %}
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
   {% block _top_assets %}{% endblock _top_assets %}
   {%- block css -%}{%- endblock css -%}
@@ -114,9 +116,12 @@
     {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
   </div>
   {%- include 'footer.html' -%}
-  {% block _bottom_assets %}
-  {% assets get_js_bundle() %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>{% endassets %}
-  {% endblock %}
+  {%- block _bottom_assets %}
+  {%- for bundle in get_js_bundle(iterate=True) %}
+  {% assets bundle %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {%- endassets %}
+  {%- endfor %}
+  {%- endblock %}
   <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
   {% block javascript %}{% endblock javascript %}
   {% if config.CFG_PIWIK_URL %}
