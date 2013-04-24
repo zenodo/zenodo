@@ -77,6 +77,10 @@ header .container .nav {
   margin-bottom: 0;
 }
 
+header .container .nav .dropdown-menu {
+  margin-top: 0;
+}
+
 header .container .nav a, footer a {
   color: #ffffff;
 }
@@ -487,3 +491,5 @@ h1, h2, h3 {
       height: 350px;
     }
 }
+
+
