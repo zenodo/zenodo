@@ -125,7 +125,7 @@ def dropbox_upload(pub_id=None, fileurl=''):
     if not fileurl:
         abort(400)
 
-    if not fileurl.startswith("https://dl.dropbox.com/"):
+    if not (fileurl.startswith("https://dl.dropbox.com/") or fileurl.startswith("https://dl.dropboxusercontent.com/")):
         abort(400)
 
     publication = OpenAIREPublication(uid)
