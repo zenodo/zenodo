@@ -1,5 +1,9 @@
 var alert_template = Hogan.compile('<div class="alert alert-{{status}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{message}}</div>');
-var tag_template = Hogan.compile('<li class="alert alert-info tag" data-tag-id="{{grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{label}}</li>');
+var tag_templates = {
+    'funding_source' : Hogan.compile('<li class="alert alert-info tag" data-tag-id="{{grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{label}}</li>'),
+    'collections' : Hogan.compile('<li class="alert alert-info tag" data-tag-id="{{value}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{label}}</li>')
+};
+
 
 $(document).ready(function(){
     $('#affix-outer').height($('#navbar').height());
@@ -91,6 +95,7 @@ function webdeposit_autocomplete(selector, remote_url, with_tags) {
             if (with_tags) {
                 existing_ids = $.map( $('#'+selector+'_values li'), function(e){ return $(e).data('tagId').toString(); } );
                 if(existing_ids.indexOf(ui.item.value) == -1){
+                    tag_template = tag_templates[selector];
                     $('#'+selector+'_values ul').append(tag_template.render(ui.item));
                 }
                 $('input.'+selector).val("");

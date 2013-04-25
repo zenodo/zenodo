@@ -5,18 +5,72 @@
 {% block title %}{% endblock %}
 
 {% block body %}
+{% if not is_new %}
+<div id="deletemodal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deletemodal_label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="deletemodal_label">Delete collection?</h3>
+  </div>
+  <div class="modal-body">
+    <div class="alert alert-danger"><h5>Warning</h5><ul><li>You will loose all connections to records currently attached to this collection and you will not be able to recover them.</li><li>Any external repository harvesting your collection will stop working.</li></ul></div>
+  </div>
+  <div class="modal-footer">
+    <form action="{{url_for('.delete', usercollection_id=usercollection.id)}}" method="POST">
+        {%- for field in deleteform %}{{ field }}{% endfor %}
+        <button class="btn btn-large" data-dismiss="modal" aria-hidden="true">No, thanks</button>
+        <button type="submit" href="{{ url_for('.delete', usercollection_id=usercollection.id) }}" class="btn btn-danger"><i class="icon-trash  icon-white"></i> Yes, delete</button>
+    </form>
+  </div>
+</div>
+{% endif %}
 <div class="row">
     <div id="file_container" class="span8">
-        <h1>{{ _("New collection") if is_new else _("Edit collection") }}</h1>
-        {% if not is_new %}
-        <div class="alert alert-info">
-            <a href="{{usercollection.collection_url}}" class="btn"><i class="icon-eye-open"></i> View</a>
-            <a href="{{usercollection.collection_provisional_url}}" class="btn"><i class="icon-check"></i> Curate</a>
-            Direct Upload link
-        </div>
-        {% endif %}
+        <h1>{% if is_new -%}
+            <i class="icon-plus"></i> {{ _("New collection") }}
+            {%- else -%}
+            <i class="icon-edit"></i> {{ _("Edit collection") }}
+            {%- endif %}</h1>
+
         <form action="." method="POST" id="edit_form" class="form-horizontal">
         <div class="accordion">
+        {% if not is_new %}
+            <div class="accordion-group">
+                <div class="accordion-heading">
+                    <span class="accordion-toggle muted pull-right"></span>
+                    <a class="accordion-toggle" data-toggle="collapse" data-idx="0" href="#collapse0">Collection URLs<b class="caret"></b></a>
+                </div>
+                <div id="collapse0" class="accordion-body collapse in">
+                    <div class="accordion-inner">
+                        <fieldset>
+                            <div class="control-group">
+                                <label class="control-label"><i class="icon-share"></i>Collection URL:</label>
+                                <div class="controls"><a href="{{ usercollection.collection_url }}">{{config.CFG_SITE_URL}}{{ usercollection.collection_url }}</a>
+                                    <p class="muted field-desc"><small>Above address links directly to your collection.</small></p>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label"><i class="icon-share"></i>Upload URL:</label>
+                                <div class="controls"><a href="{{ usercollection.upload_url }}">{{config.CFG_SITE_URL}}{{ usercollection.upload_url }}</a>
+                                    <p class="muted field-desc"><small>Above address will automatically ensure people who use it will have their record added to your collection.</small></p>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label"><i class="icon-share"></i>Curation URL:</label>
+                                <div class="controls"><a href="{{ usercollection.collection_provisional_url }}">{{config.CFG_SITE_URL}}{{ usercollection.collection_provisional_url }}</a>
+                                    <p class="muted field-desc"><small>Above address links to your private curation URL. You will find all uploads pending your curation.</small></p>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label"><i class="icon-share"></i>Harvesting URL:</label>
+                                <div class="controls"><a href="{{ usercollection.oai_url }}">{{config.CFG_SITE_URL}}{{ usercollection.oai_url }}</a>
+                                    <p class="muted field-desc"><small>Above address links to a OAI-PMH feed, which can be used by other digital repositories to harvest this collection.</small></p>
+                                </div>
+                            </div>
+                        </fieldset>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
         {%- for title, fieldnames, conf in form.field_sets %}
             <div class="accordion-group">
                 {%- if title %}
@@ -31,18 +85,17 @@
                         <p>{{ conf.description|urlize }}</p>
                         {%- endif %}
                         {% if not is_new %}
+                        <fieldset>
                         <div class="control-group field-identifier">
                                 <label class="control-label" for="identifier">
-                                    <span class="" style="margin-right: 5px; margin-top: 5px;">
-                                        <i class="icon-barcode"></i>
-                                    </span>
-                                    Identifier
+                                        <i class="icon-barcode"></i> Identifier
                                 </label>
                                 <div class="controls">
                                     <input class="span5" type="text" disabled value="{{usercollection.id}}">
                                     <p class="muted field-desc"><small>The identifier cannot be changed after creation of the collection.</small></p>
                                 </div>
                             </div>
+                        </fieldset>
                         {% endif %}
                         <fieldset>
                         {%- for f in fieldnames %}
@@ -65,9 +118,7 @@
                             <div class="control-group field-{{ field.name }}{% if field.errors %} error{% endif %}">
                                 <label class="control-label{{' required' if field.required else ''}}" for="{{field.label.field_id}}">
                                     {%- if field._icon_html or form.get_field_icon(f) %}
-                                    <span class="" style="margin-right: 5px; margin-top: 5px;">
                                         {% if form.get_field_icon(f) %}<i class="icon-{{ form.get_field_icon(f) }}"></i>{% else %}{{ field._icon_html|safe }}{% endif %}
-                                    </span>
                                     {%- endif %}
                                     {{ field.label.text }}
                                 </label>
@@ -99,7 +150,7 @@
         {%- endfor %}
         </div>
         <div class="well">
-            <a class="btn btn-danger pull-left{% if is_new %} hide{% endif %}" href="{{url_for('deposit.edit')}}/delete/"><i class="icon-trash  icon-white"></i> Delete</a>
+            <a role="button" data-toggle="modal" class="btn btn-danger pull-left{% if is_new %} hide{% endif %}" href="#deletemodal"><i class="icon-trash  icon-white"></i> Delete</a>
             <span class="pull-right">
                 <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
                 <button type="submit" class="btn btn-primary edit-form-submit"><i class="icon-ok  icon-white"></i> {% if is_new %}Create{% else %}Save{% endif %}</a>
@@ -108,11 +159,6 @@
         </form>
     </div>
     <div class="span4">
-        {% if not is_new %}
-        <div class="well" style="text-align: center;">
-<a href="{{usercollection.collection_url}}" class="btn"><i class="icon-eye-open"></i> View</a> <a href="{{usercollection.collection_provisional_url}}" class="btn"><i class="icon-check"></i> Curate</a>
-    </div>
-        {% endif %}
         {% include "usercollection_mycollections.html" %}
     </div>
 </div>

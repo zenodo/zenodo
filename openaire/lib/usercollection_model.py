@@ -45,6 +45,7 @@ After call to save_collection() you must do the following:
 """
 
 from datetime import datetime
+from urllib import quote_plus
 
 from invenio.config import CFG_SITE_LANG
 from invenio.sqlalchemyutils import db
@@ -66,7 +67,11 @@ from invenio.webaccess_model import \
     UserAccROLE
 from invenio.oai_harvest_model import OaiREPOSITORY
 from invenio.jinja2utils import render_template_to_string
-from invenio.signalutils import webcoll_after_webpage_cache_update
+from invenio.usercollection_signals import before_save_collection, \
+    after_save_collection, before_save_collections, after_save_collections, \
+    before_delete_collection, after_delete_collection, \
+    before_delete_collections, after_delete_collections
+from flask import url_for
 
 
 #
@@ -96,8 +101,7 @@ portalboxes is given by order of templates.
 """
 
 CFG_USERCOLLCTION_PORTALBOXES_PROVISIONAL = [
-    'usercollection_portalbox_main.html',
-    'usercollection_portalbox_upload.html'
+    'usercollection_portalbox_provisional.html',
 ]
 """
 List of templates to render as portalboxes for each provisional collection -
@@ -227,6 +231,11 @@ class UserCollection(db.Model):
         """ Get URL to provisional collection """
         return "/collection/%s" % self.get_collection_name(provisional=True)
 
+    @property
+    def upload_url(self):
+        """ Get direct upload URL """
+        return url_for('deposit.index', collection=self.id)
+
     #
     # Utility methods
     #
@@ -239,7 +248,7 @@ class UserCollection(db.Model):
 
     def get_title(self, provisional=False):
         if provisional:
-            return "%s (provisional)" % self.title
+            return "Provisional: %s" % self.title
         else:
             return self.title
 
@@ -466,7 +475,6 @@ class UserCollection(db.Model):
         """
         # Setup collection
         collection_name = self.get_collection_name(provisional=provisional)
-
         c = Collection.query.filter_by(name=collection_name).first()
         fields = dict(
             name=collection_name,
@@ -474,8 +482,10 @@ class UserCollection(db.Model):
         )
 
         if c:
+            before_save_collection.send(self, is_new=True, provisional=provisional)
             update_changed_fields(c, fields)
         else:
+            before_save_collection.send(self, is_new=False, provisional=provisional)
             c = Collection(**fields)
             db.session.add(c)
         setattr(self, 'collection_provisional' if provisional else 'collection', c)
@@ -504,16 +514,70 @@ class UserCollection(db.Model):
             CFG_USERCOLLCTION_PORTALBOXES_PROVISIONAL if provisional else CFG_USERCOLLCTION_PORTALBOXES
         )
         db.session.commit()
-        # FIXME - Check signals
-        webcoll_after_webpage_cache_update.send(collection_name, collection=c, lang=CFG_SITE_LANG)
-
+        after_save_collection.send(self, collection=c, provisional=provisional)
 
     def save_collections(self):
         """
         Create restricted and unrestricted collection
         """
+        before_save_collections.send(self)
         self.save_collection(provisional=False)
         self.save_collection(provisional=True)
+        after_save_collections.send(self)
+
+    def delete_collection(self, provisional=False):
+        """
+        Delete all objects related to a single collection
+        """
+        # Most of the logic in this method ought to be moved to a
+        # Collection.delete() method.
+        c = getattr(self, "collection_provisional" if provisional else "collection")
+        collction_name = self.get_collection_name(provisional=provisional)
+
+        before_delete_collection.send(self, collection=c, provisional=provisional)
+
+        if c:
+            # Delete portal boxes
+            for c_pbox in c.portalboxes:
+                if c_pbox.portalbox:
+                    db.session.delete(c_pbox.portalbox)
+                db.session.delete(c_pbox)
+
+            # Delete output formats:
+            CollectionFormat.query.filter_by(id_collection=c.id).delete()
+
+            # Delete title, tabs, collection tree
+            Collectionname.query.filter_by(id_collection=c.id).delete()
+            CollectionCollection.query.filter_by(id_son=c.id).delete()
+            Collectiondetailedrecordpagetabs.query.filter_by(id_collection=c.id).delete()
+
+        if provisional:
+            # Delete ACLs
+            AccARGUMENT.query.filter_by(keyword='collection', value=collction_name).delete()
+            role = AccROLE.query.filter_by(name='coll_%s' % collction_name).first()
+            if role:
+                UserAccROLE.query.filter_by(role=role).delete()
+                AccAuthorization.query.filter_by(role=role).delete()
+                db.session.delete(role)
+        else:
+            # Delete OAI repository
+            if self.oai_set:
+                db.session.delete(self.oai_set)
+
+        # Delete collection
+        if c:
+            db.session.delete(c)
+        db.session.commit()
+        after_delete_collection.send(self, provisional=provisional)
+
+    def delete_collections(self):
+        """
+        Delete collection and all associated objects.
+        """
+        before_delete_collections.send(self)
+        self.delete_collection(provisional=False)
+        self.delete_collection(provisional=True)
+        after_delete_collections.send(self)
 
 
 def update_changed_fields(obj, fields):

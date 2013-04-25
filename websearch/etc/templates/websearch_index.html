@@ -36,18 +36,22 @@
             </div>
         </div>
     {% endif %}
+{% if collection.name.startswith('provisional-') %}
 
-      <div class="row">
-        <div class="span4"><h2>Recent</h2></div>
-      </div>
+{% endif %}
       {% if collection.is_restricted %}
       <div class="row">
-        <div class="span8">
-          <strong>{{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
+        <div class="offset1 span6">
+            <div class="alert alert-info" style="margin-top: 50px">
+                <strong><i class="icon-ban-circle"></i> {{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
+            </div>
         </div>
       </div>
       {% else %}
         {% if collection.reclist %}
+        <div class="row">
+            <div class="span4"><h2>Recent</h2></div>
+        </div>
         {% for recid in collection.reclist[-10:]|reverse %}
           <div class="row">
             <div class="span8 record-list-elem">
@@ -66,6 +70,12 @@
             </div>
         </div>
         {% endif %}
+        {% else %}
+        <div class="row">
+            <div class="span8" align="center" style="margin-top: 40px;">
+                <em class="muted">This collection is currently empty.</em>
+            </div>
+        </div>
         {% endif %}
       {% endif %}
     </div>

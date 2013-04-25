@@ -233,6 +233,12 @@ class DepositionForm(Form):
         ('Type of file(s)', [
             'upload_type', 'publication_type', 'image_type',
         ], {'classes': 'in'}),
+        ('Collections', [
+            'collections',
+        ], {
+            'classes': 'in',
+            'state': 'recommended',
+        }),
         ('Basic information', [
             'doi', 'publication_date', 'title',  'creators', 'description',
             'keywords', 'notes',
@@ -293,6 +299,7 @@ class DepositionForm(Form):
         'thesis_supervisors': 'Family name, First name: Affiliation (one supervisor per line)',
         'keywords': 'One keyword per line...',
         'funding_source': 'Start typing a grant number, name or abbreviation...',
+        'collections': 'Start typing a collection name...',
         'license': 'Start typing a license name or abbreviation...',
         'related_identifiers': 'e.g. 10.1234/foo.bar (one DOI per line)...',
         'conference_dates': 'e.g 21-22 November 2012...',
@@ -388,6 +395,17 @@ class DepositionForm(Form):
         validators=[
             oa_validators.RequiredIf('upload_type', ['image']),
             validators.optional()
+        ]
+    )
+
+    #
+    # Collection
+    #
+    collections = fields.CollectionsField(
+        label="Collections",
+        description="Attach your record to any number of collections.",
+        filters=[
+            splitchar_list(","),
         ]
     )
 

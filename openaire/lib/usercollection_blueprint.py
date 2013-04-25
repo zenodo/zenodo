@@ -19,24 +19,12 @@
 
 """OpenAIRE Flask Blueprint"""
 
-from flask import render_template, abort, request, current_app, flash, \
-    redirect, url_for, send_file, jsonify, g
-import uuid as uuid_mod
-import hashlib
-from wtforms import Field
-from werkzeug import secure_filename
-from invenio.bibformat import format_record
+from flask import render_template, abort, request, flash, \
+    redirect, url_for
 from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
 from invenio.webuser_flask import current_user
-from invenio.bibdocfile import download_external_url
-from invenio.openaire_deposit_engine import get_exisiting_publications_for_uid,\
-    OpenAIREPublication
-from werkzeug.datastructures import MultiDict
-import invenio.template
-import os
-from invenio.usercollection_forms import CollectionForm, EditCollectionForm
-import json
-from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
+from invenio.usercollection_forms import CollectionForm, EditCollectionForm, \
+    DeleteCollectionForm
 from invenio.usercollection_model import UserCollection
 from invenio.sqlalchemyutils import db
 
@@ -49,7 +37,7 @@ blueprint = InvenioBlueprint(
         (_('User Collections'), 'usercollection.index'),
     ],
     menubuilder=[
-        ('main.usercollection', _('Collections'), 'usercollection.index', 2),
+        ('main.usercollection', _('Collections'), 'usercollection.index', 1),
     ],
 )
 
@@ -60,7 +48,7 @@ def mycollections_ctx(uid):
     """
     return {
         'mycollections': UserCollection.query.filter_by(
-            id_user=uid).order_by(db.desc(UserCollection.title)).all()
+            id_user=uid).order_by(db.asc(UserCollection.title)).all()
     }
 
 
@@ -78,6 +66,27 @@ def index():
 
     return render_template(
         "usercollection_index.html",
+        **ctx
+    )
+
+
+@blueprint.route('/<string:usercollection_id>/', methods=['GET'])
+def detail(usercollection_id=None):
+    """
+    Index page with uploader and list of existing depositions
+    """
+    # Check existence of collection
+    u = UserCollection.query.filter_by(id=usercollection_id).first_or_404()
+    uid = current_user.get_id()
+
+    ctx = mycollections_ctx(uid)
+    ctx.update({
+        'is_owner': u.id_user == uid,
+        'usercollection': u,
+    })
+
+    return render_template(
+        "usercollection_detail.html",
         **ctx
     )
 
@@ -137,11 +146,13 @@ def edit(usercollection_id):
         abort(404)
 
     form = EditCollectionForm(request.values, u, crsf_enabled=False)
+    deleteform = DeleteCollectionForm()
     ctx = mycollections_ctx(uid)
     ctx.update({
         'form': form,
         'is_new': False,
         'usercollection': u,
+        'deleteform': deleteform,
     })
 
     if request.method == 'POST' and form.validate():
@@ -156,3 +167,39 @@ def edit(usercollection_id):
         "usercollection_new.html",
         **ctx
     )
+
+
+@blueprint.route('/delete/<string:usercollection_id>/', methods=['POST'])
+@blueprint.invenio_force_https
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
+@blueprint.invenio_set_breadcrumb('Delete')
+def delete(usercollection_id):
+    """
+    Delete a collection
+    """
+    # Check existence of collection
+    u = UserCollection.query.filter_by(id=usercollection_id).first_or_404()
+    uid = current_user.get_id()
+
+    # Check ownership
+    if u.id_user != uid:
+        abort(404)
+
+    deleteform = DeleteCollectionForm(request.values)
+    ctx = mycollections_ctx(uid)
+    ctx.update({
+        'deleteform': deleteform,
+        'is_new': False,
+        'usercollection': u,
+    })
+
+    if request.method == 'POST' and deleteform.validate():
+        u.delete_collections()
+        db.session.delete(u)
+        db.session.commit()
+        flash("Collection was successfully deleted.", category='success')
+        return redirect(url_for('.index'))
+    else:
+        flash("Collection could not be deleted.", category='warning')
+        return redirect(url_for('.edit', usercollection_id=u.id))

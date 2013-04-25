@@ -20,8 +20,10 @@
 OpenAIRE local customization of Flask application
 """
 
+from invenio.config import CFG_SITE_LANG
 from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
+from invenio.usercollection_signals import after_save_collection
 from jinja2 import nodes
 from jinja2.ext import Extension
 
@@ -70,7 +72,8 @@ def customize_app(app):
     # Add {% zenodocache tag %} and connect webcoll signal handler to invalidate
     # cache.
     app.jinja_env.add_extension(ZenodoExtension)
-    webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache, app)
+    webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache)
+    after_save_collection.connect(invalidate_jinja2_cache)
 
 
 def make_template_fragment_key(fragment_name, vary_on=[]):
@@ -82,11 +85,13 @@ def make_template_fragment_key(fragment_name, vary_on=[]):
     return TEMPLATE_FRAGMENT_KEY_TEMPLATE % (fragment_name, "_".join(vary_on))
 
 
-def invalidate_jinja2_cache(sender, collection=None, lang=None):
+def invalidate_jinja2_cache(sender, collection=None, lang=None, **extra):
     """
     Invalidate collection cache
     """
     from invenio.cache import cache
+    if lang is None:
+        lang = CFG_SITE_LANG
     cache.delete(make_template_fragment_key(collection.name, vary_on=[lang]))
 
 

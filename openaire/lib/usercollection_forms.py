@@ -6,7 +6,7 @@ from flask.ext import wtf
 from sqlalchemy.exc import SQLAlchemyError
 
 from wtforms import SubmitField, Field, validators
-from invenio.wtforms_utils import InvenioForm as Form
+from invenio.wtforms_utils import InvenioForm as Form, InvenioBaseForm
 from invenio.webdeposit_field_widgets import bootstrap_submit
 from invenio.webdeposit_load_fields import fields
 from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
@@ -31,36 +31,9 @@ class CollectionForm(Form):
     ]
 
     field_placeholders = {
-        'doi': 'e.g. 10.1234/foo.bar...',
-        'creators': 'Family name, First name: Affiliation (one author per line)',
-        'thesis_supervisors': 'Family name, First name: Affiliation (one supervisor per line)',
-        'keywords': 'One keyword per line...',
-        'funding_source': 'Start typing a grant number, name or abbreviation...',
-        'license': 'Start typing a license name or abbreviation...',
-        'related_identifiers': 'e.g. 10.1234/foo.bar (one DOI per line)...',
-        'conference_dates': 'e.g 21-22 November 2012...',
-        'conference_place': 'e.g city, country...',
-        'imprint_place': 'e.g city, country...',
-        'imprint_isbn': 'e.g 0-06-251587-X',
     }
 
     field_state_mapping = {
-        'access_right': {
-            'open': (['license'], ['embargo_date']),
-            'embargoed': (['embargo_date', 'license'], []),
-            'restricted': ([], ['embargo_date', 'license']),
-            'closed': ([], ['embargo_date', 'license']),
-        },
-        'upload_type': {
-            'publication': (['publication_type', ], ['image_type']),
-            'poster': ([], ['publication_type', 'image_type']),
-            'presentation': ([], ['publication_type', 'image_type']),
-            'dataset': ([], ['publication_type', 'image_type']),
-            'image': (['image_type'], ['publication_type']),
-            'video': ([], ['publication_type', 'image_type']),
-            'audio': ([], ['publication_type', 'image_type']),
-            '': ([], ['publication_type', 'image_type']),
-        },
     }
 
     #
@@ -118,8 +91,9 @@ class CollectionForm(Form):
 
     field_icons = {
         'identifier': 'barcode',
-        'title': 'book',
+        'title': 'file-alt',
         'description': 'pencil',
+        'curation_policy': 'check',
     }
 
     #
@@ -132,4 +106,14 @@ class CollectionForm(Form):
 
 
 class EditCollectionForm(CollectionForm):
+    """
+    Same as collection form, except identifier is removed.
+    """
     identifier = None
+
+
+class DeleteCollectionForm(InvenioBaseForm):
+    """
+    Form to confirm deletion of a collection:
+    """
+    delete = wtf.HiddenField(default='yes', validators=[validators.required()])

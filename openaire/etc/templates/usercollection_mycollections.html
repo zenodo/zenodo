@@ -14,13 +14,12 @@
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
-            <li><a href="{{obj.collection_url}}">View</a></li>
-            <li><a href="{{obj.collection_provisional_url}}">Curate</a></li>
-            <li><a href="{{url_for('.edit', usercollection_id=obj.id)}}">Edit</a></li>
+            <li><a href="{{obj.collection_url}}"><i class="icon-eye-open"></i> View</a></li>
+            <li><a href="{{obj.collection_provisional_url}}"><i class="icon-check"></i> Curate</a></li>
+            <li><a href="{{url_for('.edit', usercollection_id=obj.id)}}"><i class="icon-pencil"></i> Edit</a></li>
           </ul>
         </div>
     </td>
-    <td><a href="#" class="rmlink" rel="tooltip" title="Delete collection"><i class="icon-trash"></i></a></td>
 </tr>
 {% endfor %}
 </table>

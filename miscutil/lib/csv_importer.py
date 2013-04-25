@@ -101,7 +101,8 @@ def make_record(r, files):
     if r['type'][1]:
         subfields.append(('b', r['type'][1]))
     record_add_field(rec, '980', subfields=subfields)
-    record_add_field(rec, '980', subfields=[('b', 'user_emi')])
+    record_add_field(rec, '980', subfields=[('a', 'user-emi')])
+
     # Files
     fft_status = []
     if r['access_right'] == 'open':

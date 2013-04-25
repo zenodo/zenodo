@@ -25,6 +25,7 @@
 .rmlink:hover {
   color: #666;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .hero-unit {
@@ -462,6 +463,11 @@ h1, h2, h3 {
 
 .features-page p {
     line-height: 28px
+}
+
+fieldset label i {
+    margin-right: 5px;
+    margin-top: 5px;
 }
 
 /* Adjust for phones */

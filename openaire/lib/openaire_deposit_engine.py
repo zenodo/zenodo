@@ -101,6 +101,7 @@ from invenio.shellutils import mymkdir
 from invenio.websubmit_functions.Report_Number_Generation import create_reference
 from invenio.webuser import session_param_set, session_param_get, \
     collect_user_info, get_email
+from invenio.usercollection_model import UserCollection
 
 # Globals
 openaire_deposit_templates = template.load('openaire_deposit')
@@ -1039,6 +1040,18 @@ class OpenAIREPublication(object):
             return (upload_type, self._metadata.get('image_type'))
         return (upload_type, None)
 
+    def get_provisional_user_collections(self):
+        """
+        Get user collection identifiers
+        """
+        collections = self._metadata.get('collections')
+        identifiers = []
+        for i in collections:
+            ucoll = UserCollection.query.get(i)
+            if ucoll:
+                identifiers.append(ucoll.get_collection_name(provisional=True))
+        return identifiers
+
     def get_record(self):
         """
         Generate MARC record for publication
@@ -1088,6 +1101,13 @@ class OpenAIREPublication(object):
         if sub_coll:
             subfields.append(('b', sub_coll))
         record_add_field(rec, '980', subfields=subfields)
+
+        # ================
+        # User collections
+        # ================
+        usercolls = self.get_provisional_user_collections()
+        for u in usercolls:
+            record_add_field(rec, '980', subfields=[('a', u), ])
 
         # =================
         # Files
