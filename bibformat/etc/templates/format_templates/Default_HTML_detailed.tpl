@@ -1,5 +1,4 @@
-
-<p>{{ bfe_date(bfo, date_format="%d %B %Y") }} <span class="pull-right">{{ bfe_openaire_pubtype(bfo, as_label="1") }} {{ bfe_openaire_access_rights(bfo, as_label="1") }}</span></p>
+<p data-toggle="tooltip" title="Publication date">{{ bfe_date(bfo, date_format="%d %B %Y") }} <span class="pull-right">{{ bfe_openaire_pubtype(bfo, as_label="1") }} {{ bfe_openaire_access_rights(bfo, as_label="1") }}</span></p>
 <h1 itemprop="name">{{ bfe_title(bfo, ) }}</h1>
 <p id="authors_short">
 {{ bfe_authors(bfo, relator_code_pattern="$", limit="25", interactive="yes", print_affiliations="no") }}

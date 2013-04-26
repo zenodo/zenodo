@@ -7,7 +7,7 @@
         {{ bfe_openaire_altmetric(bfo, badgetype='donut', popover='left', no_script='1', prefix="<br>") }}
     </span>
     <div class="media-body">
-        <span class="label label-info">{{ bfe_creation_date(bfo, date_format="%d %M %Y") }}</span>
+        <span class="label label-info" data-toggle="tooltip" title="Upload date">{{ bfe_creation_date(bfo, date_format="%d %M %Y") }}</span>
         {{ bfe_openaire_pubtype(bfo, as_label="1") }}
         {{ bfe_openaire_access_rights(bfo, as_label="1") }}
         <br/>
