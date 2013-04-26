@@ -254,7 +254,7 @@ class UserCollection(db.Model):
 
     def get_collection_dbquery(self, provisional=False):
         """ Get collection query """
-        return "%s:%s" % self.get_query()
+        return "%s:%s" % self.get_query(provisional=provisional)
 
     def get_query(self, provisional=False):
         """ Get tuple (field,value) for search engine query """
