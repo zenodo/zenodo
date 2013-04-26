@@ -64,7 +64,7 @@
         {% for recid in collection.reclist[-10:]|reverse %}
           <div class="row">
             <div class="span8 record-list-elem">
-                <ul class="pager pull-right"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">{{ _('View')}}</a></li></ul>
+                <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">{{ _('View')}}</a></li></ul>
                 {{ format_record(recid, 'hb', ln=g.ln)|safe }}
                 {% if not loop.last %}<hr />{% endif %}
             </div>
