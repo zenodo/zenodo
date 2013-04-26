@@ -27,7 +27,7 @@ def info():
     return "Create userCOLLECTION"
 
 
-def do_upgrade(metadata=None):
+def do_upgrade():
     """ Implement your upgrades here  """
     m = db.MetaData(bind=db.engine)
     m.reflect()

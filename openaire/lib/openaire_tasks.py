@@ -131,6 +131,7 @@ def openaire_create_icon(docid=None, recid=None, reformat=True):
                 if not f.is_icon():
                     logger.debug("File not an icon")
                     file_path = f.get_full_path()
+                    icon_path = None
                     try:
                         filename = os.path.splitext(
                             os.path.basename(file_path)
@@ -153,11 +154,12 @@ def openaire_create_icon(docid=None, recid=None, reformat=True):
                         )
 
                     try:
-                        if os.path.exists(icon_path):
+                        if icon_path and os.path.exists(icon_path):
                             logger.debug("Adding icon %s to document" % icon_path)
                             d.add_icon(icon_path, subformat=ICON_SUBFORMAT)
                             recid_list = ",".join([str(x['recid']) for x in d.bibrec_links])
-                            task_low_level_submission('bibreformat', 'openaire', '-i', recid_list)
+                            if reformat:
+                                task_low_level_submission('bibreformat', 'openaire', '-i', recid_list)
 
                     except InvenioBibDocFileError, e:
                         logger.warning('Icon %s for file %s could not be added to document: %s' % (icon_path, f, str(e)))
@@ -196,13 +198,13 @@ def openaire_altmetric_check_all():
     recids = search_pattern(p="0->Z", f="0247_a")
 
     # Do not parallelize tasks to not overload Altmetric
-    MAX_RECORDS
     subtasks = []
     logger.debug("Checking Altmetric for %s records" % len(recids))
     for i in xrange(0, len(recids), MAX_RECORDS):
-        subtasks.append(openaire_altmetric_update.s(recids[i:i+MAX_RECORDS]))
+        # Creating immutable subtasks - see http://docs.celeryproject.org/en/latest/userguide/canvas.html
+        subtasks.append(openaire_altmetric_update.si(list(recids[i:i+MAX_RECORDS])))
 
-    chain.apply_async()
+    chain(*subtasks).apply_async()
 
 
 @celery.task(ignore_result=True)
