@@ -30,7 +30,7 @@
       <div class="accordion-group" id="preview">
         <div class="accordion-heading">
           <a class="accordion-toggle" data-toggle="collapse"  href="#collapseOne">
-            Preview
+            Preview  <b class="caret"></b>
           </a>
         </div>
         <div id="collapseOne" class="accordion-body collapse in">
@@ -43,7 +43,7 @@
       <div class="accordion-group" id="files">
         <div class="accordion-heading">
           <a class="accordion-toggle" data-toggle="collapse" href="#collapseTwo">
-            {{ _("Files") }}
+            {{ _("Files") }}  <b class="caret"></b>
           </a>
         </div>
         <div id="collapseTwo" class="accordion-body collapse in">
@@ -77,7 +77,7 @@
     {%- if tab.visible and tab.key != 'record.metadata' and tab.key != 'record.files' and tab.enabled -%}
       <div class="accordion-group ">
         <div class="accordion-heading">
-          <a class="accordion-toggle tablink" data-toggle="collapse" data-idx="{{loop.index}}" href="{{ url_for(tab.key, recid=recid)}}#collapse{{loop.index}}">{{ tab.label if tab.label != 'Usage statistics' else 'Related content' }} <img src="{{ url_for('static',filename='/css/images/ajax-loader.gif') }}"></a>
+          <a class="accordion-toggle tablink" data-toggle="collapse" data-idx="{{loop.index}}" href="{{ url_for(tab.key, recid=recid)}}#collapse{{loop.index}}">{{ tab.label if tab.label != 'Usage statistics' else 'Related content' }} <b class="caret"></b> <img src="{{ url_for('static',filename='/css/images/ajax-loader.gif') }}"></a>
         </div>
         <div id="collapse{{loop.index}}" class="accordion-body collapse {{ 'in' if tab.key == request.endpoint }}">
           <div class="accordion-inner{{ ' loaded' if tab.key == request.endpoint else ''}}" id="record_content{{loop.index}}">
