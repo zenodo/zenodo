@@ -470,6 +470,10 @@ fieldset label i {
     margin-top: 5px;
 }
 
+.record-list-elem .pager {
+    margin-left: 5px;
+}
+
 /* Adjust for phones */
 @media (max-width: 767px) {
     body {

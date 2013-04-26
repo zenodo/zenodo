@@ -446,6 +446,7 @@ class DepositionForm(Form):
     )
     keywords = fields.KeywordsField(
         validators=[validators.optional()],
+        description="Format: One keyword per line.",
         filters=[
             splitlines_list
         ],

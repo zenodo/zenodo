@@ -1,6 +1,9 @@
 <div class="well">
 {% if myresearch %}
 <h2>My shared research</h2>
+{% if not myresearch.unsubmitted and not myresearch.submitted %}
+<p class="muted">You currently have no uploads.</p>
+{% endif %}
 {% if myresearch.unsubmitted %}
 <h4>Unsubmitted</h4>
 <table class="table table-striped">
