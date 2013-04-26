@@ -233,16 +233,16 @@ class DepositionForm(Form):
         ('Type of file(s)', [
             'upload_type', 'publication_type', 'image_type',
         ], {'classes': 'in'}),
+        ('Basic information', [
+            'doi', 'publication_date', 'title',  'creators', 'description',
+            'keywords', 'notes',
+        ], {'classes': 'in'}),
         ('Collections', [
             'collections',
         ], {
             'classes': 'in',
             'state': 'recommended',
         }),
-        ('Basic information', [
-            'doi', 'publication_date', 'title',  'creators', 'description',
-            'keywords', 'notes',
-        ], {'classes': 'in'}),
         ('License', [
             'access_right', 'embargo_date', 'license',
         ], {
@@ -403,7 +403,7 @@ class DepositionForm(Form):
     #
     collections = fields.CollectionsField(
         label="Collections",
-        description="Attach your record to any number of collections.",
+        description="Attach your record to any number of user collections. Inclusion of your upload in the collection is subject to approval by the curator of the collection.",
         filters=[
             splitchar_list(","),
         ]

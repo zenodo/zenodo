@@ -34,7 +34,7 @@ blueprint = InvenioBlueprint(
     __name__,
     url_prefix="/collections",
     breadcrumbs=[
-        (_('User Collections'), 'usercollection.index'),
+        (_('Collections'), 'usercollection.index'),
     ],
     menubuilder=[
         ('main.usercollection', _('Collections'), 'usercollection.index', 1),

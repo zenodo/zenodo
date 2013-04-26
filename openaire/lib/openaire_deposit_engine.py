@@ -563,6 +563,17 @@ class OpenAIREPublication(object):
         if not self.__deleted and self.__touched:
             self._dump()
 
+    def add_usercollection(self, identifier):
+        u = UserCollection.query.get(identifier)
+        if u:
+            colls = self._metadata.get('collections', [])
+            if u.id not in colls:
+                colls.append(u.id)
+            self._metadata['collections'] = colls
+            if '__form__' not in self._metadata:
+                self._metadata['__form__'] = {}
+            self._metadata['__form__']['collections'] = colls
+
     def link_project(self, projectid):
         """
         """
@@ -710,13 +721,15 @@ class OpenAIREPublication(object):
         """
         """
         sequenceid = bibtask_allocate_sequenceid()
+        pcolls = self.get_provisional_user_collections()
 
         marcxml_path = os.path.join(self.path, 'marcxml')
         main_coll, sub_coll = self.get_collection_name()
         open(marcxml_path, 'w').write(self.marcxml)
         task_low_level_submission('bibupload', 'openaire', '-r', marcxml_path, '-P5', '-I', str(sequenceid))
-        task_low_level_submission('webcoll', 'openaire', '-q', '-P5', '-I', str(sequenceid))
         task_low_level_submission('bibtasklet', 'openaire', '-T', 'bst_openaire_new_upload', '--argument', 'recid=%s' % self.recid, '-P5', '-I', str(sequenceid))
+        for c in pcolls:
+            task_low_level_submission('webcoll', 'openaire', '-c', c, '-P5', '-I', str(sequenceid))
         self.status = 'submitted'
         #self.send_emails()
 

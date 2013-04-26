@@ -21,7 +21,7 @@ $(function() {
         browse_button : 'pickfiles',
         container : 'file_container',
         max_file_size : '1024mb',
-        url : '{{url_for('deposit.upload', pub_id=pub.publicationid) if pub.publicationid else url_for('deposit.upload')}}',
+        url : '{{upload_url}}',
         flash_swf_url : '{{ url_for('static',filename='js/plupload/plupload.flash.swf')}}',
         silverlight_xap_url : '{{ url_for('static',filename='js/plupload/plupload.silverlight.xap')}}',
     });

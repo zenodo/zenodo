@@ -37,6 +37,8 @@ import os
 from invenio.openaire_forms import DepositionForm, DepositionFormMapper, PublicationMapper
 import json
 from invenio.config import CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
+from invenio.usercollection_model import UserCollection
+
 
 blueprint = InvenioBlueprint('deposit', __name__,
     url_prefix="/deposit",
@@ -61,19 +63,33 @@ def is_editable(pub):
 
 
 @blueprint.route('/', methods=['GET', 'POST'])
+#@blueprint.route('/c/<string:collection>', methods=['GET', 'POST'])
 @blueprint.invenio_force_https
 @blueprint.invenio_authenticated
 @blueprint.invenio_authorized('submit', doctype='ZENODO')
 @blueprint.invenio_errorpage(template='openaire_error.html', exc_list=(ValueError,))
-def index():
+def index(collection=None):
     """
     Index page with uploader and list of existing depositions
     """
+    u = None
+    upload_url = url_for('deposit.upload')
+    dropbox_upload_url = url_for('deposit.dropbox_upload')
+
+    if 'c' in request.values:
+        u = UserCollection.query.get(request.values.get('c'))
+        if u:
+            upload_url = url_for('deposit.upload', c=u.id)
+            dropbox_upload_url = url_for('deposit.dropbox_upload', c=u.id)
+
     return render_template(
         "openaire_index.html",
         title=_('Upload'),
         myresearch=get_exisiting_publications_for_uid(current_user.get_id()),
         pub=None,
+        usercollection=u,
+        upload_url=upload_url,
+        dropbox_upload_url=dropbox_upload_url,
     )
 
 
@@ -96,6 +112,11 @@ def upload(pub_id=None):
     afile = request.files['file']
     filename = secure_filename(afile.filename)
     publication = OpenAIREPublication(uid, publicationid=pub_id)
+
+    # Pre-fill user collection:
+    c = request.values.get('c', None)
+    if c:
+        publication.add_usercollection(c)
 
     if not is_editable(publication):
         flash("You cannot upload new files when your upload has already been submitted!")
@@ -132,6 +153,11 @@ def dropbox_upload(pub_id=None, fileurl=''):
     if not is_editable(publication):
         flash("You cannot upload new files when your upload has already been submitted!")
         abort(400)
+
+    # Pre-fill user collection
+    c = request.values.get('c', None)
+    if c:
+        publication.add_usercollection(c)
 
     uploaded_file = download_external_url(fileurl)
     publication.add_a_fulltext(uploaded_file, secure_filename(os.path.basename(fileurl)))
@@ -273,11 +299,16 @@ def edit(pub_id=u'', action=u'edit'):
         #
         # Edit action
         #
+        upload_url = url_for('deposit.upload', pub_id=pub.publicationid)
+        dropbox_upload_url = url_for('deposit.dropbox_upload', pub_id=pub.publicationid)
+
         ctx = {
             'pub': pub,
             'recid': pub.metadata.get('__recid__', None),
             'title': title,
             'is_editable': editable,
+            'upload_url': upload_url,
+            'dropbox_upload_url': dropbox_upload_url,
         }
 
         if request.method == 'POST':
