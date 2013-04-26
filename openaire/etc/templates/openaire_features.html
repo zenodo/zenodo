@@ -18,7 +18,6 @@
 #}
 {% extends "page.html" %}
 {% block body %}
-<div class="alert alert-danger"><strong>Beta Release notes:</strong> initial draft for a features page. Please read and comment with changes and more ideas. Images will be inserted after the beta release.</div>
     <div class="jumbotron" align="center">
         <h1>Introducing {{config.CFG_SITE_NAME}}!</h1>
     </div>
@@ -95,7 +94,7 @@
            <div class="span4">
               <h1>Your opinion...</h1>
               <h4>&mdash; tell us what to do!</h4>
-              <p>We have tons of ideas for the future of {{config.CFG_SITE_NAME}} but your opinions, ideas and needs decide what we will work on, so give us your <a href="{{ url_for('openaire.support') }}">feedback.</a></p>
+              <p>We have tons of ideas for the future of {{config.CFG_SITE_NAME}} but your opinions, ideas and needs decide what we will work on, so give us your <a href="{{ url_for('support') }}">feedback.</a></p>
            </div>
           </div>
     </div>

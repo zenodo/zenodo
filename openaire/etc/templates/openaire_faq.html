@@ -18,24 +18,45 @@
 #}
 {% extends "page.html" %}
 {% block body %}
-<div class="alert alert-danger"><strong>TODO:</strong> After first beta release</div>
 <h1>FAQ</h1>
 
 <ul>
     <li>
-        <h5>How much data can I upload?</h5>
-        <p>During the initial launch period we have no limits on the amount of data you
-can upload. We might later introduce quotas depending on the usage patterns of
-the service.</p>
+        <h5>What is the maximum file size I upload?</h5>
+        <p>We currently accept files up to 1GB. If you would like to upload larger files, please <a href="/contact">contact us</a>, and we will do our best to help you.</p>
+    </li>
+    <li>
+        <h5>What is the quota?</h5>
+        <p>We are currently not enforcing any quotas on the maximum amount of files they can upload. This is likely to change in the future, but with quite high ceilings for open access content and data.</p>
     </li>
     <li>
         <h5>What can I upload?</h5>
-        <p>Everything research - we monitor for spam and will close accounts submitting</p>
+        <p>All research outputs from all fields of science are welcome. We do check every piece of content being uploaded to ensure it is research related. Please see further information in our <a href="/terms">Terms of Use</a> and <a href="/policies">Policies</a>.</p>
     </li>
     <li>
-        <h5>What can I upload?</h5>
-        <p>Everything research - we monitor for spam and will close accounts submitting</p>
+        <h5>What does it cost?</h5>
+        <p>ZENODO is free for education and informational use.</p>
     </li>
-</ul>
+    <li>
+        <h5>Is data be safe with you?</h5>
+        <p></p>
+    </li>
+    <li>
+        <h5>Really, who pays for this?</h5>
+        <p>ZENODO is developed by <a href="http://www.cern.ch">CERN</a> under the EU FP7 project <a href="http://www.openaire.eu">OpenAIREplus</a> (grant agreement no. 283595).</p>
+    </li>
+    <li>
+        <h5>What happened to the OpenAIRE Orphan Record Repository?</h5>
+        <p>OpenAIRE Orphan Record Repository got an extreme make-over and was re-branded as {{config.CFG_SITE_NAME}}. If you happened to deposit your article in OpenAIRE Orphan Record Repository it is also available in {{config.CFG_SITE_NAME}}. You user account, was however not transferred to ZENODO, so you will have to <a href="{{url_for('youraccount.register')}}">register</a> again. If you register with the same email address in ZENODO as you used in OpenAIRE Orphan Record Repository, you will still have access to your publications.</p>
+    </li>
+    <li>
+        <h5>Where does the name come from?</h5>
+        <p>ZENODO is derived from <a href="http://en.wikipedia.org/wiki/Zenodotus">Zenodotus</a>, the first librarian of the Ancient Library of Alexandria and father of the first recorded use of metadata, a landmark in library history.</p>
+    </li>
+    <li>
+        <h5>How much storage you have available?</h5>
+        <p>A lot. CERN currently stores more than 100PB of data from the <a href="http://home.web.cern.ch/about/accelerators/large-hadron-collider">Large Hadron Collider</a>, and produces roughly 25PB per year. While ZENODO is not</p>
+    </li>
 
+</ul>
 {% endblock %}
