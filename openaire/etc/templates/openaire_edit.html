@@ -4,6 +4,21 @@
 
 {% block title %}{% endblock %}
 
+{% macro form_action_bar() -%}
+<div class="well">
+    <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash  icon-white"></i> Delete</a>
+    <span class="pull-right">
+        <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
+        <span class="state-success hide muted">Form saved <i class="icon-ok"></i> </span>
+        <span class="state-failure hide text-warning">Form saved, but some fields had errors <i class="icon-warning-sign"></i> </span>
+        <span class="state-danger hide text-error">Form not saved! Errors while saving the form <i class="icon-warning-sign"></i> </span>
+        <button class="btn edit-form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="icon-file"></i> Save</button>
+        <button data-target="#submitModal" data-toggle="modal" role="button" data-toggle="tooltip" title="{{_('Press "Submit" to finalize and make your upload public (further editing afterwards is  currently not possible).')}}" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit</button>
+    </span>
+    <span class="clearfix"></span>
+</div>
+{%- endmacro %}
+
 {% block body %}
 {% if is_editable %}
 <!-- Modal -->
@@ -26,7 +41,7 @@
 </div>
 {% endif %}
 <div class="row">
-    <div id="file_container" class="span8">
+    <div id="file_container" class="span8 form-feedback-warning">
         {% if not is_editable %}
         <div class="well" style="text-align: center;">
             Public URL: <a href="{{config.CFG_SITE_URL}}/record/{{recid}}">{{config.CFG_SITE_URL}}/record/{{recid}}</a>
@@ -37,20 +52,14 @@
 
         {% else %}
         <div id="form_message">{% if form_message %}<div class="alert alert-warning"><button type="button" class="close" data-dismiss="alert">&times;</button>{{form_message}}</div>{% endif %}</div>
-        <div class="well">
-            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash icon-white"></i> Delete</a>
-            <span class="pull-right">
-                <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
-                <button class="btn edit-form-save"><i class="icon-file"></i> Save</button>
-                <button data-target="#submitModal" data-toggle="modal" role="button" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit</a>
-            </span>
-        </div>
+        {{ form_action_bar() }}
         {% endif %}
         {% if not is_editable %}
         {{record_hd|safe}}
         {{record_hdinfo|safe}}
         {% else %}
         <h1>New upload</h1>
+        <p class="muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) When ready, press "Submit" to finalize and make your upload public (further editing afterwards is currently not possible).</small></p>
         <form action="." method="POST" id="edit_form" class="form-horizontal">
         <div class="accordion">
         {%- for title, fieldnames, conf in form.field_sets %}
@@ -120,14 +129,7 @@
         {%- endfor %}
         </div>
         </form>
-        <div class="well">
-            <a class="btn btn-danger pull-left" href="{{url_for('deposit.edit')}}/{{pub.publicationid}}/delete/"><i class="icon-trash  icon-white"></i> Delete</a>
-            <span class="pull-right">
-                <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
-                <button class="btn edit-form-save"><i class="icon-file"></i> Save</button>
-                <button data-target="#submitModal" data-toggle="modal" role="button" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit</a>
-            </span>
-        </div>
+        {{ form_action_bar() }}
         {% endif %}
 
         {% if pub.fulltexts %}

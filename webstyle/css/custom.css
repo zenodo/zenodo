@@ -263,11 +263,11 @@ h1, h2, h3 {
   display: none;
 }
 
-.loader {
+.loader, .state-success, .state-failure, .state-danger {
     margin-right: 10px;
 }
 
-.loader img {
+.loader img, .state-success, .state-failure, .state-danger {
     display: none;
 }
 
@@ -473,6 +473,7 @@ fieldset label i {
 .record-list-elem .pager {
     margin-left: 5px;
 }
+
 
 /* Adjust for phones */
 @media (max-width: 767px) {

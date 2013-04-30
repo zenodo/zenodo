@@ -3,6 +3,7 @@
 from invenio.webinterface_handler_flask_utils import _
 from invenio.wtforms_utils import InvenioForm as Form
 from flask.ext import wtf
+from flask import url_for
 from sqlalchemy.exc import SQLAlchemyError
 
 from wtforms import SubmitField, Field, validators
@@ -13,6 +14,7 @@ from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
 from invenio import openaire_validators as oa_validators
 from datetime import datetime, date
 from werkzeug.datastructures import MultiDict
+from jinja2 import Markup
 
 #
 # Mapping forms to different objects
@@ -232,17 +234,11 @@ class DepositionForm(Form):
     field_sets = [
         ('Type of file(s)', [
             'upload_type', 'publication_type', 'image_type',
-        ], {'classes': 'in'}),
+        ], {'classes': 'in', 'state': 'required', }),
         ('Basic information', [
             'doi', 'publication_date', 'title',  'creators', 'description',
             'keywords', 'notes',
-        ], {'classes': 'in'}),
-        ('Collections', [
-            'collections',
-        ], {
-            'classes': 'in',
-            'state': 'recommended',
-        }),
+        ], {'classes': 'in', 'state': 'required', }),
         ('License', [
             'access_right', 'embargo_date', 'license',
         ], {
@@ -253,12 +249,19 @@ class DepositionForm(Form):
                 ' and your publications under the terms of the Creative Commons Attribution 3.0 Unported (CC-BY)'
                 ' license. All authors of the data and publications have agreed to the terms of this waiver and license.' % {'site_name': CFG_SITE_NAME}
         }),
+        ('Collections', [
+            'collections',
+        ], {
+            'classes': 'in',
+            'state': 'recommended',
+            'description': Markup('Any user can create a collection on %(CFG_SITE_NAME)s (<a href="/collections/">browse collections</a>). Specify collections which you wish your upload to appear in. The owner of the collection will be notified, and can either accept or reject your request.' % {'CFG_SITE_NAME': CFG_SITE_NAME})
+        }),
         ('Funding', [
             'funding_source',
         ], {
             'classes': 'in',
             'state': 'recommended',
-            'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency now!' % CFG_SITE_NAME,
+            'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!' % CFG_SITE_NAME,
         }),
         ('Related datasets/publications', [
             'related_identifiers',
@@ -403,7 +406,7 @@ class DepositionForm(Form):
     #
     collections = fields.CollectionsField(
         label="Collections",
-        description="Attach your record to any number of user collections. Inclusion of your upload in the collection is subject to approval by the curator of the collection.",
+        description="Optional. Attach your record to any number of user collections. Inclusion of your upload in the collection is subject to approval by the curator of the collection.",
         filters=[
             splitchar_list(","),
         ]
@@ -414,7 +417,7 @@ class DepositionForm(Form):
     #
     doi = fields.DOIField(
         label="Digital Object Identifier",
-        description="Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allow others to easily and unambiguously cite your upload.",
+        description="Optional. Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allow others to easily and unambiguously cite your upload.",
         filters=[
             strip_string,
             strip_doi,
@@ -422,12 +425,13 @@ class DepositionForm(Form):
     )
     publication_date = fields.Date(
         label=_('Publication date'),
-        description='Format: YYYY-MM-DD. The date your upload was made available in case it was already published elsewhere.',
+        description='Required. Format: YYYY-MM-DD. The date your upload was made available in case it was already published elsewhere.',
         default=date.today(),
         validators=[validators.required()]
     )
     title = fields.TitleField(
         validators=[validators.required()],
+        description='Required.',
         filters=[
             strip_string,
         ],
@@ -435,10 +439,11 @@ class DepositionForm(Form):
     creators = fields.AuthorField(
         label="Authors",
         validators=[validators.required()],
-        description="Format: Family name, First name: Affiliation (one author per line)"
+        description="Optional. Format: Family name, First name: Affiliation (one author per line)"
     )
     description = fields.AbstractField(
         label="Description",
+        description='Required.',
         validators=[validators.required()],
         filters=[
             strip_string,
@@ -446,13 +451,14 @@ class DepositionForm(Form):
     )
     keywords = fields.KeywordsField(
         validators=[validators.optional()],
-        description="Format: One keyword per line.",
+        description="Optional. Format: One keyword per line.",
         filters=[
             splitlines_list
         ],
     )
     notes = wtf.TextAreaField(
         label="Additional notes",
+        description='Optional.',
         validators=[validators.optional()],
         filters=[
             strip_string,
@@ -464,13 +470,13 @@ class DepositionForm(Form):
     #
     access_right = fields.AccessRightField(
         label="Access right",
-        description="Open access uploads have considerably higher visibility on %s. Additionally, we only register DOIs for Open Access and Embargoed Access uploads." % CFG_SITE_NAME,
+        description="Required. Open access uploads have considerably higher visibility on %s." % CFG_SITE_NAME,
         default="open",
         validators=[validators.required()]
     )
     embargo_date = fields.Date(
         label=_('Embargo date'),
-        description='Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.',
+        description='Required. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.',
         default=date.today(),
         validators=[
             oa_validators.RequiredIf('access_right', ['embargoed']),
@@ -486,7 +492,7 @@ class DepositionForm(Form):
         domain_data=True,
         domain_content=True,
         domain_software=False,
-        description='The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license missing in the list, please inform us at %s.' % CFG_SITE_SUPPORT_EMAIL,
+        description='Required. The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license missing in the list, please inform us at %s.' % CFG_SITE_SUPPORT_EMAIL,
         filters=[
             strip_string,
         ],
@@ -497,7 +503,7 @@ class DepositionForm(Form):
     #
     funding_source = fields.FundingField(
         label="Grants",
-        description="Note, a human %s curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay up to 1 working day before your upload is available in OpenAIRE." % CFG_SITE_NAME,
+        description="Optional. Note, a human %s curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay before your upload is available in OpenAIRE." % CFG_SITE_NAME,
         filters=[
             splitchar_list(","),
         ]
@@ -512,26 +518,26 @@ class DepositionForm(Form):
             splitlines_list,
             map_func(strip_doi),
         ],
-        description="Format: e.g. 10.1234/foo.bar (one DOI per line)."
+        description="Optional. Format: e.g. 10.1234/foo.bar (one DOI per line)."
     )  # List identifier, rel type
 
     #
     # Journal
     #
-    journal_title = fields.JournalField()
-    journal_volume = wtf.TextField(label="Volume")
-    journal_issue = wtf.TextField(label="Issue")
-    journal_pages = wtf.TextField(label="Pages")
+    journal_title = fields.JournalField(description="Optional.")
+    journal_volume = wtf.TextField(label="Volume", description="Optional.")
+    journal_issue = wtf.TextField(label="Issue", description="Optional.")
+    journal_pages = wtf.TextField(label="Pages", description="Optional.")
 
     #
     # Book/report/chapter
     #
-    partof_title = wtf.TextField(label="Book title", description="Title of the book or report which this upload is part of.")
-    partof_pages = wtf.TextField(label="Pages")
+    partof_title = wtf.TextField(label="Book title", description="Optional. Title of the book or report which this upload is part of.")
+    partof_pages = wtf.TextField(label="Pages", description="Optional.")
 
-    imprint_isbn = wtf.TextField(label="ISBN")
-    imprint_publisher = wtf.TextField(label="Publisher")
-    imprint_place = wtf.TextField(label="Place")
+    imprint_isbn = wtf.TextField(label="ISBN", description="Optional.")
+    imprint_publisher = wtf.TextField(label="Publisher", description="Optional.")
+    imprint_place = wtf.TextField(label="Place", description="Optional.")
 
     #
     # Thesis
@@ -539,9 +545,10 @@ class DepositionForm(Form):
     thesis_supervisors = fields.AuthorField(
         label="Supervisors",
         validators=[validators.optional()],
-        description="Format: Family name, First name: Affiliation (one supervisor per line)"
+        description="Optional. Format: Family name, First name: Affiliation (one supervisor per line)"
     )
     thesis_university = wtf.TextField(
+        description="Optional.",
         label='Awarding University',
         validators=[validators.optional()],
     )
@@ -550,11 +557,11 @@ class DepositionForm(Form):
     #
     # Conference
     #
-    conference_title = wtf.TextField()
-    conference_acronym = wtf.TextField(label="Acronym")
-    conference_dates = wtf.TextField(label="Dates")
-    conference_place = wtf.TextField(label="Place")
-    conference_url = wtf.TextField(label="Website")
+    conference_title = wtf.TextField(description="Optional.")
+    conference_acronym = wtf.TextField(label="Acronym", description="Optional.")
+    conference_dates = wtf.TextField(label="Dates", description="Optional.")
+    conference_place = wtf.TextField(label="Place", description="Optional.")
+    conference_url = wtf.TextField(label="Website", description="Optional.")
 
 
 #DepostionForm.thesis_university._icon_html = '<i class="icon-building"></i>'

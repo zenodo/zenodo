@@ -194,6 +194,9 @@ function webdeposit_submit_button(selector, form_selector) {
 
 function webdeposit_save_button(selector, form_selector, message_selector, url) {
     $(selector).click(function(e){
+        $(".state-success").hide();
+        $(".state-failure").hide();
+        $(".state-danger").hide();
         $(".loader").addClass("loading");
         // Compute value of tag autocomplete fields
         var textcolor = null;
@@ -217,8 +220,9 @@ function webdeposit_save_button(selector, form_selector, message_selector, url) 
                 });
                 // Show success message
                 $(message_selector).html(alert_template.render({status: data.status, message: data.form }));
+                $(".state-success").show();
             } else {
-                for(f in data.fields) {
+                for(var f in data.fields) {
                     if(data.fields[f]){
                         $('#error-'+f).html(data.fields[f]);
                         $('.field-'+f).addClass("error");
@@ -229,11 +233,13 @@ function webdeposit_save_button(selector, form_selector, message_selector, url) 
                     }
                 }
                 $(message_selector).html(alert_template.render({status: data.status, message: data.form }));
+                $(".state-failure").show();
             }
             $(".loader").removeClass("loading");
         }).fail(function(data) {
-            $(message_selector).html(alert_template.render({state: 'error', 'message': 'The form could not be saved, due to communication problem with the server.' }));
+            $(message_selector).html(alert_template.render({status: 'danger', 'message': 'The form could not be saved, due to communication problem with the server. Please try to reload your browser.' }));
             $(".loader").removeClass("loading");
+            $(".state-danger").show();
         });
         // Resetvalue of tag autocomplete fields (can be done as soon as request have been made)
         autocomplete_tag_fields.forEach(function(e){
