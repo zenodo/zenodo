@@ -104,7 +104,7 @@
                                 <div class="controls">
                                     {% if form.has_autocomplete(field) %}
                                     <div id="{{f}}_values" class="span5 tag-values"><ul class="unstyled">{% if f == "funding_source" %}{% for tag in field.get_tags() %}<li class="alert alert-info tag" data-tag-id="{{tag.grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{tag.label}}</li>{% endfor %}{% endif %}
-                                        {% if f == "collections" %}{% for tag in field.get_tags() %}<li class="alert alert-info tag" data-tag-id="{{tag.grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{tag.label}}</li>{% endfor %}{% endif %}</ul></div>
+                                        {% if f == "collections" %}{% for tag in field.get_tags() %}<li class="alert alert-info tag" data-tag-id="{{tag.value}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{tag.label}}</li>{% endfor %}{% endif %}</ul></div>
                                     {% endif %}
                                     {%- if field.type == "Date" %}
                                         {{ field(class_="span2 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
