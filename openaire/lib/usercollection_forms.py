@@ -68,7 +68,7 @@ class CollectionForm(Form):
     #
     identifier = wtf.TextField(
         label=_('Identifier'),
-        description='Required. Only letters, numbers and dash are allowed. The identifier is used in the URL for the collection, and cannot be modified later.',
+        description='Required. Only letters, numbers and dash are allowed. The identifier is used in the URL for the community collection, and cannot be modified later.',
         validators=[validators.required(), validators.regexp(u'^[-\w]+$', message='Only letters, numbers and dash are allowed')]
     )
 
@@ -78,15 +78,15 @@ class CollectionForm(Form):
     )
 
     description = wtf.TextAreaField(
-        description='Optional. A short description of the collection, which will be displayed on the index page of the collection.',
+        description='Optional. A short description of the community collection, which will be displayed on the index page of the community.',
     )
 
     curation_policy = wtf.TextAreaField(
-        description='Optional. Please describe short and precise the policy by which you accepted/reject new uploads in this collection.',
+        description='Optional. Please describe short and precise the policy by which you accepted/reject new uploads in this community.',
     )
 
     page = wtf.TextAreaField(
-        description='Optional. A long description of the collection, which will be displayed on a separate page linked from the index page of the collection.',
+        description='Optional. A long description of the community collection, which will be displayed on a separate page linked from the index page.',
     )
 
     field_icons = {

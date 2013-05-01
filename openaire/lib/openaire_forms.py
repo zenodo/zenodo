@@ -249,12 +249,12 @@ class DepositionForm(Form):
                 ' and your publications under the terms of the Creative Commons Attribution 3.0 Unported (CC-BY)'
                 ' license. All authors of the data and publications have agreed to the terms of this waiver and license.' % {'site_name': CFG_SITE_NAME}
         }),
-        ('Collections', [
+        ('Communities', [
             'collections',
         ], {
             'classes': 'in',
             'state': 'recommended',
-            'description': Markup('Any user can create a collection on %(CFG_SITE_NAME)s (<a href="/collections/">browse collections</a>). Specify collections which you wish your upload to appear in. The owner of the collection will be notified, and can either accept or reject your request.' % {'CFG_SITE_NAME': CFG_SITE_NAME})
+            'description': Markup('Any user can create a community collection on %(CFG_SITE_NAME)s (<a href="/communities/">browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.' % {'CFG_SITE_NAME': CFG_SITE_NAME})
         }),
         ('Funding', [
             'funding_source',
@@ -302,7 +302,7 @@ class DepositionForm(Form):
         'thesis_supervisors': 'Family name, First name: Affiliation (one supervisor per line)',
         'keywords': 'One keyword per line...',
         'funding_source': 'Start typing a grant number, name or abbreviation...',
-        'collections': 'Start typing a collection name...',
+        'collections': 'Start typing a community name...',
         'license': 'Start typing a license name or abbreviation...',
         'related_identifiers': 'e.g. 10.1234/foo.bar (one DOI per line)...',
         'conference_dates': 'e.g 21-22 November 2012...',
@@ -405,8 +405,8 @@ class DepositionForm(Form):
     # Collection
     #
     collections = fields.CollectionsField(
-        label="Collections",
-        description="Optional. Attach your record to any number of user collections. Inclusion of your upload in the collection is subject to approval by the curator of the collection.",
+        label="Communities",
+        description="Optional.",
         filters=[
             splitchar_list(","),
         ]

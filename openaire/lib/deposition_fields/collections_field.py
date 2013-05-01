@@ -36,13 +36,13 @@ def _transform(val):
     }
 
 
-def kb_list_validator(kb_name):
+def _list_validator():
     def _inner(form, field):
         if isinstance(field.data, list):
             for item in field.data:
                 val = UserCollection.query.get(item)
                 if val is None:
-                    raise ("%s is not a valid user collection identifier.")
+                    raise ("%s is not a valid identifier.")
     return _inner
 
 
@@ -58,7 +58,7 @@ class CollectionsField(TextField, JsonCookerMixinBuilder('collections')):
                 if type(v) is Required:
                     self.required = True
 
-        kwargs['validators'] = [kb_list_validator("json_projects")]
+        kwargs['validators'] = [_list_validator()]
         super(CollectionsField, self).__init__(**kwargs)
 
     def _value(self):

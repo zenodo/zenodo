@@ -80,10 +80,10 @@ from flask import url_for
 CFG_USERCOLLCTION_TABS = 'usage;comments;metadata;files'
 """ Detailed record tabs to enable for a user collection """
 
-CFG_USERCOLLCTION_PARENT_NAME = 'Collections'
+CFG_USERCOLLCTION_PARENT_NAME = 'Communities'
 """ Collection name of parent of public user collections """
 
-CFG_USERCOLLCTION_PARENT_NAME_PROVISIONAL = 'Collections'
+CFG_USERCOLLCTION_PARENT_NAME_PROVISIONAL = 'Communities'
 """ Collection name of parent of provisional user collections """
 
 CFG_USERCOLLCTION_OUTPUTFORMAT = 'hb'

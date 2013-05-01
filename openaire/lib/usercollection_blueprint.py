@@ -32,12 +32,12 @@ from invenio.sqlalchemyutils import db
 blueprint = InvenioBlueprint(
     'usercollection',
     __name__,
-    url_prefix="/collections",
+    url_prefix="/communities",
     breadcrumbs=[
-        (_('Collections'), 'usercollection.index'),
+        (_('Communities'), 'usercollection.index'),
     ],
     menubuilder=[
-        ('main.usercollection', _('Collections'), 'usercollection.index', 1),
+        ('main.usercollection', _('Communities'), 'usercollection.index', 1),
     ],
 )
 
@@ -60,7 +60,7 @@ def index():
     uid = current_user.get_id()
     ctx = mycollections_ctx(uid)
     ctx.update({
-        'title': _('Collections'),
+        'title': _('Community Collections'),
         'usercollections': UserCollection.query.order_by(UserCollection.title).all(),
     })
 
@@ -119,7 +119,7 @@ def new():
         db.session.add(u)
         db.session.commit()
         u.save_collections()
-        flash("Collection was successfully created.", category='success')
+        flash("Community collection was successfully created.", category='success')
         return redirect(url_for('.index'))
 
     return render_template(
@@ -160,7 +160,7 @@ def edit(usercollection_id):
             setattr(u, field, val)
         db.session.commit()
         u.save_collections()
-        flash("Collection successfully edited.", category='success')
+        flash("Community collection successfully edited.", category='success')
         return redirect(url_for('.edit', usercollection_id=u.id))
 
     return render_template(
@@ -198,8 +198,8 @@ def delete(usercollection_id):
         u.delete_collections()
         db.session.delete(u)
         db.session.commit()
-        flash("Collection was successfully deleted.", category='success')
+        flash("Community collection was successfully deleted.", category='success')
         return redirect(url_for('.index'))
     else:
-        flash("Collection could not be deleted.", category='warning')
+        flash("Community collection could not be deleted.", category='warning')
         return redirect(url_for('.edit', usercollection_id=u.id))

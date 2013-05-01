@@ -9,8 +9,8 @@
 {% block body %}
 <div class="row" id="file_container">
     <div class="span8">
-        <h1>User Collections</h1>
-        <p class="muted">Collections created and curated by {{config.CFG_SITE_NAME}} users</p>
+        <h1>Community Collections</h1>
+        <p class="muted">Communities created and curated by {{config.CFG_SITE_NAME}} users</p>
 
         {%- for row in usercollections|batch(2) %}
         <div class="row">

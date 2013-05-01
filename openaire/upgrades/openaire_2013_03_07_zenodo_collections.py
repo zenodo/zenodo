@@ -62,7 +62,7 @@ collections = [
     (30, 'uncurated', '980:0->Z AND NOT 980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
 
     # FIXME: Perhaps use no DB query at all.
-    (31, 'user-collections', '980__a:user_*'),
+    (31, 'communities', '980__a:user-*'),
 ]
 
 relations = [
@@ -156,7 +156,7 @@ names = [
     (28, 'en', 'ln', 'Hidden'),
     (29, 'en', 'ln', 'Curated'),
     (30, 'en', 'ln', 'Uncurated'),
-    (31, 'en', 'ln', 'User Collections'),
+    (31, 'en', 'ln', 'Communities'),
 ]
 
 

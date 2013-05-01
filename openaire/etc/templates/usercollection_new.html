@@ -9,10 +9,10 @@
 <div id="deletemodal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="deletemodal_label" aria-hidden="true">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="deletemodal_label">Delete collection?</h3>
+    <h3 id="deletemodal_label">Delete community?</h3>
   </div>
   <div class="modal-body">
-    <div class="alert alert-danger"><h5>Warning</h5><ul><li>You will loose all connections to records currently attached to this collection and you will not be able to recover them.</li><li>Any external repository harvesting your collection will stop working.</li></ul></div>
+    <div class="alert alert-danger"><h5>Warning</h5><ul><li>You will loose all connections to records currently attached to this community and you will not be able to recover them.</li><li>Any external repository harvesting your community collection will stop working.</li></ul></div>
   </div>
   <div class="modal-footer">
     <form action="{{url_for('.delete', usercollection_id=usercollection.id)}}" method="POST">
@@ -26,9 +26,9 @@
 <div class="row">
     <div id="file_container" class="span8">
         <h1>{% if is_new -%}
-            <i class="icon-plus"></i> {{ _("New collection") }}
+            <i class="icon-plus"></i> {{ _("New community") }}
             {%- else -%}
-            <i class="icon-edit"></i> {{ _("Edit collection") }}
+            <i class="icon-edit"></i> {{ _("Edit community") }}
             {%- endif %}</h1>
 
         <form action="." method="POST" id="edit_form" class="form-horizontal">
@@ -37,7 +37,7 @@
             <div class="accordion-group">
                 <div class="accordion-heading">
                     <span class="accordion-toggle muted pull-right"></span>
-                    <a class="accordion-toggle" data-toggle="collapse" data-idx="0" href="#collapse0">Collection URLs<b class="caret"></b></a>
+                    <a class="accordion-toggle" data-toggle="collapse" data-idx="0" href="#collapse0">Community URLs<b class="caret"></b></a>
                 </div>
                 <div id="collapse0" class="accordion-body collapse in">
                     <div class="accordion-inner">
@@ -45,13 +45,13 @@
                             <div class="control-group">
                                 <label class="control-label"><i class="icon-share"></i>Collection URL:</label>
                                 <div class="controls"><a href="{{ usercollection.collection_url }}">{{config.CFG_SITE_URL}}{{ usercollection.collection_url }}</a>
-                                    <p class="muted field-desc"><small>Above address links directly to your collection.</small></p>
+                                    <p class="muted field-desc"><small>Above address links directly to your community collection.</small></p>
                                 </div>
                             </div>
                             <div class="control-group">
                                 <label class="control-label"><i class="icon-share"></i>Upload URL:</label>
                                 <div class="controls"><a href="{{ usercollection.upload_url }}">{{config.CFG_SITE_URL}}{{ usercollection.upload_url }}</a>
-                                    <p class="muted field-desc"><small>Above address will automatically ensure people who use it will have their record added to your collection.</small></p>
+                                    <p class="muted field-desc"><small>Above address will automatically ensure people who use it will have their record added to your community collection.</small></p>
                                 </div>
                             </div>
                             <div class="control-group">
@@ -63,7 +63,7 @@
                             <div class="control-group">
                                 <label class="control-label"><i class="icon-share"></i>Harvesting URL:</label>
                                 <div class="controls"><a href="{{ usercollection.oai_url }}">{{config.CFG_SITE_URL}}{{ usercollection.oai_url }}</a>
-                                    <p class="muted field-desc"><small>Above address links to a OAI-PMH feed, which can be used by other digital repositories to harvest this collection.</small></p>
+                                    <p class="muted field-desc"><small>Above address links to a OAI-PMH feed, which can be used by other digital repositories to harvest this community collection.</small></p>
                                 </div>
                             </div>
                         </fieldset>
@@ -92,7 +92,7 @@
                                 </label>
                                 <div class="controls">
                                     <input class="span5" type="text" disabled value="{{usercollection.id}}">
-                                    <p class="muted field-desc"><small>The identifier cannot be changed after creation of the collection.</small></p>
+                                    <p class="muted field-desc"><small>The identifier cannot be changed after creation of the community.</small></p>
                                 </div>
                             </div>
                         </fieldset>
