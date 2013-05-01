@@ -16,7 +16,7 @@
           {%- for item in config.menubuilder_map.main.children.itervalues()|sort(attribute='order') if item.display() recursive %}
           {%- if item.children -%}
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">{{ item.title|safe }}<b class="caret"></b></a>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">{{ item.title|safe }} <b class="caret"></b></a>
             <ul class="dropdown-menu">{{ loop(item.children.itervalues()|sort(attribute='order')) }}</ul>
           </li>
           {%- else -%}

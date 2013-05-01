@@ -82,6 +82,12 @@ header .container .nav .dropdown-menu {
   margin-top: 0;
 }
 
+header .container .nav .dropdown-toggle b {
+  color: white;
+  border-top-color: #fff;
+  border-bottom-color: #fff;
+}
+
 header .container .nav a, footer a {
   color: #ffffff;
 }
@@ -94,16 +100,39 @@ header .container .nav a:hover {
   color: #000000;
 }
 
+header .container .nav .open a.dropdown-toggle {
+  color: #fff;
+}
+
 header .container .nav .active a {
   color: #000000;
 }
 
 header .container .nav .active a:hover {
-  color: #000000;
+  color: #fff;
 }
+
+header .container .nav .open a :hover{
+  color: #fff;
+}
+
 
 header .container .nav li {
   margin-right: 5px;
+}
+
+header .container .btn .caret, header .container .open .btn .caret{
+  color: #000;
+  border-top-color: #000;
+  border-bottom-color: #000;
+}
+
+header .container .open .btn.dropdown-toggle {
+    color: #000;
+}
+
+.nav-tabs .open .dropdown-toggle {
+    background-color: #c5c5c5;
 }
 
 .focuson li {
