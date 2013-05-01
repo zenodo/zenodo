@@ -53,16 +53,12 @@ collections = [
     (24, 'photos', '980__b:photo'),
     (25, 'other-images', '980__b:other'),
 
-    (26, 'open', '(542__l:open OR 542__l:embargoed) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
-    (27, 'closed', '(542__l:closed OR 542__l:restricted) AND 980:0->Z AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
+    (26, 'open', '(542__l:open OR 542__l:embargoed) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
+    (27, 'closed', '(542__l:closed OR 542__l:restricted) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
 
-    (28, 'hidden', '980:PROVISIONAL OR 980:PENDING OR 980:SPAM OR 980:REJECTED OR 980:DARK'),
+    (28, 'hidden', '980__a:PROVISIONAL OR 980__a:PENDING OR 980__a:SPAM OR 980__a:REJECTED OR 980__a:DARK'),
 
-    (29, 'curated', '980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
-    (30, 'uncurated', '980:0->Z AND NOT 980:curated AND NOT 980:PROVISIONAL AND NOT 980:PENDING AND NOT 980:SPAM AND NOT 980:REJECTED AND NOT 980:DARK'),
-
-    # FIXME: Perhaps use no DB query at all.
-    (31, 'communities', '980__a:user-*'),
+    (29, 'communities', '980__a:user-*'),
 ]
 
 relations = [
@@ -94,9 +90,6 @@ relations = [
 
     (1, 26, 'v', 24),
     (1, 27, 'v', 25),
-
-    (1, 29, 'v', 26),
-    (1, 30, 'v', 27),
 ]
 
 accargs = (
@@ -154,9 +147,7 @@ names = [
     (26, 'en', 'ln', 'Open Access'),
     (27, 'en', 'ln', 'Closed Access'),
     (28, 'en', 'ln', 'Hidden'),
-    (29, 'en', 'ln', 'Curated'),
-    (30, 'en', 'ln', 'Uncurated'),
-    (31, 'en', 'ln', 'Communities'),
+    (29, 'en', 'ln', 'Communities'),
 ]
 
 
