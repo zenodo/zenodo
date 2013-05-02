@@ -104,20 +104,24 @@ exclude-result-prefixes="marc fn dc invenio">
                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_YEAR >')"/>
         </publicationYear>
         <!-- 6. Subject -->
-        <subjects>
-            <xsl:for-each select="datafield[@tag=653 and @ind1='1']">
-                <subject><xsl:value-of select="subfield[@code='a']"/></subject>
-            </xsl:for-each>
-        </subjects>
+        <xsl:if test="datafield[@tag=653 and @ind1='1']">
+            <subjects>
+                <xsl:for-each select="datafield[@tag=653 and @ind1='1']">
+                    <subject><xsl:value-of select="subfield[@code='a']"/></subject>
+                </xsl:for-each>
+            </subjects>
+        </xsl:if>
         <!-- 7. Contributor -->
-        <contributors>
-            <xsl:for-each select="datafield[@tag=536]">
-                <contributor contributorType="Funder">
-                    <contributorName>European Commission</contributorName>
-                    <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
-                </contributor>
-            </xsl:for-each>
-        </contributors>
+        <xsl:if test="datafield[@tag=536]">
+            <contributors>
+                <xsl:for-each select="datafield[@tag=536]">
+                    <contributor contributorType="Funder">
+                        <contributorName>European Commission</contributorName>
+                        <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
+                    </contributor>
+                </xsl:for-each>
+            </contributors>
+        </xsl:if>
         <!-- 8. Date -->
         <dates>
             <xsl:choose>
