@@ -32,13 +32,11 @@ class RequiredIf(object):
         try:
             other_field = getattr(form, self.other_field_name)
             other_val = other_field.data
-            print "DEBUG", other_val
             if other_val in self.values:
                 if not field.data or isinstance(field.data, basestring) and not field.data.strip():
                     if self.message is None:
                         self.message = 'This field is required.'
                     field.errors[:] = []
                     raise StopValidation(self.message % {'other_field': other_field.label.text, 'value': other_val})
-        except AttributeError, e:
-            print "DEBUG", e
+        except AttributeError:
             pass
