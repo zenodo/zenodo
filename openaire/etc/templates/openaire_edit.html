@@ -112,6 +112,9 @@
                                         {{ field(class_="span5 " + field.short_name, placeholder=form.get_field_placeholder(f)) }}
                                     {%- endif %}
                                     {% if field.description %}<p class="muted field-desc"><small>{{field.description|urlize}}</small></p>{% endif %}
+                                    {% if f == 'doi' %}
+                                    <button class="btn btn-mini" type="button" id="doi-button" data-toggle="tooltip" title="{{_('Pre-reserve a Digital Object Identifier for your upload. This allows you know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until submit your upload.')}}" ><i class="icon-barcode"></i> Pre-reserve DOI</button>
+                                    {% endif %}
                                     {% if field.errors %}
                                         <span class="alert alert-error help-inline" id="error-{{ field.name }}">{% for error in field.errors %}{{ error }}{% if not loop.last %}<br />{% endif %}{% endfor %}</span>
                                     {% else %}
@@ -183,6 +186,7 @@ $(document).ready(function() {
     // Date picker
     webdeposit_datepicker('#publication_date');
     webdeposit_datepicker('#embargo_date');
+    webdeposit_reservedoi_button('#doi-button', "#doi", '{{url_for('deposit.edit')}}/{{pub.publicationid}}/reserve-doi/');
 });
 </script>
 {% endif %}

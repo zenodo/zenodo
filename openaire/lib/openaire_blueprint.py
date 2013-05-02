@@ -264,7 +264,7 @@ def edit(pub_id=u'', action=u'edit'):
     """
     uid = current_user.get_id()
 
-    if action not in ['edit', 'save', 'delete', ]:
+    if action not in ['edit', 'save', 'delete', 'reserve-doi']:
         abort(404)
 
     try:
@@ -285,7 +285,16 @@ def edit(pub_id=u'', action=u'edit'):
     # Action handling
     #
     ctx = {}
-    if action == 'delete':
+    if action == 'reserve-doi':
+        #
+        # Reserve DOI action (AjAX)
+        #
+        if request.method == 'POST':
+            doi = pub.create_doi()
+            return json.dumps({'doi': doi})
+        else:
+            abort(405)
+    elif action == 'delete':
         #
         # Delete action
         #
@@ -315,6 +324,7 @@ def edit(pub_id=u'', action=u'edit'):
             form = DepositionForm(request.values, crsf_enabled=False)
             mapper = DepositionFormMapper(pub)
             pub = mapper.map(form)
+            form._pub = pub
 
             if form.validate():
                 pub.save()
@@ -341,6 +351,7 @@ def edit(pub_id=u'', action=u'edit'):
             form = DepositionForm(request.values, crsf_enabled=False)
             mapper = DepositionFormMapper(pub)
             pub = mapper.map(form)
+            form._pub = pub
             if form.validate():
                 pub.save()
                 return json.dumps({'status': 'success', 'form': 'Successfully saved.'})

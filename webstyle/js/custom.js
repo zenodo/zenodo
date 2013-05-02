@@ -192,6 +192,25 @@ function webdeposit_submit_button(selector, form_selector) {
     });
 }
 
+function webdeposit_reservedoi_button(selector, field_selector, url) {
+    $(selector).click(function(e){
+        $(".loader").addClass("loading");
+        $.ajax({
+            url: url,
+            type: 'POST',
+            cache: false,
+            dataType: 'json'
+        }).done(function(data) {
+            if(data.doi){
+                $(field_selector).val(data.doi);
+            }
+            $(".loader").removeClass("loading");
+        }).fail(function(data) {
+            $(".loader").removeClass("loading");
+        });
+    });
+}
+
 function webdeposit_save_button(selector, form_selector, message_selector, url) {
     $(selector).click(function(e){
         $(".state-success").hide();

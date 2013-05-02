@@ -78,7 +78,8 @@ from invenio.bibknowledge import get_kb_mapping, get_kbr_keys
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, \
-    CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL
+    CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL, \
+    CFG_DATACITE_DOI_PREFIX
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.jsonutils import json_unicode_to_utf8
@@ -102,6 +103,8 @@ from invenio.websubmit_functions.Report_Number_Generation import create_referenc
 from invenio.webuser import session_param_set, session_param_get, \
     collect_user_info, get_email
 from invenio.usercollection_model import UserCollection
+from invenio.pidstore_model import PersistentIdentifier
+
 
 # Globals
 openaire_deposit_templates = template.load('openaire_deposit')
@@ -716,7 +719,6 @@ class OpenAIREPublication(object):
                 return 'ok'
         return 'empty'
 
-
     def upload_record(self):
         """
         """
@@ -943,6 +945,28 @@ class OpenAIREPublication(object):
             self.touch()
         run_sql("UPDATE eupublication SET id_bibrec=%s WHERE uid=%s AND publicationid=%s", (self._metadata['__recid__'], self.uid, self.publicationid))
         return self._metadata['__recid__']
+
+    def create_doi(self):
+        """
+        Generate a new DOI based on the rec id.
+        """
+        if '__doi__' not in self._metadata:
+            self._metadata['__doi__'] = '%s/zenodo.%s' % (CFG_DATACITE_DOI_PREFIX, self.recid)
+            self.touch()
+            try:
+                self._metadata['doi'] = self._metadata['__doi__']
+                self._metadata['__form__']['doi'] = self._metadata['__doi__']
+            except KeyError:
+                pass
+        else:
+            try:
+                if self._metadata['doi'] != self._metadata['__doi__']:
+                    self._metadata['doi'] = self._metadata['__doi__']
+                    self._metadata['__form__']['doi'] = self._metadata['__doi__']
+                    self.touch()
+            except KeyError:
+                pass
+        return self._metadata['__doi__']
 
     def get_year(self):
         """

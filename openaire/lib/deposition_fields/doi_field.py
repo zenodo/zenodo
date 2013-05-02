@@ -18,16 +18,34 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextField
-from wtforms.validators import Regexp
+from wtforms.validators import Regexp, ValidationError
 import re
+
+from invenio.config import CFG_DATACITE_DOI_PREFIX, CFG_SITE_NAME
 
 __all__ = ['DOIField']
 
 doi_validator = Regexp("(^$|(doi:)?10\.\d+(.\d+)*/.*)", flags=re.I, message="The provided DOI is invalid - it should look similar to '10.1234/foo.bar'.")
 
 
+def prefix_validator(form, field):
+    field_doi = field.data
+    pub = getattr(form, '_pub', None)
+
+    if pub:
+        reserved_doi = pub._metadata.get("__doi__", None)
+        if reserved_doi and reserved_doi != field_doi and field_doi.startswith("%s/" % CFG_DATACITE_DOI_PREFIX):
+            raise ValidationError('You are not allowed to edit a pre-reserved DOI. Click the Pre-reserve DOI button to resolve the problem.')
+
+    elif field_doi.startswith("%s/" % CFG_DATACITE_DOI_PREFIX):
+        raise ValidationError('The prefix %s is administered automatically by %s. Please leave the field empty or click the "Pre-reserve DOI"-button and we will assign you a DOI.' % (CFG_DATACITE_DOI_PREFIX, CFG_SITE_NAME))
+
+    if CFG_DATACITE_DOI_PREFIX != "10.5072" and field_doi.startswith("10.5072/"):
+        raise ValidationError('The prefix 10.5072 is invalid. The prefix is only used for testing purposes, and no DOIs with this prefix are attached to any meaningful content.')
+
+
 class DOIField(TextField):
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-barcode"></i>'
-        kwargs['validators'] = [doi_validator]
+        kwargs['validators'] = [doi_validator, prefix_validator]
         super(DOIField, self).__init__(**kwargs)
