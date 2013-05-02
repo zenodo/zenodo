@@ -26,15 +26,17 @@ from tempfile import mkstemp
 import time
 
 from invenio.bibdocfile import BibDoc, BibRecDocs, InvenioBibDocFileError
+from invenio.bibformat import format_record
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
 from invenio.celery import celery
-from invenio.config import CFG_TMPDIR
+from invenio.config import CFG_TMPDIR, CFG_DATACITE_SITE_URL
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern, get_fieldvalues
 from invenio.websubmit_icon_creator import create_icon, \
     InvenioWebSubmitIconCreatorError
+from invenio.pidstore_model import PersistentIdentifier
 
 try:
     from altmetric import Altmetric, AltmetricHTTPException
@@ -255,3 +257,38 @@ def openaire_altmetric_update(recids, upload=True):
             bibupload(collection=records, file_prefix="altmetric")
 
     return records
+
+
+@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10*60)
+def openaire_register_doi(recid):
+    """
+    Register a DOI for new publication
+
+    If it fails, it will retry every 10 minutes for 1 hour.
+    """
+    doi_val = get_fieldvalues(recid, "0247_a")[0]
+    logger.debug("Found DOI %s in record %s" % (doi_val, recid))
+
+    pid = PersistentIdentifier.get("doi", doi_val)
+    if not pid:
+        logger.debug("DOI not locally managed.")
+        return
+    else:
+        logger.debug("DOI locally managed.")
+
+    if not pid.has_object("rec", recid):
+        raise Exception("DOI %s is not assigned to record %s." % (doi_val, recid))
+
+    if pid.is_new() or pid.is_reserved():
+        logger.info("Registering DOI %s for record %s" % (doi_val, recid))
+
+        url = "%s/doi/%s" % (CFG_DATACITE_SITE_URL, doi_val)
+        doc = format_record(recid, 'dcite')
+
+        if not pid.register(url=url, doc=doc):
+            m = "Failed to register DOI %s" % doi_val
+            logger.error(m + "\n%s\n%s" % (url, doc))
+            if not openaire_register_doi.request.is_eager:
+                raise openaire_register_doi.retry(exc=Exception(m))
+        else:
+            logger.info("Successfully registered DOI %s." % doi_val)

@@ -182,6 +182,22 @@ class PersistentIdentifier(db.Model):
     #
     # Instance methods
     #
+    def has_object(self, object_type, object_id):
+        """
+        Determine if this persistent identifier is assigned to a specific
+        object.
+        """
+        if object_type not in CFG_OBJECT_TYPES:
+            raise Exception("Invalid object type %s." % object_type)
+
+        object_id = to_unicode(object_id)
+
+        return PidRegistry.query.filter_by(
+            object_type=object_type,
+            object_id=object_id,
+            id_pid=self.id,
+        ).first() is not None
+
     def get_provider(self):
         """
         Get the provider for this type of persistent identifier

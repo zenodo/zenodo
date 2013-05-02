@@ -724,9 +724,9 @@ class OpenAIREPublication(object):
         """
         sequenceid = bibtask_allocate_sequenceid()
         pcolls = self.get_provisional_user_collections()
-
         marcxml_path = os.path.join(self.path, 'marcxml')
         main_coll, sub_coll = self.get_collection_name()
+        self.mint_doi()  # Must be called before self.marcxml
         open(marcxml_path, 'w').write(self.marcxml)
         task_low_level_submission('bibupload', 'openaire', '-r', marcxml_path, '-P5', '-I', str(sequenceid))
         task_low_level_submission('bibtasklet', 'openaire', '-T', 'bst_openaire_new_upload', '--argument', 'recid=%s' % self.recid, '-P5', '-I', str(sequenceid))
@@ -734,6 +734,21 @@ class OpenAIREPublication(object):
             task_low_level_submission('webcoll', 'openaire', '-c', c, '-P5', '-I', str(sequenceid))
         self.status = 'submitted'
         #self.send_emails()
+
+    def mint_doi(self):
+        """
+        Create DOI internally and assign it to this record.
+
+        The real minting of the DOI happens via a Celery task.
+        """
+        doi = self._metadata['doi']
+        if doi == '':
+            doi = self.create_doi()
+
+        reserved_doi = self._metadata.get("__doi__", None)
+        if (reserved_doi and reserved_doi == doi):
+            pid = PersistentIdentifier.create("doi", doi)
+            pid.assign("rec", self.recid)
 
     def send_emails(self):
         """
