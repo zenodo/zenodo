@@ -63,7 +63,10 @@
 
 
 {% macro render_search_results(recids, collection, pagination, format_record) %}
-    {% if collection.id != 1 %}<h1>{{collection.name_ln}}</h1>{% endif %}
+    {% if collection.id != 1 %}
+        {% include 'provisional_warning.html' %}
+        <h1>{{collection.name_ln}}</h1>
+    {% endif %}
       <form class="clearfix form-horizontal" name="" action="{{ url_for('search.dispatch') }}" method="post">
         <span class="btn-group hide">
           <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
@@ -123,6 +126,16 @@
           </ul>
         </div>
 
+        {# Set collection format - perhaps better located in blueprint view? #}
+        {%- set of = request.values.get('of', None) -%}
+        {% if not of %}
+            {% if collection.formatoptions %}
+                {%- set of = collection.formatoptions[0].code -%}
+            {% else %}
+                {%- set of = 'hb' -%}
+            {% endif %}
+        {% endif %}
+
         <div class="btn-group pull-right hide" style="margin-right: 5px;">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-th"></i> {{ _('Display') }}
@@ -135,7 +148,7 @@
             <li><a
                href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                class="{{ ' active' if active }}">
-              <i class="pull-right icon {{ ' icon-ok' if request.args.get('of','hb')==i.code }}"></i>
+              <i class="pull-right icon {{ ' icon-ok' if of==i.code }}"></i>
               {{ i.name }}
             </a></li>
           {%- endfor -%}
@@ -145,8 +158,6 @@
 
 
         <hr />
-
-        {%- set of = request.values.get('of', 'hb') -%}
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
           {%- if of[0] == 'h' -%}
             <div class="row-fluid">

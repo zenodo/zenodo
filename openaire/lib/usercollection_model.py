@@ -71,8 +71,10 @@ from invenio.usercollection_signals import before_save_collection, \
     after_save_collection, before_save_collections, after_save_collections, \
     before_delete_collection, after_delete_collection, \
     before_delete_collections, after_delete_collections
+from invenio.search_engine import get_record
+from invenio.bibrecord import record_add_field
 from flask import url_for
-
+from invenio.bibuploadutils import bibupload_record
 
 #
 # Configuration variables
@@ -89,6 +91,11 @@ CFG_USERCOLLCTION_PARENT_NAME_PROVISIONAL = 'Communities'
 CFG_USERCOLLCTION_OUTPUTFORMAT = 'hb'
 """
 Output format to use for collection, use empty string for default.
+"""
+
+CFG_USERCOLLCTION_OUTPUTFORMAT_PROVISIONAL = 'hbpro'
+"""
+Output format to use for provisional collection, use empty string for default.
 """
 
 CFG_USERCOLLCTION_PORTALBOXES = [
@@ -229,7 +236,7 @@ class UserCollection(db.Model):
     @property
     def collection_provisional_url(self):
         """ Get URL to provisional collection """
-        return "/collection/%s" % self.get_collection_name(provisional=True)
+        return "/search?cc=%s" % self.get_collection_name(provisional=True)
 
     @property
     def upload_url(self):
@@ -272,6 +279,91 @@ class UserCollection(db.Model):
             lambda t: render_template_to_string(t, **ctx),
             templates
         )
+
+    #
+    # Curation methods
+    #
+    def _modify_record(self, recid, test_func, replace_func, include_func):
+        """
+        Generate record a MARCXML file and upload it
+
+        @param test_func: Function to test if a collection id should be changed
+        @param replace_func: Function to replace the collection id.
+        @param include_func: Function to test if collection should be included
+        """
+        rec = get_record(recid)
+        newcolls = []
+        dirty = False
+
+        try:
+            colls = rec['980']
+            for c in colls:
+                try:
+                    # We are only interested in subfield 'a'
+                    code, val = c[0][0]
+                    if test_func(code, val):
+                        c[0][0] = replace_func(code, val)
+                        dirty = True
+                    if include_func(code, val):
+                        newcolls.append(c[0])
+                    else:
+                        dirty = True
+                except IndexError:
+                    pass
+        except KeyError:
+            return False
+
+        if not dirty:
+            return False
+
+        rec = {}
+        record_add_field(rec, '001', controlfield_value=str(recid))
+
+        for subfields in newcolls:
+            record_add_field(rec, '980', subfields=subfields)
+
+        bibupload_record(rec, file_prefix='usercoll', mode='-c', opts=['-n', '-P5'])
+        return True
+
+    def accept_record(self, recid):
+        """
+        Accept a record for inclusion in a user collection
+
+        @param recid: Record ID
+        """
+        expected_id = self.get_collection_name(provisional=True)
+        new_id = self.get_collection_name(provisional=False)
+
+        def test_func(code, val):
+            return code == 'a' and val == expected_id
+
+        def replace_func(code, val):
+            return (code, new_id)
+
+        def include_func(code, val):
+            return True
+
+        return self._modify_record(recid, test_func, replace_func, include_func)
+
+    def reject_record(self, recid):
+        """
+        Reject a record for inclusion in a user collection
+
+        @param recid: Record ID
+        """
+        expected_id = self.get_collection_name(provisional=True)
+        new_id = self.get_collection_name(provisional=False)
+
+        def test_func(code, val):
+            return False
+
+        def replace_func(code, val):
+            return (code, val)
+
+        def include_func(code, val):
+            return not (code == 'a' and (val == expected_id or val == new_id))
+
+        return self._modify_record(recid, test_func, replace_func, include_func)
 
     #
     # Data persistence methods
@@ -340,11 +432,11 @@ class UserCollection(db.Model):
         db.session.add(c_tree)
         return c_tree
 
-    def save_collectionformat(self, collection):
+    def save_collectionformat(self, collection, fmt_str):
         """
         Create or update CollectionFormat object
         """
-        fmt = Format.query.filter_by(code=CFG_USERCOLLCTION_OUTPUTFORMAT).first()
+        fmt = Format.query.filter_by(code=fmt_str).first()
 
         if collection.id:
             c_fmt = CollectionFormat.query.filter_by(
@@ -505,8 +597,10 @@ class UserCollection(db.Model):
         )
 
         # Setup collection format is needed
-        if CFG_USERCOLLCTION_OUTPUTFORMAT:
-            self.save_collectionformat(c)
+        if not provisional and CFG_USERCOLLCTION_OUTPUTFORMAT:
+            self.save_collectionformat(c, CFG_USERCOLLCTION_OUTPUTFORMAT)
+        elif provisional and CFG_USERCOLLCTION_OUTPUTFORMAT_PROVISIONAL:
+            self.save_collectionformat(c, CFG_USERCOLLCTION_OUTPUTFORMAT_PROVISIONAL)
 
         # Setup portal boxes
         self.save_collectionportalboxes(

@@ -2,10 +2,6 @@
 
 {% block title %}{% endblock %}
 
-{% block javascript %}
-{{super()}}
-{% endblock %}
-
 {% block body %}
 <div class="row">
     <div class="span12">
@@ -14,7 +10,7 @@
 </div>
 <div class="row" id="file_container">
     <div class="span8">
-        {{page|safe}}
+        {{usercollection.page|safe}}
     </div>
     <div class="span4">
         <div class="well">{% include "usercollection_portalbox_main.html" %}</div>

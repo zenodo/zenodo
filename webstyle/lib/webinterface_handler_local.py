@@ -20,12 +20,17 @@
 OpenAIRE local customization of Flask application
 """
 
+import time
+
 from invenio.config import CFG_SITE_LANG
 from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
 from invenio.usercollection_signals import after_save_collection
 from jinja2 import nodes
 from jinja2.ext import Extension
+from invenio.webuser_flask import current_user
+from invenio.usercollection_model import UserCollection
+from invenio.cache import cache
 
 JINJA_CACHE_ATTR_NAME = '_template_fragment_cache'
 TEMPLATE_FRAGMENT_KEY_TEMPLATE = '_template_fragment_cache_%s%s'
@@ -61,8 +66,85 @@ def customize_app(app):
 
     @app.template_filter('timefmt')
     def timefmt_filter(value, format="%d %b %Y, %H:%M"):
-        import time
         return time.strftime(format, value)
+
+    @app.template_filter('is_record_owner')
+    def is_record_owner(bfo, tag="8560_f"):
+        """
+        Determine if current user is owner of a given record
+
+        @param bfo: BibFormat Object
+        @param tag: Tag to use for extracting the email from the record.
+        """
+        email = bfo.field(tag)
+        return email and current_user.is_active and \
+            current_user['email'] == email
+
+    @app.template_filter('usercollection_id')
+    def usercollection_id(coll):
+        """
+        Determine if current user is owner of a given record
+
+        @param coll: Collection object
+        """
+        identifier = coll.name
+        if identifier.startswith("provisional-user-"):
+            return identifier[len("provisional-user-"):]
+        elif identifier.startswith("user-"):
+            return identifier[len("user-"):]
+        else:
+            return ""
+
+    @app.template_filter('curation_action')
+    def curation_action(recid, ucoll_id=None):
+        """
+        Determine if curation action is underway
+        """
+        return cache.get("usercoll_curate:%s_%s" % (ucoll_id, recid))
+
+    @app.template_filter('usercollection_state')
+    def usercollection_state(bfo, ucoll_id=None):
+        """
+        Determine if current user is owner of a given record
+
+        @param coll: Collection object
+        """
+        coll_id_reject = "provisional-user-%s" % ucoll_id
+        coll_id_accept = "user-%s" % ucoll_id
+
+        for cid in bfo.fields('980__a'):
+            if cid == coll_id_accept:
+                return "accepted"
+            elif cid == coll_id_reject:
+                return "provisional"
+        return "rejected"
+
+    @app.template_filter('usercollections')
+    def usercollections(bfo, is_owner=False, provisional=False, public=True):
+        """
+        Maps collection identifiers to community collection objects
+
+        @param bfo: BibFormat Object
+        @param is_owner: Set to true to only return user collections which the
+                         current user owns.
+        @oaram provisional: Return provisional collections (default to false)
+        @oaram public: Return public collections (default to true)
+        """
+        colls = []
+        if is_owner and current_user.is_guest:
+            return colls
+
+        for cid in bfo.fields('980__a'):
+            if provisional and cid.startswith('provisional-'):
+                colls.append(cid[len("provisional-user-"):])
+            elif public and cid.startswith('user-'):
+                colls.append(cid[len("user-"):])
+
+        query = [UserCollection.id.in_(colls)]
+        if is_owner:
+            query.append(UserCollection.id_user == current_user.get_id())
+
+        return UserCollection.query.filter(*query).all()
 
     #
     # Removed unwanted invenio menu items

@@ -4,9 +4,9 @@
 {% if usercollection.has_logo %}<img src="{{usercollection.logo_url}}" class="pull-right" style="padding: 2px;">{% endif %}
 
 {%- if usercollection.description %}
-<p>{{usercollection.description}}</p>
+{{usercollection.description|safe}}
 {%- endif %}
-{% if usercollection.page %}<a href="#" class="pull-right">Read more</a><br>{% endif %}
+{% if usercollection.page and not detail %}<a href="{{url_for('usercollection.detail', usercollection_id=usercollection.id)}}" class="pull-right">Read more</a><br>{% endif %}
 
 <hr>
 

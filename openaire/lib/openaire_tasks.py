@@ -82,7 +82,6 @@ def bibupload(record=None, collection=None, file_prefix="", mode="-c"):
 
     (file_out, filename) = open_temp_file(file_prefix)
 
-    file_out.write("<collection>")
     if collection is not None:
         file_out.write("<collection>")
         tot = 0

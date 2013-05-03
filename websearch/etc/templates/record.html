@@ -100,7 +100,7 @@
       {{ adminarea }}
     </div>
     {%- endif -%}
-
+    {{ format_record(recid, of='HDCUR', ln=g.ln)|safe }}
     {{ format_record(recid, of='HDINFO', ln=g.ln)|safe }}
 
     {%- if current_user.is_guest -%}

@@ -20,14 +20,15 @@
 """OpenAIRE Flask Blueprint"""
 
 from flask import render_template, abort, request, flash, \
-    redirect, url_for
+    redirect, url_for, jsonify
 from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
 from invenio.webuser_flask import current_user
 from invenio.usercollection_forms import CollectionForm, EditCollectionForm, \
     DeleteCollectionForm
 from invenio.usercollection_model import UserCollection
 from invenio.sqlalchemyutils import db
-
+from invenio.search_engine import get_fieldvalues
+from invenio.cache import cache
 
 blueprint = InvenioBlueprint(
     'usercollection',
@@ -70,7 +71,7 @@ def index():
     )
 
 
-@blueprint.route('/<string:usercollection_id>/', methods=['GET'])
+@blueprint.route('/about/<string:usercollection_id>/', methods=['GET'])
 def detail(usercollection_id=None):
     """
     Index page with uploader and list of existing depositions
@@ -83,12 +84,76 @@ def detail(usercollection_id=None):
     ctx.update({
         'is_owner': u.id_user == uid,
         'usercollection': u,
+        'detail': True,
     })
 
     return render_template(
         "usercollection_detail.html",
         **ctx
     )
+
+
+@blueprint.route('/curate/', methods=['GET', 'POST'])
+@blueprint.invenio_force_https
+@blueprint.invenio_authenticated
+@blueprint.invenio_authorized('submit', doctype='ZENODO')
+def curate():
+    """
+    Index page with uploader and list of existing depositions
+    """
+    action = request.values.get('action')
+    usercollection_id = request.values.get('collection')
+    recid = request.values.get('recid', 0, type=int)
+
+    # Allowed actions
+    if action not in ['accept', 'reject', 'remove']:
+        abort(400)
+
+    # Check recid
+    if not recid:
+        abort(400)
+    recid = int(recid)
+
+    # Does collection exists
+    u = UserCollection.query.filter_by(id=usercollection_id).first()
+    if not u:
+        abort(400)
+
+    # Check permission to perform action on this record
+    # - Accept and reject is done by community owner
+    # - Remove  is done by record owner
+    if action in ['accept', 'reject', ]:
+        if u.id_user != current_user.get_id():
+            abort(403)
+    elif action == 'remove':
+        try:
+            email = get_fieldvalues(recid, '8560_f')[0]
+            if email != current_user['email']:
+                abort(403)
+        except (IndexError, KeyError):
+            abort(403)
+
+    # Prevent double requests (i.e. give bibupload a chance to make the change)
+    key = "usercoll_curate:%s_%s" % (usercollection_id, recid)
+    cache_action = cache.get(key)
+    if cache_action == action or cache_action in ['reject', 'remove']:
+        return jsonify({'status': 'success', 'cache': 1})
+    elif cache_action:
+        # Operation under way, but the same action
+        return jsonify({'status': 'failure', 'cache': 1})
+
+
+    if action == "accept":
+        res = u.accept_record(recid)
+    elif action == "reject" or action == "remove":
+        res = u.reject_record(recid)
+
+    if res:
+        # Set 5 min cache to allow bibupload/webcoll to finish
+        cache.set(key, action, timeout=5*60)
+        return jsonify({'status': 'success', 'cache': 0})
+    else:
+        return jsonify({'status': 'failure', 'cache': 0})
 
 
 @blueprint.route('/new/', methods=['GET', 'POST'])

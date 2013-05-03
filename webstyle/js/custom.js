@@ -3,6 +3,7 @@ var tag_templates = {
     'funding_source' : Hogan.compile('<li class="alert alert-info tag" data-tag-id="{{grant_agreement_number}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{label}}</li>'),
     'collections' : Hogan.compile('<li class="alert alert-info tag" data-tag-id="{{value}}"><button type="button" class="close" data-dismiss="alert">&times;</button>{{label}}</li>')
 };
+var ajaxmsg_template = Hogan.compile('{{#icon}}<i class="icon-{{icon}}"></i> {{/icon}} {{message}}');
 
 
 $(document).ready(function(){
@@ -268,3 +269,63 @@ function webdeposit_save_button(selector, form_selector, message_selector, url) 
         e.preventDefault();
     });
 }
+
+function usercollection_approval(btn, action) {
+    recid = $(btn).data('recid');
+    coll = $(btn).data('collection');
+    url = $(btn).data('url');
+    spanid = "#curate_"+recid+"_"+coll;
+    if(action == 'remove'){
+        spanid = spanid + "_rm";
+    }
+
+    $(spanid + " .loader").addClass("loading");
+    $.ajax({
+        url: url,
+        type: 'POST',
+        cache: false,
+        data: $.param({'action': action, 'recid': recid, 'collection': coll}),
+        dataType: 'json'
+    }).done(function(data) {
+        if(data.status == 'success' ){
+            set_usercollection_buttons(spanid, action);
+        } else {
+            set_ajaxmsg(spanid, "Server problem ", "warning-sign");
+        }
+        $(spanid + " .loader").removeClass("loading");
+    }).fail(function(data) {
+        set_ajaxmsg(spanid, "Server problem ", "warning-sign");
+        $(spanid + " .loader").removeClass("loading");
+    });
+}
+
+function set_ajaxmsg(selector, message, icon){
+    $(selector+ " .ajaxmsg").show();
+    $(selector+ " .ajaxmsg").html(ajaxmsg_template.render({"message": message, "icon": icon}));
+}
+
+function set_usercollection_buttons(selector, action) {
+    // Disabled buttons
+    $(selector+ " .btn").attr('disabled', '');
+    // Show selected
+    if(action=="accept"){
+        $(selector+ " ."+action+"-coll-btn").addClass('btn-success','');
+    } else {
+        $(selector+ " ."+action+"-coll-btn").addClass('btn-danger','');
+    }
+}
+
+$(document).ready(function(){
+    $(".accept-coll-btn").click(function(e){
+        usercollection_approval(this,"accept");
+        e.preventDefault();
+    });
+    $(".reject-coll-btn").click(function(e){
+        usercollection_approval(this,"reject");
+        e.preventDefault();
+    });
+    $(".remove-coll-btn").click(function(e){
+        usercollection_approval(this,"remove");
+        e.preventDefault();
+    });
+});

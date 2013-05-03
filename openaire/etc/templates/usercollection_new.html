@@ -165,4 +165,31 @@
 {% endblock %}
 
 {% block javascript %}
+<script type="text/javascript" src="/ckeditor/ckeditor.js"></script>'
+<script type="text/javascript">//<![CDATA[
+var CKEDITOR_BASEPATH = '/ckeditor/';
+
+function init_ckeditor(selector, type) {
+    if(type=="simple"){
+        CKEDITOR.replace( selector, {
+            toolbar: [
+                ['PasteText','PasteFromWord'],
+                ['Bold','Italic','Strike','-','Subscript','Superscript',],
+                ['NumberedList','BulletedList'],
+                ['Undo','Redo','-','Find','Replace','-', 'RemoveFormat'],
+                ['Source'], ['Maximize'],
+            ],
+            disableNativeSpellChecker: false
+        });
+    } else {
+        CKEDITOR.replace( selector, {
+            toolbar: 'Basic',
+            disableNativeSpellChecker: false
+        });
+    }
+}
+
+init_ckeditor("page", 'advanced');
+init_ckeditor("description", 'simple');
+</script>
 {% endblock %}
