@@ -70,7 +70,7 @@ def map_row(row):
     #row['license'] = 'CC BY-NC-SA'
     # Owner
     if not row['owner']:
-        row['owner'] = 'florida.estrella@cern.ch'
+        row['owner'] = 'emi-po@cern.ch'
     # Type
     if row['type'] == 'Working paper':
         row['type'] = ('publication', 'workingpaper')
@@ -93,7 +93,7 @@ def map_row(row):
 def make_record(r, files):
     rec = {}
     # Owner
-    record_add_field(rec, '856', ind1='0', subfields=[('f', r['owner']), ])
+    record_add_field(rec, '856', ind1='0', subfields=[('f', r['owner']), ('y', 'EMI Project Office')])
     # Access right
     record_add_field(rec, '542', subfields=[('l', r['access_right']), ])
     # Collection
