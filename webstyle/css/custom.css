@@ -491,7 +491,8 @@ h1, h2, h3 {
 }
 
 .features-page p {
-    line-height: 28px
+    line-height: 28px;
+    margin-bottom: 50px;
 }
 
 fieldset label i {

@@ -59,7 +59,7 @@
         <div class="row">
             <div class="span4"><h2>Recent</h2></div>
         </div>
-        {% for recid in collection.reclist[-10:]|reverse %}
+        {% for recid in collection.reclist|zenodo_curated(10) %}
           <div class="row">
             <div class="span8 record-list-elem">
                 <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">{{ _('View')}}</a></li></ul>

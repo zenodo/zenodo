@@ -29,10 +29,11 @@ from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.webuser import collect_user_info, get_uid_from_email
 from invenio.openaire_deposit_engine import get_license_description, \
     get_project_description
-from invenio.bibdocfile import download_external_url
+from invenio.bibdocfile import download_external_url, open_url
 import csv
 import os
 import codecs
+from invenio.pidstore_model import PersistentIdentifier
 
 
 HEADER = [
@@ -69,8 +70,7 @@ def map_row(row):
     row['links'] = [x.strip() for x in row['links'].split(" ")]
     #row['license'] = 'CC BY-NC-SA'
     # Owner
-    if not row['owner']:
-        row['owner'] = 'emi-po@cern.ch'
+    row['owner'] = 'emi-po@cern.ch'
     # Type
     if row['type'] == 'Working paper':
         row['type'] = ('publication', 'workingpaper')
@@ -102,6 +102,7 @@ def make_record(r, files):
         subfields.append(('b', r['type'][1]))
     record_add_field(rec, '980', subfields=subfields)
     record_add_field(rec, '980', subfields=[('a', 'user-emi')])
+    record_add_field(rec, '980', subfields=[('a', 'curated')])
 
     # Files
     fft_status = []
@@ -138,6 +139,7 @@ def make_record(r, files):
     # DOI
     if r['doi']:
         record_add_field(rec, '024', '7', subfields=[('a', r['doi']), ('2', 'DOI')])
+
     # Publication date
     record_add_field(rec, '260', subfields=[('c', r['publication_date'])])
     # Title
@@ -225,7 +227,22 @@ def download_files(i, links):
 
     files = []
     for l in links:
-        basename = os.path.basename(l)
+        if not l.strip():
+            continue
+        print "Downloading %s" % l
+        # Determine filename
+        from_file = open_url(l)
+        content_disp = from_file.info().getheader('Content-Disposition')
+        basename = None
+        if content_disp:
+            for item in content_disp.split(';'):
+                item = item.strip()
+                if item.strip().startswith('filename='):
+                    basename = item[len('filename="'):-len('"')]
+        from_file.close()
+        if basename is None:
+            basename = os.path.basename(l)
+        print "Filename %s" % basename
         new_path = os.path.join(download_path, "%s_%s" % (i, basename))
         if not os.path.exists(new_path):
             tmp_path = download_external_url(l)
@@ -248,18 +265,21 @@ def main():
     presentation pubype not shown for some reason.
     """
     f = codecs.open(os.path.expanduser("~/Desktop/emi.csv"), "r", "utf-8")
+    fout = open(os.path.expanduser("~/Desktop/emi.xml"), "w")
 
-    print "<collection>"
+    fout.write("<collection>")
     for (i, row) in enumerate(unicode_csv_reader(f)):
         if i == 0:
             continue
+
+        print i
         try:
-            print record_xml_output(handle_row(i, row))
-        except Exception:
-            pass
-            #print e
-            #print "Couldn't handle row:", i
-    print "</collection>"
+            fout.write(record_xml_output(handle_row(i, row)))
+        except Exception, e:
+            print e
+            print "Couldn't handle row:", i
+    fout.write("</collection>")
+    fout.close()
     f.close()
 
 

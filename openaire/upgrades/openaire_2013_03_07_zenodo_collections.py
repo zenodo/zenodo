@@ -58,7 +58,10 @@ collections = [
 
     (28, 'hidden', '980__a:PROVISIONAL OR 980__a:PENDING OR 980__a:SPAM OR 980__a:REJECTED OR 980__a:DARK'),
 
+
     (29, 'communities', '980__a:user-*'),
+
+    (30, 'provisional', '980__a:0->Z AND NOT 980__a:curated AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
 ]
 
 relations = [
@@ -97,13 +100,16 @@ accargs = (
     (11, 'categ', '*'),
     (12, 'doctype', 'ZENODO'),
     (13, 'act', '*'),
+    (14, 'collection', 'provisional'),
 )
 
 
 restrictions = [
     # viewrestcoll
     (1, 34, 10, 1),  # admin
-    (12, 34, 10, 1),  # curator
+    #(12, 34, 10, 1),  # curator
+    (1, 34, 14, 1),  # admin
+    (12, 34, 14, 1),  # curator
 
     # submit
     (1, 29, 11, 1),  # admin
@@ -148,6 +154,12 @@ names = [
     (27, 'en', 'ln', 'Closed Access'),
     (28, 'en', 'ln', 'Hidden'),
     (29, 'en', 'ln', 'Communities'),
+    (30, 'en', 'ln', 'Provisional'),
+]
+
+
+formats = [
+    (30, 26, 1),
 ]
 
 
@@ -184,6 +196,8 @@ def do_upgrade():
     for n in names:
         run_sql("INSERT INTO collectionname (id_collection, ln, type, value) VALUES (%s, %s, %s, %s)", n)
 
+    for f in formats:
+        run_sql("INSERT INTO collection_format (id_collection, id_format, score) VALUES (%s, %s, %s)", f)
 
 
 def estimate():

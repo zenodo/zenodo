@@ -115,7 +115,7 @@ def migrate_542__l(recid, rec):
             newval = 'restricted'
         elif val[0] == 'cc0':
             newval = 'open'
-            record_add_field(rec, '540', subfields=[('a', 'cc-zero'), ('u', 'Creative Commons CCZero')])
+            record_add_field(rec, '540', subfields=[('a', 'Creative Commons CCZero'), ('u', 'http://www.opendefinition.org/licenses/cc-zero')])
             record_add_field(rec, '650', ind1="1", ind2="7", subfields=[
                 ('a', 'cc-zero'),
                 ('2', 'opendefinition.org'),

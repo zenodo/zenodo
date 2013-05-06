@@ -31,6 +31,7 @@ from jinja2.ext import Extension
 from invenio.webuser_flask import current_user
 from invenio.usercollection_model import UserCollection
 from invenio.cache import cache
+from invenio.search_engine import search_pattern
 
 JINJA_CACHE_ATTR_NAME = '_template_fragment_cache'
 TEMPLATE_FRAGMENT_KEY_TEMPLATE = '_template_fragment_cache_%s%s'
@@ -103,6 +104,18 @@ def customize_app(app):
         Determine if curation action is underway
         """
         return cache.get("usercoll_curate:%s_%s" % (ucoll_id, recid))
+
+    @app.template_filter('zenodo_curated')
+    def zenodo_curated(reclist, length=10, reverse=True):
+        """
+        Show only curated publications from reclist
+        """
+        reclist = (reclist & search_pattern(p="980__a:curated"))
+        if reverse:
+            reclist = reclist[-length:]
+            return reversed(reclist)
+        else:
+            return reclist[:length]
 
     @app.template_filter('usercollection_state')
     def usercollection_state(bfo, ucoll_id=None):
