@@ -44,14 +44,14 @@ collections = [
     (15, 'theses', '980__b:thesis'),
     (16, 'technical-notes', '980__b:technicalnote'),
     (17, 'working-papers', '980__b:workingpaper'),
-    (18, 'other-publications', '980__b:other'),
+    (18, 'other-publications', '980__a:publication AND 980__b:other'),
 
     (20, 'figures', '980__b:figure'),
     (21, 'plots', '980__b:plot'),
     (22, 'drawings', '980__b:drawing'),
     (23, 'diagrams', '980__b:diagram'),
     (24, 'photos', '980__b:photo'),
-    (25, 'other-images', '980__b:other'),
+    (25, 'other-images', '980__a:image AND 980__b:other'),
 
     (26, 'open', '(542__l:open OR 542__l:embargoed) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
     (27, 'closed', '(542__l:closed OR 542__l:restricted) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),

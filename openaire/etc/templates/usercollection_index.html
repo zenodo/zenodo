@@ -20,7 +20,7 @@
             <li><a href="{{obj.collection_url}}">View</a></li>
             {% if obj.id_user == current_user.id %}<li><a href="{{obj.collection_provisional_url}}">Curate</a></li>{% endif %}
         </ul>
-        <h4>{{obj.title}}</h4><br /><p>{{obj.description[:100]}} {{ '' if obj.description|length < 100 else '...'}}</p><small class="muted">Curated by: {{obj.owner.nickname}}</small></div></div>{% endif %}
+        <h4>{{obj.title}}</h4><br /><p>{{obj.description[:100]|safe}} {{ '' if obj.description|safe|length < 100 else '...'}}</p><small class="muted">Curated by: {{obj.owner.nickname}}</small></div></div>{% endif %}
             {%- endfor %}
         </div>
         {%- endfor %}
