@@ -52,10 +52,6 @@ def do_upgrade():
     # Remove all depositions from old users
     run_sql("DELETE FROM eupublication")
 
-    # Remove previous depositions
-    shutil.rmtree(CFG_OPENAIRE_DEPOSIT_PATH)
-    os.makedirs(CFG_OPENAIRE_DEPOSIT_PATH)
-
 
 def estimate():
     """  Estimate running time of upgrade in seconds (optional). """
