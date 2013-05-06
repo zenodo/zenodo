@@ -71,7 +71,7 @@ from invenio.usercollection_signals import before_save_collection, \
     after_save_collection, before_save_collections, after_save_collections, \
     before_delete_collection, after_delete_collection, \
     before_delete_collections, after_delete_collections
-from invenio.search_engine import get_record
+from invenio.search_engine import get_record, search_pattern, get_fieldvalues
 from invenio.bibrecord import record_add_field
 from flask import url_for
 from invenio.bibuploadutils import bibupload_record
@@ -322,7 +322,26 @@ class UserCollection(db.Model):
         for subfields in newcolls:
             record_add_field(rec, '980', subfields=subfields)
 
-        bibupload_record(rec, file_prefix='usercoll', mode='-c', opts=['-n', '-P5'])
+        return rec
+
+    def _upload_record(self, rec):
+        """
+        Bibupload one record
+        """
+        bibupload_record(
+            record=rec, file_prefix='usercoll', mode='-c',
+            opts=['-n', '-P5']
+        )
+        return True
+
+    def _upload_collection(self, coll):
+        """
+        Bibupload many records
+        """
+        bibupload_record(
+            collection=coll, file_prefix='usercoll', mode='-c',
+            opts=['-n', '-P5']
+        )
         return True
 
     def accept_record(self, recid):
@@ -343,7 +362,7 @@ class UserCollection(db.Model):
         def include_func(code, val):
             return True
 
-        return self._modify_record(recid, test_func, replace_func, include_func)
+        return self._upload_record(self._modify_record(recid, test_func, replace_func, include_func))
 
     def reject_record(self, recid):
         """
@@ -363,7 +382,7 @@ class UserCollection(db.Model):
         def include_func(code, val):
             return not (code == 'a' and (val == expected_id or val == new_id))
 
-        return self._modify_record(recid, test_func, replace_func, include_func)
+        return self._upload_record(self._modify_record(recid, test_func, replace_func, include_func))
 
     #
     # Data persistence methods
@@ -619,6 +638,30 @@ class UserCollection(db.Model):
         self.save_collection(provisional=True)
         after_save_collections.send(self)
 
+    def delete_record_collection_identifiers(self):
+        """
+        Remove collection identifiers for this user collection from all records.
+        """
+        provisional_id = self.get_collection_name(provisional=True)
+        normal_id = self.get_collection_name(provisional=False)
+
+        def test_func(code, val):
+            return False
+
+        def replace_func(code, val):
+            return (code, val)
+
+        def include_func(code, val):
+            return not (code == 'a' and (val == provisional_id or val == normal_id))
+
+        coll = []
+        for r in search_pattern(p="980__a:%s OR 980__a:%s" % (normal_id, provisional_id)):
+            coll.append(
+                self._modify_record(r, test_func, replace_func, include_func)
+            )
+
+        self._upload_collection(coll)
+
     def delete_collection(self, provisional=False):
         """
         Delete all objects related to a single collection
@@ -669,6 +712,7 @@ class UserCollection(db.Model):
         Delete collection and all associated objects.
         """
         before_delete_collections.send(self)
+        self.delete_record_collection_identifiers()
         self.delete_collection(provisional=False)
         self.delete_collection(provisional=True)
         after_delete_collections.send(self)
