@@ -142,7 +142,6 @@ def curate():
         # Operation under way, but the same action
         return jsonify({'status': 'failure', 'cache': 1})
 
-
     if action == "accept":
         res = u.accept_record(recid)
     elif action == "reject" or action == "remove":

@@ -69,7 +69,7 @@ class CollectionForm(Form):
     identifier = wtf.TextField(
         label=_('Identifier'),
         description='Required. Only letters, numbers and dash are allowed. The identifier is used in the URL for the community collection, and cannot be modified later.',
-        validators=[validators.required(), validators.regexp(u'^[-\w]+$', message='Only letters, numbers and dash are allowed')]
+        validators=[validators.required(), validators.length(max=100, message="The identifier must be less than 100 characters long."), validators.regexp(u'^[-\w]+$', message='Only letters, numbers and dash are allowed')]
     )
 
     title = wtf.TextField(
@@ -101,6 +101,7 @@ class CollectionForm(Form):
     #
     def validate_identifier(self, field):
         if field.data:
+            field.data = field.data.lower()
             if UserCollection.query.filter_by(id=field.data).first():
                 raise wtf.ValidationError("The identifier already exists. Please choose a different one.")
 

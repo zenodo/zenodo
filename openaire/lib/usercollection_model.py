@@ -518,15 +518,14 @@ class UserCollection(db.Model):
             self.oai_set = OaiREPOSITORY(**fields)
             db.session.add(self.oai_set)
 
-    def save_acl(self, collection_name):
+    def save_acl(self, collection_id, collection_name):
         """
         Create or update authorization for user to view the provisional collection
         """
-        # Role
-        role_name = 'coll_%s' % collection_name
+        # Role - use collection id, because role name is limited to 32 chars.
+        role_name = 'coll_%s' % collection_id
         role = AccROLE.query.filter_by(name=role_name).first()
         if not role:
-            # FIXME - Check firerole
             role = AccROLE(name=role_name, description='Curators of collection %s' % collection_name)
             db.session.add(role)
 
@@ -580,11 +579,12 @@ class UserCollection(db.Model):
             before_save_collection.send(self, is_new=False, provisional=provisional)
             c = Collection(**fields)
             db.session.add(c)
+            db.session.commit()
         setattr(self, 'collection_provisional' if provisional else 'collection', c)
 
         # Setup OAI Repository
         if provisional:
-            self.save_acl(collection_name)
+            self.save_acl(c.id, collection_name)
         else:
             self.save_oairepository_set(provisional=provisional)
 
@@ -648,7 +648,7 @@ class UserCollection(db.Model):
         if provisional:
             # Delete ACLs
             AccARGUMENT.query.filter_by(keyword='collection', value=collction_name).delete()
-            role = AccROLE.query.filter_by(name='coll_%s' % collction_name).first()
+            role = AccROLE.query.filter_by(name='coll_%s' % c.id).first()
             if role:
                 UserAccROLE.query.filter_by(role=role).delete()
                 AccAuthorization.query.filter_by(role=role).delete()
