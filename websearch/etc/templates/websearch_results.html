@@ -161,7 +161,7 @@
         {%- for recid in recids[(pagination.page-1)*rg:pagination.page*rg] -%}
           {%- if of[0] == 'h' -%}
             <div class="row-fluid">
-              <div class="span1">
+              <div class="span1 hidden-phone">
                 <label class="checkbox">
                   <input class="hide" type="checkbox" name="recid" value="{{ recid }}" />
                   <abbr class="unapi-id" title="{{ recid }}"></abbr>
