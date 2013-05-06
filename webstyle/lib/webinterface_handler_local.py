@@ -22,7 +22,7 @@ OpenAIRE local customization of Flask application
 
 import time
 
-from invenio.config import CFG_SITE_LANG
+from invenio.config import CFG_SITE_LANG, CFG_OPENAIRE_MAX_UPLOAD
 from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
 from invenio.usercollection_signals import after_save_collection
@@ -39,6 +39,8 @@ TEMPLATE_FRAGMENT_KEY_TEMPLATE = '_template_fragment_cache_%s%s'
 def customize_app(app):
     #from invenio.webinterface_handler_flask_utils import _
     from flask import current_app
+
+    app.config['MAX_CONTENT_LENGTH'] = CFG_OPENAIRE_MAX_UPLOAD
 
     @app.context_processor
     def local_processor():
@@ -156,6 +158,22 @@ def customize_app(app):
     app.jinja_env.add_extension(ZenodoExtension)
     webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache)
     after_save_collection.connect(invalidate_jinja2_cache)
+
+
+def parse_filesize(s):
+    """
+    Convert a human readable filesize into number of bytes
+    """
+    sizes = [('', 1), ('kb', 1024), ('mb', 1024*1024), ('gb', 1024*1024*1024),
+             ('g', 1024*1024*1024), ]
+    s = s.lower()
+    for size_str, val in sizes:
+        intval = s.replace(size_str, '')
+        try:
+            return int(intval)*val
+        except ValueError:
+            pass
+    raise ValueError("Could not parse '%s' into bytes" % s)
 
 
 def make_template_fragment_key(fragment_name, vary_on=[]):

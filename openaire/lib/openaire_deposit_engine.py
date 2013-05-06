@@ -79,17 +79,19 @@ from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission, bibtask_allocate_sequenceid
 from invenio.config import CFG_SITE_LANG, CFG_SITE_URL, CFG_SITE_NAME, \
     CFG_SITE_ADMIN_EMAIL, CFG_SITE_SECURE_URL, CFG_OPENAIRE_PORTAL_URL, \
-    CFG_DATACITE_DOI_PREFIX
+    CFG_DATACITE_DOI_PREFIX, CFG_OPENAIRE_FILESIZE_NOTIFICATION, CFG_TMPDIR
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.jsonutils import json_unicode_to_utf8
 from invenio.mailutils import send_email
+from invenio.textutils import nice_size
 from invenio.messages import gettext_set_language
 from invenio.openaire_deposit_checks import CFG_METADATA_FIELDS_CHECKS
 from invenio.openaire_deposit_config import CFG_OPENAIRE_PROJECT_DESCRIPTION_KB, \
     CFG_OPENAIRE_PROJECT_INFORMATION_KB, CFG_OPENAIRE_DEPOSIT_PATH, \
     CFG_OPENAIRE_MANDATORY_PROJECTS, CFG_METADATA_FIELDS, CFG_PUBLICATION_STATES, \
-    CFG_OPENAIRE_CURATORS, CFG_METADATA_FIELDS_GROUPS
+    CFG_OPENAIRE_CURATORS, CFG_METADATA_FIELDS_GROUPS, \
+    CFG_OPENAIRE_DEPOSIT_PATH_LARGE
 from invenio.openaire_deposit_utils import wash_form, \
     simple_metadata2namespaced_metadata, namespaced_metadata2simple_metadata, \
     strip_publicationid
@@ -552,7 +554,8 @@ class OpenAIREPublication(object):
                 CFG_OPENAIRE_DEPOSIT_PATH, str(uid), str(publicationid))
             if not os.path.exists(self.path):
                 raise ValueError("publicationid %s does not exist for user %s" % (publicationid, uid))
-        self.fulltext_path = os.path.join(self.path, 'files')
+        self.fulltext_path = os.path.join(CFG_OPENAIRE_DEPOSIT_PATH, str(uid), self._metadata['__publicationid__'], 'files')
+        self.fulltext_large_path = os.path.join(CFG_OPENAIRE_DEPOSIT_PATH_LARGE, str(uid), self._metadata['__publicationid__'], 'files')
         self.metadata_path = os.path.join(self.path, 'metadata')
         self.fulltexts = {}
         self.warnings = {}
@@ -607,7 +610,8 @@ class OpenAIREPublication(object):
     def _initialize_storage(self):
         """
         """
-        mymkdir(os.path.join(self.path, 'files'))
+        mymkdir(self.fulltext_path)
+        mymkdir(self.fulltext_large_path)
 
     def _load(self):
         """
@@ -628,22 +632,43 @@ class OpenAIREPublication(object):
     def _load_fulltexts(self):
         """
         """
-        for fulltextid in os.listdir(self.fulltext_path):
-            if not fulltextid.startswith('.') and os.path.isdir(os.path.join(self.fulltext_path, fulltextid)):
-                for filename in os.listdir(os.path.join(self.fulltext_path, fulltextid)):
-                    if not filename.startswith('.'):
-                        self.fulltexts[fulltextid] = generic_path2bidocfile(os.path.join(self.fulltext_path, fulltextid, filename))
+        for fulltext_path in [self.fulltext_path, self.fulltext_large_path]:
+            for fulltextid in os.listdir(fulltext_path):
+                if not fulltextid.startswith('.') and os.path.isdir(os.path.join(fulltext_path, fulltextid)):
+                    for filename in os.listdir(os.path.join(fulltext_path, fulltextid)):
+                        if not filename.startswith('.'):
+                            self.fulltexts[fulltextid] = generic_path2bidocfile(os.path.join(fulltext_path, fulltextid, filename))
 
     def add_a_fulltext(self, original_path, filename, req_file=None):
         """
         """
-        the_directory = mymkdtemp(prefix='', dir=self.fulltext_path)
+        # Save Flask file to temp (otherwise no reliable way to get file size)
+        if req_file:
+            fd, original_path = tempfile.mkstemp(dir=CFG_TMPDIR)
+            req_file.save(original_path)
+
+        filesize = os.path.getsize(original_path)
+        if filesize > CFG_OPENAIRE_FILESIZE_NOTIFICATION:
+            the_directory = mymkdtemp(prefix='', dir=self.fulltext_large_path)
+        else:
+            the_directory = mymkdtemp(prefix='', dir=self.fulltext_path)
+
         fulltextid = os.path.basename(the_directory)
         final_path = os.path.join(the_directory, os.path.basename(filename))
+
+        if filesize > CFG_OPENAIRE_FILESIZE_NOTIFICATION:
+            send_email(
+                CFG_SITE_ADMIN_EMAIL,
+                CFG_SITE_ADMIN_EMAIL,
+                subject="%s: %s file uploaded" % (CFG_SITE_NAME, nice_size(filesize)),
+                content="Path: %s" % final_path
+            )
+
+        shutil.copy2(original_path, final_path)
         if req_file:
-            req_file.save(final_path)
-        else:
-            shutil.copy2(original_path, final_path)
+            os.close(fd)
+            os.remove(original_path)
+
         # Set file permission
         os.chmod(final_path, stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH)
         self.fulltexts[fulltextid] = generic_path2bidocfile(final_path)

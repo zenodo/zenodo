@@ -20,7 +20,7 @@ $(function() {
         runtimes : 'gears,html5,flash,silverlight',
         browse_button : 'pickfiles',
         container : 'file_container',
-        max_file_size : '1024mb',
+        max_file_size : '{{config.CFG_OPENAIRE_MAX_UPLOAD}}',
         url : '{{upload_url}}',
         flash_swf_url : '{{ url_for('static',filename='js/plupload/plupload.flash.swf')}}',
         silverlight_xap_url : '{{ url_for('static',filename='js/plupload/plupload.silverlight.xap')}}',

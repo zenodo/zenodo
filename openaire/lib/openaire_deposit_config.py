@@ -32,8 +32,11 @@ CFG_OPENAIRE_PROJECT_INFORMATION_KB = 'json_projects'
 CFG_OPENAIRE_PROJECT_DESCRIPTION_KB = 'projects'
 """ Name of knowledge base for storing EU project description. """
 
-CFG_OPENAIRE_DEPOSIT_PATH = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, 'OpenAIRE')
+CFG_OPENAIRE_DEPOSIT_PATH = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, 'small')
 """ Path where to store in-progress submission. """
+
+CFG_OPENAIRE_DEPOSIT_PATH_LARGE = os.path.join(CFG_WEBSUBMIT_STORAGEDIR, 'large')
+""" Path where to store in-progress submission of large files. """
 
 CFG_OPENAIRE_MANDATORY_PROJECTS = True
 """ Determine if EU FP7 project metadata is required. """
