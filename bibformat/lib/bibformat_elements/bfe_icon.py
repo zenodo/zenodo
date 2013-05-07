@@ -24,7 +24,7 @@ import re
 
 template_icon = Template("""
 <a href="/record/{{bfo.recID}}">
-<img class="media-object img-rounded" width="90" src="{{icon.get_url()}}" />
+<img class="media-object img-rounded" width="90" src="{{icon.get_url().replace(CFG_SITE_URL,'')}}" />
 </a>
 """)
 #<!-- BFE_OPENAIRE_ALTMETRIC badgetype='donut' popover='left' no_script='1'
