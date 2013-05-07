@@ -64,15 +64,14 @@
     <div class="span8 offset2">
         <div class="hero-unit">
         <h1>Hi {{current_user.nickname}}!</h1>
-        <p>Where do you go from here?</p>
-        <p>
+        <p style="margin-top: 10px;">Where do you go from here?</p>
+        <p style="margin-top: 30px;">
           <div class="row">
-            <div class="offset1 span5"><a href="{{url_for('deposit.index')}}" class="btn btn-large">Upload</a> <small>Share your research!</small></div>
-          </div>
-        </p>
-        <p>
-          <div class="row">
-            <div class="offset1 span5"><a href="/" class="btn btn-large">Search</a> <small>Read or re-use other researchers data and publications.</small></div>
+            <div width="100%" align="center">
+                <a href="{{url_for('deposit.index')}}" class="btn btn-large">Upload</a>
+                <a href="/" class="btn btn-large">Search</a>
+                <a href="{{ url_for('youraccount.logout') }}" class="btn btn-large">Sign out</a>
+            </div>
           </div>
         </p>
         </div>
