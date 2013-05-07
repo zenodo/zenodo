@@ -23,11 +23,11 @@
 {% block record_content %}
 
 {%- if record.user_comment_subscritions|length -%}
-    <a class="btn pull-right" rel="tooltip" title="{{ _('Unsubscribe from this discussion. You will not receive any new comments by email.') }}" href="{{ url_for('webcomment.unsubscribe', recid=recid) }}"><i class="icon-trash"></i> {{ _('Unsubscribe') }}</a> 
+    <a class="btn pull-right" rel="tooltip" title="{{ _('Unsubscribe from this discussion. You will not receive any new comments by email.') }}" href="{{ url_for('webcomment.unsubscribe', recid=recid) }}"><i class="icon-trash"></i> {{ _('Unsubscribe') }}</a>
 {%- else -%}
-   <a class="btn pull-right" rel="tooltip" title="{{ _('Subscribe to this discussion. You will then receive all new comments by email.') }}" href="{{ url_for('webcomment.subscribe', recid=recid) }}"><i class="icon-envelope"></i> {{ _('Subscribe') }}</a> 
+   <a class="btn pull-right" rel="tooltip" title="{{ _('Subscribe to this discussion. You will then receive all new comments by email.') }}" href="{{ url_for('webcomment.subscribe', recid=recid) }}"><i class="icon-envelope"></i> {{ _('Subscribe') }}</a>
 {%- endif -%}
-<a class="btn pull-right" data-toggle="modal" style="margin-right:5px;" href="{{ url_for('webcomment.add_comment', recid=recid) }}"><i class="icon-pencil"></i> {{ _('Write comment') }}</a> 
+{% if not current_user.is_guest %}<a class="btn pull-right" data-toggle="modal" style="margin-right:5px;" href="{{ url_for('webcomment.add_comment', recid=recid) }}"><i class="icon-pencil"></i> {{ _('Write comment') }}</a> {% endif %}
 
   {%- if not comments -%}
   <p><em>{{ _('There are no comments. Be the first to comment.') }}</em></p>
