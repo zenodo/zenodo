@@ -101,11 +101,14 @@
         <h4>New to {{config.CFG_SITE_NAME}}?</h4>
         {% include "zenodo_benefits.html" %}
       </div>
+
       {%- if collection.id == 1 %}
       <div class="well">
         <h4>Mission statement</h4>
         ZENODO is a repository service that enables researchers, scientists, projects and institutions to share and showcase multidisciplinary research results (data and publications) that are not part of existing institutional or subject-based repositories.
       </div>
+
+      <a class="twitter-timeline" href="https://twitter.com/ZENODO_ORG" data-widget-id="331751059422855169">Tweets by @ZENODO_ORG</a>
       {%- endif %}
       {%- endif %}
   </div>
@@ -169,9 +172,10 @@
 
 
 {% block javascript %}
-  <script>
-  (function($) {
+<script>
+(function($) {
     $('[rel=tooltip]').tooltip();
-  })(jQuery);
-  </script>
+})(jQuery);
+</script>
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 {% endblock javascript %}
