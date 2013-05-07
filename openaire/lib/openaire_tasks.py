@@ -187,7 +187,7 @@ def openaire_check_icons():
     """)
 
     for docid, in docs:
-        openaire_create_icon.delay(docid=docid)
+        openaire_create_icon.delay(docid=docid, reformat=False)
 
 
 @celery.task(ignore_result=True)
