@@ -57,9 +57,14 @@
       {% else %}
         {% if collection.reclist %}
         <div class="row">
-            <div class="span4"><h2>Recent</h2></div>
+            <div class="span4"><h2>Recent Uploads</h2></div>
         </div>
-        {% for recid in collection.reclist|zenodo_curated(10) %}
+        {%- if collection.name.startswith("user-") or collection.name.startswith("provisional-") -%}
+            {%- set reclist = collection.reclist[-10:]|reverse -%}
+        {%- else -%}
+            {%- set reclist = collection.reclist|zenodo_curated(10, open_only=True) -%}
+        {%- endif -%}
+        {% for recid in reclist %}
           <div class="row">
             <div class="span8 record-list-elem">
                 <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">{{ _('View')}}</a></li></ul>
@@ -67,8 +72,8 @@
                 {% if not loop.last %}<hr />{% endif %}
             </div>
           </div>
-        {% endfor %}
-        {% if collection.reclist|length > 10 %}
+        {%- endfor %}
+        {%- if collection.reclist|length > 10 %}
         <div class="row">
             <div class="span8">
                 <ul class="pager">
@@ -76,36 +81,35 @@
                 </ul>
             </div>
         </div>
-        {% endif %}
-        {% else %}
+        {%- endif %}
+        {%- else %}
         <div class="row">
             <div class="span8" align="center" style="margin-top: 40px;">
                 <em class="muted">This collection is currently empty.</em>
             </div>
         </div>
-        {% endif %}
-      {% endif %}
+        {%- endif %}
+      {%- endif %}
     </div>
   </div>
   <div class="span4">
       {# portalboxes left top is not supported #}
       {{ portalbox_sidebar(portalboxes.rt, class="well") }}
-      {% if not collection.name.startswith("user-") and not collection.name.startswith("provisional-") %}
+      {%- if not collection.name.startswith("user-") and not collection.name.startswith("provisional-") %}
       <div class="well">
         <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
         <h4>New to {{config.CFG_SITE_NAME}}?</h4>
         {% include "zenodo_benefits.html" %}
       </div>
-      {% if collection.id == 1 %}
+      {%- if collection.id == 1 %}
       <div class="well">
         <h4>Mission statement</h4>
         ZENODO is a repository service that enables researchers, scientists, projects and institutions to share and showcase multidisciplinary research results (data and publications) that are not part of existing institutional or subject-based repositories.
       </div>
-      {% endif %}
-      {% endif %}
+      {%- endif %}
+      {%- endif %}
   </div>
 </div>
-
 {#
 
 
@@ -147,19 +151,19 @@
 
 
 
-  #}
+#}
 {% endmacro %}
 
 
 
 {% block body %}
-  {% if collection.is_restricted %}
+  {%- if collection.is_restricted %}
     {{ collection_records(collection) }}
-  {% else %}
-    {% zenodocache 24*60*60, collection.name, g.ln %}
+  {%- else %}
+    {%- zenodocache 24*60*60, collection.name, g.ln %}
     {{ collection_records(collection) }}
-    {% endcache %}
-  {% endif %}
+    {%- endcache %}
+  {%- endif %}
 {% endblock %}
 
 
