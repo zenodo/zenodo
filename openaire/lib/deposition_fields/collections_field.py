@@ -84,7 +84,7 @@ class CollectionsField(TextField, JsonCookerMixinBuilder('collections')):
         else:
             term = '%' + term + '%'
             objs = UserCollection.query.filter(
-                UserCollection.title.like(term) |
-                UserCollection.id.like(term)
-            ).limit(limit).all()
+                UserCollection.title.like(term) | UserCollection.id.like(term),
+                UserCollection.id != 'zenodo'
+            ).filter_by().limit(limit).all()
         return map(_transform, objs)

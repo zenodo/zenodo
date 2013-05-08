@@ -244,10 +244,9 @@ class DepositionForm(Form):
         ], {
             'classes': 'in',
             'state': 'required',
-            'description': 'Unless you explicitly specify the license conditions below,'
-                ' you agree to release your data under the terms of the Creative Commons Zero (CC0) waiver'
-                ' and your publications under the terms of the Creative Commons Attribution 3.0 Unported (CC-BY)'
-                ' license. All authors of the data and publications have agreed to the terms of this waiver and license.' % {'site_name': CFG_SITE_NAME}
+            'description': 'Unless you explicitly specify the license conditions below for Open Access and Embargoed Access uploads,'
+                ' you agree to release your data files under the terms of the Creative Commons Zero (CC0) waiver.'
+                ' All authors of the data and publications have agreed to the terms of this waiver and license.' % {'site_name': CFG_SITE_NAME}
         }),
         ('Communities', [
             'collections',
@@ -476,7 +475,7 @@ class DepositionForm(Form):
     )
     embargo_date = fields.Date(
         label=_('Embargo date'),
-        description='Required. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.',
+        description='Required only for Embargoed Access uploads. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.',
         default=date.today(),
         validators=[
             oa_validators.RequiredIf('access_right', ['embargoed']),
