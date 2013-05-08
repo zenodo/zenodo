@@ -285,7 +285,7 @@ def openaire_register_doi(recid):
     if pid.is_new() or pid.is_reserved():
         logger.info("Registering DOI %s for record %s" % (doi_val, recid))
 
-        url = "%s/doi/%s" % (CFG_DATACITE_SITE_URL, doi_val)
+        url = "%s/record/%s" % (CFG_DATACITE_SITE_URL, recid)
         doc = format_record(recid, 'dcite')
 
         if not pid.register(url=url, doc=doc):
