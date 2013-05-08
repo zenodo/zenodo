@@ -22,7 +22,8 @@ Simple tasklet that is called after a bibupload of a new record
 
 from invenio.flaskshell import *
 from invenio.openaire_tasks import openaire_create_icon, \
-    openaire_altmetric_update, openaire_register_doi
+    openaire_altmetric_update, openaire_register_doi, \
+    openaire_upload_notification
 
 
 def bst_openaire_new_upload(recid=None):
@@ -36,6 +37,7 @@ def bst_openaire_new_upload(recid=None):
     openaire_register_doi.delay(recid=recid)
     openaire_create_icon.delay(recid=recid)
     openaire_altmetric_update.delay([recid])
+    openaire_upload_notification.delay(recid=recid)
 
 if __name__ == '__main__':
     bst_openaire_new_upload()

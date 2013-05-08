@@ -30,13 +30,17 @@ from invenio.bibformat import format_record
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
 from invenio.celery import celery
-from invenio.config import CFG_TMPDIR, CFG_DATACITE_SITE_URL
+from invenio.config import CFG_TMPDIR, CFG_DATACITE_SITE_URL, \
+    CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
+from invenio.mailutils import send_email
 from invenio.dbquery import run_sql
 from invenio.errorlib import register_exception
 from invenio.search_engine import search_pattern, get_fieldvalues
 from invenio.websubmit_icon_creator import create_icon, \
     InvenioWebSubmitIconCreatorError
 from invenio.pidstore_model import PersistentIdentifier
+from invenio.usercollection_model import UserCollection
+from invenio.jinja2utils import render_template_to_string
 
 try:
     from altmetric import Altmetric, AltmetricHTTPException
@@ -291,3 +295,28 @@ def openaire_register_doi(recid):
                 raise openaire_register_doi.retry(exc=Exception(m))
         else:
             logger.info("Successfully registered DOI %s." % doi_val)
+
+
+@celery.task(ignore_result=True)
+def openaire_upload_notification(recid):
+    """
+    Send a notification to all user collections.
+    """
+    ctx = {
+        'recid': recid,
+        'title': get_fieldvalues(recid, "245__a")[0],
+        'description': get_fieldvalues(recid, "520__a")[0],
+    }
+
+    ucolls = UserCollection.from_recid(recid, provisional=True)
+    for c in ucolls:
+        try:
+            if c.owner.email:
+                ctx.update({
+                    'usercollection': c,
+                })
+                content = render_template_to_string("usercollection_new_upload_email.html", **ctx)
+                send_email(CFG_SITE_SUPPORT_EMAIL, c.owner.email, "[%s] New upload to %s" % (CFG_SITE_NAME, c.title), content=content)
+                logger.info("Sent email for new record %s to %s." % (recid, c.owner.email))
+        except AttributeError:
+            pass

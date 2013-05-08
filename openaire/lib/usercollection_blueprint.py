@@ -130,6 +130,9 @@ def curate():
             email = get_fieldvalues(recid, '8560_f')[0]
             if email != current_user['email']:
                 abort(403)
+            # User not allowed to remove from the zenodo user collection
+            if u.id == 'zenodo':
+                abort(403)
         except (IndexError, KeyError):
             abort(403)
 

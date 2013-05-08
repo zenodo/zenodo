@@ -758,7 +758,6 @@ class OpenAIREPublication(object):
         for c in pcolls:
             task_low_level_submission('webcoll', 'openaire', '-c', c, '-P5', '-I', str(sequenceid))
         self.status = 'submitted'
-        #self.send_emails()
 
     def mint_doi(self):
         """
@@ -779,8 +778,7 @@ class OpenAIREPublication(object):
         """
         """
         content = openaire_deposit_templates.tmpl_confirmation_email_body(title=self._metadata['title'], authors=self._metadata['creators'], url=self.url, report_numbers=self.report_numbers, ln=self.ln)
-        # No email to user anymore
-        #send_email(CFG_SITE_ADMIN_EMAIL, get_email(self.uid), _("Successful deposition of a publication into OpenAIRE"), content=content)
+
         bibedit_url = CFG_SITE_URL + \
             "/record/edit/#state=edit&recid=%s" % self.recid
         content = openaire_deposit_templates.tmpl_curators_email_body(title=self._metadata['title'], authors=self._metadata['authors'].splitlines(), url=self.url, bibedit_url=bibedit_url)
@@ -1179,6 +1177,9 @@ class OpenAIREPublication(object):
             subfields.append(('b', sub_coll))
         record_add_field(rec, '980', subfields=subfields)
 
+        # Specific ZENODO user collection, user to curate content for ZENODO
+        record_add_field(rec, '980', subfields=[('a', 'provisional-user-zenodo'), ])
+
         # ================
         # User collections
         # ================
@@ -1285,6 +1286,10 @@ class OpenAIREPublication(object):
                     subfields.append(('a', project_description))
                 subfields.append(('c', str(projectid)))
                 record_add_field(rec, '536', subfields=subfields)
+
+                # Specific ZENODO user collection for OpenAIRE (used to curate
+                # FP7 funded research)
+                record_add_field(rec, '980', subfields=[('a', 'provisional-user-ecfunded'), ])
 
        # Keywords
         if self._metadata.get('keywords'):

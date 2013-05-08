@@ -244,6 +244,30 @@ class UserCollection(db.Model):
         return url_for('deposit.index', c=self.id)
 
     #
+    #
+    #
+    @classmethod
+    def from_recid(cls, recid, provisional=False):
+        """ Get user collections specified in recid """
+        rec = get_record(recid)
+        prefix = "%s-" % CFG_USERCOLLECTION_ID_PREFIX_PROVISIONAL if provisional else CFG_USERCOLLECTION_ID_PREFIX
+
+        colls = rec.get('980', [])
+        usercolls = []
+        for c in colls:
+            try:
+            # We are only interested in subfield 'a'
+                code, val = c[0][0]
+                if code == 'a' and val.startswith(prefix):
+                    val = val[len(prefix):]
+                    u = UserCollection.query.filter_by(id=val).first()
+                    if u:
+                        usercolls.append(u)
+            except IndexError:
+                pass
+        return usercolls
+
+    #
     # Utility methods
     #
     def get_collection_name(self, provisional=False):

@@ -29,8 +29,8 @@ def format_element(bfo, separator="<br />"):
     @param separator: a separator between each collection link.
     """
     def _include(collname):
-        return not (collname.startswith('provisional') or
-                    collname == 'zenodo-public')
+        return not (collname.startswith('provisional-') or
+                    collname == 'zenodo-public' or collname == 'user-zenodo')
 
     coll_names = filter(_include, get_all_collections_of_a_record(bfo.recID))
 

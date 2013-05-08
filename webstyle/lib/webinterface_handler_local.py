@@ -111,9 +111,9 @@ def customize_app(app):
         Show only curated publications from reclist
         """
         if open_only:
-            p = "980__a:curated AND (542__l:open OR 542__l:embargoed)"
+            p = "(980__a:curated OR 980__a:user-zenodo) AND (542__l:open OR 542__l:embargoed)"
         else:
-            p = "980__a:curated"
+            p = "980__a:curated OR 980__a:user-zenodo"
         reclist = (reclist & search_pattern_parenthesised(p=p))
         if reverse:
             reclist = reclist[-length:]
@@ -139,7 +139,7 @@ def customize_app(app):
         return "rejected"
 
     @app.template_filter('usercollections')
-    def usercollections(bfo, is_owner=False, provisional=False, public=True):
+    def usercollections(bfo, is_owner=False, provisional=False, public=True, filter_zenodo=False):
         """
         Maps collection identifiers to community collection objects
 
@@ -154,6 +154,10 @@ def customize_app(app):
             return colls
 
         for cid in bfo.fields('980__a'):
+            # Remove zenodo collections from ab
+            if filter_zenodo and (cid == 'user-zenodo' or
+               cid == 'provisional-user-zenodo'):
+                continue
             if provisional and cid.startswith('provisional-'):
                 colls.append(cid[len("provisional-user-"):])
             elif public and cid.startswith('user-'):

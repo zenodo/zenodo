@@ -23,7 +23,7 @@
 
 {# Record owner is allowed to remove his record from a given collection #}
 {% if bfo|is_record_owner %}
-    {% for coll in bfo|usercollections(public=True, is_owner=False) %}
+    {% for coll in bfo|usercollections(public=True, is_owner=False, filter_zenodo=True) %}
         {% if loop.first %}
             <h5><i class="icon-group"></i> Communities</h5>
         {% endif %}
