@@ -439,7 +439,7 @@ class DepositionForm(Form):
     creators = fields.AuthorField(
         label="Authors",
         validators=[validators.required()],
-        description="Optional. Format: Family name, First name: Affiliation (one author per line)"
+        description="Required. Format: Family name, First name: Affiliation (one author per line)"
     )
     description = fields.AbstractField(
         label="Description",

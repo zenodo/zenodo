@@ -388,10 +388,6 @@ h1, h2, h3 {
     z-index:1000;
 }
 
-.in {
-    overflow: visible;
-}
-
 .form-tag {
     padding: 5px;
     font-size: 110%;
