@@ -19,9 +19,105 @@
 {% extends "page.html" %}
 {% block body %}
 <h1>Policies</h1>
-{#
+<div class="row-fluid">
+<div class="span6">
+    <h4>Content</h4>
+<dl>
+<dt>Scope</dt>
+<dd>All fields of science. English is preferred, but all languages accepted.</dd>
 
-<h2>Licensing<h2>
-http://www.dcc.ac.uk/resources/how-guides/license-research-data
-#}
+<dt>Kinds of research data</dt>
+<dd>All research outputs.</dd>
+
+<dt>Status of research data</dt>
+<dd>Any status is accepted.</dd>
+
+<dt>Versions</dt>
+<dd>Data files are versioned. Records are not versioned. Submission Information Package is archived. Derivatives of data files are generated, but original content is never modified.
+Records can be retracted from public view, however the data files and record is preserved.</dd>
+
+<dt>Data file formats</dt>
+<dd>All formats allowed - even preservation unfriendly. We are working on guidelines and features that will help people deposit in preservation friendly formats.</dd>
+
+<dt>Volume and size limitations</dt>
+<dd>1GB per file size constraint. Higher quotas per file can be requested. Quotas are likely to be introduced at a later stage. All data files are stored in CERN Data Centre, Geneva, Switzerland and kept in multiple replicas in a distributed file system which is backed up to tape on a nightly basis.</dd>
+</dl>
+
+<h4>Metadata</h4>
+
+<dl>
+<dt>Access</dt>
+<dd>ZENODO is provided free of charge for educational and informational use.
+Metadata is licensed under CC0, except for email addresses.</dd>
+
+<dt>Reuse</dt>
+<dd>Metadata is licensed under CC0, except for email addresses.
+All metadata is exported via OAI-PMH and can be harvested.</dd>
+
+<dt>Metadata types and sources</dt>
+<dd>All metadata is stored internally in MARC according to the schema defined in <a href="http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup">http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup</a>. Metadata is exported in several standard formats such as MARCXML, Dublin Core and DataCite Metadata Schema according to OpenAIRE Guidelines.</dd>
+
+<dt>Eligible depositors</dt>
+<dd>Anyone may register as user of {{config.CFG_SITE_NAME}}. All users are allowed to deposit content for which they possess the appropriate rights.</dd>
+
+<dt>Moderation by repository</dt>
+<dd>All content is checked after upload by repository staff. Content not considered to fall under the scope of the repository will be removed, and the depositor notified. Content will be removed also be removed in case of (but not excluded to) copyright violation, legal requirements and proven violations, national security and confidentiality concerns. All records are assigned a Digital Object Identifier. User access may be revoked on violation of Terms of Use.
+</dd>
+
+<dt>Data quality</dt>
+<dd>All information is provided “as-is” and the user shall hold the ZENODO collaboration and information providers supplying data to ZENODO free and harmless in connection with the use of such information.</dd>
+
+<dt>Confidentiality and disclosure</dt>
+<dd>Publicly accessible content breaching confidentiality or non-disclosure for data collected from human subjects will be removed.</dd>
+
+<dt>Embargo status</dt>
+<dd>Users may deposit content under an embargo status and provide and end date for the embargo. The repository will initially restrict access to the data, and then automatically make the content publicly available after the end of the embargo period. User may deposit restricted data files, which will not be made publicly available.</dd>
+
+<dt>Rights and ownership</dt>
+<dd>Users must specify a license for all publicly available files. User may specify a license for all closed access files.</dd>
+</dl>
+</div>
+<div class="span6">
+    <h4>Access and reuse of data</h4>
+<dl>
+
+<dt>Access to data objects</dt>
+<dd>Files may be deposited under closed, open, embargoed or restricted access. The repository treats data files under closed and restricted access the same.
+Data files deposited under closed or restricted access are protected against unauthorized access at all levels. Access to metadata and data files is provided over standard protocols such as HTTP and OAI-PMH.</dd>
+
+<dt>Use and re-use of data objects</dt>
+<dd>Use and re-use is subject to the license under which the data objects were deposited.</dd>
+
+<dt>Tracking users and statistics</dt>
+<dd>The ZENODO collaboration does not track, collect or retain personal information from users of ZENODO, except as otherwise provided herein. In order to enhance ZENODO and monitor traffic, non-personal information such as IP addresses and cookies may be tracked and retained, as well as log files shared in aggregation with other community services (in particular OpenAIREplus partners). User provided information, like corrections of metadata or paper claims, will be integrated into the database without displaying its source and may be shared with other services.
+ZENODO will take all reasonable measures to protect the privacy of its users and to resist service interruptions, intentional attacks, or other events that may compromise the security of the ZENODO website.</dd>
+</dl>
+
+<h4>Preservation of data</h4>
+<dl>
+
+<dt>Retention period</dt>
+<dd>Items will be retained for the lifetime of the repository.</dd>
+
+<dt>Functional preservation</dt>
+<dd>ZENODO makes no promises of usability and understandability of deposited objects over time.</dd>
+
+<dt>File preservation</dt>
+<dd>Data files and metadata is backed up on a nightly basis, as well as replicated in multiple copies in the online system.</dd>
+
+<dt>Fixity and authenticity</dt>
+<dd>All data files are stored along with a MD5 checksum of the file content. Regular checks of files against their checksums are made.</dd>
+</dl>
+
+<h4>Withdrawal of data and succession plans</h4>
+<dl>
+<dd>Content not considered to fall under the scope of the repository will be removed. Content will also be removed in case of copyright violation, legal requirements and proven violations, national security and confidentiality concerns. Items may be removed from public view on request of the depositor, but will not be deleted. In case of removed objects, DOIs and URL for the object is retained. In case of closure of the repository, best efforts will be made to integrate all content into suitable alternative institutional and/or subject based repositories.</dd>
+</dl>
+</div>
+</div>
+
+
+
+
+
 {% endblock %}
