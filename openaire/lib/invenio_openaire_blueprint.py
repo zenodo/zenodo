@@ -41,7 +41,7 @@ blueprint = InvenioBlueprint('invenio_openaire', __name__,
     #('footermenu_right.api', _('API'), 'invenio_openaire.api', 5),
     ('footermenu_bottom.terms', _('Terms of use'), 'invenio_openaire.terms', 1),
     ('footermenu_bottom.privacy_policy', _('Privacy policy'), 'invenio_openaire.privacy_policy', 2),
-    ('footermenu_bottom.support', _('Support/Feedback'), 'invenio_openaire.support', 3),
+    ('footermenu_bottom.support', _('Support/Feedback'), 'invenio_openaire.contact', 3),
     ]
 )
 
