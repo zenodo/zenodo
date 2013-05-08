@@ -126,16 +126,24 @@
   <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
   {% block javascript %}{% endblock javascript %}
   {% if config.CFG_PIWIK_URL %}
+  <!-- Piwik -->
   <script type="text/javascript">
-  var pkBaseURL = (("https:" == document.location.protocol) ? "https://{{config.CFG_PIWIK_URL}}" : "http://{{config.CFG_PIWIK_URL}}");
-  document.write(unescape("%3Cscript src='" + pkBaseURL + "piwik.js' type='text/javascript'%3E%3C/script%3E"));
-  </script><script type="text/javascript">
-  try {
-  var piwikTracker = Piwik.getTracker(pkBaseURL + "piwik.php", {{config.CFG_PIWIK_SITE_ID}});
-  piwikTracker.trackPageView();
-  piwikTracker.enableLinkTracking();
-  } catch( err ) {}
+  var _paq = _paq || [];
+  _paq.push(["setDomains", ["*.zenodo.org","*.zenodo.cern.ch","*.zenodo.eu","*.zenodo.net"]]);
+  _paq.push(["trackPageView"]);
+  _paq.push(["enableLinkTracking"]);
+
+  (function() {
+    var u=(("https:" == document.location.protocol) ? "https" : "http") + "://piwik.web.cern.ch/piwik/";
+    _paq.push(["setTrackerUrl", u+"piwik.php"]);
+    _paq.push(["setSiteId", "57"]);
+    var d=document, g=d.createElement("script"), s=d.getElementsByTagName("script")[0]; g.type="text/javascript";
+    g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
+  })();
   </script>
+<!-- End Piwik Code -->
+  </script>
+<!-- End Piwik Code -->
   {% endif %}
 </body>
 </html>
