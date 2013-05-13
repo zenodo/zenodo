@@ -374,6 +374,7 @@ class DepositionForm(Form):
             ('patent', 'Patent'),
             ('preprint', 'Preprint'),
             ('report', 'Report'),
+            ('softwaredocumentation', 'Software documentation'),
             ('thesis', 'Thesis'),
             ('technicalnote', 'Technical note'),
             ('workingpaper', 'Working paper'),
