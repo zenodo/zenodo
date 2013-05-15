@@ -139,6 +139,7 @@ def CFG_OPENAIRE_PUBTYPE_MAP(ln):
         ('report', 'Report'),
         ('thesis', 'Thesis'),
         ('technicalnote', 'Technical note'),
+        ('softwaredocumentation', 'Software documentation'),
         ('workingpaper', 'Working paper'),
         ('other', 'Other'),
         ('figure', 'Figure'),
