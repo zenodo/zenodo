@@ -1158,7 +1158,7 @@ class OpenAIREPublication(object):
         name = user_info.get(
             "external_fullname", user_info.get("nickname", "")).strip()
         record_add_field(
-            rec, '856', ind1='0', subfields=[('f', email.encode('utf8')), ('y', name.encode('utf8'))])
+            rec, '856', ind1='0', subfields=[('f', email.encode('utf8')), ('y', wash_for_xml(name.encode('utf8')))])
 
         # =================
         # Access right
@@ -1222,7 +1222,7 @@ class OpenAIREPublication(object):
         # FFT-tag (file uploads)
         for key, fulltext in self.fulltexts.items():
             record_add_field(rec, 'FFT', subfields=[
-                ('a', fulltext.fullpath),
+                ('a', fulltext.fullpath.encode('utf8')),
                 #('d', 'some description') # TODO
                 #('t', 'Type'), # TODO
                 ('r', fft_status),
@@ -1236,8 +1236,8 @@ class OpenAIREPublication(object):
             license_info = get_license_description(license)
             subfields = []
             if license_info:
-                subfields.append(('a', license_info['title'].encode('utf8')),)
-                subfields.append(('u', license_info['url'].encode('utf8')),)
+                subfields.append(('a', wash_for_xml(license_info['title'].encode('utf8'))),)
+                subfields.append(('u', wash_for_xml(license_info['url'].encode('utf8'))),)
             else:
                 subfields.append(('a', license,))
             record_add_field(rec, '540', subfields=subfields)
@@ -1245,7 +1245,7 @@ class OpenAIREPublication(object):
             # Add identifier for license
             if license_info:
                 record_add_field(rec, '650', ind1="1", ind2="7", subfields=[
-                    ('a', license),
+                    ('a', wash_for_xml(license)),
                     ('2', 'opendefinition.org'),
                 ])
 
@@ -1265,7 +1265,7 @@ class OpenAIREPublication(object):
 
         # Title
         record_add_field(
-            rec, '245', subfields=[('a', self._metadata['title'])])
+            rec, '245', subfields=[('a', wash_for_xml(self._metadata['title']))])
 
         # Creators
         creators = self._metadata['creators']
@@ -1274,14 +1274,14 @@ class OpenAIREPublication(object):
                 field_no = '100'
             else:
                 field_no = '700'
-            subfields = [('a', name), ]
+            subfields = [('a', wash_for_xml(name)), ]
             if affil:
-                subfields.append(('u', affil))
+                subfields.append(('u', wash_for_xml(affil)))
             record_add_field(rec, field_no, subfields=subfields)
 
         # Description
         record_add_field(
-            rec, '520', subfields=[('a', self._metadata['description'])])
+            rec, '520', subfields=[('a', wash_for_xml(self._metadata['description']))])
 
         # ProjectID
         for projectid in self._metadata['funding_source']:
@@ -1302,12 +1302,12 @@ class OpenAIREPublication(object):
             for keyword in self._metadata['keywords']:
                 if keyword:
                     record_add_field(
-                        rec, '653', ind1="1", subfields=[('a', keyword)])
+                        rec, '653', ind1="1", subfields=[('a', wash_for_xml(keyword))])
 
         # Notes
         if self._metadata.get('notes'):
             record_add_field(
-                rec, '500', subfields=[('a', self._metadata['notes'])])
+                rec, '500', subfields=[('a', wash_for_xml(self._metadata['notes']))])
 
         # =================
         # Related datasets/publications
@@ -1390,9 +1390,9 @@ class OpenAIREPublication(object):
         # Supervisors
         supervisors = self._metadata.get('thesis_supervisors')
         for (name, affil) in supervisors:
-            subfields = [('a', name), ('4', 'ths')]
+            subfields = [('a', wash_for_xml(name)), ('4', 'ths')]
             if affil:
-                subfields.append(('u', affil))
+                subfields.append(('u', wash_for_xml(affil)))
             record_add_field(rec, '700', subfields=subfields)
 
         # University
