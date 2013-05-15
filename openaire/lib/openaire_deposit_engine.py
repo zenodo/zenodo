@@ -772,7 +772,13 @@ class OpenAIREPublication(object):
         reserved_doi = self._metadata.get("__doi__", None)
         if (reserved_doi and reserved_doi == doi):
             pid = PersistentIdentifier.create("doi", doi)
-            pid.assign("rec", self.recid)
+            if pid is None:
+                pid = PersistentIdentifier.get("doi", doi)
+
+            try:
+                pid.assign("rec", self.recid)
+            except Exception:
+                register_exception(alert_admin=True)
 
     def send_emails(self):
         """
