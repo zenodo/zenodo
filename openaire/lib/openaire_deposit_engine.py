@@ -1191,7 +1191,7 @@ class OpenAIREPublication(object):
         # ================
         usercolls = self.get_provisional_user_collections()
         for u in usercolls:
-            record_add_field(rec, '980', subfields=[('a', u), ])
+            record_add_field(rec, '980', subfields=[('a', u.encode('utf8')), ])
 
         # =================
         # Files
