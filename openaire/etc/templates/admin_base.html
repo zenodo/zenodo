@@ -1,0 +1,41 @@
+{% import 'admin/layout.html' as layout with context -%}
+{% extends "page.html" %}
+
+{%- block css -%}{% block head_css %}<link href="{{ url_for('admin.static', filename='css/admin.css') }}" rel="stylesheet">{% endblock %}{%- endblock css -%}
+
+{% block header %}{{ super() }}
+    {% block head_meta %}{% endblock -%}
+    {% block head %}{% endblock -%}
+    {% block head_tail %}{% endblock -%}
+{% endblock header -%}
+
+{% block pagefooteradd -%}{{ super() }}
+    {% block tail %}{% endblock -%}
+{% endblock pagefooteradd -%}
+
+
+
+
+
+
+{% block page_body %}
+<div class="row">
+    <div class="span3">
+        <ul class="nav nav-tabs nav-stacked">
+            {{ layout.menu() }}
+        </ul>
+    </div>
+    <div class="span9">
+        {% if admin_view.name %}<h4>{{admin_view.name}}</h4>{% endif %}
+        {{ layout.messages() }}
+        {% block body %}{% endblock %}
+    </div>
+</dib>
+
+
+
+{% endblock %}
+
+
+
+{% block title %}{% endblock %}

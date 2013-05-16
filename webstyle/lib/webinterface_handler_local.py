@@ -21,7 +21,6 @@ OpenAIRE local customization of Flask application
 """
 
 import time
-
 from invenio.config import CFG_SITE_LANG, CFG_OPENAIRE_MAX_UPLOAD
 from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
@@ -31,6 +30,7 @@ from jinja2.ext import Extension
 from invenio.webuser_flask import current_user
 from invenio.usercollection_model import UserCollection
 from invenio.cache import cache
+from invenio.admin import register_admin
 from invenio.search_engine import search_pattern_parenthesised
 
 JINJA_CACHE_ATTR_NAME = '_template_fragment_cache'
@@ -42,6 +42,9 @@ def customize_app(app):
     from flask import current_app
 
     app.config['MAX_CONTENT_LENGTH'] = CFG_OPENAIRE_MAX_UPLOAD
+
+    # Install Flask Admin
+    register_admin(app)
 
     @app.context_processor
     def local_processor():

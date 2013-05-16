@@ -85,6 +85,7 @@
       {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
 {%- endif -%}
 {%- if not no_pagebody -%}
+      {% block page_body %}
       {% block title %}
       {% if title %}
       <div class="row">
@@ -107,6 +108,7 @@
       </div>
       {% endblock messages %}
       {% block body %}{{ body }}{% endblock body %}
+      {% endblock page_body %}
 {%- endif -%}
 {%- if not no_pagefooter -%}
       <div id="push"></div>
