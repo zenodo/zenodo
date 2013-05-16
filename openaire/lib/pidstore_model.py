@@ -176,8 +176,11 @@ class PersistentIdentifier(db.Model):
         """
         pid = to_unicode(pid)
         obj = cls.query.filter_by(type=pid_type, pid=pid).first()
-        obj._provider = provider
-        return obj
+        if obj:
+            obj._provider = provider
+            return obj
+        else:
+            return None
 
     #
     # Instance methods
