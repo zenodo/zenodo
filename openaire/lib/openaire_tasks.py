@@ -316,7 +316,7 @@ def openaire_upload_notification(recid):
                     'usercollection': c,
                 })
                 content = render_template_to_string("usercollection_new_upload_email.html", **ctx)
-                send_email(CFG_SITE_SUPPORT_EMAIL, c.owner.email, "[%s] New upload to %s" % (CFG_SITE_NAME, c.title), content=content)
-                logger.info("Sent email for new record %s to %s." % (recid, c.owner.email))
+                send_email(CFG_SITE_SUPPORT_EMAIL, c.owner.email.encode('utf8'), "[%s] New upload to %s" % (CFG_SITE_NAME, c.title.encode('utf8')), content=content.encode('utf8'))
+                logger.info("Sent email for new record %s to %s." % (recid, c.owner.email.encode('utf8')))
         except AttributeError:
             pass
