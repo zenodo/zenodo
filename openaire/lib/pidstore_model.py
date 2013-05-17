@@ -257,7 +257,7 @@ class PersistentIdentifier(db.Model):
         if self.is_new() or self.is_reserved():
             raise Exception("Persistent identifier has not yet been registered.")
 
-        if not with_deleted and self.is_deleted:
+        if not with_deleted and self.is_deleted():
             raise Exception("Persistent identifier has been deleted.")
 
         provider = self.get_provider()
