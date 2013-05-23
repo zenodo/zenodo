@@ -263,6 +263,41 @@ def openaire_altmetric_update(recids, upload=True):
 
 
 @celery.task(ignore_result=True, max_retries=6, default_retry_delay=10*60)
+def openaire_update_doi(recid):
+    """
+    Update DOI in DataCite
+
+    If it fails, it will retry every 10 minutes for 1 hour.
+    """
+    doi_val = get_fieldvalues(recid, "0247_a")[0]
+    logger.debug("Found DOI %s in record %s" % (doi_val, recid))
+
+    pid = PersistentIdentifier.get("doi", doi_val)
+    if not pid:
+        logger.debug("DOI not locally managed.")
+        return
+    else:
+        logger.debug("DOI locally managed.")
+
+    if not pid.has_object("rec", recid):
+        raise Exception("DOI %s is not assigned to record %s." % (doi_val, recid))
+
+    if pid.is_registered() or pid.is_deleted():
+        logger.info("Updating DOI %s for record %s" % (doi_val, recid))
+
+        url = "%s/record/%s" % (CFG_DATACITE_SITE_URL, recid)
+        doc = format_record(recid, 'dcite')
+
+        if not pid.update(url=url, doc=doc):
+            m = "Failed to update DOI %s" % doi_val
+            logger.error(m + "\n%s\n%s" % (url, doc))
+            if not openaire_update_doi.request.is_eager:
+                raise openaire_update_doi.retry(exc=Exception(m))
+        else:
+            logger.info("Successfully updated DOI %s." % doi_val)
+
+
+@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10*60)
 def openaire_register_doi(recid):
     """
     Register a DOI for new publication
