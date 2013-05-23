@@ -30,7 +30,7 @@ from invenio.bibformat import format_record
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
 from invenio.celery import celery
-from invenio.config import CFG_TMPDIR, CFG_DATACITE_SITE_URL, \
+from invenio.config import CFG_TMPSHAREDDIR, CFG_DATACITE_SITE_URL, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
 from invenio.mailutils import send_email
 from invenio.dbquery import run_sql
@@ -67,7 +67,7 @@ def open_temp_file(prefix):
     """
     # Prepare to save results in a tmp file
     (fd, filename) = mkstemp(
-        dir=CFG_TMPDIR,
+        dir=CFG_TMPSHAREDDIR,
         prefix='prefix_' + time.strftime("%Y%m%d_%H%M%S_", time.localtime())
     )
     file_out = os.fdopen(fd, "w")
