@@ -1157,8 +1157,12 @@ class OpenAIREPublication(object):
             email = get_email(self.uid)
         name = user_info.get(
             "external_fullname", user_info.get("nickname", "")).strip()
+        if isinstance(email, unicode):
+            email = email.encode('utf8')
+        if isinstance(name, unicode):
+            name = name.encode('utf8')
         record_add_field(
-            rec, '856', ind1='0', subfields=[('f', email.encode('utf8')), ('y', wash_for_xml(name.encode('utf8')))])
+            rec, '856', ind1='0', subfields=[('f', email), ('y', wash_for_xml(name))])
 
         # =================
         # Access right
