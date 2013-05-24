@@ -56,12 +56,6 @@ def features():
     return render_template('openaire_features.html')
 
 
-@blueprint.route('/signup', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Sign up"))
-def signup():
-    return render_template('openaire_signup.html')
-
-
 @blueprint.route('/use-data', methods=['GET', ])
 @blueprint.invenio_set_breadcrumb(_("Use data"))
 def use_data():
