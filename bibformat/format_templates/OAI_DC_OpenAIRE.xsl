@@ -103,19 +103,6 @@
         </dc:identifier>
       </xsl:if>
     </xsl:for-each>
-
-<!--    <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
-      <dc:identifier>
-        <xsl:value-of select="subfield[@code='u']"/>
-      </dc:identifier>
-    </xsl:for-each>
-    <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
-      <xsl:if test="subfield[@code='q']">
-        <dc:format>
-            <xsl:value-of select="subfield[@code='q']"/>
-        </dc:format>
-      </xsl:if>
-    </xsl:for-each>-->
     <xsl:for-each select="datafield[@tag=520]">
       <dc:description>
         <xsl:value-of select="subfield[@code='a']"/>
@@ -133,15 +120,13 @@
     </xsl:for-each>
     <xsl:for-each select="datafield[@tag=542]">
       <dc:rights>
-        info:eu-repo/semantics/<xsl:value-of select="subfield[@code='l']"/>
+        info:eu-repo/semantics/<xsl:value-of select="subfield[@code='l']"/>Access
       </dc:rights>
     </xsl:for-each>
-    <dc:audience>
-      Education Level
-    </dc:audience>
     <dc:type>
       info:eu-repo/semantics/article
     </dc:type>
+    <!--
     <xsl:if test="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_EMAIL />&quot;)">
       <dc:contributor>
         <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_EMAIL />&quot;)" />
@@ -152,5 +137,6 @@
         <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001], &quot;&lt;BFE_OPENAIRE_USER_FULLNAME />&quot;)" />
       </dc:contributor>
     </xsl:if>
+    -->
   </xsl:template>
 </xsl:stylesheet>
