@@ -56,7 +56,7 @@ class PidProvider(object):
         PidProvider.register_provider(MyProvider)
 
 
-    The provider is responsible for hanlding of errors, as well as logging of
+    The provider is responsible for handling of errors, as well as logging of
     actions happening to the pid. See example above as well as the
     DataCitePidProvider.
 
@@ -132,6 +132,29 @@ class PidProvider(object):
     @classmethod
     def is_provider_for_pid(cls, pid_str):
         raise NotImplementedError
+
+
+class LocalPidProvider(PidProvider):
+    """
+    Abstract class for local persistent identifier provides (i.e locally
+    unmanaged DOIs).
+    """
+    def reserve(self, pid, *args, **kwargs):
+        pid.log("RESERVE", "Successfully reserved locally")
+        return True
+
+    def register(self, pid, *args, **kwargs):
+        pid.log("REGISTER", "Successfully registered in locally")
+        return True
+
+    def update(self, pid, *args, **kwargs):
+        # No logging necessary as status of PID is not changing
+        return True
+
+    def delete(self, pid, *args, **kwargs):
+        """ Delete a registered DOI """
+        pid.log("DELETE", "Successfully deleted locally")
+        return True
 
 
 #
@@ -250,5 +273,21 @@ class DataCitePidProvider(PidProvider):
         """
         return pid_str.startswith("%s/" % CFG_DATACITE_DOI_PREFIX)
 
+
+class LocalDOIProvider(LocalPidProvider):
+    """
+    Provider for locally unmanaged DOIs.
+    """
+    pid_type = 'doi'
+
+    @classmethod
+    def is_provider_for_pid(cls, pid_str):
+        """
+        Check if DOI is not the local datacite managed one.
+        """
+        return not pid_str.startswith("%s/" % CFG_DATACITE_DOI_PREFIX)
+
+
 # Register the DataCite DOI provider
 PidProvider.register_provider(DataCitePidProvider)
+PidProvider.register_provider(LocalDOIProvider)

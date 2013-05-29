@@ -83,6 +83,7 @@ CFG_STATUS_RESERVED = 'K'
 """ The pid has been reserved in the service provider but not yet fully
 registered. """
 
+
 #
 # Utility method
 #
@@ -103,12 +104,15 @@ class PersistentIdentifier(db.Model):
 
     Assumptions:
       * Persistent identifiers can be represented as a string of max 255 chars.
+      * An object has many persistent identifiers.
+      * A persistent identifier has one and only one object.
     """
 
     __tablename__ = 'pid'
     __table_args__ = (
         db.Index('uidx_type_pid', 'type', 'pid', unique=True),
         db.Index('idx_status', 'status'),
+        db.Index('', 'object_type', 'object_id'),
     )
 
     id = db.Column(db.Integer(15, unsigned=True), primary_key=True)
@@ -122,6 +126,12 @@ class PersistentIdentifier(db.Model):
 
     status = db.Column(db.Char(length=1), nullable=False)
     """ Status of persistent identifier, e.g. registered, reserved, deleted """
+
+    object_type = db.Column(db.String(3), nullable=True)
+    """ Object Type - e.g. rec for record """
+
+    object_id = db.Column(db.String(length=255), nullable=True)
+    """ Object ID - e.g. a record id """
 
     created = db.Column(db.DateTime(), nullable=False, default=datetime.now)
     """ Creation datetime of entry """
@@ -138,7 +148,7 @@ class PersistentIdentifier(db.Model):
     @classmethod
     def create(cls, pid_type, pid, provider=None):
         """
-        Internally reserve a new persistent identifier internally in Invenio.
+        Internally reserve a new persistent identifier in Invenio.
 
         A provider for the given persistent identifier type must exists. By
         default the system will choose a provider according to the pid
@@ -195,11 +205,7 @@ class PersistentIdentifier(db.Model):
 
         object_id = to_unicode(object_id)
 
-        return PidRegistry.query.filter_by(
-            object_type=object_type,
-            object_id=object_id,
-            id_pid=self.id,
-        ).first() is not None
+        return self.object_type == object_type and self.object_id == object_id
 
     def get_provider(self):
         """
@@ -229,27 +235,26 @@ class PersistentIdentifier(db.Model):
             raise Exception("You cannot assign objects to a deleted persistent identifier.")
 
         # Check for an existing object assigned to this pid
-        existing_obj = self.get_assigned_object(object_type)
+        existing_obj_id = self.get_assigned_object(object_type)
 
-        if existing_obj and existing_obj.object_id != object_id:
+        if existing_obj_id and existing_obj_id != object_id:
             if not overwrite:
-                raise Exception("Persistent identifier is already assigned to another object of type %s" % object_type)
+                raise Exception("Persistent identifier is already assigned to another object")
             else:
-                db.session.delete(existing_obj)
                 self.log("ASSIGN", "Unassigned object %s:%s (overwrite requested)" % (
-                    existing_obj.object_type, existing_obj.object_id)
+                    self.object_type, self.object_id)
                 )
-        elif existing_obj and existing_obj.object_id == object_id:
+                self.object_type = None
+                self.object_id = None
+        elif existing_obj_id and existing_obj_id == object_id:
             # The object is already assigned to this pid.
             return True
 
-        obj = PidRegistry(
-            object_type=object_type, object_id=object_id, id_pid=self.id
-        )
-        db.session.add(obj)
+        self.object_type = object_type
+        self.object_id = object_id
         db.session.commit()
-        self.log("ASSIGN", "Assigned object %s:%s" % (obj.object_type,
-                                                      obj.object_id))
+        self.log("ASSIGN", "Assigned object %s:%s" % (self.object_type,
+                                                      self.object_id))
         return True
 
     def update(self, with_deleted=False, *args, **kwargs):
@@ -276,7 +281,7 @@ class PersistentIdentifier(db.Model):
         """
         Reserve the persistent identifier with the provider
 
-        Note, a reserve method may be called multiple times, even if it was
+        Note, the reserve method may be called multiple times, even if it was
         already reserved.
         """
         if not (self.is_new() or self.is_reserved()):
@@ -319,7 +324,6 @@ class PersistentIdentifier(db.Model):
             # New DOI which haven't been registered yet. Just delete it
             # completely but keep log)
             # Remove links to log entries (but otherwise leave the log entries)
-            PidRegistry.query.filter_by(id_pid=self.id).delete()
             PidLog.query.filter_by(id_pid=self.id).update({'id_pid': None})
             db.session.delete(self)
             self.log("DELETE", "Unregistered PID successfully deleted")
@@ -331,10 +335,10 @@ class PersistentIdentifier(db.Model):
             db.session.commit()
         return True
 
-    def get_assigned_object(self, object_type):
-        return PidRegistry.query.filter_by(
-            object_type=object_type, id_pid=self.id
-        ).first()
+    def get_assigned_object(self, object_type=None):
+        if object_type is not None and self.object_type == object_type:
+            return self.object_id
+        return None
 
     def is_registered(self):
         """ Returns true if the persistent identifier has been registered """
@@ -364,49 +368,6 @@ class PersistentIdentifier(db.Model):
         p = PidLog(id_pid=self.id, action=action, message=message)
         db.session.add(p)
         db.session.commit()
-
-
-class PidRegistry(db.Model):
-    """
-    Registry of objects assigned to persistent identifiers.
-
-    Assumptions:
-    * An object has many persistent identifiers (even from the same pid type).
-    * A persistent identifier has one and only one object from the same
-      object type.
-
-    Questions:
-    * Now that an object has several different PIDs, do we need a preferred
-      pid?
-    """
-    __tablename__ = 'pidREGISTRY'
-    __table_args__ = (
-        db.Index('idx_type_id', 'object_type', 'object_id'),
-    )
-
-    #
-    # Fields
-    #
-    object_type = db.Column(db.String(3), nullable=False, primary_key=True)
-    """ Object Type - e.g. record """
-
-    object_id = db.Column(db.String(length=255), nullable=False)
-    """ Object ID - e.g. record id """
-
-    id_pid = db.Column(
-        db.Integer(15, unsigned=True), db.ForeignKey(PersistentIdentifier.id),
-        nullable=False, primary_key=True
-    )
-    """ Persistent Identifier """
-
-    #
-    # Relationships
-    #
-    pid = db.relationship(
-        PersistentIdentifier, backref='objects',
-        foreign_keys=[id_pid]
-    )
-    """ Relation to the owner (User) of the collection """
 
 
 class PidLog(db.Model):
