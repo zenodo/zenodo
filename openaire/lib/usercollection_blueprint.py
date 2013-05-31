@@ -62,7 +62,7 @@ def index():
     ctx = mycollections_ctx(uid)
     ctx.update({
         'title': _('Community Collections'),
-        'usercollections': UserCollection.query.order_by(UserCollection.title).all(),
+        'usercollections': UserCollection.query.filter(UserCollection.title != 'ZENODO').order_by(UserCollection.title).all(),
     })
 
     return render_template(
