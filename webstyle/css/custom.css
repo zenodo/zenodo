@@ -154,6 +154,10 @@ header .container .open .btn.dropdown-toggle {
   text-decoration: none;
 }
 
+.pager li > a.btn-info:hover {
+    background-color: #1f6377;
+}
+
 /*
 ----------------------- Stick footer ----------------------- */
 html,
