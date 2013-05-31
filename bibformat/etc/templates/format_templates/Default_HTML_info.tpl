@@ -22,7 +22,7 @@
     {{ bfe_openaire_license(bfo, prefix='<dt>License (for files):</dt><dd>', suffix='</dd>') }}
     {% if bfo.field('8560_y') %}
     <dt>Uploaded by:</dt>
-    <dd><a href="{{ url_for('yourmessages.write', sent_to_user_nicks=bfo.field('8560_y')) }}">{{bfo.field('8560_y')}}</a> (on {{ bfe_creation_date(bfo, date_format="%d %M %Y") }})</dd>
+    <dd><a href="{{ url_for('yourmessages.write', sent_to_user_nicks=bfo.field('8560_y')) }}">{{bfo.field('8560_y').decode('utf8')}}</a> (on {{ bfe_creation_date(bfo, date_format="%d %M %Y") }})</dd>
     {% else %}
     <dt>Uploaded on:</dt>
     <dd>{{ bfe_creation_date(bfo, date_format="%d %M %Y") }}</dd>
