@@ -22,7 +22,6 @@ from invenio.messages import gettext_set_language
 
 def format_element(bfo, title='Related DOIs', type=None):
     ln = bfo.lang
-    _ = gettext_set_language(ln)
 
     related_dois = bfo.fields('773__')
     related_doi_str = []
@@ -42,10 +41,7 @@ def format_element(bfo, title='Related DOIs', type=None):
 
     related_doi_str = ", ".join(["<a href=\"http://dx.doi.org/%(doi)s\">%(doi)s</a>" % {'doi': x} for x in related_doi_str])
 
-    return "%(x_fmt_s)s%(title)s%(x_fmt_e)s: %(related_doi_str)s" % {
-        'x_fmt_s': "<strong>",
-        'x_fmt_e': "</strong>",
-        'title': _(title),
+    return "%(related_doi_str)s" % {
         'related_doi_str': related_doi_str,
     }
 

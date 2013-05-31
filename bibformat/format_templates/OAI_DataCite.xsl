@@ -186,6 +186,13 @@ exclude-result-prefixes="marc fn dc invenio">
             </xsl:for-each>
         </alternateIdentifiers>
         <!-- 12 RelatedIdentifier -->
+        <xsl:if test="datafield[@tag=773]">
+            <relatedIdentifiers>
+                <xsl:for-each select="datafield[@tag=773]">
+                    <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType">"<xsl:value-of select="subfield[@code='n']"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
+                </xsl:for-each>
+            </relatedIdentifiers>
+        </xsl:if>
         <!-- 13 Size -->
         <xsl:if test="datafield[@tag=300]">
             <sizes>
@@ -197,9 +204,26 @@ exclude-result-prefixes="marc fn dc invenio">
         <!-- 14 Format -->
         <!-- 15 Version -->
         <!-- 16 Rights -->
-        <xsl:for-each select="datafield[@tag=542]">
-            <rights>info:eu-repo/semantics/<xsl:value-of select="subfield[@code='l']"/>Access</rights>
-        </xsl:for-each>
+        <xsl:variable name="license" select="datafield[@tag=650 and @ind1=1 and @ind2=7]/subfield[@code='a']" />
+        <xsl:choose>
+            <xsl:when test="$license='cc-zero'">
+                <rights>http://creativecommons.org/publicdomain/zero/1.0/</rights>
+            </xsl:when>
+            <xsl:when test="$license='cc-by'">
+                <rights>http://creativecommons.org/licenses/by/3.0/</rights>
+            </xsl:when>
+            <xsl:when test="$license='cc-by-sa'">
+                <rights>http://creativecommons.org/licenses/by-sa/3.0/</rights>
+            </xsl:when>
+            <xsl:when test="$license='cc-nc'">
+                <rights>http://creativecommons.org/licenses/by-nc/3.0/</rights>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:if test="datafield[@tag=542]">
+                    <rights>info:eu-repo/semantics/<xsl:value-of select="datafield[@tag=542]/subfield[@code='l']"/>Access</rights>
+                </xsl:if>
+            </xsl:otherwise>
+        </xsl:choose>
         <!-- 17 Description -->
         <descriptions>
             <xsl:for-each select="datafield[@tag=520]">

@@ -179,6 +179,13 @@ exclude-result-prefixes="marc fn dc invenio">
             </xsl:for-each>
         </alternateIdentifiers>
         <!-- 12 RelatedIdentifier -->
+        <xsl:if test="datafield[@tag=773]">
+            <relatedIdentifiers>
+                <xsl:for-each select="datafield[@tag=773]">
+                    <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType">"<xsl:value-of select="subfield[@code='n']"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
+                </xsl:for-each>
+            </relatedIdentifiers>
+        </xsl:if>
         <!-- 13 Size -->
         <xsl:if test="datafield[@tag=300]">
             <sizes>
