@@ -6,7 +6,7 @@
     <div class="media-body">
         {%- set ucoll_id = collection|usercollection_id %}
         {{ curation_buttons(bfo, ucoll_id) }}
-        <span class="label label-info" data-toggle="tooltip" title="Upload date">{{ bfe_creation_date(bfo, date_format="%d %M %Y") }}</span>
+        <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ bfe_date(bfo, date_format='%d %B %Y') }}</span>
         {{ bfe_openaire_pubtype(bfo, as_label="1") }}
         {{ bfe_openaire_access_rights(bfo, as_label="1") }}
         <br/>
