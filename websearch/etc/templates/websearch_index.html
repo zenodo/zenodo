@@ -67,7 +67,7 @@
         {% for recid in reclist %}
           <div class="row">
             <div class="span8 record-list-elem">
-                <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}">{{ _('View')}}</a></li></ul>
+                <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>
                 {{ format_record(recid, 'hb', ln=g.ln)|safe }}
                 {% if not loop.last %}<hr />{% endif %}
             </div>
@@ -77,7 +77,7 @@
         <div class="row">
             <div class="span8">
                 <ul class="pager">
-                <li><a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}">{{ _('View all')}}  &rarr;</a></li>
+                <li><a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}" class="btn btn-info">{{ _('View all')}}  &rarr;</a></li>
                 </ul>
             </div>
         </div>

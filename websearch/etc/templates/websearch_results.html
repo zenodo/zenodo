@@ -169,6 +169,7 @@
                 </label>
               </div>
               <div class="span11">
+                <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>
                 {{ format_record(recid, of, ln=g.ln)|safe }}
                 {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
               </div>
