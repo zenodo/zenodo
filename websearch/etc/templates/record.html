@@ -20,6 +20,11 @@
 
 {% block title %}{% endblock title %}
 
+{% block header %}
+{{ super() }}
+{{ format_record(recid, of='hdm', ln=g.ln)|safe }}
+{% endblock header -%}
+
 {% block body %}
 {% set formattedrecord = format_record(recid, of='hd', ln=g.ln)|safe %}
 <div class="row">
