@@ -18,9 +18,11 @@
 {{- bfe_meta(bfo, tag="088__a", name="citation_technical_report_number") -}}
 {{- bfe_meta(bfo, tag="020%_a", name="citation_isbn") -}}
 {{- bfe_meta(bfo, tag="502__c", name="citation_dissertation_institution") -}}
+<meta content="{{ bfe_record_url(bfo, with_ln='no', absolute='yes') }}" name="citation_abstract_html_url" />
 {%- if files -%}
 {%- for file in files -%}
 <link rel="alternate" type="{{file.mime}}" href="{{file.get_url()}}">
+{%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url()}}" name="citation_pdf_url" />{%- endif -%}
 {%- endfor -%}
 {%- endif -%}
 {{- bfe_meta(bfo, tag="245__a", tag_name="title", name="og:title", protocol="opengraph") -}}
