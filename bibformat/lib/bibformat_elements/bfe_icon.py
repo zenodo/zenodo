@@ -31,7 +31,7 @@ template_icon = Template("""
 # prefix="<br>" / -->
 
 
-def format_element(bfo, template='record_hb.html', subformat_re='icon.*', **kwargs):
+def format_element(bfo, template='record_hb.html', subformat_re='icon.*', as_url=False, **kwargs):
     bibarchive = BibRecDocs(bfo.recID)
     docs = bibarchive.list_bibdocs()
     if len(docs) > 0:
@@ -43,12 +43,15 @@ def format_element(bfo, template='record_hb.html', subformat_re='icon.*', **kwar
                 return ""
 
         else:
-            ctx = {
-                'icon': icon,
-                'bfo': bfo,
-                'CFG_SITE_URL': CFG_SITE_URL,
-            }
-            return template_icon.render(**ctx)
+            if as_url:
+                return icon.get_url()
+            else:
+                ctx = {
+                    'icon': icon,
+                    'bfo': bfo,
+                    'CFG_SITE_URL': CFG_SITE_URL,
+                }
+                return template_icon.render(**ctx)
 
 
 def escape_values(bfo):

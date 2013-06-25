@@ -25,10 +25,11 @@
 {%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url()}}" name="citation_pdf_url" />{%- endif -%}
 {%- endfor -%}
 {%- endif -%}
+{%- set icon_url = bfe_icon(bfo, subformat_re='icon-90', as_url=True) -%}
+<meta name="twitter:card" content="summary">
+<meta name="twitter:site" content="@zenodo_org">
 {{- bfe_meta(bfo, tag="245__a", tag_name="title", name="og:title", protocol="opengraph") -}}
-{{- bfe_meta(bfo, tag="980__a", tag_name="collection", name="og:type", kb="DBCOLLID2OPENGRAPHTYPE", kb_default_output="website", protocol="opengraph") -}}
-{{- bfe_meta(bfo, var="recurl", name="og:url", protocol="opengraph") -}}
-{{- bfe_meta_opengraph_video(bfo, ) -}}
-{{- bfe_meta_opengraph_image(bfo, ) -}}
-{{- bfe_meta(bfo, var="CFG_SITE_NAME", name="og:site_name", protocol="opengraph") -}}
 {{- bfe_meta(bfo, tag="520__a", tag_name="abstract", name="og:description", protocol="opengraph") -}}
+{{- bfe_meta(bfo, var="recurl", name="og:url", protocol="opengraph") -}}
+{% if icon_url %}<meta name="og:image" content="{{icon_url}}"{% endif %}>
+{{- bfe_meta(bfo, var="CFG_SITE_NAME", name="og:site_name", protocol="opengraph") -}}
