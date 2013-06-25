@@ -89,6 +89,9 @@ AC_CONFIG_FILES([config.nice  \
      Makefile \
      bibedit/Makefile \
      bibedit/etc/Makefile \
+     bibexport/Makefile \
+     bibexport/etc/Makefile \
+     bibexport/web/Makefile \
      bibformat/Makefile \
      bibformat/lib/Makefile \
      bibformat/etc/Makefile \
@@ -129,7 +132,6 @@ AC_CONFIG_FILES([config.nice  \
      webstyle/font/Makefile \
      webstyle/img/Makefile \
      webstyle/flash/Makefile \
-     webstyle/www/Makefile \
      webstyle/etc/Makefile \
      webstyle/etc/templates/Makefile \
      ])
