@@ -62,7 +62,7 @@
   {% endfor -%}
   {% block header %}{{ metaheaderadd|safe }}{% endblock header -%}
 </head>
-<body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}">
+<body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}" itemscope itemtype="http://schema.org/WebPage">
 {%- if config.CFG_SITE_TAG %}<div class="img-rounded" align="center" style="color: #ffffff; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5); position: absolute; top:20px; left: 20px; background-color: #faa732; width: 100px;"><h5>{{config.CFG_SITE_TAG}}</h5></div>{% endif -%}
   <div id="wrap">
     {% block headerbox %}{% include 'header.html' %}{% endblock headerbox %}
@@ -70,7 +70,7 @@
       {% block breadcrumb %}{% if breadcrumbs|length > 1 %}
       <div class="row">
         <div class="span12">
-          <ul class="breadcrumb">
+          <ul class="breadcrumb" itemprop="breadcrumb">
             {% for breadcrumb in breadcrumbs %}{% if loop.last %}
             <li class="active">{{ breadcrumb[0] }}</li>
             {% else %}

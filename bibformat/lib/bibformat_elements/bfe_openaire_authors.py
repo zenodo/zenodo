@@ -77,21 +77,21 @@ def format_element(bfo, limit, separator=' ; ',
 
             if print_links.lower() == "yes":
                 if link_author_pages == "no":
-                    author['a'] = '<span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a href="' + CFG_SITE_URL + \
+                    author['a'] = '<a itemprop="creator" href="' + CFG_SITE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                   '&amp;ln=' + bfo.lang + \
-                                  '" >' + escape(author['a']) + '</a></span></span>'
+                                  '" ><span itemscope itemtype="http://schema.org/Person"><span itemprop="name">' + escape(author['a']) + '</span></span></a>'
                 else:
-                    author['a'] = '<span itemprop="creator" itemscope itemtype="http://schema.org/Person"><span itemprop="name"><a rel="author" href="' + CFG_SITE_URL + \
+                    author['a'] = '<a itemprop="creator" rel="author" href="' + CFG_SITE_URL + \
                                   '/author/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
                                   '&ln=' + bfo.lang + \
-                                  '">' + escape(author['a']) + '</a></span></span>'
+                                  '">' + escape(author['a']) + '</a>'
 
         if author.has_key('u'):
             if print_affiliations == "yes":
-                author['u'] = affiliation_prefix + author['u'] + \
-                              affiliation_suffix
+                author['u'] = affiliation_prefix + '<span itemprop="affiliation">' + author['u'] + \
+                              '<span>' + affiliation_suffix
 
     # Flatten author instances
     if print_affiliations == 'yes':

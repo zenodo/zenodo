@@ -27,7 +27,7 @@
 
 {% block body %}
 {% set formattedrecord = format_record(recid, of='hd', ln=g.ln)|safe %}
-<div class="row">
+<div class="row" itemscope itemtype="{{recid|schemaorg_type()}}">
   {%- if formattedrecord %}
   <div class="span8">
     {{formattedrecord}}

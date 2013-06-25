@@ -150,6 +150,34 @@ def CFG_OPENAIRE_PUBTYPE_MAP(ln):
         ('other', 'Other'),
     ]
 
+
+CFG_OPENAIRE_SCHEMAORG_MAP = dict([
+    ('publication', 'http://schema.org/ScholarlyArticle'),
+    ('poster', 'http://schema.org/CreativeWork'),
+    ('presentation', 'http://schema.org/CreativeWork'),
+    ('dataset', 'http://schema.org/Dataset'),
+    ('image', 'http://schema.org/ImageObject'),
+    ('video', 'http://schema.org/VideoObject'),
+    ('book', 'http://schema.org/Book'),
+    ('section', 'http://schema.org/ScholarlyArticle'),
+    ('conferencepaper', 'http://schema.org/ScholarlyArticle'),
+    ('article', 'http://schema.org/ScholarlyArticle'),
+    ('patent', 'http://schema.org/CreativeWork'),
+    ('preprint', 'http://schema.org/ScholarlyArticle'),
+    ('report', 'http://schema.org/ScholarlyArticle'),
+    ('thesis', 'http://schema.org/ScholarlyArticle'),
+    ('technicalnote', 'http://schema.org/ScholarlyArticle'),
+    ('softwaredocumentation', 'http://schema.org/'),
+    ('workingpaper', 'http://schema.org/ScholarlyArticle'),
+    ('other', 'http://schema.org/CreativeWork'),
+    ('figure', 'http://schema.org/CreativeWork'),
+    ('plot', 'http://schema.org/CreativeWork'),
+    ('drawing', 'http://schema.org/CreativeWork'),
+    ('diagram', 'http://schema.org/CreativeWork'),
+    ('photo', 'http://schema.org/Photograph'),
+    ('other', 'http://schema.org/CreativeWork'),
+])
+
 # ===============
 # Metadata fields
 # ===============

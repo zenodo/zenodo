@@ -183,6 +183,25 @@ def customize_app(app):
     webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache)
     after_save_collection.connect(invalidate_jinja2_cache)
 
+    @app.template_filter('schemaorg_type')
+    def schemaorg_type(recid=None, bfo=None):
+        if recid:
+            from invenio.bibformat_engine import BibFormatObject
+            bfo = BibFormatObject(recid)
+
+        if bfo:
+            from invenio.openaire_deposit_config import CFG_OPENAIRE_SCHEMAORG_MAP
+            collections = bfo.fields('980__')
+            for c in collections:
+                a = c.get('a', None)
+                b = c.get('b', None)
+                res = CFG_OPENAIRE_SCHEMAORG_MAP.get(b if b else a, None)
+                if res:
+                    return res
+        return 'http://schema.org/CreativeWork'
+
+
+
 
 def parse_filesize(s):
     """
