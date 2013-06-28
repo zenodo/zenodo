@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextAreaField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_field import WebDepositField
 from wtforms.compat import text_type
 from wtforms.validators import Regexp, ValidationError
 from invenio.textutils import wash_for_xml
@@ -46,7 +46,7 @@ def doi_list_validator(form, field):
             raise ValidationError("The provided DOI is invalid - it should look similar to '10.1234/foo.bar'.")
 
 
-class RelatedIdentifiersField(TextAreaField):
+class RelatedIdentifiersField(WebDepositField(key=None), TextAreaField):
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-barcode"></i>'
         kwargs['validators'] = [doi_list_validator]

@@ -18,7 +18,7 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import TextAreaField
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_field import WebDepositField
 from invenio.openaire_deposit_engine import get_favourite_keywords_for_user
 from invenio.webuser_flask import current_user
 from wtforms.compat import text_type
@@ -33,7 +33,7 @@ def _kb_transform(val):
     return ret
 
 
-class KeywordsField(TextAreaField, JsonCookerMixinBuilder('keywords')):
+class KeywordsField(WebDepositField(key=None), TextAreaField):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-tags"></i>'

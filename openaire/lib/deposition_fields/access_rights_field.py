@@ -20,6 +20,7 @@
 from wtforms import RadioField
 from wtforms.validators import Required
 from wtforms.widgets import RadioInput, HTMLString
+from invenio.webdeposit_field import WebDepositField
 
 __all__ = ['AccessRightField']
 
@@ -36,6 +37,8 @@ ACCESS_RIGHTS_ICONS = {
     'embargoed': 'icon-warning-sign',
     'restricted': 'icon-ban-circle',
 }
+
+
 
 
 class InlineListWidget(object):
@@ -89,7 +92,7 @@ class IconRadioInput(RadioInput):
         return html
 
 
-class AccessRightField(RadioField):
+class AccessRightField(WebDepositField(key=None), RadioField):
     widget = InlineListWidget(prefix_label=False, inline=False)
     option_widget = IconRadioInput(icons=ACCESS_RIGHTS_ICONS)
 

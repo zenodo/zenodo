@@ -20,7 +20,7 @@
 from wtforms import TextField
 from wtforms.validators import Required
 from invenio.bibknowledge import get_kb_mappings
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_field import WebDepositField
 
 __all__ = ['JournalField']
 
@@ -31,8 +31,8 @@ def _kb_transform(val):
     ret['label'] = val['key']
     return ret
 
-'validators'
-class JournalField(TextField, JsonCookerMixinBuilder('journal')):
+
+class JournalField(WebDepositField(key=None), TextField):
 
     def __init__(self, **kwargs):
         self._icon_html = ''

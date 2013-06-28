@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from wtforms.validators import Required, ValidationError
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_field import WebDepositField
 from invenio.bibknowledge import get_kb_mappings, get_kb_mapping
 import json
 
@@ -44,7 +44,7 @@ def kb_list_validator(kb_name):
     return _inner
 
 
-class FundingField(TextField, JsonCookerMixinBuilder('journal')):
+class FundingField(WebDepositField(key=None), TextField):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-money"></i>'

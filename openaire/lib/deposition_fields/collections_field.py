@@ -19,7 +19,7 @@
 
 from wtforms import TextField
 from wtforms.validators import Required, ValidationError
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_field import WebDepositField
 import json
 from invenio.usercollection_model import UserCollection
 
@@ -46,7 +46,7 @@ def _list_validator():
     return _inner
 
 
-class CollectionsField(TextField, JsonCookerMixinBuilder('collections')):
+class CollectionsField(WebDepositField(key=None), TextField):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-th-list"></i>'

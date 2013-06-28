@@ -19,7 +19,7 @@
 
 from wtforms import SelectField
 from wtforms.validators import Required
-from invenio.webdeposit_workflow_utils import JsonCookerMixinBuilder
+from invenio.webdeposit_field import WebDepositField
 from invenio.bibknowledge import get_kb_mappings
 import json
 
@@ -44,7 +44,7 @@ def _kb_license_choices(domain_data=True, domain_content=True, domain_software=T
     return filter(lambda x: x is not None, map(_mapper, get_kb_mappings('licenses', '', '')))
 
 
-class LicenseField(SelectField, JsonCookerMixinBuilder('journal')):
+class LicenseField(WebDepositField(key=None), SelectField):
 
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-certificate"></i>'
