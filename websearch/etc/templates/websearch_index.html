@@ -1,5 +1,5 @@
 {% from "_formhelpers.html" import render_filter_form with context %}
-{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form  with context %}
+{% from "websearch_helpers.html" import collection_tree, portalbox_sidebar, search_also, search_form, search_form_javascript  with context %}
 {% extends "page.html" %}
 
 {% set title = None %}
@@ -67,8 +67,8 @@
         {% for recid in reclist %}
           <div class="row">
             <div class="span8 record-list-elem">
-                <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>
-                {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+                <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>
+                {{ format_record(recid, 'hb', ln=g.ln, brief_links=False)|safe }}
                 {% if not loop.last %}<hr />{% endif %}
             </div>
           </div>
@@ -157,19 +157,15 @@
 #}
 {% endmacro %}
 
-
-
 {% block body %}
   {%- if collection.is_restricted %}
     {{ collection_records(collection) }}
   {%- else %}
-    {%- zenodocache 24*60*60, collection.name, g.ln %}
+    {%- cache 24*60*60, collection.name, g.ln %}
     {{ collection_records(collection) }}
     {%- endcache %}
   {%- endif %}
 {% endblock %}
-
-
 
 {% block javascript %}
 <script>
@@ -177,5 +173,5 @@
     $('[rel=tooltip]').tooltip();
 })(jQuery);
 </script>
-<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+{{ search_form_javascript(collection)}}
 {% endblock javascript %}

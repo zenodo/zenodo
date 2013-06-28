@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -17,12 +17,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% macro record_brief_links(recID, i) %}
-  {%- set rinfo = RecordInfo(recID) -%}
+{% macro record_brief_links(record) %}
   <p>
-    {%- set similar = "recid:%d" % recID -%}
+    {%- set recID = record['recid'] -%}
+    {%- set i = recID %}
+    {%- set similar = "recid:%s" % recID -%}
     {%- if config.CFG_WEBSEARCH_USE_ALEPH_SYSNOS -%}
-      {%- set alephsysnos = rinfo.get_fieldvalues("970__a") -%}
+      {%- set alephsysnos = record['system_number'] -%}
       {%- if len(alephsysnos) > 0 -%}
         {%- set recID = alephsysnos[0] -%}
         {%- set similar = "sysno:%d" % recID -%}
@@ -33,7 +34,7 @@
 
   {# Citations link #}
   {%- if config.CFG_BIBRANK_SHOW_CITATION_LINKS -%}
-    {%- set num_citations = rinfo.get_cited_by_count() -%}
+    {%- set num_citations = record['_cited_by_count'] -%}
     {%- if num_citations -%}
      -
     <a href="{{ url_for('.search', p="refersto:recid:%d" % recID) }}"
@@ -46,7 +47,7 @@
 
   {# Comments link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_COMMENTS and config.CFG_WEBSEARCH_SHOW_COMMENT_COUNT -%}
-    {%- set num_comments = rinfo.get_nb_comments() -%}
+    {%- set num_comments = record['_number_of_comments'] -%}
     {%- if num_comments -%}
      -
     <a href="{{ url_for('webcomment.comments', recid=recID) }}"
@@ -60,7 +61,7 @@
 
   {# Reviews link #}
   {%- if config.CFG_WEBCOMMENT_ALLOW_REVIEWS and config.CFG_WEBSEARCH_SHOW_REVIEW_COUNT -%}
-    {%- set num_reviews = rinfo.get_nb_reviews() -%}
+    {%- set num_reviews = record['_number_of_reviews'] -%}
     {%- if num_reviews -%}
      -
     <a href="{{ url_for('webcomment.reviews', recid=recID) }}">
@@ -69,12 +70,7 @@
     </a>
     {%- endif -%}
   {%- endif -%}
-
-
   </p>
-
-
-
 {% endmacro %}
 
 
@@ -106,7 +102,7 @@
 {% macro portalbox_sidebar(portalboxes, width=2) %}
   {% if portalboxes %}
     {% for cp in portalboxes %}
-    <div <div{{ kwargs|xmlattr }}>
+    <div{{ kwargs|xmlattr }}>
       {% if cp.portalbox.title %}<h4>{{ cp.portalbox.title }}</h4>{% endif %}
       <p>{{ cp.portalbox.body|safe }}</p>
     </div>
@@ -116,7 +112,7 @@
 
 {% macro search_also(externalcollections) %}
   {% if externalcollections %}
-    <h4>{{ _("Search also") }}</h4>
+    <h4>{{ _("Search also:") }}</h4>
     <ul>
     {% for ex in externalcollections %}
       <li>{{ ex.name }} <a href="{{ ex.engine.base_url}}">
@@ -437,7 +433,7 @@
               {%- if not collection.nbrecs -%}
               {%- set nbrecs = 0 -%}
               {%- endif -%}
-              {{ _("Search %d records for:")|format(nbrecs) }}
+              {{ _("Search %s records for")|format(nbrecs) }}
             </label>
           </div>
           <div class="span9">
@@ -457,7 +453,7 @@
                      data-delay="100"
                      data-toggle="dropdown" role="button"
                      href="#"><i class="icon-question-sign"></i></a>
-                  <ul class="searchexamples dropdown-menu" role="menu" aria-labelledby="dLabel" style="text-align: left;">
+                  <ul class="searchexamples dropdown-menu" style="text-align: left;">
                     <li>
                       <a href="/help/search-tips">
                         <i class="pull-right icon-info-sign"></i>
@@ -540,8 +536,10 @@
     </div><!-- end span12 -->
     </div>
   </div><!-- end row -->
+{% endmacro %}
 
 
+{% macro search_form_javascript(collection) %}
 
   <script>
   $(function () {
@@ -719,7 +717,7 @@
             var typeahead = this
             $.ajax({
               type: 'GET',
-              url: '{{ url_for('search.list', field='exactauthor') }}',
+              url: '{{ url_for('search.autocomplete', field='exactauthor') }}',
               data: $.param({
                 q: query.substr(query.lastIndexOf(':')+1)
               })
@@ -773,7 +771,4 @@
   });
 
  </script>
-
-
 {% endmacro %}
-

@@ -148,7 +148,7 @@
             <li><a
                href="{{ url_for('search.search', **used_args) }}{{ '#'+request.form.get('filter','')|default('', true) }}"
                class="{{ ' active' if active }}">
-              <i class="pull-right icon {{ ' icon-ok' if of==i.code }}"></i>
+              <i class="pull-right icon {{ ' icon-ok' if request.args.get('of','hb')==i.code }}"></i>
               {{ i.name }}
             </a></li>
           {%- endfor -%}
@@ -171,19 +171,17 @@
               <div class="span11">
                 {% if not collection.name.startswith('provisional-') %}
                 <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>{% endif %}
-                {{ format_record(recid, of, ln=g.ln)|safe }}
-                {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
+                {{ format_record(recid, of, ln=g.ln, brief_links=False)|safe }}
               </div>
             </div>
             <hr />
           {%- else -%}
-          {{ format_record(recid, of, ln=g.ln) }}
-          {{ record_brief_links(recid, loop.index+(pagination.page-1)*rg) }}
+          {{ format_record(recid, of, ln=g.ln, brief_links=False) }}
           {%- endif -%}
         {%- endfor -%}
 
         <div class="row clearfix">
-          <div class="span10 ">
+          <div class="span10">
             <span class="pull-left btn-group clearfix hide">
             <span onclick="$('[name=recid]').prop('checked', function() {return !$(this).prop('checked')});"
                   class="btn">
@@ -209,6 +207,7 @@
                  title="{{ _('Export') }}"></i> {{ _('Export') }}
              </button>
             </span>
+
             {{ render_search_pagination(pagination) }}
           </div>
         </div>
