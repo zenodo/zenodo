@@ -329,6 +329,21 @@ class DepositionForm(Form):
         },
     }
 
+    field_derived_mapping = {
+        'upload_type': {
+            'field': 'license',
+            'values': {
+                'dataset': 'cc-zero',
+                'publication': 'cc-by',
+                'poster': 'cc-by',
+                'presentation': 'cc-by',
+                'image': 'cc-by',
+                'video': 'cc-by',
+                'audio': 'cc-by',
+            }
+        }
+    }
+
     field_icons = {
         'thesis_university': 'building',
     }

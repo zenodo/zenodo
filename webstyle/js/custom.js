@@ -271,6 +271,23 @@ function webdeposit_save_button(selector, form_selector, message_selector, url) 
     });
 }
 
+function webdeposit_derived_field(selector, derived_field_selector, mapping, only_untouched) {
+    var touched_fields = {};
+
+    $(derived_field_selector).change(function(e){
+        touched_fields[derived_field_selector] = 1;
+    });
+
+    $(selector).change(function(e){
+        if((only_untouched && !(derived_field_selector in touched_fields)) || !only_untouched) {
+            if($(this).val() in mapping['values']){
+                new_field_value = mapping['values'][$(this).val()];
+                $(derived_field_selector).val(new_field_value);
+            }
+        }
+    });
+}
+
 function usercollection_approval(btn, action) {
     recid = $(btn).data('recid');
     coll = $(btn).data('collection');

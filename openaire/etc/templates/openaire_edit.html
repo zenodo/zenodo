@@ -187,6 +187,7 @@ $(document).ready(function() {
     webdeposit_datepicker('#publication_date');
     webdeposit_datepicker('#embargo_date');
     webdeposit_reservedoi_button('#doi-button', "#doi", '{{url_for('deposit.edit')}}/{{pub.publicationid}}/reserve-doi/');
+    webdeposit_derived_field('input[name=upload_type]', '#license', {{form.field_derived_mapping.get('upload_type')|tojson|safe}}, true);
 });
 </script>
 {% endif %}
