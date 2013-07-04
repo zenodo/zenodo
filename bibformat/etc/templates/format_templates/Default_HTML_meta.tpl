@@ -31,5 +31,5 @@
 {{- bfe_meta(bfo, tag="245__a", tag_name="title", name="og:title", protocol="opengraph") -}}
 {{- bfe_meta(bfo, tag="520__a", tag_name="abstract", name="og:description", protocol="opengraph") -}}
 {{- bfe_meta(bfo, var="recurl", name="og:url", protocol="opengraph") -}}
-{% if icon_url %}<meta name="og:image" content="{{icon_url}}"{% endif %}>
+{% if icon_url %}<meta name="og:image" content="{{icon_url}}">{% endif %}
 {{- bfe_meta(bfo, var="CFG_SITE_NAME", name="og:site_name", protocol="opengraph") -}}
