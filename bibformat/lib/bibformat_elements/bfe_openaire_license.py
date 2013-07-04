@@ -24,11 +24,14 @@ def format_element(bfo, as_label=False):
     ln = bfo.lang
     license = bfo.field('540__a')
     license_url = bfo.field('540__u')
+    access_right = bfo.field('542__l')
 
-    if license_url:
-        return """<a href="%s">%s</a>""" % (license_url, license)
-    else:
-        return license
+    if access_right in ["open", "embargoed"]:
+        if license_url:
+            return """<a href="%s">%s</a>""" % (license_url, license)
+        else:
+            return license
+    return ""
 
 
 def escape_values(bfo):

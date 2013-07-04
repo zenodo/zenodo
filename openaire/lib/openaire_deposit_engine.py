@@ -1236,7 +1236,7 @@ class OpenAIREPublication(object):
         # License
         # =================
         license = self._metadata.get('license', '')
-        if license:
+        if license and access_right in ["open", "embargoed"]:
             license_info = get_license_description(license)
             subfields = []
             if license_info:
