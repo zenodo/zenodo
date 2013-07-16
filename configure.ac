@@ -105,6 +105,9 @@ AC_CONFIG_FILES([config.nice  \
      bibsched/lib/bibsched_tasklets/Makefile \
      miscutil/Makefile \
      miscutil/lib/Makefile \
+     miscutil/etc/Makefile \
+     miscutil/etc/templates/Makefile \
+     miscutil/etc/certs/Makefile \
      openaire/js/Makefile \
      openaire/etc/Makefile \
      openaire/etc/bibrank/Makefile \
