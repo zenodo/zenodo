@@ -308,7 +308,8 @@ class UserCollection(db.Model):
     #
     # Curation methods
     #
-    def _modify_record(self, recid, test_func, replace_func, include_func, extra_colls=[]):
+    def _modify_record(self, recid, test_func, replace_func, include_func,
+            append_colls=[], replace_colls=[]):
         """
         Generate record a MARCXML file
 
@@ -322,22 +323,28 @@ class UserCollection(db.Model):
 
         try:
             colls = rec['980']
-            for c in colls:
-                try:
-                    # We are only interested in subfield 'a'
-                    code, val = c[0][0]
-                    if test_func(code, val):
-                        c[0][0] = replace_func(code, val)
-                        dirty = True
-                    if include_func(code, val):
-                        newcolls.append(c[0])
-                    else:
-                        dirty = True
-                except IndexError:
-                    pass
-            for c in extra_colls:
-                newcolls.append([('a', c)])
-                dirty=True
+            print colls
+            if replace_colls:
+                for c in replace_colls:
+                    newcolls.append([('a', c)])
+                    dirty=True
+            else:
+                for c in colls:
+                    try:
+                        # We are only interested in subfield 'a'
+                        code, val = c[0][0]
+                        if test_func(code, val):
+                            c[0][0] = replace_func(code, val)
+                            dirty = True
+                        if include_func(code, val):
+                            newcolls.append(c[0])
+                        else:
+                            dirty = True
+                    except IndexError:
+                        pass
+                for c in append_colls:
+                    newcolls.append([('a', c)])
+                    dirty=True
         except KeyError:
             return False
 
@@ -384,6 +391,8 @@ class UserCollection(db.Model):
         expected_id = self.get_collection_name(provisional=True)
         new_id = self.get_collection_name(provisional=False)
 
+        append_colls, replace_colls = signalresult2list(pre_curation.send(self, action='accept', recid=recid, pretend=pretend))
+
         def test_func(code, val):
             return code == 'a' and val == expected_id
 
@@ -393,8 +402,14 @@ class UserCollection(db.Model):
         def include_func(code, val):
             return True
 
-        extra_colls = signalresult2list(pre_curation.send(self, action='accept', recid=recid, pretend=pretend))
-        rec = self._upload_record(self._modify_record(recid, test_func, replace_func, include_func, extra_colls=extra_colls), pretend=pretend)
+        rec = self._upload_record(
+            self._modify_record(
+                recid, test_func, replace_func, include_func,
+                append_colls=append_colls, replace_colls=replace_colls
+            ),
+            pretend=pretend
+        )
+
         post_curation.send(self, action='accept', recid=recid, record=rec, pretend=pretend)
         return rec
 
@@ -407,6 +422,8 @@ class UserCollection(db.Model):
         expected_id = self.get_collection_name(provisional=True)
         new_id = self.get_collection_name(provisional=False)
 
+        append_colls, replace_colls = signalresult2list(pre_curation.send(self, action='reject', recid=recid, pretend=pretend))
+
         def test_func(code, val):
             return False
 
@@ -416,8 +433,14 @@ class UserCollection(db.Model):
         def include_func(code, val):
             return not (code == 'a' and (val == expected_id or val == new_id))
 
-        extra_colls = signalresult2list(pre_curation.send(self, action='reject', recid=recid, pretend=pretend))
-        rec = self._upload_record(self._modify_record(recid, test_func, replace_func, include_func, extra_colls=extra_colls), pretend=pretend)
+        rec = self._upload_record(
+            self._modify_record(
+                recid, test_func, replace_func, include_func,
+                append_colls=append_colls, replace_colls=replace_colls
+            ),
+            pretend=pretend
+        )
+
         post_curation.send(self, action='reject', recid=recid, record=rec, pretend=pretend)
         return rec
 
@@ -770,4 +793,7 @@ def update_changed_fields(obj, fields):
 
 
 def signalresult2list(extra_colls):
-    return list(set(reduce(sum, map(lambda x: x[1] if x[1] else [], extra_colls))))
+    replace = list(set(reduce(sum, map(lambda x: x[1].get('replace',[]) if x[1] else [], extra_colls))))
+    append = list(set(reduce(sum, map(lambda x: x[1].get('append',[]) if x[1] else [], extra_colls))))
+
+    return (append, replace)

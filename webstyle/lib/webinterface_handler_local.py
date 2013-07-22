@@ -24,7 +24,8 @@ import time
 from invenio.config import CFG_SITE_LANG, CFG_OPENAIRE_MAX_UPLOAD
 from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
-from invenio.usercollection_signals import after_save_collection
+from invenio.usercollection_signals import after_save_collection, \
+    post_curation, pre_curation
 from jinja2 import nodes
 from jinja2.ext import Extension
 from invenio.webuser_flask import current_user
@@ -182,6 +183,8 @@ def customize_app(app):
     app.jinja_env.add_extension(ZenodoExtension)
     webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache)
     after_save_collection.connect(invalidate_jinja2_cache)
+    pre_curation.connect(pre_curation_reject_listener)
+    post_curation.connect(post_curation_reject_listener)
 
     @app.template_filter('schemaorg_type')
     def schemaorg_type(recid=None, bfo=None):
@@ -236,6 +239,28 @@ def invalidate_jinja2_cache(sender, collection=None, lang=None, **extra):
     if lang is None:
         lang = CFG_SITE_LANG
     cache.delete(make_template_fragment_key(collection.name, vary_on=[lang]))
+
+
+def pre_curation_reject_listener(sender, action=None, recid=None, pretend=None):
+    """
+    Pre-curation reject listener that will add 'spam' collection identifier
+    if a record is rejected.
+    """
+    if sender.id == "zenodo" and action == "reject":
+        # Overrides all other collections identifiers
+        return {'correct': [], 'replace': ['SPAM']}
+    else:
+        return None
+
+
+def post_curation_reject_listener(sender, action=None, recid=None, record=None, pretend=None):
+    """
+    Post-curation reject listener that will inactive an already minted
+    DOI for a rejected record.
+    """
+    if sender.id == "zenodo" and action == "reject" and not pretend:
+        from invenio.openaire_tasks import openaire_delete_doi
+        openaire_delete_doi.delay(recid)
 
 
 class ZenodoExtension(Extension):
