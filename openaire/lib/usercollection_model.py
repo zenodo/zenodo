@@ -70,7 +70,8 @@ from invenio.jinja2utils import render_template_to_string
 from invenio.usercollection_signals import before_save_collection, \
     after_save_collection, before_save_collections, after_save_collections, \
     before_delete_collection, after_delete_collection, \
-    before_delete_collections, after_delete_collections
+    before_delete_collections, after_delete_collections, \
+    pre_curation, post_curation
 from invenio.search_engine import get_record, search_pattern, get_fieldvalues
 from invenio.bibrecord import record_add_field
 from flask import url_for
@@ -307,9 +308,9 @@ class UserCollection(db.Model):
     #
     # Curation methods
     #
-    def _modify_record(self, recid, test_func, replace_func, include_func):
+    def _modify_record(self, recid, test_func, replace_func, include_func, extra_colls=[]):
         """
-        Generate record a MARCXML file and upload it
+        Generate record a MARCXML file
 
         @param test_func: Function to test if a collection id should be changed
         @param replace_func: Function to replace the collection id.
@@ -334,6 +335,9 @@ class UserCollection(db.Model):
                         dirty = True
                 except IndexError:
                     pass
+            for c in extra_colls:
+                newcolls.append([('a', c)])
+                dirty=True
         except KeyError:
             return False
 
@@ -348,15 +352,18 @@ class UserCollection(db.Model):
 
         return rec
 
-    def _upload_record(self, rec):
+    def _upload_record(self, rec, pretend=False):
         """
         Bibupload one record
         """
-        bibupload_record(
-            record=rec, file_prefix='usercoll', mode='-c',
-            opts=['-n', '-P5']
-        )
-        return True
+        if rec is False:
+            return None
+        if not pretend:
+            bibupload_record(
+                record=rec, file_prefix='usercoll', mode='-c',
+                opts=['-n', '-P5']
+            )
+        return rec
 
     def _upload_collection(self, coll):
         """
@@ -368,7 +375,7 @@ class UserCollection(db.Model):
         )
         return True
 
-    def accept_record(self, recid):
+    def accept_record(self, recid, pretend=False):
         """
         Accept a record for inclusion in a user collection
 
@@ -386,9 +393,12 @@ class UserCollection(db.Model):
         def include_func(code, val):
             return True
 
-        return self._upload_record(self._modify_record(recid, test_func, replace_func, include_func))
+        extra_colls = signalresult2list(pre_curation.send(self, action='accept', recid=recid, pretend=pretend))
+        rec = self._upload_record(self._modify_record(recid, test_func, replace_func, include_func, extra_colls=extra_colls), pretend=pretend)
+        post_curation.send(self, action='accept', recid=recid, record=rec, pretend=pretend)
+        return rec
 
-    def reject_record(self, recid):
+    def reject_record(self, recid, pretend=False):
         """
         Reject a record for inclusion in a user collection
 
@@ -406,7 +416,10 @@ class UserCollection(db.Model):
         def include_func(code, val):
             return not (code == 'a' and (val == expected_id or val == new_id))
 
-        return self._upload_record(self._modify_record(recid, test_func, replace_func, include_func))
+        extra_colls = signalresult2list(pre_curation.send(self, action='reject', recid=recid, pretend=pretend))
+        rec = self._upload_record(self._modify_record(recid, test_func, replace_func, include_func, extra_colls=extra_colls), pretend=pretend)
+        post_curation.send(self, action='reject', recid=recid, record=rec, pretend=pretend)
+        return rec
 
     #
     # Data persistence methods
@@ -754,3 +767,7 @@ def update_changed_fields(obj, fields):
             setattr(obj, attr, newval)
             dirty = True
     return dirty
+
+
+def signalresult2list(extra_colls):
+    return list(set(reduce(sum, map(lambda x: x[1] if x[1] else [], extra_colls))))

@@ -83,3 +83,28 @@ after_delete_collections = _signals.signal('after-delete-collection')
 This signal is sent right after all collections are deleted.
 Sender is the user collection.
 """
+
+
+pre_curation = _signals.signal('pre-curation')
+"""
+This signal is sent right before a record is accepted or rejected.
+Sender is the user collection. Extra data pass is:
+
+ * action: accept or reject
+ * recid: Record ID
+ * pretend: True if record changes is actually not persisted
+"""
+
+post_curation = _signals.signal('post-curation')
+"""
+This signal is sent right after a record is accepted or rejected.
+Sender is the user collection.
+
+ * action: accept or reject
+ * recid:  Record ID
+ * record: Record which was uploaded
+ * pretend: True if record changes is actually not persisted
+
+Note, the record which was accept/reject is most likely not updated
+yet in the database, since bibupload has to run first.
+"""
