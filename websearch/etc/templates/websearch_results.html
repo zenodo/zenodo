@@ -171,12 +171,12 @@
               <div class="span11">
                 {% if not collection.name.startswith('provisional-') %}
                 <ul class="pager pull-right  hidden-phone"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>{% endif %}
-                {{ format_record(recid, of, ln=g.ln, brief_links=False)|safe }}
+                {{ format_record(recid, of, ln=g.ln, brief_links=False, collection=collection)|safe }}
               </div>
             </div>
             <hr />
           {%- else -%}
-          {{ format_record(recid, of, ln=g.ln, brief_links=False) }}
+          {{ format_record(recid, of, ln=g.ln, brief_links=False, collection=collection) }}
           {%- endif -%}
         {%- endfor -%}
 

@@ -90,13 +90,13 @@ def customize_app(app):
 
         @param coll: Collection object
         """
-        identifier = coll.name
-        if identifier.startswith("provisional-user-"):
-            return identifier[len("provisional-user-"):]
-        elif identifier.startswith("user-"):
-            return identifier[len("user-"):]
-        else:
-            return ""
+        if coll:
+            identifier = coll.name
+            if identifier.startswith("provisional-user-"):
+                return identifier[len("provisional-user-"):]
+            elif identifier.startswith("user-"):
+                return identifier[len("user-"):]
+        return ""
 
     @app.template_filter('curation_action')
     def curation_action(recid, ucoll_id=None):
