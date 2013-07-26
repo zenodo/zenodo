@@ -23,6 +23,9 @@
 
 {%- block header -%}
 {{ '#' if not listen_directive_needed }}{{ 'Listen ' + vhost_site_url_port}}
+TraceEnable off
+SSLProtocol all -SSLv2
+SSLCipherSuite HIGH:MEDIUM:!ADH
 NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
 {%- endblock -%}
 

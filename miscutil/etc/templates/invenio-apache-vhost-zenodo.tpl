@@ -34,7 +34,7 @@
 
 {%- block deflate_directive %}
         AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/xhtml+xml application/xml application/rss+xml application/atom_xml application/x-javascript image/svg+xml
-        
+
         # Don't do etags for files since in a load balanced environment, two servers
         # will compute different etags for the same component.
         FileETag None
