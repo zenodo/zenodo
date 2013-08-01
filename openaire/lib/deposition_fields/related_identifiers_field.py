@@ -52,10 +52,10 @@ class RelatedIdentifiersField(WebDepositField(key=None), TextAreaField):
         kwargs['validators'] = [doi_list_validator]
         super(RelatedIdentifiersField, self).__init__(**kwargs)
 
-    def _value(self):
-        if not self.data:
-            return ""
-        if isinstance(self.data, list):
-            return text_type("\n".join(self.data))
-        else:
-            return text_type(self.data)
+    # def _value(self):
+    #     if not self.data:
+    #         return ""
+    #     if isinstance(self.data, list):
+    #         return text_type("\n".join(self.data))
+    #     else:
+    #         return text_type(self.data)

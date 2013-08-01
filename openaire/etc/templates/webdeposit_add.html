@@ -1,0 +1,307 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "page.html" %}
+
+
+{% macro form_action_bar(margin="") -%}
+    <div class="well"{% if margin %}style="margin-top: {{margin}}"{% endif %}>
+        <a class="btn btn-danger pull-left" href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=uuid) }}"><i class="icon-trash  icon-white"></i> {{ _('Delete') }}</a>
+        <span class="pull-right">
+            <span class="loader"><img src="{{ url_for('static', filename='css/images/ajax-loader.gif' ) }}" /></span>
+            <span class="status-indicator muted"></span>&nbsp;
+            <button class="btn form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="icon-file"></i> Save</button>
+            <button data-target="#submitModal" data-toggle="modal" role="button" data-toggle="tooltip" title="{{_('Press "Submit" to finalize and make your upload public (further editing afterwards is  currently not possible).')}}" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit</button>
+        </span>
+        <span class="clearfix"></span>
+    </div>
+{%- endmacro %}
+
+{% macro submit_dialog_body() %}
+<ul>
+    <li>Editing is only possible via submitting changes to <a href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>*.</li>
+    <li>Your upload will be <strong>publicly available</strong> shortly after you submit &mdash; uploaded files are only publicly available if you have chosen Open Access and/or Embargoed Access (subject to the embargo date).</li>
+</ul>
+<p><small class="muted">* We are working on making editing possible after you have submitted, and plan to launch the feature in June.</small></p>
+{% endmacro %}
+
+
+{% macro modal_dialog(id="submitModal", title="Are you sure you want to submit?", body=submit_dialog_body()) %}
+<div id="{{id}}" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="{{id}}Label">{{title}}</h3>
+  </div>
+  <div class="modal-body">
+    {{body}}
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary form-submit">Submit</button>
+  </div>
+</div>
+{% endmacro %}
+
+
+{%- macro form_group_accordion_start(group, idx) -%}
+<div class="accordion-group">
+    <div class="accordion-heading">
+        {% if group.meta.indication %}
+            <span class="accordion-toggle muted pull-right">{{ group.meta.indication }}</span>
+        {% endif %}
+        <a class="accordion-toggle" data-toggle="collapse" href="#collapse-{{ idx }}"> {{ group.name }} <b class="caret" style="margin-top: 8px;"></b></a>
+    </div>
+    <div id="collapse-{{ idx }}" class="accordion-body collapse {{ 'in' if group.meta.classes is none else group.meta.classes }}">
+    <div class="accordion-inner">
+{%- endmacro -%}
+
+
+
+{%- macro form_group_accordion_start_end(group, idx) -%}
+    </div></div></div>
+{%- endmacro -%}
+
+
+
+{%- macro field_label(thisfield) -%}
+{% if thisfield.label.text %}
+    {% if thisfield.form %}
+        <h5>{{ thisfield.label.text }}</h5>
+    {% else %}
+        <label class="control-label{{' required' if thisfield.flags.required}}{{ ' error' if thisfield.errors }}" for="{{thisfield.label.field_id}}">
+            {%- if thisfield._icon_html %}
+                <span class="" style="margin-right: 5px; margin-top: 5px;">
+                {{ thisfield._icon_html|safe }}
+                </span>
+            {%- endif %}
+
+            {{ thisfield.label.text }}
+        </label>
+    {% endif %}
+{% endif %}
+{%- endmacro -%}
+
+
+
+{%- macro field_display(thisfield, field_class="span5", container_class="control-group") -%}
+<div class="{{container_class}} {{ "error" if thisfield.errors }}{{ 'hide' if thisfield.flags.hidden}}" id="state-group-{{ thisfield.name }}">
+
+    {{ field_label(thisfield) }}
+
+    <div class="{{ 'controls' if thisfield.widget.__name__ not in ['plupload_widget'] }}" id="field-{{ thisfield.name }}">
+        {{ thisfield(class_= field_class + " " + thisfield.short_name) }}
+
+        {% if thisfield.description %}
+            <p class="muted field-desc"><small>{{thisfield.description|urlize}}</small></p>
+        {% endif %}
+
+        {% if thisfield.errors %}
+            <span class="alert help-inline alert-error" id="state-{{ thisfield.name }}">{% for error in thisfield.errors %}{{ error }}{% if not loop.last %}<br />{% endif %}{% endfor %}</span>
+        {% else %}
+            <span class="alert help-inline hide" id="state-{{ thisfield.name }}"></span>
+        {% endif %}
+    </div>
+</div>
+{%- endmacro -%}
+
+
+{%- macro field_display_subform(thisfield) -%}
+    <div class="control-group {{ "error" if thisfield.errors }}" id="state-group-{{ thisfield.name }}">
+        {{ field_label(thisfield) }}
+    </div>
+    {% for subfield in thisfield.form %}
+        {{ field_display( subfield )}}
+    {% endfor %}
+    <hr />
+{%- endmacro -%}
+
+
+{%- block header -%}
+    {{ super() }}
+    {%- js 'js/plupload/plupload.full.js', '50-webdeposit' -%}
+    {%- js 'js/webdeposit_templates.js', '50-webdeposit' -%}
+    {%- js 'js/webdeposit_form.js', '50-webdeposit' -%}
+    {%- js 'ckeditor/ckeditor.js', '50-ckeditor' -%}
+    {%- js 'ckeditor/invenio-ckeditor-config.js', '50-ckeditor' -%}
+    <style>
+    .ui-autocomplete-loading { background: white url('{{ url_for('static', filename='img/loading.gif') }}') right center no-repeat; }
+
+    span.ui-icon.ui-icon-circle-triangle-w { color: transparent; cursor: pointer; }
+    span.ui-icon.ui-icon-circle-triangle-e { color: transparent; cursor: pointer; }
+
+    .typeahead {
+        max-height: 250px;
+        overflow-y: auto;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden;
+    }
+
+    .l{
+        size: 10px;
+    }
+
+    .required:after {
+        color: red;
+        content:" *";
+    }
+
+    .rmlink {
+        cursor: pointer;
+        display: block;
+        margin-left: auto;
+        margin-right: auto
+    }
+    </style>
+{% endblock %}
+
+
+{% block body %}
+{{ modal_dialog() }}
+<div class="row">
+    <div id="file_container" class="span8 form-feedback-warning">
+    <div id="flash-message"></div>
+    <form enctype="multipart/form-data" name="submitForm" id="submitForm" class="form-horizontal" method="post" action="{{ url_for('webdeposit.add', deposition_type=deposition_type, uuid=uuid) }}">
+    {% block form_header scoped %}{{ form_action_bar() }}{% endblock form_header%}
+
+    {% block form_title scoped %}
+        <h1>{{ form._title }}</h1>
+        <p class="muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Submit" to finalize and make your upload public (editing afterwards only possible via submitting changes to <a class="muted" href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>).</small></p>
+    {% endblock form_title %}
+
+    {% block form_body scoped %}
+        {% for group, fields in form.get_groups() %}
+            {% set grouploop = loop %}
+            {% block form_group scoped %}
+                {% if grouploop.first %}
+                    <div id="webdeposit_form_accordion" class="accordion">
+                {% endif %}
+                {% block form_group_header scoped %}
+                    {% if group %}
+                        {{ form_group_accordion_start(group, grouploop.index) }}
+                    {% else %}
+                        {{ form_action_bar(margin="10px") }}
+                    {% endif %}
+                {% endblock %}
+
+                {% block form_group_body scoped %}
+                    {% if group and group.meta.description %}
+                        <p>{{ group.meta.description|urlize }}</p>
+                    {% endif %}
+
+                    {% block fieldset scoped %}
+                    <fieldset>
+                    {% for field in fields %}
+                        {% block field_body scoped %}
+                            {%- if field.name == 'upload_type' -%}
+                                <div class="upload-type" align="center">
+                                    <div class="control-group {{ "error" if field.errors }}" id="state-group-{{ field.name }}">
+                                        {{field}}
+                                    </div>
+                                </div>
+                            {% elif field.form %}
+                                {{ field_display_subform(field) }}
+                            {% elif field.short_name == 'prereserve_doi' %}
+                                {{ field_display(field, field_class="btn btn-mini") }}
+                            {% else %}
+                                {{ field_display(field) }}
+                            {% endif %}
+                        {% endblock field_body %}
+                    {% endfor %}
+                    </fieldset>
+                    {% endblock fieldset %}
+                {% endblock form_group_body%}
+
+                {% block form_group_footer scoped %}
+                    {% if group %}
+                        {{ form_group_accordion_start_end(group, grouploop.index) }}
+                    {% endif %}
+
+                {% endblock form_group_footer %}
+
+                {% if grouploop.last %}</div>{% endif %}
+            {% endblock form_group %}
+        {% endfor %}
+    {% endblock form_body %}
+
+    {% block form_footer scoped %}{% endblock form_footer %}
+    </form>
+    </div>
+    <div class="span4">
+        {% include "webdeposit_myview.html" %}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
+<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="72dpqrjvx71mqyu"></script>
+<!-- yahooapis is imported for pluploader -->
+<script type="text/javascript" src="http://bp.yahooapis.com/2.4.21/browserplus-min.js"></script>
+<script type="text/javascript">
+var required_fields = {{ form.required_field_names|tojson|safe }};
+
+var date_options = {
+    format: 'yyyy-mm-dd',
+    weekStart: 1,
+    autoclose: true,
+    todayBtn: "linked",
+    todayHighlight: true,
+    keyboardNavigation: true
+};
+
+$(document).ready(function() {
+  webdeposit_init_plupload('.pluploader',
+                            '{{ url_for('webdeposit.plupload', deposition_type=deposition_type, uuid=uuid) }}',
+                            '{{ url_for('webdeposit.plupload_delete', uuid=uuid) }}',
+                            '{{ url_for('webdeposit.plupload_get_file', uuid=uuid) }}',
+                            {{ form.files|safe }},
+                            '{{ url_for('webdeposit.upload_from_url', deposition_type=deposition_type, uuid=uuid) }}');
+
+  webdeposit_input_error_check('#submitForm input, #submitForm textarea, #submitForm select',
+                               '{{ url_for("webdeposit.error_check", uuid=uuid) }}');
+  webdeposit_button_click('#submitForm .form-button', '{{ url_for("webdeposit.error_check", uuid=uuid) }}')
+
+  webdeposit_check_status('{{ url_for('webdeposit.check_status', uuid=uuid) }}');
+
+
+// Render autocomplete functions and ckeditor
+{% for field in form %}
+    {% if field.autocomplete %}
+        webdeposit_field_autocomplete('input[name="{{ field.name }}"]',
+                                    '{{ url_for("webdeposit.autocomplete",
+                                        uuid=uuid, type=field.name) }}');
+    {% endif %}
+
+    {% if field.ckeditor %}
+        webdeposit_ckeditor_init( '{{ field.id }}',
+                                  '{{ url_for("webdeposit.error_check", uuid=uuid) }}');
+    {% endif %}
+
+{% endfor %}
+
+    // Date pickers
+    $(".datepicker").addClass("input-small");
+    $(".datepicker").datepicker(date_options);
+
+    // Save & submit buttons
+    webdeposit_init_save('{{ url_for("webdeposit.error_check", uuid=uuid) }}', '.form-save', '#submitForm');
+    webdeposit_init_submit('{{ url_for("webdeposit.error_check", uuid=uuid) }}', '.form-submit', '#submitForm');
+});
+</script>
+{% endblock %}

@@ -19,6 +19,8 @@
 
 from wtforms import RadioField
 from wtforms.widgets import HTMLString, RadioInput
+from invenio.openaire_validators import object_type_validator
+from invenio.webdeposit_field import WebDepositField
 
 
 __all__ = ['UploadTypeField']
@@ -71,7 +73,7 @@ class BigIconRadioInput(RadioInput):
         return html
 
 
-class UploadTypeField(RadioField):
+class UploadTypeField(WebDepositField(), RadioField):
     """
     Field to render a list
     """
@@ -81,3 +83,22 @@ class UploadTypeField(RadioField):
     def __init__(self, **kwargs):
         kwargs['choices'] = [(x[0], x[1]) for x in UPLOAD_TYPES]
         super(UploadTypeField, self).__init__(**kwargs)
+
+    def post_process(self, form):
+        # Hide/show subtype fields.
+        form.image_type.flags.hidden=True
+        form.image_type.flags.disabled=True
+        form.publication_type.flags.hidden=True
+        form.publication_type.flags.disabled=True
+        if self.data == 'publication':
+            form.publication_type.flags.hidden=False
+            form.publication_type.flags.disabled=False
+        elif self.data == 'image':
+            form.image_type.flags.hidden=False
+            form.image_type.flags.disabled=False
+
+        # Set value of license field
+        if self.data == "dataset":
+            form.license.data = 'cc-zero'
+        else:
+            form.license.data = 'cc-by'

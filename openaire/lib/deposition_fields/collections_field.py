@@ -59,6 +59,7 @@ class CollectionsField(WebDepositField(key=None), TextField):
                     self.required = True
 
         kwargs['validators'] = [_list_validator()]
+
         super(CollectionsField, self).__init__(**kwargs)
 
     def _value(self):

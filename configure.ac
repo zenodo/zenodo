@@ -116,6 +116,8 @@ AC_CONFIG_FILES([config.nice  \
      openaire/Makefile \
      openaire/lib/Makefile \
      openaire/lib/deposition_fields/Makefile \
+     openaire/lib/deposition_types/Makefile \
+     openaire/lib/deposition_forms/Makefile \
      openaire/tpl/Makefile \
      openaire/upgrades/Makefile \
      websearch/Makefile \

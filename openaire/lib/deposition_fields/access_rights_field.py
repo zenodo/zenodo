@@ -21,6 +21,7 @@ from wtforms import RadioField
 from wtforms.validators import Required
 from wtforms.widgets import RadioInput, HTMLString
 from invenio.webdeposit_field import WebDepositField
+from invenio.openaire_validators import access_right_validator
 
 __all__ = ['AccessRightField']
 
@@ -110,3 +111,20 @@ class AccessRightField(WebDepositField(key=None), RadioField):
                     self.required = True
 
         super(AccessRightField, self).__init__(**kwargs)
+
+    def pre_validate(self, form=None):
+        return access_right_validator(self)
+
+    def post_process(self, form):
+        form.embargo_date.flags.hidden = True
+        form.embargo_date.flags.disabled = True
+        form.license.flags.hidden = True
+        form.license.flags.disabled = True
+
+        if self.data == 'embargoed':
+            form.embargo_date.flags.hidden = False
+            form.embargo_date.flags.disabled = False
+
+        if self.data in ['open', 'embargoed']:
+            form.license.flags.hidden = False
+            form.license.flags.disabled = False

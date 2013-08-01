@@ -1,0 +1,19 @@
+<div class="well">
+<h2>My uploads</h2>
+{% if not drafts %}
+<p class="muted">You currently have no uploads.</p>
+{% else %}
+<h4>Unsubmitted</h4>
+<table class="table table-striped">
+{% for draft in drafts %}
+<tr>
+    <td><a href="{{ url_for('webdeposit.add', deposition_type=draft.workflow.name, uuid=draft.uuid) }}">{% if draft.form_values and draft.form_values.title %}
+              {{ draft.form_values.title }}
+          {% else %}
+              {{ _('Untitled') }}
+          {% endif %}</a></td><td>{{ draft.timestamp|invenio_pretty_date }}</td><td><a href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=uuid) }}" class="rmlink" rel="tooltip" title="Delete upload"><i class="icon-trash"></i></a></td>
+</tr>
+{% endfor %}
+</table>
+{% endif %}
+</div>
