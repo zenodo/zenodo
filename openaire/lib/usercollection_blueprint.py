@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+#zenodo -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
 ## Copyright (C) 2013 CERN.
@@ -38,7 +38,7 @@ blueprint = InvenioBlueprint(
         (_('Communities'), 'usercollection.index'),
     ],
     menubuilder=[
-        ('main.usercollection', _('Communities'), 'usercollection.index', 1),
+        ('main.usercollection', _('Communities'), 'usercollection.index', 2),
     ],
 )
 

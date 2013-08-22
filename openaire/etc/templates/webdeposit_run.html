@@ -16,9 +16,15 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "webdeposit_add_base.html" %}
+{% extends "webdeposit_run_base.html" %}
 
-
+{% block webdeposit_assets %}
+    {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
+    {% js 'js/typeahead.min.js', '50-webdeposit' %}
+    {% js 'js/webdeposit_form.js', '50-webdeposit' %}
+    {% js 'js/webdeposit_templates.js', '50-webdeposit' %}
+    {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
+{% endblock webdeposit_assets %}
 
 {% macro submit_dialog_body() %}
 <ul>
@@ -66,7 +72,7 @@
     {% endif %}
 {% endblock %}
 
-
+{% block form_footer scoped %}{% endblock %}
 
 {#
  # Custom display of upload_type field
@@ -77,16 +83,21 @@
             <div class="control-group {{ "error" if field.errors }}" id="state-group-{{ field.name }}">
                 {{field}}
             </div>
+            {%- if field.description %}
+            <p class="muted field-desc"><small>{{field.description|urlize}}</small></p>
+            {%- endif %}
+            <div class="alert help-inline {{ 'alert-error' if field.errors else 'hide' }}" id="state-{{ field.name }}" style="margin-top: 5px;{% if field.errors %} display:block;{% endif %}">
+                {%- for error in field.errors %}
+                    <div>{{ error }}</div>
+                {%- endfor %}
+            </div>
         </div>
-    {% elif field.form %}
-        {{ field_display_subform(field) }}
     {% elif field.short_name == 'prereserve_doi' %}
         {{ field_display(field, field_class="btn btn-mini") }}
     {% else %}
         {{ field_display(field) }}
     {% endif %}
 {% endblock field_body %}
-
 
 
 {#
@@ -98,11 +109,10 @@
 {% endblock body %}
 
 
-
 {#
  # Set date picker options
  #}
-{% block form_script_options %}
+{%- block form_script_options %}
 <script type="text/javascript">
 var date_options = {
     format: 'yyyy-mm-dd',
@@ -113,18 +123,4 @@ var date_options = {
     keyboardNavigation: true
 };
 </script>
-{% endblock form_script_options %}
-
-
-
-{#
- # Add a bit of JavaScript to the end
- #}
-{% block javascript %}
-{{ super() }}
-<script type="text/javascript">
-$(document).ready(function() {
-    $(".datepicker").addClass("input-small");
-});
-</script>
-{% endblock %}
+{%- endblock form_script_options %}

@@ -9,6 +9,6 @@
 <p><small><a href="#" class="muted" id="author_affiliations_link">(show affliations)</a></small></p>
 
 {{ bfe_openaire_authors(bfo, relator_code_pattern='ths$', prefix='<p id="supervisors_short"><strong>Supervisor(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
-<p><span itemprop="description">{{ bfe_abstract(bfo, highlight="yes") }}</span></p>
+<p><span itemprop="description">{{bfo.field('520__a').decode('utf8')|safe}}</span></p>
 
 {{ bfe_notes(bfo, prefix='<div class="alert">', suffix='</div>') }}

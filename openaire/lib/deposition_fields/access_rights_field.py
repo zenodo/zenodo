@@ -18,12 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import RadioField
-from wtforms.validators import Required
 from wtforms.widgets import RadioInput, HTMLString
 from invenio.webdeposit_field import WebDepositField
-from invenio.openaire_validators import access_right_validator
 
 __all__ = ['AccessRightField']
+
 
 ACCESS_RIGHTS_CHOICES = [
     ('open', 'Open Access'),
@@ -32,14 +31,13 @@ ACCESS_RIGHTS_CHOICES = [
     ('closed', 'Closed Access'),
 ]
 
+
 ACCESS_RIGHTS_ICONS = {
     'open': 'icon-unlock',
     'closed': 'icon-lock',
     'embargoed': 'icon-warning-sign',
     'restricted': 'icon-ban-circle',
 }
-
-
 
 
 class InlineListWidget(object):
@@ -80,51 +78,46 @@ class IconRadioInput(RadioInput):
 
     def __init__(self, icons={}, **kwargs):
         self.choices_icons = icons
-        super(RadioInput, self).__init__(**kwargs)
+        super(IconRadioInput, self).__init__(**kwargs)
 
     def __call__(self, field, **kwargs):
         if field.checked:
             kwargs['checked'] = u'checked'
 
-        html = super(RadioInput, self).__call__(field, **kwargs)
+        html = super(IconRadioInput, self).__call__(field, **kwargs)
         icon = self.choices_icons.get(field._value(), '')
         if icon:
             html = '%s&nbsp;<i class="%s"></i>' % (html, icon)
         return html
 
 
-class AccessRightField(WebDepositField(key=None), RadioField):
+def access_right_processor(form, field, dummy_submit):
+    """
+    Enable/disable fields based on access right value.
+    """
+    form.embargo_date.flags.hidden = True
+    form.embargo_date.flags.disabled = True
+    form.license.flags.hidden = True
+    form.license.flags.disabled = True
+
+    if field.data == 'embargoed':
+        form.embargo_date.flags.hidden = False
+        form.embargo_date.flags.disabled = False
+
+    if field.data in ['open', 'embargoed']:
+        form.license.flags.hidden = False
+        form.license.flags.disabled = False
+
+
+class AccessRightField(WebDepositField, RadioField):
     widget = InlineListWidget(prefix_label=False, inline=False)
     option_widget = IconRadioInput(icons=ACCESS_RIGHTS_ICONS)
 
     def __init__(self, **kwargs):
-        #self._icon_html = '<i class="icon-unlock"></i>'
+        defaults = dict(
+            choices=ACCESS_RIGHTS_CHOICES,
+            processors=[access_right_processor],
 
-        if 'choices' not in kwargs:
-            kwargs['choices'] = ACCESS_RIGHTS_CHOICES
-
-        # Create our own Required data member
-        # for client-side use
-        if 'validators' in kwargs:
-            for v in kwargs.get("validators"):
-                if type(v) is Required:
-                    self.required = True
-
-        super(AccessRightField, self).__init__(**kwargs)
-
-    def pre_validate(self, form=None):
-        return access_right_validator(self)
-
-    def post_process(self, form):
-        form.embargo_date.flags.hidden = True
-        form.embargo_date.flags.disabled = True
-        form.license.flags.hidden = True
-        form.license.flags.disabled = True
-
-        if self.data == 'embargoed':
-            form.embargo_date.flags.hidden = False
-            form.embargo_date.flags.disabled = False
-
-        if self.data in ['open', 'embargoed']:
-            form.license.flags.hidden = False
-            form.license.flags.disabled = False
+        )
+        defaults.update(kwargs)
+        super(AccessRightField, self).__init__(**defaults)

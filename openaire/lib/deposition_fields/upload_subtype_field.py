@@ -18,12 +18,13 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import SelectField
+from invenio.webdeposit_field import WebDepositField
 from invenio.webdeposit_deposition_fields.objecttype_field import UPLOAD_TYPES
 
 __all__ = ['UploadSubtypeField']
 
 
-class UploadSubtypeField(SelectField):
+class UploadSubtypeField(WebDepositField, SelectField):
     def __init__(self, **kwargs):
         kwargs['choices'] = UPLOAD_TYPES[0][2]
         super(UploadSubtypeField, self).__init__(**kwargs)

@@ -1,0 +1,185 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+
+{% block body %}
+<h1>{{config.CFG_SITE_NAME}} Upload API v1.0</h1>
+
+<p>The purpose of this document is to explain how to upload via our RESTful API. Before you will be able to use our API you must create an account and generate an API key under your profile.<p>
+
+<h5>Audience</h5>
+
+<p>This document and the API is meant for use by a technical audience. You will need a working knowledge of programming and the HTTP protocol.</p>
+
+
+<h4>Overview</h4>
+<p>The API is implemented in RESTful style. The end point for v1 you are going to use is:</p>
+
+<ul>
+<li><code>https://zenodo.org/api/deposit/</code></li>
+</ul>
+
+<p>At the moment there are two resources:</p>
+
+<ul>
+<li><code>/depositions/</code></li>
+<li><code>/depositions/:uuid/</code></li>
+</ul>
+
+<h5>Characters</h5>
+UTF8 encoding
+
+<h5>Security</h5>
+All the traffic goes via HTTPS - please remember we do not support bare HTTP. All the requests to this system require API key authentication. Each key have some constraints associated with it:
+
+<h4>API Reference</h4>
+
+Resources
+GET depositions - List ongoing and submitted depositions
+POST depositions - Create a new deposition
+GET depositions/:uuid - Get deposition
+PUT depositions/:uuid - Update deposition metadata
+DELETE depositions/:uuid - Delete deposition
+GET depositions/:uuid/files - List deposition files
+POST depositions/:uuid/files - Create a new file
+GET depositions/:uuid/files/:id - Get file metadata
+PUT depositions/:uuid/files/:id - Replace file metadata
+DELETE depositions/:uuid/files/:id - Delete file
+
+
+<h5>Metadata object</h5>
+
+<table class="table table-hover">
+<tbody>
+    <tr>
+        <td class="param">upload_type<span>required</span></td>
+        <td>
+        <p>The type of upload.</p>
+        <p><strong>Allowed values:</strong> <tt>publication</tt>, <tt>presentation</tt>, <tt>poster</tt>, <tt>dataset</tt>, <tt>image</tt>, <tt>video</tt>.</p>
+        </td>
+    </tr>
+    <tr>
+        <td class="param">publication_type<span>optional*</span></td>
+        <td>
+        <p>The type of publication if upload type</p>
+        <p><strong>Allowed values:</strong> <tt>publication</tt>, <tt>presentation</tt>, <tt>poster</tt>, <tt>dataset</tt>, <tt>image</tt>, <tt>video</tt>.</p>
+        </td>
+    </tr>
+</tbody>
+</table>
+{#
+upload_type (required): CV
+publication_type (required if): CV
+image_type (required if): CV
+collections: list of strings
+doi: string
+prereserve_doi: bool
+publication_date:
+title: string
+creators: list of dictionary
+name
+affiliation
+identifier
+description: string
+kewords:
+
+notes
+access_right
+embargo_date
+license
+funding_source
+related_identifiers
+scheme
+identifier
+relation
+journal_title
+journal_volume
+journal_issue
+journal_pages
+
+
+Deposition:
+uuid
+type: “zenodo”
+data:
+#}
+
+<h5>GET /api/deposit/depositions - List ongoing and submitted depositions</h5>
+
+<p>Resource URL</p>
+<code>https://zenodo.org/api/deposit/depositions</code>
+
+
+HTTP method:
+GET
+Request parameters:
+status (optional)
+draft, final
+type (optiona)l
+
+Response status:
+200 - Successful
+400 - Bad request
+401 - Unauthorized
+403 - Forbidden
+500 - Internal server error
+Response format:
+JSON
+Example:
+GET https://zenodo.org/api/deposit/depositions
+
+POST /api/deposit/depositions - Create a new deposition
+Create a new deposition in ZENODO
+
+Resource URL
+https://zenodo.org/api/deposit/depositions
+
+Parameters
+
+
+Example request
+POST
+https://zenodo.org/api/deposit/depositions
+POST Data
+
+
+
+Example response
+
+
+
+
+HTTP method:
+POST
+Request parameters:
+type (optional)
+
+Response status:
+201 - Created
+400 - Bad request
+401 - Unauthorized
+403 - Forbidden
+500 - Internal server error
+Response format:
+JSON
+Response body:
+uuid:
+Example:
+GET https://zenodo.org/api/deposit/depositions
+{% endblock %}

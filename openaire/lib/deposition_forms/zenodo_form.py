@@ -1,100 +1,218 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
+#
+# This file is part of Invenio.
+# Copyright (C) 2013 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA
 
-from wtforms import validators
-from invenio.webinterface_handler_flask_utils import _
-from invenio.webdeposit_form import WebDepositForm as Form
-from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
-    ButtonWidget
-from flask.ext import wtf
-from invenio import openaire_validators as oa_validators
-from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
-from datetime import datetime, date
+from datetime import date
 from jinja2 import Markup
-
-# Import custom fields
+from wtforms import validators, widgets
+from wtforms.validators import ValidationError
+from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_DATACITE_DOI_PREFIX
+from invenio.dbquery import run_sql
+from invenio.webinterface_handler_flask_utils import _
+from invenio.webdeposit_form import WebDepositForm
+from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
+    ButtonWidget, ExtendedListWidget, ListItemWidget
+from invenio.webdeposit_filter_utils import strip_string, sanitize_html
+from invenio.webdeposit_validation_utils import doi_syntax_validator, \
+    invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
+    list_length, not_required_if, pid_validator
+from invenio.webdeposit_processor_utils import datacite_lookup, \
+    PidSchemeDetection, PidNormalize
+from invenio.webdeposit_autocomplete_utils import kb_autocomplete
 from invenio.webdeposit_load_fields import fields
+from invenio.openaire_autocomplete_utils import usercollection_autocomplete
+from invenio.webdeposit_field_widgets import TagListWidget, TagInput, \
+    ItemWidget, CKEditorWidget
+from invenio.zenodoutils import create_doi, filter_empty_helper
+import json
 
 __all__ = ['ZenodoForm']
 
 
 #
-# WTForm filters
+# Local processors
 #
-def strip_string(data):
-    if isinstance(data, basestring):
-        return data.strip()
-    else:
-        return data
-
-
-def strip_doi(data):
-    """
-    Remove "doi:" prefix from string
-    """
-    if isinstance(data, basestring):
-        if data.lower().startswith("doi:"):
-            return data[4:]
-    return data
-
-
-def splitchar_list(c):
-    def _inner(data):
-        if isinstance(data, basestring):
-            newdata = []
-            for item in data.split(c):
-                if item.strip():
-                    newdata.append(item.strip().encode('utf8'))
-            return newdata
-        else:
-            return data
-    return _inner
-
-
-def splitlines_list(data):
-    if isinstance(data, basestring):
-        newdata = []
-        for line in data.splitlines():
-            if line.strip():
-                newdata.append(line.strip().encode('utf8'))
-        return newdata
-    else:
-        return data
-
-
-def map_func(func):
-    def _mapper(data):
-        if isinstance(data, list):
-            return map(func, data)
-        else:
-            return data
-    return _mapper
+local_datacite_lookup = datacite_lookup(mapping=dict(
+    get_titles='title',
+    get_dates='publication_date',
+    get_description='description',
+))
 
 #
-# ZENODO Upload Form
+# Local autocomplete mappers
 #
-class ZenodoForm(Form):
+def map_result(func, mapper):
+    def inner(form, field, term, limit=50):
+        prefix = form._prefix
+        return map(
+            lambda x: mapper(x, prefix),
+            func(form, field, term, limit=limit)
+        )
+    return inner
 
+
+def communityform_mapper(obj, prefix):
+    obj.update({
+        'fields': {
+            '%sidentifier' % prefix: obj['id'],
+            '%stitle' % prefix: obj['value'],
+        }
+    })
+    return obj
+
+
+def authorform_mapper(obj, prefix):
+    obj.update({
+        'value': "%s: %s" % (obj['name'], obj['affiliation']),
+        'fields': {
+            '%sname' % prefix: obj['name'],
+            '%saffiliation' % prefix: obj['affiliation'],
+        }
+    })
+    return obj
+
+
+def json_projects_kb_mapper(val):
+    data = json.loads(val['value'])
+    grant_id = data.get('grant_agreement_number', '')
+    acronym = data.get('acronym', '')
+    title = data.get('title', '')
+    return {
+        'value': "%s - %s (%s)" % (acronym, title, grant_id),
+        'fields': {
+            'id': grant_id,
+            'acronym': acronym,
+            'title': title,
+        }
+    }
+
+
+def dummy_autocomplete(form, field, term, limit=50):
+    return [
+        {
+            'name': 'Nielsen, Lars',
+            'affiliation': 'CERN',
+        },
+        {
+            'name': 'Mele, Salvatore',
+            'affiliation': 'CERN',
+        }
+    ]
+
+
+#
+# Subforms
+#
+class RelatedIdentifierForm(WebDepositForm):
+    scheme = fields.TextField(
+        label="",
+        default='',
+        widget_classes='span1',
+        widget=widgets.HiddenInput(),
+    )
+    identifier = fields.TextField(
+        label="",
+        placeholder="e.g. 10.1234/foo.bar...",
+        validators=[
+            validators.optional(),
+            pid_validator(),
+        ],
+        processors=[
+            PidSchemeDetection(set_field='scheme'),
+            PidNormalize(scheme_field='scheme'),
+        ],
+        widget_classes='span3',
+    )
+    relation = fields.SelectField(
+        label="",
+        choices=[
+            ('isCitedBy', 'cites this upload'),
+            ('cites', 'is cited by this upload'),
+            ('isSupplementTo', 'is supplemented by this upload'),
+            ('isSupplementedBy', 'is a supplement to this upload'),
+            #('isPartof','upload is part of),
+            #('hasPart','has part'),
+        ],
+        default='isSupplementTo',
+        widget_classes='span2',
+    )
+
+
+class CreatorForm(WebDepositForm):
+    name = fields.TextField(
+        placeholder="Family name, First name",
+        widget_classes='span3',
+        # autocomplete=map_result(
+        #     dummy_autocomplete,
+        #     authorform_mapper
+        # ),
+    )
+    affiliation = fields.TextField(
+        placeholder="Affiliation",
+        widget_classes='span2',
+    )
+
+
+class CommunityForm(WebDepositForm):
+    identifier = fields.TextField(
+        widget=widgets.HiddenInput(),
+    )
+    title = fields.TextField(
+        placeholder="Start typing a community name...",
+        autocomplete=map_result(
+            usercollection_autocomplete,
+            communityform_mapper
+        ),
+        widget=TagInput(),
+        widget_classes='span5',
+    )
+
+
+class GrantForm(WebDepositForm):
+    id = fields.TextField(
+        widget=widgets.HiddenInput(),
+    )
+    acronym = fields.TextField(
+        widget=widgets.HiddenInput(),
+    )
+    title = fields.TextField(
+        placeholder="Start typing a grant number, name or abbreviation...",
+        autocomplete=kb_autocomplete(
+            'json_projects',
+            mapper=json_projects_kb_mapper
+        ),
+        widget=TagInput(),
+        widget_classes='span5',
+    )
+
+
+#
+# Form
+#
+class ZenodoForm(WebDepositForm):
     #
     # Fields
     #
-    upload_type = fields.UploadTypeField(validators=[validators.required()])
+    upload_type = fields.UploadTypeField(
+        validators=[validators.required()],
+        export_key='upload_type.type',
+    )
     publication_type = fields.SelectField(
         label='Type of publication',
         choices=[
@@ -112,14 +230,14 @@ class ZenodoForm(Form):
             ('other', 'Other'),
         ],
         validators=[
-            oa_validators.RequiredIf('upload_type', ['publication']),
+            required_if('upload_type', ['publication']),
             validators.optional()
         ],
         hidden=True,
         disabled=True,
+        export_key='upload_type.subtype',
     )
     image_type = fields.SelectField(
-        label='Type of image',
         choices=[
             ('figure', 'Figure'),
             ('plot', 'Plot'),
@@ -129,23 +247,12 @@ class ZenodoForm(Form):
             ('other', 'Other'),
         ],
         validators=[
-            oa_validators.RequiredIf('upload_type', ['image']),
+            required_if('upload_type', ['image']),
             validators.optional()
         ],
         hidden=True,
         disabled=True,
-    )
-
-    #
-    # Collection
-    #
-    collections = fields.CollectionsField(
-        label="Communities",
-        description="Optional.",
-        filters=[
-            splitchar_list(","),
-        ],
-        placeholder="Start typing a community name...",
+        export_key='upload_type.subtype',
     )
 
     #
@@ -154,33 +261,47 @@ class ZenodoForm(Form):
     doi = fields.DOIField(
         label="Digital Object Identifier",
         description="Optional. Did your publisher already assign a DOI to your"
-            " upload? If not, leave the field empty and we will register a new"
-            " DOI for you. A DOI allow others to easily and unambiguously cite"
-            " your upload.",
-        filters=[
-            strip_string,
-            strip_doi,
-        ],
+        " upload? If not, leave the field empty and we will register a new"
+        " DOI for you. A DOI allow others to easily and unambiguously cite"
+        " your upload.",
         placeholder="e.g. 10.1234/foo.bar...",
+        validators=[
+            doi_syntax_validator,
+            pre_reserved_doi_validator(
+                'prereserve_doi',
+                prefix=CFG_DATACITE_DOI_PREFIX
+            ),
+            invalid_doi_prefix_validator(prefix=CFG_DATACITE_DOI_PREFIX),
+        ],
+        processors=[
+            local_datacite_lookup
+        ],
+        export_key='doi',
     )
-
     prereserve_doi = fields.ReserveDOIField(
         label="",
         doi_field="doi",
+        doi_creator=create_doi,
         widget=ButtonWidget(
             label=_("Pre-reserve DOI"),
             icon='icon-barcode',
-            tooltip=_('Pre-reserve a Digital Object Identifier for your upload. This allows you know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until submit your upload.'),
+            tooltip=_(
+                'Pre-reserve a Digital Object Identifier for your upload. This'
+                ' allows you know the DOI before you submit your upload, and'
+                ' can thus include it in e.g. publications. The DOI is not'
+                ' finally registered until submit your upload.'
+            ),
         ),
     )
-
     publication_date = fields.Date(
         label=_('Publication date'),
+        icon='icon-calendar',
         description='Required. Format: YYYY-MM-DD. The date your upload was '
-            'made available in case it was already published elsewhere.',
+        'made available in case it was already published elsewhere.',
         default=date.today(),
         validators=[validators.required()],
         widget=date_widget,
+        widget_classes='input-small',
     )
     title = fields.TitleField(
         validators=[validators.required()],
@@ -188,33 +309,64 @@ class ZenodoForm(Form):
         filters=[
             strip_string,
         ],
+        export_key='title',
     )
-    creators = fields.AuthorField(
-        label="Authors",
-        validators=[validators.required()],
-        description="Required. Format: Family name, First name: Affiliation"
-            " (one author per line)",
-        placeholder="Family name, First name: Affiliation (one author per line)",
+    creators = fields.DynamicFieldList(
+        fields.FormField(
+            CreatorForm,
+            widget=ExtendedListWidget(
+                item_widget=ListItemWidget(with_label=False),
+                class_='inline',
+            ),
+        ),
+        label='Authors',
+        add_label='Add another author',
+        icon='icon-user',
+        widget_classes='',
+        min_entries=1,
+        export_key='authors',
+        validators=[validators.required(), list_length(
+            min_num=1, element_filter=filter_empty_helper(),
+        )],
     )
-    description = fields.AbstractField(
+    description = fields.TextAreaField(
         label="Description",
         description='Required.',
+        default='',
+        icon='icon-pencil',
         validators=[validators.required()],
+        widget=CKEditorWidget(
+            toolbar=[
+                ['PasteText', 'PasteFromWord'],
+                ['Bold', 'Italic', 'Strike', '-',
+                    'Subscript', 'Superscript', ],
+                ['NumberedList', 'BulletedList'],
+                ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
+                ['SpecialChar', 'ScientificChar'], ['Source'], ['Maximize'],
+            ],
+            disableNativeSpellChecker=False,
+            extraPlugins='scientificchar',
+            removePlugins='elementspath',
+        ),
         filters=[
+            sanitize_html,
             strip_string,
         ],
     )
-    keywords = fields.KeywordsField(
-        validators=[validators.optional()],
-        description="Optional. Format: One keyword per line.",
-        filters=[
-            splitlines_list
-        ],
-        placeholder="One keyword per line...",
+    keywords = fields.DynamicFieldList(
+        fields.TextField(
+            widget_classes="span5"
+        ),
+        label='Keywords',
+        add_label='Add another keyword',
+        icon='icon-tags',
+        widget_classes='',
+        min_entries=1,
     )
     notes = fields.TextAreaField(
         label="Additional notes",
         description='Optional.',
+        default='',
         validators=[validators.optional()],
         filters=[
             strip_string,
@@ -227,27 +379,29 @@ class ZenodoForm(Form):
     access_right = fields.AccessRightField(
         label="Access right",
         description="Required. Open access uploads have considerably higher "
-            "visibility on %s." % CFG_SITE_NAME,
+        "visibility on %s." % CFG_SITE_NAME,
         default="open",
         validators=[validators.required()]
     )
     embargo_date = fields.Date(
         label=_('Embargo date'),
+        icon='icon-calendar',
         description='Required only for Embargoed Access uploads. Format: '
-            'YYYY-MM-DD. The date your upload will be made publicly available '
-            'in case it is under an embargo period from your publisher.',
+        'YYYY-MM-DD. The date your upload will be made publicly available '
+        'in case it is under an embargo period from your publisher.',
         default=date.today(),
         validators=[
-            oa_validators.RequiredIf('access_right', ['embargoed']),
+            required_if('access_right', ['embargoed']),
             validators.optional()
         ],
         widget=date_widget,
+        widget_classes='input-small',
         hidden=True,
         disabled=True,
     )
     license = fields.LicenseField(
         validators=[
-            oa_validators.RequiredIf('access_right', ['embargoed', 'open', ]),
+            required_if('access_right', ['embargoed', 'open', ]),
             validators.required()
         ],
         default='cc-zero',
@@ -255,10 +409,10 @@ class ZenodoForm(Form):
         domain_content=True,
         domain_software=False,
         description='Required. The selected license applies to all of your '
-            'files displayed in the bottom of the form. If you want to upload '
-            'some files under a different license, please do so in two separate'
-            ' uploads. If you think a license missing in the list, please '
-            'inform us at %s.' % CFG_SITE_SUPPORT_EMAIL,
+        'files displayed in the bottom of the form. If you want to upload '
+        'some files under a different license, please do so in two separate'
+        ' uploads. If you think a license missing is in the list, please '
+        'inform us at %s.' % CFG_SITE_SUPPORT_EMAIL,
         filters=[
             strip_string,
         ],
@@ -266,84 +420,223 @@ class ZenodoForm(Form):
     )
 
     #
+    # Collection
+    #
+    communities = fields.DynamicFieldList(
+        fields.FormField(
+            CommunityForm,
+            widget=ExtendedListWidget(html_tag=None, item_widget=ItemWidget())
+        ),
+        widget=TagListWidget(template="{{title}}"),
+        icon='icon-group',
+        export_key='provisional_communities',
+    )
+
+    #
     # Funding
     #
-    funding_source = fields.FundingField(
-        label="Grants",
-        description="Optional. Note, a human %s curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay before your upload is available in OpenAIRE." % CFG_SITE_NAME,
-        filters=[
-            splitchar_list(","),
-        ],
-        placeholder="Start typing a grant number, name or abbreviation...",
+    grants = fields.DynamicFieldList(
+        fields.FormField(
+            GrantForm,
+            widget=ExtendedListWidget(html_tag=None, item_widget=ItemWidget()),
+            export_key=lambda f: {
+                'identifier': f.data['id'],
+                'title': "%s - %s (%s)" % (
+                    f.data['acronym'], f.data['title'], f.data['id']
+                )
+            }
+        ),
+        widget=TagListWidget(template="{{acronym}} - {{title}} ({{id}})"),
+        icon='icon-group',
+        description="Optional. Note, a human %s curator will validate your"
+                    " upload before reporting it to OpenAIRE, and you may "
+                    "thus experience a delay before your upload is available "
+                    "in OpenAIRE." % CFG_SITE_NAME,
     )
 
     #
     # Related work
     #
-    related_identifiers = fields.RelatedIdentifiersField(
+    related_identifiers = fields.DynamicFieldList(
+        fields.FormField(
+            RelatedIdentifierForm,
+            description="Optional. Format: e.g. 10.1234/foo.bar",
+            widget=ExtendedListWidget(
+                item_widget=ListItemWidget(
+                    with_label=False,
+                ),
+                class_='inline',
+            ),
+        ),
         label="Related identifiers",
-        filters=[
-            splitlines_list,
-            map_func(strip_doi),
-        ],
-        description="Optional. Format: e.g. 10.1234/foo.bar (one DOI per line).",
-        placeholder="e.g. 10.1234/foo.bar (one DOI per line)...",
-    )  # List identifier, rel type
+        add_label='Add another related identifier',
+        icon='icon-barcode',
+        widget_classes='',
+        min_entries=1,
+    )
 
     #
     # Journal
     #
-    journal_title = fields.JournalField(description="Optional.")
-    journal_volume = fields.TextField(label="Volume", description="Optional.")
-    journal_issue = fields.TextField(label="Issue", description="Optional.")
-    journal_pages = fields.TextField(label="Pages", description="Optional.")
+    journal_title = fields.TextField(
+        label="Journal title",
+        description="Optional.",
+        validators=[
+            required_if(
+                'journal_volume', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Journal title is required if you specify either "
+                        "volume, issue or pages."
+            ),
+            required_if(
+                'journal_issue', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Journal title is required if you specify either "
+                        "volume, issue or pages."
+            ),
+            required_if(
+                'journal_pages', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Journal title is required if you specify either "
+                        "volume, issue or pages."
+            ),
+        ],
+        export_key='journal.title',
+    )
+    journal_volume = fields.TextField(
+        label="Volume", description="Optional.", export_key='journal.volume',
+    )
+    journal_issue = fields.TextField(
+        label="Issue", description="Optional.", export_key='journal.issue',
+    )
+    journal_pages = fields.TextField(
+        label="Pages", description="Optional.", export_key='journal.pages',
+    )
 
     #
     # Book/report/chapter
     #
-    partof_title = fields.TextField(label="Book title", description="Optional. "
-        "Title of the book or report which this upload is part of.")
-    partof_pages = fields.TextField(label="Pages", description="Optional.")
-
-    imprint_isbn = fields.TextField(label="ISBN", description="Optional.",
-        #placeholder="e.g 0-06-251587-X"
+    partof_title = fields.TextField(
+        label="Book title",
+        description="Optional. "
+                    "Title of the book or report which this "
+                    "upload is part of.",
+        export_key='part_of.title',
     )
-    imprint_publisher = fields.TextField(label="Publisher", description="Optional.")
-    imprint_place = fields.TextField(label="Place", description="Optional.",
-        #placeholder="e.g city, country..."
+    partof_pages = fields.TextField(
+        label="Pages",
+        description="Optional.",
+        export_key='part_of.pages',
+    )
+
+    imprint_isbn = fields.TextField(
+        label="ISBN",
+        description="Optional.",
+        placeholder="e.g 0-06-251587-X",
+        export_key='isbn',
+    )
+    imprint_publisher = fields.TextField(
+        label="Publisher",
+        description="Optional.",
+        export_key='imprint.publisher',
+    )
+    imprint_place = fields.TextField(
+        label="Place",
+        description="Optional.",
+        placeholder="e.g city, country...",
+        export_key='imprint.place',
     )
 
     #
     # Thesis
     #
-    thesis_supervisors = fields.AuthorField(
-        label="Supervisors",
-        validators=[validators.optional()],
-        description="Optional. Format: Family name, First name: Affiliation"
-            " (one supervisor per line)",
-        placeholder="Family name, First name: Affiliation (one supervisor per line)",
+    thesis_supervisors = fields.DynamicFieldList(
+        fields.FormField(
+            CreatorForm,
+            widget=ExtendedListWidget(
+                item_widget=ListItemWidget(with_label=False),
+                class_='inline',
+            ),
+        ),
+        label='Supervisors',
+        add_label='Add another supervisor',
+        icon='icon-user',
+        widget_classes='',
+        min_entries=1,
     )
     thesis_university = fields.TextField(
         description="Optional.",
         label='Awarding University',
         validators=[validators.optional()],
+        icon='icon-building',
     )
-    thesis_university._icon_html = '<i class="icon-building"></i>',
 
     #
     # Conference
     #
-    conference_title = fields.TextField(description="Optional.")
-    conference_acronym = fields.TextField(label="Acronym", description="Optional.")
-    conference_dates = fields.TextField(label="Dates", description="Optional.",
-        placeholder="e.g 21-22 November 2012..."
+    conference_title = fields.TextField(
+        label="Conference title",
+        description="Optional.",
+        validators=[
+            not_required_if('conference_acronym', [lambda x: bool(x.strip())]),
+            required_if(
+                'conference_dates', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Conference title or acronym is required if you "
+                        "specify either dates or place."
+            ),
+            required_if(
+                'conference_place', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Conference title or acronym is required if you "
+                        "specify either dates or place."
+            ),
+        ],
+        export_key="meetings.title"
     )
-    conference_place = fields.TextField(label="Place", description="Optional.",
-        placeholder="e.g city, country..."
+    conference_acronym = fields.TextField(
+        label="Acronym",
+        description="Optional.",
+        validators=[
+            not_required_if('conference_title', [lambda x: bool(x.strip())]),
+            required_if(
+                'conference_dates', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Conference title or acronym is required if you "
+                        "specify either dates or place."
+            ),
+            required_if(
+                'conference_place', [lambda x: bool(x.strip()), ],  # non-empty
+                message="Conference title or acronym is required if you "
+                        "specify either dates or place."
+            ),
+        ],
+        export_key="meetings.acronym",
     )
-    conference_url = fields.TextField(label="Website", description="Optional.")
+    conference_dates = fields.TextField(
+        label="Dates", description="Optional.",
+        placeholder="e.g 21-22 November 2012...",
+        export_key="meetings.dates",
+    )
+    conference_place = fields.TextField(
+        label="Place",
+        description="Optional.",
+        placeholder="e.g city, country...",
+        export_key="meetings.place",
+    )
+    conference_url = fields.TextField(
+        label="Website",
+        description="Optional. E.g. http://zenodo.org",
+        validators=[validators.optional(), validators.URL()]
+    )
 
-    plupload_file = fields.FileUploadField(label="", widget=plupload_widget)
+    #
+    # File upload field
+    #
+    plupload_file = fields.FileUploadField(
+        label="",
+        widget=plupload_widget,
+        export_key=False
+    )
+
+    def validate_plupload_file(form, field):
+        """ Ensure minimum one file is attached. """
+        if len(form.files) == 0:
+            raise ValidationError("You must provide minimum one file.")
 
     #
     # Form configuration
@@ -356,7 +649,7 @@ class ZenodoForm(Form):
     #
     groups = [
         ('Type of file(s)',
-            ['upload_type', 'publication_type', 'image_type',],
+            ['upload_type', 'publication_type', 'image_type', ],
             {'indication': 'required'}),
         ('Basic information', [
             'doi', 'prereserve_doi', 'publication_date', 'title',  'creators', 'description',
@@ -367,17 +660,17 @@ class ZenodoForm(Form):
         ], {
             'indication': 'required',
             'description': 'Unless you explicitly specify the license conditions below for Open Access and Embargoed Access uploads,'
-                ' you agree to release your data files under the terms of the Creative Commons Zero (CC0) waiver.'
-                ' All authors of the data and publications have agreed to the terms of this waiver and license.' % {'site_name': CFG_SITE_NAME}
+            ' you agree to release your data files under the terms of the Creative Commons Zero (CC0) waiver.'
+            ' All authors of the data and publications have agreed to the terms of this waiver and license.'
         }),
         ('Communities', [
-            'collections',
+            'communities',
         ], {
             'indication': 'recommended',
             'description': Markup('Any user can create a community collection on %(CFG_SITE_NAME)s (<a href="/communities/">browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.' % {'CFG_SITE_NAME': CFG_SITE_NAME})
         }),
         ('Funding', [
-            'funding_source',
+            'grants',
         ], {
             'indication': 'recommended',
             'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!' % CFG_SITE_NAME,
@@ -387,7 +680,7 @@ class ZenodoForm(Form):
         ], {
             'classes': '',
             'indication': 'recommended',
-            'description': 'Specify the Digital Object Identifiers (DOIs) of e.g. datasets referenced by your upload or e.g. publications referencing your upload:'
+            'description': 'Specify identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs.'
         }),
         ('Journal', [
             'journal_title', 'journal_volume', 'journal_issue',
@@ -404,7 +697,7 @@ class ZenodoForm(Form):
             'indication': 'optional',
         }),
         ('Book/Report/Chapter', [
-            'imprint_publisher',  'imprint_place', 'imprint_isbn',
+            'imprint_publisher',  'imprint_place', 'imprint_isbn', '-',
             'partof_title', 'partof_pages',
         ], {'classes': '', 'indication': 'optional', }),
         ('Thesis', [
@@ -414,6 +707,3 @@ class ZenodoForm(Form):
             'indication': 'optional',
         }),
     ]
-
-
-

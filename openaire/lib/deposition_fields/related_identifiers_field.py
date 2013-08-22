@@ -46,7 +46,7 @@ def doi_list_validator(form, field):
             raise ValidationError("The provided DOI is invalid - it should look similar to '10.1234/foo.bar'.")
 
 
-class RelatedIdentifiersField(WebDepositField(key=None), TextAreaField):
+class RelatedIdentifiersField(WebDepositField, TextAreaField):
     def __init__(self, **kwargs):
         self._icon_html = '<i class="icon-barcode"></i>'
         kwargs['validators'] = [doi_list_validator]

@@ -20,11 +20,11 @@
 confignicedir = $(sysconfdir)/build
 confignice_SCRIPTS=config.nice
 
-SUBDIRS = bibedit bibformat bibsched miscutil openaire websearch websession webstyle
+SUBDIRS = bibfield bibedit bibformat bibsched miscutil openaire websearch websession webstyle
 
 EXTRA_DIST = config.nice.in config.rpath
 
 install-tables:
-	${prefix}/bin/dbexec < $(top_srcdir)/openaire/sql/tabcreate.sql 
+	${prefix}/bin/dbexec < $(top_srcdir)/openaire/sql/tabcreate.sql
 
 CLEANFILES = *~ *.pyc *.tmp

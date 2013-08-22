@@ -22,10 +22,59 @@
 .rmlink {
   color: #000;
 }
+
 .rmlink:hover {
   color: #666;
   text-decoration: none;
   cursor: pointer;
+}
+
+.iconlink {
+   text-decoration: none;
+}
+
+.iconlink:hover {
+   text-decoration: none;
+   cursor: pointer;
+}
+
+.sortlink:hover {
+   cursor: move;
+}
+
+.remove-element {
+   padding-left: 10px;
+}
+
+.add-element {
+   text-decoration: none;
+}
+
+.add-element:hover {
+   cursor: pointer;
+   text-decoration: none;
+}
+
+
+.field-list-element .inline > li {
+  padding-left: 0;
+  padding-right: 10px;
+}
+
+.field-list-element .inline {
+  margin-bottom: 10px;
+}
+
+.field-list-element .inline input {
+  margin-bottom: 5px;
+}
+
+.field-list-element li > input {
+  vertical-align: top;
+}
+
+.field-list-element > input {
+  margin-bottom: 10px;
 }
 
 .hero-unit {
@@ -382,9 +431,10 @@ h1, h2, h3 {
 
 .field-desc {
     margin-top: 10px;
+    clear: both;
 }
 
-#description, #keywords, #creators, #related_identifiers {
+#description {
     height: 110px;
 }
 
@@ -504,6 +554,9 @@ fieldset label i {
     margin-left: 5px;
 }
 
+.empty-element {
+   display: none;
+}
 
 /* Adjust for phones */
 @media (max-width: 767px) {

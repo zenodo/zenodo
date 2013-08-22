@@ -24,15 +24,14 @@ from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
 blueprint = InvenioBlueprint('invenio_openaire', __name__,
   url_prefix="",
   menubuilder=[
-    ('main.deposit', _('Upload old'), 'deposit', 1),
-    ('main.browse', _('Browse'), '', 1),
+    ('main.browse', _('Browse'), '', 2),
     ('main.browse.datasets', _('Datasets'), 'collection.datasets', 1),
     ('main.browse.images', _('Images'), 'collection.images', 2),
     ('main.browse.posters', _('Posters'), 'collection.posters', 3),
     ('main.browse.presentations', _('Presentations'), 'collection.presentations', 4),
     ('main.browse.publications', _('Publications'), 'collection.publications', 5),
     ('main.browse.videos', _('Video/Audio'), 'collection.videos', 6),
-    ('main.getstarted', _('Get started'), '', 3),
+    ('main.getstarted', _('Get started'), '', 4),
     ('main.getstarted.features', _('Features'), 'invenio_openaire.features', 1),
     #('main.getstarted.deposit_data', _('Deposit data'), 'invenio_openaire.deposit_data', 2),
     #('main.getstarted.use_data', _('Use data'), 'invenio_openaire.use_data', 3),
@@ -91,6 +90,12 @@ def contact():
 @blueprint.invenio_set_breadcrumb(_("API"))
 def api():
     return render_template('openaire_api.html')
+
+
+@blueprint.route('/api/upload', methods=['GET', ])
+@blueprint.invenio_set_breadcrumb(_("API"))
+def api_upload():
+    return render_template('openaire_api_upload.html')
 
 
 @blueprint.route('/faq', methods=['GET', ])

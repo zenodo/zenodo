@@ -21,11 +21,13 @@ OpenAIRE local customization of Flask application
 """
 
 import time
-from invenio.config import CFG_SITE_LANG, CFG_OPENAIRE_MAX_UPLOAD
+from invenio.config import CFG_SITE_LANG, CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE
 from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
 from invenio.usercollection_signals import after_save_collection, \
     post_curation, pre_curation
+from invenio.webdeposit_signals import template_context_created
+from invenio.webdeposit_local import index_context_listener
 from jinja2 import nodes
 from jinja2.ext import Extension
 from invenio.webuser_flask import current_user
@@ -38,10 +40,9 @@ TEMPLATE_FRAGMENT_KEY_TEMPLATE = '_template_fragment_cache_%s%s'
 
 
 def customize_app(app):
-    #from invenio.webinterface_handler_flask_utils import _
     from flask import current_app
 
-    app.config['MAX_CONTENT_LENGTH'] = CFG_OPENAIRE_MAX_UPLOAD
+    app.config['MAX_CONTENT_LENGTH'] = CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE
 
     @app.context_processor
     def local_processor():
@@ -57,15 +58,7 @@ def customize_app(app):
             current_app.config['menubuilder_map']['footermenu_bottom'].children.values())
 
         return dict(footermenu_left=left, footermenu_right=right,
-            footermenu_bottom=bottom)
-
-    @app.template_filter('filesizeformat')
-    def filesizeformat_filter(value):
-        """
-        Jinja2 filesizeformat filters is broken in Jinja2 up to v2.7, so
-        let's implement our own.
-        """
-        return nice_size(value)
+                    footermenu_bottom=bottom)
 
     @app.template_filter('timefmt')
     def timefmt_filter(value, format="%d %b %Y, %H:%M"):
@@ -177,10 +170,17 @@ def customize_app(app):
     # Add {% zenodocache tag %} and connect webcoll signal handler to invalidate
     # cache.
     app.jinja_env.add_extension(ZenodoExtension)
+
     webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache)
     after_save_collection.connect(invalidate_jinja2_cache)
     pre_curation.connect(pre_curation_reject_listener)
     post_curation.connect(post_curation_reject_listener)
+    template_context_created.connect(
+        index_context_listener,
+        sender='webdeposit.index'
+    )
+
+
 
     @app.template_filter('schemaorg_type')
     def schemaorg_type(recid=None, bfo=None):

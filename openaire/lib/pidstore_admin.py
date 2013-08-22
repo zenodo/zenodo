@@ -21,7 +21,7 @@
 
 
 #from flask.ext.admin import expose
-from invenio.admin import InvenioModelView
+from invenio.adminutils import InvenioModelView
 from invenio.sqlalchemyutils import db
 from invenio.pidstore_model import PersistentIdentifier, PidLog
 

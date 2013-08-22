@@ -63,7 +63,7 @@
               </tr>
             </thead>
             <tbody>
-              {%- for file in files -%}
+              {%- for file in files|sort(attribute='comment') -%}
                 <tr class="">
                   <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
                   <td>{{ file.md.strftime('%d %b %Y') }}</td>

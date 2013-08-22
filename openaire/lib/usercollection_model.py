@@ -242,7 +242,7 @@ class UserCollection(db.Model):
     @property
     def upload_url(self):
         """ Get direct upload URL """
-        return url_for('deposit.index', c=self.id)
+        return url_for('webdeposit.index', c=self.id)
 
     #
     #

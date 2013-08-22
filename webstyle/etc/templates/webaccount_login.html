@@ -31,14 +31,14 @@
         <p>
           {% include "zenodo_benefits.html" %}
         </p>
-        <p><a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
+        <p><a href="{{url_for('webaccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
         </p>
         </div>
     </div>
     <div class="span4">
       <div class="well">
       <legend>{{ _('Please Sign In') }}</legend>
-      <form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('.login') }}" method="POST">
+      <form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('webaccount.login') }}" method="POST">
       {{ form.referer }}
         <div class="control-group{% if form.nickname.errors %} error{% endif %}">
         {{ form.nickname(placeholder=_('Username or email'), class_="span3") }}
@@ -68,9 +68,9 @@
         <p style="margin-top: 30px;">
           <div class="row">
             <div width="100%" align="center">
-                <a href="{{url_for('deposit.index')}}" class="btn btn-large">Upload</a>
+                <a href="{{url_for('webdeposit.index')}}" class="btn btn-large">Upload</a>
                 <a href="/" class="btn btn-large">Search</a>
-                <a href="{{ url_for('youraccount.logout') }}" class="btn btn-large">Sign out</a>
+                <a href="{{ url_for('webaccount.logout') }}" class="btn btn-large">Sign out</a>
             </div>
           </div>
         </p>

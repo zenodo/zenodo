@@ -17,6 +17,61 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 {% extends "page.html" %}
+
 {% block body %}
-<h1>API</h1>
+<h1>{{config.CFG_SITE_NAME}} Developers</h1>
+<p>
+   ZENODO{{config.CFG_SITE_NAME}} supports Getting started with {{config.CFG_SITE_NAME}} is easy. Jump right into
+   the API documentation
+</p>
+
+<h2>Upload API</h2>
+<p>This API allows you to upload data and publications via our RESTful API.
+
+
+Before you will be able to use our API you must create an account and generate an API key under your profile.
+
+<h2>Harvesting API</h2>
+<p>
+{{config.CFG_SITE_NAME}} allows you to harvest our entire repository via
+the Open Archives Initiative Protocol for Metadata Harvesting (OAI-PMH). All
+metadata is licensed under Creative Commons Zero, while individual data
+files may be either open access and subject to a license described in the
+metadata or embargoed, restricted or closed access and not availble for
+download.
+
+<h3>Available metadata formats</h3>
+<dl>
+<dt>OAI Dublin Core (oai_dc)</dt>
+<dd>As a minimum requirement for OAI-PMH compliance, metadata must be made available in the OAI Dublin Core format. For more information please see the OAI-PMH web site.</dd>
+<dt>OAI DataCite (oai_datacite)</dt>
+<dd>This metadata format has been specifically established for the dissemination of DataCite records using OAI-PMH. In addition to the original DataCite metadata, this format contains several other elements describing the version of the metadata, whether it is of reference quality, and the registering datacentre. For more information about this format and its schema please see the Datacite OAI schema web site.</dd>
+<dt>DataCite (datacite)</dt>
+<dd>This metadata format contains only the original DataCite metadata without additions or alterations. Because there are multiple versions of DataCite metadata in the MDS, there is no one schema that they will all adhere to. Therefore the schema for this format does not exist and metadata will not validate against it. Please note that this format is not OAI-PMH version 2.0 compliant for the previously stated reasons.</dd>
+<dt>MARC XML (marcxml)</dt>
+<dd></dd>
+</dl>
+
+<h3>OAI-PMH Sets</h3>
+
+The following global OAI-PMH sets are defined
+<dl>
+<dt>ZENODO (zenodo)</dt>
+<dd></dd>
+<dt>OpenAIRE Publications (openaire)</dt>
+<dd></dd>
+<dt>OpenAIRE Research Data(openaire_data)</dt>
+<dd></dd>
+</dl>
+
+Additionally, each community is exported via a set. The harvesting link is
+listed on each page following the pattern:
+
+<dl>
+<dt>user-&gt;community identifier&lt;</dt>
+<dd></dd>
+</dl>
+
+</p>
+
 {% endblock %}

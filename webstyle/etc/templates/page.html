@@ -18,9 +18,11 @@
 {%- css 'css/token-input-facebook.css', '00-invenio' -%}
 {%- css 'css/datepicker.css', '00-invenio' -%}
 {%- css 'css/font-awesome.min.css', '00-invenio' -%}
+{%- css 'css/typeahead.js-bootstrap.css', '00-invenio' -%}
 {%- css 'css/custom.css', '00-invenio' -%}
 {%- js "js/hogan.js", '00-invenio' -%}
 {%- js 'js/jquery.min.js', '00-invenio' -%}
+{%- js 'js/jquery-migrate.min.js', '00-invenio' -%}
 {%- js 'js/jquery-ui.custom.min.js', '00-invenio' -%}
 {%- js 'js/bootstrap.min.js', '00-invenio' -%}
 {%- js "js/bootstrap-select.js", '00-invenio' -%}
@@ -123,7 +125,8 @@
   {%- include 'footer.html' -%}
   {%- block _bottom_assets %}
   {%- for bundle in get_js_bundle(iterate=True) %}
-  {% assets bundle %}<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+  {% assets bundle %}
+  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
   {%- endassets %}
   {%- endfor %}
   {%- endblock %}

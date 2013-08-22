@@ -18,18 +18,11 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from wtforms import SelectField
-from wtforms.validators import Required
 from invenio.webdeposit_field import WebDepositField
 from invenio.bibknowledge import get_kb_mappings
 import json
 
 __all__ = ['LicenseField']
-
-
-def _kb_transform(val):
-    val = json.loads(val['value'])
-    val['value'] = val.get('title', '')
-    return val
 
 
 def _kb_license_choices(domain_data=True, domain_content=True, domain_software=True):
@@ -44,17 +37,10 @@ def _kb_license_choices(domain_data=True, domain_content=True, domain_software=T
     return filter(lambda x: x is not None, map(_mapper, get_kb_mappings('licenses', '', '')))
 
 
-class LicenseField(WebDepositField(key=None), SelectField):
+class LicenseField(WebDepositField, SelectField):
 
     def __init__(self, **kwargs):
-        self._icon_html = '<i class="icon-certificate"></i>'
-
-        # Create our own Required data member
-        # for client-side use
-        if 'validators' in kwargs:
-            for v in kwargs.get("validators"):
-                if type(v) is Required:
-                    self.required = True
+        kwargs.setdefault("icon","icon-certificate")
 
         if 'choices' not in kwargs:
             license_filter = {}
@@ -63,13 +49,4 @@ class LicenseField(WebDepositField(key=None), SelectField):
                     license_filter[opt] = kwargs[opt]
                     del kwargs[opt]
             kwargs['choices'] = _kb_license_choices(**license_filter)
-
         super(LicenseField, self).__init__(**kwargs)
-
-    def pre_validate(self, form):
-        return dict(error=0, error_message='')
-
-    # def autocomplete(self, term, limit):
-    #     if not term:
-    #         term = ''
-    #     return map(_kb_transform, get_kb_mappings('licenses', '', term)[:limit])
