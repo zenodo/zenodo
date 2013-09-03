@@ -15,11 +15,9 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-imgdir = $(localstatedir)/www/img/
+imgdir = $(localstatedir)/www/img/logos/
 
-img_DATA = *.png *.jpeg
-
-SUBDIRS = logos
+img_DATA = *.png *.jpg
 
 EXTRA_DIST = $(img_DATA)
 
