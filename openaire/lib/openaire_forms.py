@@ -325,6 +325,7 @@ class DepositionForm(Form):
             'image': (['image_type'], ['publication_type']),
             'video': ([], ['publication_type', 'image_type']),
             'audio': ([], ['publication_type', 'image_type']),
+            'software': ([], ['publication_type', 'image_type']),
             '': ([], ['publication_type', 'image_type']),
         },
     }
@@ -340,6 +341,7 @@ class DepositionForm(Form):
                 'image': 'cc-by',
                 'video': 'cc-by',
                 'audio': 'cc-by',
+                'software': 'mit-license',
             }
         }
     }
@@ -506,7 +508,7 @@ class DepositionForm(Form):
         default='cc-zero',
         domain_data=True,
         domain_content=True,
-        domain_software=False,
+        domain_software=True,
         description='Required. The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license missing in the list, please inform us at %s.' % CFG_SITE_SUPPORT_EMAIL,
         filters=[
             strip_string,
