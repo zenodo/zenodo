@@ -43,7 +43,11 @@ class KeywordsField(TextAreaField, JsonCookerMixinBuilder('keywords')):
         if not self.data:
             return ""
         if isinstance(self.data, list):
-            return text_type("\n".join(self.data))
+            text = "\n".join(self.data)
+            if isinstance(text, unicode):
+                return text
+            else:
+                return text_type(text.decode('utf8'))
         else:
             return text_type(self.data)
 
