@@ -28,12 +28,14 @@ __all__ = ['CollectionsField']
 
 
 def _transform(val):
-    return {
-        'label': val.title,
-        'value': val.id,
-        'curatedby': val.owner.nickname,
-        'description': val.description,
-    }
+    if val:
+        return {
+            'label': val.title,
+            'value': val.id,
+            'curatedby': val.owner.nickname,
+            'description': val.description,
+        }
+    return None
 
 
 def _list_validator():
