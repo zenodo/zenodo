@@ -138,6 +138,7 @@ AC_CONFIG_FILES([config.nice  \
      webstyle/lib/Makefile \
      webstyle/font/Makefile \
      webstyle/img/Makefile \
+     webstyle/img/logos/Makefile \
      webstyle/flash/Makefile \
      webstyle/etc/Makefile \
      webstyle/etc/templates/Makefile \

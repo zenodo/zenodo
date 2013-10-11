@@ -148,6 +148,7 @@ def CFG_OPENAIRE_PUBTYPE_MAP(ln):
         ('diagram', 'Diagram'),
         ('photo', 'Photo'),
         ('other', 'Other'),
+        ('software', 'Software'),
     ]
 
 
@@ -176,6 +177,7 @@ CFG_OPENAIRE_SCHEMAORG_MAP = dict([
     ('diagram', 'http://schema.org/CreativeWork'),
     ('photo', 'http://schema.org/Photograph'),
     ('other', 'http://schema.org/CreativeWork'),
+    ('software', 'http://schema.org/Code'),
 ])
 
 # ===============

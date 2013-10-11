@@ -32,7 +32,7 @@ UPLOAD_TYPES = [
     #('Software', []),
     ('image', 'Image', [], 'bar-chart'),
     ('video', 'Video/Audio', [], 'film'),
-    #('audio', 'Audio', [], 'volume-up'),
+    ('software', 'Software', [], 'cogs'),
 ]
 
 UPLOAD_TYPE_ICONS = dict([(t[0], t[3]) for t in UPLOAD_TYPES])
