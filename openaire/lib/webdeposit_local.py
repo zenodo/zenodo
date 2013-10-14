@@ -54,6 +54,3 @@ def index_context_listener(sender, context=None):
                 context['usercollection'] = u
             except Exception:
                 context['usercollection'] = None
-
-        from flask import current_app
-        current_app.logger.info(context)
