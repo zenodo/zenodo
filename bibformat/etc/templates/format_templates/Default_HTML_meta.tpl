@@ -21,8 +21,8 @@
 <meta content="{{ bfe_record_url(bfo, with_ln='no', absolute='yes') }}" name="citation_abstract_html_url" />
 {%- if files -%}
 {%- for file in files -%}
-<link rel="alternate" type="{{file.mime}}" href="{{file.get_url()}}">
-{%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url()}}" name="citation_pdf_url" />{%- endif -%}
+<link rel="alternate" type="{{file.mime}}" href="{{file.get_url().decode('utf8')}}">
+{%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url().decode('utf8')}}" name="citation_pdf_url" />{%- endif -%}
 {%- endfor -%}
 {%- endif -%}
 {%- set icon_url = bfe_icon(bfo, subformat_re='icon-90', as_url=True) -%}
