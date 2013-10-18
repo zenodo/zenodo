@@ -19,13 +19,15 @@
 
 from wtforms import SelectField
 from invenio.webdeposit_field import WebDepositField
+from invenio.webdeposit_processor_utils import set_flag
 from invenio.bibknowledge import get_kb_mappings
 import json
 
 __all__ = ['LicenseField']
 
 
-def _kb_license_choices(domain_data=True, domain_content=True, domain_software=True):
+def _kb_license_choices(domain_data=True, domain_content=True,
+                        domain_software=True):
     def _mapper(x):
         license = json.loads(x['value'])
         if (license['domain_data'] and domain_data) or \
@@ -34,13 +36,14 @@ def _kb_license_choices(domain_data=True, domain_content=True, domain_software=T
             return (x['key'], license['title'])
         else:
             return None
-    return filter(lambda x: x is not None, map(_mapper, get_kb_mappings('licenses', '', '')))
+    return filter(lambda x: x is not None, map(
+        _mapper, get_kb_mappings('licenses', '', ''))
+    )
 
 
 class LicenseField(WebDepositField, SelectField):
-
     def __init__(self, **kwargs):
-        kwargs.setdefault("icon","icon-certificate")
+        kwargs.setdefault("icon", "icon-certificate")
 
         if 'choices' not in kwargs:
             license_filter = {}
@@ -49,4 +52,5 @@ class LicenseField(WebDepositField, SelectField):
                     license_filter[opt] = kwargs[opt]
                     del kwargs[opt]
             kwargs['choices'] = _kb_license_choices(**license_filter)
+        kwargs['processors'] = [set_flag('touched'), ]
         super(LicenseField, self).__init__(**kwargs)

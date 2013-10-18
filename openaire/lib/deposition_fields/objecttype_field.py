@@ -53,12 +53,10 @@ def subtype_processor(form, field, submit):
 
 def set_license_processor(form, field, submit):
     if field.data == "dataset":
-        # i.e user likely didn't change default
-        if form.license.data == 'cc-by':
+        if not form.license.flags.touched:
             form.license.data = 'cc-zero'
     else:
-        # i.e user likely didn't change default
-        if form.license.data in ['cc-zero', 'cc-by']:
+        if not form.license.flags.touched:
             form.license.data = 'cc-by'
 
 
