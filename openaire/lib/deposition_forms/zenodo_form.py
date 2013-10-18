@@ -407,7 +407,7 @@ class ZenodoForm(WebDepositForm):
         default='cc-zero',
         domain_data=True,
         domain_content=True,
-        domain_software=False,
+        domain_software=True,
         description='Required. The selected license applies to all of your '
         'files displayed in the bottom of the form. If you want to upload '
         'some files under a different license, please do so in two separate'
