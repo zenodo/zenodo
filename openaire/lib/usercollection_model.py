@@ -83,10 +83,10 @@ from invenio.bibuploadutils import bibupload_record
 CFG_USERCOLLCTION_TABS = 'usage;comments;metadata;files'
 """ Detailed record tabs to enable for a user collection """
 
-CFG_USERCOLLCTION_PARENT_NAME = 'Communities'
+CFG_USERCOLLCTION_PARENT_NAME = 'communities'
 """ Collection name of parent of public user collections """
 
-CFG_USERCOLLCTION_PARENT_NAME_PROVISIONAL = 'Communities'
+CFG_USERCOLLCTION_PARENT_NAME_PROVISIONAL = 'communities'
 """ Collection name of parent of provisional user collections """
 
 CFG_USERCOLLCTION_OUTPUTFORMAT = 'hb'
@@ -271,12 +271,25 @@ class UserCollection(db.Model):
     #
     # Utility methods
     #
-    def get_collection_name(self, provisional=False):
+    @classmethod
+    def make_collection_name(cls, provisional=False, id=None):
         """ Get a unique collection name identifier """
         if provisional:
-            return "%s-%s" % (CFG_USERCOLLECTION_ID_PREFIX_PROVISIONAL, self.id)
+            return "%s-%s" % (
+                CFG_USERCOLLECTION_ID_PREFIX_PROVISIONAL, id
+            )
         else:
-            return "%s-%s" % (CFG_USERCOLLECTION_ID_PREFIX, self.id)
+            return "%s-%s" % (
+                CFG_USERCOLLECTION_ID_PREFIX, id
+            )
+
+    def get_collection_name(self, provisional=False):
+        """ Get a unique collection name identifier """
+        return self.make_collection_name(provisional=provisional, id=self.id)
+
+    @staticmethod
+    def get_role_name(collection_id):
+        return 'coll_%s' % collection_id
 
     def get_title(self, provisional=False):
         if provisional:
@@ -564,7 +577,7 @@ class UserCollection(db.Model):
 
         for score, body in enumerate(bodies):
             p = Portalbox(title='', body=body)
-            c_pbox = CollectionPortalbox(None, None, None, None, None)
+            c_pbox = CollectionPortalbox()
             update_changed_fields(c_pbox, dict(
                 collection=collection,
                 portalbox=p,
@@ -602,7 +615,7 @@ class UserCollection(db.Model):
         Create or update authorization for user to view the provisional collection
         """
         # Role - use collection id, because role name is limited to 32 chars.
-        role_name = 'coll_%s' % collection_id
+        role_name = self.get_role_name(collection_id)
         role = AccROLE.query.filter_by(name=role_name).first()
         if not role:
             role = AccROLE(name=role_name, description='Curators of collection %s' % collection_name)
@@ -728,10 +741,15 @@ class UserCollection(db.Model):
         """
         # Most of the logic in this method ought to be moved to a
         # Collection.delete() method.
-        c = getattr(self, "collection_provisional" if provisional else "collection")
+        c = getattr(
+            self,
+            "collection_provisional" if provisional else "collection"
+        )
         collction_name = self.get_collection_name(provisional=provisional)
 
-        before_delete_collection.send(self, collection=c, provisional=provisional)
+        before_delete_collection.send(
+            self, collection=c, provisional=provisional
+        )
 
         if c:
             # Delete portal boxes
@@ -746,16 +764,22 @@ class UserCollection(db.Model):
             # Delete title, tabs, collection tree
             Collectionname.query.filter_by(id_collection=c.id).delete()
             CollectionCollection.query.filter_by(id_son=c.id).delete()
-            Collectiondetailedrecordpagetabs.query.filter_by(id_collection=c.id).delete()
+            Collectiondetailedrecordpagetabs.query.filter_by(
+                id_collection=c.id
+            ).delete()
 
         if provisional:
             # Delete ACLs
-            AccARGUMENT.query.filter_by(keyword='collection', value=collction_name).delete()
-            role = AccROLE.query.filter_by(name='coll_%s' % c.id).first()
-            if role:
-                UserAccROLE.query.filter_by(role=role).delete()
-                AccAuthorization.query.filter_by(role=role).delete()
-                db.session.delete(role)
+            AccARGUMENT.query.filter_by(
+                keyword='collection', value=collction_name
+            ).delete()
+
+            if c:
+                role = AccROLE.query.filter_by(name=self.get_role_name(c.id)).first()
+                if role:
+                    UserAccROLE.query.filter_by(role=role).delete()
+                    AccAuthorization.query.filter_by(role=role).delete()
+                    db.session.delete(role)
         else:
             # Delete OAI repository
             if self.oai_set:
