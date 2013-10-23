@@ -257,6 +257,23 @@ def run_tasks():
     return _run_tasks
 
 
+def reserved_recid():
+    """
+    Check for existence of a reserved recid and put in metadata so
+    other tasks are not going to reserve yet another recid.
+    """
+    def _reserved_recid(obj, dummy_eng):
+        d = Deposition(obj)
+        sip = d.get_latest_sip(include_sealed=False)
+        reserved_doi = sip.metadata.get('prereserve_doi', None)
+
+        if reserved_doi and reserved_doi['recid']:
+            sip.metadata['recid'] = reserved_doi['recid']
+
+        d.update()
+    return _reserved_recid
+
+
 class upload(DepositionType):
     """
     ZENODO deposition workflow
@@ -269,6 +286,8 @@ class upload(DepositionType):
         # Create the submission information package by merging data from
         # all drafts - i.e. generate the recjson.
         prepare_sip(),
+        # Check for reserved recids.
+        reserved_recid(),
         # Reserve a new record id
         create_recid(),
         # Register DOI in internal pid store.
