@@ -180,7 +180,30 @@ def customize_app(app):
         sender='webdeposit.index'
     )
 
+    @app.template_filter('relation_title')
+    def relation_title(relation):
+        if relation == 'isCitedBy':
+            return 'Cited by'
+        elif relation == 'cites':
+            return 'Cites'
+        elif relation == 'isSupplementTo':
+            return 'Supplement to'
+        elif relation == 'isSupplementedBy':
+            return 'Supplementary material'
+        elif relation == 'references':
+            return 'References'
+        elif relation == 'isReferencedBy':
+            return 'Referenced by'
+        return relation
 
+    @app.template_filter('pid_url')
+    def pid_url(related_identifier):
+        from invenio import pidutils
+        identifier = related_identifier.get('identifier')
+        scheme = related_identifier.get('scheme')
+        if scheme and identifier:
+            return pidutils.to_url(identifier, scheme)
+        return ""
 
     @app.template_filter('schemaorg_type')
     def schemaorg_type(recid=None, bfo=None):
