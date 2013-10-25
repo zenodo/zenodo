@@ -187,7 +187,7 @@ exclude-result-prefixes="marc fn dc invenio">
                 <xsl:for-each select="datafield[@tag=773]">
                     <xsl:choose>
                         <xsl:when test="subfield[@code='n']">
-                            <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType"><xsl:value-of select="subfield[@code='n']"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
+                            <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType"><xsl:value-of select="translate(subfield[@code='n'],'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
                         </xsl:when>
                     </xsl:choose>
                 </xsl:for-each>
