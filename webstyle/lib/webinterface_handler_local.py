@@ -26,7 +26,7 @@ from invenio.textutils import nice_size
 from invenio.signalutils import webcoll_after_webpage_cache_update
 from invenio.usercollection_signals import after_save_collection, \
     post_curation, pre_curation
-from invenio.webdeposit_signals import template_context_created
+from invenio.webdeposit_signals import template_context_created, file_uploaded
 from invenio.webdeposit_local import index_context_listener
 from jinja2 import nodes
 from jinja2.ext import Extension
@@ -179,6 +179,30 @@ def customize_app(app):
         index_context_listener,
         sender='webdeposit.index'
     )
+
+    def large_file_notification(sender, deposition=None, deposition_file=None,
+                                **kwargs):
+        if deposition_file and deposition_file.size > 10485760:
+            from invenio.mailutils import send_email
+            from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_NAME
+            from invenio.textutils import nice_size
+            from invenio.jinja2utils import render_template_to_string
+            current_app.logger.info(deposition_file.__getstate__())
+            send_email(
+                CFG_SITE_ADMIN_EMAIL,
+                CFG_SITE_ADMIN_EMAIL,
+                subject="%s: %s file uploaded" % (
+                    CFG_SITE_NAME, nice_size(deposition_file.size)
+                ),
+                content=render_template_to_string(
+                    "email_large_file.html",
+                    deposition=deposition,
+                    deposition_file=deposition_file,
+                )
+            )
+
+    file_uploaded.connect(large_file_notification, weak=False)
+
 
     @app.template_filter('relation_title')
     def relation_title(relation):
