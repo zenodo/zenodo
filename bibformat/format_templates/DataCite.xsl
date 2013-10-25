@@ -182,16 +182,18 @@ exclude-result-prefixes="marc fn dc invenio">
             </xsl:for-each>
         </alternateIdentifiers>
         <!-- 12 RelatedIdentifier -->
-        <xsl:if test="datafield[@tag=773]">
-            <relatedIdentifiers>
-                <xsl:for-each select="datafield[@tag=773]">
-                    <xsl:choose>
-                        <xsl:when test="subfield[@code='n']">
-                            <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType"><xsl:value-of select="translate(subfield[@code='n'],'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
-                        </xsl:when>
-                    </xsl:choose>
-                </xsl:for-each>
-            </relatedIdentifiers>
+        <xsl:if test="datafield[@tag=773]/subfield[@code='n']">
+            <xsl:if test="subfield[@code='n']='doi' or subfield[@code='n']='ark' or subfield[@code='n']='ean13' or subfield[@code='n']='eissn' or subfield[@code='n']='handle' or subfield[@code='n']='isbn' or subfield[@code='n']='issn' or subfield[@code='n']='istc' or subfield[@code='n']='lissn' or subfield[@code='n']='lsid' or subfield[@code='n']='purl' or subfield[@code='n']='upc' or subfield[@code='n']='url' or subfield[@code='n']='urn'">
+                <relatedIdentifiers>
+                    <xsl:for-each select="datafield[@tag=773]">
+                        <xsl:choose>
+                            <xsl:when test="subfield[@code='n']">
+                                <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType"><xsl:value-of select="translate(subfield[@code='n'],'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
+                            </xsl:when>
+                        </xsl:choose>
+                    </xsl:for-each>
+                </relatedIdentifiers>
+            </xsl:if>
         </xsl:if>
         <!-- 13 Size -->
         <xsl:if test="datafield[@tag=300]">
