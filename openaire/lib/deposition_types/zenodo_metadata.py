@@ -116,7 +116,7 @@ def process_sip():
 
         fft_status = "firerole: %s" % "\n".join(fft_status)
         # Calculate number of leading zeros needed in the comment.
-        file_commment_fmt = "%%.d%d" % len(str(len(recjson['fft'])))
+        file_commment_fmt = "%%0%dd" % len(str(len(recjson['fft'])))
 
         for idx, f in enumerate(recjson['fft']):
             f['restriction'] = fft_status
