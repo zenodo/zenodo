@@ -17,8 +17,8 @@
     {{ bfe_openaire_university(bfo, prefix='<dt>Thesis:</dt><dd>', suffix='</dd>') }}
     {{ bfe_openaire_meeting(bfo, prefix='<dt>Meeting:</dt><dd>', suffix='</dd>') }}
     {{ bfe_pagination(bfo, prefix='<dt>Pages:</dt><dd itemprop="numberOfPages">', suffix='</dd>', default='', escape='') }}
-    <dt>Related publications and datasets:</dt>
     {%- for group in record.related_identifiers|groupby('relation') %}
+    {%- if loop.first %}<dt>Related publications and datasets:</dt>{% endif %}
         <dd>{{group.grouper|relation_title}}:<br />
     {%- for related_id in group.list %}{% set related_url = related_id|pid_url %}
         {% if related_url %}<a href="{{related_id|pid_url}}">{{related_id.identifier}}</a>{% else %}<i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}){% endif %}{% if not loop.last %}, {% endif %}
