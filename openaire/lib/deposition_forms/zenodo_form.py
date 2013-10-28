@@ -153,6 +153,19 @@ class RelatedIdentifierForm(WebDepositForm):
         widget_classes='span2',
     )
 
+    def validate_scheme(form, field):
+        """
+        Always set scheme based on value in identifier
+        """
+        from invenio import pidutils
+        schemes = pidutils.detect_identifier_schemes(
+            form.data.get('identifier') or ''
+        )
+        if schemes:
+            field.data = schemes[0]
+        else:
+            field.data = ''
+
 
 class CreatorForm(WebDepositForm):
     name = fields.TextField(
