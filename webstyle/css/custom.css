@@ -105,6 +105,10 @@
   padding-top: 10px;
 }
 
+.hero-unit .dropbox-dropin-btn {
+    height: 25px!important;
+}
+
 .headerbg {
   background-image: url('../img/header.png');
   background-repeat:
