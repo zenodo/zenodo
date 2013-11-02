@@ -20,6 +20,7 @@
 
 import re
 from wtforms.validators import ValidationError, StopValidation, Regexp
+from invenio.usercollection_model import UserCollection
 
 class RequiredIf(object):
     """
@@ -61,3 +62,15 @@ def doi_prefix_validator(form, field):
     if CFG_DATACITE_DOI_PREFIX != "10.5072" and field_doi.startswith("10.5072/"):
         raise ValidationError('The prefix 10.5072 is invalid. The prefix is only used for testing purposes, and no DOIs with this prefix are attached to any meaningful content.')
 
+
+def community_validator(form, field):
+    if field.data:
+        ids = map(lambda x: x.get('identifier'), field.data)
+        query = UserCollection.query.filter(UserCollection.id.in_(ids)).all()
+        if not ids or len(query) == len(ids):
+            return True
+
+        found = map(lambda x: x.id, query)
+        for i in ids:
+            if i not in found:
+                raise ValidationError("Invalid community identifier: %s" % i)

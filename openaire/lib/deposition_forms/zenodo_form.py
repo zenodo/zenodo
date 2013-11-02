@@ -21,9 +21,10 @@ from datetime import date
 from jinja2 import Markup
 from wtforms import validators, widgets
 from wtforms.validators import ValidationError
+from flask import request
 from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
 from invenio.config import CFG_DATACITE_DOI_PREFIX
-from invenio.dbquery import run_sql
+from invenio.bibknowledge import get_kb_mapping
 from invenio.webinterface_handler_flask_utils import _
 from invenio.webdeposit_form import WebDepositForm
 from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
@@ -33,10 +34,11 @@ from invenio.webdeposit_validation_utils import doi_syntax_validator, \
     invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
     list_length, not_required_if, pid_validator
 from invenio.webdeposit_processor_utils import datacite_lookup, \
-    PidSchemeDetection, PidNormalize
+    PidSchemeDetection, PidNormalize, replace_field_data
 from invenio.webdeposit_autocomplete_utils import kb_autocomplete
 from invenio.webdeposit_load_fields import fields
 from invenio.openaire_autocomplete_utils import usercollection_autocomplete
+from invenio.openaire_validators import community_validator
 from invenio.webdeposit_field_widgets import TagListWidget, TagInput, \
     ItemWidget, CKEditorWidget
 from invenio.zenodoutils import create_doi, filter_empty_helper
@@ -53,6 +55,7 @@ local_datacite_lookup = datacite_lookup(mapping=dict(
     get_dates='publication_date',
     get_description='description',
 ))
+
 
 #
 # Local autocomplete mappers
@@ -116,6 +119,29 @@ def dummy_autocomplete(form, field, term, limit=50):
     ]
 
 
+def grants_validator(form, field):
+    if field.data:
+        for item in field.data:
+            val = get_kb_mapping('json_projects', str(item['id']))
+            if val:
+                data = json_projects_kb_mapper(val)
+                item['acronym'] = data['fields']['acronym']
+                item['title'] = data['fields']['title']
+                continue
+            raise ValidationError("Invalid grant identifier %s" % item['id'])
+
+
+def grant_kb_value(key_name):
+    def _getter(field):
+        if field.data:
+            val = get_kb_mapping('json_projects', str(field.data))
+            if val:
+                data = json_projects_kb_mapper(val)
+                return data['fields'][key_name]
+        return ''
+    return _getter
+
+
 #
 # Subforms
 #
@@ -175,6 +201,13 @@ class CreatorForm(WebDepositForm):
         #     dummy_autocomplete,
         #     authorform_mapper
         # ),
+        validators=[
+            required_if(
+                'affiliation',
+                [lambda x: bool(x.strip()), ],  # non-empty
+                message="Creator name is required if you specify affiliation."
+            ),
+        ],
     )
     affiliation = fields.TextField(
         placeholder="Affiliation",
@@ -200,6 +233,10 @@ class CommunityForm(WebDepositForm):
 class GrantForm(WebDepositForm):
     id = fields.TextField(
         widget=widgets.HiddenInput(),
+        processors=[
+            replace_field_data('acronym', grant_kb_value('acronym')),
+            replace_field_data('title', grant_kb_value('title'))
+        ],
     )
     acronym = fields.TextField(
         widget=widgets.HiddenInput(),
@@ -347,7 +384,7 @@ class ZenodoForm(WebDepositForm):
         description='Required.',
         default='',
         icon='icon-pencil',
-        validators=[validators.required()],
+        validators=[validators.required(), ],
         widget=CKEditorWidget(
             toolbar=[
                 ['PasteText', 'PasteFromWord'],
@@ -440,6 +477,7 @@ class ZenodoForm(WebDepositForm):
             CommunityForm,
             widget=ExtendedListWidget(html_tag=None, item_widget=ItemWidget())
         ),
+        validators=[community_validator],
         widget=TagListWidget(template="{{title}}"),
         icon='icon-group',
         export_key='provisional_communities',
@@ -465,6 +503,7 @@ class ZenodoForm(WebDepositForm):
                     " upload before reporting it to OpenAIRE, and you may "
                     "thus experience a delay before your upload is available "
                     "in OpenAIRE." % CFG_SITE_NAME,
+        validators=[grants_validator],
     )
 
     #
@@ -648,8 +687,11 @@ class ZenodoForm(WebDepositForm):
 
     def validate_plupload_file(form, field):
         """ Ensure minimum one file is attached. """
-        if len(form.files) == 0:
-            raise ValidationError("You must provide minimum one file.")
+        if not getattr(request, 'is_api_request', False):
+            # Tested in API by a separate workflow task.
+            if len(form.files) == 0:
+                raise ValidationError("You must provide minimum one file.")
+
 
     #
     # Form configuration

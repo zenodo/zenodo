@@ -19,13 +19,17 @@
 
 import json
 
-from flask import render_template
+from flask import render_template, url_for, request
+from flask.ext.restful import fields, marshal
 
+from invenio.restapi import UTCISODateTimeString
+from invenio.config import CFG_DATACITE_DOI_PREFIX
 from invenio.bibformat import format_record
 from invenio.bibknowledge import get_kb_mapping
 from invenio.webuser_flask import current_user
 from invenio.webdeposit_load_forms import forms
-from invenio.webdeposit_models import DepositionType, Deposition
+from invenio.webdeposit_models import DepositionType, Deposition, \
+    InvalidApiAction
 from invenio.webdeposit_workflow_tasks import render_form, \
     create_recid, \
     prepare_sip, \
@@ -35,6 +39,7 @@ from invenio.webdeposit_workflow_tasks import render_form, \
     prefill_draft
 from invenio.zenodoutils import create_doi, filter_empty_helper
 from invenio.bibtask import task_low_level_submission
+from invenio.restapi import error_codes
 
 
 __all__ = ['upload']
@@ -127,7 +132,6 @@ def process_sip():
             # we add leading zeores) by their comment.
             f['comment'] = file_commment_fmt % idx
 
-
         # =================
         # License
         # =================
@@ -215,7 +219,6 @@ def process_sip():
     return _process_sip
 
 
-
 def check_existing_pid(pid, recjson):
     """
     In Zenodo an existing pid is either 1) pre-reserved and should be minted or
@@ -239,7 +242,7 @@ def run_tasks():
         recid = sip.metadata['recid']
         communities = sip.metadata['provisional_communities']
 
-        common_args = ['-P5',]
+        common_args = ['-P5', ]
         sequenceid = getattr(d.workflow_object, 'task_sequence_id', None)
         if sequenceid:
             common_args += ['-I', str(sequenceid)]
@@ -274,15 +277,44 @@ def reserved_recid():
     return _reserved_recid
 
 
+def api_validate_files():
+    """
+    Check for existence of a reserved recid and put in metadata so
+    other tasks are not going to reserve yet another recid.
+    """
+    def _api_validate_files(obj, eng):
+        if getattr(request, 'is_api_request', False):
+            d = Deposition(obj)
+            if len(d.files) < 1:
+                d.set_render_context(dict(
+                    message="Bad request",
+                    status=400,
+                    errors=[dict(
+                        message="Minimum one file must be provided.",
+                        code=error_codes['validation_error']
+                    )],
+                ))
+                d.update()
+                eng.halt("API: No files provided")
+            else:
+                # Mark all drafts as completed
+                for draft in d.drafts.values():
+                    draft.complete()
+                d.update()
+    return _api_validate_files
+
+
 class upload(DepositionType):
     """
     ZENODO deposition workflow
     """
     workflow = [
         # Load pre-filled data from cache
-        prefill_draft(forms['ZenodoForm']),
+        prefill_draft(draft_id='_default'),
         # Render the form and wait until it is completed
-        render_form(forms['ZenodoForm']),
+        render_form(draft_id='_default'),
+        # Test if all files are available for API
+        api_validate_files(),
         # Create the submission information package by merging data from
         # all drafts - i.e. generate the recjson.
         prepare_sip(),
@@ -312,6 +344,63 @@ class upload(DepositionType):
     name_plural = "Uploads"
     enabled = True
     default = True
+    api = True
+    draft_definitions = {
+        '_default': forms['ZenodoForm'],
+    }
+
+    marshal_deposition_fields = DepositionType.marshal_deposition_fields.copy()
+    del marshal_deposition_fields['drafts']
+
+    marshal_draft_fields = DepositionType.marshal_draft_fields.copy()
+    del marshal_draft_fields['id']
+    del marshal_draft_fields['completed']
+
+    @classmethod
+    def marshal_deposition(cls, deposition):
+        """
+        Generate a JSON representation for REST API of a Deposition
+        """
+        draft = deposition.get_or_create_draft('_default')
+        obj = marshal(deposition, cls.marshal_deposition_fields)
+        obj['metadata'] = draft.values
+
+        # Add record and DOI information from latest SIP
+        for sip in deposition.sips:
+            if sip.is_sealed():
+                obj['submitted'] = UTCISODateTimeString().format(sip.timestamp)
+                recjson = sip.metadata
+                if recjson.get('recid'):
+                    obj['record_id'] = fields.Integer().format(
+                        recjson.get('recid')
+                    )
+                    obj['record_url'] = fields.String().format(url_for(
+                        'record.metadata',
+                        recid=recjson.get('recid'),
+                        _external=True
+                    ))
+                if recjson.get('doi') and \
+                   recjson.get('doi').startswith(CFG_DATACITE_DOI_PREFIX+"/"):
+                    obj['doi'] = fields.String().format(recjson.get('doi'))
+                    obj['doi_url'] = fields.String().format(
+                        "http://dx.doi.org/%s" % obj['doi']
+                    )
+                break
+
+        return obj
+
+    @classmethod
+    def marshal_draft(cls, obj):
+        """
+        Generate a JSON representation for REST API of a DepositionDraft
+        """
+        return marshal(obj, cls.marshal_draft_fields)
+
+    @classmethod
+    def api_action(cls, deposition, action_id):
+        if action_id == 'publish':
+            return deposition.run_workflow(headless=True)
+        raise InvalidApiAction(action_id)
 
     @classmethod
     def render_completed(cls, d):

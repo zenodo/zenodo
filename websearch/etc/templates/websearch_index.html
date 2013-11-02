@@ -97,7 +97,7 @@
       {{ portalbox_sidebar(portalboxes.rt, class="well") }}
       {%- if not collection.name.startswith("user-") and not collection.name.startswith("provisional-") %}
       <div class="well">
-        {%- if current_user.is_guest %}<a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>{% endif%}
+        <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-large signup pull-right">Sign Up</a>
         <h4>New to {{config.CFG_SITE_NAME}}?</h4>
         {% include "zenodo_benefits.html" %}
       </div>
@@ -161,7 +161,7 @@
   {%- if collection.is_restricted %}
     {{ collection_records(collection) }}
   {%- else %}
-    {%- cache 24*60*60, collection.name, g.ln, "guest" if current_user.is_guest  else "no_guest" %}
+    {%- cache 24*60*60, collection.name, g.ln %}
     {{ collection_records(collection) }}
     {%- endcache %}
   {%- endif %}

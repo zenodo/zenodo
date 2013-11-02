@@ -246,6 +246,9 @@ def customize_app(app):
                     return res
         return 'http://schema.org/CreativeWork'
 
+    from invenio.restapi import setup_app
+    setup_app(app)
+
 
 
 
