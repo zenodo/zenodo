@@ -45,7 +45,7 @@ blueprint = InvenioBlueprint('invenio_openaire', __name__,
     #('footermenu_right.deposit_data', _('Deposit data'), 'invenio_openaire.deposit_data', 2),
     #('footermenu_right.use_data', _('Use data'), 'invenio_openaire.use_data', 3),
     ('footermenu_right.faq', _('FAQ'), 'invenio_openaire.faq', 4),
-    #('footermenu_right.api', _('API'), 'invenio_openaire.api', 5),
+    ('footermenu_right.api', _('API'), 'invenio_openaire.api', 5),
     ('footermenu_bottom.terms', _('Terms of use'), 'invenio_openaire.terms', 1),
     ('footermenu_bottom.privacy_policy', _('Privacy policy'), 'invenio_openaire.privacy_policy', 2),
     ('footermenu_bottom.support', _('Support/Feedback'), 'invenio_openaire.contact', 3),
@@ -87,16 +87,16 @@ def contact():
     return render_template('openaire_contact.html')
 
 
-@blueprint.route('/api', methods=['GET', ])
+@blueprint.route('/dev', methods=['GET', ])
 @blueprint.invenio_set_breadcrumb(_("API"))
 def api():
     return render_template('openaire_api.html')
 
 
-@blueprint.route('/api/upload', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("API"))
-def api_upload():
-    return render_template('openaire_api_upload.html')
+#@blueprint.route('/api/upload', methods=['GET', ])
+#@blueprint.invenio_set_breadcrumb(_("API"))
+#def api_upload():
+#    return render_template('openaire_api_upload.html')
 
 
 @blueprint.route('/faq', methods=['GET', ])
