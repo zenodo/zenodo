@@ -207,8 +207,40 @@ header .container .open .btn.dropdown-toggle {
   text-decoration: none;
 }
 
+.pager li > a.btn-info {
+    background-color: #49afcd;
+}
+
 .pager li > a.btn-info:hover {
     background-color: #1f6377;
+}
+
+.dep-accord .accordion-inner {
+    padding: 0 0 !important;
+}
+
+.dep-accord .accordion-heading.info {
+    background-color: #d9edf7 !important;
+}
+
+.dep-accord .accordion-heading.info a {
+    color: #000000 !important;
+}
+
+.hide-on-collapsed {
+  display: block;
+}
+
+.show-on-collapsed {
+  display: none;
+}
+
+.accordion-toggle.collapsed .hide-on-collapsed {
+  display: none;
+}
+
+.accordion-toggle.collapsed .show-on-collapsed {
+  display: block;
 }
 
 /*
