@@ -714,9 +714,9 @@ class ZenodoForm(WebDepositForm):
             'access_right', 'embargo_date', 'license',
         ], {
             'indication': 'required',
-            'description': 'Unless you explicitly specify the license conditions below for Open Access and Embargoed Access uploads,'
-            ' you agree to release your data files under the terms of the Creative Commons Zero (CC0) waiver.'
-            ' All authors of the data and publications have agreed to the terms of this waiver and license.'
+            #'description': 'Unless you explicitly specify the license conditions below for Open Access and Embargoed Access uploads,'
+            #' you agree to release your data files under the terms of the Creative Commons Zero (CC0) waiver.'
+            #' All authors of the data and publications have agreed to the terms of this waiver and license.'
         }),
         ('Communities', [
             'communities',

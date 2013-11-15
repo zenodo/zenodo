@@ -27,7 +27,6 @@ __all__ = ['AccessRightField']
 ACCESS_RIGHTS_CHOICES = [
     ('open', 'Open Access'),
     ('embargoed', 'Embargoed Access'),
-    ('restricted', 'Restricted Access'),
     ('closed', 'Closed Access'),
 ]
 
@@ -36,7 +35,6 @@ ACCESS_RIGHTS_ICONS = {
     'open': 'icon-unlock',
     'closed': 'icon-lock',
     'embargoed': 'icon-warning-sign',
-    'restricted': 'icon-ban-circle',
 }
 
 
