@@ -251,7 +251,7 @@ class UserCollection(db.Model):
     def from_recid(cls, recid, provisional=False):
         """ Get user collections specified in recid """
         rec = get_record(recid)
-        prefix = "%s-" % CFG_USERCOLLECTION_ID_PREFIX_PROVISIONAL if provisional else CFG_USERCOLLECTION_ID_PREFIX
+        prefix = "%s-" % (CFG_USERCOLLECTION_ID_PREFIX_PROVISIONAL if provisional else CFG_USERCOLLECTION_ID_PREFIX)
 
         colls = rec.get('980', [])
         usercolls = []
