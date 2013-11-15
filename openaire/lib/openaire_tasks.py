@@ -29,6 +29,7 @@ from invenio.bibdocfile import BibDoc, BibRecDocs, InvenioBibDocFileError
 from invenio.bibformat import format_record
 from invenio.bibrecord import record_add_field, record_xml_output
 from invenio.bibtask import task_low_level_submission
+from invenio.bibfield import get_record
 from invenio.celery import celery
 from invenio.config import CFG_TMPSHAREDDIR, CFG_DATACITE_SITE_URL, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
@@ -41,6 +42,7 @@ from invenio.websubmit_icon_creator import create_icon, \
 from invenio.pidstore_model import PersistentIdentifier
 from invenio.usercollection_model import UserCollection
 from invenio.jinja2utils import render_template_to_string
+
 
 try:
     from altmetric import Altmetric, AltmetricHTTPException
@@ -370,9 +372,7 @@ def openaire_upload_notification(recid):
     Send a notification to all user collections.
     """
     ctx = {
-        'recid': recid,
-        'title': get_fieldvalues(recid, "245__a")[0],
-        'description': get_fieldvalues(recid, "520__a")[0],
+        'record': get_record(recid),
     }
 
     ucolls = UserCollection.from_recid(recid, provisional=True)
