@@ -24,66 +24,82 @@
     <h4>Content</h4>
 <dl>
 <dt>Scope</dt>
-<dd>All fields of science. English is preferred, but all languages accepted.</dd>
-
-<dt>Kinds of research data</dt>
-<dd>All research outputs.</dd>
+<dd>All fields of science. All types of research artifacts. Content must not violate privacy or copyright, or breach confidentiality or non-disclosure for data collected from human subjects.</dd>
 
 <dt>Status of research data</dt>
-<dd>Any status is accepted.</dd>
+<dd>Any status is accepted, from any stage of the research lifecycle.</dd>
 
 <dt>Versions</dt>
-<dd>Data files are versioned. Records are not versioned. Submission Information Package is archived. Derivatives of data files are generated, but original content is never modified.
+<dd>Data files are versioned. Records are not versioned. The uploaded data is archived as a Submission Information Package. Derivatives of data files are generated, but original content is never modified.
 Records can be retracted from public view, however the data files and record is preserved.</dd>
 
 <dt>Data file formats</dt>
-<dd>All formats allowed - even preservation unfriendly. We are working on guidelines and features that will help people deposit in preservation friendly formats.</dd>
+<dd>All formats are allowed - even preservation unfriendly. We are working on guidelines and features that will help people deposit in preservation friendly formats.</dd>
 
 <dt>Volume and size limitations</dt>
 <dd>2GB per file size constraint. Higher quotas per file can be requested. Quotas are likely to be introduced at a later stage. All data files are stored in CERN Data Centres, primarily Geneva, with replicas in Budapest. Data files are kept in multiple replicas in a distributed file system which is backed up to tape on a nightly basis.</dd>
-</dl>
-
-<h4>Metadata</h4>
-
-<dl>
-<dt>Access</dt>
-<dd>ZENODO is provided free of charge for educational and informational use.
-Metadata is licensed under CC0, except for email addresses.</dd>
-
-<dt>Reuse</dt>
-<dd>Metadata is licensed under CC0, except for email addresses.
-All metadata is exported via OAI-PMH and can be harvested.</dd>
-
-<dt>Metadata types and sources</dt>
-<dd>All metadata is stored internally in MARC according to the schema defined in <a href="http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup">http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup</a>. Metadata is exported in several standard formats such as MARCXML, Dublin Core and DataCite Metadata Schema according to OpenAIRE Guidelines.</dd>
-
-<dt>Eligible depositors</dt>
-<dd>Anyone may register as user of {{config.CFG_SITE_NAME}}. All users are allowed to deposit content for which they possess the appropriate rights.</dd>
-
-<dt>Moderation by repository</dt>
-<dd>All content is checked after upload by repository staff. Content not considered to fall under the scope of the repository will be removed, and the depositor notified. Content will be removed also be removed in case of (but not excluded to) copyright violation, legal requirements and proven violations, national security and confidentiality concerns. All records are assigned a Digital Object Identifier. User access may be revoked on violation of Terms of Use.
-</dd>
 
 <dt>Data quality</dt>
 <dd>All information is provided “as-is” and the user shall hold ZENODO and information providers supplying data to ZENODO free and harmless in connection with the use of such information.</dd>
 
-<dt>Confidentiality and disclosure</dt>
-<dd>Publicly accessible content breaching confidentiality or non-disclosure for data collected from human subjects will be removed.</dd>
+<dt>Language</dt>
+<dd>For textual items, English is preferred, but all languages accepted.</dd>
 
 <dt>Embargo status</dt>
 <dd>Users may deposit content under an embargo status and provide and end date for the embargo. The repository will initially restrict access to the data, and then automatically make the content publicly available after the end of the embargo period. User may deposit restricted data files, which will not be made publicly available.</dd>
 
 <dt>Rights and ownership</dt>
 <dd>Users must specify a license for all publicly available files. User may specify a license for all closed access files.</dd>
+
+<dt>Eligible depositors</dt>
+<dd>Anyone may register as user of {{config.CFG_SITE_NAME}}. All users are allowed to deposit content for which they possess the appropriate rights.</dd>
+
 </dl>
+
+<h4>Withdrawal of data and revocation of DOIs</h4>
+<dl>
+<dt>Revocation</dt>
+<dd>Content not considered to fall under the scope of the repository will be removed and associated DOIs issued by {{config.CFG_SITE_NAME}} revoked. Please signal promptly any suspected policy violation, ideally no later than 24 hours from upload. Alternatively, content found to already have an external DOI, will have the {{config.CFG_SITE_NAME}} DOI invalidated, and the record updated to indicate the original external DOI. User access may be revoked on violation of Terms of Use.</dd>
+
+<dt>Withdrawal</dt>
+<dd>If the uploaded research object must later be withdrawn, the reason for the withdrawal will be indicated on a tombstone page which will henceforth be served in its place. Withdrawal is considered an exceptional action which normally should be requested and fully justified by the original uploader. In any other circumstance reasonable attempts will be made to contact the original uploader to obtain consent. The DOI and the URL of the original object are retained.</dd>
+</dl>
+
+
 </div>
+
 <div class="span6">
+<h4>Metadata</h4>
+
+<dl>
+<dt>Metadata access</dt>
+<dd>ZENODO is provided free of charge for educational and informational use.
+Metadata is licensed under CC0, except for email addresses.</dd>
+
+<dt>Metadata Reuse</dt>
+<dd>Metadata is licensed under CC0, except for email addresses.
+All metadata is exported via OAI-PMH and can be harvested.</dd>
+
+<dt>Metadata types and sources</dt>
+<dd>All metadata is stored internally in MARC according to the schema defined in <a href="http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup">http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup</a>. Metadata is exported in several standard formats such as MARCXML, Dublin Core and DataCite Metadata Schema according to OpenAIRE Guidelines.</dd>
+
+
+
+{#
+<dt>Moderation by repository</dt>
+<dd>All content is checked after upload by repository staff. Content not considered to fall under the scope of the repository will be removed, and the depositor notified. Content will also be removed in case of (but not excluded to) copyright violation, legal requirements and proven violations, national security and confidentiality concerns. All records are assigned a Digital Object Identifier. User access may be revoked on violation of Terms of Use.
+</dd>
+#}
+
+</dl>
+
+
+
     <h4>Access and reuse of data</h4>
 <dl>
 
 <dt>Access to data objects</dt>
-<dd>Files may be deposited under closed, open, embargoed or restricted access. The repository treats data files under closed and restricted access the same.
-Data files deposited under closed or restricted access are protected against unauthorized access at all levels. Access to metadata and data files is provided over standard protocols such as HTTP and OAI-PMH.</dd>
+<dd>Files may be deposited under closed, open, or embargoed access. Data files deposited under closed access are protected against unauthorized access at all levels. Access to metadata and data files is provided over standard protocols such as HTTP and OAI-PMH.</dd>
 
 <dt>Use and re-use of data objects</dt>
 <dd>Use and re-use is subject to the license under which the data objects were deposited.</dd>
@@ -109,9 +125,9 @@ ZENODO will take all reasonable measures to protect the privacy of its users and
 <dd>All data files are stored along with a MD5 checksum of the file content. Regular checks of files against their checksums are made.</dd>
 </dl>
 
-<h4>Withdrawal of data and succession plans</h4>
+<h4>Succession plans</h4>
 <dl>
-<dd>Content not considered to fall under the scope of the repository will be removed. Content will also be removed in case of copyright violation, legal requirements and proven violations, national security and confidentiality concerns. Items may be removed from public view on request of the depositor, but will not be deleted. In case of removed objects, DOIs and URL for the object is retained. In case of closure of the repository, best efforts will be made to integrate all content into suitable alternative institutional and/or subject based repositories.</dd>
+<dd>In case of closure of the repository, best efforts will be made to integrate all content into suitable alternative institutional and/or subject based repositories.</dd>
 </dl>
 </div>
 </div>
