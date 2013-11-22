@@ -564,7 +564,7 @@ class UserCollection(db.Model):
 
         for score, body in enumerate(bodies):
             p = Portalbox(title='', body=body)
-            c_pbox = CollectionPortalbox(None, None, None, None, None)
+            c_pbox = CollectionPortalbox()
             update_changed_fields(c_pbox, dict(
                 collection=collection,
                 portalbox=p,
