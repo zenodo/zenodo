@@ -32,7 +32,8 @@ from invenio.webdeposit_field_widgets import date_widget, plupload_widget, \
 from invenio.webdeposit_filter_utils import strip_string, sanitize_html
 from invenio.webdeposit_validation_utils import doi_syntax_validator, \
     invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
-    list_length, not_required_if, pid_validator
+    list_length, not_required_if, pid_validator, minted_doi_validator, \
+    unchangeable
 from invenio.webdeposit_processor_utils import datacite_lookup, \
     PidSchemeDetection, PidNormalize, replace_field_data
 from invenio.webdeposit_autocomplete_utils import kb_autocomplete
@@ -78,6 +79,18 @@ def communityform_mapper(obj, prefix):
         }
     })
     return obj
+
+
+def community_obj_value(key_name):
+    from invenio.usercollection_model import UserCollection
+
+    def _getter(field):
+        if field.data:
+            obj = UserCollection.query.filter_by(id=field.data).first()
+            if obj:
+                return getattr(obj, key_name)
+        return None
+    return _getter
 
 
 def authorform_mapper(obj, prefix):
@@ -197,10 +210,10 @@ class CreatorForm(WebDepositForm):
     name = fields.TextField(
         placeholder="Family name, First name",
         widget_classes='span3',
-        # autocomplete=map_result(
-        #     dummy_autocomplete,
-        #     authorform_mapper
-        # ),
+        #autocomplete=map_result(
+        #    dummy_autocomplete,
+        #    authorform_mapper
+        #),
         validators=[
             required_if(
                 'affiliation',
@@ -218,6 +231,9 @@ class CreatorForm(WebDepositForm):
 class CommunityForm(WebDepositForm):
     identifier = fields.TextField(
         widget=widgets.HiddenInput(),
+        processors=[
+            replace_field_data('title', community_obj_value('title')),
+        ],
     )
     title = fields.TextField(
         placeholder="Start typing a community name...",
@@ -227,6 +243,13 @@ class CommunityForm(WebDepositForm):
         ),
         widget=TagInput(),
         widget_classes='span5',
+    )
+    provisional = fields.BooleanField(
+        default=True,
+        widget=widgets.HiddenInput(),
+        processors=[
+            replace_field_data('provisional', lambda x: x.object_data),
+        ]
     )
 
 
@@ -762,3 +785,60 @@ class ZenodoForm(WebDepositForm):
             'indication': 'optional',
         }),
     ]
+
+
+def filter_fields(groups):
+    def _inner(element):
+        element = list(element)
+        element[1] = filter(lambda x: x in groups, element[1])
+        return tuple(element)
+    return _inner
+
+
+class EditFormMixin(object):
+    """
+    Mixin class for forms that needs editing.
+    """
+    recid = fields.IntegerField(
+        validators=[
+            unchangeable(),
+        ],
+        widget=widgets.HiddenInput(),
+        label=""
+    )
+    version_id = fields.DateTimeField(
+        validators=[
+            unchangeable(),
+        ],
+        widget=widgets.HiddenInput(),
+        label=""
+    )
+
+
+class ZenodoEditForm(ZenodoForm, EditFormMixin):
+    """
+    Specialized form for editing a record
+    """
+    # Remove some fields.
+    doi = fields.DOIField(
+        label="Digital Object Identifier",
+        description="Optional. Did your publisher already assign a DOI to your"
+        " upload? If not, leave the field empty and we will register a new"
+        " DOI for you. A DOI allow others to easily and unambiguously cite"
+        " your upload.",
+        placeholder="e.g. 10.1234/foo.bar...",
+        validators=[
+            doi_syntax_validator,
+            minted_doi_validator(prefix=CFG_DATACITE_DOI_PREFIX),
+            invalid_doi_prefix_validator(prefix=CFG_DATACITE_DOI_PREFIX),
+        ],
+        processors=[
+            local_datacite_lookup
+        ],
+        export_key='doi',
+    )
+    prereserve_doi = None
+    plupload_file = None
+
+    _title = _('Edit upload')
+    template = "webdeposit_edit.html"

@@ -1,5 +1,6 @@
+#!/usr/bin/env python
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -15,10 +16,26 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibfield
+"""
+Simple tasklet that is called after a bibupload of an updated record.
+"""
 
-etc_DATA = *.cfg
+from invenio.flaskshell import *
+from invenio.openaire_tasks import openaire_altmetric_update, \
+    openaire_update_doi
 
-EXTRA_DIST = $(etc_DATA)
 
-CLEANFILES = *~ *.tmp
+def bst_openaire_update_upload(recid=None):
+    """
+    Tasklet to run after a new record has been uploaded.
+    """
+    if recid is None:
+        return
+
+    # Ship of tasks to Celery for background processing
+    openaire_update_doi.delay(recid)
+    openaire_altmetric_update.delay([recid])
+
+
+if __name__ == '__main__':
+    bst_openaire_update_upload()

@@ -15,10 +15,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-etcdir = $(sysconfdir)/bibfield
+pylibdir = $(libdir)/python/invenio/bibfield_functions
 
-etc_DATA = *.cfg
+pylib_DATA = *.py
 
-EXTRA_DIST = $(etc_DATA)
+EXTRA_DIST = $(pylib_DATA)
 
-CLEANFILES = *~ *.tmp
+CLEANFILES = *~ *.tmp *.pyc

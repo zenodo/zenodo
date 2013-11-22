@@ -288,6 +288,11 @@ We use the following HTTP status codes to indicate success or failure of a reque
 <td>Request failed, due to unsupported HTTP method. <a href="#restapi-errors">Error response</a> included.</td>
 </tr>
 <tr>
+<td><code>409</code></td>
+<td>Conflict</td>
+<td>Request failed, due to the current state of the resource (e.g. edit a deopsition which is not fully integrated). <a href="#restapi-errors">Error response</a> included.</td>
+</tr>
+<tr>
 <td><code>415</code></td>
 <td>Unsupported Media Type</td>
 <td>Request failed, due to missing or invalid request header <code>Content-Type</code>. <a href="#restapi-errors">Error response</a> included.</td>

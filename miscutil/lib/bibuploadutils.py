@@ -47,7 +47,8 @@ def close_temp_file(file_out, filename):
     os.chmod(filename, 0644)
 
 
-def bibupload_record(record=None, collection=None, file_prefix="bibuploadutils", mode="-c",
+def bibupload_record(record=None, collection=None,
+                     file_prefix="bibuploadutils", mode="-c",
                      alias='bibuploadutils', opts=[]):
     """
     General purpose function that will write a MARCXML file and call bibupload
@@ -81,4 +82,7 @@ def bibupload_record(record=None, collection=None, file_prefix="bibuploadutils",
 
     close_temp_file(file_out, filename)
     if tot > 0:
-        task_low_level_submission('bibupload', alias, mode, filename, *opts)
+        return task_low_level_submission(
+            'bibupload', alias, mode, filename, *opts
+        )
+    return None

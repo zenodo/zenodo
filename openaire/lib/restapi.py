@@ -44,6 +44,17 @@ Available error codes for REST API
 #
 # Marshal fields
 #
+class ISODate(fields.Raw):
+    """
+    Format a datetime object in ISO format and convert to UTC if necessary
+    """
+    def format(self, dt):
+        try:
+            return six.text_type(dt.isoformat())
+        except AttributeError as ae:
+            raise fields.MarshallingException(ae)
+
+
 class UTCISODateTime(fields.DateTime):
     """
     Format a datetime object in ISO format and convert to UTC if necessary

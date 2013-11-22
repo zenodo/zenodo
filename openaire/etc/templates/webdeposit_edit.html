@@ -1,5 +1,6 @@
+{#
 ## This file is part of Invenio.
-## Copyright (C) 2010, 2011, 2012 CERN.
+## Copyright (C) 2013 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -14,11 +15,22 @@
 ## You should have received a copy of the GNU General Public License
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "webdeposit_run.html" %}
 
-etcdir = $(sysconfdir)/bibfield
+{% macro edit_action_bar(margin="") -%}
+    {% include "webdeposit_edit_action_bar.html" %}
+{%- endmacro %}
 
-etc_DATA = *.cfg
+{% block form_header scoped %}{{ edit_action_bar() }}{% endblock form_header%}
 
-EXTRA_DIST = $(etc_DATA)
+{% block instructions %}Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) When ready, press "Submit" to finalize your changes. (iii) Press "Discard" to discard your changes. {% endblock %}
 
-CLEANFILES = *~ *.tmp
+
+{% block form_group_header scoped %}
+    {% if group %}
+        {{ form_group_accordion_start(group, grouploop.index) }}
+    {% else %}
+        {{ edit_action_bar(margin="10px") }}
+    {% endif %}
+{% endblock %}

@@ -323,7 +323,6 @@ class UserCollection(db.Model):
 
         try:
             colls = rec['980']
-            print colls
             if replace_colls:
                 for c in replace_colls:
                     newcolls.append([('a', c)])
@@ -368,7 +367,7 @@ class UserCollection(db.Model):
         if not pretend:
             bibupload_record(
                 record=rec, file_prefix='usercoll', mode='-c',
-                opts=['-n', '-P5']
+                opts=['-n', '-P5'], alias="usercoll",
             )
         return rec
 
@@ -378,7 +377,7 @@ class UserCollection(db.Model):
         """
         bibupload_record(
             collection=coll, file_prefix='usercoll', mode='-c',
-            opts=['-n', '-P5']
+            opts=['-n', '-P5'], alias="usercoll",
         )
         return True
 

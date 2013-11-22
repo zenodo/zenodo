@@ -91,6 +91,8 @@ AC_CONFIG_FILES([config.nice  \
      bibedit/etc/Makefile \
      bibfield/Makefile \
      bibfield/etc/Makefile \
+     bibfield/lib/Makefile \
+     bibfield/lib/functions/Makefile \
      bibexport/Makefile \
      bibexport/etc/Makefile \
      bibexport/web/Makefile \
