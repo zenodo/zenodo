@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
+#
+## This file is part of ZENODO.
+## Copyright (C) 2012, 2013 CERN.
 ##
-## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
 ##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
 
 import warnings
 from invenio.dbquery import run_sql
@@ -34,7 +37,7 @@ def do_upgrade():
     """
     tables = [x[0] for x in run_sql("SHOW TABLES;")]
 
-    # Remove old migration table (from before invenio upgrader was integrated 
+    # Remove old migration table (from before invenio upgrader was integrated
     # into Invenio).
     if 'migrations' in tables:
         run_sql("DROP TABLE migrations")
@@ -96,7 +99,7 @@ def do_upgrade():
         import os
         import shutil
         from invenio.config import CFG_PREFIX
-        
+
         files = [
             "bin/inveniomigrate",
             "lib/python/invenio/inveniomigrate.pyc",
