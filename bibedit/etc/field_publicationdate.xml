@@ -1,7 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Publication date -->
-<!-- BibEdit-Field-Template-Description: Publication date -->
-<record>
-  <datafield tag="260" ind1=" " ind2=" ">
-    <subfield code="c">VOLATILE:2012-12-24</subfield>
-  </datafield>
-</record>

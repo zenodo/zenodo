@@ -1,8 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Dataset publisher -->
-<!-- BibEdit-Field-Template-Description: Dataset publisher -->
-<record>
-  <datafield tag="260" ind1=" " ind2=" ">
-    <subfield code="b">VOLATILE:OpenAIRE Orphan Record Repository</subfield>
-    <subfield code="c">VOLATILE:Year</subfield>
-  </datafield>
-</record>

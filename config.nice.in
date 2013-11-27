@@ -1,5 +1,0 @@
-#!/bin/sh
-# Automatically created during the building process. Do not edit.
-./configure --prefix=@prefix@ \
-            --with-python=@PYTHON@ \
-            --with-mysql=@MYSQL@

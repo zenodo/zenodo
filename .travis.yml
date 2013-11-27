@@ -1,0 +1,76 @@
+# -*- coding: utf-8 -*-
+#
+## This file is part of ZENODO.
+## Copyright (C) 2012, 2013 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
+
+notifications:
+  email: false
+
+services:
+  - mysql # will start mysqld
+  - rabbitmq # will start rabbitmq-server
+  - redis # will start memcached
+
+python:
+  - "2.7"
+  - "2.6"
+
+install:
+  - "sudo apt-get update"
+  - "sudo apt-get install apache2 libapache2-mod-wsgi ssl-cert poppler-utils --fix-missing"
+  - "sudo a2enmod actions"
+  - "sudo a2enmod rewrite"
+  - "sudo mkdir /etc/apache2/ssl"
+  - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
+  - sudo pip install --upgrade pip
+  - sudo pip install --upgrade setuptools
+  - sudo pip install --upgrade distribute
+  - sudo pip install --upgrade virtualenvwrapper
+  - ". `which virtualenvwrapper.sh`"
+  - mkvirtualenv invenio
+  - workon invenio
+  - "pip install nose==1.2.1"
+  - "pip install -r requirements.txt"
+  - "pip install -r requirements-extras.txt"
+  - "pip install -r requirements-flask.txt"
+  - "pip install -r requirements-flask-ext.txt"
+  - "pip install git+https://github.com/zenodo/invenio-op@next-op"
+  - "python setup.py install"
+#  - "inveniomanage config create secret-key"
+#  - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
+#  - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
+
+before_script:
+#  - "inveniomanage apache create-config"
+#  - "sudo ln -s $WORKON_HOME/invenio/etc/apache/invenio-apache-vhost.conf /etc/apache2/sites-available/invenio"
+#  - "sudo ln -s $WORKON_HOME/invenio/etc/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-available/invenio-ssl"
+#  - "sudo /usr/sbin/a2dissite default || echo ':('"
+#  - "sudo /usr/sbin/a2ensite invenio" # enable Invenio web site
+#  - "sudo /usr/sbin/a2ensite invenio-ssl" # enable Invenio secure web site
+#  - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
+#  - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
+#  - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
+  - "inveniomanage database init --yes-i-know || echo ':('"
+  - "inveniomanage database create || echo ':('"
+#  - "inveniomanage demosite create"
+#  - "inveniomanage demosite populate"
+
+script:
+  - "python setup.py test"

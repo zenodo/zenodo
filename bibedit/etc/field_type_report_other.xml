@@ -1,7 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Type: Report other -->
-<!-- BibEdit-Field-Template-Description: Type: Report other -->
-<record>
-  <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="a">REPORT_OTHER</subfield>
-  </datafield>
-</record>

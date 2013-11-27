@@ -1,7 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Type: Meeting poster -->
-<!-- BibEdit-Field-Template-Description: Type: Meeting poster -->
-<record>
-  <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="a">MEETING_POSTER</subfield>
-  </datafield>
-</record>

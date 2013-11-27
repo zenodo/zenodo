@@ -1,7 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Type: Dataset -->
-<!-- BibEdit-Field-Template-Description: Type: Dataset -->
-<record>
-  <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="a">DATA</subfield>
-  </datafield>
-</record>

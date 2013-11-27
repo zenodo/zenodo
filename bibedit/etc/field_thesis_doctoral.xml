@@ -1,8 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Thesis: Doctoral -->
-<!-- BibEdit-Field-Template-Description: Thesis: Doctoral -->
-<record>
-  <datafield tag="502" ind1=" " ind2=" ">
-    <subfield code="c">VOLATILE:University</subfield>
-    <subfield code="b">doctoralThesis</subfield>
-  </datafield>
-</record>

@@ -1,8 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Additional author -->
-<!-- BibEdit-Field-Template-Description: Additional author -->
-<record>
-  <datafield tag="700" ind1=" " ind2=" ">
-    <subfield code="a">VOLATILE:Familyname, Firstname</subfield>
-    <subfield code="u">VOLATILE:Affiliation</subfield>
-  </datafield>
-</record>

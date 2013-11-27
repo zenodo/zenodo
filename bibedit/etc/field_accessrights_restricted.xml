@@ -1,7 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Access right: Restricted access -->
-<!-- BibEdit-Field-Template-Description: Access right: Restricted access -->
-<record>
-  <datafield tag="542" ind1=" " ind2=" ">
-    <subfield code="l">restrictedAccess</subfield>
-  </datafield>
-</record>

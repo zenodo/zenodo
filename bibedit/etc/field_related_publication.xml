@@ -1,8 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Related publication -->
-<!-- BibEdit-Field-Template-Description: Related publication -->
-<record>
-  <datafield tag="773" ind1=" " ind2=" ">
-    <subfield code="a">VOLATILE:DOI</subfield>
-    <subfield code="n">pub</subfield>
-  </datafield>
-</record>

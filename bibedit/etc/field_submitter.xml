@@ -1,8 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Submitter -->
-<!-- BibEdit-Field-Template-Description: Submitter -->
-<record>
-  <datafield tag="856" ind1="0" ind2=" ">
-    <subfield code="f">VOLATILE:Email</subfield>
-    <subfield code="y">VOLATILE:Name</subfield>
-  </datafield>
-</record>

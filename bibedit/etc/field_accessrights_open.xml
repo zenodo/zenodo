@@ -1,7 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Access right: Open access -->
-<!-- BibEdit-Field-Template-Description: Access right: Open access -->
-<record>
-  <datafield tag="542" ind1=" " ind2=" ">
-    <subfield code="l">openAccess</subfield>
-  </datafield>
-</record>

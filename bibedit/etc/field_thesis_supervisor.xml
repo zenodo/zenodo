@@ -1,9 +1,0 @@
-<!-- BibEdit-Field-Template-Name: Thesis supervisor -->
-<!-- BibEdit-Field-Template-Description: Thesis supervisor -->
-<record>
-  <datafield tag="700" ind1=" " ind2=" ">
-    <subfield code="a">VOLATILE:Family name, First name</subfield>
-    <subfield code="u">VOLATILE:Affiliatuion</subfield>
-    <subfield code="4">ths</subfield>
-  </datafield>
-</record>

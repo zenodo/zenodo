@@ -1,8 +1,0 @@
-<!-- BibEdit-Field-Template-Name: DOI -->
-<!-- BibEdit-Field-Template-Description: DOI -->
-<record>
-  <datafield tag="024" ind1="7" ind2=" ">
-    <subfield code="a">VOLATILE:10.1234/foo.bar</subfield>
-    <subfield code="2">VOLATILE:DOI</subfield>
-  </datafield>
-</record>
