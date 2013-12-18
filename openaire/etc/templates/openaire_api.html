@@ -70,10 +70,6 @@
 <h2 id="restapi-intro">Introduction</h2>
 <p>The REST API allows you to programmatically upload and publish research outputs on {{config.CFG_SITE_NAME}}, with the same functionality which is available in our <a href="{{url_for('webdeposit.index')}}">Upload</a> user interface.</p>
 
-<div class="alert">
-  <strong>Important!</strong> This version of the REST API is a release candidate. A final version 1.0 will be released on Dec 4th, 2013. We expect no major changes, but minor changes in validation or provided metadata might happen between now and the final release. Please send your feedback to <a href="mailto:info@zenodo.org">info@zenodo.org</a>.
-</div>
-
 <div class="accordion dep-accord" id="dep-accord-0">
   <div class="accordion-group">
     <div class="accordion-heading info">
@@ -160,7 +156,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>and, we're ready to publish:</p>
 <div class="alert alert-danger">Don't execute this last step - it will put your test upload straight online.</div>
 <pre>
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/action/publish?apikey=YOUR_API_KEY" % deposition_id)
+>>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/actions/publish?apikey=YOUR_API_KEY" % deposition_id)
 >>> r.status_code
 202
 </pre>
@@ -1198,7 +1194,7 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 <div class="accordion-group">
     <div class="accordion-heading info">
         <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-a-publish">
-          <h4 id="restapi-res-">Publish <small>POST deposit/depositions/:id/action/publish</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Publish <small>POST deposit/depositions/:id/actions/publish</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-a-publish" class="accordion-body collapse">
@@ -1212,7 +1208,7 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/action/publish</td>
+    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/actions/publish</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1252,12 +1248,12 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-pub">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/action/publish?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?apikey=YOUR_API_KEY</pre>
     </div>
     <div class="tab-pane" id="python-a-pub">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/action/publish?apikey=YOUR_API_KEY")</pre>
+r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?apikey=YOUR_API_KEY")</pre>
     </div>
   </div>
 </div>
@@ -1268,6 +1264,173 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </div>
     </div>
   </div>
+
+
+
+
+<div class="accordion-group">
+    <div class="accordion-heading info">
+        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-a-edit">
+          <h4 id="restapi-a-edit">Edit <small>POST deposit/depositions/:id/actions/edit</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+        </a>
+    </div>
+    <div id="collapse-a-edit" class="accordion-body collapse">
+      <div class="accordion-inner">
+
+<table class="table table-striped">
+<tbody>
+<tr>
+    <th class="span2">Description</th>
+    <td>Unlock already submitted deposition for editing.</td>
+</tr>
+<tr>
+    <th class="span2">URL</th>
+    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/actions/edit</td>
+</tr>
+<tr>
+    <th>Method</th>
+    <td>POST</td>
+</tr>
+<tr class="warning">
+    <th>Request headers</th>
+    <td><em>None</em></td>
+</tr>
+<tr>
+    <th>URL parameters</th>
+    <td>
+      <ul>
+        <li><strong>Required:</strong>
+          <ul>
+            <li><strong>id:</strong> Deposition identifier</li>
+          </ul>
+        </li>
+      </ul>
+    </td>
+</tr>
+<tr>
+    <th>Success response</th>
+    <td><ul><li><strong>Code:</strong> <code>201 Created</code></li><li><strong>Body</strong>: a <a href="#restapi-rep-dep">deposition</a> resource.</li></ul></td>
+</tr>
+<tr>
+    <th>Error response</th>
+    <td>
+    <ul>
+      <li><code>400 Bad Request</code>: Deposition state does not allow for editing (e.g. depositions in state <code>inprogress</code>).</li>
+      <li><code>409 Conflict</code>: Deposition is in the process of being integrated, please wait 5 minutes before trying again.</li>
+    </ul>
+    See <a href="#restapi-http">HTTP status codes</a> (400 and 500 series errors) and <a href="#restapi-errors">error responses</a>.</td>
+</tr>
+<tr>
+    <th>Example</th>
+    <td>
+<div class="tabbable">
+  <ul class="nav nav-pills">
+    <li class="active"><a href="#curl-a-edit" data-toggle="tab">cURL</a></li>
+    <li ><a href="#python-a-edit" data-toggle="tab">Python</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="curl-a-edit">
+      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?apikey=YOUR_API_KEY</pre>
+    </div>
+    <div class="tab-pane" id="python-a-edit">
+      <pre>import requests
+
+r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?apikey=YOUR_API_KEY")</pre>
+    </div>
+  </div>
+</div>
+    </td>
+</tr>
+</tbody>
+</table>
+</div>
+    </div>
+  </div>
+
+
+
+
+<div class="accordion-group">
+    <div class="accordion-heading info">
+        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-a-discard">
+          <h4 id="restapi-a-discard">Discard <small>POST deposit/depositions/:id/actions/discard</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+        </a>
+    </div>
+    <div id="collapse-a-discard" class="accordion-body collapse">
+      <div class="accordion-inner">
+
+<table class="table table-striped">
+<tbody>
+<tr>
+    <th class="span2">Description</th>
+    <td>Discard changes in the current editing session.</td>
+</tr>
+<tr>
+    <th class="span2">URL</th>
+    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/actions/discard</td>
+</tr>
+<tr>
+    <th>Method</th>
+    <td>POST</td>
+</tr>
+<tr class="warning">
+    <th>Request headers</th>
+    <td><em>None</em></td>
+</tr>
+<tr>
+    <th>URL parameters</th>
+    <td>
+      <ul>
+        <li><strong>Required:</strong>
+          <ul>
+            <li><strong>id:</strong> Deposition identifier</li>
+          </ul>
+        </li>
+      </ul>
+    </td>
+</tr>
+<tr>
+    <th>Success response</th>
+    <td><ul><li><strong>Code:</strong> <code>201 Created</code></li><li><strong>Body</strong>: a <a href="#restapi-rep-dep">deposition</a> resource.</li></ul></td>
+</tr>
+<tr>
+    <th>Error response</th>
+    <td>
+    <ul>
+      <li><code>400 Bad Request</code>: Deposition is not being edited.</li>
+    </ul>
+    See <a href="#restapi-http">HTTP status codes</a> (400 and 500 series errors) and <a href="#restapi-errors">error responses</a>.</td>
+</tr>
+<tr>
+    <th>Example</th>
+    <td>
+<div class="tabbable">
+  <ul class="nav nav-pills">
+    <li class="active"><a href="#curl-a-discard" data-toggle="tab">cURL</a></li>
+    <li ><a href="#python-a-discard" data-toggle="tab">Python</a></li>
+  </ul>
+  <div class="tab-content">
+    <div class="tab-pane active" id="curl-a-discard">
+      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?apikey=YOUR_API_KEY</pre>
+    </div>
+    <div class="tab-pane" id="python-a-discard">
+      <pre>import requests
+
+r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?apikey=YOUR_API_KEY")</pre>
+    </div>
+  </div>
+</div>
+    </td>
+</tr>
+</tbody>
+</table>
+</div>
+    </div>
+  </div>
+
+
+
+
 </div>
 
 
@@ -1359,15 +1522,16 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>String</td>
     <td>No</td>
     <td>One of the values:<ul>
-      <li><code>"unsubmitted"</code>: Deposition has not yet been published.</li>
-      <li><code>"submitted"</code>: Deposition has been published.</li></ul>
+      <li><code>"inprogress"</code>: Deposition metadata can be updated. If deposition is also unsubmitted (see <code>submitted</code>) files can be updated as well. </li>
+      <li><code>"done"</code>: Deposition has been published.</li></ul>
+      <li><code>"error"</code>: Deposition is in an error state - contact our support.</li></ul>
     </td>
 </tr>
 <tr>
     <td><code>submitted</code></td>
-    <td>Timestamp</td>
+    <td>Bool</td>
     <td>No</td>
-    <td>Timestamp when submission was published (in ISO8601 format).  This field is only present for published depositions.</td>
+    <td>True of deposition has been published, False otherwise.</td>
 </tr>
 <tr>
     <td><code>title</code></td>
@@ -1724,8 +1888,16 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </dl>#}
 
 <h2 id="restapi-changes">Changes</h2>
+<dt>2013-12-18</dt>
+<dd><p>REST API version 1.0 final release</p><ul>
+<li>Deposition actions moved from <code>deposit/depositions/:id/action</code> to <code>deposit/depositions/:id/actions</code></li>
+<li>Added <code>edit</code> and <code>discard</code> deposition action resources.</li>
+<li>Deposition resource representation:<ul>
+<li><code>state</code>: Controlled vocabulary changed.</li>
+<li><code>submitted</code>: Data type changed from Timestamp to Bool.</li></ul></li>
+<ul></dd>
 <dt>2013-11-13</dt>
-<dd><p>REST API release candidate.</p></dd>
+<dd><p>REST API initial release candidate</p></dd>
 </dl>
 
 <h2 id="harvest"><strong>OAI-PMH API</strong> <small>use OAI-PMH to harvest {{config.CFG_SITE_NAME}}</small></h2>
