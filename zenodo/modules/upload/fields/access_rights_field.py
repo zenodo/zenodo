@@ -92,7 +92,7 @@ class IconRadioInput(RadioInput):
         return html
 
 
-def access_right_processor(form, field, dummy_submit):
+def access_right_processor(form, field, submit=False, fields=None):
     """
     Enable/disable fields based on access right value.
     """

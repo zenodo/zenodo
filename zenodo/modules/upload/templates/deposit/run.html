@@ -28,10 +28,8 @@
 
 {% macro submit_dialog_body() %}
 <ul>
-    <li>Editing is only possible via submitting changes to <a href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>*.</li>
     <li>Your upload will be <strong>publicly available</strong> shortly after you submit &mdash; uploaded files are only publicly available if you have chosen Open Access and/or Embargoed Access (subject to the embargo date).</li>
 </ul>
-<p><small class="muted">* We are working on making editing possible after you have submitted.</small></p>
 {% endmacro %}
 
 
@@ -56,10 +54,11 @@
 
 {% block form_title scoped %}
 {{super()}}
-<p class="muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Submit" to finalize and make your upload public (editing afterwards only possible via submitting changes to <a class="muted" href="mailto:{{config.CFG_SITE_SUPPORT_EMAIL}}">{{config.CFG_SITE_SUPPORT_EMAIL}}</a>).</small></p>
+<p class="muted"><small>{% block instructions %}Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Submit" to finalize and make your upload public.{% endblock %}</small></p>
 {% endblock form_title %}
 
 
+{% block form_header scoped %}{{ super() }}{% endblock form_header%}
 
 {#
  # Add action bar in bottom, just before the file upload field
