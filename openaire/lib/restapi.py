@@ -32,6 +32,7 @@ from flask import request
 from invenio.importutils import autodiscover_modules
 from dateutil import parser
 from dateutil.tz import tzlocal, tzutc
+from datetime import date
 
 error_codes = dict(
     validation_error=10,
@@ -46,11 +47,14 @@ Available error codes for REST API
 #
 class ISODate(fields.Raw):
     """
-    Format a datetime object in ISO format and convert to UTC if necessary
+    Format a datetime object in ISO format
     """
     def format(self, dt):
         try:
-            return six.text_type(dt.isoformat())
+            if isinstance(dt, date):
+                return six.text_type(dt.isoformat())
+            else:
+                return six.text_type(dt)
         except AttributeError as ae:
             raise fields.MarshallingException(ae)
 

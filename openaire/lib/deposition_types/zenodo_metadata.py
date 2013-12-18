@@ -29,7 +29,7 @@ from invenio.bibformat import format_record
 from invenio.bibknowledge import get_kb_mapping
 from invenio.webuser_flask import current_user
 from invenio.webdeposit_models import DepositionType, Deposition, \
-    InvalidApiAction
+    DepositionDraft, InvalidApiAction
 from invenio.webdeposit_workflow_tasks import render_form, \
     create_recid, \
     prepare_sip, \
@@ -49,7 +49,7 @@ from invenio.restapi import error_codes, ISODate
 from invenio.webdeposit_deposition_forms.zenodo_form import ZenodoForm, \
     ZenodoEditForm
 from invenio.webinterface_handler_flask_utils import unicodifier
-from invenio.bibfield import get_record
+from invenio.bibfield import create_record
 
 __all__ = ['upload']
 
@@ -102,20 +102,20 @@ def check_existing_pid(pid, recjson):
     return False
 
 
-# ===============
+# =========================
 # JSON processing functions
-# ===============
-def process_form_json(data):
+# =========================
+def process_draft(draft):
     """
     Process loaded form JSON
     """
     # Filter out ZENODO and OpenAIRE communities
-    data['communities'] = filter(
+    draft.values['communities'] = filter(
         lambda c: c['identifier'] not in [CFG_ZENODO_USER_COLLECTION_ID,
                                           CFG_ECFUNDED_USER_COLLECTION_ID],
-        data.get('communities', [])
+        draft.values.get('communities', [])
     )
-    return data
+    return draft
 
 
 def process_recjson(deposition, recjson):
@@ -201,6 +201,12 @@ def process_recjson(deposition, recjson):
     # =======================
     # Filter out empty fields
     # =======================
+    filter_empty_elements(recjson)
+
+    return recjson
+
+
+def filter_empty_elements(recjson):
     list_fields = [
         'authors', 'keywords', 'thesis_supervisors'
     ]
@@ -211,7 +217,7 @@ def process_recjson(deposition, recjson):
 
     recjson['related_identifiers'] = filter(
         filter_empty_helper(keys=['identifier']),
-        recjson['related_identifiers']
+        recjson.get('related_identifiers', [])
     )
 
     return recjson
@@ -393,24 +399,6 @@ def api_validate_files():
     return _api_validate_files
 
 
-def merge_communities(obj, eng):
-    """
-    """
-    d = Deposition(obj)
-    sip = d.get_latest_sip(sealed=False)
-
-    record = get_record(
-        sip.metadata.get('recid'), reset_cache=True
-    )
-    sip.metadata['version_id'] = record['version_id']
-    print(record['version_id'])
-    print(record.get('communities'))
-    print(record.get('provisional_communities'))
-
-    print(sip.metadata.get('communities'))
-    print(sip.metadata.get('provisional_communities'))
-
-
 # ===============
 # Deposition type
 # ===============
@@ -425,7 +413,8 @@ class upload(DepositionType):
             [
                 # Load initial record
                 load_record(
-                    draft_id='_edit', post_process=process_form_json
+                    draft_id='_edit',
+                    post_process=process_draft
                 ),
                 # Render the form and wait until it is completed
                 render_form(draft_id='_edit'),
@@ -451,7 +440,7 @@ class upload(DepositionType):
                 # Merge SIP metadata into record and generate MARC
                 merge_record(
                     draft_id='_edit',
-                    process_load=process_form_json,
+                    post_process_load=process_draft,
                     process_export=process_recjson_edit,
                 ),
                 # Set file restrictions
@@ -515,7 +504,7 @@ class upload(DepositionType):
         conference_place=fields.String,
         conference_title=fields.String,
         conference_url=fields.String,
-        creators=fields.Raw,
+        creators=fields.Raw(default=[]),
         description=fields.String,
         doi=fields.String(default=''),
         embargo_date=ISODate,
@@ -528,20 +517,18 @@ class upload(DepositionType):
         journal_pages=fields.String,
         journal_title=fields.String,
         journal_volume=fields.String,
-        keywords=fields.Raw,
+        keywords=fields.Raw(default=[]),
         license=fields.String,
-        notes=fields.String,
+        notes=fields.String(default=''),
         partof_pages=fields.String,
         partof_title=fields.String,
         prereserve_doi=fields.Raw,
         publication_date=ISODate,
         publication_type=fields.String(default=''),
-
-        related_identifiers=fields.Raw,
-        thesis_supervisors=fields.Raw,
+        related_identifiers=fields.Raw(default=[]),
+        thesis_supervisors=fields.Raw(default=[]),
         title=fields.String,
         upload_type=fields.String,
-
     )
 
     marshal_metadata_edit_fields = marshal_metadata_fields.copy()
@@ -572,18 +559,35 @@ class upload(DepositionType):
         """
         Generate a JSON representation for REST API of a Deposition
         """
+        # Get draft
         if deposition.has_sip() and '_edit' in deposition.drafts:
             draft = deposition.get_draft('_edit')
             metadata_fields = cls.marshal_metadata_edit_fields
         elif deposition.has_sip():
+            # FIXME: Not based on latest available data in record.
             sip = deposition.get_latest_sip(sealed=True)
-            record = get_record(sip.metadata.get('recid'))
-            draft = record_to_draft(record, post_process=process_form_json)
+            draft = record_to_draft(
+                create_record(sip.package),
+                post_process=process_draft
+            )
             metadata_fields = cls.marshal_metadata_edit_fields
         else:
             draft = deposition.get_or_create_draft('_default')
             metadata_fields = cls.marshal_metadata_fields
+
+        # Fix known differences in marshalling
+        draft.values = filter_empty_elements(draft.values)
+        if 'grants' not in draft.values:
+            draft.values['grants'] = []
+
+        # Set disabled values to None in output
+        for field, flags in draft.flags.items():
+            if 'disabled' in flags and field in draft.values:
+                del draft.values[field]
+
+        # Marshal deposition
         obj = marshal(deposition, cls.marshal_deposition_fields)
+        # Marshal the metadata attribute
         obj['metadata'] = marshal(unicodifier(draft.values), metadata_fields)
 
         # Add record and DOI information from latest SIP

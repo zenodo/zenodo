@@ -30,7 +30,7 @@ from invenio.webdeposit_field_widgets import ButtonWidget
 __all__ = ['ReserveDOIField']
 
 
-def reserve_doi(dummy_form, field, dummy_submit):
+def reserve_doi(dummy_form, field, submit=False, fields=None):
     if field.object_data != field.data and field.data:
         if not field.object_data:
             # Call the user supplied function to create a doi.

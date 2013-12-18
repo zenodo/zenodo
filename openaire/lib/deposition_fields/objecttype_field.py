@@ -38,7 +38,7 @@ UPLOAD_TYPES = [
 UPLOAD_TYPE_ICONS = dict([(t[0], t[3]) for t in UPLOAD_TYPES])
 
 
-def subtype_processor(form, field, submit):
+def subtype_processor(form, field, submit=False, fields=None):
     form.image_type.flags.hidden = True
     form.image_type.flags.disabled = True
     form.publication_type.flags.hidden = True
@@ -51,13 +51,15 @@ def subtype_processor(form, field, submit):
         form.image_type.flags.disabled = False
 
 
-def set_license_processor(form, field, submit):
-    if field.data == "dataset":
-        if not form.license.flags.touched:
-            form.license.data = 'cc-zero'
-    else:
-        if not form.license.flags.touched:
-            form.license.data = 'cc-by'
+def set_license_processor(form, field, submit=False, fields=None):
+    # Only run license processor, when the license wasn't specified.
+    if fields and 'license' not in fields:
+        if field.data == "dataset":
+            if not form.license.flags.touched:
+                form.license.data = 'cc-zero'
+        else:
+            if not form.license.flags.touched:
+                form.license.data = 'cc-by'
 
 
 class UploadTypeField(WebDepositField, RadioField):
