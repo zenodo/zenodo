@@ -20,12 +20,36 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+
 """
-Instance independent configuration for ZENODO (e.g. modules to load etc)
+Zenodo configuration
+--------------------
+Instance independent configuration (e.g. which extensions to load) is defined
+in ``zenodo.config'' while instance dependent configuration (e.g. database
+host etc.) is defined in an optional ``zenodo.instance_config'' which
+can be installed by a separate package.
+
+This config module is loaded by the Flask application factory via an entry
+point specified in the setup.py::
+
+    entry_points={
+        'invenio.config': [
+            "zenodo = zenodo.config"
+        ]
+    },
 """
 
 PACKAGES = [
     'zenodo.base',
-    'zenodo.modules.*',
+    #'zenodo.modules.*',
     'invenio.modules.*',
 ]
+
+# Default database name
+CFG_DATABASE_NAME = "zenodo"
+CFG_DATABASE_USER = "zenodo"
+
+try:
+    from zenodo.instance_config import *
+except ImportError:
+    pass

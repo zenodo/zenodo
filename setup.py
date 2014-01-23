@@ -60,8 +60,10 @@ setup(
     platforms='any',
     install_requires=install_requires,
     dependency_links=dependency_links,
-    data_files=[
-        ('var/invenio.base-instance', ['invenio.cfg'])
-    ],
+    entry_points={
+        'invenio.config': [
+            "zenodo = zenodo.config"
+        ]
+    },
     test_suite='zenodo.testsuite.suite'
 )
