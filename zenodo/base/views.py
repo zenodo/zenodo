@@ -20,119 +20,133 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-"""OpenAIRE Flask Blueprint"""
-from flask import render_template
-from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
+"""
+Base blueprint for Zenodo
+"""
+from flask import Blueprint, render_template
+from flask.ext.menu import register_menu
+from flask.ext.breadcrumbs import register_breadcrumb
+from invenio.base.i18n import _
 
-blueprint = InvenioBlueprint('invenio_openaire', __name__,
-  url_prefix="",
-  menubuilder=[
-    ('main.browse', _('Browse'), '', 2),
-    ('main.browse.datasets', _('Datasets'), 'collection.datasets', 1),
-    ('main.browse.images', _('Images'), 'collection.images', 2),
-    ('main.browse.posters', _('Posters'), 'collection.posters', 3),
-    ('main.browse.presentations', _('Presentations'), 'collection.presentations', 4),
-    ('main.browse.publications', _('Publications'), 'collection.publications', 5),
-    ('main.browse.software', _('Software'), 'collection.software', 6),
-    ('main.browse.videos', _('Video/Audio'), 'collection.videos', 6),
-    ('main.getstarted', _('Get started'), '', 4),
-    ('main.getstarted.features', _('Features'), 'invenio_openaire.features', 1),
-    #('main.getstarted.deposit_data', _('Deposit data'), 'invenio_openaire.deposit_data', 2),
-    #('main.getstarted.use_data', _('Use data'), 'invenio_openaire.use_data', 3),
-    ('main.getstarted.faq', _('FAQ'), 'invenio_openaire.faq', 4),
-    ('footermenu_left.about', _('About'), 'invenio_openaire.about', 1),
-    ('footermenu_left.contact', _('Contact'), 'invenio_openaire.contact', 2),
-    ('footermenu_left.policies', _('Policies'), 'invenio_openaire.policies', 3),
-    #('footermenu_left.partners', _('Partners'), 'invenio_openaire.partners', 4),
-    ('footermenu_right.features', _('Features'), 'invenio_openaire.features', 1),
-    #('footermenu_right.deposit_data', _('Deposit data'), 'invenio_openaire.deposit_data', 2),
-    #('footermenu_right.use_data', _('Use data'), 'invenio_openaire.use_data', 3),
-    ('footermenu_right.faq', _('FAQ'), 'invenio_openaire.faq', 4),
-    ('footermenu_right.api', _('API'), 'invenio_openaire.api', 5),
-    ('footermenu_bottom.terms', _('Terms of use'), 'invenio_openaire.terms', 1),
-    ('footermenu_bottom.privacy_policy', _('Privacy policy'), 'invenio_openaire.privacy_policy', 2),
-    ('footermenu_bottom.support', _('Support/Feedback'), 'invenio_openaire.contact', 3),
-    ]
+blueprint = Blueprint(
+    'zenodo_base',
+    __name__,
+    url_prefix="",
+    # menubuilder=[
+    #     # Top menu
+    #     ('main.browse', _('Browse'), '', 2),
+    #     ('main.browse.datasets', _('Datasets'), 'collection.datasets', 1),
+    #     ('main.browse.images', _('Images'), 'collection.images', 2),
+    #     ('main.browse.posters', _('Posters'), 'collection.posters', 3),
+    #     ('main.browse.presentations', _('Presentations'),
+    #         'collection.presentations', 4),
+    #     ('main.browse.publications', _('Publications'),
+    #         'collection.publications', 5),
+    #     ('main.browse.software', _('Software'), 'collection.software', 6),
+    #     ('main.browse.videos', _('Video/Audio'), 'collection.videos', 6),
+    #     ('main.getstarted', _('Get started'), '', 4),
+
+    #     ('main.getstarted.faq', _('FAQ'), 'zenodo_base.faq', 4),
+
+    #     # Footer menu
+    #     ('footermenu_left.about', _('About'), 'zenodo_base.about', 1),
+    #     ('footermenu_left.contact', _('Contact'),
+    #         'zenodo_base.contact', 2),
+    #     ('footermenu_left.policies', _('Policies'),
+    #         'zenodo_base.policies', 3),
+    #     ('footermenu_right.features', _('Features'),
+    #         'zenodo_base.features', 1),
+    #     ('footermenu_right.faq', _('FAQ'),
+    #         'zenodo_base.faq', 4),
+    #     ('footermenu_right.api', _('API'), 'zenodo_base.api', 5),
+    #     ('footermenu_bottom.terms', _('Terms of use'),
+    #         'zenodo_base.terms', 1),
+    #     ('footermenu_bottom.privacy_policy', _('Privacy policy'),
+    #         'zenodo_base.privacy_policy', 2),
+    #     ('footermenu_bottom.support', _('Support/Feedback'),
+    #         'zenodo_base.contact', 3),
+    # ],
+    static_folder="static",
+    template_folder="templates",
 )
+
+
+#@register_menu(blueprint, 'main.search', _('Search'), order=1)
+#@register_breadcrumb(blueprint, '.', _('Home'))
+
+#register_menu()()
 
 #
 # Static pages
 #
-
-
 @blueprint.route('/features', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Features"))
+@register_menu(blueprint, 'main.getstarted.features', _('Features'), order=1)
+@register_breadcrumb(blueprint, '.features', _("Features"))
 def features():
-    return render_template('openaire_features.html')
+    return render_template('zenodo/features.html')
 
 
 @blueprint.route('/use-data', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Use data"))
+@register_breadcrumb(blueprint, '.use_data', _("Use data"))
 def use_data():
-    return render_template('openaire_use-data.html')
+    return render_template('zenodo/use-data.html')
 
 
 @blueprint.route('/deposit-data', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Deposit data"))
+@register_breadcrumb(blueprint, '.deposit_data', _("Deposit data"))
 def deposit_data():
-    return render_template('openaire_deposit-data.html')
+    return render_template('zenodo/deposit-data.html')
 
 
 @blueprint.route('/about', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("About"))
+@register_breadcrumb(blueprint, '.about', _("About"))
 def about():
-    return render_template('openaire_about.html')
+    return render_template('zenodo/about.html')
 
 
 @blueprint.route('/contact', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Contact"))
+@register_breadcrumb(blueprint, '.contact', _("Contact"))
 def contact():
-    return render_template('openaire_contact.html')
+    return render_template('zenodo/contact.html')
 
 
 @blueprint.route('/dev', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("API"))
+@register_breadcrumb(blueprint, '.api', _("API"))
 def api():
-    return render_template('openaire_api.html')
-
-
-#@blueprint.route('/api/upload', methods=['GET', ])
-#@blueprint.invenio_set_breadcrumb(_("API"))
-#def api_upload():
-#    return render_template('openaire_api_upload.html')
+    return render_template('zenodo/api.html')
 
 
 @blueprint.route('/faq', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("FAQ"))
+@register_breadcrumb(blueprint, '.faq', _("FAQ"))
 def faq():
-    return render_template('openaire_faq.html')
+    return render_template('zenodo/faq.html')
 
 
 @blueprint.route('/policies', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Policies"))
+@register_breadcrumb(blueprint, '.policies', _("Policies"))
 def policies():
-    return render_template('openaire_policies.html')
+    return render_template('zenodo/policies.html')
 
 
 @blueprint.route('/partners', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Partners"))
+@register_breadcrumb(blueprint, '.partners', _("Partners"))
 def partners():
-    return render_template('openaire_partners.html')
+    return render_template('zenodo/partners.html')
 
 
 @blueprint.route('/terms', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Terms of use"))
+@register_breadcrumb(blueprint, '.terms', _("Terms of use"))
 def terms():
-    return render_template('openaire_terms.html')
+    return render_template('zenodo/terms.html')
 
 
 @blueprint.route('/privacy-policy', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Privacy policy"))
+@register_breadcrumb(blueprint, '.privacy_policy', _("Privacy policy"))
 def privacy_policy():
-    return render_template('openaire_privacy-policy.html')
+    return render_template('zenodo/privacy-policy.html')
 
 
 @blueprint.route('/support', methods=['GET', ])
-@blueprint.invenio_set_breadcrumb(_("Support/Feedback"))
+@register_breadcrumb(blueprint, '.support', _("Support/Feedback"))
 def support():
-    return render_template('openaire_support.html')
+    return render_template('zenodo/support.html')
