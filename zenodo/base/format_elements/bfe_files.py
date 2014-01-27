@@ -24,18 +24,15 @@
 """
 
 import re
-from invenio.bibdocfile import BibRecDocs, file_strip_ext, normalize_format, compose_format
-from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_CERN_SITE, CFG_SITE_RECORD, \
-    CFG_BIBFORMAT_HIDDEN_FILE_FORMATS
-from invenio.bibdocfile_config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
+from flask import current_app
+from invenio.legacy.bibdocfile.api import BibRecDocs, file_strip_ext, normalize_format, compose_format
+from invenio.legacy.bibdocfile.config import CFG_BIBDOCFILE_ICON_SUBFORMAT_RE
+from invenio.base.i18n import gettext_set_language
 from cgi import escape, parse_qs
 from urlparse import urlparse
 from os.path import basename
 import urllib
-from invenio.jinja2utils import render_template_to_string
-
-_CFG_NORMALIZED_BIBFORMAT_HIDDEN_FILE_FORMATS = set(normalize_format(fmt) for fmt in CFG_BIBFORMAT_HIDDEN_FILE_FORMATS)
+from invenio.ext.template import render_template_to_string
 
 
 def format_element(bfo, template='bfe_files.html', show_subformat_icons='yes',
@@ -106,6 +103,10 @@ def get_files(bfo, distinguish_main_and_additional_files=True,
           files. Otherwise returns all the files as main. This is only
           enabled if distinguish_main_and_additional_files is set to True
     """
+    CFG_SITE_URL = current_app.config['CFG_SITE_URL']
+    CFG_CERN_SITE = current_app.config['CFG_CERN_SITE']
+    CFG_BIBFORMAT_HIDDEN_FILE_FORMATS = current_app.config['CFG_BIBFORMAT_HIDDEN_FILE_FORMATS']
+    _CFG_NORMALIZED_BIBFORMAT_HIDDEN_FILE_FORMATS = set(normalize_format(fmt) for fmt in CFG_BIBFORMAT_HIDDEN_FILE_FORMATS)
 
     _ = gettext_set_language(bfo.lang)
 

@@ -20,8 +20,8 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.openaire_deposit_config import CFG_OPENAIRE_PUBTYPE_MAP
-
+from flask import current_app
+from invenio.base.i18n import _
 
 def format_element(bfo, as_label=False):
     ln = bfo.lang
@@ -30,18 +30,21 @@ def format_element(bfo, as_label=False):
     # Loop over collection identifiers. First 980 entry that has a publication
     # type in subfield a is used. Subfield b denotes a subtype.
     #
-    # Other non-publication type 980 entries include user collection identifiers,
-    # and ZENODO specific identifiers like "curated".
+    # Other non-publication type 980 entries include user collection
+    # identifiers, and ZENODO specific identifiers like "curated".
+
+    CFG_OPENAIRE_PUBTYPE_MAP = current_app.config['CFG_OPENAIRE_PUBTYPE_MAP']
     for c in collections:
         try:
+
             collection = c.get('a')
             subcollection = c.get('b', None)
 
-            name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[collection]
+            name = _(dict(CFG_OPENAIRE_PUBTYPE_MAP)[collection])
             query = "980__a:%s" % collection
 
             if subcollection:
-                name = dict(CFG_OPENAIRE_PUBTYPE_MAP(ln))[subcollection]
+                name = _(dict(CFG_OPENAIRE_PUBTYPE_MAP)[subcollection])
                 query = "980__b:%s" % subcollection
 
             if as_label:

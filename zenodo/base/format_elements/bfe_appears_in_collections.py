@@ -24,7 +24,7 @@
 """
 __revision__ = "$Id$"
 
-from invenio.search_engine import get_all_collections_of_a_record, \
+from invenio.legacy.search_engine import get_all_collections_of_a_record, \
     create_navtrail_links
 
 def format_element(bfo, separator="<br />"):

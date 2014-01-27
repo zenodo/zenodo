@@ -1,0 +1,65 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "accounts/login_base.html" %}
+
+{%- block form_header %}{% endblock %}
+{%- block form_auth_external scoped -%}{% endblock %}
+{% block nickname_popover_placement %}left{% endblock%}
+
+{% block body %}
+{%- if current_user.is_guest %}
+  {{super()}}
+{%- else -%}
+    <div class="col-lg-offset-2 col-sm-8 col-md-8">
+        <div class="jumbotron">
+        <h1>Hi {{current_user.nickname}}!</h1>
+        <p style="margin-top: 10px;">Where do you go from here?</p>
+        <p style="margin-top: 30px;">
+          </p><div class="row">
+            <div width="100%" align="center">
+                <a href="{{url_for('webdeposit.index')}}" class="btn btn-default btn-lg">Upload</a>
+                <a href="/" class="btn btn-default btn-lg">Search</a>
+                <a href="{{ url_for('webaccount.logout') }}" class="btn btn-default btn-lg">Sign out</a>
+            </div>
+          </div>
+        <p></p>
+        </div>
+    </div>
+{%- endif -%}
+{%- endblock body -%}
+
+
+{%- block form_auth_internal -%}
+  <div class="col-sm-8 col-md-8">
+      <div class="jumbotron login-features">
+        <a href="{{url_for('webaccount.register')}}" class="btn btn-warning pull-right signup btn-lg" style="margin-top:45px;">Sign Up</a>
+        <h1>New to {{config.CFG_SITE_NAME}}?</h1>
+        <p>— sign up for a free account to share your research!</p>
+        {% include "zenodo/benefits.html" %}
+      </div>
+  </div>
+  <div class="col-sm-4 col-md-4">
+    {%- block form_auth_internal_form -%}
+      <div class="well">
+      {{super()}}
+      </div>
+    {%- endblock -%}
+  </div>
+{%- endblock -%}

@@ -21,7 +21,7 @@
 {% block body %}
 
 <div class="row">
-<div class="span3">
+<div class="col-sm-3 col-md-3 hidden-print">
 <ul class="nav nav-list well ">
   <li class="nav-header">API Documentation</li>
   <li><a href="#">Introduction</i></a></li>
@@ -54,7 +54,7 @@
   <li><a href="#metadata-changes">Changes</i></a></li>#}
 </ul>
 </div>
-<div class="span9" data-spy="scroll" data-target=".navmenu">
+<div class="col-sm-9 col-md-9" data-spy="scroll" data-target=".navmenu">
 <h1 id="intro"><strong>API Documentation</strong> <small>for developers</small></h1>
 <hr />
 {{config.CFG_SITE_NAME}} currently offers two different APIs:
@@ -70,14 +70,14 @@
 <h2 id="restapi-intro">Introduction</h2>
 <p>The REST API allows you to programmatically upload and publish research outputs on {{config.CFG_SITE_NAME}}, with the same functionality which is available in our <a href="{{url_for('webdeposit.index')}}">Upload</a> user interface.</p>
 
-<div class="accordion dep-accord" id="dep-accord-0">
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-list0">
+<div class="panel-group dep-accord" id="dep-accord-0">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-list0">
           <h4 id="restapi-res-">Quick start <small></small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-list0" class="accordion-body collapse">
+    <div id="collapse-list0" class="panel-collapse collapse">
       <div style="padding: 9px 15px;">
           <p>This short guide will give a quick overview of how to upload and publish on {{config.CFG_SITE_NAME}}, and will be using Python together with the <a href="http://www.python-requests.org/en/latest/user/install/">Requests</a> package.</p>
 
@@ -337,15 +337,15 @@ Error responses for 400 series errors (e.g. 400, 401, 403, ...) are returned as 
 
 <h3 id="restapi-res-dep">Depositions</h3>
 
-<div class="accordion dep-accord" id="dep-accord-1">
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-list">
+<div class="panel-group dep-accord" id="dep-accord-1">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-list">
           <h4 id="restapi-res-">List <small>GET deposit/depositions</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-list" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-list" class="panel-collapse collapse">
+      <div class="panel-body">
           <table class="table table-striped">
           <tbody>
           <tr>
@@ -395,14 +395,14 @@ print response.json()
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-create">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-create">
         <h4 id="restapi-res-">Create <small>POST deposit/depositions</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-create" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-create" class="panel-collapse collapse">
+      <div class="panel-body">
 <table class="table table-striped">
 <tbody>
 <tr>
@@ -445,7 +445,7 @@ print response.json()
 <div class="tabbable">
   <ul class="nav nav-pills">
     <li class="active"><a href="#curl-d-create" data-toggle="tab">cURL</a></li>
-    <li ><a href="#python-d-create" data-toggle="tab">Python</a></li>
+    <li ><a href="#python" data-toggle="tab">Python</a></li>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-create">
@@ -477,14 +477,14 @@ r = requests.post(url, data=json.dumps(data), headers=headers)</pre>
       </div>
     </div>
   </div>
-   <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-get">
+   <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-get">
           <h4 id="restapi-res-">Retrieve <small>GET deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-get" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-get" class="panel-collapse collapse">
+      <div class="panel-body">
           <table class="table table-striped">
 <tbody>
 <tr>
@@ -545,14 +545,14 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ap
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-update">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-update">
           <h4 id="restapi-res-">Update <small>PUT deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-update" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-update" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -632,14 +632,14 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-delete">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-delete">
           <h4 id="restapi-res-">Delete <small>DELETE deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-delete" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-delete" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -717,15 +717,15 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 
 <h3 id="restapi-res-files">Deposition files</h3>
 
-<div class="accordion dep-accord">
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-f-list">
+<div class="panel-group dep-accord">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-list">
           <h4 id="restapi-res-">List <small>GET deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-f-list" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-f-list" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -786,14 +786,14 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-f-create">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-create">
           <h4 id="restapi-res-">Create (upload) <small>POST deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-f-create" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-f-create" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -866,14 +866,14 @@ r = requests.post(url, data=data, files=files)</pre>
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-f-sort">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-sort">
           <h4 id="restapi-res-">Sort <small>PUT deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-f-sort" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-f-sort" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -953,14 +953,14 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-f-get">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-get">
           <h4 id="restapi-res-">Retrieve <small>GET deposit/depositions/:id/files/:file_id</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-f-get" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-f-get" class="panel-collapse collapse">
+      <div class="panel-body">
 <table class="table table-striped">
 <tbody>
 <tr>
@@ -1022,14 +1022,14 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-f-update">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-update">
           <h4 id="#restapi-obj-deposition-file">Update <small>PUT deposit/depositions/:id/files/:file_id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-f-update" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-f-update" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -1108,14 +1108,14 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
       </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-f-delete">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-delete">
           <h4 id="restapi-res-">Delete <small>DELETE deposit/depositions/:id/files/:file_id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-f-delete" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-f-delete" class="panel-collapse collapse">
+      <div class="panel-body">
         <table class="table table-striped">
 <tbody>
 <tr>
@@ -1190,15 +1190,15 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 <h3 id="restapi-res-actions">Deposition actions</h3>
 
 
-<div class="accordion dep-accord">
-<div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-a-publish">
+<div class="panel-group dep-accord">
+<div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-a-publish">
           <h4 id="restapi-res-">Publish <small>POST deposit/depositions/:id/actions/publish</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-a-publish" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-a-publish" class="panel-collapse collapse">
+      <div class="panel-body">
 
 <table class="table table-striped">
 <tbody>
@@ -1268,14 +1268,14 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 
 
-<div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-a-edit">
+<div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-a-edit">
           <h4 id="restapi-a-edit">Edit <small>POST deposit/depositions/:id/actions/edit</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-a-edit" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-a-edit" class="panel-collapse collapse">
+      <div class="panel-body">
 
 <table class="table table-striped">
 <tbody>
@@ -1350,14 +1350,14 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 
 
-<div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-a-discard">
+<div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-a-discard">
           <h4 id="restapi-a-discard">Discard <small>POST deposit/depositions/:id/actions/discard</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-a-discard" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-a-discard" class="panel-collapse collapse">
+      <div class="panel-body">
 
 <table class="table table-striped">
 <tbody>
@@ -1438,15 +1438,15 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 <p>The following section documents all the object attributes for the above documented resources.</p>
 
-<div class="accordion dep-accord">
-<div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-r-dep">
+<div class="panel-group dep-accord">
+<div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-r-dep">
           <h4 id="restapi-rep-dep">Deposition <small></small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-r-dep" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-r-dep" class="panel-collapse collapse">
+      <div class="panel-body">
 <table class="table table-striped">
 <thead>
 <tr>
@@ -1544,14 +1544,14 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-r-meta">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-r-meta">
           <h4 id="restapi-rep-meta">Deposition metadata <small></small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-r-meta" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-r-meta" class="panel-collapse collapse">
+      <div class="panel-body">
 <table class="table table-striped">
 <thead>
 <tr>
@@ -1653,7 +1653,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><code>license</code></td>
     <td>String</td>
     <td>Yes, if <code>access_right</code> is <code>"open"</code> or <code>"embargoed"</code>.</td>
-    <td><p>Controlled vocabulary based on <a href="http://licenses.opendefinition.org/licenses/groups/all.json">http://licenses.opendefinition.org</a>. The selected license applies to all files in this deposition, but not to the metadata which is licensed under <a href="{{url_for('invenio_openaire.terms')}}">Creative Commons Zero</a>. Further information about licenses is available at <a href="http://licenses.opendefinition.org/">Open Definition Licenses Service</a>.</p>
+    <td><p>Controlled vocabulary based on <a href="http://licenses.opendefinition.org/licenses/groups/all.json">http://licenses.opendefinition.org</a>. The selected license applies to all files in this deposition, but not to the metadata which is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>. Further information about licenses is available at <a href="http://licenses.opendefinition.org/">Open Definition Licenses Service</a>.</p>
     <p>Defaults to <code>cc-by</code> for non-datasets and <code>cc-zero</code> for datasets.</p></td>
 </tr>
 <tr>
@@ -1824,14 +1824,14 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </div>
     </div>
   </div>
-  <div class="accordion-group">
-    <div class="accordion-heading info">
-        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#collapse-r-files">
+  <div class="panel panel-default">
+    <div class="panel-heading info">
+        <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-r-files">
           <h4 id="restapi-rep-files">Deposition file<small></small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
         </a>
     </div>
-    <div id="collapse-r-files" class="accordion-body collapse">
-      <div class="accordion-inner">
+    <div id="collapse-r-files" class="panel-collapse collapse">
+      <div class="panel-body">
 <table class="table table-striped">
 <thead>
 <tr>
@@ -1907,7 +1907,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 the Open Archives Initiative Protocol for Metadata Harvesting (<a href="http://www.openarchives.org/pmh/">OAI-PMH</a>). OAI-PMH is a widely used protocol for harvesting metadata and most popular repository software provide support for this protocol.
 </p>
 <p>
-All metadata is licensed under <a href="{{url_for('invenio_openaire.terms')}}">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
+All metadata is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
 </p>
 <h3 id="harvest-baseurl">Base URL</h3>
 <p>
@@ -1943,7 +1943,7 @@ Metadata for each record is available in several formats. The available formats 
 <dt><code>user-<em>&lt;identifier&gt;</em></code></dt>
 <dd><p>Community sets &mdash; allows selective harvesting of specific communities. Replace <code><em>&lt;identifier&gt;</em></code> with the community identifier. Alternatively each community provides a direct harvesting API link on their front-page, which includes the correct community identifier.</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=user-cfa">See example</a></p></dd>
 </dl>
-<p>If you need selective harvesting and your use case is not supported by above sets, please <a href="{{url_for('invenio_openaire.contact')}}">contact us</a> and we may possible set a specific set for you.</p>
+<p>If you need selective harvesting and your use case is not supported by above sets, please <a href="{{url_for('zenodo_base.contact')}}">contact us</a> and we may possible set a specific set for you.</p>
 
 <h3 id="harvest-schedule">Update schedule</h3>
 Sets are updated once an hour.
@@ -1959,7 +1959,7 @@ The OAI-PMH API is rated limited to one request per 2 seconds. We would be grate
 {#
 <h2 id="metadata"><strong>Metadata API</strong> <small>machine readable formats of records</small></h2>
 <hr/>
-<p>Metadata for individual records are exportable in several different machine readable formats. All metadata is licensed under <a href="{{url_for('invenio_openaire.terms')}}">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
+<p>Metadata for individual records are exportable in several different machine readable formats. All metadata is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
 </p>
 
 <h3 id="metadata-url">URL pattern</h3>

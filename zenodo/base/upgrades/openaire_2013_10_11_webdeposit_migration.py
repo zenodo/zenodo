@@ -21,9 +21,8 @@
 ## or submit itself to any jurisdiction.
 
 import warnings
-from invenio.dbquery import run_sql
-from invenio.sqlalchemyutils import db
-from invenio.textutils import wait_for_user
+from invenio.legacy.dbquery import run_sql
+from invenio.ext.sqlalchemy import db
 from datetime import datetime
 import os
 import json
@@ -31,7 +30,7 @@ import logging
 
 depends_on = ['openaire_2013_09_25_software_coll']
 
-from invenio.bibknowledge import get_kb_mapping
+from invenio.modules.knowledge.api import get_kb_mapping
 
 
 
@@ -80,7 +79,7 @@ class OldDeposition(object):
 
 def map_metadata(metadata):
     from werkzeug.datastructures import MultiDict
-    from invenio.usercollection_model import UserCollection
+    from invenio.modules.communities.models import Community
     newdata = metadata.copy()
 
     del_keys = [
@@ -122,7 +121,7 @@ def map_metadata(metadata):
 
     if 'collections' in newdata:
         def _f2(x):
-            u = UserCollection.query.filter_by(id=x).first()
+            u = Community.query.filter_by(id=x).first()
             return {'identifier': u.id, 'title': u.title}
         newdata['communities'] = map(_f2, newdata['collections'])
         del newdata['collections']

@@ -20,7 +20,7 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 
 def format_element(bfo, title='Related DOIs', type=None):

@@ -1,3 +1,12 @@
+body {
+  padding-top: 0px;
+}
+
+.col-pad-0 {
+  padding-left: 0;
+  padding-right: 0;
+}
+
 .jumbotron  {
     padding-top: 40px;
     padding-bottom: 40px;
@@ -6,6 +15,23 @@
 .jumbotron h1 {
     font-size: 70px;
     line-height: 90px;
+}
+
+.jumbotron.page-features {
+  background-color: #ffffff;
+  font-weight: 100;
+}
+
+.jumbotron.page-features h1 {
+  font-weight: 100;
+}
+
+.jumbotron.login-features h1 {
+  font-size: 60px;
+}
+
+.jumbotron.login-features {
+  font-size: 18px;
 }
 
 .marketing-bg {
@@ -77,7 +103,7 @@
   margin-bottom: 10px;
 }
 
-.hero-unit {
+.jumbotron {
   font-weight: 300;
 }
 
@@ -85,7 +111,20 @@
   background-color: #fff;
 }
 
-.hero-unit h1 {
+#upload.jumbotron {
+  padding-top: 0px;
+
+}
+
+#upload {
+  font-size: 17.5px;
+}
+
+#upload small {
+  font-size: 12px;
+}
+
+.jumbotron h1 {
   font-weight: 500;
 }
 
@@ -93,20 +132,31 @@
   margin-top: 40px;
 }
 
+#pickfiles {
+  font-weight: 200;
+}
+
+#upload #local {
+  line-height: 15px;
+}
+
 #upload #or, #upload #dropbox, #upload #local {
   text-align: center;
 }
 
 #upload #or {
-  padding-top: 10px;
 }
 
 #upload #dropbox {
-  padding-top: 10px;
 }
 
-.hero-unit .dropbox-dropin-btn {
-    height: 25px!important;
+#upload div.row.text-center {
+  margin-top: 25px;
+  margin-left: 20px;
+}
+
+.dropbox-dropin-btn {
+  height: inherit!important;
 }
 
 .headerbg {
@@ -121,6 +171,7 @@
 
 header {
   background-color: #0067c9;
+  margin-bottom: 20px;
 }
 
 header .container .row {
@@ -143,6 +194,11 @@ header .container .nav .dropdown-toggle b {
 
 header .container .nav a, footer a {
   color: #ffffff;
+}
+
+header .container {
+  padding-left: 0;
+  padding-right: 0
 }
 
 footer a:hover {
@@ -169,9 +225,12 @@ header .container .nav .open a :hover{
   color: #fff;
 }
 
-
 header .container .nav li {
   margin-right: 5px;
+}
+
+header .container .nav li .form-group {
+  padding: 0 2px;
 }
 
 header .container .btn .caret, header .container .open .btn .caret{
@@ -182,6 +241,10 @@ header .container .btn .caret, header .container .open .btn .caret{
 
 header .container .open .btn.dropdown-toggle {
     color: #000;
+}
+
+.pager.view-record {
+  margin-top: 0;
 }
 
 .nav-tabs .open .dropdown-toggle {
@@ -215,15 +278,15 @@ header .container .open .btn.dropdown-toggle {
     background-color: #1f6377;
 }
 
-.dep-accord .accordion-inner {
+.dep-accord .panel-body {
     padding: 0 0 !important;
 }
 
-.dep-accord .accordion-heading.info {
+.dep-accord .panel-heading.info {
     background-color: #d9edf7 !important;
 }
 
-.dep-accord .accordion-heading.info a {
+.dep-accord .panel-heading.info a {
     color: #000000 !important;
 }
 
@@ -235,12 +298,141 @@ header .container .open .btn.dropdown-toggle {
   display: none;
 }
 
-.accordion-toggle.collapsed .hide-on-collapsed {
+.panel-toggle.collapsed .hide-on-collapsed {
   display: none;
 }
 
-.accordion-toggle.collapsed .show-on-collapsed {
+.panel-toggle.collapsed .show-on-collapsed {
   display: block;
+}
+
+/* Search form */
+#search-label {
+  font-size: 14px;
+}
+
+.label-inverse {
+  background-color: #000000;
+}
+
+.label-inverse:hover {
+  background-color: #666666;
+}
+
+dd {
+  padding-left: 10px;
+}
+
+dd .label {
+   padding: .1em .3em .1em;
+   font-size: 80%;
+}
+
+.label-success {
+  background-color: #356635;
+}
+
+.label-info {
+  background-color: #3a87ad;
+}
+
+h4.media-heading {
+  margin-top: 8px;
+}
+
+label {
+  font-weight: normal;
+}
+
+/* -------------- */
+
+/*
+to make "add to search" form look consistent
+in much shrinked window
+
+values copied from bootstrap ones for higher than xs size counterparts -> to be unified using "less"
+*/
+
+.navbar-collapse {
+  border-top: none;
+}
+
+.navbar-collapse .navbar-nav.navbar-left:first-child {
+  margin-left: -15px;
+}
+
+.navbar-form {
+  padding-top: 0;
+  padding-bottom: 0;
+  margin-right: 0;
+  margin-left: 0;
+  border: 0;
+}
+
+/* ------------ */
+
+.navbar-row {
+  width: 100%;
+  margin: inherit;
+}
+
+.navbar-row .navbar-row-container {
+  /* same colour as navbar border*/
+  border-top: 1px solid #e7e7e7;
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.navbar-collapse {
+  max-height: none;
+}
+
+/*
+  somehow original bootstrap's -4px doesn't look good
+  and results in thick (double) borders around buttons
+*/
+.input-group-btn > .btn + .btn,
+.input-group-btn > .btn {
+  margin-left: -5px;
+}
+
+/*
+  too keep searchbar with buttons in one line
+*/
+@media (min-width: 768px) { /* ld size */
+   #searchform-input-group {
+     width: 670px;
+   }
+}
+
+@media (min-width: 992px) { /* md size */
+   #searchform-input-group {
+     width: 710px;
+   }
+}
+
+@media (min-width: 1200px) { /* ld size */
+   #searchform-input-group {
+     width: 920px;
+   }
+}
+
+/*
+  showing dropdown stil as dropdown
+  on shrinked window
+*/
+@media (max-width: 767px) {
+  .navbar-nav .open .dropdown-menu {
+    position: absolute;
+    margin-top: 2px;
+    background-color: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
+  }
+
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+    color: #333333;
+  }
 }
 
 /*
@@ -298,6 +490,10 @@ body {
   font-weight: 400;
 }
 
+h1, .h2, .h3, .h4, .h5, .h6, h1, h2, h3, h4, h5, h6 {
+  font-family: 'Roboto', sans-serif;
+}
+
 footer .partners > a {
   margin-left: 10px;
 }
@@ -346,25 +542,29 @@ h1, h2, h3 {
   background-image: radial-gradient(circle farthest-corner at left top, #0047A8 0%, #2BBCFF 100%);
 }
 
-.accordion-heading .caret {
+.panel-heading .caret {
   margin-top: 8px;
   margin-left: 5px;
 }
 
+.panel {
+  margin-bottom: 2px;
+}
 
-.collapse .accordion-toggle .icon-caret-left {
+
+.collapse .panel-toggle .icon-caret-left {
     display: inline;
 }
 
-.collapse .in .accordion-toggle .icon-caret-left {
+.collapse .in .panel-toggle .icon-caret-left {
     display: none;
 }
 
-.collapse .accordion-toggle .icon-caret-down {
+.collapse .panel-toggle .icon-caret-down {
     display: none;
 }
 
-.collapse .in .accordion-toggle .icon-caret-down {
+.collapse .in .panel-toggle .icon-caret-down {
     display: inline;
 }
 
@@ -398,15 +598,31 @@ h1, h2, h3 {
 }
 
 /* =================== INVENIO templates =================*/
+#search-box-main {
+    margin-bottom: 20px;
+}
+
+.websearch .col-md-4 {
+  padding-right: 0;
+}
+
+.websearch .nav li {
+  margin-bottom: 5px;
+}
+
 .websearch .nav > li > ul > li {
   float: left;
 }
+
 .websearch .nav > li > a {
   white-space: nowrap;
+  padding: 0;
 }
+
 .websearch .nav > li > a:hover {
   background-color: inherit;
 }
+
 .websearch ul.nav > li > ul {
   clear: both;
 }
@@ -416,6 +632,7 @@ h1, h2, h3 {
 .websearch ul.nav > li > ul > li > a {
   display: inline;
 }
+
 .websearch .badge {
   font-size: 80%;
 }
@@ -426,6 +643,10 @@ h1, h2, h3 {
 
 .collection ul.nav-list ul.nav-list {
   font-size: 90%;
+}
+
+.collection ul.nav-list a {
+  display: inline;
 }
 
 .collection ul ul li a {

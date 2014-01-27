@@ -22,9 +22,7 @@
 
 import cgi
 import time
-
-#from invenio.openaire_deposit_config import CFG_OPENAIRE_THESIS_TYPES
-from invenio.messages import gettext_set_language
+from invenio.base.i18n import gettext_set_language
 
 def format_element(bfo):
     ln = bfo.lang

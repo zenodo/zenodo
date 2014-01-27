@@ -1,138 +1,120 @@
-{%- set guest = current_user.is_guest -%}
-{%- set usealerts = current_user['precached_usealerts'] -%}
-{%- set usemessages = current_user['precached_usemessages'] -%}
-{%- set usebaskets = current_user['precached_usebaskets'] -%}
-{%- set useloans = current_user['precached_useloans'] -%}
-{%- set usegroups = current_user['precached_usegroups'] -%}
-{%- set viewsubmissions = current_user['precached_viewsubmissions'] -%}
-{%- set useapprove = current_user['precached_useapprove'] -%}
-{%- set useadmin = current_user['precached_useadmin'] -%}
-{%- set usestats = current_user['precached_usestats'] -%}
-{%- set viewclaimlink = current_user['precached_viewclaimlink'] -%}
-{%- set usepaperclaim = current_user['precached_usepaperclaim'] -%}
-{%- set usepaperattribution = current_user['precached_usepaperattribution'] -%}
-{%- css 'css/jquery-ui.custom.css', '00-invenio' -%}
-{%- css 'css/bootstrap.css', '00-invenio' -%}
-{%- css 'css/bootstrap-responsive.min.css', '00-invenio' -%}
-{%- css 'css/token-input.css', '00-invenio' -%}
-{%- css 'css/token-input-facebook.css', '00-invenio' -%}
-{%- css 'css/datepicker.css', '00-invenio' -%}
-{%- css 'css/font-awesome.min.css', '00-invenio' -%}
-{%- css 'css/typeahead.js-bootstrap.css', '00-invenio' -%}
-{%- css 'css/custom.css', '00-invenio' -%}
-{%- js "js/hogan.js", '00-invenio' -%}
-{%- js 'js/jquery.min.js', '00-invenio' -%}
-{%- js 'js/jquery-migrate.min.js', '00-invenio' -%}
-{%- js 'js/jquery-ui.custom.min.js', '00-invenio' -%}
-{%- js 'js/bootstrap.min.js', '00-invenio' -%}
-{%- js "js/bootstrap-select.js", '00-invenio' -%}
-{%- js "js/bootstrap-datepicker.js", '00-invenio' -%}
-{%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
-{%- js "js/websearch_typeahead.js", '00-invenio' -%}
-{%- js "js/holder.js", '00-invenio' -%}
-{%- js "js/custom.js", '00-invenio' -%}
-{%- if not no_pageheader -%}
-<!DOCTYPE html>
-<html{% if ln %} lang="{{ ln|safe }}"{% endif %}{% if is_language_rtl(g.ln) %} dir="rtl"{% endif %}>
-<head>
-  <meta charset="utf-8">
-  <title>{{ title+' | ' if title }}{{ config.CFG_SITE_NAME_INTL[g.ln] }}</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-  <meta http-equiv="Content-Language" content="{{ g.ln|safe }}" />
-{%- if config.get('CFG_GOOGLE_SITE_VERIFICATION', None) -%}
-{%- for google_id in config.CFG_GOOGLE_SITE_VERIFICATION.split(",") -%}
-  <meta name="google-site-verification" content="{{google_id}}" />
-{%- endfor -%}
-{%- endif -%}
-  <link rev="made" href="mailto:{{ config.CFG_SITE_SUPPORT_EMAIL }}" />
-  <link rel="alternate" type="application/rss+xml" title="{{ config.CFG_SITE_NAME }} RSS" href="{{ url_for('rss') }}" />
-  <link rel="search" type="application/opensearchdescription+xml" href="{{ url_for('opensearchdescription') }}" title="{{ config.CFG_SITE_NAME }}" />
-  <link rel="unapi-server" type="application/xml" title="unAPI" href="{{ url_for('unapi') }}" />
-  {% for bundle in get_css_bundle(iterate=True) %}
-  {% assets bundle %}
-    <link rel="stylesheet" type="text/css" href="{{ ASSET_URL }}"></link>
-  {%- endassets -%}
-  {% endfor %}
+{#
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
+#}
+
+{%- extends "page_base.html" %}
+
+{%- block global_css -%}
+  {%- css 'css/jquery-ui.custom.css', '00-invenio' -%}
+  {#- css url_for('static', filename='css/base.css'), '00-invenio' -#}
+  {%- css 'css/bootstrap.min.css', '00-invenio' -%}
+  {%- css 'css/bootstrap-theme.min.css', '00-invenio' -%}
+  {%- css 'css/token-input.css', '00-invenio' -%}
+  {%- css 'css/token-input-facebook.css', '00-invenio' -%}
+  {%- css 'css/datepicker.css', '00-invenio' -%}
+  {%- css 'css/font-awesome.min.css', '00-invenio' -%}
+  {%- css 'css/typeahead.js-bootstrap.css', '00-invenio' -%}
+  {%- css 'css/custom.css', '00-invenio' -%}
+{%- endblock global_css -%}
+
+{%- block global_javascript -%}
+  {%- js "js/hogan.js", '00-invenio' -%}
+  {%- js 'js/jquery.min.js', '00-invenio' -%}
+  {%- js 'js/jquery-migrate.min.js', '00-invenio' -%}
+  {%- js 'js/jquery-ui.custom.min.js', '00-invenio' -%}
+  {%- js 'js/bootstrap.js', '00-invenio' -%}
+  {%- js "js/bootstrap-select.js", '00-invenio' -%}
+  {%- js "js/bootstrap-datepicker.js", '00-invenio' -%}
+  {%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
+  {%- js "js/holder.js", '00-invenio' -%}
+  {%- js "js/custom.js", '00-invenio' -%}
+{%- endblock global_javascript -%}
+
+
+{%- block head_links %}
+{{ super() }}
   <link href='https://fonts.googleapis.com/css?family=Roboto:400,300,100' rel='stylesheet' type='text/css'>
-  {% block _top_assets %}{% endblock _top_assets %}
-  {%- block css -%}{%- endblock css -%}
-  <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
-  <!--[if lt IE 9]>
-    <script src="https://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-  <![endif]-->
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  {% for size in [144, 114, 72, 57] %}{% set icon_name = 'apple-touch-icon-%d-precomposed.png'|format(size) -%}
-  <link rel="apple-touch-icon-precomposed" sizes="{{ size }}x{{ size }}" href="{{ url_for('static', filename=icon_name) }}">
-  {% endfor -%}
-  {% block header %}{{ metaheaderadd|safe }}{% endblock header -%}
-</head>
-<body {{ body_css_classes|safe }} lang="{{ g.ln|safe }}" itemscope itemtype="http://schema.org/WebPage">
+{%- endblock head_links %}
+
+
+{% block head_links_langs %}{% endblock %}
+{%- block css -%}{%- endblock css -%}
+{%- block head_apple_icons -%}{%- endblock head_apple_icons -%}
+
+
+{%- block body_start %}
 {%- if config.CFG_SITE_TAG %}<div class="img-rounded" align="center" style="color: #ffffff; text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.5); position: absolute; top:20px; left: 20px; background-color: #faa732; width: 100px;"><h5>{{config.CFG_SITE_TAG}}</h5></div>{% endif -%}
+{% endblock body_start %}
+
+
+
+{%- block page_header %}
   <div id="wrap">
-    {% block headerbox %}{% include 'header.html' %}{% endblock headerbox %}
+  {%- block headerbox %}{% include 'header.html' %}{% endblock headerbox %}
     <div class="container phone-margin">
-      {% block breadcrumb %}{% if breadcrumbs|length > 1 %}
-      <div class="row">
-        <div class="span12">
-          <ul class="breadcrumb" itemprop="breadcrumb">
-            {% for breadcrumb in breadcrumbs %}{% if loop.last %}
-            <li class="active">{{ breadcrumb[0] }}</li>
-            {% else %}
-            <li>{% set url_args = breadcrumb[2] or {} %}<a href="{{ url_for(breadcrumb[1], **url_args) }}" class="navtrail">{{ breadcrumb[0] }}</a> <span class="divider">/</span></li>
-            {% endif %}
-            {% endfor %}
-          </ul>
-        </div>
-      </div>
-      {% endif %}{% endblock breadcrumb %}
-      {% block pageheaderadd %}{{ pageheaderadd|safe }}{% endblock pageheaderadd %}
-{%- endif -%}
-{%- if not no_pagebody -%}
-      {% block page_body %}
-      {% block title %}
-      {% if title %}
-      <div class="row">
-        <div class="span12">
-          <div class="page-header"><h1>{{ title }}</h1></div>
-        </div>
-      </div>
-      {% endif %}
-      {% endblock title %}
-      {% block messages %}
-      <div class="row">
-        <div class="span12">
-          {% for category, msg in get_flashed_messages(with_categories=true) %}
-            <div class="alert alert-{{ category }}">
-              <a class="close" data-dismiss="alert" href="#">×</a>
-              {{ msg }}
-            </div>
-          {% endfor %}
-        </div>
-      </div>
-      {% endblock messages %}
-      {% block body %}{{ body }}{% endblock body %}
-      {% endblock page_body %}
-{%- endif -%}
-{%- if not no_pagefooter -%}
+    {%- block breadcrumb %}{%- include 'breadcrumbs.html' -%}{%- endblock breadcrumb -%}
+    {%- block pageheaderadd -%}{{ pageheaderadd|safe }}{%- endblock pageheaderadd -%}
+{%- endblock page_header -%}
+
+
+
+
+{%- block page_body %}
+{%- block title %}
+{%- if title %}
+  <div class="row">
+    <div class="col-sm-12 col-md-12">
+      <div class="page-header"><h1>{{ title }}</h1></div>
+    </div>
+  </div>
+{%- endif %}
+{%- endblock title %}
+{%- block messages %}
+  <div class="row">
+    <div class="col-sm-12 col-md-12 col-pad-0">
+  {{ flashed_messages() }}
+    </div>
+  </div>
+{%- endblock messages %}
+{%- block body %}{{ body }}{% endblock body %}
+{%- endblock page_body %}
+
+
+
+
+{%- block page_footer %}
       <div id="push"></div>
     </div>
   </div>
-
   <div class="container phone-margin">
-    {% block pagefooteradd %}{{ pagefooteradd|safe }}{% endblock pagefooteradd %}
+    {%- block pagefooteradd -%}{{ pagefooteradd|safe }}{%- endblock pagefooteradd -%}
   </div>
   {%- include 'footer.html' -%}
-  {%- block _bottom_assets %}
-  {%- for bundle in get_js_bundle(iterate=True) %}
-  {% assets bundle %}
-  <script type="text/javascript" src="{{ ASSET_URL }}"></script>
-  {%- endassets %}
-  {%- endfor %}
-  {%- endblock %}
+{%- endblock page_footer %}
+
+{%- block body_end -%}
+  {# Altmetric badge #}
   <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
-  {% block javascript %}{% endblock javascript %}
-  {% if config.CFG_PIWIK_URL and config.CFG_PIWIK_SITE_ID %}
+{%- if config.CFG_PIWIK_URL and config.CFG_PIWIK_SITE_ID %}
   <script type="text/javascript">
   var _paq = _paq || [];
   _paq.push(["setDomains", ["*.zenodo.org","*.zenodo.cern.ch","*.zenodo.eu","*.zenodo.net"]]);
@@ -147,7 +129,5 @@
     g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
   })();
   </script>
-  {% endif %}
-</body>
-</html>
 {%- endif -%}
+{%- endblock body_end %}

@@ -1,55 +1,54 @@
-<form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('youraccount.login') }}" method="POST" class="form-inline">
   <header class="gradient">
     <div class="container headerbg">
       <div class="container">
         <div class="row">
-          <div class="span3">
-            <a href="{{ url_for('search.index') }}"><img id="logoimg" src="{{ url_for('static', filename='img/zenodo.png') }}" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"/></a><br />
+          <div class="col-md-3">
+            <a href="{{ url_for('search.index') }}"><img id="logoimg" src="{{ url_for('static', filename='img/zenodo.png') }}" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"></a><br>
           </div>
-          <div class="span9 pull-right hidden-phone">
+          <div class="col-md-9 pull-right hidden-sm hidden-xs">
             <h1 style="padding-top: 50px; color: #00488c; font-size: 60px; line-height: 60px; text-align:right;">Research. Shared.</h1>
           </div>
         </div>
       </div>
       <div class="container" style="height:37px;">
         <ul class="nav nav-tabs">
-          {%- for item in config.menubuilder_map.main.children.itervalues()|sort(attribute='order') if item.display() recursive %}
+          {%- for item in current_menu.submenu('main').children if item.visible recursive %}
           {%- if item.children -%}
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ url_for(item.url) }}">{{ item.title|safe }} <b class="caret"></b></a>
-            <ul class="dropdown-menu">{{ loop(item.children.itervalues()|sort(attribute='order')) }}</ul>
+            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ item.url }}">{{ item.text|safe }} <b class="caret"></b></a>
+            <ul class="dropdown-menu">{{ loop(item.children|sort(attribute='order')) }}</ul>
           </li>
           {%- else -%}
-          <li><a href="{{ url_for(item.url) }}">{{ item.title|safe }}</a></li>
+          <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
           {%- endif %}
           {%- endfor %}
-          <li class="dropdown pull-right">
-              {%- if current_user.is_guest %}
-                {%- if form and form.referer %}
-                {{ form.referer }}
-                {%- else %}
-                <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}" />
-                {%- endif %}
-                <input id="remember" name="remember" type="hidden" value="n">
-                <input name="nickname" type="text" class="input-small hidden-phone" placeholder="{{ _("Email") }}" />
-                <input name="password" type="password" class="input-small hidden-phone" placeholder="{{ _("Password") }}" />
-                <button name="submit" type="submit" class="btn"><i class="icon-signin"></i> {{ _("Sign in") }}</button>
-
-              {% else %}
-                <button class="btn dropdown-toggle" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="icon icon-white icon-user"></i> {{ current_user.email }} <span class="caret"></span>&nbsp;</button>
-                <ul class="dropdown-menu">
-                  <li><a href="/youraccount/edit">{{ _("Profile") }}</a></li>
-                  <li><a href="{{ url_for('webdeposit.index')}}">{{ _("My uploads") }}</a></li>
-                  <li><a href="{{ url_for('usercollection.index')}}">{{ _("My communities") }}</a></li>
-                  <li class="divider"></li>
-                  <li><a href="{{ url_for('youraccount.logout') }}">
-                    <i class="icon icon-off"></i> {{ _("Logout") }}
-                  </a></li>
-                </ul>
-              {% endif %}
+          <li class="pull-right">
+            <form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('youraccount.login') }}" method="POST" class="form-inline" role="form">
+            {%- if current_user.is_guest %}
+              {%- if form and form.referer %}
+              {{ form.referer }}
+              {%- else %}
+              <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}">
+              {%- endif %}
+              <input id="remember" name="remember" type="hidden" value="n">
+              <div class="form-group"><input name="nickname" type="text" class="form-control input-sm hidden-sm hidden-xs" placeholder="{{ _(" email") }}"></div>
+              <div class="form-group"><input name="password" type="password" class="form-control input-sm hidden-sm hidden-xs" placeholder="{{ _(" password") }}"></div>
+              <div class="form-group"><button name="submit" type="submit" class="btn btn-default"><i class="icon-signin"></i> {{ _("Sign in") }}</button></div>
+            {%- else %}
+              <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="icon icon-white icon-user"></i> {{ current_user.email }} <span class="caret"></span>&nbsp;</button>
+              <ul class="dropdown-menu">
+                <li><a href="/youraccount/edit">{{ _("Profile") }}</a></li>
+                <li><a href="{{ url_for('webdeposit.index')}}">{{ _("My uploads") }}</a></li>
+                <li><a href="{{ url_for('communities.index')}}">{{ _("My communities") }}</a></li>
+                <li class="divider"></li>
+                <li><a href="{{ url_for('youraccount.logout') }}">
+                  <i class="icon icon-off"></i> {{ _("Sign out") }}
+                </a></li>
+              </ul>
+            {%- endif %}
+             </form>
           </li>
         </ul>
       </div>
     </div>
   </header>
-</form>

@@ -20,7 +20,7 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.jinja2utils import render_template_to_string
+from invenio.ext.template import render_template_to_string
 
 
 def format_element(bfo, template='record_hb.html', **kwargs):

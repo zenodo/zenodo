@@ -1,0 +1,138 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2013 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "deposit/run_base.html" %}
+
+{% block webdeposit_assets %}
+    {% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
+    {% js 'js/typeahead.min.js', '50-webdeposit' %}
+    {% js 'js/deposit/form.js', '50-webdeposit' %}
+    {% js 'js/deposit/templates.js', '50-webdeposit' %}
+    {% js 'ckeditor/ckeditor.js', '50-ckeditor' %}
+{% endblock webdeposit_assets %}
+
+{% macro submit_dialog_body() %}
+<ul>
+    <li>Your upload will be <strong>publicly available</strong> shortly after you submit &mdash; uploaded files are only publicly available if you have chosen Open Access and/or Embargoed Access (subject to the embargo date).</li>
+</ul>
+{% endmacro %}
+
+
+
+{% macro modal_dialog(id="submitModal", title="Are you sure you want to submit?", body=submit_dialog_body()) %}
+<div id="{{id}}" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="{{id}}Label">{{title}}</h3>
+  </div>
+  <div class="modal-body">
+    {{body}}
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary form-submit-zenodo">Submit</button>
+  </div>
+</div>
+{% endmacro %}
+
+
+
+{% block form_title scoped %}
+{{super()}}
+<p class="text-muted"><small>{% block instructions %}Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Submit" to finalize and make your upload public.{% endblock %}</small></p>
+{% endblock form_title %}
+
+
+{% block form_header scoped %}{{ super() }}{% endblock form_header%}
+
+{#
+ # Add action bar in bottom, just before the file upload field
+ #}
+{% block form_group_header scoped %}
+    {% if group %}
+        {{ form_group_accordion_start(group, grouploop.index) }}
+    {% else %}
+        {{ form_action_bar(margin="10px") }}
+    {% endif %}
+{% endblock %}
+
+{% block form_footer scoped %}{% endblock %}
+
+{#
+ # Custom display of upload_type field
+ #}
+{% block field_body scoped %}
+    {%- if field.name == 'upload_type' -%}
+        <div class="upload-type" align="center">
+            <div class="form-group {{ "error" if field.errors }}" id="state-group-{{ field.name }}">
+                {{field}}
+            </div>
+            {%- if field.description %}
+            <p class="text-muted field-desc"><small>{{field.description|urlize}}</small></p>
+            {%- endif %}
+            <div class="alert help-block {{ 'alert-error' if field.errors else 'hide' }}" id="state-{{ field.name }}" style="margin-top: 5px;{% if field.errors %} display:block;{% endif %}">
+                {%- for error in field.errors %}
+                    <div>{{ error }}</div>
+                {%- endfor %}
+            </div>
+        </div>
+    {% elif field.short_name == 'prereserve_doi' %}
+        {{ field_display(field, field_class="btn  btn-default btn-xs") }}
+    {% elif field.short_name == 'plupload_file' %}
+        {{ field_display(field, field_size="col-md-12") }}
+    {% else %}
+        {{ field_display(field) }}
+    {% endif %}
+{% endblock field_body %}
+
+
+{#
+ # Add modal dialog
+ #}
+{% block body %}
+{{ modal_dialog() }}
+{{super()}}
+{% endblock body %}
+
+
+{#
+ # Set date picker options
+ #}
+{%- block form_script_options %}
+<script type="text/javascript">
+var date_options = {
+    format: 'yyyy-mm-dd',
+    weekStart: 1,
+    autoclose: true,
+    todayBtn: "linked",
+    todayHighlight: true,
+    keyboardNavigation: true
+};
+
+function webdeposit_init_submit_zenodo(url, selector, form_selector, dialog) {
+    $(selector).click(function(e){
+        e.preventDefault();
+        $("#submitModal").modal('hide');
+        webdeposit_submit(url, form_selector, dialog);
+    });
+}
+
+var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
+webdeposit_init_submit_zenodo(complete_url, '.form-submit-zenodo', '#submitForm', '#form-submit-dialog');
+</script>
+{%- endblock form_script_options %}

@@ -1,10 +1,10 @@
-{% from "usercollection_helpers.html" import curation_buttons with context %}
+{% from "communities/helpers.html" import curation_buttons with context %}
 <div class="media htmlbrief">
     <span class="pull-left hidden-phone">
         {{ bfe_icon(bfo, subformat_re='icon-90') }}
     </span>
     <div class="media-body">
-        {%- set ucoll_id = collection|usercollection_id %}
+        {%- set ucoll_id = collection|community_id %}
         {{ curation_buttons(bfo, ucoll_id) }}
         <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ bfe_date(bfo, date_format='%d %B %Y') }}</span>
         {{ bfe_openaire_pubtype(bfo, as_label="1") }}

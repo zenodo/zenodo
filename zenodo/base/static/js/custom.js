@@ -288,7 +288,7 @@ function webdeposit_derived_field(selector, derived_field_selector, mapping, onl
     });
 }
 
-function usercollection_approval(btn, action) {
+function community_approval(btn, action) {
     recid = $(btn).data('recid');
     coll = $(btn).data('collection');
     url = $(btn).data('url');
@@ -306,7 +306,7 @@ function usercollection_approval(btn, action) {
         dataType: 'json'
     }).done(function(data) {
         if(data.status == 'success' ){
-            set_usercollection_buttons(spanid, action);
+            set_community_buttons(spanid, action);
         } else {
             set_ajaxmsg(spanid, "Server problem ", "warning-sign");
         }
@@ -322,7 +322,7 @@ function set_ajaxmsg(selector, message, icon){
     $(selector+ " .ajaxmsg").html(ajaxmsg_template.render({"message": message, "icon": icon}));
 }
 
-function set_usercollection_buttons(selector, action) {
+function set_community_buttons(selector, action) {
     // Disabled buttons
     $(selector+ " .btn").attr('disabled', '');
     // Show selected
@@ -335,15 +335,15 @@ function set_usercollection_buttons(selector, action) {
 
 $(document).ready(function(){
     $(".accept-coll-btn").click(function(e){
-        usercollection_approval(this,"accept");
+        community_approval(this,"accept");
         e.preventDefault();
     });
     $(".reject-coll-btn").click(function(e){
-        usercollection_approval(this,"reject");
+        community_approval(this,"reject");
         e.preventDefault();
     });
     $(".remove-coll-btn").click(function(e){
-        usercollection_approval(this,"remove");
+        community_approval(this,"remove");
         e.preventDefault();
     });
 });

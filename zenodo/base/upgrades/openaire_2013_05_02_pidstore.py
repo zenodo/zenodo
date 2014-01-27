@@ -21,7 +21,7 @@
 ## or submit itself to any jurisdiction.
 
 from sqlalchemy import *
-from invenio.sqlalchemyutils import db
+from invenio.ext.sqlalchemy import db
 
 depends_on = ['openaire_2013_04_18_usercollection']
 

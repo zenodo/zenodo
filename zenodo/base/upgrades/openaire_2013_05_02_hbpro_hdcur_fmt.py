@@ -20,7 +20,7 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.dbquery import run_sql
+from invenio.legacy.dbquery import run_sql
 
 depends_on = ['openaire_2013_05_02_pidstore']
 

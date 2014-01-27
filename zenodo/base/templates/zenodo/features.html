@@ -18,53 +18,53 @@
 #}
 {% extends "page.html" %}
 {% block body %}
-    <div class="jumbotron" align="center">
+    <div class="jumbotron page-features" align="center">
         <h1>Introducing {{config.CFG_SITE_NAME}}!</h1>
     </div>
 
 
-        <div class="row-fluid features-page" align="center">
-                <div class="span4">
+        <div class="features-page row" align="center">
+                <div class="col-sm-4 col-md-4">
                 <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
-                  <h1>(All) Research.<br /> Shared.</h1>
-                  <h4>&mdash; your one stop research shop!</h4>
+                  <h1>(All) Research.<br> Shared.</h1>
+                  <h4>— your one stop research shop!</h4>
                   <p>All research outputs from across all fields of science are welcome! {{config.CFG_SITE_NAME}} accept any file format as well as both positive and negative results. However, we do promote peer-reviewed openly accessible research, and we do curate your upload before putting it on the front-page.</p>
                 </div>
-                <div class="span4">
+                <div class="col-sm-4 col-md-4">
                     <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
-                  <h1>Citeable.<br />Discoverable.</h1>
-                  <h4>&mdash; be found!</h4>
+                  <h1>Citeable.<br>Discoverable.</h1>
+                  <h4>— be found!</h4>
                   <p>{{config.CFG_SITE_NAME}} assigns all publicly available uploads a Digital Object Identifier (DOI) to make the upload easily and uniquely citeable. {{config.CFG_SITE_NAME}} further supports harvesting of all content via the OAI-PMH protocol.</p>
                </div>
-               <div class="span4">
+               <div class="col-sm-4 col-md-4">
                   <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
-                  <h1>Community<br />Collections</h1>
-                  <h4>&mdash; create your own repository</h4>
+                  <h1>Community<br>Collections</h1>
+                  <h4>— create your own repository</h4>
                   <p>{{config.CFG_SITE_NAME}} allows you to create your own collection and accept or reject all uploads to it. Creating a space for your next workshop or project have never been easier. Plus, everything is citeable and discoverable.</p>
                 </div>
         </div>
     </div>
 <div class="marketing-bg">
     <div class="container">
-    <div class="row-fluid features-page" align="center">
+    <div class="features-page row" align="center">
 
-            <div class="span4">
+            <div class="col-sm-4 col-md-4">
                 <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
               <h1>Safe</h1>
-              <h4>&mdash; more than just a drop box!</h4>
+              <h4>— more than just a drop box!</h4>
               <p>Your research output is stored safely for the future in same cloud infrastructure as research data from CERN's <a href="http://home.web.cern.ch/about/accelerators/large-hadron-collider">Large Hadron Collider</a> using a CERN's battle-tested repository software <a href="http://invenio-software.org">INVENIO</a> used by some of the world's largest repositories such as <a href="http://inspirehep.net">INSPIRE HEP</a> and <a href="http://cds.cern.ch">CERN Document Server</a>.</p>
             </div>
-            <div class="span4">
+            <div class="col-sm-4 col-md-4">
                 <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
               <h1>Reporting</h1>
-              <h4>&mdash; tell your funding agency!</h4>
+              <h4>— tell your funding agency!</h4>
               <p>{{config.CFG_SITE_NAME}} is integrated into reporting lines for research funded by the European Commission via <a href="http://www.openaire.eu">OpenAIRE</a>. Just upload your research on {{config.CFG_SITE_NAME}} and we will take care of the reporting for you. We plan to extend with futher funding agencies in the future so stay tuned!</p>
            </div>
-           <div class="span4">
+           <div class="col-sm-4 col-md-4">
                 <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
-              <h1>Flexible<br />Licensing</h1>
-              <h4>&mdash; not everything is under Creative Commons</h4>
-              <p>{{config.CFG_SITE_NAME}} encourage you to share your research as openly as possible to maximize use and re-use of your research results. However, we also acknowledge that one size does not fit all, and therefore allow for uploading under a multitude of different licenses and access levels<super>*</super>.<br /><small class="muted">* You are responsible for respecting applicable copyright and license conditions for the files you upload.</small></p>
+              <h1>Flexible<br>Licensing</h1>
+              <h4>— not everything is under Creative Commons</h4>
+              <p>{{config.CFG_SITE_NAME}} encourage you to share your research as openly as possible to maximize use and re-use of your research results. However, we also acknowledge that one size does not fit all, and therefore allow for uploading under a multitude of different licenses and access levels<super>*</super>.<br><small class="text-muted">* You are responsible for respecting applicable copyright and license conditions for the files you upload.</small></p>
             </div>
             <!--<div class="span4">
                 <img class="img-circle" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
@@ -76,25 +76,25 @@
 </div>
 </div>
 
-    <div class="jumbotron" align="center">
+    <div class="jumbotron page-features" align="center">
         <h1>Upcoming Features</h1>
     </div>
     <div class="container">
-        <div class="row-fluid features-page" align="center">
-            <div class="span4">
+        <div class="features-page row" align="center">
+            <div class="col-sm-4 col-md-4">
               <h1>Metadata Extraction</h1>
-              <h4>&mdash; DRY, don't repeat yourself!</h4>
+              <h4>— DRY, don't repeat yourself!</h4>
               <p>{{config.CFG_SITE_NAME}} will automatically discover basic information like title, description, authors and publication date about your upload so you just have to validate our findings instead of copy/pasting or re-typing everything.</p>
             </div>
-            <div class="span4">
+            <div class="col-sm-4 col-md-4">
               <h1>Authentication</h1>
-              <h4>&mdash; use your existing account.</h4>
+              <h4>— use your existing account.</h4>
               <p>{{config.CFG_SITE_NAME}} will allow authentication via other services such as Google, Twitter, ORCID and OpenAIRE, so that you do not have to remember yet another username and password for yet another service.</p>
            </div>
-           <div class="span4">
+           <div class="col-sm-4 col-md-4">
               <h1>Your opinion...</h1>
-              <h4>&mdash; tell us what to do!</h4>
-              <p>We have tons of ideas for the future of {{config.CFG_SITE_NAME}} but your opinions, ideas and needs decide what we will work on, so give us your <a href="{{ url_for('invenio_openaire.contact') }}">feedback.</a></p>
+              <h4>— tell us what to do!</h4>
+              <p>We have tons of ideas for the future of {{config.CFG_SITE_NAME}} but your opinions, ideas and needs decide what we will work on, so give us your <a href="{{ url_for('zenodo_base.contact') }}">feedback.</a></p>
            </div>
           </div>
     </div>

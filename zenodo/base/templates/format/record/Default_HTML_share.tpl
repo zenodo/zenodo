@@ -1,6 +1,5 @@
-
 <div class="well">
-  <span class="pull-right hidden-phone" rel="tooltip" title="QR-code for easy mobile access to this page.">{{ bfe_qrcode(bfo, width="100") }}</span>
+  <span class="pull-right hidden-sm" rel="tooltip" title="QR-code for easy mobile access to this page.">{# bfe_qrcode(bfo, width="100") #}</span>
   <h4>Share </h4>
   <!-- AddThis Button BEGIN -->
 <div class="addthis_toolbox addthis_default_style addthis_32x32_style">

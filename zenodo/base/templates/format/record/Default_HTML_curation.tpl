@@ -1,5 +1,5 @@
-{% from "usercollection_helpers.html" import curation_buttons with context %}
-{% for coll in bfo|usercollections(provisional=True, public=False, is_owner=True) %}
+{% from "communities/helpers.html" import curation_buttons with context %}
+{% for coll in bfo|communities(provisional=True, public=False, is_owner=True) %}
 {% if loop.first %}
 <h5><i class="icon-legal"></i> Pending approvals</h5>
 {% endif %}
@@ -10,7 +10,7 @@
 {% if not loop.last %}<hr />{% endif %}
 {% endfor %}
 
-{% for coll in bfo|usercollections(provisional=False, public=True, is_owner=True) %}
+{% for coll in bfo|communities(provisional=False, public=True, is_owner=True) %}
 {% if loop.first %}
 <h5><i class="icon-check"></i> Existing approvals</h5>
 {% endif %}
@@ -23,7 +23,7 @@
 
 {# Record owner is allowed to remove his record from a given collection #}
 {% if bfo|is_record_owner %}
-    {% for coll in bfo|usercollections(public=True, is_owner=False, filter_zenodo=True) %}
+    {% for coll in bfo|communities(public=True, is_owner=False, filter_zenodo=True) %}
         {% if loop.first %}
             <h5><i class="icon-group"></i> Communities</h5>
         {% endif %}

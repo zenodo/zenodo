@@ -20,12 +20,10 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-import warnings
-from invenio.dbquery import run_sql
-from invenio.inveniocfg_upgrader import run_sql_ignore
+from invenio.legacy.dbquery import run_sql
 
 
-depends_on = ['openaire_initial']
+depends_on = ['openaire_release_initial']
 
 
 def info():
@@ -36,14 +34,14 @@ def do_upgrade():
     from invenio import config
 
     # Portalboxes upgrade
-    run_sql_ignore("""DELETE FROM collection_portalbox WHERE id_portalbox=1 or id_portalbox=2;""")
-    run_sql_ignore("""DELETE FROM portalbox WHERE id=1 or id=2;""")
+    run_sql("""DELETE FROM collection_portalbox WHERE id_portalbox=1 or id_portalbox=2;""")
+    run_sql("""DELETE FROM portalbox WHERE id=1 or id=2;""")
 
     # Main collection name
-    run_sql_ignore("UPDATE collection SET name=%s WHERE id=1", (config.CFG_SITE_NAME,))
+    run_sql("UPDATE collection SET name=%s WHERE id=1", (config.CFG_SITE_NAME,))
 
     # Available tabs
-    run_sql_ignore("""DELETE FROM collectiondetailedrecordpagetabs;""")
+    run_sql("""DELETE FROM collectiondetailedrecordpagetabs;""")
     for r in run_sql("""SELECT id FROM collection"""):
         run_sql("""INSERT INTO collectiondetailedrecordpagetabs VALUES (%s,'usage;comments;metadata;files')""", r)
 

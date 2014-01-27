@@ -24,9 +24,9 @@
 """
 __revision__ = "$Id$"
 
-from invenio.config import CFG_SITE_URL
-from invenio.urlutils import create_html_link
-from invenio.access_control_engine import acc_authorize_action
+from flask import current_app
+from invenio.utils.url import create_html_link
+from invenio.modules.access.engine import acc_authorize_action
 
 def format_element(bfo, remote_server_id, style, css_class, link_label="Push via Sword",):
     """
@@ -36,6 +36,8 @@ def format_element(bfo, remote_server_id, style, css_class, link_label="Push via
                              not specified, link to BibSword page
                              allowing to select server.
     """
+    CFG_SITE_URL = current_app.config['CFG_SITE_URL']
+
     user_info = bfo.user_info
     auth_code, auth_message = acc_authorize_action(user_info, 'runbibswordclient')
     if auth_code != 0:

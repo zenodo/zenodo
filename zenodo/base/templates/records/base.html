@@ -1,0 +1,190 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{% extends "page.html" %}
+
+{% block title %}{% endblock title %}
+
+{% block header %}
+{{ super() }}
+{{ format_record(recid, of='hdm', ln=g.ln)|safe }}
+{% endblock header -%}
+
+{% block body %}
+{% set formattedrecord = format_record(recid, of='hd', ln=g.ln)|safe %}
+<div class="row" itemscope="" itemtype="{{recid|schemaorg_type()}}">
+  {%- if formattedrecord %}
+  <div class="col-sm-8 col-md-8">
+    {{formattedrecord}}
+    <div class="panel-group" id="record_detail">
+      {% if files %}
+      <div class="panel panel-default" id="preview">
+        <div class="panel-heading">
+          <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
+            Preview
+            <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span>
+            <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span>
+          </a>
+        </div>
+        <div id="collapseOne" class="panel-body collapse in">
+          <div class="panel-inner" style="margin:0;padding:0;">
+            <iframe id="preview-iframe" width="100%" height="400" style="border: none;"></iframe>
+          </div>
+        </div>
+      </div>
+      <div class="panel panel-default" id="files">
+        <div class="panel-heading">
+          <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
+            {{ _("Files") }}  <b class="caret"></b>
+          </a>
+        </div>
+        <div id="collapseTwo" class="panel-body collapse in">
+          <div class="panel-inner" style="margin:0;padding:0;">
+
+              {%- for file in files|sort(attribute='comment') -%}
+
+              {%- endfor -%}
+            <table class="table table-striped">
+            <thead>
+              <tr class="">
+                <th>Name</th>
+                <th>Date</th>
+                <th>Size</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody><tr class="">
+                  <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
+                  <td>{{ file.md.strftime('%d %b %Y') }}</td>
+                  <td>{{ file.size|filesizeformat }}</td>
+                  <td><span class="pull-right">{% if file.get_superformat() == '.pdf' %}<button class="btn preview-link btn-default" data-url="{{file.get_url()}}"><i class="icon-eye-open"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-default" href="{{file.get_url()}}"><i class="icon-download"></i> {{_("Download")}}</a></span></td>
+                </tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      {% endif%}
+    {% block record_tabs %}
+    {%- for tab in tabs|sort(attribute='order') -%}
+    {%- if tab.visible and tab.key != 'record.metadata' and tab.key != 'record.files' and tab.enabled -%}
+      <div class="panel panel-default">
+        <div class="panel-heading">
+          <a class="panel-toggle collapsed tablink" data-toggle="collapse" data-idx="{{loop.index}}" href="{{ url_for(tab.key, recid=recid)}}#collapse{{loop.index}}">{{ tab.label if tab.label != 'Usage statistics' else 'Related content' }}<span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span>
+            <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></b> <img src="{{ url_for('static',filename='/css/images/ajax-loader.gif') }}"></a>
+        </div>
+        <div id="collapse{{loop.index}}" class="panel-body collapse {{ 'in' if tab.key == request.endpoint }}">
+          <div class="panel-inner{{ ' loaded' if tab.key == request.endpoint else ''}}" id="record_content{{loop.index}}">
+            {# Only load tab content if tab is active #}
+            {% if tab.key == request.endpoint %}
+              {% block record_content %}{% endblock %}
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    {%- endif -%}
+    {%- endfor -%}
+    {%- endblock -%}
+    </div>
+  </div>
+  <div class="col-sm-4 col-md-4">
+    {%- set adminarea = format_record(recid, of='HDACT', ln=g.ln)|safe -%}
+    {# {%- set curatearea = format_record(recid, of='HDCUR', ln=g.ln)|safe -%} #}
+    {%- if adminarea.strip() -%}
+    <div class="well" style="text-align: center;">
+      {{ adminarea }}
+    </div>
+    {%- endif -%}
+    {# {%- if curatearea.strip() -%}
+    <div class="well">
+      {{ curatearea }}
+    </div>
+    {%- endif -%}#}
+    {{ format_record(recid, of='HDINFO', ln=g.ln)|safe }}
+
+    {%- if current_user.is_guest -%}
+    <div class="well">
+      <a href="{{ url_for("youraccount.register") }}" class="btn btn-warning signup pull-right btn-lg">{{ _("Sign Up") }}</a>
+      <h4>New to {{config.CFG_SITE_NAME}}?</h4>
+      <p>{{ _("Read more about") }} <a href="{{ url_for("features") }}">{{ _("features and benefits") }}</a>.</p>
+    </div>
+    {%- endif -%}
+
+    {{ format_record(recid, of='HDSHAR', ln=g.ln)|safe }}
+    {{ format_record(recid, of='HDEXP', ln=g.ln)|safe }}
+  </div>
+  {%- else %}
+  <div class="col-lg-offset-3 col-sm-6 col-md-6">
+    <div class="alert alert-warning">
+        <h3>New record</h3>
+        <p>This record was just uploaded, and will be available here shortly.</p>
+    </div>
+  </div>
+  {%- endif %}
+</div>
+{% endblock %}
+
+{% block javascript %}
+{{ super() }}
+<script>
+$(function () {
+  var reloadTab = function(target, path, idx) {
+    if( !$('#record_content' + idx).hasClass("loaded") ){
+      $.post(path, function(data) {
+        $('#record_content' + idx).html(data);
+        $('#record_content' + idx).addClass("loaded");
+        $(target).removeClass("loading");
+      });
+    }
+  };
+
+  $('#record_detail a.tablink').on('click', function(event) {
+    var path = $(event.target).attr('href');
+    var idx = $(event.target).data('idx');
+    //event.preventDefault();
+    //event.stopImmediatePropagation();
+    if (typeof(window.history.pushState) == 'function') {
+      window.history.pushState({path:path}, document.title, path);
+    } else {
+      window.location.hash = '#!' + path;
+    }
+    if( !$('#record_content' + idx).hasClass("loaded") ){
+      $(event.target).addClass("loading");
+      reloadTab(event.target, path, idx);
+    }
+  });
+});
+
+{% if files %}
+$(function () {
+  $('.preview-link').on('click', function(event) {
+    $('#preview').show();
+    var frameurl = $(event.target).data('url');
+    frameurl = encodeURIComponent(frameurl);
+    $('#preview-iframe').attr("src","https://docs.google.com/viewer?url=" + frameurl +"&embedded=true");
+  });
+
+  var previewbutton = $('.preview-link:first');
+  if (previewbutton.html()) {
+    previewbutton.click();
+  } else {
+    $('#preview').hide();
+  }
+});
+{% endif %}
+</script>
+{% endblock %}

@@ -23,11 +23,12 @@
 import cgi
 import time
 
-from invenio.openaire_deposit_config import CFG_ACCESS_RIGHTS
-from invenio.messages import gettext_set_language
+from flask import current_app
+from invenio.base.i18n import gettext_set_language
 
 
 def format_element(bfo, as_label=False, only_restrictions=False):
+    CFG_ACCESS_RIGHTS = current_app.config['CFG_ACCESS_RIGHTS']
     ln = bfo.lang
     _ = gettext_set_language(ln)
     access_rights = bfo.field('542__l')
@@ -40,7 +41,7 @@ def format_element(bfo, as_label=False, only_restrictions=False):
 
     submitter = bfo.field('8560_f')
     email = """<a href="mailto:%s">%s</a>""" % (cgi.escape(submitter, True), cgi.escape(submitter))
-    access = dict(CFG_ACCESS_RIGHTS(ln))[access_rights]
+    access = _(dict(current_app.config['CFG_ACCESS_RIGHTS'])[access_rights])
 
     if only_restrictions:
         if access_rights in ('embargoedAccess', 'embargoed'):

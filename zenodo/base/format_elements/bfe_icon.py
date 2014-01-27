@@ -20,9 +20,9 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+from flask import current_app
 from jinja2 import Template
-from invenio.bibdocfile import BibRecDocs
-from invenio.config import CFG_SITE_URL
+from invenio.legacy.bibdocfile.api import BibRecDocs
 import re
 
 template_icon = Template("""
@@ -52,7 +52,7 @@ def format_element(bfo, template='record_hb.html', subformat_re='icon.*', as_url
                 ctx = {
                     'icon': icon,
                     'bfo': bfo,
-                    'CFG_SITE_URL': CFG_SITE_URL,
+                    'CFG_SITE_URL': current_app.config['CFG_SITE_URL'],
                 }
                 return template_icon.render(**ctx)
 

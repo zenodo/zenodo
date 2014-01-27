@@ -20,8 +20,6 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.openaire_deposit_config import CFG_OPENAIRE_PUBTYPE_MAP
-
 
 def format_element(bfo, as_label=False):
     ln = bfo.lang

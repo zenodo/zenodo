@@ -23,8 +23,8 @@
 """BibFormat element - QR code generator
 """
 
-from invenio.config import CFG_SITE_SECURE_URL, CFG_WEBDIR, CFG_SITE_RECORD
 import os
+from flask import current_app
 
 try:
     import qrcode
@@ -61,6 +61,9 @@ def format_element(bfo, width="100"):
         return ""
 
     width = int(width)
+    CFG_SITE_SECURE_URL = current_app.config['CFG_SITE_SECURE_URL']
+    CFG_WEBDIR = current_app.config['CFG_WEBDIR']
+    CFG_SITE_RECORD = current_app.config['CFG_SITE_RECORD']
 
     bibrec_id = bfo.control_field("001")
     link = "%s/%s/%s" % (CFG_SITE_SECURE_URL, CFG_SITE_RECORD, bibrec_id)

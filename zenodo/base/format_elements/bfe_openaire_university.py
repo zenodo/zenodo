@@ -23,12 +23,14 @@
 import cgi
 import time
 
-from invenio.openaire_deposit_config import CFG_OPENAIRE_THESIS_TYPES
-from invenio.messages import gettext_set_language
+from flask import current_app
+from invenio.base.i18n import gettext_set_language
 
 def format_element(bfo):
     ln = bfo.lang
     _ = gettext_set_language(ln)
+
+    CFG_OPENAIRE_THESIS_TYPES = current_app.config['CFG_OPENAIRE_THESIS_TYPES']
 
     info = bfo.field('502__')
 
@@ -44,7 +46,7 @@ def format_element(bfo):
         ret = "%(university)s"
 
     try:
-        type_title = dict(CFG_OPENAIRE_THESIS_TYPES(ln))[info['b']]
+        type_title = _(dict(CFG_OPENAIRE_THESIS_TYPES[info['b']]))
     except KeyError:
         type_title = ''
 

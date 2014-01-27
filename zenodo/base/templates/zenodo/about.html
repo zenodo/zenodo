@@ -16,13 +16,14 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "page.html" %}
+{%- extends "page.html" %}
+
 {% block body %}
 
 <h1>About {{config.CFG_SITE_NAME}}</h1>
 
 <div class="row">
-    <div class="span8">
+    <div class="col-md-6 col-lg-7">
         <p>{{config.CFG_SITE_NAME}} builds and operate a simple and innovative service that enables researchers, scientists, EU projects and institutions to share and showcase multidisciplinary research results (data and publications) that are not part of the existing institutional or subject-based repositories of the research communities.</p>
 
 <p>{{config.CFG_SITE_NAME}} enables researchers, scientists, EU projects and institutions to:</p>
@@ -35,7 +36,7 @@
 <p><strong>Deliverables:</strong></p>
 <ul>
     <li>An open digital repository for everyone and everything that isn’t served by a dedicated service; the so called “long tail” of research results.
-    <li>A modern look and feel in line with current trends for state-of-the-art online services.</li>
+    </li><li>A modern look and feel in line with current trends for state-of-the-art online services.</li>
     <li>Integration with OpenAIRE infrastructure, and assured inclusion in OpenAIRE corpus.</li>
     <li>Easy upload and semi-automatic metadata completion by communication with existing online services such as DropBox for upload, Mendeley/ORCID/CrossRef/OpenAIRE for upload and pre-filling metadata.</li>
     <li>Easy access to research results via innovative viewing and as well as open APIs and integration with existing online services and preservation of community independent data formats.</li>
@@ -45,7 +46,7 @@
     <li>Easy means to link research results with other results, funding sources, institutes, and licenses.</li>
 </ul>
     </div>
-    <div class="span4">
+    <div class="col-md-6 col-lg-5">
         <div class="well"><h4>The name</h4>
         <p>{{config.CFG_SITE_NAME}} is derived from <a href="http://en.wikipedia.org/wiki/Zenodotus">Zenodotus</a>, the first librarian of the Ancient Library of Alexandria and father of the first recorded use of metadata, a landmark in library history.</p></div>
 
@@ -63,40 +64,40 @@
 <tbody>
 <tr>
     <td>Color</td>
-    <td><img class="img-rounded" src="{{ url_for('static', filename='img/logos/zenodo-gradient-200.png') }}" /></td>
+    <td><img class="img-rounded" src="{{ url_for('static', filename='img/logos/zenodo-gradient-200.png') }}"></td>
     <td>
-        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-2500.png')}}">2500px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-1000.png')}}">1000px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-200.png')}}">200px</a><br />
+        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-2500.png')}}">2500px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-1000.png')}}">1000px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-200.png')}}">200px</a><br>
     </td>
     <td>
-        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-2500.jpg')}}">2500px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-1000.jpg')}}">1000px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-200.jpg')}}">200px</a><br />
+        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-2500.jpg')}}">2500px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-1000.jpg')}}">1000px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-gradient-200.jpg')}}">200px</a><br>
     </td>
 </tr>
 <tr>
     <td>Black</td>
-    <td><img class="img-rounded" style="background-color: white;" src="{{ url_for('static', filename='img/logos/zenodo-black-200.png') }}" /></td>
+    <td><img class="img-rounded" style="background-color: white;" src="{{ url_for('static', filename='img/logos/zenodo-black-200.png') }}"></td>
     <td>
-        <a href="{{url_for('static', filename='img/logos/zenodo-black-2500.png')}}">2500px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-black-1000.png')}}">1000px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-black-200.png')}}">200px</a><br />
+        <a href="{{url_for('static', filename='img/logos/zenodo-black-2500.png')}}">2500px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-black-1000.png')}}">1000px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-black-200.png')}}">200px</a><br>
     </td>
     <td>
-        <small class="muted">Not available</small>
+        <small class="text-muted">Not available</small>
     </td>
 </tr>
 <tr>
     <td>White</td>
-    <td><img class="img-rounded" style="background-color: #555555;" src="{{ url_for('static', filename='img/logos/zenodo-white-200.png') }}" /></td>
+    <td><img class="img-rounded" style="background-color: #555555;" src="{{ url_for('static', filename='img/logos/zenodo-white-200.png') }}"></td>
     <td>
-        <a href="{{url_for('static', filename='img/logos/zenodo-white-2500.png')}}">2500px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-white-1000.png')}}">1000px</a><br />
-        <a href="{{url_for('static', filename='img/logos/zenodo-white-200.png')}}">200px</a><br />
+        <a href="{{url_for('static', filename='img/logos/zenodo-white-2500.png')}}">2500px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-white-1000.png')}}">1000px</a><br>
+        <a href="{{url_for('static', filename='img/logos/zenodo-white-200.png')}}">200px</a><br>
     </td>
     <td>
-        <small class="muted">Not available</small>
+        <small class="text-muted">Not available</small>
     </td>
 </tr>
 </tbody>

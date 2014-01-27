@@ -1,0 +1,135 @@
+{#
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
+#}
+{%- extends "search/index_base.html" -%}
+
+{%- block extra_style %}{% endblock extra_style -%}
+
+{%- block search_form %}
+{{ super() }}
+{%- if collection.id != 1 %}
+<div class="row">
+    <div class="col-md-12">
+        {% include 'provisional_warning.html' %}
+        <h1>{{collection.name_ln}}</h1  >
+    </div>
+</div>
+{%- endif %}
+{%- endblock search_form %}
+
+{%- block portalbox_lt -%}{%- endblock -%}
+
+{%- block index_left -%}{%- endblock index_left -%}
+
+{%- block index_right -%}
+    <div class="col-md-8">
+        {% if collection.collection_children_r %}
+        <div class="row">
+              <div class="collection panel-group">
+                  <div class="panel panel-default">
+                      <div class="panel-heading">
+                          <a class="panel-toggle collapsed" data-toggle="collapse" data-idx="0" href="#collapse0">{% if not collection.name.startswith('user-') %}{{ _("Filter by types") }}{% else %}_("Browse by subcollections"){% endif %} <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span> <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></a>
+                      </div>
+                      <div id="collapse0" class="panel-collapse collapse">
+                          <div class="panel-body">
+                              {{ collection_tree(collection.collection_children_r, limit=2, class="nav nav-list clearfix") }}
+                          </div>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        {% endif %}
+
+        {% if collection.is_restricted %}
+        <div class="row">
+          <div class="col-lg-offset-1 col-sm-6 col-md-6">
+              <div class="alert alert-info" style="margin-top: 50px">
+                  <strong><i class="icon-ban-circle"></i> {{ _('This collection is restricted. If you are authorized to access it, please click on the Search button.') }}</strong>
+              </div>
+          </div>
+        </div>
+        {% else %}
+
+        {% if collection.reclist %}
+        <h2>Recent Uploads</h2>
+
+        {%- if collection.name.startswith("user-") or collection.name.startswith("provisional-") -%}
+            {%- set reclist = collection.reclist[-10:]|reverse -%}
+        {%- else -%}
+            {# FIXME:- set reclist = collection.reclist|zenodo_curated(10, open_only=True) -#}
+            {%- set reclist = collection.reclist[-10:]|reverse -%}
+        {%- endif -%}
+        {% for recid in reclist %}
+          <div class="row">
+            <div class="col-md-12 record-list-elem">
+                <ul class="pager pull-right view-record hidden-sm"><li><a href="{{ url_for('record.metadata', recid=recid) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>
+                {{ format_record(recid, 'hb', ln=g.ln)|safe }}
+                {% if not loop.last %}<hr>{% endif %}
+            </div>
+          </div>
+        {%- endfor %}
+        {%- if collection.reclist|length > 10 %}
+        <div class="row">
+            <ul class="pager">
+                <li><a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}" class="btn btn-info">{{ _('View all')}}  &rarr;</a></li>
+            </ul>
+        </div>
+        {%- endif %}
+        {%- else %}
+        <div class="row">
+            <div class="col-md-12" align="center" style="margin-top: 40px;">
+                <em class="text-muted">This collection is currently empty.</em>
+            </div>
+        </div>
+        {%- endif %}
+      {%- endif %}
+    </div>
+{%- endblock index_right -%}
+
+
+{%- block portalbox_rt -%}
+  <div class="col-md-4">
+      {{ portalbox_sidebar(portalboxes.rt, class="well") }}
+      {%- if not collection.name.startswith("user-") and not collection.name.startswith("provisional-") %}
+      <div class="well">
+        <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-lg signup pull-right">Sign Up</a>
+        <h4>New to {{config.CFG_SITE_NAME}}?</h4>
+        {% include "zenodo/benefits.html" %}
+      </div>
+
+      {%- if collection.id == 1 %}
+      <div class="well">
+        <h4>Mission statement</h4>
+        ZENODO is a repository service that enables researchers, scientists, projects and institutions to share and showcase multidisciplinary research results (data and publications) that are not part of existing institutional or subject-based repositories.
+      </div>
+
+      <a class="twitter-timeline" href="https://twitter.com/ZENODO_ORG" data-widget-id="331751059422855169">Tweets by @ZENODO_ORG</a>
+      {%- endif %}
+      {%- endif %}
+  </div>
+{%- endblock portalbox_rt -%}
+
+
+
+{% block javascript %}
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+{{ super() }}
+{% endblock javascript %}

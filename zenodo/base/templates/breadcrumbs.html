@@ -1,0 +1,14 @@
+{% if breadcrumbs|length > 1 %}
+      <div class="row">
+        <div class="span12">
+          <ul class="breadcrumb" itemprop="breadcrumb">
+            {%- for breadcrumb in breadcrumbs %}{% if loop.last %}
+            <li class="active">{{ breadcrumb.text|safe }}</li>
+            {%- else %}
+            <li><a href="{{ breadcrumb.url|safe }}" class="navtrail">{{ breadcrumb.text|safe }}</a></li>
+            {%- endif %}
+            {%- endfor %}
+          </ul>
+        </div>
+      </div>
+{% endif %}

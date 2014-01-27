@@ -1,0 +1,70 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+{%- if not request.is_xhr -%}
+  {% extends "records/base.html" %}
+{%- endif -%}
+
+{% block record_content %}
+  <div class="page-header">
+    {{ format_record(recid, 'hs', ln=g.ln)|safe }}
+  </div>
+
+  {#
+  TODO print self cited
+  {{ citations|tojson|safe }}
+  #}
+
+  {%- if citations.citinglist -%}
+  <h4>{{ _('Cited by: %i records') % (citations.citinglist|length,) }}</h4>
+  <ul class="unstyled">
+  {%- for c in citations.citinglist -%}
+  <li>
+    <span class="badge">{{ c[1] }}</span>
+    {{ format_record(c[0], 'hs', ln=g.ln)|safe }}
+  </li>
+  {%- endfor -%}
+  </ul>
+  <div class="pager">
+    <a href="{{ url_for('search.search', p='refersto:recid:%s' % (recid,)) }}">
+      {{ _('more') }}
+    </a>
+  </div>
+  {%- endif -%}
+
+  {%- if citations.co_cited-%}
+  <h4>{{ _('Co-cited with: %s records') % (citations.co_cited|length,) }}</h4>
+  <ul class="unstyled">
+  {%- for c in citations.co_cited-%}
+  <li>
+    <span class="badge">{{ c[1] }}</span>
+    {{ format_record(c[0], 'hs', ln=g.ln)|safe }}
+  </li>
+  {%- endfor -%}
+  </ul>
+  <div class="pager">
+    <a href="{{ url_for('search.search', p='cocitedwith:%s' % (recid,)) }}">
+      {{ _('more') }}
+    </a>
+  </div>
+  {%- endif -%}
+
+
+
+
+{% endblock %}

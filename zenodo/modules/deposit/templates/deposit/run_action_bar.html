@@ -1,0 +1,10 @@
+<div class="well"{% if margin %}style="margin-top: {{margin}}"{% endif %}>
+    <a class="btn btn-danger pull-left" href="{{ url_for('webdeposit.delete', deposition_type=deposition_type, uuid=uuid) }}"><i class="icon-trash icon-white"></i> {{ _('Delete') }}</a>
+    <span class="pull-right">
+        <span class="loader hide"><img src="{{ url_for('static', filename='img/loading.gif' ) }}" /></span>
+        <small><span class="status-indicator text-muted"></span></small>&nbsp;
+        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="icon-file"></i> Save</button>
+        <button data-target="#submitModal" data-toggle="modal" role="button" data-toggle="tooltip" title="{{_('Press "Submit" to finalize and make your upload public.')}}" class="btn btn-primary"><i class="icon-ok  icon-white"></i> Submit ...</button>
+    </span>
+    <span class="clearfix"></span>
+</div>

@@ -1,0 +1,41 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2013, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{% extends "search/helpers_base.html" %}
+
+{% block portalbox_sidebar %}
+  {% if portalboxes %}
+    {% for cp in portalboxes %}
+    <div{{ macrokwargs|xmlattr }}>
+      {% if cp.portalbox.title %}<h4>{{ cp.portalbox.title }}</h4>{% endif %}
+      <p>{{ cp.portalbox.body|safe }}</p>
+    </div>
+    {% endfor %}
+  {% endif %}
+{% endblock portalbox_sidebar %}
+
+{% block record_brief_links_details %}
+<ul class="pager pull-right"><li><a class="text-success hide" data-hotkey-action="click" data-hotkey-value="g{{ i }}v" href="{{ url_for('record.metadata', recid=recID) }}">{{ _('View')}}</a></li></ul>
+{% endblock %}
+
+{% block search_form_style %}{% endblock %}
+{% block search_form_dropdown_boxes %}{% endblock %}
+{% block search_form_settings %}{% endblock %}
+{% block search_form_ctrls_help %}{% endblock %}
+{% block search_form_ctrls_settings %}{% endblock %}

@@ -22,13 +22,13 @@
 
 <p>See also <a href="http://www.openaire.eu/en/support/faq">OpenAIRE FAQ</a> for general information on Open Access and European Commission funded research.</p>
 
-<div class="row-fluid">
-    <div class="span6">
+<div class="row">
+    <div class="col-md-6">
 <ul>
 
     <li>
         <h5>What is the maximum file size I can upload?</h5>
-        <p>We currently accept files up to 2GB. If you would like to upload larger files, please <a href="{{url_for('invenio_openaire.contact')}}">contact us</a>, and we will do our best to help you.</p>
+        <p>We currently accept files up to 2GB. If you would like to upload larger files, please <a href="{{url_for('zenodo_base.contact')}}">contact us</a>, and we will do our best to help you.</p>
     </li>
     <li>
         <h5>What are the size limits in {{config.CFG_SITE_NAME}}?</h5>
@@ -36,7 +36,7 @@
     </li>
     <li>
         <h5>What can I upload?</h5>
-        <p>All research outputs from all fields of science are welcome. In the upload form you can choose between types of files: publications (book, book section, conference paper, journal article, patent, preprint, report, thesis, technical note, working paper), posters, presentations, images (figures, plots, drawings, diagrams, photos) and videos/audio. We do check every piece of content being uploaded to ensure it is research related. Please see further information in our <a href="{{url_for('invenio_openaire.terms')}}">Terms of Use</a> and <a href="{{url_for('invenio_openaire.policies')}}">Policies</a>.</p>
+        <p>All research outputs from all fields of science are welcome. In the upload form you can choose between types of files: publications (book, book section, conference paper, journal article, patent, preprint, report, thesis, technical note, working paper), posters, presentations, images (figures, plots, drawings, diagrams, photos) and videos/audio. We do check every piece of content being uploaded to ensure it is research related. Please see further information in our <a href="{{url_for('zenodo_base.terms')}}">Terms of Use</a> and <a href="{{url_for('zenodo_base.policies')}}">Policies</a>.</p>
     </li>
     <li>
         <h5>Is {{config.CFG_SITE_NAME}} only for EU-funded research?</h5>
@@ -62,7 +62,7 @@
 
 </ul>
 </div>
-    <div class="span6">
+    <div class="col-md-6">
 <ul>
     <li>
         <h5>Why is my upload not on the front-page?</h5>
@@ -78,7 +78,7 @@
     </li>
     <li>
         <h5>What happened to the OpenAIRE Orphan Record Repository?</h5>
-        <p>OpenAIRE Orphan Record Repository got a make-over and was re-branded as {{config.CFG_SITE_NAME}}. If you happened to deposit your article in OpenAIRE Orphan Record Repository it is also available in {{config.CFG_SITE_NAME}}. You user account, was however not transferred to {{config.CFG_SITE_NAME}}, so you will have to <a href="{{url_for('youraccount.register')}}">register</a> again. If you register with the same email address in {{config.CFG_SITE_NAME}} as you used in OpenAIRE Orphan Record Repository, you will still have access to your publications. Don't hesitate to <a href="{{url_for('invenio_openaire.contact')}}">contact us</a> for further information.</p>
+        <p>OpenAIRE Orphan Record Repository got a make-over and was re-branded as {{config.CFG_SITE_NAME}}. If you happened to deposit your article in OpenAIRE Orphan Record Repository it is also available in {{config.CFG_SITE_NAME}}. You user account, was however not transferred to {{config.CFG_SITE_NAME}}, so you will have to <a href="{{url_for('youraccount.register')}}">register</a> again. If you register with the same email address in {{config.CFG_SITE_NAME}} as you used in OpenAIRE Orphan Record Repository, you will still have access to your publications. Don't hesitate to <a href="{{url_for('zenodo_base.contact')}}">contact us</a> for further information.</p>
     </li>
     <li>
         <h5>Where does the name come from?</h5>

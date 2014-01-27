@@ -1,0 +1,32 @@
+<div id="field-plupload_file">
+    <div class="jumbotron" id="upload">
+        <h1>Upload</h1>
+        {% if community %}<h4>{{community.title}}</h4>{% endif %}
+        <p>Share your research &mdash; all research outputs from across all fields of
+        science are welcome.</p>
+        <p>
+            <div class="row text-center">
+                <div id="local" class="col-sm-12 col-md-4 text-right"><a class="btn btn-default btn-lg" id="pickfiles">Choose files...</a><br><small class="text-muted"> Max 2GB per file</small></div>
+                <div id="or" class="col-sm-12 col-md-3">—&nbsp;OR&nbsp;—</div>
+                <div id="dropbox" class="col-sm-12 col-md-4"><form id="dropbox-upload-form" action="{{dropbox_upload_url}}?ln=en" method="POST">
+                    <input class="form-control" name="fileurl" style="visibility: hidden;" data-multiselect="true" data-link-type="direct" id="db-chooser" type="dropbox-chooser">
+                </form></div>
+            </div>
+        </p>
+    </div>
+
+    <div id="{{field_id}}" class="hide pluploader">
+        <hr />
+        <a class="btn btn-success pull-right disabled" id="uploadfiles"><i class="icon-upload icon-white"></i> Start upload</a>
+        <a class="btn btn-danger pull-right" id="stopupload" style="display: none;"><i class="icon-stop icon-white"></i> Stop upload</a>
+        <h3>Selected files</h3>
+        <table id="file-table" class="table table-striped">
+        <thead>
+            <tr><th>Filename</th><th>Size</th><td><small id="upload_speed" class="muted"></small></td><td></td></tr>
+        </thead>
+        <tbody id="filelist">
+        </tbody>
+        </table>
+        <div id="upload-errors"></div>
+    </div>
+</div>

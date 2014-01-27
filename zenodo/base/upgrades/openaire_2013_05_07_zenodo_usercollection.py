@@ -21,7 +21,6 @@
 ## or submit itself to any jurisdiction.
 
 from sqlalchemy import *
-from invenio.dbquery import run_sql
 import warnings
 
 depends_on = ['openaire_2013_05_02_pidstore']

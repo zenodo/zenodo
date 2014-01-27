@@ -21,8 +21,8 @@
 ## or submit itself to any jurisdiction.
 
 
-from invenio.dbquery import run_sql
-from invenio.config import CFG_DATACITE_DOI_PREFIX
+from invenio.legacy.dbquery import run_sql
+from flask import current_app
 
 
 def create_doi(recid=None):
@@ -32,7 +32,10 @@ def create_doi(recid=None):
                         " VALUES (NOW(), NOW())")
 
     return dict(
-        doi='%s/zenodo.%s' % (CFG_DATACITE_DOI_PREFIX, recid),
+        doi='%s/zenodo.%s' % (
+            current_app.config['CFG_DATACITE_DOI_PREFIX'],
+            recid
+        ),
         recid=recid,
     )
 

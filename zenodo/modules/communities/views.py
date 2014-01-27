@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,256 +20,110 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-"""OpenAIRE Flask Blueprint"""
+""" Zenodo Communities Blueprint """
 
-from flask import render_template, abort, request, flash, \
-    redirect, url_for, jsonify
-from invenio.webinterface_handler_flask_utils import InvenioBlueprint, _
-from invenio.webuser_flask import current_user
-from invenio.usercollection_forms import CollectionForm, EditCollectionForm, \
-    DeleteCollectionForm
-from invenio.usercollection_model import UserCollection
-from invenio.sqlalchemyutils import db
-from invenio.search_engine import get_fieldvalues
-from invenio.cache import cache
+from flask import Blueprint
+from flask.ext.login import current_user
 
-blueprint = InvenioBlueprint(
-    'usercollection',
+from invenio.ext.cache import cache
+from invenio.modules.communities.models import Community
+from invenio.base.signals import webcoll_after_webpage_cache_update
+from invenio.modules.communities.signals import after_save_collection, \
+    pre_curation, post_curation
+
+from .receivers import invalidate_jinja2_cache, pre_curation_reject_listener, \
+    post_curation_reject_listener
+
+
+blueprint = Blueprint(
+    'zenodo_communities',
     __name__,
-    url_prefix="/communities",
-    breadcrumbs=[
-        (_('Communities'), 'usercollection.index'),
-    ],
-    menubuilder=[
-        ('main.usercollection', _('Communities'), 'usercollection.index', 2),
-    ],
+    static_folder="static",
+    template_folder="templates",
 )
 
 
-def mycollections_ctx(uid):
+@blueprint.before_app_first_request
+def register_receivers():
     """
-    Helper method for return ctx used by many views
+    Setup signal receivers for communities module.
     """
-    return {
-        'mycollections': UserCollection.query.filter_by(
-            id_user=uid).order_by(db.asc(UserCollection.title)).all()
-    }
+    webcoll_after_webpage_cache_update.connect(invalidate_jinja2_cache)
+    after_save_collection.connect(invalidate_jinja2_cache)
+    pre_curation.connect(pre_curation_reject_listener)
+    post_curation.connect(post_curation_reject_listener)
 
 
-@blueprint.route('/', methods=['GET', ])
-def index():
+@blueprint.app_template_filter('community_id')
+def community_id(coll):
     """
-    Index page with uploader and list of existing depositions
+    Determine if current user is owner of a given record
+
+    @param coll: Collection object
     """
-    uid = current_user.get_id()
-    ctx = mycollections_ctx(uid)
-    ctx.update({
-        'title': _('Community Collections'),
-        'usercollections': UserCollection.query.filter(UserCollection.title != 'ZENODO').order_by(UserCollection.title).all(),
-    })
-
-    return render_template(
-        "usercollection_index.html",
-        **ctx
-    )
+    if coll:
+        identifier = coll.name
+        if identifier.startswith("provisional-user-"):
+            return identifier[len("provisional-user-"):]
+        elif identifier.startswith("user-"):
+            return identifier[len("user-"):]
+    return ""
 
 
-@blueprint.route('/about/<string:usercollection_id>/', methods=['GET'])
-def detail(usercollection_id=None):
+@blueprint.app_template_filter('curation_action')
+def curation_action(recid, ucoll_id=None):
     """
-    Index page with uploader and list of existing depositions
+    Determine if curation action is underway
     """
-    # Check existence of collection
-    u = UserCollection.query.filter_by(id=usercollection_id).first_or_404()
-    uid = current_user.get_id()
-
-    ctx = mycollections_ctx(uid)
-    ctx.update({
-        'is_owner': u.id_user == uid,
-        'usercollection': u,
-        'detail': True,
-    })
-
-    return render_template(
-        "usercollection_detail.html",
-        **ctx
-    )
+    return cache.get("usercoll_curate:%s_%s" % (ucoll_id, recid))
 
 
-@blueprint.route('/curate/', methods=['GET', 'POST'])
-@blueprint.invenio_force_https
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='ZENODO')
-def curate():
+@blueprint.app_template_filter('community_state')
+def community_state(bfo, ucoll_id=None):
     """
-    Index page with uploader and list of existing depositions
+    Determine if current user is owner of a given record
+
+    @param coll: Collection object
     """
-    action = request.values.get('action')
-    usercollection_id = request.values.get('collection')
-    recid = request.values.get('recid', 0, type=int)
+    coll_id_reject = "provisional-user-%s" % ucoll_id
+    coll_id_accept = "user-%s" % ucoll_id
 
-    # Allowed actions
-    if action not in ['accept', 'reject', 'remove']:
-        abort(400)
-
-    # Check recid
-    if not recid:
-        abort(400)
-    recid = int(recid)
-
-    # Does collection exists
-    u = UserCollection.query.filter_by(id=usercollection_id).first()
-    if not u:
-        abort(400)
-
-    # Check permission to perform action on this record
-    # - Accept and reject is done by community owner
-    # - Remove  is done by record owner
-    if action in ['accept', 'reject', ]:
-        if u.id_user != current_user.get_id():
-            abort(403)
-    elif action == 'remove':
-        try:
-            email = get_fieldvalues(recid, '8560_f')[0]
-            if email != current_user['email']:
-                abort(403)
-            # User not allowed to remove from the zenodo user collection
-            if u.id == 'zenodo':
-                abort(403)
-        except (IndexError, KeyError):
-            abort(403)
-
-    # Prevent double requests (i.e. give bibupload a chance to make the change)
-    key = "usercoll_curate:%s_%s" % (usercollection_id, recid)
-    cache_action = cache.get(key)
-    if cache_action == action or cache_action in ['reject', 'remove']:
-        return jsonify({'status': 'success', 'cache': 1})
-    elif cache_action:
-        # Operation under way, but the same action
-        return jsonify({'status': 'failure', 'cache': 1})
-
-    if action == "accept":
-        res = u.accept_record(recid)
-    elif action == "reject" or action == "remove":
-        res = u.reject_record(recid)
-
-    if res:
-        # Set 5 min cache to allow bibupload/webcoll to finish
-        cache.set(key, action, timeout=5*60)
-        return jsonify({'status': 'success', 'cache': 0})
-    else:
-        return jsonify({'status': 'failure', 'cache': 0})
+    for cid in bfo.fields('980__a'):
+        if cid == coll_id_accept:
+            return "accepted"
+        elif cid == coll_id_reject:
+            return "provisional"
+    return "rejected"
 
 
-@blueprint.route('/new/', methods=['GET', 'POST'])
-@blueprint.invenio_force_https
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='ZENODO')
-@blueprint.invenio_set_breadcrumb('Create new')
-def new():
+@blueprint.app_template_filter('communities')
+def communities(bfo, is_owner=False, provisional=False, public=True,
+                filter_zenodo=False):
     """
-    Create or edit a collection.
+    Maps collection identifiers to community collection objects
+
+    @param bfo: BibFormat Object
+    @param is_owner: Set to true to only return user collections which the
+                     current user owns.
+    @oaram provisional: Return provisional collections (default to false)
+    @oaram public: Return public collections (default to true)
     """
-    uid = current_user.get_id()
-    form = CollectionForm(request.values, crsf_enabled=False)
+    colls = []
+    if is_owner and current_user.is_guest:
+        return colls
 
-    ctx = mycollections_ctx(uid)
-    ctx.update({
-        'form': form,
-        'is_new': True,
-        'usercollection': None,
-    })
+    for cid in bfo.fields('980__a'):
+        # Remove zenodo collections from ab
+        if filter_zenodo and (cid == 'user-zenodo' or
+           cid == 'provisional-user-zenodo'):
+            continue
+        if provisional and cid.startswith('provisional-'):
+            colls.append(cid[len("provisional-user-"):])
+        elif public and cid.startswith('user-'):
+            colls.append(cid[len("user-"):])
 
-    if request.method == 'POST' and form.validate():
-        # Map form
-        data = form.data
-        data['id'] = data['identifier']
-        del data['identifier']
-        u = UserCollection(id_user=uid, **data)
-        db.session.add(u)
-        db.session.commit()
-        u.save_collections()
-        flash("Community collection was successfully created.", category='success')
-        return redirect(url_for('.index'))
+    query = [Community.id.in_(colls)]
+    if is_owner:
+        query.append(Community.id_user == current_user.get_id())
 
-    return render_template(
-        "usercollection_new.html",
-        **ctx
-    )
-
-
-@blueprint.route('/edit/<string:usercollection_id>/', methods=['GET', 'POST'])
-@blueprint.invenio_force_https
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='ZENODO')
-@blueprint.invenio_set_breadcrumb('Edit')
-def edit(usercollection_id):
-    """
-    Create or edit a collection.
-    """
-    # Check existence of collection
-    u = UserCollection.query.filter_by(id=usercollection_id).first_or_404()
-    uid = current_user.get_id()
-
-    # Check ownership
-    if u.id_user != uid:
-        abort(404)
-
-    form = EditCollectionForm(request.values, u, crsf_enabled=False)
-    deleteform = DeleteCollectionForm()
-    ctx = mycollections_ctx(uid)
-    ctx.update({
-        'form': form,
-        'is_new': False,
-        'usercollection': u,
-        'deleteform': deleteform,
-    })
-
-    if request.method == 'POST' and form.validate():
-        for field, val in form.data.items():
-            setattr(u, field, val)
-        db.session.commit()
-        u.save_collections()
-        flash("Community collection successfully edited.", category='success')
-        return redirect(url_for('.edit', usercollection_id=u.id))
-
-    return render_template(
-        "usercollection_new.html",
-        **ctx
-    )
-
-
-@blueprint.route('/delete/<string:usercollection_id>/', methods=['POST'])
-@blueprint.invenio_force_https
-@blueprint.invenio_authenticated
-@blueprint.invenio_authorized('submit', doctype='ZENODO')
-@blueprint.invenio_set_breadcrumb('Delete')
-def delete(usercollection_id):
-    """
-    Delete a collection
-    """
-    # Check existence of collection
-    u = UserCollection.query.filter_by(id=usercollection_id).first_or_404()
-    uid = current_user.get_id()
-
-    # Check ownership
-    if u.id_user != uid:
-        abort(404)
-
-    deleteform = DeleteCollectionForm(request.values)
-    ctx = mycollections_ctx(uid)
-    ctx.update({
-        'deleteform': deleteform,
-        'is_new': False,
-        'usercollection': u,
-    })
-
-    if request.method == 'POST' and deleteform.validate():
-        u.delete_collections()
-        db.session.delete(u)
-        db.session.commit()
-        flash("Community collection was successfully deleted.", category='success')
-        return redirect(url_for('.index'))
-    else:
-        flash("Community collection could not be deleted.", category='warning')
-        return redirect(url_for('.edit', usercollection_id=u.id))
+    return Community.query.filter(*query).all()

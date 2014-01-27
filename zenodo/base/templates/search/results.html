@@ -1,0 +1,70 @@
+{#
+## This file is part of Invenio.
+## Copyright (C) 2012, 2014 CERN.
+##
+## Invenio is free software; you can redistribute it and/or
+## modify it under the terms of the GNU General Public License as
+## published by the Free Software Foundation; either version 2 of the
+## License, or (at your option) any later version.
+##
+## Invenio is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Invenio; if not, write to the Free Software Foundation, Inc.,
+## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#}
+
+{%- extends "search/results_base.html" -%}
+
+{%- block results_actions scoped -%}{% endblock %}
+
+{% block render_search_results %}
+{% if collection.id != 1 %}
+    {% include 'provisional_warning.html' %}
+    <h1>{{collection.name_ln}}</h1>
+{% endif %}{{ super() }}{% endblock %}
+
+{% block search_result_settings scoped %}{% endblock %}
+
+{%- block search_result_prefix -%}
+<div class="col-sm-1 col-xs-1">
+  <abbr class="unapi-id" title="{{ recid }}"></abbr>
+  {{ recordloop.index+(pagination.page-1)*rg }}
+</div>
+{%- endblock search_result_prefix -%}
+
+
+{%- block search_result_record scoped -%}
+<div class="col-sm-10 col-xs-10">
+  {# format_record(recid, of, ln=g.ln, qid=qid, extra_context=dict(collection=collection))|safe #}
+  {{ format_record(recid, of, ln=g.ln, qid=qid)|safe }}
+  {% if not recordloop.last %}<hr/>{% endif %}
+</div>
+<div class="col-sm-1 col-xs-1">
+{%- if not collection.name.startswith('provisional-') %}
+  <ul class="pager pull-right view-record hidden-sm"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>{% endif %}
+</div>
+{%- endblock search_result_record -%}
+
+
+{%- block search_result_record_nohtml scoped %}
+{{ format_record(recid, of, ln=g.ln)|safe }}
+{# format_record(recid, of, ln=g.ln, extra_context=dict(collection=collection))|safe #}
+{%- endblock search_result_record_nohtml %}
+
+
+{% block search_results_export %}{% endblock %}
+
+{%- block search_results_footer scoped %}
+<hr/>
+<div class="row clearfix">
+  <div class="col-md-12" align="center">
+    <div class="form-group">
+      {{ render_search_pagination(pagination) }}
+    </div>
+  </div>
+</div>
+{%- endblock search_results_footer %}

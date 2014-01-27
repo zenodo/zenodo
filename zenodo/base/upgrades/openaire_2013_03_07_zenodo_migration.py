@@ -21,8 +21,8 @@
 ## or submit itself to any jurisdiction.
 
 import warnings
-from invenio.dbquery import run_sql
-from invenio.textutils import wait_for_user
+from invenio.legacy.dbquery import run_sql
+from invenio.utils.text import wait_for_user
 
 
 depends_on = ['openaire_2013_03_03_license_data']

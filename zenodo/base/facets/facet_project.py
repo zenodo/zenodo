@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 
 """FP7 prject facet"""
 
-from invenio.websearch_facet_builders import FacetBuilder
+from invenio.modules.search.facet_builders import FacetBuilder
 
 
 class FundingFacetBuilder(FacetBuilder):

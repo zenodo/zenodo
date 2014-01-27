@@ -24,10 +24,12 @@
 """
 __revision__ = "$Id$"
 
-from invenio.urlutils import create_html_link
-from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
-from invenio.bibedit_utils import user_can_edit_record_collection
+
+from flask import current_app
+from invenio.utils.url import create_html_link
+from invenio.base.i18n import gettext_set_language
+from invenio.legacy.bibedit.utils import user_can_edit_record_collection
+
 
 def format_element(bfo, style, css_class):
     """
@@ -47,13 +49,14 @@ def format_element(bfo, style, css_class):
             linkattrd['style'] = style
         if css_class != '':
             linkattrd['class'] = css_class
-        out += create_html_link(CFG_SITE_URL +
-               '/%s/edit/?ln=%s#state=edit&recid=%s' % (CFG_SITE_RECORD, bfo.lang, str(bfo.recID)),
+        out += create_html_link(current_app.config['CFG_SITE_URL'] +
+               '/%s/edit/?ln=%s#state=edit&recid=%s' % (current_app.config['CFG_SITE_RECORD'], bfo.lang, str(bfo.recID)),
                {},
                link_label="<i class=\"icon-pencil\"></i> %s" % _("Edit"),
                linkattrd=linkattrd)
 
     return out
+
 
 def escape_values(bfo):
     """

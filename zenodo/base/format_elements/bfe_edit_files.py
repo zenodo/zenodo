@@ -24,10 +24,11 @@
 """
 __revision__ = "$Id$"
 
-from invenio.urlutils import create_html_link
-from invenio.messages import gettext_set_language
-from invenio.config import CFG_SITE_URL, CFG_SITE_RECORD
-from invenio.access_control_engine import acc_authorize_action
+from flask import current_app
+from invenio.utils.url import create_html_link
+from invenio.base.i18n import gettext_set_language
+from invenio.modules.access.engine import acc_authorize_action
+
 
 def format_element(bfo, style, css_class):
     """
@@ -49,12 +50,13 @@ def format_element(bfo, style, css_class):
             linkattrd['style'] = style
         if css_class != '':
             linkattrd['class'] = css_class
-        out += create_html_link(CFG_SITE_URL + '/%s/managedocfiles' % CFG_SITE_RECORD,
+        out += create_html_link(current_app.config['CFG_SITE_URL'] + '/%s/managedocfiles' % current_app.config['CFG_SITE_RECORD'],
                          urlargd={'ln': bfo.lang,
                                   'recid': str(bfo.recID)},
                          link_label= """<i class="icon-file"></i> %s""" % _("Manage Files"),
                          linkattrd=linkattrd)
     return out
+
 
 def escape_values(bfo):
     """
