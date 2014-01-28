@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -19,3 +19,22 @@
 ## In applying this licence, CERN does not waive the privileges and immunities
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
+
+
+""" Unit tests jsonext """
+
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
+
+class TestReaders(InvenioTestCase):
+    def test_json_for_form(self):
+        from invenio.modules.records.api import Record
+        r = Record.create({'title': 'Test'}, 'json')
+        assert r.produce('json_for_form') == {'title': 'Test'}
+        assert r.produce('json_for_marc') == [{'245__a': 'Test'}]
+
+
+TEST_SUITE = make_test_suite(TestReaders)
+
+if __name__ == '__main__':
+    run_test_suite(TEST_SUITE)

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,14 +18,14 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-def produce_json_for_form(self, fields=None):
+def produce(self, fields=None):
     """
     Export the record in marc format
 
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
     """
-    from invenio.bibfield_utils import get_producer_rules
+    from invenio.modules.jsonalchemy.parser import get_producer_rules
 
     if not fields:
         fields = self.keys()
@@ -36,7 +36,7 @@ def produce_json_for_form(self, fields=None):
         if field.startswith('__'):
             continue
         try:
-            rules = get_producer_rules(field, 'json_for_form')
+            rules = get_producer_rules(field, 'json_for_form', 'recordext')
             for rule in rules:
                 field = self.get(rule[0], None)
                 if field is None:
@@ -46,7 +46,7 @@ def produce_json_for_form(self, fields=None):
                 for f in field:
                     for r in rule[1]:
                         tmp_dict = {}
-                        for key, subfield in r.items():
+                        for key, subfield in r[1].items():
                             if not subfield:
                                 tmp_dict[key] = f
                             else:
@@ -57,7 +57,7 @@ def produce_json_for_form(self, fields=None):
                                         tmp_dict[key] = self._try_to_eval(
                                             subfield, value=f
                                         )
-                                    except Exception, e:
+                                    except Exception as e:
                                         self['__error_messages.cerror[n]'] = \
                                             'Producer CError - Unable to ' \
                                             'produce %s - %s' % (field, str(e))
