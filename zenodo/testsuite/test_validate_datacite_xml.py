@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,7 +20,9 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.testutils import make_test_suite, run_test_suite, InvenioTestCase
+
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+
 from lxml import etree
 from StringIO import StringIO
 
@@ -39,9 +41,9 @@ class DataCiteXMLRegressionTest(InvenioTestCase):
         """
         Validate generated DataCite XML for all public records
         """
-        from invenio.websearch_model import Collection
-        from invenio.bibformat import format_record
-        from invenio.bibfield import get_record
+        from invenio.modules.search.models import Collection
+        from invenio.modules.formatter import format_record
+        from invenio.modules.records.api import get_record
 
         etree.clear_error_log()
 
@@ -56,10 +58,10 @@ class DataCiteXMLRegressionTest(InvenioTestCase):
                     xml = StringIO(format_record(recid, 'dcite'))
                     xml_doc = etree.parse(xml)
                     self.schema.assertValid(xml_doc)
-            except Exception, e:
-                print recid
+            except Exception as e:
+                print(recid)
                 if xml:
-                    print xml.getvalue()
+                    print(xml.getvalue())
                 raise e
 
 TEST_SUITE = make_test_suite(DataCiteXMLRegressionTest)
