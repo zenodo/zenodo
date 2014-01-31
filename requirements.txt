@@ -8,3 +8,5 @@ git+https://github.com/fatiherikli/dictdiffer.git@78268d535d0ee844b7e14741f9841d
 
 # Development related - rpdb2 needs to be installed in venv.
 https://winpdb.googlecode.com/files/winpdb-1.4.8.tar.gz
+flask-restful
+pyfilesystem
