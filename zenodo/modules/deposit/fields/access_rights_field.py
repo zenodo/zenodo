@@ -35,9 +35,9 @@ ACCESS_RIGHTS_CHOICES = [
 
 
 ACCESS_RIGHTS_ICONS = {
-    'open': 'icon-unlock',
-    'closed': 'icon-lock',
-    'embargoed': 'icon-warning-sign',
+    'open': 'fa fa-unlock fa-fw',
+    'closed': 'fa fa-lock fa-fw',
+    'embargoed': 'fa fa-warning fa-fw',
 }
 
 

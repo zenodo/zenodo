@@ -361,6 +361,7 @@ class ZenodoForm(WebDepositForm):
             local_datacite_lookup
         ],
         export_key='doi',
+        icon='fa fa-barcode fa-fw',
     )
     prereserve_doi = zfields.ReserveDOIField(
         label="",
@@ -368,7 +369,7 @@ class ZenodoForm(WebDepositForm):
         doi_creator=create_doi,
         widget=ButtonWidget(
             label=_("Pre-reserve DOI"),
-            icon='icon-barcode',
+            icon='fa fa-barcode',
             tooltip=_(
                 'Pre-reserve a Digital Object Identifier for your upload. This'
                 ' allows you know the DOI before you submit your upload, and'
@@ -379,7 +380,7 @@ class ZenodoForm(WebDepositForm):
     )
     publication_date = fields.Date(
         label=_('Publication date'),
-        icon='icon-calendar',
+        icon='fa fa-calendar fa-fw',
         description='Required. Format: YYYY-MM-DD. The date your upload was '
         'made available in case it was already published elsewhere.',
         default=date.today(),
@@ -394,6 +395,7 @@ class ZenodoForm(WebDepositForm):
             strip_string,
         ],
         export_key='title',
+        icon='fa fa-book fa-fw',
     )
     creators = fields.DynamicFieldList(
         fields.FormField(
@@ -405,7 +407,7 @@ class ZenodoForm(WebDepositForm):
         ),
         label='Authors',
         add_label='Add another author',
-        icon='icon-user',
+        icon='fa fa-user fa-fw',
         widget_classes='',
         min_entries=1,
         export_key='authors',
@@ -417,7 +419,7 @@ class ZenodoForm(WebDepositForm):
         label="Description",
         description='Required.',
         default='',
-        icon='icon-pencil',
+        icon='fa fa-pencil fa-fw',
         validators=[validators.required(), ],
         widget=CKEditorWidget(
             toolbar=[
@@ -443,7 +445,7 @@ class ZenodoForm(WebDepositForm):
         ),
         label='Keywords',
         add_label='Add another keyword',
-        icon='icon-tags',
+        icon='fa fa-tags fa-fw',
         widget_classes='',
         min_entries=1,
     )
@@ -456,6 +458,7 @@ class ZenodoForm(WebDepositForm):
             strip_string,
         ],
         widget_classes='form-control',
+        icon='fa fa-pencil fa-fw',
     )
 
     #
@@ -470,7 +473,7 @@ class ZenodoForm(WebDepositForm):
     )
     embargo_date = fields.Date(
         label=_('Embargo date'),
-        icon='icon-calendar',
+        icon='fa fa-calendar fa-fw',
         description='Required only for Embargoed Access uploads. Format: '
         'YYYY-MM-DD. The date your upload will be made publicly available '
         'in case it is under an embargo period from your publisher.',
@@ -502,6 +505,7 @@ class ZenodoForm(WebDepositForm):
             strip_string,
         ],
         placeholder="Start typing a license name or abbreviation...",
+        icon='fa fa-certificate fa-fw',
     )
 
     #
@@ -514,7 +518,7 @@ class ZenodoForm(WebDepositForm):
         ),
         validators=[community_validator],
         widget=TagListWidget(template="{{title}}"),
-        icon='icon-group',
+        icon='fa fa-group fa-fw',
         export_key='provisional_communities',
     )
 
@@ -533,7 +537,7 @@ class ZenodoForm(WebDepositForm):
             }
         ),
         widget=TagListWidget(template="{{acronym}} - {{title}} ({{id}})"),
-        icon='icon-group',
+        icon='fa fa-money fa-fw',
         description="Optional. Note, a human %s curator will validate your"
                     " upload before reporting it to OpenAIRE, and you may "
                     "thus experience a delay before your upload is available "
@@ -557,7 +561,7 @@ class ZenodoForm(WebDepositForm):
         ),
         label="Related identifiers",
         add_label='Add another related identifier',
-        icon='icon-barcode',
+        icon='fa fa-barcode fa-fw',
         widget_classes='',
         min_entries=1,
     )
@@ -644,7 +648,7 @@ class ZenodoForm(WebDepositForm):
         ),
         label='Supervisors',
         add_label='Add another supervisor',
-        icon='icon-user',
+        icon='fa fa-user fa-fw',
         widget_classes='',
         min_entries=1,
     )
@@ -652,7 +656,7 @@ class ZenodoForm(WebDepositForm):
         description="Optional.",
         label='Awarding University',
         validators=[validators.optional()],
-        icon='icon-building',
+        icon='fa fa-building fa-fw',
     )
 
     #
