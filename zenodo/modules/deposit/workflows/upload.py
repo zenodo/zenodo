@@ -670,4 +670,4 @@ class upload(DepositionType):
             format_record=format_record,
         )
 
-        return render_template('webdeposit_completed.html', **ctx)
+        return render_template('deposit/completed.html', **ctx)

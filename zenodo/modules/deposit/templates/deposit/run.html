@@ -35,7 +35,9 @@
 
 
 {% macro modal_dialog(id="submitModal", title="Are you sure you want to submit?", body=submit_dialog_body()) %}
-<div id="{{id}}" class="modal hide" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+<div id="{{id}}" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="{{id}}Label" aria-hidden="true">
+  <div class="modal-dialog">
+  <div class="modal-content">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
     <h3 id="{{id}}Label">{{title}}</h3>
@@ -44,8 +46,10 @@
     {{body}}
   </div>
   <div class="modal-footer">
-    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">Close</button>
-    <button class="btn btn-primary form-submit-zenodo">Submit</button>
+    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true"><i class="fa fa-times"></i> Close</button>
+    <button class="btn btn-primary form-submit-zenodo"><i class="fa fa-check fa-inverse"></i> Submit</button>
+  </div>
+  </div>
   </div>
 </div>
 {% endmacro %}

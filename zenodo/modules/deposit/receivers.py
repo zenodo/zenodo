@@ -21,7 +21,10 @@
 ## or submit itself to any jurisdiction.
 
 from flask import request, current_app
-
+from invenio.utils.text import nice_size
+from invenio.ext.email import send_email
+from invenio.ext.template import render_template_to_string
+from invenio.base.globals import cfg
 from invenio.modules.deposit.form import WebDepositForm
 from invenio.modules.deposit.fields.file_upload import FileUploadField
 from invenio.modules.deposit.field_widgets import PLUploadWidget
@@ -72,16 +75,12 @@ def large_file_notification(sender, deposition=None, deposition_file=None,
     Send notification on large file uploads
     """
     if deposition_file and deposition_file.size > 10485760:
-        from invenio.mailutils import send_email
-        from invenio.config import CFG_SITE_ADMIN_EMAIL, CFG_SITE_NAME
-        from invenio.textutils import nice_size
-        from invenio.jinja2utils import render_template_to_string
         current_app.logger.info(deposition_file.__getstate__())
         send_email(
-            CFG_SITE_ADMIN_EMAIL,
-            CFG_SITE_ADMIN_EMAIL,
+            cfg['CFG_SITE_ADMIN_EMAIL'],
+            cfg['CFG_SITE_ADMIN_EMAIL'],
             subject="%s: %s file uploaded" % (
-                CFG_SITE_NAME, nice_size(deposition_file.size)
+                cfg['CFG_SITE_NAME'], nice_size(deposition_file.size)
             ),
             content=render_template_to_string(
                 "deposit/email_large_file.html",
