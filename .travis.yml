@@ -39,14 +39,11 @@ install:
   - "sudo a2enmod rewrite"
   - "sudo mkdir /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
-  - sudo pip install --upgrade pip
-  - sudo pip install --upgrade setuptools
-  - sudo pip install --upgrade distribute
-  - sudo pip install --upgrade virtualenvwrapper
+  - "travis_retry sudo pip install --upgrade virtualenvwrapper"
   - ". `which virtualenvwrapper.sh`"
-  - mkvirtualenv invenio
-  - workon invenio
-  - "pip install . --process-dependency-links --allow-all-external"
+  - "mkvirtualenv invenio"
+  - "workon invenio"
+  - "travis_retry pip install . --process-dependency-links --allow-all-external"
   - "pybabel compile -f -d invenio/base/translations/"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
@@ -57,15 +54,11 @@ before_script:
   - "sudo ln -s /home/travis/.virtualenvs/invenio/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
   - "sudo ln -s /home/travis/.virtualenvs/invenio/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
   - "sudo /usr/sbin/a2dissite default || echo ':('"
-#  - "sudo /usr/sbin/a2ensite invenio || echo ':('" # enable Invenio web site
-#  - "sudo /usr/sbin/a2ensite invenio-ssl || echo ':('" # enable Invenio secure web site
   - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
   - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
   - "inveniomanage database init --yes-i-know || echo ':('"
   - "inveniomanage database create || echo ':('"
-#  - "inveniomanage demosite create"
-#  - "inveniomanage demosite populate"
 
 script:
   - "python setup.py test"

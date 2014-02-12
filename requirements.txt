@@ -20,12 +20,8 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-psycopg2
+
 qrcode==2.4.2
 Pillow==1.7.8
 altmetric
 beautifulsoup4
-git+https://github.com/fatiherikli/dictdiffer.git@78268d535d0ee844b7e14741f9841da460fb129c#egg=dictdiffer
-
-# Development related - rpdb2 needs to be installed in venv.
-https://winpdb.googlecode.com/files/winpdb-1.4.8.tar.gz
