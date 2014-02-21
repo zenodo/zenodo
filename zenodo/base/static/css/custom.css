@@ -7,6 +7,18 @@ body {
   padding-right: 0;
 }
 
+.col-pad-right-0 {
+    padding-right: 0;
+}
+
+.col-pad-left-0 {
+    padding-left: 0;
+}
+
+.panel-bot-margin {
+    margin-bottom: 10px;
+}
+
 .jumbotron  {
     padding-top: 40px;
     padding-bottom: 40px;
@@ -342,6 +354,10 @@ h4.media-heading {
 
 label {
   font-weight: normal;
+}
+
+.list-group-item.active a {
+   color: #ffffff;
 }
 
 /* -------------- */
@@ -844,3 +860,52 @@ fieldset label i {
 }
 
 
+/* GitHub View Styles */
+
+div .extra-small {
+  font-size: 50%;
+  cursor: pointer;
+}
+
+div .extra-small:hover {
+  color: red;
+}
+
+h4.repo {
+}
+
+.doi-toggle {
+  margin: 10px 0;
+  text-align: right;
+}
+
+i.hook-status {
+  color: green;
+  padding-left: 10px;
+}
+
+i.hook-status.fa-exclamation {
+  color: red;
+}
+
+i.error {
+  color: red;
+}
+
+i.fa-ellipsis-h {
+  cursor: pointer;
+  padding-left: 4px;
+  vertical-align: bottom;
+}
+
+div.repo-info {
+  padding-top: 20px;
+}
+
+.badge-modal h3 {
+  margin-top: 0;
+}
+
+span.get-badge {
+  cursor: pointer;
+}
