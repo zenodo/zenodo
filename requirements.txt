@@ -23,5 +23,8 @@
 
 qrcode==2.4.2
 Pillow==1.7.8
+git+https://github.com/lepture/flask-oauthlib.git#egg=Flask-OAuthlib
+requests==1.2.3
 altmetric
 beautifulsoup4
+humanize==0.5

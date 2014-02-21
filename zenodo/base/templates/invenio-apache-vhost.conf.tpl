@@ -16,7 +16,6 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-
 {%- extends "invenio-apache-vhost-zenodo.tpl" -%}
 
 {%- block header -%}
@@ -28,12 +27,16 @@ NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
 {{ '#' if not wsgi_socket_directive_needed }}WSGISocketPrefix {{ [config.CFG_PREFIX, 'var', 'run']|path_join }}
 {{ super() }}
 {%- endblock header -%}
-
+{%- set wsgi_processes = config.get('APACHE_WSGI_DAEMON_PROCESSES', 5) -%}
+{%- if config.DEBUG -%}
+    {%- set wsgi_processes = 1 -%}
+{%- endif -%}
 {%- block wsgi %}
-        WSGIDaemonProcess invenio processes={{ '1' if 'werkzeug-debugger' in config.CFG_DEVEL_TOOLS else '5' }} threads=1 user={{ config.CFG_RUNNING_AS_USER }} display-name=%{GROUP} inactivity-timeout=3600 maximum-requests=10000
+        WSGIDaemonProcess invenio processes={{ wsgi_processes }} threads=1 user={{ config.CFG_RUNNING_AS_USER }} display-name=%{GROUP} inactivity-timeout=3600 maximum-requests=10000
         WSGIImportScript {{ config.CFG_WSGIDIR }}/invenio.wsgi process-group=invenio application-group=%{GLOBAL}
         {{ super() }}
 {%- endblock wsgi -%}
 
 {%- block auth_shibboleth -%}
+{# shibboleth is allowed only on https #}
 {%- endblock auth_shibboleth -%}

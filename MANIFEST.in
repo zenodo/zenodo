@@ -20,6 +20,30 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-include requirements*.txt invenio.cfg COPYING setup.cfg README.md fabfile.py
-recursive-include docs *.xml *.xsl *.tpl *.html *.js *.css *.cfg *.bft *.rst
-recursive-include zenodo *.xml *.xsl *.tpl *.html *.js *.css *.cfg *.bft *.rst
+include requirements*.txt AUTHORS COPYING README.md bower.json setup.cfg
+
+recursive-include docs *
+recursive-exclude docs/_build *
+
+recursive-include zenodo/base/static *
+recursive-include zenodo/base/templates *
+recursive-include zenodo/base/format_elements *
+recursive-include zenodo/base/output_formats *
+recursive-include zenodo/base/recordext *
+
+recursive-include zenodo/modules/*/static *
+recursive-include zenodo/modules/*/templates *
+recursive-include zenodo/modules/*/testsuite *
+recursive-include zenodo/modules/*/recordext/* *
+recursive-include zenodo/modules/*/converterext *
+recursive-include zenodo/modules/*/documentext *
+recursive-include zenodo/modules/*/editorext *
+recursive-include zenodo/modules/*/exportext *
+recursive-include zenodo/modules/*/format_elements *
+recursive-include zenodo/modules/*/format_templates *
+recursive-include zenodo/modules/*/output_formats *
+recursive-include zenodo/modules/*/rankext *
+
+recursive-include zenodo/legacy/resources *
+
+recursive-exclude * *.pyc *.pyo

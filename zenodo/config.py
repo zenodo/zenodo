@@ -38,14 +38,44 @@ point specified in the setup.py::
     },
 """
 
+import os
+import sys
+
 # Define identity function for string extraction
 _ = lambda x: x
 
 PACKAGES = [
     'zenodo.base',
     'zenodo.modules.deposit',
+    'zenodo.modules.github',
     'zenodo.modules.communities',
     'invenio.modules.*',
+]
+
+EXTENSIONS = [
+    'zenodo.ext.oauth',
+    'invenio.ext.confighacks',
+    'invenio.ext.jinja2hacks',
+    'invenio.ext.debug_toolbar',
+    'invenio.ext.babel',
+    'invenio.ext.sqlalchemy',
+    'invenio.ext.sslify',
+    'invenio.ext.cache',
+    'invenio.ext.session',
+    'invenio.ext.login',
+    'invenio.ext.principal',
+    'invenio.ext.email',
+    'invenio.ext.legacy',
+    'invenio.ext.assets',
+    'invenio.ext.template',
+    'invenio.ext.admin',
+    'invenio.ext.logging',
+    'invenio.ext.gravatar',
+    'invenio.ext.collect',
+    'invenio.ext.restful',
+    'flask.ext.menu:Menu',
+    'flask.ext.breadcrumbs:Breadcrumbs',
+    'invenio.modules.deposit.url_converters',
 ]
 
 DEPOSIT_TYPES = [
@@ -63,6 +93,10 @@ COMMUNITIES_PORTALBOXES_PROVISIONAL = [
     'communities/portalbox_provisional.html',
 ]
 
+WEBHOOKS_DEBUG_RECEIVER_URLS = {
+    'github': 'http://github.zenodo.ultrahook.com?access_token=%(token)s',
+}
+
 RECORDS_BREADCRUMB_TITLE_KEY = 'title'
 
 # Debug toolbar configuration
@@ -70,6 +104,11 @@ DEBUG = True
 DEBUG_TB_ENABLED = True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 CFG_EMAIL_BACKEND = "flask.ext.email.backends.console.Mail"
+
+APACHE_CERTIFICATE_FILE = os.path.join(sys.prefix, 'etc/certs/localhost.crt')
+APACHE_CERTIFICATE_KEYFILE = os.path.join(
+    sys.prefix, 'etc/certs/localhost.key'
+)
 
 # Default database name
 CFG_DATABASE_NAME = "zenodo"
@@ -82,7 +121,7 @@ CFG_SITE_NAME_INTL = dict(
 )
 CFG_SITE_LANGS = ["en"]
 CFG_SITE_TAG = "LOCAL"
-CFG_SITE_EMERGENCY_EMAIL_ADDRESSES = {'*': '{{CFG_INVENIO_ADMIN}}'}
+CFG_SITE_EMERGENCY_EMAIL_ADDRESSES = {'*': 'team@zenodo.org'}
 
 CFG_SITE_ADMIN_EMAIL = "admin@zenodo.org"
 CFG_SITE_SUPPORT_EMAIL = "info@zenodo.org"
@@ -93,8 +132,6 @@ CFG_GOOGLE_SITE_VERIFICATION = [
 ]
 CFG_DROPBOX_API_KEY = "72dpqrjvx71mqyu"
 CFG_BIBFORMAT_ADD_THIS_ID = "ra-4dc80cde118f4dad"
-#CFG_PIWIK_URL = "piwik.web.cern.ch/piwik/"
-#CFG_PIWIK_SITE_ID = "57"
 
 CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE = 2147483648
 CFG_OPENAIRE_FILESIZE_NOTIFICATION = 10485760

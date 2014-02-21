@@ -24,3 +24,6 @@
 *.egg-info
 dist
 *.pyc
+build
+.DS_Store
+zenodo/modules/github/static/badges/*.png

@@ -26,16 +26,8 @@
 
 {%- block xsendfile_directive %}
     {{ super() }}
-    {%- if config.CFG_BIBDOCFILE_USE_XSENDFILE %}
+    {%- if config.CFG_BIBDOCFILE_USE_XSENDFILE and config.DEBUG %}
         XSendFilePath {{ [config.CFG_PREFIX, 'lib', 'python2.7', 'site-packages', 'flask_debugtoolbar', 'static']|path_join }}
         XSendFilePath {{ [config.CFG_PREFIX, 'local', 'lib', 'python2.7', 'site-packages', 'flask_admin', 'static']|path_join }}
     {%- endif -%}
 {%- endblock xsendfile_directive -%}
-
-{%- block deflate_directive %}
-        AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript application/xhtml+xml application/xml application/rss+xml application/atom_xml application/x-javascript image/svg+xml
-
-        # Don't do etags for files since in a load balanced environment, two servers
-        # will compute different etags for the same component.
-        FileETag None
-{%- endblock deflate_directive -%}

@@ -1,10 +1,9 @@
-OpenAIRE AUTHORS
-================
+AUTHORS
+=======
 
- * Samuele Kaplun <samuele.kaplun@cern.ch>
  * Lars Holm Nielsen <lars.holm.nielsen@cern.ch>
+ * Samuele Kaplun <samuele.kaplun@cern.ch>
+ * Amit Kapadia <akapad@gmail.com>
 
 # Run:
 # git log | grep "^Author:" | sort | uniq | sed s/Author:\ //
-
-- end of file -

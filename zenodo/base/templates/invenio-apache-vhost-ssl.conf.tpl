@@ -22,18 +22,27 @@
 {% set log_suffix = '-ssl' %}
 
 {%- block header -%}
-{{ '#' if not listen_directive_needed }}{{ 'Listen ' + vhost_site_url_port}}
+ServerSignature Off
+ServerTokens Prod
 TraceEnable off
 SSLProtocol all -SSLv2
 SSLCipherSuite HIGH:MEDIUM:!ADH
+{{ '#' if not listen_directive_needed }}{{ 'Listen ' + vhost_site_url_port}}
 NameVirtualHost {{ vhost_ip_address }}:{{ vhost_site_url_port }}
+{%- if config.APACHE_CERTIFICATE_FILE and config.APACHE_CERTIFICATE_KEY_FILE %}
+SSLCertificateFile {{config.APACHE_CERTIFICATE_FILE}}
+SSLCertificateKeyFile {{config.APACHE_CERTIFICATE_KEY_FILE}}
+{%- else %}
+{{ ssl_pem_directive }}
+{{ ssl_crt_directive }}
+{{ ssl_key_directive }}
+{%- endif %}
+{{ super() }}
 {%- endblock -%}
 
 {%- block server %}
         {{ super() }}
         SSLEngine on
-        SSLCertificateFile {{config.CFG_ETCDIR}}/certs/localhost.crt
-        SSLCertificateKeyFile {{config.CFG_ETCDIR}}/certs/localhost.key
 {%- endblock server -%}
 
 {%- block wsgi %}
