@@ -41,10 +41,8 @@
             <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span>
           </a>
         </div>
-        <div id="collapseOne" class="panel-body collapse in">
-          <div class="panel-inner" style="margin:0;padding:0;">
+        <div id="collapseOne" class="collapse in">
             <iframe id="preview-iframe" width="100%" height="400" style="border: none;"></iframe>
-          </div>
         </div>
       </div>
       <div class="panel panel-default" id="files">
@@ -53,29 +51,27 @@
             {{ _("Files") }}  <b class="caret"></b>
           </a>
         </div>
-        <div id="collapseTwo" class="panel-body collapse in">
-          <div class="panel-inner" style="margin:0;padding:0;">
-
-              {%- for file in files|sort(attribute='comment') -%}
-
-              {%- endfor -%}
-            <table class="table table-striped">
-            <thead>
-              <tr class="">
-                <th>Name</th>
-                <th>Date</th>
-                <th>Size</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody><tr class="">
-                  <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
-                  <td>{{ file.md.strftime('%d %b %Y') }}</td>
-                  <td>{{ file.size|filesizeformat }}</td>
-                  <td><span class="pull-right">{% if file.get_superformat() == '.pdf' %}<button class="btn preview-link btn-default" data-url="{{file.get_url()}}"><i class="icon-eye-open"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-default" href="{{file.get_url()}}"><i class="icon-download"></i> {{_("Download")}}</a></span></td>
-                </tr></tbody>
-            </table>
-          </div>
+        <div class="collapse in" id="collapseTwo">
+        <table class="table table-striped" >
+        <thead>
+          <tr class="">
+            <th>Name</th>
+            <th>Date</th>
+            <th>Size</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+        {%- for file in files|sort(attribute='comment') -%}
+          <tr class="">
+              <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
+              <td>{{ file.md.strftime('%d %b %Y') }}</td>
+              <td>{{ file.size|filesizeformat }}</td>
+              <td><span class="pull-right">{% if file.get_superformat() == '.pdf' %}<button class="btn preview-link btn-default" data-url="{{file.get_url()}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-default" href="{{file.get_url()}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+            </tr>
+          {%- endfor -%}
+          </tbody>
+        </table>
         </div>
       </div>
       {% endif%}

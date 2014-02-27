@@ -17,13 +17,14 @@ def setup_app(app):
     oauth.init_app(app)
 
     # Initialize an OAuth host
-    oauth.remote_app(
-        'github',
-        consumer_key = CLIENT_ID,
-        consumer_secret = CLIENT_SECRET,
-        request_token_params = OAUTH_SCOPE,
-        base_url='https://api.github.com/',
-        request_token_url = None,
-        access_token_url = ACCESS_TOKEN_URL,
-        authorize_url = AUTHORIZE_URL
-    )
+    if 'github' not in oauth.remote_apps:
+        oauth.remote_app(
+            'github',
+            consumer_key = CLIENT_ID,
+            consumer_secret = CLIENT_SECRET,
+            request_token_params = OAUTH_SCOPE,
+            base_url='https://api.github.com/',
+            request_token_url = None,
+            access_token_url = ACCESS_TOKEN_URL,
+            authorize_url = AUTHORIZE_URL
+        )

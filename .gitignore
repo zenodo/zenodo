@@ -27,3 +27,4 @@ dist
 build
 .DS_Store
 zenodo/modules/github/static/badges/*.png
+docs/_build
