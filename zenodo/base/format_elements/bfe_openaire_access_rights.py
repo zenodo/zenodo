@@ -51,8 +51,8 @@ def format_element(bfo, as_label=False, only_restrictions=False):
     elif as_label:
         if access_rights in ('embargoedAccess', 'embargoed'):
             return """<a href="/search?p=542__l:embargoed" class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</a>""" % (embargo, _(access))
-        elif access_rights in ('closeDaccess', 'closed'):
-            return """<a href="/search?p=542__l:closed" class="label label-important">%s</a>""" % _(access)
+        elif access_rights in ('closedAccess', 'closed'):
+            return """<a href="/search?p=542__l:closed" class="label label-danger">%s</a>""" % _(access)
         elif access_rights in ('openAccess', 'open'):
             return """<a href="/search?p=542__l:open" class="label label-success">%s</a>""" % _(access)
         elif access_rights in ('restricteDaccess', 'restricted'):
