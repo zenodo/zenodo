@@ -20,8 +20,8 @@
 Simple tasklet that is called after a bibupload of an updated record.
 """
 
-from invenio.flaskshell import *
-from invenio.openaire_tasks import openaire_altmetric_update, \
+
+from zenodo.modules.deposit.tasks import openaire_altmetric_update, \
     openaire_update_doi
 
 

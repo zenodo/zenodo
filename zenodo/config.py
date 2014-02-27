@@ -97,6 +97,11 @@ WEBHOOKS_DEBUG_RECEIVER_URLS = {
     'github': 'http://github.zenodo.ultrahook.com?access_token=%(token)s',
 }
 
+CFG_BIBSCHED_TASKLET_PACKAGES = [
+    'invenio.legacy.bibsched.tasklets',
+    'zenodo.legacy.tasklets',
+]
+
 RECORDS_BREADCRUMB_TITLE_KEY = 'title'
 
 # Debug toolbar configuration

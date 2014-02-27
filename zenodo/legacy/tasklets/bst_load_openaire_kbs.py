@@ -1,35 +1,37 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
-##
-## ZENODO is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## ZENODO is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of ZENODO.
+# Copyright (C) 2012, 2013 CERN.
+#
+# ZENODO is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# ZENODO is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 """
 Tasklets to import/update knowledge base of journal names and
 FP7 projects.
 """
 
-from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
-from invenio.dbquery import run_sql
-from invenio.bibknowledge import add_kb_mapping, kb_exists, update_kb_mapping, add_kb, kb_mapping_exists, add_kb_mapping, remove_kb_mapping, get_kbr_keys, get_kb_mappings
-from invenio.dnetutils import dnet_run_sql
-from invenio.errorlib import register_exception
+from invenio.legacy.bibsched.bibtask import write_message, \
+    task_update_progress, task_sleep_now_if_required
+from invenio.modules.knowledge.api import kb_exists, \
+    update_kb_mapping, add_kb, kb_mapping_exists, add_kb_mapping, \
+    remove_kb_mapping, get_kbr_keys, get_kb_mappings
+from zenodo.legacy.utils.dnetutils import dnet_run_sql
+from invenio.ext.logging.wrappers import register_exception
 
 import datetime
 import urllib
@@ -47,7 +49,9 @@ else:
 
 CFG_ENTREZ = "ftp://ftp.ncbi.nih.gov/pubmed/J_Entrez.gz"
 
+
 class ComplexEncoder(json.JSONEncoder):
+
     def default(self, obj):
         if isinstance(obj, datetime.date):
             return obj.strftime('%Y-%m-%d')
@@ -77,15 +81,15 @@ def get_journals_from_entrez():
         ENTREZ_JOURNALS[item["JrId"]] = item
     return ENTREZ_JOURNALS
 
-#def _init_journals():
+# def _init_journals():
     #import gzip
-    #run_sql(gzip.open("journals.sql.gz").read())
+    # run_sql(gzip.open("journals.sql.gz").read())
 
 CFG_JOURNAL_KBS = {
     'journal_name': """tuple((item["JournalTitle"], "%s - %s" % (item["JournalTitle"], item["IsoAbbr"])) for item in get_journals_from_entrez().itervalues())"""
 }
 
-#CFG_JOURNAL_KBS = {
+# CFG_JOURNAL_KBS = {
     #'journal_issn': 'SELECT name, issn FROM journals_journal',
     #'journal_essn': 'SELECT name, essn FROM journals_journal',
     #'journal_publisher': 'SELECT journals_journal.name, journals_publisher.name FROM journals_journal JOIN journals_publisher ON journals_journal.publisher_id=journals_publisher.id',
@@ -96,13 +100,13 @@ CFG_DNET_KBS = {
     #'project_acronym': 'SELECT grant_agreement_number, acronym FROM projects',
     #'project_title': 'SELECT grant_agreement_number, title FROM projects',
     #'json_projects': """SELECT grant_agreement_number,*
-        #FROM projects
-            #LEFT OUTER JOIN projects_projectsubjects ON project=projectid
-            #LEFT OUTER JOIN projectsubjects ON project_subject=projectsubjectid
-            #LEFT OUTER JOIN projects_contracttypes ON projects_contracttypes.project=projectid
-            #LEFT OUTER JOIN contracttypes ON contracttype=contracttypeid
-            #LEFT OUTER JOIN participants_projects ON participants_projects.project=projectid
-            #LEFT OUTER JOIN participants ON beneficiaryid=participant
+    # FROM projects
+    # LEFT OUTER JOIN projects_projectsubjects ON project=projectid
+    # LEFT OUTER JOIN projectsubjects ON project_subject=projectsubjectid
+    # LEFT OUTER JOIN projects_contracttypes ON projects_contracttypes.project=projectid
+    # LEFT OUTER JOIN contracttypes ON contracttype=contracttypeid
+    # LEFT OUTER JOIN participants_projects ON participants_projects.project=projectid
+    # LEFT OUTER JOIN participants ON beneficiaryid=participant
     #""",
     'json_projects': """SELECT projectid,grant_agreement_number,ec_project_website,acronym,call_identifier,end_date,start_date,title,fundedby FROM projects""",
     'projects': """SELECT grant_agreement_number, COALESCE(acronym, title) || ' - ' || COALESCE(title, acronym) || ' (' || grant_agreement_number || ')' FROM projects""",
@@ -116,8 +120,10 @@ CFG_ADDITIONAL_ENTRIES = {
     'projects': [('502084', 'POLYMOD - Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases (502084)')],
 }
 
+
 def none_run_sql(query):
     return eval(query)
+
 
 def load_kbs(cfg, run_sql, in_task=False):
     for kb, query in cfg.iteritems():
@@ -141,7 +147,8 @@ def load_kbs(cfg, run_sql, in_task=False):
                 new_description = []
                 for column in description[1:]:
                     column = column[0]
-                    counter = column_counter[column] = column_counter.get(column, 0) + 1
+                    counter = column_counter[
+                        column] = column_counter.get(column, 0) + 1
                     if counter > 1:
                         new_description.append('%s%d' % (column, counter))
                     else:
@@ -173,7 +180,8 @@ def load_kbs(cfg, run_sql, in_task=False):
                     if key in original_keys:
                         original_keys.remove(key)
                     if in_task:
-                        task_update_progress("%s - %s%%" % (kb, i * 100 / len(mapping)))
+                        task_update_progress(
+                            "%s - %s%%" % (kb, i * 100 / len(mapping)))
                     if kb_mapping_exists(kb, key):
                         updated += 1
                         update_kb_mapping(kb, key, key, value)
@@ -191,7 +199,8 @@ def load_kbs(cfg, run_sql, in_task=False):
             if not in_task:
                 print "kb after remove:", len(get_kb_mappings(kb))
         except:
-            register_exception(alert_admin=True, prefix="Error when updating KB %s" % kb)
+            register_exception(
+                alert_admin=True, prefix="Error when updating KB %s" % kb)
             continue
 
 
@@ -205,4 +214,3 @@ def bst_load_openaire_kbs(journals=True, in_task=True):
 
 if __name__ == '__main__':
     bst_load_openaire_kbs(journals=True, in_task=False)
-

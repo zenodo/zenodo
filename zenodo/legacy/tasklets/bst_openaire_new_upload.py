@@ -24,8 +24,7 @@
 Simple tasklet that is called after a bibupload of a new record
 """
 
-from invenio.flaskshell import *
-from invenio.openaire_tasks import openaire_create_icon, \
+from zenodo.modules.deposit.tasks import openaire_create_icon, \
     openaire_altmetric_update, openaire_register_doi, \
     openaire_upload_notification
 

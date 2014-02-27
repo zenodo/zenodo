@@ -23,11 +23,11 @@
 from marshal import loads
 from zlib import decompress
 
-from invenio.dbquery import run_sql
-from invenio.dnetutils import dnet_run_sql
+from invenio.legacy.dbquery import run_sql
+from zenodo.legacy.utils.dnetutils import dnet_run_sql
 from invenio.errorlib import register_exception
-from invenio.bibtask import write_message, task_update_progress, task_sleep_now_if_required
-from invenio.intbitset import intbitset
+from intbitset import intbitset
+
 
 def bst_openaire_pgreplayqueue():
     """
