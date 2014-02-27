@@ -23,6 +23,7 @@
 from __future__ import absolute_import
 
 import json
+from datetime import date
 
 from flask import render_template, url_for, request
 from flask.ext.restful import fields, marshal
@@ -84,7 +85,7 @@ def file_firerole(email, access_right, embargo_date):
         # then allow all
         fft_status = [
             'allow email "%s"' % email,
-            'deny until "%s"' % embargo_date.isoformat(),
+            'deny until "%s"' % embargo_date,
             'allow any',
         ]
     elif access_right in ('closed', 'restricted',):
@@ -128,6 +129,21 @@ def process_recjson(deposition, recjson):
     """
     Process exported recjson (common for both new and edited records)
     """
+    # ================
+    # ISO format dates
+    # ================
+    for k in recjson.keys():
+        if isinstance(recjson[k], date):
+            recjson[k] = recjson[k].isoformat()
+
+    # =======
+    # Authors
+    # =======
+    if 'authors' in recjson and recjson['authors']:
+        recjson['first_author'] = recjson['authors'][0]
+        recjson['additional_authors'] = recjson['authors'][1:]
+        del recjson['authors']
+
     # ===========
     # Communities
     # ===========
@@ -169,13 +185,13 @@ def process_recjson(deposition, recjson):
     # =======================
     # Set year or delete fields if no title is provided
     if recjson.get('journal.title', None):
-        recjson['journal.year'] = recjson['publication_date'].year
+        recjson['journal.year'] = recjson['publication_date'][:4]
 
     # =======================
     # Book/chaper/report
     # =======================
     if 'imprint.publisher' in recjson and 'imprint.place' in recjson:
-        recjson['imprint.year'] = recjson['publication_date'].year
+        recjson['imprint.year'] = recjson['publication_date'][:4]
 
     if 'part_of.title' in recjson:
         mapping = [
@@ -209,12 +225,22 @@ def process_recjson(deposition, recjson):
     # =======================
     filter_empty_elements(recjson)
 
+    # ==================================
+    # Map dot-keys to their dictionaries
+    # ==================================
+    for k in recjson.keys():
+        if '.' in k:
+            mainkey, subkey = k.split('.')
+            if mainkey not in recjson:
+                recjson[mainkey] = {}
+            recjson[mainkey][subkey] = recjson.pop(k)
+
     return recjson
 
 
 def filter_empty_elements(recjson):
     list_fields = [
-        'authors', 'keywords', 'thesis_supervisors'
+        'additional_authors', 'keywords', 'thesis_supervisors'
     ]
     for key in list_fields:
         recjson[key] = filter(
@@ -504,7 +530,7 @@ class upload(DepositionType):
 
     marshal_metadata_fields = dict(
         access_right=fields.String,
-        #communities=fields.List(fields.Raw),
+        communities=fields.List(fields.Raw),
         conference_acronym=fields.String,
         conference_dates=fields.String,
         conference_place=fields.String,
@@ -514,7 +540,7 @@ class upload(DepositionType):
         description=fields.String,
         doi=fields.String(default=''),
         embargo_date=ISODate,
-        #grants=fields.List(fields.Raw),
+        grants=fields.List(fields.Raw),
         image_type=fields.String(default=''),
         imprint_isbn=fields.String,
         imprint_place=fields.String,
@@ -573,7 +599,7 @@ class upload(DepositionType):
             # FIXME: Not based on latest available data in record.
             sip = deposition.get_latest_sip(sealed=True)
             draft = record_to_draft(
-                Record.create(sip.package, 'marc'),
+                Record.create(sip.package, master_format='marc'),
                 post_process=process_draft
             )
             metadata_fields = cls.marshal_metadata_edit_fields
@@ -648,8 +674,8 @@ class upload(DepositionType):
         if schema and draft_id == '_edit':
             if 'recid' in schema['schema']:
                 del schema['schema']['recid']
-            if 'version_id' in schema['schema']:
-                del schema['schema']['version_id']
+            if 'modification_date' in schema['schema']:
+                del schema['schema']['modification_date']
         return schema
 
     @classmethod

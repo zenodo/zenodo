@@ -39,7 +39,7 @@ from invenio.modules.records.api import get_record
 from invenio.celery import celery
 from invenio.config import CFG_TMPSHAREDDIR, CFG_DATACITE_SITE_URL, \
     CFG_SITE_SUPPORT_EMAIL, CFG_SITE_NAME
-from invenio.utils.mail import send_email
+from invenio.ext.email import send_email
 from invenio.legacy.dbquery import run_sql
 from invenio.ext.logging.wrappers import register_exception
 from invenio.legacy.search_engine import search_pattern, get_fieldvalues

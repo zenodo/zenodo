@@ -822,12 +822,12 @@ class EditFormMixin(object):
         widget=widgets.HiddenInput(),
         label=""
     )
-    version_id = fields.DateTimeField(
+    modification_date = fields.DateTimeField(
         validators=[
             unchangeable(),
         ],
         widget=widgets.HiddenInput(),
-        label=""
+        label="",
     )
 
 

@@ -25,6 +25,7 @@ def produce(self, fields=None):
     @param tags: list of tags to include in the output, if None or
                 empty list all available tags will be included.
     """
+    from invenio.base.utils import try_to_eval
     from invenio.modules.jsonalchemy.parser import get_producer_rules
 
     if not fields:
@@ -54,13 +55,11 @@ def produce(self, fields=None):
                                     tmp_dict[key] = f[subfield]
                                 except:
                                     try:
-                                        tmp_dict[key] = self._try_to_eval(
-                                            subfield, value=f
+                                        tmp_dict[key] = try_to_eval(
+                                            subfield, value=f, self=self
                                         )
                                     except Exception as e:
-                                        self['__error_messages.cerror[n]'] = \
-                                            'Producer CError - Unable to ' \
-                                            'produce %s - %s' % (field, str(e))
+                                        self['__meta_metadata__']['__continuable_errors__'].append('Producer CError - Unable to produce %s - %s' % (field, str(e)))
                         if tmp_dict:
                             for k, v in tmp_dict.items():
                                 if isinstance(v, list):
@@ -71,6 +70,6 @@ def produce(self, fields=None):
                                 else:
                                     out[k] = v
         except KeyError:
-            self['__error_messages.cerror[n]'] = \
-                'Producer CError - No producer rule for field %s' % field
+            self['__meta_metadata__']['__continuable_errors__'].append(
+                'Producer CError - No producer rule for field %s' % field)
     return out
