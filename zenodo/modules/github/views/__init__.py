@@ -22,10 +22,10 @@
 
 from __future__ import absolute_import
 
-from .settings import blueprint as settings_bp
+from .badge import blueprint as badge_bp
 from .github import blueprint as github_bp
 
 blueprints = [
-    settings_bp,
+    badge_bp,
     github_bp,
 ]

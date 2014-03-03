@@ -38,9 +38,10 @@ point specified in the setup.py::
     },
 """
 
+from __future__ import unicode_literals
+
 import os
 import sys
-from invenio.base.config import EXTENSIONS
 
 # Define identity function for string extraction
 _ = lambda x: x
@@ -70,7 +71,6 @@ PACKAGES = [
     'invenio.modules.documents',
     'invenio.modules.editor',
     'invenio.modules.encoder',
-    'invenio.modules.export',
     'invenio.modules.exporter',
     'invenio.modules.formatter',
     'invenio.modules.groups',
@@ -81,15 +81,13 @@ PACKAGES = [
     'invenio.modules.matcher',
     'invenio.modules.merger',
     'invenio.modules.messages',
-    'invenio.modules.oai_harvest',
     'invenio.modules.oaiharvester',
     'invenio.modules.oairepository',
     'invenio.modules.oauth2server',
+    'invenio.modules.oauthclient',
     'invenio.modules.pidstore',
     'invenio.modules.previewer',
-    'invenio.modules.previews',
     'invenio.modules.ranker',
-    'invenio.modules.record_editor',
     'invenio.modules.records',
     'invenio.modules.redirector',
     'invenio.modules.refextract',
@@ -109,15 +107,28 @@ PACKAGES = [
     'invenio.modules.workflows',
 ]
 
-EXTENSIONS = [
-    'zenodo.ext.oauth',
-] + EXTENSIONS
-
 PACKAGES_EXCLUDE = []
 
 
-ZENODO_GITHUB_CLIENT_ID = "changeme"
-ZENODO_GITHUB_CLIENT_SECRET = "changeme"
+OAUTH_REMOTE_APPS = dict(
+    github=dict(
+        authorized_handler="zenodo.modules.github.views.handlers:authorized",
+        params=dict(
+            request_token_params={'scope': 'user:email,admin:repo_hook'},
+            base_url='https://api.github.com/',
+            request_token_url=None,
+            access_token_url="https://github.com/login/oauth/access_token",
+            authorize_url="https://github.com/login/oauth/authorize",
+            app_key="OAUTH_GITHUB",
+        )
+    ),
+)
+
+OAUTH_GITHUB = dict(
+    consumer_key="changeme",
+    consumer_secret="changeme",
+)
+
 
 DEPOSIT_TYPES = [
     "zenodo.modules.deposit.workflows.upload:upload",

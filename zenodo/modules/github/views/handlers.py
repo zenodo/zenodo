@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,12 +20,34 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+from __future__ import absolute_import
 
-qrcode==2.4.2
-Pillow==1.7.8
-git+https://github.com/lepture/flask-oauthlib.git#egg=Flask-OAuthlib
-requests==1.2.3
-altmetric
-beautifulsoup4
-humanize==0.5
-github3.py==0.8.2
+
+from flask import url_for, redirect, current_app, abort
+from flask.ext.login import current_user
+from invenio.modules.oauthclient.handlers import oauth2_token_setter
+
+from ..utils import init_account
+
+
+def authorized(resp, remote):
+    """
+    Authorized callback handler for GitHub
+    """
+    # User must be authenticated
+    if not current_user.is_authenticated():
+        return current_app.login_manager.unauthorized()
+
+    if resp is None:
+        # User rejected authorization request
+        return redirect(url_for('github.rejected'))
+
+    # Store or update acquired access token
+    token = oauth2_token_setter(remote, resp)
+    if token is None:
+        abort(500)
+
+    if not token.remote_account.extra_data:
+        init_account(token)
+
+    return redirect(url_for('zenodo_github.index'))

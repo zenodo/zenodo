@@ -20,7 +20,27 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-ZENODO_API_KEY = ""
-GITHUB_WEBHOOK_ID = "github"
-ZENODO_GITHUB_CLIENT_ID = "changeme"
-ZENODO_GITHUB_CLIENT_SECRET = "changeme"
+GITHUB_WEBHOOK_RECEIVER_ID = "github"
+"""
+Local name of webhook receiver.
+"""
+
+GITHUB_BASE_URL = "https://api.github.com"
+"""
+Base URL of the GitHub API
+"""
+
+GITHUB_SHARED_SECRET = "CHANGEME"
+"""
+Shared secret between you and GitHub. Used to make GitHub sign webhook requests
+with HMAC.
+
+See http://developer.github.com/v3/repos/hooks/#example
+"""
+
+GITHUB_INSECURE_SSL = False
+"""
+Determines if the GitHub webhook request will check the SSL certificate. Never
+set to True in a production environment, but can be useful for development and
+integration servers.
+"""

@@ -42,11 +42,10 @@ from flask.ext.login import login_required
 from invenio.base.i18n import _
 from invenio.ext.sqlalchemy import db
 
-from zenodo.ext.oauth import oauth
-from ..models import OAuthTokens
+from invenio.modules.oauthclient.client import oauth
+from invenio.modules.oauthclient.models import RemoteToken as OAuthTokens
 
 
-remote = oauth.remote_apps['github']
 blueprint = Blueprint(
     'zenodo_github_badge',
     __name__,
@@ -55,23 +54,25 @@ blueprint = Blueprint(
     template_folder="../templates",
 )
 
+
 @blueprint.route("/<string:user_id>/<path:repository>", methods=["GET"])
 def index(user_id, repository):
+    remote = oauth.remote_apps['github']
     user = OAuthTokens.query \
         .filter_by(
             user_id=user_id,
             client_id=remote.consumer_key
         ).first()
-    
+
     if repository not in user.extra_data["repos"]:
         return json.dumps({})
-    
+
     if "doi" not in user.extra_data["repos"][repository]:
         return json.dumps({})
-    
+
     doi = user.extra_data["repos"][repository]["doi"]
     doi_encoded = urllib.quote(doi, '')
-    
+
     badge_path = os.path.join(
         blueprint.static_folder, "badges", "%s.png" % doi_encoded
     )
@@ -79,7 +80,7 @@ def index(user_id, repository):
         resp = make_response(open(badge_path, 'r').read())
         resp.content_type = "image/png"
         return resp
-    
+
     font = ImageFont.truetype(
         os.path.join(blueprint.static_folder, "badges", "Trebuchet MS.ttf"),
         11
@@ -88,21 +89,21 @@ def index(user_id, repository):
     arr = np.asarray(
         Image.open(badge_template)
     )
-    
+
     # Get left vertical strip for the DOI label
     label_strip = arr[:, 2]
     value_strip = arr[:, 3]
-    
+
     # Splice into array
     label_width = 28
     value_width = 6 + font.getsize(doi)[0]
-    
+
     # TODO: Use numpy repeat
     for i in xrange(label_width):
         arr = np.insert(arr, 3, label_strip, 1)
     for i in xrange(value_width):
         arr = np.insert(arr, label_width + 4, value_strip, 1)
-    
+
     im = Image.fromarray(arr)
     draw = ImageDraw.Draw(im)
     draw.text(
@@ -118,7 +119,7 @@ def index(user_id, repository):
         font=font
     )
     im.save(badge_path)
-    
+
     resp = make_response(open(badge_path, 'r').read())
     resp.content_type = "image/png"
     return resp
