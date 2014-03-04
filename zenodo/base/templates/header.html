@@ -1,3 +1,77 @@
+{%- if current_user.is_guest %}
+<div class="modal fade" id="sign-in-modal" tabindex="-1" role="dialog" aria-labelledby="sign-in-label" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header" align="center" style="background-color: #eeeeee;">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="modal-title" id="sign-in-label">Sign In</h3>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">{% set next = request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL %}
+          <br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next)}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> Sign in with GitHub</a>
+          </div>
+        </div>
+      </div>
+      <div class="modal-body" align="center">
+          <h3>&mdash; OR &mdash;</h3>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-8 col-md-offset-2">
+            <form class="form-signin" action="{{url_for('webaccount.login')}}" method="POST">
+            <input id="referer" name="referer" type="hidden" value="{{url_for('accounts_settings.profile')}}">
+            <input id="login_method" name="login_method" type="hidden" value="Local">
+            <div class="form-group">
+              <input class="form-control" id="nickname" name="nickname" placeholder="Username or email" type="text" value="">
+            </div>
+            <div class="form-group">
+              <input class="form-control" id="password" name="password" placeholder="Password" type="password" value="">
+
+              <label class="checkbox">
+                <input class="checkbox" id="remember" name="remember" type="checkbox" value="y"> Remember Me
+              </label>
+              <button class="btn btn-info btn-lg btn-block" id="submit" name="submit" type="submit"><i class="fa fa-sign-in"></i> Sign in</button>
+            </form>
+            <p class="text-center"><br><small>
+              <a href="{{ url_for('webaccount.lost') }}">
+                {{ _('Lost your password?') }}
+              </a>
+            </small></p>
+          </div>
+        </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="sign-up-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h3 class="modal-title" id="sign-in-label">Sign In</h3>
+      </div>
+      <div class="modal-body">
+        <p>One fine body&hellip;</p>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endif -%}
+<!-- <form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('youraccount.login') }}" method="POST" class="form-inline" role="form">
+              {%- if form and form.referer %}
+              {{ form.referer }}
+              {%- else %}
+              <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}">
+              {%- endif %}
+              <input id="remember" name="remember" type="hidden" value="n">
+              <div class="form-group"><input name="nickname" type="text" class="form-control input-sm hidden-sm hidden-xs" placeholder="{{ _(" email") }}"></div>
+              <div class="form-group"><input name="password" type="password" class="form-control input-sm hidden-sm hidden-xs" placeholder="{{ _(" password") }}"></div>
+              <div class="form-group"><button name="submit" type="submit" class="btn btn-default"><i class="fa fa-sign-in"></i> {{ _("Sign in") }}</button></div>
+              </form>-->
+
   <header class="gradient">
     <div class="container headerbg">
       <div class="container">
@@ -23,17 +97,9 @@
           {%- endif %}
           {%- endfor %}
           <li class="pull-right">
-            <form action="{{config.CFG_SITE_SECURE_URL}}{{ url_for('youraccount.login') }}" method="POST" class="form-inline" role="form">
             {%- if current_user.is_guest %}
-              {%- if form and form.referer %}
-              {{ form.referer }}
-              {%- else %}
-              <input id="referer" name="referer" type="hidden" value="{{ request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL }}">
-              {%- endif %}
-              <input id="remember" name="remember" type="hidden" value="n">
-              <div class="form-group"><input name="nickname" type="text" class="form-control input-sm hidden-sm hidden-xs" placeholder="{{ _(" email") }}"></div>
-              <div class="form-group"><input name="password" type="password" class="form-control input-sm hidden-sm hidden-xs" placeholder="{{ _(" password") }}"></div>
-              <div class="form-group"><button name="submit" type="submit" class="btn btn-default"><i class="fa fa-sign-in"></i> {{ _("Sign in") }}</button></div>
+              <button class="btn btn-default" data-toggle="modal" data-target="#sign-in-modal"><i class="fa fa-sign-in"></i> Sign In</button>
+              <button class="btn btn-warning" onclick="window.location='{{config.CFG_SITE_URL}}{{url_for('webaccount.register')}}'"><i class="fa fa-edit"></i> Sign Up</button>
             {%- else %}
               <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="fa fa-user"></i> {{ current_user.email }} <span class="caret"></span>&nbsp;</button>
               <ul class="dropdown-menu">
@@ -46,7 +112,6 @@
                 </a></li>
               </ul>
             {%- endif %}
-             </form>
           </li>
         </ul>
       </div>

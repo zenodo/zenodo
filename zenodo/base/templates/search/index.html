@@ -110,7 +110,6 @@
       {{ portalbox_sidebar(portalboxes.rt, class="well") }}
       {%- if not collection.name.startswith("user-") and not collection.name.startswith("provisional-") %}
       <div class="well">
-        <a href="{{url_for('youraccount.register')}}" class="btn btn-warning btn-lg signup pull-right">Sign Up</a>
         <h4>New to {{config.CFG_SITE_NAME}}?</h4>
         {% include "zenodo/benefits.html" %}
       </div>
