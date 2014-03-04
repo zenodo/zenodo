@@ -297,4 +297,4 @@ def privacy_policy():
                order=3)
 @register_breadcrumb(blueprint, 'breadcrumbs.support', _("Support/Feedback"))
 def support():
-    return render_template('zenodo/support.html')
+    return render_template('zenodo/contact.html')
