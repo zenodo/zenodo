@@ -182,6 +182,10 @@ def relation_title(relation):
         return 'References'
     elif relation == 'isReferencedBy':
         return 'Referenced by'
+    elif relation == 'isNewVersionOf':
+        return 'Previous versions'
+    elif relation == 'isPreviousVersionOf':
+        return 'New versions'
     return relation
 
 

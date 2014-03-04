@@ -1693,7 +1693,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><p>Persistent identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs. Each array element is an object with the attributes:</p>
     <ul>
       <li><code>identifier</code>: The persistent identifier</li>
-      <li><code>relation</code>: Relationship. Controlled vocabulary (<code>isCitedBy</code>, <code>cites</code>, <code>isSupplementTo</code>, <code>isSupplementedBy</code>).</li>
+      <li><code>relation</code>: Relationship. Controlled vocabulary (<code>isCitedBy</code>, <code>cites</code>, <code>isSupplementTo</code>, <code>isSupplementedBy</code>, <code>isNewVersionOf</code>, <code>isPreviousVersionOf</code>).</li>
     </ul>
     <p>Example:</p>
     <pre>[
