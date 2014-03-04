@@ -25,9 +25,11 @@
 
 import re
 from urllib import quote
+import six
 from cgi import escape
 from flask import current_app
 from invenio.base.i18n import gettext_set_language
+
 
 def format_element(bfo, limit, separator=' ; ',
            extension='[...]',
@@ -54,7 +56,10 @@ def format_element(bfo, limit, separator=' ; ',
     @param relator_code_pattern: a regular expression to filter authors based on subfield $4 (relator code)
     """
     _ = gettext_set_language(bfo.lang)    # load the right message language
+
     CFG_SITE_URL = current_app.config['CFG_SITE_URL']
+    if isinstance(CFG_SITE_URL, six.text_type):
+        CFG_SITE_URL = CFG_SITE_URL.encode('utf8')
 
     authors = []
     authors_1 = bfo.fields('100__')
