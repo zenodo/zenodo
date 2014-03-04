@@ -110,21 +110,26 @@ PACKAGES = [
 PACKAGES_EXCLUDE = []
 
 
-OAUTH_REMOTE_APPS = dict(
+OAUTHCLIENT_REMOTE_APPS = dict(
     github=dict(
+        title='GitHub',
+        description='Software collaboration platform, with one-click software '
+                    'preservation in Zenodo.',
+        icon='fa fa-github',
         authorized_handler="zenodo.modules.github.views.handlers:authorized",
+        disconnect_handler="zenodo.modules.github.views.handlers:disconnect",
         params=dict(
             request_token_params={'scope': 'user:email,admin:repo_hook'},
             base_url='https://api.github.com/',
             request_token_url=None,
             access_token_url="https://github.com/login/oauth/access_token",
             authorize_url="https://github.com/login/oauth/authorize",
-            app_key="OAUTH_GITHUB",
+            app_key="GITHUB_APP_CREDENTIALS",
         )
     ),
 )
 
-OAUTH_GITHUB = dict(
+GITHUB_APP_CREDENTIALS = dict(
     consumer_key="changeme",
     consumer_secret="changeme",
 )

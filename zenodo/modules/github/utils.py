@@ -283,6 +283,23 @@ def is_valid_token(remote, access_token):
     return r.status_code == 200
 
 
+def revoke_token(remote, access_token):
+    """
+    Revokes an access token
+    """
+    r = requests.delete(
+        "%(base)s/applications/%(client_id)s/tokens/%(access_token)s" % {
+            "client_id": remote.consumer_key,
+            "access_token": access_token,
+            "base": cfg['GITHUB_BASE_URL']
+        },
+        auth=(remote.consumer_key, remote.consumer_secret)
+    )
+
+    return r.status_code == 200
+
+
+
 def is_valid_sender(extra_data, sender_login):
     return sender_login == extra_data['login']
 

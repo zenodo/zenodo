@@ -30,11 +30,13 @@ from __future__ import absolute_import
 
 from celery.utils.log import get_task_logger
 import requests
+import six
 
 from invenio.celery import celery
 from invenio.ext.sqlalchemy import db
 from invenio.modules.webhooks.models import Event
 from invenio.modules.oauth2server.models import Token as ProviderToken
+from invenio.modules.oauthclient.client import oauth
 #from invenio.ext.email import send_email
 #from invenio.config import CFG_SITE_ADMIN_EMAIL
 #from invenio.ext.template import render_template_to_string
@@ -44,10 +46,32 @@ from invenio.modules.oauth2server.models import Token as ProviderToken
 from .helpers import get_account, get_api
 from .upload import upload
 from .utils import submitted_deposition, get_zenodo_json, is_valid_sender, \
-    get_contributors
+    get_contributors, init_api, revoke_token, remove_hook
 
 
 logger = get_task_logger(__name__)
+
+
+@celery.task(ignore_result=True)
+def disconnect_github(remote_app, access_token, extra_data):
+    """
+    Uninstall webhooks
+    """
+    # Note at this point the remote account and all associated data have
+    # already been deleted. The celery task is passed the access_token and
+    # extra_data to make some last cleanup and afterwards delete itself
+    # remotely.
+    remote = oauth.remote_apps[remote_app]
+
+    try:
+        gh = init_api(access_token)
+
+        # Remove all installed hooks.
+        for full_name, repo in six.iteritems(extra_data["repos"]):
+            if repo.get('hook', None):
+                remove_hook(gh, extra_data, full_name)
+    finally:
+        revoke_token(remote, access_token)
 
 
 @celery.task(ignore_result=True)

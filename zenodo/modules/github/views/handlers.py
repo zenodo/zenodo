@@ -23,11 +23,14 @@
 from __future__ import absolute_import
 
 
-from flask import url_for, redirect, current_app, abort
+from flask import url_for, redirect, current_app, abort, request, flash
 from flask.ext.login import current_user
 from invenio.modules.oauthclient.handlers import oauth2_token_setter
+from invenio.modules.oauthclient.models import RemoteToken
+from invenio.modules.oauthclient.utils import oauth_authenticate
 
-from ..utils import init_account
+from ..utils import init_account, init_api
+from ..tasks import disconnect_github
 
 
 def authorized(resp, remote):
@@ -36,7 +39,20 @@ def authorized(resp, remote):
     """
     # User must be authenticated
     if not current_user.is_authenticated():
-        return current_app.login_manager.unauthorized()
+        if resp is None:
+            # User rejected authorization request
+            return current_app.login_manager.unauthorized()
+
+        # Get users email address
+        gh = init_api(resp['access_token'])
+        ghuser = gh.user()
+
+        authenticated = oauth_authenticate(
+            remote.consumer_key, ghuser.email,
+            require_existing_link=False, auto_register=True
+        )
+        if not authenticated:
+            return current_app.login_manager.unauthorized()
 
     if resp is None:
         # User rejected authorization request
@@ -50,4 +66,26 @@ def authorized(resp, remote):
     if not token.remote_account.extra_data:
         init_account(token)
 
-    return redirect(url_for('zenodo_github.index'))
+    if request.args.get('next', None):
+        return redirect(request.args.get('next'))
+    else:
+        return redirect(url_for('zenodo_github.index'))
+
+
+def disconnect(remote):
+    """
+    Authorized callback handler for GitHub
+    """
+    # User must be authenticated
+    if not current_user.is_authenticated():
+        return current_app.login_manager.unauthorized()
+
+    token = RemoteToken.get(current_user.get_id(), remote.consumer_key)
+
+    if token:
+        disconnect_github.delay(
+            remote.name, token.access_token, token.remote_account.extra_data
+        )
+        token.remote_account.delete()
+
+    return redirect(url_for('oauthclient_settings.index'))
