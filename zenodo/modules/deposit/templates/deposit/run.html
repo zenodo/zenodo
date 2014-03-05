@@ -128,15 +128,15 @@ var date_options = {
     keyboardNavigation: true
 };
 
-function webdeposit_init_submit_zenodo(url, selector, form_selector, dialog) {
+function init_submit_zenodo(url, selector, form_selector, dialog) {
     $(selector).click(function(e){
         e.preventDefault();
         $("#submitModal").modal('hide');
-        webdeposit_submit(url, form_selector, dialog);
+        DEPOSIT_FORM.submit(url, form_selector, dialog);
     });
 }
 
 var complete_url = '{{ url_for(".save", deposition_type=deposition_type, uuid=uuid, draft_id=draft.id, submit='1') }}';
-webdeposit_init_submit_zenodo(complete_url, '.form-submit-zenodo', '#submitForm', '#form-submit-dialog');
+init_submit_zenodo(complete_url, '.form-submit-zenodo', '#submitForm', '#form-submit-dialog');
 </script>
 {%- endblock form_script_options %}

@@ -649,7 +649,8 @@ class ZenodoForm(WebDepositForm):
         fields.FormField(
             CreatorForm,
             widget=ExtendedListWidget(
-                item_widget=ListItemWidget(with_label=False),
+                item_widget=ItemWidget(),
+                html_tag='div'
             ),
         ),
         label='Supervisors',
@@ -863,4 +864,4 @@ class ZenodoEditForm(ZenodoForm, EditFormMixin):
     plupload_file = None
 
     _title = _('Edit upload')
-    template = "webdeposit_edit.html"
+    template = "deposit/edit.html"

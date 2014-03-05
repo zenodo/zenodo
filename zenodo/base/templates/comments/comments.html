@@ -24,26 +24,26 @@
 
 {% if not current_user.is_guest %}
 {%- if record.user_comment_subscritions|length -%}
-    <a class="btn btn-default pull-right" rel="tooltip" title="{{ _('Unsubscribe from this discussion. You will not receive any new comments by email.') }}" href="{{ url_for('webcomment.unsubscribe', recid=recid) }}"><i class="icon-trash"></i> {{ _('Unsubscribe') }}</a>
+    <a class="btn btn-default pull-right" rel="tooltip" title="{{ _('Unsubscribe from this discussion. You will not receive any new comments by email.') }}" href="{{ url_for('comments.unsubscribe', recid=recid) }}"><i class="fa fa-trash-o"></i> {{ _('Unsubscribe') }}</a>
 {%- else -%}
-   <a class="btn  btn-default pull-right" rel="tooltip" title="{{ _('Subscribe to this discussion. You will then receive all new comments by email.') }}" href="{{ url_for('webcomment.subscribe', recid=recid) }}"><i class="icon-envelope"></i> {{ _('Subscribe') }}</a>
+   <a class="btn  btn-default pull-right" rel="tooltip" title="{{ _('Subscribe to this discussion. You will then receive all new comments by email.') }}" href="{{ url_for('comments.subscribe', recid=recid) }}"><i class="fa fa-envelope"></i> {{ _('Subscribe') }}</a>
 {%- endif -%}
-<a class="btn btn-default pull-right" data-toggle="modal" style="margin-right:5px;" href="{{ url_for('webcomment.add_comment', recid=recid) }}"><i class="icon-pencil"></i> {{ _('Write comment') }}</a> {% endif %}
+<a class="btn btn-default pull-right" data-toggle="modal" style="margin-right:5px;" href="{{ url_for('comments.add_comment', recid=recid) }}"><i class="fa fa-pencil"></i> {{ _('Write comment') }}</a> {% endif %}
 
   {%- if not comments -%}
   <p><em>{{ _('There are no comments. Be the first to comment.') }}</em></p>
   {% if current_user.is_guest %}<p><small class="text-muted">You must be signed in to comment.</small></p>{% endif %}
   {%- else -%}
   <div style="clear:both;"></div>
-  <ul class="comments unstyled">
+  <ul class="comments list-unstyled">
   {%- for c in comments recursive -%}
   <li name="{{ c.id }}">
     <a class="collapse-comment pull-left{{ ' collapsed' if c.is_collapsed(current_user.get_id()) }}"
        style="margin-right: 5px;"
        data-toggle="collapse"
        data-target="#collapse-{{ c.id }}"
-       href="{{ url_for('webcomment.toggle', recid=recid, id=c.id) }}">
-      <i class="icon-chevron-down"></i>
+       href="{{ url_for('comments.toggle', recid=recid, id=c.id) }}">
+      <i class="fa fa-chevron-down"></i>
     </a>
     <h5>
     {{ c.title }}
@@ -60,7 +60,7 @@
     </small>
     </h5>
     <div id="collapse-{{ c.id }}"
-         data-action="{{ url_for('webcomment.toggle', recid=recid, id=c.id) }}"
+         data-action="{{ url_for('comments.toggle', recid=recid, id=c.id) }}"
          class="collapse{{ ' in' if not c.is_collapsed(current_user.get_id()) }}">
     <blockquote>
       <p style="font-size:90%;">
@@ -78,27 +78,14 @@
         {%- else -%}
           {{ _('Guest') }}
         {%- endif -%} &nbsp;
-        - <i class="icon-time"></i> {{ c.date_creation }}
-        - <i class="icon-pencil"></i>
-        <a data-toggle="modal" href="{{ url_for('webcomment.add_comment', recid=recid, in_reply=c.id) }}">
+        - <i class="fa fa-clock-o"></i> {{ c.date_creation }}
+        - <i class="fa fa-pencil"></i>
+        <a data-toggle="modal" href="{{ url_for('comments.add_comment', recid=recid, in_reply=c.id) }}">
           {{ _('reply') }}
         </a>
-        - <i class="icon-question-sign"></i> {{ _('Was it helpful?') }}
-         <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=1,
-            referer=request.url
-          ) }}">
-          <i class="icon-thumbs-up"></i>
-          {{ _('yes') }}
-          </a> /
-          <a href="{{ url_for('webcomment.vote', recid=recid, id=c.id, value=-1,
-            referer=request.url
-          ) }}">
-          <i class="icon-thumbs-down"></i>
-          {{ _('no') }}
-          </a>
         -
-          <a href="{{ url_for('webcomment.report', recid=recid, id=c.id) }}">
-            <i class="icon-exclamation-sign"></i>
+          <a href="{{ url_for('comments.report', recid=recid, id=c.id) }}">
+            <i class="fa fa-exclamation-circle"></i>
             {{ _('report abuse') }}
           </a>
       </small>

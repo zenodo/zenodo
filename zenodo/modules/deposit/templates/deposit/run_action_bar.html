@@ -3,8 +3,8 @@
     <span class="pull-right">
         <span class="loader hide"><img src="{{ url_for('static', filename='img/loading.gif' ) }}" /></span>
         <small><span class="status-indicator text-muted"></span></small>&nbsp;
-        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" ><i class="fa fa-file-o"></i> Save</button>
-        <button data-target="#submitModal" data-toggle="modal" role="button" data-toggle="tooltip" title="{{_('Press "Submit" to finalize and make your upload public.')}}" class="btn btn-primary"><i class="fa fa-check fa-inverse"></i> Submit ...</button>
+        <button class="btn btn-default form-save" data-toggle="tooltip" title="{{_('Press "Save" to save your upload for editing later, as many times you like.')}}" type="button"><i class="fa fa-file-o"></i> Save</button>
+        <button data-target="#submitModal" data-toggle="modal" role="button" data-toggle="tooltip" title='{{_('Press "Submit" to finalize and make your upload public.')}}' type="button" class="btn btn-primary"><i class="fa fa-check fa-inverse"></i> Submit ...</button>
     </span>
     <span class="clearfix"></span>
 </div>

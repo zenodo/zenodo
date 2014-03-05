@@ -16,10 +16,10 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "webdeposit_run.html" %}
+{% extends "deposit/run.html" %}
 
 {% macro edit_action_bar(margin="") -%}
-    {% include "webdeposit_edit_action_bar.html" %}
+    {% include "deposit/edit_action_bar.html" %}
 {%- endmacro %}
 
 {% block form_header scoped %}{{ edit_action_bar() }}{% endblock form_header%}

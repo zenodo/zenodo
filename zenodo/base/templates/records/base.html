@@ -98,18 +98,19 @@
     </div>
   </div>
   <div class="col-sm-4 col-md-4">
-    {%- set adminarea = format_record(recid, of='HDACT', ln=g.ln)|safe -%}
-    {# {%- set curatearea = format_record(recid, of='HDCUR', ln=g.ln)|safe -%} #}
+    {#- set adminarea = format_record(recid, of='HDACT', ln=g.ln)|safe -#}
+    {%- set adminarea = "" -%}
+    {%- set curatearea = format_record(recid, of='HDCUR', ln=g.ln)|safe -%}
     {%- if adminarea.strip() -%}
     <div class="well" style="text-align: center;">
       {{ adminarea }}
     </div>
     {%- endif -%}
-    {# {%- if curatearea.strip() -%}
+    {%- if curatearea.strip() -%}
     <div class="well">
       {{ curatearea }}
     </div>
-    {%- endif -%}#}
+    {%- endif -%}
     {{ format_record(recid, of='HDINFO', ln=g.ln)|safe }}
 
     {%- if current_user.is_guest -%}

@@ -34,6 +34,19 @@
 <ul class="pager pull-right"><li><a class="text-success hide" data-hotkey-action="click" data-hotkey-value="g{{ i }}v" href="{{ url_for('record.metadata', recid=recID) }}">{{ _('View')}}</a></li></ul>
 {% endblock %}
 
+{% block search_form_text scoped %}
+<!-- Brand and toggle get grouped for better mobile display -->
+<div class="navbar-header">
+  <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
+    {%- set nbrecs = collection.nbrecs -%}
+    {%- if not collection.nbrecs -%}
+    {%- set nbrecs = 0 -%}
+    {%- endif -%}
+    {{ _("Search %(x_num)s records for", x_num=nbrecs) }}
+  </span>
+</div>
+{% endblock search_form_text %}
+
 {% block search_form_style %}{% endblock %}
 {% block search_form_dropdown_boxes %}{% endblock %}
 {% block search_form_settings %}{% endblock %}
