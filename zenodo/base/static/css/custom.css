@@ -115,6 +115,10 @@ body {
   margin-bottom: 10px;
 }
 
+.field-list-element .row {
+  margin-bottom: 5px;
+}
+
 .jumbotron {
   font-weight: 300;
 }
@@ -194,17 +198,17 @@ header .container .nav {
   margin-bottom: 0;
 }
 
-header .container .nav .dropdown-menu {
-  margin-top: 0;
+header .container .nav > li > .dropdown-menu {
+  margin-top: -2px;
 }
 
-header .container .nav .dropdown-toggle b {
+header .container .nav > li > a.dropdown-toggle b {
   color: white;
   border-top-color: #fff;
   border-bottom-color: #fff;
 }
 
-header .container .nav a, footer a {
+header .container .nav > li > a, footer a {
   color: #ffffff;
 }
 
@@ -217,12 +221,27 @@ footer a:hover {
   color: #bbbbbb;
 }
 
-header .container .nav a:hover {
+header .container .nav a:hover, header .container .nav a:focus {
   color: #000000;
 }
 
+header .container .nav a.dropdown-toggle:hover b,
+header .container .nav a.dropdown-toggle:focus b {
+  color: #000000;
+  border-top-color: #000;
+  border-bottom-color: #000;
+}
+
+
 header .container .nav .open a.dropdown-toggle {
-  color: #fff;
+  color: #000;
+}
+
+
+header .container .nav .open a.dropdown-toggle b {
+  color: #000;
+  border-top-color: #000;
+  border-bottom-color: #000;
 }
 
 header .container .nav .active a {
@@ -374,7 +393,7 @@ values copied from bootstrap ones for higher than xs size counterparts -> to be 
 }
 
 .navbar-collapse .navbar-nav.navbar-left:first-child {
-  margin-left: -15px;
+  /*margin-left: -15px;*/
 }
 
 .navbar-form {
@@ -619,7 +638,7 @@ h1, h2, h3 {
 }
 
 .websearch .col-md-4 {
-  padding-right: 0;
+  /*padding-right: 0;*/
 }
 
 .websearch .nav li {
@@ -651,6 +670,10 @@ h1, h2, h3 {
 
 .websearch .badge {
   font-size: 80%;
+}
+
+.collection.panel-group {
+  padding-left: 15px;
 }
 
 .collection ul.nav-list {

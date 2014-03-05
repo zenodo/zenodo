@@ -1,6 +1,6 @@
 {%- if current_user.is_guest %}
 <div class="modal fade" id="sign-in-modal" tabindex="-1" role="dialog" aria-labelledby="sign-in-label" aria-hidden="true">
-  <div class="modal-dialog modal-md">
+  <div class="modal-dialog modal-sm">
     <div class="modal-content">
       <div class="modal-header" align="center" style="background-color: #eeeeee;">
         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -8,7 +8,7 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-8 col-md-offset-2">{% set next = request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL %}
+          <div class="col-md-12">{% set next = request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL %}
           <br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next)}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> Sign in with GitHub</a>
           </div>
         </div>
@@ -18,7 +18,7 @@
       </div>
       <div class="modal-body">
         <div class="row">
-          <div class="col-md-8 col-md-offset-2">
+          <div class="col-md-12">
             <form class="form-signin" action="{{url_for('webaccount.login')}}" method="POST">
             <input id="referer" name="referer" type="hidden" value="{{url_for('accounts_settings.profile')}}">
             <input id="login_method" name="login_method" type="hidden" value="Local">
@@ -101,16 +101,23 @@
               <button class="btn btn-default" data-toggle="modal" data-target="#sign-in-modal"><i class="fa fa-sign-in"></i> Sign In</button>
               <button class="btn btn-warning" onclick="window.location='{{config.CFG_SITE_URL}}{{url_for('webaccount.register')}}'"><i class="fa fa-edit"></i> Sign Up</button>
             {%- else %}
-              <button class="btn dropdown-toggle btn-default" data-toggle="dropdown" href="{{ url_for('youraccount.display') }}"><i class="fa fa-user"></i> {{ current_user.email }} <span class="caret"></span>&nbsp;</button>
-              <ul class="dropdown-menu">
-                <li><a href="{{ url_for('accounts_settings.profile') }}">{{ _("Profile") }}</a></li>
-                <li><a href="{{ url_for('webdeposit.index')}}">{{ _("My uploads") }}</a></li>
-                <li><a href="{{ url_for('communities.index')}}">{{ _("My communities") }}</a></li>
-                <li class="divider"></li>
-                <li><a href="{{ url_for('youraccount.logout') }}">
-                  <i class="fa fa-sign-out"></i> {{ _("Sign out") }}
-                </a></li>
-              </ul>
+              <div class="btn-group">
+                <a class="btn btn-default" href="{{ url_for('accounts_settings.profile') }}"><i class="fa fa-user"></i> {{ current_user.email }}</a>
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown">
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                  {%- for item in current_menu.submenu('settings').children if item.visible %}
+                  <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+                  {%- endfor %}
+                  <li><a href="{{ url_for('webdeposit.index')}}"><i class="fa fa-upload fa-fw"></i> {{ _("My uploads") }}</a></li>
+                  <li><a href="{{ url_for('communities.index')}}"><i class="fa fa-group fa-fw"></i> {{ _("My communities") }}</a></li>
+                  <li class="divider"></li>
+                  <li><a href="{{ url_for('youraccount.logout') }}">
+                    <i class="fa fa-sign-out"></i> {{ _("Sign out") }}
+                  </a></li>
+                </ul>
+              </div>
             {%- endif %}
           </li>
         </ul>

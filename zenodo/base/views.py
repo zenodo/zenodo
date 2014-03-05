@@ -54,7 +54,7 @@ def register_menu_items():
     item.register('', '')
 
     item = current_menu.submenu('main.browse')
-    item.register('', _('Browse'), order=2)
+    item.register('', _('Browse'), order=3)
 
     item = current_menu.submenu('main.browse.datasets')
     item.register(
@@ -99,7 +99,28 @@ def register_menu_items():
     )
 
     item = current_menu.submenu('main.getstarted')
-    item.register('', _('Get started'), order=4)
+    item.register('', _('Get started'), order=5)
+
+    def menu_fixup():
+        # Change order
+        item = current_menu.submenu("main.communities")
+        item._order = 2
+
+        # Change order and text
+        item = current_menu.submenu("main.webdeposit")
+        item._text = "Upload"
+        item._order = 4
+
+        item = current_menu.submenu("breadcrumbs.webdeposit")
+        item._text = "Upload"
+
+        # Remove item
+        item = current_menu.submenu("main")
+        item._child_entries.pop('documentation', None)
+
+    # Append function to end of before first request functions, to ensure
+    # all menu items have been loaded.
+    current_app.before_first_request_funcs.append(menu_fixup)
 
 
 def add_bibdoc_files(sender, **kwargs):
