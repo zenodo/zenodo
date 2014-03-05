@@ -28,14 +28,14 @@ from invenio.modules.deposit.field_widgets import InlineListWidget,\
 __all__ = ['UploadTypeField']
 
 UPLOAD_TYPES = [
-    ('publication', 'Publication', [], 'file-alt'),
-    ('poster', 'Poster', [], 'columns'),
-    ('presentation', 'Presentation', [], 'group'),
-    ('dataset', 'Dataset', [], 'table'),
+    ('publication', 'Publication', [], 'fa fa-file-text-o fa-2x fa-fw'),
+    ('poster', 'Poster', [], 'fa fa-columns fa-2x fa-fw'),
+    ('presentation', 'Presentation', [], 'fa fa-group fa-2x fa-fw'),
+    ('dataset', 'Dataset', [], 'fa fa-table fa-2x fa-fw'),
     #('Software', []),
-    ('image', 'Image', [], 'bar-chart'),
-    ('video', 'Video/Audio', [], 'film'),
-    ('software', 'Software', [], 'cogs'),
+    ('image', 'Image', [], 'fa fa-bar-chart-o fa-2x fa-fw'),
+    ('video', 'Video/Audio', [], 'fa fa-film fa-2x fa-fw'),
+    ('software', 'Software', [], 'fa fa-cogs fa-2x fa-fw'),
 ]
 
 UPLOAD_TYPE_ICONS = dict([(t[0], t[3]) for t in UPLOAD_TYPES])
@@ -60,6 +60,9 @@ def set_license_processor(form, field, submit=False, fields=None):
         if field.data == "dataset":
             if not form.license.flags.touched:
                 form.license.data = 'cc-zero'
+        elif field.data == "software":
+            if not form.license.flags.touched:
+                form.license.data = 'mit-license'
         else:
             if not form.license.flags.touched:
                 form.license.data = 'cc-by'

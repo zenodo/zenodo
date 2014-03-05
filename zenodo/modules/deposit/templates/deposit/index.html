@@ -31,7 +31,7 @@
 <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-    webdeposit_init_plupload(
+    DEPOSIT_FORM.init_plupload(
         '{{config.CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
         '.pluploader',
         undefined,

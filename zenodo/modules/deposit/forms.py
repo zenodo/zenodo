@@ -37,7 +37,7 @@ from invenio.modules.knowledge.api import get_kb_mapping
 from invenio.modules.deposit.form import WebDepositForm
 from invenio.modules.deposit.field_widgets import date_widget, \
     plupload_widget, ButtonWidget, ExtendedListWidget, ListItemWidget, \
-    TagListWidget, TagInput, ItemWidget, CKEditorWidget
+    TagListWidget, TagInput, ItemWidget, CKEditorWidget, ColumnInput
 from invenio.modules.deposit.filter_utils import strip_string, sanitize_html
 from invenio.modules.deposit.validation_utils import doi_syntax_validator, \
     invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
@@ -173,7 +173,7 @@ class RelatedIdentifierForm(WebDepositForm):
     scheme = fields.TextField(
         label="",
         default='',
-        widget_classes='span1',
+        widget_classes='',
         widget=widgets.HiddenInput(),
     )
     identifier = fields.TextField(
@@ -187,7 +187,8 @@ class RelatedIdentifierForm(WebDepositForm):
             PidSchemeDetection(set_field='scheme'),
             PidNormalize(scheme_field='scheme'),
         ],
-        widget_classes='span3',
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-4"),
     )
     relation = fields.SelectField(
         label="",
@@ -200,7 +201,10 @@ class RelatedIdentifierForm(WebDepositForm):
             ('isPreviousVersionOf', 'is new version of this upload'),
         ],
         default='isSupplementTo',
-        widget_classes='span2',
+        widget_classes='form-control',
+        widget=ColumnInput(
+            class_="col-xs-6 col-pad-0", widget=widgets.Select()
+        ),
     )
 
     def validate_scheme(form, field):
@@ -220,11 +224,12 @@ class RelatedIdentifierForm(WebDepositForm):
 class CreatorForm(WebDepositForm):
     name = fields.TextField(
         placeholder="Family name, First name",
-        widget_classes='span3',
+        widget_classes='form-control',
         #autocomplete=map_result(
         #    dummy_autocomplete,
         #    authorform_mapper
         #),
+        widget=ColumnInput(class_="col-xs-6"),
         validators=[
             required_if(
                 'affiliation',
@@ -235,7 +240,8 @@ class CreatorForm(WebDepositForm):
     )
     affiliation = fields.TextField(
         placeholder="Affiliation",
-        widget_classes='span2',
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-4 col-pad-0"),
     )
 
 
@@ -253,7 +259,7 @@ class CommunityForm(WebDepositForm):
             communityform_mapper
         ),
         widget=TagInput(),
-        widget_classes='span5',
+        widget_classes='form-control',
     )
     provisional = fields.BooleanField(
         default=True,
@@ -282,7 +288,7 @@ class GrantForm(WebDepositForm):
             mapper=json_projects_kb_mapper
         ),
         widget=TagInput(),
-        widget_classes='span5',
+        widget_classes='form-control',
     )
 
 
@@ -386,7 +392,7 @@ class ZenodoForm(WebDepositForm):
         default=date.today(),
         validators=[validators.required()],
         widget=date_widget,
-        widget_classes='input-sm col-md-3',
+        widget_classes='input-sm',
     )
     title = fields.TitleField(
         validators=[validators.required()],
@@ -401,8 +407,8 @@ class ZenodoForm(WebDepositForm):
         fields.FormField(
             CreatorForm,
             widget=ExtendedListWidget(
-                item_widget=ListItemWidget(with_label=False),
-                class_='inline',
+                item_widget=ItemWidget(),
+                html_tag='div'
             ),
         ),
         label='Authors',
@@ -441,7 +447,8 @@ class ZenodoForm(WebDepositForm):
     )
     keywords = fields.DynamicFieldList(
         fields.TextField(
-            widget_classes="span5"
+            widget_classes='form-control',
+            widget=ColumnInput(class_="col-xs-10"),
         ),
         label='Keywords',
         add_label='Add another keyword',
@@ -518,6 +525,7 @@ class ZenodoForm(WebDepositForm):
         ),
         validators=[community_validator],
         widget=TagListWidget(template="{{title}}"),
+        widget_classes=' dynamic-field-list',
         icon='fa fa-group fa-fw',
         export_key='provisional_communities',
     )
@@ -537,6 +545,7 @@ class ZenodoForm(WebDepositForm):
             }
         ),
         widget=TagListWidget(template="{{acronym}} - {{title}} ({{id}})"),
+        widget_classes=' dynamic-field-list',
         icon='fa fa-money fa-fw',
         description="Optional. Note, a human %s curator will validate your"
                     " upload before reporting it to OpenAIRE, and you may "
@@ -553,10 +562,8 @@ class ZenodoForm(WebDepositForm):
             RelatedIdentifierForm,
             description="Optional. Format: e.g. 10.1234/foo.bar",
             widget=ExtendedListWidget(
-                item_widget=ListItemWidget(
-                    with_label=False,
-                ),
-                class_='inline',
+                item_widget=ItemWidget(),
+                html_tag='div'
             ),
         ),
         label="Related identifiers",
@@ -643,7 +650,6 @@ class ZenodoForm(WebDepositForm):
             CreatorForm,
             widget=ExtendedListWidget(
                 item_widget=ListItemWidget(with_label=False),
-                class_='inline',
             ),
         ),
         label='Supervisors',
