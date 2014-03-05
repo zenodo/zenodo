@@ -37,12 +37,8 @@
 {% block search_form_text scoped %}
 <!-- Brand and toggle get grouped for better mobile display -->
 <div class="navbar-header">
-  <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
-    {%- set nbrecs = collection.nbrecs -%}
-    {%- if not collection.nbrecs -%}
-    {%- set nbrecs = 0 -%}
-    {%- endif -%}
-    {{ _("Search %(x_num)s records for", x_num=nbrecs) }}
+  <span class="navbar-brand hidden-sm hidden-xs" id="search-label" style="width: 50px;">
+
   </span>
 </div>
 {% endblock search_form_text %}
