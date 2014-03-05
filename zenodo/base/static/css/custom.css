@@ -56,6 +56,9 @@ body {
     padding-top: 80px;
 }
 
+h4.repo {
+  color: #000;
+}
 
 .rmlink {
   color: #000;

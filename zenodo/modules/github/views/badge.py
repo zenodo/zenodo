@@ -28,23 +28,12 @@ Badge Blueprint
 from __future__ import absolute_import
 
 import os
-import json
 import urllib
 
-import numpy as np
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw
+from flask import Blueprint, make_response, abort
 
-from flask import Blueprint, render_template, make_response
-from flask.ext.login import login_required
-
-from invenio.base.i18n import _
-from invenio.ext.sqlalchemy import db
-
-from invenio.modules.oauthclient.client import oauth
-from invenio.modules.oauthclient.models import RemoteToken as OAuthTokens
-
+from ..helpers import get_account
+from ..badge import create_badge
 
 blueprint = Blueprint(
     'zenodo_github_badge',
@@ -55,70 +44,36 @@ blueprint = Blueprint(
 )
 
 
-@blueprint.route("/<string:user_id>/<path:repository>", methods=["GET"])
+@blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
 def index(user_id, repository):
-    remote = oauth.remote_apps['github']
-    user = OAuthTokens.query \
-        .filter_by(
-            user_id=user_id,
-            client_id=remote.consumer_key
-        ).first()
+    account = get_account(user_id=user_id)
 
-    if repository not in user.extra_data["repos"]:
-        return json.dumps({})
+    if repository not in account.extra_data["repos"]:
+        return abort(404)
 
-    if "doi" not in user.extra_data["repos"][repository]:
-        return json.dumps({})
+    # Get the latest deposition
+    dep = account.extra_data["repos"][repository]['depositions'][-1]
 
-    doi = user.extra_data["repos"][repository]["doi"]
+    # Extract DOI
+    if "doi" not in dep:
+        return abort(404)
+
+    doi = dep["doi"]
     doi_encoded = urllib.quote(doi, '')
 
+    # Check if badge already exists
     badge_path = os.path.join(
         blueprint.static_folder, "badges", "%s.png" % doi_encoded
     )
-    if os.path.isfile(badge_path):
-        resp = make_response(open(badge_path, 'r').read())
-        resp.content_type = "image/png"
-        return resp
-
-    font = ImageFont.truetype(
-        os.path.join(blueprint.static_folder, "badges", "Trebuchet MS.ttf"),
-        11
+    font_path = os.path.join(
+        blueprint.static_folder, "badges", "Trebuchet MS.ttf"
     )
-    badge_template = os.path.join(blueprint.static_folder, "badges", "template.png")
-    arr = np.asarray(
-        Image.open(badge_template)
+    template_path = os.path.join(
+        blueprint.static_folder, "badges", "template.png"
     )
 
-    # Get left vertical strip for the DOI label
-    label_strip = arr[:, 2]
-    value_strip = arr[:, 3]
-
-    # Splice into array
-    label_width = 28
-    value_width = 6 + font.getsize(doi)[0]
-
-    # TODO: Use numpy repeat
-    for i in xrange(label_width):
-        arr = np.insert(arr, 3, label_strip, 1)
-    for i in xrange(value_width):
-        arr = np.insert(arr, label_width + 4, value_strip, 1)
-
-    im = Image.fromarray(arr)
-    draw = ImageDraw.Draw(im)
-    draw.text(
-        (6, 4),
-        "DOI",
-        (255, 255, 255),
-        font=font
-    )
-    draw.text(
-        (label_width + 8, 4),
-        doi,
-        (255, 255, 255),
-        font=font
-    )
-    im.save(badge_path)
+    if not os.path.isfile(badge_path):
+        create_badge(doi, badge_path, font_path, template_path)
 
     resp = make_response(open(badge_path, 'r').read())
     resp.content_type = "image/png"

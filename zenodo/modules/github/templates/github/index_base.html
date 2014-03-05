@@ -143,52 +143,44 @@ $(document).ready(function() {
     <td>
 
       <div class="repo-container">
-        <h4 class="repo">{{repo}}
-          {% if description.doi %}
+      {% set latest_dep = description.depositions[-1] if description.depositions else '' %}
 
+      {% if latest_dep %}
+          {% set doi_url = "http://dx.doi.org/" + latest_dep.doi %}
+          {% set image_url = config.CFG_SITE_SECURE_URL + url_for('zenodo_github_badge.index', user_id=current_user.get_id(), repository=repo) %}
           <span class="get-badge" data-toggle="tooltip" data-placement="bottom" title="Get a DOI badge!">
-            <img data-toggle="modal" data-target="[data-modal='{{ repo | replace('/', '-') }}']" src="/badge/{{user_id}}/{{repo | replace('/', '%2F')}}" />
+            <img data-toggle="modal" data-target="[data-modal='{{ repo | replace('/', '-') }}']" src="{{image_url}}" />
           </span>
 
           <div class="modal fade badge-modal" data-modal='{{ repo | replace("/", "-") }}'>
             <div class="modal-dialog">
               <div class="modal-content">
                 <div class="modal-body">
-                  <h4>DOI Badges</h4>
+                  <h4>DOI Badge</h4>
 
                   <h4><small>Markdown</small><h4>
-                  <pre>[![DOI](http://zenodo.org/badge/{{user_id}}/{{repo | replace('/', '%2F') }})](http://dx.doi.org/{{description.doi}})</pre>
+                  <pre>[![DOI]({{image_url}})]({{doi_url}})</pre>
 
                   <h4><small>reStructedText</small><h4>
-                  <pre>.. image:: http://zenodo.org/badge/{{user_id}}/{{repo | replace('/', '%2F') }}   :target: http://dx.doi.org/{{description.doi}}</pre>
+                  <pre>.. image:: {{image_url}}   :target: {{doi_url}}</pre>
 
                   <h4><small>Image URL</small><h4>
-                  <pre>http://zenodo.org/badge/{{user_id}}/{{repo | replace('/', '%2F') }}</pre>
+                  <pre>{{image_url}}</pre>
 
                   <h4><small>HTML</small><h4>
-                  <pre>&lt;a href="http://dx.doi.org/{{description.doi}}"&gt;&lt;img src="http://zenodo.org/badge/{{user_id}}/{{repo | replace('/', '%2F') }}"&gt;&lt;a&gt;</pre>
-
+                  <pre>&lt;a href="{{doi_url}}"&gt;&lt;img src="{{image_url}}"&gt;&lt;a&gt;</pre>
                 </div>
-
               </div>
-
             </div>
 
           </div>
-          {% endif %}
-        </h4>
-        <small class="text-muted repo-description"> {{description.description}}</small>
-
-        {% if description.doi %}
-        <i class="fa fa-ellipsis-h text-muted" data-toggle="collapse" data-target=".{{ repo | replace('/', '-') }}"></i>
         {% endif %}
-      </div>
+        <h4 class="repo"><a href="https://github.com/{{repo}}">{{repo}}</a>{% if latest_dep and description.hook %} <i class="fa fa-check" style="color: #5cb85c;"></i>{% endif %}</h4>
 
-      {% if description.doi %}
-      <div class="repo-info collapse {{ repo | replace('/', '-') }}">
-      </div>
-      {% endif %}
-
+        <small class="text-muted repo-description"> {{description.description}}</small>
+        {% if latest_dep %}
+        <p><small class="text-muted">Latest release ({{latest_dep.github_ref}}): <i class="fa fa-eye"></i> <a href="{{doi_url}}" class="">{{config.CFG_SITE_NAME}}</a>, <i class="fa fa-github"></i> <a href="https://github.com/{{repo}}/tree/{{latest_dep.github_ref}}" class="">GitHub</a></small></p>
+        {% endif %}
       </div>
     </td>
     <td>
@@ -209,7 +201,6 @@ $(document).ready(function() {
         <input type="checkbox" {{ 'checked' if description.hook }} data-size="mini" data-animate="true" data-repo-name="{{repo}}">
         <i class="hook-status fa"></i>
         <br/>
-        <!-- <a target="_blank" href="https://github.com/{{repo}}/releases/new"><button type="button" class="btn btn-default btn-xs">New Release</button> -->
         <small class="text-muted doi-time"> {{description.modified|naturaltime if description.get('modified') else ''}}</small>
       </div>
     </td>

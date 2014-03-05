@@ -140,7 +140,7 @@ def extract_metadata(gh, payload, github_name):
         title=release['name'],
         description=gh.markdown(release['body']),
         access_right='open',
-        license='other-closed',
+        license='other-open',
         related_identifiers=[],
     )
 
