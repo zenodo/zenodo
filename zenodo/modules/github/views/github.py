@@ -133,7 +133,7 @@ def index():
 
         if last_sync < yesterday:
             token.remote_account.extra_data = sync(get_api(), extra_data)
-            token.remote_account.changed()
+            token.remote_account.extra_data.changed()
             db.session.commit()
 
         ctx.update({

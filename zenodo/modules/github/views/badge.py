@@ -30,7 +30,7 @@ from __future__ import absolute_import
 import os
 import urllib
 
-from flask import Blueprint, make_response, abort
+from flask import Blueprint, make_response, abort, current_app
 
 from ..helpers import get_account
 from ..badge import create_badge
@@ -63,7 +63,7 @@ def index(user_id, repository):
 
     # Check if badge already exists
     badge_path = os.path.join(
-        blueprint.static_folder, "badges", "%s.png" % doi_encoded
+        current_app.config['COLLECT_STATIC_ROOT'], "badges", "%s.png" % doi_encoded
     )
     font_path = os.path.join(
         blueprint.static_folder, "badges", "Trebuchet MS.ttf"
@@ -71,6 +71,9 @@ def index(user_id, repository):
     template_path = os.path.join(
         blueprint.static_folder, "badges", "template.png"
     )
+
+    if not os.path.exists(os.path.dirname(badge_path)):
+        os.makedirs(os.path.dirname(badge_path))
 
     if not os.path.isfile(badge_path):
         create_badge(doi, badge_path, font_path, template_path)

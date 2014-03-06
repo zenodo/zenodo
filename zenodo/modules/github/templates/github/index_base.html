@@ -111,7 +111,10 @@ $(document).ready(function() {
     id="github-view",
 )}}
 <div class="panel-body">
+<div class="pull-right" style="color: #f00; margin-right: 0; margin-top: 20px; transform:rotate(45deg); -ms-transform:rotate(45deg); -webkit-transform:rotate(45deg); font-family: 'Courier New', Courier, monospace;">Public Beta</div>
 <h1 align="center"><i class="fa fa-github"></i> Get started</h1>
+
+
 <div class="row">
     <div class="col-md-4">
     <h2><strong>1</strong> <small>Flip the switch</small></h2>
@@ -122,7 +125,7 @@ $(document).ready(function() {
     <div class="col-md-4">
     <h2><strong>2</strong> <small>Create a release</small></h2>
     <hr>
-    Go to GitHub and <a href="https://help.github.com/articles/creating-releases">create a release</a>. {{config.CFG_SITE_NAME}} will automatically download a .zip package of all new releases and register
+    Go to GitHub and <a href="https://help.github.com/articles/creating-releases">create a release</a>. {{config.CFG_SITE_NAME}} will automatically download a .zip-ball of all new releases and register
     a DOIs for them.
     </div>
     <div class="col-md-4">
@@ -134,6 +137,7 @@ $(document).ready(function() {
 </div>
 <p></p>
 <p class="text-muted text-center"><small>More question? Check out the <a href="{{url_for('zenodo_base.faq')}}">FAQ</a>.</small></p>
+<p class="text-muted text-left"><small><strong>Beta version</strong>: This is a public beta of GitHub integration in Zenodo. Over the coming weeks we will be adding some additional features. Be sure to let us know by tweeting us @zenodo_org if you have ideas for what we should improve.</small></p>
 </div>
 <table class="table table-striped">
   <tbody>
