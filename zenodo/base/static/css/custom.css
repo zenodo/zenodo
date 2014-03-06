@@ -935,3 +935,7 @@ div.repo-info {
 span.get-badge {
   cursor: pointer;
 }
+
+#search-box-main .navbar-form .form-control {
+  width: 100%;
+}

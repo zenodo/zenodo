@@ -74,8 +74,7 @@
         {%- if collection.name.startswith("user-") or collection.name.startswith("provisional-") -%}
             {%- set reclist = collection.reclist[-10:]|reverse -%}
         {%- else -%}
-            {# FIXME:- set reclist = collection.reclist|zenodo_curated(10, open_only=True) -#}
-            {%- set reclist = collection.reclist[-10:]|reverse -%}
+            {%- set reclist = collection.reclist|zenodo_curated(10, open_only=True) -%}
         {%- endif -%}
         {% for recid in reclist %}
           <div class="row">
@@ -109,6 +108,11 @@
   <div class="col-md-4">
       {{ portalbox_sidebar(portalboxes.rt, class="well") }}
       {%- if not collection.name.startswith("user-") and not collection.name.startswith("provisional-") %}
+      <div class="well">
+        <h4>GitHub integration</h4>
+        Want to preview the public beta of GitHub integration? Just <a href="#sign-in-modal" data-toggle="modal">Sign In</a> with your GitHub account and <a href="{{url_for('zenodo_github.index')}}">click here</a>.
+      </div>
+
       <div class="well">
         <h4>New to {{config.CFG_SITE_NAME}}?</h4>
         {% include "zenodo/benefits.html" %}

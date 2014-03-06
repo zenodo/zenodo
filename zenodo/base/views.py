@@ -177,10 +177,11 @@ def zenodo_curated(reclist, length=10, reverse=True, open_only=False):
     from invenio.legacy.search_engine import search_pattern_parenthesised
 
     if open_only:
-        p = "(980__a:curated OR 980__a:user-zenodo) " \
-            "AND (542__l:open OR 542__l:embargoed)"
+        p = "(collection:curated OR collection:user-zenodo) " \
+            "AND (access_rights:open OR access_rights:embargoed)"
     else:
-        p = "980__a:curated OR 980__a:user-zenodo"
+        p = "collection:curated OR collection:user-zenodo"
+
     reclist = (reclist & search_pattern_parenthesised(p=p))
     if reverse:
         reclist = reclist[-length:]
