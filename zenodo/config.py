@@ -42,6 +42,7 @@ from __future__ import unicode_literals
 
 import os
 import sys
+from datetime import timedelta
 
 # Define identity function for string extraction
 _ = lambda x: x
@@ -149,6 +150,13 @@ COMMUNITIES_PORTALBOXES = [
 COMMUNITIES_PORTALBOXES_PROVISIONAL = [
     'communities/portalbox_provisional.html',
 ]
+COMMUNITIES_DISPLAYED_PER_PAGE = 200
+COMMUNITIES_DEFAULT_SORTING_OPTION = 'title'
+COMMUNITIES_PERIODIC_TASKS = {
+    'ranking_deamon': {
+        'run_every': timedelta(minutes=60),
+    },
+}
 
 WEBHOOKS_DEBUG_RECEIVER_URLS = {
     'github': 'http://github.zenodo.ultrahook.com?access_token=%(token)s',
