@@ -27,6 +27,7 @@ from collections import OrderedDict
 
 from fabric.api import *
 from fabric.colors import cyan
+from fabric.contrib.console import confirm
 
 
 def common():
@@ -44,6 +45,7 @@ def common():
     ])
     env.PREFIX = "/opt/zenodo"
     env.OWNER = 'apache'
+    env.HAPROXY_BACKENDS = {}
 
 
 #
@@ -81,11 +83,12 @@ def upload_dist(path, name):
 
 
 @task
-def install_dist(path, with_postinstall=False):
+def install_dist(path, with_postinstall=False, with_deps=False):
     ctx = {}
     ctx.update(env)
     ctx.update(dict(
         path=path % env,
+        deps='--no-deps' if not with_deps else ''
     ))
 
     dist = local('cd %(path)s; python setup.py --fullname' % ctx,
@@ -96,7 +99,7 @@ def install_dist(path, with_postinstall=False):
     with cd("%(PREFIX)s/dist/" % ctx):
         sudo('%(PREFIX)s/bin/pip install %(dist)s.tar.gz'
              ' --process-dependency-links --allow-all-external '
-             '--upgrade --no-deps' % ctx,
+             '--upgrade %(deps)s' % ctx,
              user=env.OWNER)
 
     if with_postinstall:
@@ -125,10 +128,10 @@ def upload(name=None):
 
 @task
 @roles('web')
-def install(name=None):
+def install(name=None, with_deps=False):
     for key, conf in dists(name):
         print(cyan("Installing %s" % key))
-        install_dist(conf['path'])
+        install_dist(conf['path'], with_deps=with_deps)
 
 
 def dists(name):
@@ -148,13 +151,7 @@ def post_install():
         sudo("bin/inveniomanage collect" % env, user=env.OWNER)
         sudo("bin/inveniomanage apache create-config" % env, user=env.OWNER)
 
-    sudo("/etc/init.d/celeryd restart" % env)
-    sudo("/etc/init.d/httpd graceful")
-
-
-@task
-@roles('web')
-def apache_restart():
+    sudo("/etc/init.d/celeryd restart")
     sudo("/etc/init.d/httpd graceful")
 
 
@@ -168,9 +165,156 @@ def get_password():
 # All combined
 #
 @task
-def deploy(name=None):
+def deploy(name=None, with_deps=True):
     print(cyan(("Deploying %s" % name) if name else "Deploying all"))
-    execute(get_password)
     execute(pack, name=name)
+    execute(get_password)
     execute(upload, name=name)
-    execute(install, name=name)
+
+    for h in env.roledefs['web']:
+        if h == env.get('BIBSCHED_HOST', '') and \
+           confirm(cyan("Stop bibsched?")):
+            with settings(host_string=h):
+                sudo("%(PREFIX)s/bin/bibsched stop" % env,
+                     user=env.OWNER)
+        if confirm(cyan("Stop celery?")):
+            execute(celery_stop, hosts=[h], )
+
+        if h in env.get('HAPROXY_BACKENDS', {}):
+            if confirm(cyan("Set %s in maintenance mode?" % h)):
+                execute(haproxy_disable_server, h, hosts=env.roledefs['lb'],)
+
+        if confirm(cyan("Install?")):
+            execute(install, hosts=[h], name=name, with_deps=with_deps)
+
+        if h in env.get('HAPROXY_BACKENDS', {}):
+            if confirm(cyan("Restart Apache?")):
+                execute(apache_restart, hosts=[h], )
+            if confirm(cyan("Set %s in production mode?" % h)):
+                execute(haproxy_enable_server, h, hosts=env.roledefs['lb'],)
+
+        if h == env.get('BIBSCHED_HOST', '') and \
+           confirm(cyan("Run upgrader?")):
+            with settings(host_string=h):
+                sudo("%(PREFIX)s/bin/inveniomanage upgrader run" % env,
+                     user=env.OWNER)
+        if h == env.get('BIBSCHED_HOST', '') and \
+           confirm(cyan("Start bibsched?")):
+            with settings(host_string=h):
+                sudo("%(PREFIX)s/bin/bibsched start" % env,
+                     user=env.OWNER)
+        if confirm(cyan("Start celery?")):
+            execute(celery_start, hosts=[h])
+
+
+#
+# Boostrap
+#
+@task
+@roles('web')
+def bootstrap():
+    ctx = {}
+    ctx.update(env)
+    ctx.update(dict(
+        dirname=os.path.dirname(env.PREFIX),
+        basename=os.path.basename(env.PREFIX),
+    ))
+
+    with cd(ctx['dirname']):
+        sudo("mkdir %s" % ctx['basename'])
+        sudo("chown %(OWNER)s:%(OWNER)s %(basename)s" % ctx)
+        sudo("virtualenv %(basename)s" % ctx, user=env.OWNER)
+
+    with cd(ctx['PREFIX']):
+        sudo("mkdir dist", user=env.OWNER)
+        sudo("mkdir -p etc/certs", user=env.OWNER)
+        sudo("bin/pip install setuptools pip --upgrade", user=env.OWNER)
+        sudo("bin/pip install ipython ipdb importlib --upgrade",
+             user=env.OWNER)
+
+    with cd(os.path.join(ctx['PREFIX'], 'var')):
+        sudo("mkdir run", user=env.OWNER)
+        sudo("mkdir dbdump", user=env.OWNER)
+        sudo("mkdir cache", user=env.OWNER)
+        sudo("mkdir log", user=env.OWNER)
+        sudo("mkdir tmp-shared", user=env.OWNER)
+        sudo("mkdir tmp", user=env.OWNER)
+        sudo("mkdir -p data/deposit/storage", user=env.OWNER)
+        sudo("mkdir -p data/files", user=env.OWNER)
+        sudo("mkdir -p data/deposit", user=env.OWNER)
+        sudo("mkdir invenio.base-instance", user=env.OWNER)
+
+    with cd(os.path.join(ctx['PREFIX'], 'var/invenio.base-instance')):
+        sudo("mkdir run", user=env.OWNER)
+        sudo("mkdir docs", user=env.OWNER)
+        sudo("mkdir static", user=env.OWNER)
+        sudo("mkdir apache", user=env.OWNER)
+
+    deploy(with_deps=True)
+    post_install()
+
+
+#
+# HAProxy
+#
+@task
+@roles('lb')
+def haproxy_disable_server(servername):
+    haproxy_server_action(servername, action='disable')
+
+
+@task
+@roles('lb')
+def haproxy_enable_server(servername):
+    haproxy_server_action(servername, action='enable')
+
+
+def haproxy_server_action(servername, action='disable'):
+    servers = env.get('HAPROXY_BACKENDS', {}).get(servername, [])
+
+    if servers:
+        if action == 'disable':
+            puts(cyan(">>> Disabling %s ..." % ", ".join(servers)))
+        else:
+            puts(cyan(">>> Enabling %s ..." % ", ".join(servers)))
+    else:
+        puts(cyan(">>> No servers to %s..." % action))
+
+    cmd = ";".join([
+        """echo "%s server %s" | socat stdio /var/lib/haproxy/stats""" %
+        (action, x) for x in servers])
+
+    sudo(cmd)
+
+
+#
+# Apache
+#
+@task
+@roles('web')
+def apache_restart():
+    sudo("/etc/init.d/httpd graceful")
+
+
+@task
+@roles('web')
+def apache_start():
+    sudo("/etc/init.d/httpd start")
+
+
+@task
+@roles('web')
+def apache_stop():
+    sudo("/etc/init.d/httpd stop")
+
+
+@task
+@roles('web')
+def celery_start():
+    sudo("/etc/init.d/celeryd start")
+
+
+@task
+@roles('web')
+def celery_stop():
+    sudo("/etc/init.d/celeryd stop")
