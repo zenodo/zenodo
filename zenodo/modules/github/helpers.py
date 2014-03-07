@@ -57,10 +57,11 @@ def get_token(user_id=None):
     if user_id is None:
         session_token = token_getter(get_remote())
     if session_token:
-        return RemoteToken.get(
+        token = RemoteToken.get(
             current_user.get_id(), get_client_id(),
             access_token=session_token[0]
         )
+        return token
     return None
 
 
