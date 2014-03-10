@@ -60,7 +60,6 @@ def index_context_listener(sender, context=None):
                 }, ]
                 del draft_cache.data['c']
                 draft_cache.save()
-                current_app.logger.info(draft_cache.data)
                 context['community'] = c
             except Exception:
                 context['community'] = None
