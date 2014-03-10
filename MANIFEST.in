@@ -28,6 +28,7 @@ recursive-exclude docs/_build *
 recursive-include zenodo/base/static *
 recursive-include zenodo/base/templates *
 recursive-include zenodo/base/format_elements *
+recursive-include zenodo/base/format_templates *
 recursive-include zenodo/base/output_formats *
 recursive-include zenodo/base/recordext *
 

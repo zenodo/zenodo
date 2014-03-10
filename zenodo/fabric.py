@@ -93,14 +93,21 @@ def install_dist(path, with_postinstall=False, with_deps=False):
 
     dist = local('cd %(path)s; python setup.py --fullname' % ctx,
                  capture=True)
+    name = local('cd %(path)s; python setup.py --name' % ctx,
+                 capture=True)
 
     ctx['dist'] = dist
+    ctx['name'] = name
 
-    with cd("%(PREFIX)s/dist/" % ctx):
-        sudo('%(PREFIX)s/bin/pip install %(dist)s.tar.gz'
-             ' --process-dependency-links --allow-all-external '
-             '--upgrade %(deps)s' % ctx,
-             user=env.OWNER)
+    with cd("%(PREFIX)s/src/" % ctx):
+        with settings(warn_only=True):
+            sudo('%(PREFIX)s/bin/pip uninstall -y %(name)s' % ctx,
+                 user=env.OWNER)
+            sudo('rm -Rf %(dist)s' % ctx, user=env.OWNER)
+        sudo('tar -xzvf ../dist/%(dist)s.tar.gz' % ctx, user=env.OWNER)
+
+    with cd("%(PREFIX)s/src/%(dist)s" % ctx):
+        sudo('%(PREFIX)s/bin/python setup.py develop' % ctx, user=env.OWNER)
 
     if with_postinstall:
         post_install()
@@ -148,11 +155,11 @@ def dists(name):
 @roles('web')
 def post_install():
     with cd(env.PREFIX):
+        sudo('bin/pip install requests==1.2.3'
+             ' --upgrade' % env,
+             user=env.OWNER)
         sudo("bin/inveniomanage collect" % env, user=env.OWNER)
         sudo("bin/inveniomanage apache create-config" % env, user=env.OWNER)
-
-    sudo("/etc/init.d/celeryd restart")
-    sudo("/etc/init.d/httpd graceful")
 
 
 @task
@@ -165,45 +172,56 @@ def get_password():
 # All combined
 #
 @task
-def deploy(name=None, with_deps=True):
+def deploy(name=None, quite=False, with_deps=True):
     print(cyan(("Deploying %s" % name) if name else "Deploying all"))
-    execute(pack, name=name)
-    execute(get_password)
-    execute(upload, name=name)
+    if quite:
+        execute(get_password)
+
+    if (quite or confirm(cyan("Pack project?"))):
+        execute(pack, name=name)
+
+    if (quite or confirm(cyan("Upload project?"))):
+        if not quite:
+            execute(get_password)
+        execute(upload, name=name)
 
     for h in env.roledefs['web']:
         if h == env.get('BIBSCHED_HOST', '') and \
-           confirm(cyan("Stop bibsched?")):
+           (quite or confirm(cyan("Stop bibsched?"))):
             with settings(host_string=h):
                 sudo("%(PREFIX)s/bin/bibsched stop" % env,
                      user=env.OWNER)
-        if confirm(cyan("Stop celery?")):
+        if (quite or confirm(cyan("Stop celery?"))):
             execute(celery_stop, hosts=[h], )
 
         if h in env.get('HAPROXY_BACKENDS', {}):
-            if confirm(cyan("Set %s in maintenance mode?" % h)):
+            if quite or confirm(cyan("Set %s in maintenance mode?" % h)):
                 execute(haproxy_disable_server, h, hosts=env.roledefs['lb'],)
 
-        if confirm(cyan("Install?")):
+        if quite or confirm(cyan("Install?")):
             execute(install, hosts=[h], name=name, with_deps=with_deps)
 
+        if quite or confirm(cyan("Run post install?")):
+            execute(post_install, hosts=[h])
+
+        if quite or confirm(cyan("Restart Apache?")):
+            execute(apache_restart, hosts=[h], )
+
         if h in env.get('HAPROXY_BACKENDS', {}):
-            if confirm(cyan("Restart Apache?")):
-                execute(apache_restart, hosts=[h], )
-            if confirm(cyan("Set %s in production mode?" % h)):
+            if quite or confirm(cyan("Set %s in production mode?" % h)):
                 execute(haproxy_enable_server, h, hosts=env.roledefs['lb'],)
 
         if h == env.get('BIBSCHED_HOST', '') and \
-           confirm(cyan("Run upgrader?")):
+           (quite or confirm(cyan("Run upgrader?"))):
             with settings(host_string=h):
                 sudo("%(PREFIX)s/bin/inveniomanage upgrader run" % env,
                      user=env.OWNER)
         if h == env.get('BIBSCHED_HOST', '') and \
-           confirm(cyan("Start bibsched?")):
+           (quite or confirm(cyan("Start bibsched?"))):
             with settings(host_string=h):
                 sudo("%(PREFIX)s/bin/bibsched start" % env,
                      user=env.OWNER)
-        if confirm(cyan("Start celery?")):
+        if quite or confirm(cyan("Start celery?")):
             execute(celery_start, hosts=[h])
 
 
@@ -227,6 +245,7 @@ def bootstrap():
 
     with cd(ctx['PREFIX']):
         sudo("mkdir dist", user=env.OWNER)
+        sudo("mkdir src", user=env.OWNER)
         sudo("mkdir -p etc/certs", user=env.OWNER)
         sudo("bin/pip install setuptools pip --upgrade", user=env.OWNER)
         sudo("bin/pip install ipython ipdb importlib --upgrade",
@@ -293,6 +312,7 @@ def haproxy_server_action(servername, action='disable'):
 @task
 @roles('web')
 def apache_restart():
+    sudo("/etc/init.d/httpd configtest")
     sudo("/etc/init.d/httpd graceful")
 
 
