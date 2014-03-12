@@ -183,11 +183,24 @@ exclude-result-prefixes="marc fn dc invenio">
         </alternateIdentifiers>
         <!-- 12 RelatedIdentifier -->
         <xsl:if test="datafield[@tag=773]/subfield[@code='n']">
-            <xsl:if test="subfield[@code='n']='doi' or subfield[@code='n']='ark' or subfield[@code='n']='ean13' or subfield[@code='n']='eissn' or subfield[@code='n']='handle' or subfield[@code='n']='isbn' or subfield[@code='n']='issn' or subfield[@code='n']='istc' or subfield[@code='n']='lissn' or subfield[@code='n']='lsid' or subfield[@code='n']='purl' or subfield[@code='n']='upc' or subfield[@code='n']='url' or subfield[@code='n']='urn'">
+            <xsl:if test="datafield[@tag=773]/subfield[@code='n']='doi' or
+                datafield[@tag=773]/subfield[@code='n']='ark' or
+                datafield[@tag=773]/subfield[@code='n']='ean13' or
+                datafield[@tag=773]/subfield[@code='n']='eissn' or
+                datafield[@tag=773]/subfield[@code='n']='handle' or
+                datafield[@tag=773]/subfield[@code='n']='isbn' or
+                datafield[@tag=773]/subfield[@code='n']='issn' or
+                datafield[@tag=773]/subfield[@code='n']='istc' or
+                datafield[@tag=773]/subfield[@code='n']='lissn' or
+                datafield[@tag=773]/subfield[@code='n']='lsid' or
+                datafield[@tag=773]/subfield[@code='n']='purl' or
+                datafield[@tag=773]/subfield[@code='n']='upc' or
+                datafield[@tag=773]/subfield[@code='n']='url' or
+                datafield[@tag=773]/subfield[@code='n']='urn'">
                 <relatedIdentifiers>
                     <xsl:for-each select="datafield[@tag=773]">
                         <xsl:choose>
-                            <xsl:when test="subfield[@code='n']">
+                            <xsl:when test="subfield[@code='n']='doi' or subfield[@code='n']='ark' or subfield[@code='n']='ean13' or subfield[@code='n']='eissn' or subfield[@code='n']='handle' or subfield[@code='n']='isbn' or subfield[@code='n']='issn' or subfield[@code='n']='istc' or subfield[@code='n']='lissn' or subfield[@code='n']='lsid' or subfield[@code='n']='purl' or subfield[@code='n']='upc' or subfield[@code='n']='url' or subfield[@code='n']='urn'">
                                 <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType"><xsl:value-of select="translate(subfield[@code='n'],'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
                             </xsl:when>
                         </xsl:choose>
@@ -212,13 +225,13 @@ exclude-result-prefixes="marc fn dc invenio">
                 <rights>http://creativecommons.org/publicdomain/zero/1.0/</rights>
             </xsl:when>
             <xsl:when test="$license='cc-by'">
-                <rights>http://creativecommons.org/licenses/by/3.0/</rights>
+                <rights>http://creativecommons.org/licenses/by/4.0/</rights>
             </xsl:when>
             <xsl:when test="$license='cc-by-sa'">
-                <rights>http://creativecommons.org/licenses/by-sa/3.0/</rights>
+                <rights>http://creativecommons.org/licenses/by-sa/4.0/</rights>
             </xsl:when>
             <xsl:when test="$license='cc-nc'">
-                <rights>http://creativecommons.org/licenses/by-nc/3.0/</rights>
+                <rights>http://creativecommons.org/licenses/by-nc/4.0/</rights>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:if test="datafield[@tag=542]">

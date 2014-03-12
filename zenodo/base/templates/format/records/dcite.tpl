@@ -1,3 +1,3 @@
-{% for recid in recids %}
-{{ format_record(recid, of=of)|indent() }}
-{% endfor %}
+{% for recid in recids -%}
+{{ format_record(recid, of='dcite')|indent() }}
+{%- endfor %}
