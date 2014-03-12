@@ -1920,10 +1920,18 @@ All metadata is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creati
 Metadata for each record is available in several formats. The available formats include:
 
 <dl>
+<dt><code>oai_datacite3</code></dt>
+<dd><p>OAI DataCite &mdash; This metadata format has been specifically established for the dissemination of DataCite records using OAI-PMH. In addition to the original DataCite v3.0 metadata, this format contains several other elements describing the version of the metadata, whether it is of reference quality, and the registering datacentre. For more information about this format and its schema please see the <a href="http://oai.datacite.org/">DataCite OAI schema</a> web site.</p>
+<p><span class="label label-info">Recommended</span> We recommend you harvest using this metadata format. The format contains the most complete metadata and is our primary supported format.</p>
+<p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite3&set=openaire_data">See example</a></p>
+</dd>
 <dt><code>oai_datacite</code></dt>
 <dd><p>OAI DataCite &mdash; This metadata format has been specifically established for the dissemination of DataCite records using OAI-PMH. In addition to the original DataCite metadata, this format contains several other elements describing the version of the metadata, whether it is of reference quality, and the registering datacentre. For more information about this format and its schema please see the <a href="http://oai.datacite.org/">DataCite OAI schema</a> web site.</p>
-<p><span class="label">Recommended</span> We recommend you harvest using this metadata format. The format contains the most complete metadata and is our primary supported format.</p>
 <p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=openaire_data">See example</a></p>
+</dd>
+<dt><code>datacite3</code></dt>
+<dd><p>DataCite v3.0 &mdash; This metadata format contains only the original DataCite metadata without additions or alterations. The schema for this format does not exist and metadata will not validate against it. Please note that this format is not OAI-PMH version 2.0 compliant.</p>
+<p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=datacite3&set=openaire_data">See example</a></p>
 </dd>
 <dt><code>datacite</code></dt>
 <dd><p>DataCite v2.2 &mdash; This metadata format contains only the original DataCite metadata without additions or alterations. The schema for this format does not exist and metadata will not validate against it. Please note that this format is not OAI-PMH version 2.0 compliant.</p> <p>
@@ -1952,6 +1960,9 @@ Sets are updated once an hour.
 The OAI-PMH API is rated limited to one request per 2 seconds. We would be grateful if you <a href="{{url_for('invenio_opeanire.contact')}}">notify us</a> that you are harvesting us and in which context. It allows us to take your use case into consideration for future developments.
 
 <h3 id="harvest-changes">Changes</h3>
+<dl>
+<dt>2014-03-10</dt>
+<dd><p>Added metadata formats <code>datacite3</code> and <code>oai_datacite3</code> to support DataCite v3.0.</p></dd>
 <dt>2013-05-08</dt>
 <dd><p>Initial release of OAI-PMH API</p></dd>
 </dl>

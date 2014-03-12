@@ -33,6 +33,9 @@ class DataCiteXMLRegressionTest(InvenioTestCase):
         self.schema = etree.XMLSchema(
             file='http://schema.datacite.org/meta/kernel-2.2/metadata.xsd'
         )
+        self.schema3 = etree.XMLSchema(
+            file='http://schema.datacite.org/meta/kernel-3/metadata.xsd'
+        )
 
     #
     # Tests
@@ -55,9 +58,14 @@ class DataCiteXMLRegressionTest(InvenioTestCase):
                     if identifier['scheme'] != identifier['scheme'].lower():
                         raise Exception("Record %s has problem with upper-case scheme %s" % (recid, identifier['scheme']))
                 if record.get('doi', None):
+                    # v2.2
                     xml = StringIO(format_record(recid, 'dcite'))
                     xml_doc = etree.parse(xml)
                     self.schema.assertValid(xml_doc)
+                    # v3.0
+                    xml = StringIO(format_record(recid, 'dcite3'))
+                    xml_doc = etree.parse(xml)
+                    self.schema3.assertValid(xml_doc)
             except Exception as e:
                 print(recid)
                 if xml:

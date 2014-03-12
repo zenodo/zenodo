@@ -240,6 +240,8 @@ CFG_OAI_METADATA_FORMATS = {
     'oai_dc': ('XOAIDC', 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd', 'http://www.loc.gov/MARC21/slim'),
     'datacite': ('DCITE', 'http://schema.datacite.org/meta/kernel-2.2/metadata.xsd', 'http://datacite.org/schema/kernel-2.2'),
     'oai_datacite': ('OAIDCI', 'http://schema.datacite.org/meta/kernel-2.2/metadata.xsd', 'http://datacite.org/schema/kernel-2.2'),
+    'datacite3': ('DCITE3', 'http://schema.datacite.org/meta/kernel-3/metadata.xsd', 'http://datacite.org/schema/kernel-3'),
+    'oai_datacite3': ('OAIDC3', 'http://schema.datacite.org/meta/kernel-3/metadata.xsd', 'http://datacite.org/schema/kernel-3'),
 }
 
 CFG_OAI_ID_PREFIX = "zenodo.org"
