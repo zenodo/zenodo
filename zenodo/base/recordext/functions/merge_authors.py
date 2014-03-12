@@ -25,4 +25,4 @@ def merge_authors(self):
     if self.get('first_author'):
         return [self.get('first_author')] + self.get('additional_authors', [])
     else:
-        self.get('additional_authors', [])
+        return self.get('additional_authors', [])
