@@ -34,12 +34,17 @@ __all__ = ['ReserveDOIField']
 
 
 def reserve_doi(dummy_form, field, submit=False, fields=None):
-    if field.object_data != field.data and field.data:
+    if field.data is True:
+        # Button was pressed
         if not field.object_data:
             # Call the user supplied function to create a doi.
             field.data = field.doi_creator()
         else:
             field.data = field.object_data
+    else:
+        # Button not pressed so prevent updating of DOI field (the
+        # next post processor)
+        raise StopIteration
 
 
 class ReserveDOIField(WebDepositField, Field):
@@ -64,18 +69,14 @@ class ReserveDOIField(WebDepositField, Field):
 
     def _value(self):
         """
-        Return true if button was pressed.
+        Return true if button was pressed at some point
         """
         return bool(self.data)
 
     def process_formdata(self, valuelist):
-        if self.object_data:
-            # DOI already reserved, so set value to reserved DOI
-            self.data = self.object_data
-        elif (valuelist and valuelist[0] and (
-              (isinstance(valuelist[0], basestring)
-               and valuelist[0].lower() not in ['false', 'no']
-               )
-              or not (isinstance(valuelist[0], basestring)))
-              ):
+        if valuelist and valuelist[0] is True:
+            # Button was pressed
             self.data = True
+        else:
+            # Reset data tp value of object data.
+            self.data = self.object_data
