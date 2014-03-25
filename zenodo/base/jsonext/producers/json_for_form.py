@@ -26,7 +26,9 @@ def produce(self, fields=None):
                 empty list all available tags will be included.
     """
     from invenio.base.utils import try_to_eval
+
     from invenio.modules.jsonalchemy.parser import get_producer_rules
+    from invenio.modules.jsonalchemy.registry import functions
 
     if not fields:
         fields = self.keys()
@@ -34,42 +36,52 @@ def produce(self, fields=None):
     out = {}
 
     for field in fields:
-        if field.startswith('__'):
+        if field.startswith('__') or self.get(field) is None:
             continue
-        try:
-            rules = get_producer_rules(field, 'json_for_form', 'recordext')
-            for rule in rules:
-                field = self.get(rule[0], None)
-                if field is None:
-                    continue
-                if not isinstance(field, list):
-                    field = [field, ]
-                for f in field:
-                    for r in rule[1]:
-                        tmp_dict = {}
-                        for key, subfield in r[1].items():
-                            if not subfield:
-                                tmp_dict[key] = f
-                            else:
+        json_id = self.meta_metadata[field]['json_id']
+        values = self.get(field)
+        if not  isinstance(values, (list, tuple)):
+            values = (values, )
+        for value in values:
+            try:
+                rules = get_producer_rules(json_id, 'json_for_form', 'recordext')
+                for rule in rules:
+                    tags = rule[0] if isinstance(rule[0], tuple) \
+                                        else (rule[0], )
+                    if tags and not any([tag in tags \
+                            for tag in self.meta_metadata[field]['function']]):
+                        continue
+                    tmp_dict = {}
+                    for key, subfield in rule[1].items():
+                        if not subfield:
+                            tmp_dict[key] = value
+                        else:
+                            try:
+                                tmp_dict[key] = value[subfield]
+                            except:
                                 try:
-                                    tmp_dict[key] = f[subfield]
-                                except:
-                                    try:
-                                        tmp_dict[key] = try_to_eval(
-                                            subfield, value=f, self=self
-                                        )
-                                    except Exception as e:
-                                        self['__meta_metadata__']['__continuable_errors__'].append('Producer CError - Unable to produce %s - %s' % (field, str(e)))
-                        if tmp_dict:
-                            for k, v in tmp_dict.items():
-                                if isinstance(v, list):
-                                    if k not in out:
-                                        out[k] = []
-                                    for element in v:
-                                        out[k].append(element)
-                                else:
-                                    out[k] = v
-        except KeyError:
-            self['__meta_metadata__']['__continuable_errors__'].append(
-                'Producer CError - No producer rule for field %s' % field)
+                                    tmp_dict[key] = try_to_eval(subfield,
+                                        functions(
+                                            self.additional_info.namespace),
+                                        value=value, self=self)
+                                except ImportError:
+                                    pass
+                                except Exception as e:
+                                    self.continuable_errors.append(
+                                        "Producer CError - Unable to produce "
+                                        "'%s'.\n %s" % (field, str(e)))
+
+                    if tmp_dict:
+                        for k, v in tmp_dict.items():
+                            if isinstance(v, list):
+                                if k not in out:
+                                    out[k] = []
+                                for element in v:
+                                    out[k].append(element)
+                            else:
+                                out[k] = v
+            except KeyError:
+                self.continuable_errors.append(
+                    "Producer CError - Unable to produce '%s' (No rule found).\n %s"
+                    % (field, str(e)))
     return out
