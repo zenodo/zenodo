@@ -50,6 +50,7 @@ from invenio.modules.deposit.tasks import render_form, \
     process_sip_metadata, \
     process_bibdocfile
 from invenio.modules.deposit.helpers import record_to_draft
+from invenio.modules.deposit.tasks import merge_changes
 from zenodo.legacy.utils.zenodoutils import create_doi, filter_empty_helper
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.ext.restful import error_codes, ISODate
@@ -118,8 +119,7 @@ def process_draft(draft):
     """
     # Filter out ZENODO and OpenAIRE communities
     draft.values['communities'] = filter(
-        lambda c: c['identifier'] not in [CFG_ZENODO_USER_COLLECTION_ID,
-                                          CFG_ECFUNDED_USER_COLLECTION_ID],
+        lambda c: c['identifier'] not in [CFG_ZENODO_USER_COLLECTION_ID, ],
         draft.values.get('communities', [])
     )
     return draft
@@ -147,19 +147,20 @@ def process_recjson(deposition, recjson):
     # ===========
     # Communities
     # ===========
-    # FIXME: Properly deal with provisional/non-provisional
     try:
+        communities = recjson.get('provisional_communities', [])
+
         # Extract identifier (i.e. elements are mapped from dict ->
         # string)
-        recjson['provisional_communities'] = list(set(map(
+        recjson['provisional_communities'] = map(
             lambda x: x['identifier'],
-            recjson.get('provisional_communities', [])
-        )))
+            filter(lambda x: x.get('provisional', False), communities)
+        )
 
-        recjson['communities'] = list(set(map(
+        recjson['communities'] = map(
             lambda x: x['identifier'],
-            recjson.get('communities', [])
-        )))
+            filter(lambda x: not x.get('provisional', False), communities)
+        )
     except TypeError:
         # Happens on re-run
         pass
@@ -315,7 +316,7 @@ def process_recjson_edit(deposition, recjson):
     Process recjson for an edited record
     """
     process_recjson(deposition, recjson)
-    # Remove all FFTS
+    # Remove all FFTs
     try:
         del recjson['fft']
     except KeyError:
@@ -345,6 +346,44 @@ def process_files(deposition, bibrecdocs):
             'description': 'KEEP-OLD-VALUE',
             'comment': 'KEEP-OLD-VALUE',
         })
+
+
+def merge(dest, a, b):
+    """
+    Merge changes from editing a deposition.
+    """
+    # A record might have been approved in communities since it was loaded,
+    # thus we "manually" merge communities
+    approved = set(a['communities']) & set(b['provisional_communities'])
+
+    communities = b['communities']
+    provisional = []
+
+    for c in b['provisional_communities']:
+        if c in approved:
+            if c not in communities:
+                communities.append(c)
+        else:
+            provisional.append(c)
+
+    # Ensure that no community is in two states
+    common = set(communities) & set(provisional)
+    for c in common:
+        provisional.pop(c)
+
+    b['communities'] = communities
+    b['provisional_communities'] = provisional
+
+    # Append ZENODO collection
+    if CFG_ZENODO_USER_COLLECTION_ID in dest['communities']:
+        a['communities'].append(CFG_ZENODO_USER_COLLECTION_ID)
+        b['communities'].append(CFG_ZENODO_USER_COLLECTION_ID)
+    elif CFG_ZENODO_USER_COLLECTION_ID in dest['provisional_communities']:
+        a['provisional_communities'].append(CFG_ZENODO_USER_COLLECTION_ID)
+        b['provisional_communities'].append(CFG_ZENODO_USER_COLLECTION_ID)
+
+    # Now proceed, with normal merging.
+    return merge_changes(dest, a, b)
 
 
 # ==============
@@ -474,11 +513,10 @@ class upload(DepositionType):
                     draft_id='_edit',
                     post_process_load=process_draft,
                     process_export=process_recjson_edit,
+                    merge_func=merge,
                 ),
                 # Set file restrictions
                 process_bibdocfile(process=process_files),
-                # Merge communities
-                #merge_communities,
             ],
             [
                 # Check for reserved recids.
