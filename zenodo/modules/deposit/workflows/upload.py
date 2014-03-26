@@ -34,7 +34,7 @@ from workflow import patterns as p
 from invenio.config import CFG_DATACITE_DOI_PREFIX
 from invenio.modules.formatter import format_record
 from invenio.modules.knowledge.api import get_kb_mapping
-
+from invenio.ext.login import UserInfo
 from invenio.modules.deposit.models import DepositionType, Deposition, \
     InvalidApiAction
 from invenio.modules.deposit.tasks import render_form, \
@@ -50,12 +50,13 @@ from invenio.modules.deposit.tasks import render_form, \
     process_sip_metadata, \
     process_bibdocfile
 from invenio.modules.deposit.helpers import record_to_draft
-from invenio.modules.deposit.tasks import merge_changes
+from invenio.modules.deposit.tasks import merge_changes, is_sip_uploaded
 from zenodo.legacy.utils.zenodoutils import create_doi, filter_empty_helper
 from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.ext.restful import error_codes, ISODate
 from zenodo.modules.deposit.forms import ZenodoForm, \
     ZenodoEditForm
+from invenio.ext.sqlalchemy import db
 from invenio.base.helpers import unicodifier
 from invenio.modules.records.api import Record
 
@@ -119,7 +120,8 @@ def process_draft(draft):
     """
     # Filter out ZENODO and OpenAIRE communities
     draft.values['communities'] = filter(
-        lambda c: c['identifier'] not in [CFG_ZENODO_USER_COLLECTION_ID, ],
+        lambda c: c['identifier'] not in [CFG_ZENODO_USER_COLLECTION_ID,
+                                          CFG_ECFUNDED_USER_COLLECTION_ID],
         draft.values.get('communities', [])
     )
     return draft
@@ -262,12 +264,16 @@ def process_recjson_new(deposition, recjson):
     """
     process_recjson(deposition, recjson)
 
+    # ================
+    # Owner
+    # ================
     # Owner of record (can edit/view the record)
-    email = current_user.info.get('email', '')
+    user = UserInfo(deposition.user_id)
+    email = user.info.get('email', '')
     recjson['owner'] = dict(
         email=email,
-        username=current_user.info.get('nickname', ''),
-        id=current_user.get_id(),
+        username=user.info.get('nickname', ''),
+        id=deposition.user_id,
         deposition_id=deposition.id,
     )
 
@@ -348,7 +354,7 @@ def process_files(deposition, bibrecdocs):
         })
 
 
-def merge(dest, a, b):
+def merge(deposition, dest, a, b):
     """
     Merge changes from editing a deposition.
     """
@@ -382,8 +388,52 @@ def merge(dest, a, b):
         a['provisional_communities'].append(CFG_ZENODO_USER_COLLECTION_ID)
         b['provisional_communities'].append(CFG_ZENODO_USER_COLLECTION_ID)
 
+    if CFG_ECFUNDED_USER_COLLECTION_ID in dest['communities']:
+        a['communities'].append(CFG_ECFUNDED_USER_COLLECTION_ID)
+        b['communities'].append(CFG_ECFUNDED_USER_COLLECTION_ID)
+    elif CFG_ECFUNDED_USER_COLLECTION_ID in dest['provisional_communities']:
+        a['provisional_communities'].append(CFG_ECFUNDED_USER_COLLECTION_ID)
+        b['provisional_communities'].append(CFG_ECFUNDED_USER_COLLECTION_ID)
+
     # Now proceed, with normal merging.
-    return merge_changes(dest, a, b)
+    data = merge_changes(deposition, dest, a, b)
+
+    # Force ownership (owner of record (can edit/view the record))
+    user = UserInfo(deposition.user_id)
+    data['owner'].update(dict(
+        email=user.info.get('email', ''),
+        username=user.info.get('nickname', ''),
+        id=deposition.user_id,
+        deposition_id=deposition.id,
+    ))
+
+    return data
+
+
+def transfer_ownership(deposition, user_id):
+    """
+    Transfer ownership of a deposition
+    """
+    if deposition.state != 'done':
+        return False
+
+    # Get latest uploaded SIP
+    sip = deposition.get_latest_sip(sealed=True)
+
+    if not is_sip_uploaded(sip):
+        return False
+
+    # Change user_id
+    deposition.user_id = user_id
+    db.session.commit()
+
+    # Re-upload record to apply changes (e.g. file restrictions and uploader)
+    deposition.reinitialize_workflow()
+    deposition.run_workflow(headless=True)
+    deposition.drafts['_edit'].completed = True
+    deposition.run_workflow(headless=True)
+
+    return True
 
 
 # ==============

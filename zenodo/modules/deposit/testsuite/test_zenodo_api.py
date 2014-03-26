@@ -1371,12 +1371,11 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
         # File restrictions
         # - check file availability after changing to closed access
         # - file is not publicly accessible.
-
+        response = self.client.get(
+            url_for('record.files', recid=record_id) + "/test.pdf"
+        )
         # FIXME
-        # response = self.client.get(
-        #     url_for('record.files', recid=record_id) + "/test.pdf"
-        # )
-        # self.assertStatus(response, 401)
+        #self.assertStatus(response, 401)
 
         # Edit deposition - now possible again
         response = self.post(
