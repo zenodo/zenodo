@@ -179,6 +179,7 @@ APACHE_CERTIFICATE_FILE = os.path.join(sys.prefix, 'etc/certs/localhost.crt')
 APACHE_CERTIFICATE_KEYFILE = os.path.join(
     sys.prefix, 'etc/certs/localhost.key'
 )
+APACHE_ALIAS_EXCLUDES = ["/admin/"]
 
 # Default database name
 CFG_DATABASE_NAME = "zenodo"

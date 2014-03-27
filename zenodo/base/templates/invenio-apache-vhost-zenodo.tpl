@@ -20,8 +20,12 @@
 {%- extends "invenio-apache-vhost.tpl" -%}
 
 {%- block aliases %}
-{{ super() }}
-        Alias /font/ /home/lnielsen/envs/zenodomaster/var/www/font/
+        DirectoryIndex index.en.html index.html
+        # Auto-generated aliasses
+        {% for alias in aliases if alias not in config.APACHE_ALIAS_EXCLUDES -%}
+        Alias {{ alias }} {{ config.COLLECT_STATIC_ROOT+alias }}
+        {% endfor %}
+        AliasMatch /sitemap-(.*) {{ config.CFG_WEBDIR }}/sitemap-$1
 {%- endblock -%}
 
 {%- block xsendfile_directive %}
