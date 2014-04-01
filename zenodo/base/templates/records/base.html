@@ -16,6 +16,7 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
+{% from "helpers.html" import copy_to_clipboard_js %}
 {% extends "page.html" %}
 
 {% block title %}{% endblock title %}
@@ -26,11 +27,13 @@
 {% endblock header -%}
 
 {% block body %}
-{% set formattedrecord = format_record(recid, of='hd', ln=g.ln)|safe %}
+{% set of = of or 'hd' %}
+{% set formattedrecord = format_record(recid, of=of, ln=g.ln)|safe %}
 <div class="row" itemscope="" itemtype="{{recid|schemaorg_type()}}">
   {%- if formattedrecord %}
   <div class="col-sm-8 col-md-8">
     {{formattedrecord}}
+    {%- if of == 'hd' %}
     <div class="panel-group" id="record_detail">
       {% if files %}
       <div class="panel panel-default" id="preview">
@@ -96,6 +99,7 @@
     {%- endfor -%}
     {%- endblock -%}
     </div>
+    {%- endif -%}
   </div>
   <div class="col-sm-4 col-md-4">
     {%- set adminarea = format_record(recid, of='HDACT', ln=g.ln)|safe -%}
@@ -137,6 +141,7 @@
 {% block javascript %}
 {{ super() }}
 <script>
+{%- if of == 'hd' %}
 $(function () {
   var reloadTab = function(target, path, idx) {
     if( !$('#record_content' + idx).hasClass("loaded") ){
@@ -182,5 +187,8 @@ $(function () {
   }
 });
 {% endif %}
+{%- else %}
+{{ copy_to_clipboard_js() }}
+{%- endif %}
 </script>
 {% endblock %}
