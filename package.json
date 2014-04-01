@@ -1,0 +1,17 @@
+{
+  "name": "zenodo-grunt",
+  "version": "1.0.0",
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-copy": "*",
+    "grunt-contrib-cssmin": "*",
+    "grunt-contrib-clean": "*",
+    "grunt-contrib-uglify": "*",
+    "load-grunt-config": "*",
+    "grunt-newer": "*",
+    "grunt-concurrent": "*"
+  },
+  "dependencies": {
+     "time-grunt": "*"
+  }
+}

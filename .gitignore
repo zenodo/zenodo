@@ -28,3 +28,6 @@ build
 .DS_Store
 zenodo/modules/github/static/badges/*.png
 docs/_build
+bower_components
+node_modules
+zenodo/base/static/js/vendor/

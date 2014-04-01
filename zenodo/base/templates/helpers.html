@@ -1,0 +1,10 @@
+{% macro copy_to_clipboard(clipboard_target="clipboard_text") %}{% block copy_to_clipboard scoped %}
+<button data-clipboard-target="{{clipboard_target}}" class="btn btn-default btn-xs clip-button"><i class="fa fa-copy" title="Copy to clipboard"></i> Copy</button>
+{% endblock %}{% endmacro %}
+
+{% macro copy_to_clipboard_js() %}{% block copy_to_clipboard_js scoped %}
+$(function () {
+  ZeroClipboard.config({moviePath: '{{ url_for('static', filename='js/vendor/ZeroClipboard.swf')}}' } );
+  var client = ZeroClipboard($('.clip-button'));
+});
+{% endblock %}{% endmacro %}

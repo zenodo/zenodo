@@ -41,6 +41,7 @@ def common():
         )),
         ('zenodo', dict(
             path="%(VIRTUAL_ENV)s/src/zenodo",
+            cmd="sdist_deploy",
         ))
     ])
     env.PREFIX = "/opt/zenodo"
