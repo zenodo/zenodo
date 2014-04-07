@@ -59,9 +59,8 @@ class PayloadExtractionTestCase(InvenioTestCase):
         gh = MagicMock()
         gh.repository = MagicMock(return_value=repo)
 
-        metadata = extract_metadata(gh, PAYLOAD_EXAMPLE)
+        metadata = extract_metadata(gh, PAYLOAD_EXAMPLE, 'lnielsen-cern')
         assert metadata['upload_type'] == 'dataset'
-
 
 
 PAYLOAD_EXAMPLE = {

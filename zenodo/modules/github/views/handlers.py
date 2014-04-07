@@ -23,7 +23,7 @@
 from __future__ import absolute_import
 
 
-from flask import url_for, redirect, current_app, abort, request, flash
+from flask import url_for, redirect, current_app, abort, request
 from flask.ext.login import current_user
 from invenio.modules.oauthclient.handlers import oauth2_token_setter
 from invenio.modules.oauthclient.models import RemoteToken
@@ -37,6 +37,20 @@ def authorized(resp, remote):
     """
     Authorized callback handler for GitHub
     """
+    if resp and 'error' in resp:
+        if resp['error'] == 'bad_verification_code':
+            # See https://developer.github.com/v3/oauth/#bad-verification-code
+            # which recommends starting auth flow again.
+            return redirect(url_for('oauthclient.login', remote_app='github'))
+        elif resp['error'] == 'incorrect_client_credentials':
+            raise Exception(
+                "Application mis-configuration in GitHub: %s" % resp
+            )
+        elif resp['error'] == 'redirect_uri_mismatch':
+            raise Exception(
+                "Application mis-configuration in GitHub: %s" % resp
+            )
+
     # User must be authenticated
     if not current_user.is_authenticated():
         if resp is None:
@@ -74,7 +88,7 @@ def authorized(resp, remote):
 
 def disconnect(remote):
     """
-    Authorized callback handler for GitHub
+    Disconnect callback handler for GitHub
     """
     # User must be authenticated
     if not current_user.is_authenticated():
