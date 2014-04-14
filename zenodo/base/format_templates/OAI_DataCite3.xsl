@@ -40,7 +40,7 @@ exclude-result-prefixes="marc fn dc invenio">
         <xsl:if test="record">
             <oai_datacite xsi:schemaLocation="http://schema.datacite.org/oai/oai-1.0/ http://schema.datacite.org/oai/oai-1.0/oai.xsd">
                 <isReferenceQuality>true</isReferenceQuality>
-                <schemaVersion>2.2</schemaVersion>
+                <schemaVersion>3.0</schemaVersion>
                 <datacentreSymbol>DK.OPENAIRE</datacentreSymbol>
                 <payload>
                     <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
@@ -229,28 +229,42 @@ exclude-result-prefixes="marc fn dc invenio">
         <xsl:variable name="license" select="datafield[@tag=650 and @ind1=1 and @ind2=7]/subfield[@code='a']" />
         <xsl:if test="$license or datafield[@tag=542]">
             <rightsList>
-            <xsl:choose>
-                <xsl:when test="$license='cc-zero'">
-                    <rights rightsURI="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 Universal</rights>
-                </xsl:when>
-                <xsl:when test="$license='cc-by'">
-                    <rights rightsURI="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</rights>
-                </xsl:when>
-                <xsl:when test="$license='cc-by-sa'">
-                    <rights rightsURI="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International</rights>
-                </xsl:when>
-                <xsl:when test="$license='cc-nc'">
-                    <rights rightsURI="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International</rights>
-                </xsl:when>
-                <xsl:when test="$license='cc-by-nc-sa'">
-                    <rights rightsURI="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International</rights>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:if test="datafield[@tag=542]">
-                        <rights>info:eu-repo/semantics/<xsl:value-of select="datafield[@tag=542]/subfield[@code='l']"/>Access</rights>
-                    </xsl:if>
-                </xsl:otherwise>
-            </xsl:choose>
+                <xsl:if test="datafield[@tag=542]">
+                    <rights>
+                        <xsl:attribute name="rightsURI">info:eu-repo/semantics/<xsl:value-of select="datafield[@tag=542]/subfield[@code='l']"/>Access</xsl:attribute>
+                        <xsl:choose>
+                            <xsl:when test="datafield[@tag=542]/subfield[@code='l']='open'">Open Access</xsl:when>
+                            <xsl:when test="datafield[@tag=542]/subfield[@code='l']='closed'">Closed Access</xsl:when>
+                            <xsl:when test="datafield[@tag=542]/subfield[@code='l']='embargoed'">Embargoed Access</xsl:when>
+                            <xsl:when test="datafield[@tag=542]/subfield[@code='l']='restricted'">Restricted Access</xsl:when>
+                        </xsl:choose>
+                    </rights>
+                </xsl:if>
+                <xsl:choose>
+                    <xsl:when test="$license='cc-zero'">
+                        <rights rightsURI="http://creativecommons.org/publicdomain/zero/1.0/">Creative Commons Zero 1.0 Universal</rights>
+                    </xsl:when>
+                    <xsl:when test="$license='cc-by'">
+                        <rights rightsURI="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International</rights>
+                    </xsl:when>
+                    <xsl:when test="$license='cc-by-sa'">
+                        <rights rightsURI="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International</rights>
+                    </xsl:when>
+                    <xsl:when test="$license='cc-nc'">
+                        <rights rightsURI="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons Attribution-NonCommercial 4.0 International</rights>
+                    </xsl:when>
+                    <xsl:when test="$license='cc-by-nc-sa'">
+                        <rights rightsURI="http://creativecommons.org/licenses/by-nc-sa/4.0/">Creative Commons Attribution-NonCommercial-ShareAlike 4.0 International</rights>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:if test="datafield[@tag=540]">
+                            <rights>
+                                <xsl:attribute name="rightsURI"><xsl:value-of select="datafield[@tag=540]/subfield[@code='u']"/></xsl:attribute>
+                                <xsl:value-of select="datafield[@tag=540]/subfield[@code='a']"/>
+                            </rights>
+                        </xsl:if>
+                    </xsl:otherwise>
+                </xsl:choose>
             </rightsList>
         </xsl:if>
         <!-- 17 Description -->
