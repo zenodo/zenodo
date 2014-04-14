@@ -34,6 +34,8 @@ xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
 xmlns:invenio="http://invenio-software.org/elements/1.0"
 exclude-result-prefixes="marc fn dc invenio">
     <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
+    <xsl:variable name="LOWERCASE" select="'abcdefghijklmnopqrstuvwxyz'"/>
+    <xsl:variable name="UPPERCASE" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <xsl:template match="/">
         <xsl:if test="collection">
         </xsl:if>
@@ -208,7 +210,20 @@ exclude-result-prefixes="marc fn dc invenio">
                     <xsl:for-each select="datafield[@tag=773]">
                         <xsl:choose>
                             <xsl:when test="subfield[@code='n']='doi' or subfield[@code='n']='ark' or subfield[@code='n']='ean13' or subfield[@code='n']='eissn' or subfield[@code='n']='handle' or subfield[@code='n']='isbn' or subfield[@code='n']='issn' or subfield[@code='n']='istc' or subfield[@code='n']='lissn' or subfield[@code='n']='lsid' or subfield[@code='n']='purl' or subfield[@code='n']='upc' or subfield[@code='n']='url' or subfield[@code='n']='urn'">
-                                <relatedIdentifier relationType="IsReferencedBy"><xsl:attribute name="relatedIdentifierType"><xsl:value-of select="translate(subfield[@code='n'],'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')"/></xsl:attribute><xsl:value-of select="subfield[@code='a']"/></relatedIdentifier>
+                                <relatedIdentifier relationType="IsReferencedBy">
+                                    <xsl:attribute name="relationType">
+                                    <xsl:choose>
+                                        <xsl:when test="subfield[@code='i']!=''"><xsl:value-of select="concat(translate(substring(subfield[@code='i'], 1,1), $LOWERCASE, $UPPERCASE), substring(subfield[@code='i'], 2))"/></xsl:when>
+                                        <xsl:otherwise>IsReferencedBy</xsl:otherwise>
+                                    </xsl:choose>
+                                    </xsl:attribute>
+                                    <xsl:attribute name="relatedIdentifierType">
+                                    <xsl:choose>
+                                        <xsl:when test="subfield[@code='n']='handle'">Handle</xsl:when>
+                                        <xsl:otherwise><xsl:value-of select="translate(subfield[@code='n'],$LOWERCASE,$UPPERCASE)"/></xsl:otherwise>
+                                    </xsl:choose>
+                                    </xsl:attribute><xsl:value-of select="subfield[@code='a']"/>
+                                </relatedIdentifier>
                             </xsl:when>
                         </xsl:choose>
                     </xsl:for-each>
@@ -232,13 +247,13 @@ exclude-result-prefixes="marc fn dc invenio">
                 <rights>http://creativecommons.org/publicdomain/zero/1.0/</rights>
             </xsl:when>
             <xsl:when test="$license='cc-by'">
-                <rights>http://creativecommons.org/licenses/by/3.0/</rights>
+                <rights>http://creativecommons.org/licenses/by/4.0/</rights>
             </xsl:when>
             <xsl:when test="$license='cc-by-sa'">
-                <rights>http://creativecommons.org/licenses/by-sa/3.0/</rights>
+                <rights>http://creativecommons.org/licenses/by-sa/4.0/</rights>
             </xsl:when>
             <xsl:when test="$license='cc-nc'">
-                <rights>http://creativecommons.org/licenses/by-nc/3.0/</rights>
+                <rights>http://creativecommons.org/licenses/by-nc/4.0/</rights>
             </xsl:when>
             <xsl:otherwise>
                 <xsl:if test="datafield[@tag=542]">

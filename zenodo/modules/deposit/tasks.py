@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-#
+##
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@ import re
 from tempfile import mkstemp
 import time
 
+from invenio.base.globals import cfg
 from invenio.legacy.bibdocfile.api import BibDoc, BibRecDocs, \
     InvenioBibDocFileError
 from invenio.modules.formatter import format_record
@@ -67,6 +68,7 @@ ICON_SIZE = "90"
 ICON_SUBFORMAT = 'icon-%s' % ICON_SIZE
 ICON_FILEFORMAT = "png"
 MAX_RECORDS = 100
+DEPOSIT_DATACITE_OF = 'dcite'
 
 
 def open_temp_file(prefix):
@@ -103,8 +105,10 @@ def bibupload(record=None, collection=None, file_prefix="", mode="-c"):
             if tot == MAX_RECORDS:
                 file_out.write("</collection>")
                 file_out.close()
-                logger.debug("Submitting bibupload %s -n %s" % (mode, filename))
-                task_low_level_submission('bibupload', 'openaire', mode, filename, '-n')
+                logger.debug(
+                    "Submitting bibupload %s -n %s" % (mode, filename))
+                task_low_level_submission(
+                    'bibupload', 'openaire', mode, filename, '-n')
 
                 (file_out, filename) = open_temp_file(file_prefix)
                 file_out.write("<collection>")
@@ -117,7 +121,8 @@ def bibupload(record=None, collection=None, file_prefix="", mode="-c"):
     file_out.close()
     if tot > 0:
         logger.debug("Submitting bibupload %s -n %s" % (mode, filename))
-        task_low_level_submission('bibupload', 'openaire', mode, filename, '-n')
+        task_low_level_submission(
+            'bibupload', 'openaire', mode, filename, '-n')
 
 
 #
@@ -160,24 +165,37 @@ def openaire_create_icon(docid=None, recid=None, reformat=True):
                              'verbosity': 0})
                         icon_path = os.path.join(icon_dir, icon_name)
                     except InvenioWebSubmitIconCreatorError, e:
-                        logger.warning('Icon for file %s could not be created: %s' % (file_path, str(e)))
+                        logger.warning(
+                            'Icon for file %s could not be created: %s' % (
+                                file_path, str(e))
+                            )
                         register_exception(
-                            prefix='Icon for file %s could not be created: %s' % (file_path, str(e)),
+                            prefix='Icon for file %s could not be created: %s'
+                                   % (file_path, str(e)),
                             alert_admin=False
                         )
 
                     try:
                         if icon_path and os.path.exists(icon_path):
-                            logger.debug("Adding icon %s to document" % icon_path)
+                            logger.debug(
+                                "Adding icon %s to document" % icon_path)
                             d.add_icon(icon_path, subformat=ICON_SUBFORMAT)
-                            recid_list = ",".join([str(x['recid']) for x in d.bibrec_links])
+                            recid_list = ",".join(
+                                [str(x['recid']) for x in d.bibrec_links])
                             if reformat:
-                                task_low_level_submission('bibreformat', 'openaire', '-i', recid_list)
+                                task_low_level_submission(
+                                    'bibreformat', 'openaire', '-i',
+                                    recid_list
+                                )
 
                     except InvenioBibDocFileError, e:
-                        logger.warning('Icon %s for file %s could not be added to document: %s' % (icon_path, f, str(e)))
+                        logger.warning(
+                            'Icon %s for file %s could not be added to '
+                            'document: %s' % (icon_path, f, str(e))
+                        )
                         register_exception(
-                            prefix='Icon %s for file %s could not be added to document: %s' % (icon_path, f, str(e)),
+                            prefix='Icon %s for file %s could not be added'
+                                   ' to document: %s' % (icon_path, f, str(e)),
                             alert_admin=False
                         )
 
@@ -214,8 +232,10 @@ def openaire_altmetric_check_all():
     subtasks = []
     logger.debug("Checking Altmetric for %s records" % len(recids))
     for i in xrange(0, len(recids), MAX_RECORDS):
-        # Creating immutable subtasks - see http://docs.celeryproject.org/en/latest/userguide/canvas.html
-        subtasks.append(openaire_altmetric_update.si(list(recids[i:i+MAX_RECORDS])))
+        # Creating immutable subtasks - see
+        # http://docs.celeryproject.org/en/latest/userguide/canvas.html
+        subtasks.append(
+            openaire_altmetric_update.si(list(recids[i:i + MAX_RECORDS])))
 
     chain(*subtasks).apply_async()
 
@@ -252,9 +272,13 @@ def openaire_altmetric_update(recids, upload=True):
                 ])
                 records.append(rec)
         except AltmetricHTTPException, e:
-            logger.warning('Altmetric error for recid %s with DOI %s (status code %s): %s' % (recid, doi_val, e.status_code, str(e)))
+            logger.warning(
+                'Altmetric error for recid %s with DOI %s (status code %s): %s'
+                % (recid, doi_val, e.status_code, str(e))
+            )
             register_exception(
-                prefix='Altmetric error (status code %s): %s' % (e.status_code, str(e)),
+                prefix='Altmetric error (status code %s): %s' % (
+                    e.status_code, str(e)),
                 alert_admin=False
             )
         except IndexError:
@@ -270,7 +294,8 @@ def openaire_altmetric_update(recids, upload=True):
     return records
 
 
-@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10*60)
+@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
+             rate_limit="100/m")
 def openaire_update_doi(recid):
     """
     Update DOI in DataCite
@@ -288,13 +313,14 @@ def openaire_update_doi(recid):
         logger.debug("DOI locally managed.")
 
     if not pid.has_object("rec", recid):
-        raise Exception("DOI %s is not assigned to record %s." % (doi_val, recid))
+        raise Exception(
+            "DOI %s is not assigned to record %s." % (doi_val, recid))
 
     if pid.is_registered() or pid.is_deleted():
         logger.info("Updating DOI %s for record %s" % (doi_val, recid))
 
         url = "%s/record/%s" % (CFG_DATACITE_SITE_URL, recid)
-        doc = format_record(recid, 'dcite')
+        doc = format_record(recid, DEPOSIT_DATACITE_OF)
 
         if not pid.update(url=url, doc=doc):
             m = "Failed to update DOI %s" % doi_val
@@ -305,7 +331,28 @@ def openaire_update_doi(recid):
             logger.info("Successfully updated DOI %s." % doi_val)
 
 
-@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10*60)
+@celery.task(ignore_result=True)
+def openaire_update_all_doi(recids=None):
+    """
+    Update many DOIs in DataCite
+    """
+    pid_query = PersistentIdentifier.query.filter_by(
+        object_type='rec', pid_type='doi', status=cfg['CFG_STATUS_REGISTERED']
+    )
+
+    if recids is not None:
+        pid_query = pid_query.filter(
+            PersistentIdentifier.object_value.in_(
+                map(lambda x: unicode(x), recids)
+            )
+        )
+
+    for pid in pid_query.all():
+        openaire_update_doi.delay(pid.object_value)
+
+
+@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
+             rate_limit="100/m")
 def openaire_delete_doi(recid):
     """
     Delete DOI in DataCite
@@ -323,7 +370,8 @@ def openaire_delete_doi(recid):
         logger.debug("DOI locally managed.")
 
     if not pid.has_object("rec", recid):
-        raise Exception("DOI %s is not assigned to record %s." % (doi_val, recid))
+        raise Exception(
+            "DOI %s is not assigned to record %s." % (doi_val, recid))
 
     if pid.is_registered():
         logger.info("Inactivating DOI %s for record %s" % (doi_val, recid))
@@ -337,7 +385,8 @@ def openaire_delete_doi(recid):
             logger.info("Successfully inactivated DOI %s." % doi_val)
 
 
-@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10*60)
+@celery.task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
+             rate_limit="100/m")
 def openaire_register_doi(recid):
     """
     Register a DOI for new publication
@@ -355,13 +404,14 @@ def openaire_register_doi(recid):
         logger.debug("DOI locally managed.")
 
     if not pid.has_object("rec", recid):
-        raise Exception("DOI %s is not assigned to record %s." % (doi_val, recid))
+        raise Exception(
+            "DOI %s is not assigned to record %s." % (doi_val, recid))
 
     if pid.is_new() or pid.is_reserved():
         logger.info("Registering DOI %s for record %s" % (doi_val, recid))
 
         url = "%s/record/%s" % (CFG_DATACITE_SITE_URL, recid)
-        doc = format_record(recid, 'dcite')
+        doc = format_record(recid, DEPOSIT_DATACITE_OF)
 
         if not pid.register(url=url, doc=doc):
             m = "Failed to register DOI %s" % doi_val
@@ -388,8 +438,18 @@ def openaire_upload_notification(recid):
                 ctx.update({
                     'community': c,
                 })
-                content = render_template_to_string("communities/new_upload_email.html", **ctx)
-                send_email(CFG_SITE_SUPPORT_EMAIL, c.owner.email.encode('utf8'), "[%s] New upload to %s" % (CFG_SITE_NAME, c.title.encode('utf8')), content=content.encode('utf8'))
-                logger.info("Sent email for new record %s to %s." % (recid, c.owner.email.encode('utf8')))
+                content = render_template_to_string(
+                    "communities/new_upload_email.html", **ctx)
+                send_email(
+                    CFG_SITE_SUPPORT_EMAIL,
+                    c.owner.email.encode('utf8'),
+                    "[%s] New upload to %s" % (
+                        CFG_SITE_NAME,
+                        c.title.encode('utf8')
+                    ),
+                    content=content.encode('utf8')
+                )
+                logger.info("Sent email for new record %s to %s." %
+                            (recid, c.owner.email.encode('utf8')))
         except AttributeError:
             pass
