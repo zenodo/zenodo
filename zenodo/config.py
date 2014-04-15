@@ -69,7 +69,7 @@ PACKAGES = [
     'invenio.modules.dashboard',
     'invenio.modules.deposit',
     'invenio.modules.documentation',
-    'invenio.modules.documents',
+    #'invenio.modules.documents',
     'invenio.modules.editor',
     'invenio.modules.encoder',
     'invenio.modules.exporter',
@@ -390,6 +390,6 @@ CFG_OPENAIRE_THESIS_TYPES = [
 ]
 
 try:
-    from zenodo.instance_config import *
+    from zenodo.instance_config import *  # noqa
 except ImportError:
     pass
