@@ -68,7 +68,7 @@ ICON_SIZE = "90"
 ICON_SUBFORMAT = 'icon-%s' % ICON_SIZE
 ICON_FILEFORMAT = "png"
 MAX_RECORDS = 100
-DEPOSIT_DATACITE_OF = 'dcite'
+DEPOSIT_DATACITE_OF = 'dcite3'
 
 
 def open_temp_file(prefix):
