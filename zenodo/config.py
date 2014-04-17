@@ -301,6 +301,10 @@ CFG_DATACITE_TESTMODE = False
 # Test prefix (use with or without test mode):
 CFG_DATACITE_DOI_PREFIX = "10.5072"
 
+PIDSTORE_DATACITE_RECORD_DOI_FIELD = 'doi'
+PIDSTORE_DATACITE_OUTPUTFORMAT = 'dcite3'
+PIDSTORE_DATACITE_SITE_URL = "http://zenodo.org"
+
 SCHEMAORG_MAP = dict(
     publication='http://schema.org/ScholarlyArticle',
     poster='http://schema.org/CreativeWork',
