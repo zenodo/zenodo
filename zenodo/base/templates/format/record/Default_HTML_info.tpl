@@ -1,6 +1,17 @@
 
 {{ bfe_openaire_altmetric(bfo, prefix='<div class="well metadata">', suffix="</div>", badgetype='donut', details='left', no_script='1') }}
 
+{% set published_in = record|zenodo_related_links %}
+
+{% if published_in %}
+<div class="well metadata">
+{% for item in published_in %}
+{% if not loop.last %}<hr>{% endif %}
+<small class="text-muted">{{item.text}}</small>
+<a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>{% endfor %}
+</div>
+{% endif %}
+
 <div class="well metadata">
   <dl>
     {{ bfe_date(bfo, date_format='%d %B %Y', prefix='<dt>Publication date:</dt><dd>', suffix='</dd>') }}

@@ -24,6 +24,7 @@
 Base blueprint for Zenodo
 """
 
+import copy
 import time
 from flask import Blueprint, render_template, current_app
 from flask.ext.menu import register_menu, current_menu
@@ -188,6 +189,45 @@ def zenodo_curated(reclist, length=10, reverse=True, open_only=False):
         return reversed(reclist)
     else:
         return reclist[:length]
+
+
+RULES = {
+    'f1000research': [{
+        'prefix': '10.12688/f1000research',
+        'relation': 'isCitedBy',
+        'scheme': 'doi',
+        'text': 'Published in',
+        'image': 'img/f1000research.jpg',
+    }]
+}
+
+
+@blueprint.app_template_filter('zenodo_related_links')
+def zenodo_related_links(record):
+    def apply_rule(item, rule):
+        r = copy.deepcopy(rule)
+        r['link'] = persistentid.to_url(item['identifier'], item['scheme'])
+        return r
+
+    def match_rules(item, communities):
+        rs = []
+        for c in set(communities):
+            if c in RULES:
+                rules = RULES[c]
+                for r in rules:
+                    if item['relation'] == r['relation'] and \
+                       item['scheme'] == r['scheme'] and \
+                       item['identifier'].startswith(r['prefix']):
+                        rs.append(r)
+        return rs
+
+    ret = []
+    communities = record.get('communities', [])
+    for item in record.get('related_identifiers', []):
+        for r in match_rules(item, communities):
+            ret.append(apply_rule(item, r))
+
+    return ret
 
 
 @blueprint.app_template_filter('relation_title')
