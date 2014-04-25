@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2012, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -35,7 +35,7 @@
     {{formattedrecord}}
     {%- if of == 'hd' %}
     <div class="panel-group" id="record_detail">
-      {% if files %}
+      {% if zenodo_files %}
       <div class="panel panel-default" id="preview">
         <div class="panel-heading">
           <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
@@ -65,7 +65,7 @@
           </tr>
         </thead>
         <tbody>
-        {%- for file in files|sort(attribute='comment') -%}
+        {%- for file in zenodo_files|sort(attribute='comment') -%}
           <tr class="">
               <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
               <td>{{ file.md.strftime('%d %b %Y') }}</td>
@@ -170,7 +170,7 @@ $(function () {
   });
 });
 
-{% if files %}
+{% if zenodo_files %}
 $(function () {
   $('.preview-link').on('click', function(event) {
     $('#preview').show();

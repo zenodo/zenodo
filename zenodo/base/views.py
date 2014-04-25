@@ -125,6 +125,9 @@ def register_menu_items():
 
 
 def add_bibdoc_files(sender, **kwargs):
+    """
+    Adds a variable 'zenodo_files' into record templates
+    """
     if 'recid' not in kwargs:
         return
 
@@ -132,7 +135,7 @@ def add_bibdoc_files(sender, **kwargs):
     def _add_bibdoc_files():
         from invenio.legacy.bibdocfile.api import BibRecDocs
         return dict(
-            files=[f for f in BibRecDocs(
+            zenodo_files=[f for f in BibRecDocs(
                 kwargs['recid'], human_readable=True
             ).list_latest_files(
                 list_hidden=False
