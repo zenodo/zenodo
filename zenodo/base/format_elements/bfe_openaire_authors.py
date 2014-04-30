@@ -89,13 +89,13 @@ def format_element(bfo, limit, separator=' ; ',
                 if link_author_pages == "no":
                     author['a'] = '<a itemprop="creator" href="' + CFG_SITE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
-                                  '&amp;ln=' + bfo.lang + \
+                                  '&amp;ln=' + str(bfo.lang) + \
                                   '" ><span itemscope itemtype="http://schema.org/Person"><span itemprop="name">' + escape(author['a']) + '</span></span></a>'
                 else:
                     author['a'] = '<a itemprop="creator" rel="author" href="' + CFG_SITE_URL + \
                                   '/author/' + quote(author['a']) + \
                                   '?recid=' +  bibrec_id + \
-                                  '&ln=' + bfo.lang + \
+                                  '&ln=' + str(bfo.lang) + \
                                   '">' + escape(author['a']) + '</a>'
 
         if author.has_key('u'):
