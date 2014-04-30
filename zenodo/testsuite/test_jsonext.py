@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of ZENODO.
-# Copyright (C) 2014 CERN.
-#
-# ZENODO is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# ZENODO is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-#
-# In applying this licence, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+##
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
 
 
 """ Unit tests jsonext """
@@ -97,7 +97,7 @@ test_record = dict(
     oai={"oai": "oai:zenodo.org:1",
          "indicator": ["user-zenodo", "user-ecfunded"]},
     upload_type={'type': 'publication', 'subtype': 'book'},
-    collections=[{'primary': "pri", "secondary": "secondary",}],
+    collections=[{'primary': "pri", "secondary": "secondary", }],
     publication_date="2014-02-27",
     title="Test title",
     # FIXME
@@ -150,9 +150,9 @@ class TestReaders(InvenioTestCase):
             create_record(test_marc)[0],
         )
 
-        # form_json = r.produce('json_for_form')
-        # for k, v in test_form_json.items():
-        #     self.assertEqual(form_json[k], test_form_json[k])
+        form_json = r.produce('json_for_form')
+        for k, v in test_form_json.items():
+            self.assertEqual(form_json[k], test_form_json[k])
 
     def test_lossless_marc_import_export(self):
         from invenio.modules.records.api import Record
