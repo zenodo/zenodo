@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -26,6 +26,8 @@ __revision__ = "$Id$"
 
 from invenio.legacy.search_engine import get_all_collections_of_a_record, \
     create_navtrail_links
+import six
+
 
 def format_element(bfo, separator="<br />"):
     """Prints the list of collections the record belongs to.
@@ -36,9 +38,15 @@ def format_element(bfo, separator="<br />"):
         return not (collname.startswith('provisional-') or
                     collname == 'zenodo-public' or collname == 'user-zenodo')
 
+    if isinstance(bfo.recID, six.string_types):
+        bfo.recID = int(bfo.recID)
+
     coll_names = filter(_include, get_all_collections_of_a_record(bfo.recID))
 
-    navtrails = [create_navtrail_links(coll_name, ln=bfo.lang) for coll_name in coll_names]
+    navtrails = [
+        create_navtrail_links(coll_name, ln=bfo.lang)
+        for coll_name in coll_names
+    ]
     navtrails = [navtrail for navtrail in navtrails if navtrail]
     navtrails.sort(lambda x, y: cmp(len(y), len(x)))
     final_navtrails = []
@@ -49,6 +57,7 @@ def format_element(bfo, separator="<br />"):
         else:
             final_navtrails.append(navtrail)
     return separator.join(final_navtrails)
+
 
 def escape_values(bfo):
     """
