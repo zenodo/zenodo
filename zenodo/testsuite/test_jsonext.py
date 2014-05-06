@@ -100,11 +100,10 @@ test_record = dict(
     collections=[{'primary': "pri", "secondary": "secondary", }],
     publication_date="2014-02-27",
     title="Test title",
-    # FIXME
-    first_author={'name': 'Doe, John', 'affiliation': 'CERN'},
-    additional_authors=[
+    authors=[
+        {'name': 'Doe, John', 'affiliation': 'CERN'},
         {'name': 'Doe, Jane', 'affiliation': 'CERN'},
-        {'name': 'Smith, John', 'affiliation': 'CERN'}
+        {'name': 'Smith, John', 'affiliation': 'CERN'},
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],
@@ -160,6 +159,11 @@ class TestReaders(InvenioTestCase):
 
         for k in test_record.keys():
             self.assertEqual(test_record[k], r[k])
+
+    def test_form_export(self):
+        from invenio.modules.records.api import Record
+        r = Record.create(test_marc, master_format='marc')
+        print r.produce('json_for_form')['creators']
 
 
 TEST_SUITE = make_test_suite(TestReaders)

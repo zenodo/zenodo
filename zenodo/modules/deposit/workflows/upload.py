@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -142,9 +142,8 @@ def process_recjson(deposition, recjson):
     # Authors
     # =======
     if 'authors' in recjson and recjson['authors']:
-        recjson['first_author'] = recjson['authors'][0]
-        recjson['additional_authors'] = recjson['authors'][1:]
-        del recjson['authors']
+        recjson['_first_author'] = recjson['authors'][0]
+        recjson['_additional_authors'] = recjson['authors'][1:]
 
     # ===========
     # Communities
@@ -243,7 +242,7 @@ def process_recjson(deposition, recjson):
 
 def filter_empty_elements(recjson):
     list_fields = [
-        'additional_authors', 'keywords', 'thesis_supervisors'
+        'authors', 'keywords', 'thesis_supervisors'
     ]
     for key in list_fields:
         recjson[key] = filter(
@@ -397,6 +396,10 @@ def merge(deposition, dest, a, b):
 
     # Now proceed, with normal merging.
     data = merge_changes(deposition, dest, a, b)
+
+    if 'authors' in data and data['authors']:
+        data['_first_author'] = data['authors'][0]
+        data['_additional_authors'] = data['authors'][1:]
 
     # Force ownership (owner of record (can edit/view the record))
     user = UserInfo(deposition.user_id)

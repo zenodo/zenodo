@@ -17,16 +17,22 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-from .util_merge_authors import util_merge_authors
+from invenio.modules.jsonalchemy.jsonext.functions.util_merge_fields_info_list \
+    import util_merge_fields_info_list
 
-def sync_authors(self, field_name, connected_field, action):
+
+def sync_authors(self, field_name, connected_field, action):  # pylint: disable=W0613
+    """Sync authors content only when `__setitem__` or similar is used"""
     if action == 'set':
         if field_name == 'authors' and self.get('authors'):
-            self.__setitem__('first_author', self['authors'][0],
-                            exclude=['connect'])
-            if self['authors'][1:]:
-                self.__setitem__('additional_authors', self['authors'][1:],
-                                 exclude=['connect'])
-        elif field_name in ('first_author', 'additional_authors'):
-            self.__setitem__('authors', util_merge_authors(self),
+            self.__setitem__('_first_author', self['authors'][0],
                              exclude=['connect'])
+            if self['authors'][1:]:
+                self.__setitem__('_additional_authors', self['authors'][1:],
+                                 exclude=['connect'])
+        elif field_name in ('_first_author', '_additional_authors'):
+            self.__setitem__(
+                'authors',
+                util_merge_fields_info_list(self, ['_first_author',
+                                            '_additional_authors']),
+                exclude=['connect'])
