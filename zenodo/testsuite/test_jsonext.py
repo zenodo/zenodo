@@ -139,6 +139,13 @@ class TestReaders(InvenioTestCase):
         assert r.produce('json_for_form')['title'] == 'Test'
         assert {'245__a': 'Test'} in r.produce('json_for_marc')
 
+        import copy
+        r = Record(json=copy.copy(test_record), master_format='marc')
+
+        form_json = r.produce('json_for_form')
+        for k, v in test_form_json.items():
+            self.assertEqual(form_json[k], test_form_json[k])
+
     def test_marc_export(self):
         from invenio.modules.records.api import Record
         from invenio.legacy.bibrecord import create_record
@@ -159,11 +166,6 @@ class TestReaders(InvenioTestCase):
 
         for k in test_record.keys():
             self.assertEqual(test_record[k], r[k])
-
-    def test_form_export(self):
-        from invenio.modules.records.api import Record
-        r = Record.create(test_marc, master_format='marc')
-        print r.produce('json_for_form')['creators']
 
 
 TEST_SUITE = make_test_suite(TestReaders)

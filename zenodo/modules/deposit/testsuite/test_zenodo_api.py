@@ -21,7 +21,7 @@ from cerberus import Validator
 from invenio.testsuite import make_test_suite, run_test_suite, \
     InvenioTestCase, make_pdf_fixture
 import json
-from datetime import date
+from datetime import date, timedelta
 from flask import url_for
 
 
@@ -582,6 +582,15 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
                 return
         raise AssertionError("Field %s not found in errors" % field)
 
+    def assert_workflow_status(self, res_id, obj_version, wf_status):
+        from invenio.modules.workflows.models import BibWorkflowObject
+
+        wfobj = BibWorkflowObject.query.filter_by(id=res_id).first()
+        if obj_version is not None:
+            self.assertEqual(wfobj.version, obj_version)
+        if wf_status is not None:
+            self.assertEqual(wfobj.workflow.status, wf_status)
+
     def test_input_output(self):
         test_data = dict(
             metadata=dict(
@@ -718,11 +727,21 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
                 code=201,
             )
 
+        from invenio.modules.workflows.engine import ObjectVersion, \
+            WorkflowStatus
+        self.assert_workflow_status(
+            res_id, ObjectVersion.INITIAL, None
+        )
+
         # Publish deposition
         response = self.post(
             'depositionactionresource',
             urlargs=dict(resource_id=res_id, action_id='publish'),
             code=202
+        )
+
+        self.assert_workflow_status(
+            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
         )
 
         self.run_deposition_tasks(res_id)
@@ -952,6 +971,7 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
         response = self.post(
             'depositionlistresource', data=test_data, code=201
         )
+
         self.assertTrue(response.json['id'])
         self.assertTrue(response.json['created'])
         self.assertTrue(response.json['modified'])
@@ -1035,6 +1055,16 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             urlargs=dict(resource_id=res_id, action_id='publish'),
             code=202
         )
+
+        #
+        # Test for workflow status
+        #
+        from invenio.modules.workflows.engine import ObjectVersion, \
+            WorkflowStatus
+        self.assert_workflow_status(
+            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+        )
+
         # Second request will return forbidden since it's already published
         response = self.post(
             'depositionactionresource',
@@ -1103,6 +1133,10 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             urlargs=dict(resource_id=res_id, file_id=files_list[0]['id']),
             data=dict(filename="another_test.pdf"),
             code=403,
+        )
+
+        self.assert_workflow_status(
+            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
         )
 
         self.run_deposition_tasks(res_id)
@@ -1194,11 +1228,21 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
 
         record_id = response.json['record_id']
 
+        from invenio.modules.workflows.engine import ObjectVersion, \
+            WorkflowStatus
+        self.assert_workflow_status(
+            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+        )
+
         # Edit deposition - not possible yet (until fully integrated)
         response = self.post(
             'depositionactionresource',
             urlargs=dict(resource_id=res_id, action_id='edit'),
             code=409
+        )
+
+        self.assert_workflow_status(
+            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
         )
 
         # Edit deposition - check for consistency in result being returned
@@ -1216,6 +1260,10 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             'depositionactionresource',
             urlargs=dict(resource_id=res_id, action_id='edit'),
             code=201
+        )
+
+        self.assert_workflow_status(
+            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
         )
 
         # Edit deposition - second request should return bad request (state of
@@ -1278,6 +1326,10 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             code=400,
         )
 
+        self.assert_workflow_status(
+            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
+        )
+
         # Update deposition - cannot edit recid and modification_date (hidden)
         response = self.put(
             'depositionresource',
@@ -1332,11 +1384,19 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             code=202
         )
 
+        self.assert_workflow_status(
+            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+        )
+
         # Edit deposition - not possible yet (until fully integrated)
         response = self.post(
             'depositionactionresource',
             urlargs=dict(resource_id=res_id, action_id='edit'),
             code=409
+        )
+
+        self.assert_workflow_status(
+            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
         )
 
         # Integrate record
@@ -1371,11 +1431,10 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
         # File restrictions
         # - check file availability after changing to closed access
         # - file is not publicly accessible.
-        response = self.client.get(
-            url_for('record.files', recid=record_id) + "/test.pdf"
-        )
-        # FIXME
-        #self.assertStatus(response, 401)
+        # response = self.client.get(
+        #     url_for('record.files', recid=record_id) + "/test.pdf"
+        # )
+        # self.assertStatus(response, 401)
 
         # Edit deposition - now possible again
         response = self.post(
@@ -1412,6 +1471,10 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             code=201
         )
 
+        self.assert_workflow_status(
+            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+        )
+
         # Discard changes - state of resource changed (no longer a valid
         # action)
         response = self.post(
@@ -1431,7 +1494,7 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             "My new title"
         )
 
-    def _create_and_upload(self):
+    def _create_and_upload(self, extra=None, webcoll=False):
         test_data = dict(
             metadata=dict(
                 access_right='open',
@@ -1445,6 +1508,9 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
                 license="cc-by-sa",
             )
         )
+
+        if extra is not None:
+            test_data['metadata'].update(extra)
 
         # Create deposition
         response = self.post(
@@ -1470,9 +1536,30 @@ class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
             urlargs=dict(resource_id=res_id, action_id='publish'),
             code=202
         )
-        self.run_deposition_tasks(res_id, with_webcoll=False)
+        self.run_deposition_tasks(res_id, with_webcoll=webcoll)
 
         return res_id
+
+    def test_file_restrictions(self):
+        extra_data = dict(
+            access_right='embargoed',
+            embargo_date=(date.today() + timedelta(days=2)).isoformat()
+        )
+
+        res_id = self._create_and_upload(extra=extra_data, webcoll=True)
+
+        # Get deposition
+        response = self.get(
+            'depositionresource',
+            urlargs=dict(resource_id=res_id),
+            code=200
+        )
+        record_id = response.json['record_id']
+
+        response = self.client.get(
+            url_for('record.files', recid=record_id) + "/test.pdf"
+        )
+        self.assertStatus(response, 401)
 
     def test_empty_edit(self):
         """

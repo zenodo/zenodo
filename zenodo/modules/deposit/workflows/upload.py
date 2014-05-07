@@ -453,7 +453,7 @@ def run_tasks(update=False):
         recid = sip.metadata['recid']
         communities = sip.metadata.get('provisional_communities', [])
 
-        common_args = ['-P5', ]
+        common_args = []
         sequenceid = getattr(d.workflow_object, 'task_sequence_id', None)
         if sequenceid:
             common_args += ['-I', str(sequenceid)]
