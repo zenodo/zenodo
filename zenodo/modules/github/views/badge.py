@@ -21,9 +21,7 @@
 ## or submit itself to any jurisdiction.
 
 
-"""
-Badge Blueprint
-"""
+""" DOI Badge Blueprint. """
 
 from __future__ import absolute_import
 
@@ -31,6 +29,8 @@ import os
 import urllib
 
 from flask import Blueprint, make_response, abort, current_app
+
+from invenio.modules.pidstore.models import PersistentIdentifier
 
 from ..helpers import get_account
 from ..badge import create_badge
@@ -44,27 +44,17 @@ blueprint = Blueprint(
 )
 
 
-@blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
-def index(user_id, repository):
-    account = get_account(user_id=user_id)
-
-    if repository not in account.extra_data["repos"]:
-        return abort(404)
-
-    # Get the latest deposition
-    dep = account.extra_data["repos"][repository]['depositions'][-1]
-
-    # Extract DOI
-    if "doi" not in dep:
-        return abort(404)
-
-    doi = dep["doi"]
+def badge(doi):
+    """ Helper method to generate DOI badge. """
     doi_encoded = urllib.quote(doi, '')
 
     # Check if badge already exists
     badge_path = os.path.join(
-        current_app.config['COLLECT_STATIC_ROOT'], "badges", "%s.png" % doi_encoded
+        current_app.config['COLLECT_STATIC_ROOT'],
+        "badges",
+        "%s.png" % doi_encoded
     )
+
     font_path = os.path.join(
         blueprint.static_folder, "badges", "Trebuchet MS.ttf"
     )
@@ -81,3 +71,36 @@ def index(user_id, repository):
     resp = make_response(open(badge_path, 'r').read())
     resp.content_type = "image/png"
     return resp
+
+
+#
+# Views
+#
+@blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
+def index(user_id, repository):
+    """ Generate a badge for a specific GitHub repository. """
+    account = get_account(user_id=user_id)
+
+    if repository not in account.extra_data["repos"]:
+        return abort(404)
+
+    # Get the latest deposition
+    dep = account.extra_data["repos"][repository]['depositions'][-1]
+
+    # Extract DOI
+    if "doi" not in dep:
+        return abort(404)
+
+    doi = dep["doi"]
+
+    return badge(doi)
+
+
+@blueprint.route("/doi/<path:doi>.png", methods=["GET"])
+def doi_badge(doi):
+    """ Generate a badge for a specific DOI. """
+    pid = PersistentIdentifier.get("doi", doi)
+
+    if pid is None:
+        return abort(404)
+    return badge(doi)

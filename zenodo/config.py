@@ -21,8 +21,8 @@
 ## or submit itself to any jurisdiction.
 
 """
-Zenodo configuration
---------------------
+Zenodo configuration.
+
 Instance independent configuration (e.g. which extensions to load) is defined
 in ``zenodo.config'' while instance dependent configuration (e.g. database
 host etc.) is defined in an optional ``zenodo.instance_config'' which
@@ -199,7 +199,8 @@ CFG_SITE_SUPPORT_EMAIL = "info@zenodo.org"
 CFG_OPENAIRE_CURATORS = ["team@zenodo.org"]
 
 CFG_GOOGLE_SITE_VERIFICATION = [
-    "5fPGCLllnWrvFxH9QWI0l1TadV7byeEvfPcyK2VkS_s,Rp5zp04IKW-s1IbpTOGB7Z6XY60oloZD5C3kTM-AiY4",
+    "5fPGCLllnWrvFxH9QWI0l1TadV7byeEvfPcyK2VkS_s",
+    "Rp5zp04IKW-s1IbpTOGB7Z6XY60oloZD5C3kTM-AiY4",
 ]
 CFG_DROPBOX_API_KEY = "72dpqrjvx71mqyu"
 CFG_BIBFORMAT_ADD_THIS_ID = "ra-4dc80cde118f4dad"
@@ -207,7 +208,8 @@ CFG_BIBFORMAT_ADD_THIS_ID = "ra-4dc80cde118f4dad"
 CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE = 2147483648
 CFG_OPENAIRE_FILESIZE_NOTIFICATION = 10485760
 
-#CFG_BROKER_URL = "amqp://openairenext:openairenext@localhost:5672/openairenext_vhost"
+#CFG_BROKER_URL = "amqp://openairenext:openairenext@localhost:5672/" \
+#    "openairenext_vhost"
 CFG_CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 
 
@@ -237,12 +239,36 @@ CFG_WEB_API_KEY_ALLOWED_URL = [('api/deposit/\?', 0, False), ]
 CFG_WEB_API_KEY_ENABLE_SIGNATURE = False
 
 CFG_OAI_METADATA_FORMATS = {
-    'marcxml': ('XOAIMARC', 'http://www.openarchives.org/OAI/1.1/dc.xsd', 'http://purl.org/dc/elements/1.1/'),
-    'oai_dc': ('XOAIDC', 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd', 'http://www.loc.gov/MARC21/slim'),
-    'datacite': ('DCITE', 'http://schema.datacite.org/meta/kernel-2.2/metadata.xsd', 'http://datacite.org/schema/kernel-2.2'),
-    'oai_datacite': ('OAIDCI', 'http://schema.datacite.org/meta/kernel-2.2/metadata.xsd', 'http://datacite.org/schema/kernel-2.2'),
-    'datacite3': ('DCITE3', 'http://schema.datacite.org/meta/kernel-3/metadata.xsd', 'http://datacite.org/schema/kernel-3'),
-    'oai_datacite3': ('OAIDC3', 'http://schema.datacite.org/meta/kernel-3/metadata.xsd', 'http://datacite.org/schema/kernel-3'),
+    'marcxml': (
+        'XOAIMARC',
+        'http://www.openarchives.org/OAI/1.1/dc.xsd',
+        'http://purl.org/dc/elements/1.1/'
+    ),
+    'oai_dc': (
+        'XOAIDC',
+        'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
+        'http://www.loc.gov/MARC21/slim'
+    ),
+    'datacite': (
+        'DCITE',
+        'http://schema.datacite.org/meta/kernel-2.2/metadata.xsd',
+        'http://datacite.org/schema/kernel-2.2'
+    ),
+    'oai_datacite': (
+        'OAIDCI',
+        'http://schema.datacite.org/meta/kernel-2.2/metadata.xsd',
+        'http://datacite.org/schema/kernel-2.2'
+    ),
+    'datacite3': (
+        'DCITE3',
+        'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'http://datacite.org/schema/kernel-3'
+    ),
+    'oai_datacite3': (
+        'OAIDC3',
+        'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'http://datacite.org/schema/kernel-3'
+    ),
 }
 
 CFG_OAI_ID_PREFIX = "zenodo.org"

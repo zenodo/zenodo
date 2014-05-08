@@ -31,6 +31,7 @@ from flask.ext.menu import register_menu, current_menu
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.login import current_user
 from invenio.base.i18n import _
+from invenio.base.globals import cfg
 from invenio.base.signals import pre_template_render
 from invenio.ext.template.context_processor import \
     register_template_context_processor
@@ -158,6 +159,13 @@ def register_receivers():
 @blueprint.app_template_filter('timefmt')
 def timefmt_filter(value, format="%d %b %Y, %H:%M"):
     return time.strftime(format, value)
+
+
+@blueprint.app_template_filter('is_local_doi')
+def is_local_doi(value):
+    """ Convert DOI to a link. """
+    return value.startswith(cfg['CFG_DATACITE_DOI_PREFIX']) or \
+        value.startswith("10.5281/")
 
 
 @blueprint.app_template_filter('is_record_owner')

@@ -1,3 +1,4 @@
+{%- from "github/helpers.html" import doi_badge with context %}
 
 {{ bfe_openaire_altmetric(bfo, prefix='<div class="well metadata">', suffix="</div>", badgetype='donut', details='left', no_script='1') }}
 
@@ -13,10 +14,17 @@
 {% endif %}
 
 <div class="well metadata">
+
+
+
+
   <dl>
     {{ bfe_date(bfo, date_format='%d %B %Y', prefix='<dt>Publication date:</dt><dd>', suffix='</dd>') }}
     {{ bfe_openaire_access_rights(bfo, only_restrictions="yes") }}
-    {{ bfe_doi(bfo, prefix='<dt>DOI:</dt><dd>', suffix='</dd>') }}
+    {% if record.doi %}
+    <dt>DOI</dt>
+    <dd>{% if record.doi|is_local_doi %}{{doi_badge(record.doi)}}{% else %}{{ record.doi|doi_link }}{% endif %}</dd>
+    {% endif%}
     {{ bfe_isbn(bfo, prefix='<dt>ISBN:</dt><dd itemprop="isbn">', suffix='</dd>') }}
     {{ bfe_report_numbers(bfo, prefix='<dt>Report number(s):</dt><dd>', suffix='</dd>') }}
     {{ bfe_keywords(bfo, prefix='<dt>Keyword(s):</dt><dd>', suffix='</dd>', keyword_prefix='<span class="label label-default" itemprop="keywords">', keyword_suffix='</span>', separator=' ') }}

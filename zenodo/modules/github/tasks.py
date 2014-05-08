@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of ZENODO.
-# Copyright (C) 2014 CERN.
-#
-# ZENODO is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# ZENODO is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-#
-# In applying this licence, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+##
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
 
 
 """
@@ -54,9 +54,7 @@ logger = get_task_logger(__name__)
 
 @celery.task(ignore_result=True)
 def disconnect_github(remote_app, access_token, extra_data):
-    """
-    Uninstall webhooks
-    """
+    """ Uninstall webhooks. """
     # Note at this point the remote account and all associated data have
     # already been deleted. The celery task is passed the access_token and
     # extra_data to make some last cleanup and afterwards delete itself
@@ -76,9 +74,7 @@ def disconnect_github(remote_app, access_token, extra_data):
 
 @celery.task(ignore_result=True)
 def handle_github_payload(event_state):
-    """
-    Handle incoming notification from GitHub on a new release
-    """
+    """ Handle incoming notification from GitHub on a new release. """
     e = Event()
     e.__setstate__(event_state)
 
@@ -128,9 +124,7 @@ def handle_github_payload(event_state):
 
 
 def extract_metadata(gh, payload, github_name):
-    """
-    Extracts metadata for ZENODO from a release
-    """
+    """ Extract metadata for ZENODO from a release. """
     release = payload["release"]
     repository = payload["repository"]
 
@@ -180,9 +174,7 @@ def extract_metadata(gh, payload, github_name):
 
 
 def extract_files(payload):
-    """
-    Extract files to download from GitHub payload
-    """
+    """ Extract files to download from GitHub payload. """
     release = payload["release"]
     repository = payload["repository"]
 

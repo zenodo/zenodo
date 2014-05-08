@@ -1,32 +1,33 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of ZENODO.
-# Copyright (C) 2014 CERN.
-#
-# ZENODO is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# ZENODO is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-#
-# In applying this licence, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+##
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
 
 
 """
-GitHub blueprint for Zenodo
+GitHub blueprint for Zenodo.
 
 
 1) Go to GitHub and create a new application
-   *) Set Authorization callback URL to http://localhost:4000/oauth/authorized/github/
+   *) Set Authorization callback URL to
+      http://localhost:4000/oauth/authorized/github/
    *) Add the keys to configuration
         OAUTH_GITHUB = dict(
             consumer_key="changeme",
@@ -82,9 +83,7 @@ blueprint = Blueprint(
 #
 @blueprint.before_app_first_request
 def register_webhook():
-    """
-    Setup webhook endpoint for github notifications
-    """
+    """ Setup webhook endpoint for github notifications. """
     Receiver.register(
         current_app.config.get('GITHUB_WEBHOOK_RECEIVER_ID'),
         CeleryReceiver(handle_github_payload)
@@ -96,6 +95,7 @@ def register_webhook():
 #
 @blueprint.app_template_filter('naturaltime')
 def naturaltime(val):
+    """ Get humanized version of time. """
     val = parse(val)
     now = datetime.utcnow().replace(tzinfo=pytz.utc)
 
@@ -116,9 +116,7 @@ def naturaltime(val):
 )
 @register_breadcrumb(blueprint, 'breadcrumbs.settings.github', _('GitHub'))
 def index():
-    """
-    Display list of repositories
-    """
+    """ Display list of repositories. """
     token = get_token()
     ctx = dict(connected=False)
 
