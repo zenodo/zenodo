@@ -31,6 +31,7 @@ from __future__ import absolute_import
 from celery.utils.log import get_task_logger
 import requests
 import six
+from flask import current_app
 
 from invenio.celery import celery
 from invenio.ext.sqlalchemy import db
@@ -98,15 +99,15 @@ def handle_github_payload(event_state):
 
     try:
         # Extra metadata from .zenodo.json and github repository
-        metadata = extract_metadata(gh, e.payload, account.extra_data['name'])
+        metadata = extract_metadata(gh, e.payload)
 
         # Extract zip snapshot from github
         files = extract_files(e.payload)
 
         # Upload into Zenodo
-        logger.info(metadata)
+        current_app.logger.debug(metadata)
         deposition = upload(access_token, metadata, files, publish=True)
-        logger.info(deposition)
+        current_app.logger.debug(deposition)
 
         # TODO: Add step to update metadata of all previous records
         submitted_deposition(
@@ -114,16 +115,17 @@ def handle_github_payload(event_state):
             deposition, e.payload['release']['tag_name']
         )
         account.extra_data.changed()
+        db.session.commit()
+        # Send email to user that release was included.
     except Exception as e:
         # Handle errors and possibly send user an email
         # Send email to user
-        import traceback
-        logger.info(traceback.format_exc(e))
+        current_app.logger.exception("Failed handling GitHub payload")
+        db.session.commit()
+        six.reraise()
 
-    db.session.commit()
 
-
-def extract_metadata(gh, payload, github_name):
+def extract_metadata(gh, payload):
     """ Extract metadata for ZENODO from a release. """
     release = payload["release"]
     repository = payload["repository"]
@@ -143,7 +145,6 @@ def extract_metadata(gh, payload, github_name):
         gh, repository['owner']['login'], repository['name'],
         release['tag_name']
     )
-    metadata = None
 
     if metadata is not None:
         defaults.update(metadata)
@@ -168,7 +169,6 @@ def extract_metadata(gh, payload, github_name):
         defaults['creators'] = get_contributors(
             gh, repository['owner']['login'], repository['name'],
         )
-        print defaults['creators']
 
     return defaults
 
@@ -188,6 +188,8 @@ def extract_files(payload):
 
     r = requests.get(zipball_url, stream=True)
     if r.status_code != 200:
-        raise Exception("Could not retrieve the archive from GitHub.")
+        raise Exception(
+            "Could not retrieve archive from GitHub: %s" % zipball_url
+        )
 
     return [(r.raw, filename)]

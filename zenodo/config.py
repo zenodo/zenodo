@@ -119,11 +119,17 @@ OAUTHCLIENT_REMOTE_APPS = dict(
         icon='fa fa-github',
         authorized_handler="zenodo.modules.github.views.handlers:authorized",
         disconnect_handler="zenodo.modules.github.views.handlers:disconnect",
+        signup_handler=dict(
+            info="zenodo.modules.github.views.handlers:account_info",
+            setup="zenodo.modules.github.views.handlers:account_setup",
+            view="invenio.modules.oauthclient.handlers:signup_handler",
+        ),
         params=dict(
             request_token_params={'scope': 'user:email,admin:repo_hook'},
             base_url='https://api.github.com/',
             request_token_url=None,
             access_token_url="https://github.com/login/oauth/access_token",
+            access_token_method='POST',
             authorize_url="https://github.com/login/oauth/authorize",
             app_key="GITHUB_APP_CREDENTIALS",
         )

@@ -31,6 +31,7 @@ var hook_url = "{{url_for('zenodo_github.hook')}}";
 
 function init_switches(){
     // Initialize bootstrap switches
+    var test_switch = $("input[name='test-flip']").bootstrapSwitch();
     var doiSwitches = $("input[data-repo-name]").bootstrapSwitch();
     doiSwitches.on("switchChange", function(e, data) {
       var state = data.value;
@@ -111,9 +112,7 @@ $(document).ready(function() {
     id="github-view",
 )}}
 <div class="panel-body">
-<div class="pull-right" style="color: #f00; margin-right: 0; margin-top: 20px; transform:rotate(45deg); -ms-transform:rotate(45deg); -webkit-transform:rotate(45deg); font-family: 'Courier New', Courier, monospace;">Public Beta</div>
 <h1 align="center"><i class="fa fa-github"></i> Get started</h1>
-
 
 <div class="row">
     <div class="col-md-4">
@@ -131,19 +130,31 @@ $(document).ready(function() {
     <div class="col-md-4">
     <h2><strong>3</strong> <small>Get the badge</small></h2>
     <hr>
-    After your first release, you can get a DOI badge to include in your GitHub
-    README file.
+    After your first release, a DOI badge that you can include in GitHub README will appear next to your repository below.
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-4" align="center">
+    <br/>
+    <input type="checkbox" checked data-size="large" data-animate="true" name="test-flip">
+    </div>
+    <div class="col-md-4">
+    </div>
+    <div class="col-md-4" align="center">
+    <br>
+    <a href="http://dx.doi.org/10.5281/zenodo.8475"><img src="{{config.CFG_SITE_SECURE_URL}}/badge/doi/10.5281/zenodo.8475.png" alt="10.5281/zenodo.8475"></a><br><small class="text-muted">(example)</small>
     </div>
 </div>
 <p></p>
-<p class="text-muted text-center"><small>More question? Check out the <a href="{{url_for('zenodo_base.faq')}}">FAQ</a>.</small></p>
-<p class="text-muted text-left"><small><strong>Beta version</strong>: This is a public beta of GitHub integration in Zenodo. Over the coming weeks we will be adding some additional features. Be sure to let us know by tweeting us @zenodo_org if you have ideas for what we should improve.</small></p>
+<p class="hide text-muted text-center"><small>More question? Check out the <a href="{{url_for('zenodo_github.faq')}}">FAQ</a>.</small></p>
 </div>
 <table class="table table-striped">
   <tbody>
+  {% if not repos %}
+  <tr><td colspan="2"><div align="center"><em>You have no repositories on GitHub.<br >Go to <a href="http://github.com/new">GitHub</a> and create your first or click Sync-button to synchronize latest changes from GitHub.</em></div></td></tr>
+  {% endif %}
   {%- for repo, description in repos|dictsort %}
   <tr>
-
     <td>
 
       <div class="repo-container">

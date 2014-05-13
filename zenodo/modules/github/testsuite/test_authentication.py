@@ -20,12 +20,33 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-from flask import url_for
+from __future__ import absolute_import
 
+from flask import url_for
+from mock import MagicMock
+import httpretty
+
+from invenio.ext.sqlalchemy import db
 from invenio.modules.oauthclient.testsuite.helpers import OAuth2ClientTestCase
+
+from . import fixtures
 
 
 class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
+    def setUp(self):
+        super(GitHubAuthenticationErrorsTest, self).setUp()
+
+        from invenio.modules.oauthclient.models import RemoteToken, \
+            RemoteAccount
+        from invenio.modules.accounts.models import User
+
+        RemoteToken.query.delete()
+        RemoteAccount.query.delete()
+        db.session.commit()
+        db.session.expunge_all()
+
+        User.query.filter_by(email='noemailuser@invenio-software.org').delete()
+
     def test_bad_verification_code(self):
         # Test redirect
         resp = self.client.get(
@@ -36,21 +57,76 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
             "https://github.com/login/oauth/authorize"
         )
 
-        # Mock up fake request from GitHub
-        self.mock_response(app='github', data=dict(
-            error_uri='http://developer.github.com/v3/oauth/'
-                      '#bad-verification-code',
-            error_description='The code passed is '
-                              'incorrect or expired.',
-            error='bad_verification_code',
-        ))
+        httpretty.enable()
+        fixtures.register_github_api()
 
+        # Test restart of auth flow when getting a bad_verification_code
         resp = self.client.get(
-            url_for("oauthclient.authorized", remote_app='github', code='test')
+            url_for(
+                "oauthclient.authorized",
+                remote_app='github',
+                code='bad_verification_code'
+            )
         )
 
-        # Assert that auth flow is reinitialized
         assert resp.status_code == 302
         assert resp.location.endswith(
             url_for('oauthclient.login', remote_app='github')
         )
+
+        httpretty.disable()
+        httpretty.reset()
+
+    def test_no_public_email(self):
+        # Test redirect
+        resp = self.client.get(
+            url_for("oauthclient.login", remote_app='github')
+        )
+        self.assertStatus(resp, 302)
+        assert resp.location.startswith(
+            "https://github.com/login/oauth/authorize"
+        )
+
+        httpretty.enable()
+        fixtures.register_oauth_flow()
+        fixtures.register_endpoint(
+            "/user",
+            fixtures.USER('noemailuser', bio=False)
+        )
+
+        # Assert user is redirect to page requesting email address
+        resp = self.client.get(
+            url_for(
+                "oauthclient.authorized",
+                remote_app='github',
+                code='test_no_email'
+            )
+        )
+        self.assertRedirects(
+            resp,
+            url_for("oauthclient.signup", remote_app='github', next='/')
+        )
+
+        # Mock account setup to prevent GitHub queries
+        from invenio.modules.oauthclient.client import signup_handlers
+        signup_handlers['github']['setup'] = MagicMock()
+
+        resp = self.client.post(
+            url_for(
+                "oauthclient.signup",
+                remote_app='github',
+                next='/mytest/',
+            ),
+            data={'email': 'noemailuser@invenio-software.org'}
+        )
+        self.assertRedirects(
+            resp,
+            '/mytest/',
+        )
+
+        from invenio.modules.accounts.models import User
+        assert User.query.filter_by(
+            email='noemailuser@invenio-software.org').count() == 1
+
+        httpretty.disable()
+        httpretty.reset()

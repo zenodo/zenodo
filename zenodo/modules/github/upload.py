@@ -62,6 +62,7 @@ def requests_request_factory(method, endpoint, urlargs, data, is_json, headers,
         url_for(
             endpoint,
             _external=True,
+            _scheme='https',
             **urlargs
         ),
         verify=verify_ssl,
@@ -104,7 +105,7 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
     """
     client = ZenodoClient(
         access_token,
-        ssl_verify=cfg['GITHUB_INSECURE_SSL'],
+        ssl_verify=False,
         request_factory=request_factory,
     )
 

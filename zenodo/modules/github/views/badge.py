@@ -31,6 +31,7 @@ import urllib
 from flask import Blueprint, make_response, abort, current_app
 
 from invenio.modules.pidstore.models import PersistentIdentifier
+from invenio.ext.sslify import ssl_required
 
 from ..helpers import get_account
 from ..badge import create_badge
@@ -77,6 +78,7 @@ def badge(doi):
 # Views
 #
 @blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
+@ssl_required
 def index(user_id, repository):
     """ Generate a badge for a specific GitHub repository. """
     account = get_account(user_id=user_id)
@@ -97,6 +99,7 @@ def index(user_id, repository):
 
 
 @blueprint.route("/doi/<path:doi>.png", methods=["GET"])
+@ssl_required
 def doi_badge(doi):
     """ Generate a badge for a specific DOI. """
     pid = PersistentIdentifier.get("doi", doi)

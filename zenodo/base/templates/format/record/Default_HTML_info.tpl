@@ -7,17 +7,12 @@
 {% if published_in %}
 <div class="well metadata">
 {% for item in published_in %}
-{% if not loop.last %}<hr>{% endif %}
 <small class="text-muted">{{item.text}}</small>
 <a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>{% endfor %}
 </div>
 {% endif %}
 
 <div class="well metadata">
-
-
-
-
   <dl>
     {{ bfe_date(bfo, date_format='%d %B %Y', prefix='<dt>Publication date:</dt><dd>', suffix='</dd>') }}
     {{ bfe_openaire_access_rights(bfo, only_restrictions="yes") }}

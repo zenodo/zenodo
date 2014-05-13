@@ -20,194 +20,152 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-from invenio.testsuite import InvenioTestCase
-from mock import MagicMock, patch
-from cStringIO import StringIO
+from __future__ import absolute_import
+
+import httpretty
+
+from invenio.celery.testsuite.helpers import CeleryTestCase
+from invenio.ext.sqlalchemy import db
 import json
 
-response = MagicMock()
-response.raw = StringIO("TEST")
-response.status_code = 200
+from . import fixtures
 
 
-class PayloadExtractionTestCase(InvenioTestCase):
+class GitHubTestCase(CeleryTestCase):
     def setUp(self):
-        pass
+        # Create celery application
+        self.create_celery_app()
+
+        # Run Flask initialization code - to before_first_request functions
+        # being executed
+        with self.app.test_request_context(''):
+            self.app.try_trigger_before_first_request_functions()
+            self.app.preprocess_request()
+
+        # Create a user
+        from invenio.modules.accounts.models import User
+        self.user = User(
+            email='info@invenio-software.org', nickname='githubuser'
+        )
+        self.user.password = "githubuser"
+        db.session.add(self.user)
+        db.session.commit()
+
+        # Create GitHub link
+        from invenio.modules.oauthclient.models import RemoteToken
+        from zenodo.modules.github.helpers import get_client_id
+        from zenodo.modules.github.utils import init_account
+
+        self.remote_token = RemoteToken.create(
+            self.user.id,
+            get_client_id(),
+            "test",
+            "",
+        )
+
+        # Init GitHub account and mock up GitHub API
+        httpretty.enable()
+        fixtures.register_github_api()
+        init_account(self.remote_token)
+        httpretty.disable()
 
     def tearDown(self):
-        pass
+        from invenio.modules.oauth2server.models import Token as ProviderToken
 
-    @patch('requests.get', return_value=response)
-    def test_extract_files(self, get):
+        # Disable httpretty if enabled
+        httpretty.disable()
+        httpretty.reset()
+
+        # Destroy Celery application
+        self.destroy_celery_app()
+
+        # Remove GitHub token
+        if self.remote_token:
+            self.remote_token.remote_account.delete()
+
+        # Remove User and provider tokens
+        if self.user:
+            ProviderToken.query.filter_by(user_id=self.user.id).delete()
+            db.session.delete(self.user)
+
+        db.session.commit()
+        db.session.expunge_all()
+
+
+class HandlePayloadTestCase(GitHubTestCase):
+    def test_handle_payload(self):
+        from zenodo.modules.github.tasks import handle_github_payload
+        from invenio.modules.webhooks.models import Event
+
+        httpretty.enable()
+        extra_data = self.remote_token.remote_account.extra_data
+        assert 'auser/repo-1' in extra_data['repos']
+        assert 'auser/repo-2' in extra_data['repos']
+
+        assert len(extra_data['repos']['auser/repo-1']['depositions']) == 0
+        assert len(extra_data['repos']['auser/repo-2']['depositions']) == 0
+
+        e = Event(
+            user_id=self.user.id,
+            payload=fixtures.PAYLOAD('auser', 'repo-1')
+        )
+
+        handle_github_payload.delay(e.__getstate__())
+
+        assert len(extra_data['repos']['auser/repo-1']['depositions']) == 1
+        assert len(extra_data['repos']['auser/repo-2']['depositions']) == 0
+
+        dep = extra_data['repos']['auser/repo-1']['depositions'][0]
+
+        assert dep['deposition_id'] == 1
+        assert dep['doi'] == "10.1234/foo.bar"
+        assert dep['record_id'] == 1234
+        assert dep['github_ref'] == "v1.0"
+
+
+class PayloadExtractionTestCase(GitHubTestCase):
+    def test_extract_files(self):
         from ..tasks import extract_files
 
-        files = extract_files(PAYLOAD_EXAMPLE)
+        httpretty.enable()
+        files = extract_files(
+            fixtures.PAYLOAD('auser', 'repo-1', tag='v1.0')
+        )
         assert len(files) == 1
 
         fileobj, filename = files[0]
-        assert filename == "decouple-v1.1.4.zip"
+        assert filename == "repo-1-v1.0.zip"
 
     def test_extract_metadata(self):
         from ..tasks import extract_metadata
+        from ..helpers import get_api
 
-        content = MagicMock()
-        content.decoded = json.dumps(dict(upload_type="dataset"))
+        gh = get_api(user_id=self.user.id)
 
-        repo = MagicMock()
-        repo.contents = MagicMock(return_value=content)
+        # Mock up responses
+        httpretty.enable()
+        fixtures.register_endpoint(
+            "/repos/auser/repo-2",
+            fixtures.REPO('auser', 'repo-2'),
+        )
+        fixtures.register_endpoint(
+            "/repos/auser/repo-2/contents/.zenodo.json",
+            fixtures.CONTENT(
+                'auser', 'repo-2', '.zenodo.json', 'v1.0',
+                json.dumps(dict(
+                    upload_type='dataset',
+                    license='mit-license',
+                    creators=[
+                        dict(name='Smith, Joe', affiliation='CERN'),
+                        dict(name='Smith, Joe', affiliation='CERN')
+                    ]
+                ))
+            )
+        )
 
-        gh = MagicMock()
-        gh.repository = MagicMock(return_value=repo)
+        metadata = extract_metadata(
+            gh,
+            fixtures.PAYLOAD('auser', 'repo-2', tag='v1.0'),
+        )
 
-        metadata = extract_metadata(gh, PAYLOAD_EXAMPLE, 'lnielsen-cern')
         assert metadata['upload_type'] == 'dataset'
-
-
-PAYLOAD_EXAMPLE = {
-    "action": "published",
-    "release": {
-        "url": "https://api.github.com/repos/lnielsen-cern/decouple/releases/204424",
-        "assets_url": "https://api.github.com/repos/lnielsen-cern/decouple/releases/204424/assets",
-        "upload_url": "https://uploads.github.com/repos/lnielsen-cern/decouple/releases/204424/assets{?name}",
-        "html_url": "https://github.com/lnielsen-cern/decouple/releases/tag/v1.1.4",
-        "id": 204424,
-        "tag_name": "v1.1.4",
-        "target_commitish": "master",
-        "name": "GitHub/Zenodo release test",
-        "body": "",
-        "draft": False,
-        "author": {
-            "login": "lnielsen-cern",
-            "id": 1698163,
-            "avatar_url": "https://avatars.githubusercontent.com/u/1698163",
-            "gravatar_id": "bbc951080061fc48cae0279d27f3c015",
-            "url": "https://api.github.com/users/lnielsen-cern",
-            "html_url": "https://github.com/lnielsen-cern",
-            "followers_url": "https://api.github.com/users/lnielsen-cern/followers",
-            "following_url": "https://api.github.com/users/lnielsen-cern/following{/other_user}",
-            "gists_url": "https://api.github.com/users/lnielsen-cern/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/lnielsen-cern/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/lnielsen-cern/subscriptions",
-            "organizations_url": "https://api.github.com/users/lnielsen-cern/orgs",
-            "repos_url": "https://api.github.com/users/lnielsen-cern/repos",
-            "events_url": "https://api.github.com/users/lnielsen-cern/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/lnielsen-cern/received_events",
-            "type": "User",
-            "site_admin": False
-        },
-        "prerelease": False,
-        "created_at": "2014-02-26T08:13:42Z",
-        "published_at": "2014-02-28T13:55:32Z",
-        "assets": [
-
-        ],
-        "tarball_url": "https://api.github.com/repos/lnielsen-cern/decouple/tarball/v1.1.4",
-        "zipball_url": "https://api.github.com/repos/lnielsen-cern/decouple/zipball/v1.1.4"
-    },
-    "repository": {
-        "id": 17202897,
-        "name": "decouple",
-        "full_name": "lnielsen-cern/decouple",
-        "owner": {
-            "login": "lnielsen-cern",
-            "id": 1698163,
-            "avatar_url": "https://avatars.githubusercontent.com/u/1698163",
-            "gravatar_id": "bbc951080061fc48cae0279d27f3c015",
-            "url": "https://api.github.com/users/lnielsen-cern",
-            "html_url": "https://github.com/lnielsen-cern",
-            "followers_url": "https://api.github.com/users/lnielsen-cern/followers",
-            "following_url": "https://api.github.com/users/lnielsen-cern/following{/other_user}",
-            "gists_url": "https://api.github.com/users/lnielsen-cern/gists{/gist_id}",
-            "starred_url": "https://api.github.com/users/lnielsen-cern/starred{/owner}{/repo}",
-            "subscriptions_url": "https://api.github.com/users/lnielsen-cern/subscriptions",
-            "organizations_url": "https://api.github.com/users/lnielsen-cern/orgs",
-            "repos_url": "https://api.github.com/users/lnielsen-cern/repos",
-            "events_url": "https://api.github.com/users/lnielsen-cern/events{/privacy}",
-            "received_events_url": "https://api.github.com/users/lnielsen-cern/received_events",
-            "type": "User",
-            "site_admin": False
-        },
-        "private": False,
-        "html_url": "https://github.com/lnielsen-cern/decouple",
-        "description": "Decouple and recouple.",
-        "fork": True,
-        "url": "https://api.github.com/repos/lnielsen-cern/decouple",
-        "forks_url": "https://api.github.com/repos/lnielsen-cern/decouple/forks",
-        "keys_url": "https://api.github.com/repos/lnielsen-cern/decouple/keys{/key_id}",
-        "collaborators_url": "https://api.github.com/repos/lnielsen-cern/decouple/collaborators{/collaborator}",
-        "teams_url": "https://api.github.com/repos/lnielsen-cern/decouple/teams",
-        "hooks_url": "https://api.github.com/repos/lnielsen-cern/decouple/hooks",
-        "issue_events_url": "https://api.github.com/repos/lnielsen-cern/decouple/issues/events{/number}",
-        "events_url": "https://api.github.com/repos/lnielsen-cern/decouple/events",
-        "assignees_url": "https://api.github.com/repos/lnielsen-cern/decouple/assignees{/user}",
-        "branches_url": "https://api.github.com/repos/lnielsen-cern/decouple/branches{/branch}",
-        "tags_url": "https://api.github.com/repos/lnielsen-cern/decouple/tags",
-        "blobs_url": "https://api.github.com/repos/lnielsen-cern/decouple/git/blobs{/sha}",
-        "git_tags_url": "https://api.github.com/repos/lnielsen-cern/decouple/git/tags{/sha}",
-        "git_refs_url": "https://api.github.com/repos/lnielsen-cern/decouple/git/refs{/sha}",
-        "trees_url": "https://api.github.com/repos/lnielsen-cern/decouple/git/trees{/sha}",
-        "statuses_url": "https://api.github.com/repos/lnielsen-cern/decouple/statuses/{sha}",
-        "languages_url": "https://api.github.com/repos/lnielsen-cern/decouple/languages",
-        "stargazers_url": "https://api.github.com/repos/lnielsen-cern/decouple/stargazers",
-        "contributors_url": "https://api.github.com/repos/lnielsen-cern/decouple/contributors",
-        "subscribers_url": "https://api.github.com/repos/lnielsen-cern/decouple/subscribers",
-        "subscription_url": "https://api.github.com/repos/lnielsen-cern/decouple/subscription",
-        "commits_url": "https://api.github.com/repos/lnielsen-cern/decouple/commits{/sha}",
-        "git_commits_url": "https://api.github.com/repos/lnielsen-cern/decouple/git/commits{/sha}",
-        "comments_url": "https://api.github.com/repos/lnielsen-cern/decouple/comments{/number}",
-        "issue_comment_url": "https://api.github.com/repos/lnielsen-cern/decouple/issues/comments/{number}",
-        "contents_url": "https://api.github.com/repos/lnielsen-cern/decouple/contents/{+path}",
-        "compare_url": "https://api.github.com/repos/lnielsen-cern/decouple/compare/{base}...{head}",
-        "merges_url": "https://api.github.com/repos/lnielsen-cern/decouple/merges",
-        "archive_url": "https://api.github.com/repos/lnielsen-cern/decouple/{archive_format}{/ref}",
-        "downloads_url": "https://api.github.com/repos/lnielsen-cern/decouple/downloads",
-        "issues_url": "https://api.github.com/repos/lnielsen-cern/decouple/issues{/number}",
-        "pulls_url": "https://api.github.com/repos/lnielsen-cern/decouple/pulls{/number}",
-        "milestones_url": "https://api.github.com/repos/lnielsen-cern/decouple/milestones{/number}",
-        "notifications_url": "https://api.github.com/repos/lnielsen-cern/decouple/notifications{?since,all,participating}",
-        "labels_url": "https://api.github.com/repos/lnielsen-cern/decouple/labels{/name}",
-        "releases_url": "https://api.github.com/repos/lnielsen-cern/decouple/releases{/id}",
-        "created_at": "2014-02-26T07:39:11Z",
-        "updated_at": "2014-02-28T13:55:32Z",
-        "pushed_at": "2014-02-28T13:55:32Z",
-        "git_url": "git://github.com/lnielsen-cern/decouple.git",
-        "ssh_url": "git@github.com:lnielsen-cern/decouple.git",
-        "clone_url": "https://github.com/lnielsen-cern/decouple.git",
-        "svn_url": "https://github.com/lnielsen-cern/decouple",
-        "homepage": None,
-        "size": 388,
-        "stargazers_count": 0,
-        "watchers_count": 0,
-        "language": "Python",
-        "has_issues": False,
-        "has_downloads": True,
-        "has_wiki": True,
-        "forks_count": 0,
-        "mirror_url": None,
-        "open_issues_count": 0,
-        "forks": 0,
-        "open_issues": 0,
-        "watchers": 0,
-        "default_branch": "master",
-        "master_branch": "master"
-    },
-    "sender": {
-        "login": "lnielsen-cern",
-        "id": 1698163,
-        "avatar_url": "https://avatars.githubusercontent.com/u/1698163",
-        "gravatar_id": "bbc951080061fc48cae0279d27f3c015",
-        "url": "https://api.github.com/users/lnielsen-cern",
-        "html_url": "https://github.com/lnielsen-cern",
-        "followers_url": "https://api.github.com/users/lnielsen-cern/followers",
-        "following_url": "https://api.github.com/users/lnielsen-cern/following{/other_user}",
-        "gists_url": "https://api.github.com/users/lnielsen-cern/gists{/gist_id}",
-        "starred_url": "https://api.github.com/users/lnielsen-cern/starred{/owner}{/repo}",
-        "subscriptions_url": "https://api.github.com/users/lnielsen-cern/subscriptions",
-        "organizations_url": "https://api.github.com/users/lnielsen-cern/orgs",
-        "repos_url": "https://api.github.com/users/lnielsen-cern/repos",
-        "events_url": "https://api.github.com/users/lnielsen-cern/events{/privacy}",
-        "received_events_url": "https://api.github.com/users/lnielsen-cern/received_events",
-        "type": "User",
-        "site_admin": False
-    }
-}

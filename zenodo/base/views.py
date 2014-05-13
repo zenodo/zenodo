@@ -209,6 +209,20 @@ RULES = {
         'scheme': 'doi',
         'text': 'Published in',
         'image': 'img/f1000research.jpg',
+    }],
+    'inspire': [{
+        'prefix': 'http://inspirehep.net/record/',
+        'relation': 'isSupplementedBy',
+        'scheme': 'url',
+        'text': 'Available in',
+        'image': 'img/inspirehep.png',
+    }],
+    'zenodo': [{
+        'prefix': 'https://github.com',
+        'relation': 'isSupplementTo',
+        'scheme': 'url',
+        'text': 'Available in',
+        'image': 'img/github.png',
     }]
 }
 
@@ -233,7 +247,8 @@ def zenodo_related_links(record):
         return rs
 
     ret = []
-    communities = record.get('communities', [])
+    communities = record.get('communities', []) + \
+        record.get('provisional_communities', [])
     for item in record.get('related_identifiers', []):
         for r in match_rules(item, communities):
             ret.append(apply_rule(item, r))

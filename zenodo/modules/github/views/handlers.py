@@ -23,16 +23,28 @@
 from __future__ import absolute_import
 
 
-from flask import url_for, redirect, current_app, abort, request
+from flask import url_for, redirect, current_app
 from flask.ext.login import current_user
-from invenio.modules.oauthclient.handlers import oauth2_token_setter
 from invenio.modules.oauthclient.models import RemoteToken
-from invenio.modules.oauthclient.utils import oauth_authenticate
+from invenio.modules.oauthclient.handlers import authorized_signup_handler, \
+    oauth_error_handler
+from invenio.modules.oauthclient.errors import OAuthResponseError
 
 from ..utils import init_account, init_api
 from ..tasks import disconnect_github
 
 
+def account_info(remote, resp):
+    gh = init_api(resp['access_token'])
+    ghuser = gh.user()
+    return dict(email=ghuser.email, nickname=ghuser.login)
+
+
+def account_setup(remote, token):
+    init_account(token)
+
+
+@oauth_error_handler
 def authorized(resp, remote):
     """
     Authorized callback handler for GitHub
@@ -42,53 +54,20 @@ def authorized(resp, remote):
             # See https://developer.github.com/v3/oauth/#bad-verification-code
             # which recommends starting auth flow again.
             return redirect(url_for('oauthclient.login', remote_app='github'))
-        elif resp['error'] == 'incorrect_client_credentials':
-            raise Exception(
-                "Application mis-configuration in GitHub: %s" % resp
-            )
-        elif resp['error'] == 'redirect_uri_mismatch':
-            raise Exception(
-                "Application mis-configuration in GitHub: %s" % resp
+        elif resp['error'] in ['incorrect_client_credentials',
+                               'redirect_uri_mismatch']:
+            raise OAuthResponseError(
+                "Application mis-configuration in GitHub", remote, resp
             )
 
-    # User must be authenticated
-    if not current_user.is_authenticated():
-        if resp is None:
-            # User rejected authorization request
-            return current_app.login_manager.unauthorized()
-
-        # Get users email address
-        gh = init_api(resp['access_token'])
-        ghuser = gh.user()
-
-        authenticated = oauth_authenticate(
-            remote.consumer_key, ghuser.email,
-            require_existing_link=False, auto_register=True
-        )
-        if not authenticated:
-            return current_app.login_manager.unauthorized()
-
-    if resp is None:
-        # User rejected authorization request
-        return redirect(url_for('github.rejected'))
-
-    # Store or update acquired access token
-    token = oauth2_token_setter(remote, resp)
-    if token is None:
-        abort(500)
-
-    if not token.remote_account.extra_data:
-        init_account(token)
-
-    if request.args.get('next', None):
-        return redirect(request.args.get('next'))
-    else:
-        return redirect(url_for('zenodo_github.index'))
+    return authorized_signup_handler(resp, remote)
 
 
 def disconnect(remote):
     """
-    Disconnect callback handler for GitHub
+    Disconnect callback handler for GitHub.
+
+    This is a test
     """
     # User must be authenticated
     if not current_user.is_authenticated():
@@ -103,3 +82,8 @@ def disconnect(remote):
         token.remote_account.delete()
 
     return redirect(url_for('oauthclient_settings.index'))
+
+
+def signup(remote):
+    """ Signup callback handler for GitHub. """
+    pass

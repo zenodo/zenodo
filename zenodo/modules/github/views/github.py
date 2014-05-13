@@ -145,13 +145,19 @@ def index():
     return render_template("github/index.html", **ctx)
 
 
+@blueprint.route('/faq')
+@ssl_required
+@login_required
+def faq():
+    """  Display FAQ. """
+    return render_template("github/faq.html")
+
+
 @blueprint.route('/rejected/')
 @ssl_required
 @login_required
 def rejected(resp):
-    """
-    View for when user rejects request to connect to github.
-    """
+    """ View for when user rejects request to connect to github. """
     return render_template("github/rejected.html")
 
 

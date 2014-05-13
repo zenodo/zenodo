@@ -23,6 +23,7 @@ import json
 import pytz
 import requests
 from operator import itemgetter
+from flask import current_app
 
 from datetime import datetime
 import dateutil.parser
@@ -226,13 +227,14 @@ def get_zenodo_json(gh, owner, repo_name, ref):
             return None
         return json.loads(content.decoded)
     except Exception:
+        current_app.logger.exception("Failed to decode .zenodo.json.")
         # Problems decoding the file
         return None
 
 
 def get_contributors(gh, owner, repo_name):
     """
-    Get the .zenodo.json file
+    Get list of contributors to a repository
     """
     try:
         contrib_url = gh.repository(owner, repo_name).contributors_url
@@ -246,8 +248,10 @@ def get_contributors(gh, owner, repo_name):
                 if r.status_code == 200:
                     data = r.json()
                     return dict(
-                        name=data['name'],
-                        affiliation=data['company'] or '',
+                        name=(data['name'] if 'name' in data and data['name']
+                              else data['login']),
+                        affiliation=(data['company'] if 'company' in data
+                                     else ''),
                     )
 
             # Sort according to number of contributions
@@ -257,9 +261,11 @@ def get_contributors(gh, owner, repo_name):
                 get_author,
                 filter(lambda x: x['type'] == 'User', contributors)
             )
+            contributors = filter(lambda x: x is not None, contributors)
 
             return contributors
     except Exception:
+        current_app.logger.exception("Failed to get GitHub contributors.")
         return None
 
 
@@ -299,7 +305,6 @@ def revoke_token(remote, access_token):
     return r.status_code == 200
 
 
-
 def is_valid_sender(extra_data, sender_login):
     return sender_login == extra_data['login']
 
@@ -314,5 +319,4 @@ def submitted_deposition(extra_data, full_name, deposition, github_ref,
         errors=errors,
         github_ref=github_ref,  # TODO
     )
-
     extra_data["repos"][full_name]['depositions'].append(deposition)
