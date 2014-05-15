@@ -89,37 +89,6 @@ def register_github_api():
         streaming=True,
     )
 
-    base = current_app.config['CFG_SITE_SECURE_URL']
-    httpretty.register_uri(
-        httpretty.POST,
-        "%s/api/deposit/depositions/" % base,
-        body=json.dumps(dict(id=1)),
-        status=201,
-    )
-    httpretty.register_uri(
-        httpretty.POST,
-        "%s/api/deposit/depositions/1/files/" % base,
-        body=json.dumps(dict()),
-        status=201,
-    )
-    httpretty.register_uri(
-        httpretty.PUT,
-        "%s/api/deposit/depositions/1" % base,
-        body=json.dumps(dict()),
-        status=200,
-    )
-    httpretty.register_uri(
-        httpretty.POST,
-        "%s/api/deposit/depositions/1/actions/publish" % base,
-        body=json.dumps(dict(
-            id=1,
-            record_id=1234,
-            doi='10.1234/foo.bar',
-            modified=datetime.now(tz=tzutc()).isoformat(),
-        )),
-        status=202,
-    )
-
 
 def register_oauth_flow():
     """ Register URIs used for OAuth flow. """

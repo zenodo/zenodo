@@ -1,28 +1,29 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of ZENODO.
-# Copyright (C) 2014 CERN.
-#
-# ZENODO is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# ZENODO is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-#
-# In applying this licence, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+##
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
 
 from __future__ import absolute_import
 
 import httpretty
+import six
 
 from invenio.celery.testsuite.helpers import CeleryTestCase
 from invenio.ext.sqlalchemy import db
@@ -117,9 +118,8 @@ class HandlePayloadTestCase(GitHubTestCase):
 
         dep = extra_data['repos']['auser/repo-1']['depositions'][0]
 
-        assert dep['deposition_id'] == 1
-        assert dep['doi'] == "10.1234/foo.bar"
-        assert dep['record_id'] == 1234
+        assert dep['doi'].endswith(six.text_type(dep['record_id']))
+        assert dep['errors'] is None
         assert dep['github_ref'] == "v1.0"
 
 

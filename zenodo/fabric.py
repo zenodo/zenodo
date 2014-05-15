@@ -212,11 +212,11 @@ def deploy(name=None, quite=False, with_deps=True):
             if quite or confirm(cyan("Set %s in production mode?" % h)):
                 execute(haproxy_enable_server, h, hosts=env.roledefs['lb'],)
 
-        if h == env.get('BIBSCHED_HOST', '') and \
-           (quite or confirm(cyan("Run upgrader?"))):
-            with settings(host_string=h):
-                sudo("%(PREFIX)s/bin/inveniomanage upgrader run" % env,
-                     user=env.OWNER)
+        if h == env.get('BIBSCHED_HOST', '') and not quite:
+            if confirm(cyan("Run upgrader?")):
+                with settings(host_string=h):
+                    sudo("%(PREFIX)s/bin/inveniomanage upgrader run" % env,
+                         user=env.OWNER)
         if h == env.get('BIBSCHED_HOST', '') and \
            (quite or confirm(cyan("Start bibsched?"))):
             with settings(host_string=h):

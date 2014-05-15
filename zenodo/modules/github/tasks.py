@@ -31,6 +31,7 @@ from __future__ import absolute_import
 from celery.utils.log import get_task_logger
 import requests
 import six
+import sys
 from flask import current_app
 
 from invenio.celery import celery
@@ -74,7 +75,7 @@ def disconnect_github(remote_app, access_token, extra_data):
 
 
 @celery.task(ignore_result=True)
-def handle_github_payload(event_state):
+def handle_github_payload(event_state, verify_sender=True):
     """ Handle incoming notification from GitHub on a new release. """
     e = Event()
     e.__setstate__(event_state)
@@ -92,7 +93,8 @@ def handle_github_payload(event_state):
     ).first().access_token
 
     # Validate payload sender
-    if not is_valid_sender(account.extra_data, e.payload['sender']['login']):
+    if verify_sender and \
+       not is_valid_sender(account.extra_data, e.payload['sender']['login']):
         raise Exception("Invalid sender for payload %s for user %s" % (
             e.payload, e.user_id
         ))
@@ -105,9 +107,7 @@ def handle_github_payload(event_state):
         files = extract_files(e.payload)
 
         # Upload into Zenodo
-        current_app.logger.debug(metadata)
         deposition = upload(access_token, metadata, files, publish=True)
-        current_app.logger.debug(deposition)
 
         # TODO: Add step to update metadata of all previous records
         submitted_deposition(
@@ -122,7 +122,18 @@ def handle_github_payload(event_state):
         # Send email to user
         current_app.logger.exception("Failed handling GitHub payload")
         db.session.commit()
-        six.reraise()
+        six.reraise(*sys.exc_info())
+
+
+def extract_title(release, repository):
+    return release['name'] or "%s %s" % (
+        repository['name'], release['tag_name']
+    )
+
+
+def extract_description(gh, release, repository):
+    return gh.markdown(release['body']) or repository['description'] or \
+        'No description provided.'
 
 
 def extract_metadata(gh, payload):
@@ -133,8 +144,8 @@ def extract_metadata(gh, payload):
     defaults = dict(
         upload_type='software',
         publication_date=release['published_at'][:10],
-        title=release['name'],
-        description=gh.markdown(release['body']),
+        title=extract_title(release, repository),
+        description=extract_description(gh, release, repository),
         access_right='open',
         license='other-open',
         related_identifiers=[],
