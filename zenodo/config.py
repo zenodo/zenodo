@@ -134,9 +134,38 @@ OAUTHCLIENT_REMOTE_APPS = dict(
             app_key="GITHUB_APP_CREDENTIALS",
         )
     ),
+    orcid=dict(
+        title='ORCID',
+        description='Connecting Research and Researchers.',
+        icon='',
+        authorized_handler="invenio.modules.oauthclient.handlers"
+                           ":authorized_signup_handler",
+        disconnect_handler="invenio.modules.oauthclient.handlers"
+                           ":disconnect_handler",
+        signup_handler=dict(
+            info="invenio.modules.oauthclient.contrib.orcid:account_info",
+            setup="invenio.modules.oauthclient.contrib.orcid:account_setup",
+            view="invenio.modules.oauthclient.handlers:signup_handler",
+        ),
+        params=dict(
+            request_token_params={'scope': '/authenticate'},
+            base_url='https://pub.orcid.com/',
+            request_token_url=None,
+            access_token_url="https://pub.orcid.org/oauth/token",
+            access_token_method='GET',
+            authorize_url="https://orcid.org/oauth/authorize",
+            app_key="ORCID_APP_CREDENTIALS",
+            content_type="application/json",
+        )
+    ),
 )
 
 GITHUB_APP_CREDENTIALS = dict(
+    consumer_key="changeme",
+    consumer_secret="changeme",
+)
+
+ORCID_APP_CREDENTIALS = dict(
     consumer_key="changeme",
     consumer_secret="changeme",
 )

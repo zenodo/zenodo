@@ -58,8 +58,15 @@
   <div class="col-sm-4 col-md-4">
     {%- block form_auth_internal_form -%}
       <div class="well">
+      <h3>Sign In</h3>
+
+      {% set next = request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL %}
+      <br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next)}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> Sign in with GitHub</a>
+      {# <br /><a href="{{url_for('oauthclient.login', remote_app='orcid', next=next)}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.png') }}"></i> Sign in with ORCID</a>#}
+      <h3 align="center">&mdash; OR &mdash;</h3>
       {{super()}}
       </div>
     {%- endblock -%}
+    {%- block form_auth_internal_title scoped -%}{% endblock %}
   </div>
 {%- endblock -%}

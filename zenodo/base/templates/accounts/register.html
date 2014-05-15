@@ -20,58 +20,14 @@
 {% extends "accounts/register_base.html" %}
 {% block title %}{% endblock %}
 
-{% block body %}
-<div class="container">
-  <div class="row">
-    <div class="col-md-offset-3 col-md-6 well">
-    {%- block form scoped -%}
-      <form class="form-horizontal" role="form" method="POST" action="{{ url_for('.register',) }}">
-      {%- if state == 'success' %}
-      {%- block form_success scoped -%}
-        <legend>{{title}}<span class="pull-right"><i class="glyphicon glyphicon-ok"></i></span></legend>
-        {%- for m in messages %}
-            <p>{{m}}</p>
-        {%- endfor %}
-      {%- endblock form_success -%}
-      {%- else %}
-      {%- block form_inner scoped -%}
-        <fieldset>
-          {%- block form_title scoped -%}
-          <legend>{{title}}<span class="pull-right">
-          {%- if state -%}
-            <i class="glyphicon glyphicon-warning-sign"></i>
-          {%- else -%}
-            <i class="glyphicon glyphicon-edit"></i>
-          {%- endif -%}
-          </span></legend>
-          {%- endblock form_title -%}
-          {%- block form_message scoped -%}
-          {% if messages and state != 'success' %}
-          <div class="alert alert-{{state}}">
-          {%- for m in messages %}
-            <p>{{m}}</p>
-          {%- endfor %}
-          </div>
-          {% endif %}
-          {%- endblock form_message -%}
-          {%- block form_fields scoped -%}
-          {% for field in form if field.name != 'submit' %}
-            {%- block form_field scoped -%}{{render_field(field, show_description=True, label_size=4, field_size=5)}}{%- endblock form_field -%}
-          {% endfor %}
-          {%- endblock form_fields -%}
-        </fieldset>
-        {{form.submit(value="Sign up", class="btn btn-warning btn-lg pull-right")}}
-      {%- endblock form_inner -%}
-      {% endif %}
-      </form>
-    {%- endblock form -%}
-    <div class="modal-body" align="center">
-          <h3>&mdash; OR &mdash;</h3>
-      </div>
-    {% set next = request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL %}
-          <br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next)}}" class="btn btn-default btn-lg"><i class="fa fa-github"></i> Sign up with GitHub</a>
-          <a href="{{url_for('oauthclient.login', remote_app='orcid', next=next)}}" class="btn btn-default btn-lg"><img src="http://orcid.org/sites/about.orcid.org/files/images/ID_symbol_24x24.png"></i> Sign up with ORCID</a>
-    </div>
-  </div>
+{%- block form_title scoped -%}
+{{ super() }}
+<div align="center">
+{% set next = '/' %}
+<br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next)}}" class="btn btn-default btn-lg"><i class="fa fa-github"></i> Sign up with GitHub</a>
+{#<a href="{{url_for('oauthclient.login', remote_app='orcid', next=next)}}" class="btn btn-default btn-lg"><img src="{{ url_for('static', filename='img/orcid.png') }}"></i> Sign up with ORCID</a>#}
 </div>
-{% endblock %}
+<br>
+<h3 align="center">&mdash; OR &mdash;</h3>
+<br>
+{%- endblock form_title -%}
