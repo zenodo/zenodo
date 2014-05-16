@@ -94,7 +94,7 @@ def handle_github_payload(event_state, verify_sender=True):
 
     # Validate payload sender
     if verify_sender and \
-       not is_valid_sender(account.extra_data, e.payload['sender']['login']):
+       not is_valid_sender(account.extra_data, e.payload):
         raise Exception("Invalid sender for payload %s for user %s" % (
             e.payload, e.user_id
         ))

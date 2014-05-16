@@ -125,7 +125,9 @@ OAUTHCLIENT_REMOTE_APPS = dict(
             view="invenio.modules.oauthclient.handlers:signup_handler",
         ),
         params=dict(
-            request_token_params={'scope': 'user:email,admin:repo_hook'},
+            request_token_params={
+                'scope': 'user:email,admin:repo_hook,read:org'
+            },
             base_url='https://api.github.com/',
             request_token_url=None,
             access_token_url="https://github.com/login/oauth/access_token",

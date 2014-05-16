@@ -131,7 +131,7 @@ def sync(gh, extra_data, sync_hooks=True):
     existing_set = set(extra_data['repos'].keys())
     new_set = set()
 
-    for u in [login]:  # + list(gh.iter_orgs())
+    for u in [login] + [x.login for x in gh.iter_orgs()]:
         for r in gh.iter_user_repos(u, type='owner', sort='full_name'):
             # Add if not in list
             if r.full_name not in extra_data["repos"]:
@@ -305,8 +305,8 @@ def revoke_token(remote, access_token):
     return r.status_code == 200
 
 
-def is_valid_sender(extra_data, sender_login):
-    return sender_login == extra_data['login']
+def is_valid_sender(extra_data, payload):
+    return payload['repository']['full_name'] in extra_data['repos']
 
 
 def submitted_deposition(extra_data, full_name, deposition, github_ref,
