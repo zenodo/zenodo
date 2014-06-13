@@ -137,7 +137,6 @@ OAUTHCLIENT_REMOTE_APPS = dict(
         )
     ),
     orcid=dict(
-        hide=True,
         title='ORCID',
         description='Connecting Research and Researchers.',
         icon='',
