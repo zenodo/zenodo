@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2012 CERN.
+## Copyright (C) 2013, 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -110,10 +110,10 @@ Type "help", "copyright", "credits" or "license" for more information.
 </pre>
 </li>
 
-<li>All API access requires an API key, so <a href="#restapi-auth">create</a> one.</li>
+<li>All API access requires an access token, so <a href="#restapi-auth">create</a> one.</li>
 
-<li><p>Let's try again (replace <code>YOUR_API_KEY</code> with your newly created API key):</p>
-<pre>>>> r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?apikey=YOUR_API_KEY")
+<li><p>Let's try again (replace <code>ACCESS_TOKEN</code> with your newly created personal access token):</p>
+<pre>>>> r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?access_token=ACCESS_TOKEN")
 >>> r.status_code
 200
 >>> r.json()
@@ -123,7 +123,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 <li><p>Next, let's create a new empty upload:</p>
 <pre>>>> headers = {"Content-Type": "application/json"}
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?apikey=YOUR_API_KEY", data="{}", headers=headers)
+>>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?access_token=ACCESS_TOKEN", data="{}", headers=headers)
 >>> r.status_code
 201
 >>> r.json()
@@ -135,7 +135,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>Now, let's upload a new file:</p>
 <pre>>>> data = {'filename': 'myfirstfile.csv'}
 >>> files = {'file': open('/path/to/myfirstfile.csv', 'rb')}
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/files?apikey=YOUR_API_KEY" % deposition_id, data=data, files=files)
+>>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/files?access_token=ACCESS_TOKEN" % deposition_id, data=data, files=files)
 >>> r.status_code
 201
 >>> r.json()
@@ -147,7 +147,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>Last thing missing, is just to add some metadata:</p>
 <pre>
 >>> data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}
->>> r = requests.put("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s?apikey=YOUR_API_KEY" % deposition_id, data=json.dumps(data), headers=headers)
+>>> r = requests.put("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s?access_token=ACCESS_TOKEN" % deposition_id, data=json.dumps(data), headers=headers)
 >>> r.status_code
 200
 </pre>
@@ -156,7 +156,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>and, we're ready to publish:</p>
 <div class="alert alert-danger">Don't execute this last step - it will put your test upload straight online.</div>
 <pre>
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/actions/publish?apikey=YOUR_API_KEY" % deposition_id)
+>>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/actions/publish?access_token=ACCESS_TOKEN" % deposition_id)
 >>> r.status_code
 202
 </pre>
@@ -175,26 +175,52 @@ Type "help", "copyright", "credits" or "license" for more information.
 The REST API is versioned. We strive not to make backward incompatible changes to the API, but if we do, we release a new version. {# By default our URL endpoint always provide the latest version. A client can force a specific API version by including the <code>X-API-Version</code> header in the request.</p>#} <a href="#restapi-changes">Changes</a> to the API are documented on this page, and advance notification is given on our <a href="http://twitter.com/zenodo_org">Twitter account</a>.</p>
 
 <h2 id="restapi-auth">Authentication</h2>
-<p>All API requests must be authenticated and over HTTPS. Any request over plain HTTP will fail. Currently we support authentication with API keys, but will add support for OAuth 2.0 in the near future as well.</p>
+<p>All API requests must be authenticated and over HTTPS. Any request over plain HTTP will fail. We support authentication with via OAuth 2.0.</p>
 
-<p><strong>Acquiring API keys</strong>
+<p><strong>Acquiring a personal access token</strong>
 <ol>
 <li><a href="{{url_for('youraccount.register')}}">Register</a> for a ZENODO account if you don't already have one.</li>
-<li>Go to your <a href="{{url_for('youraccount.register')}}">profile</a>, and click "Create new key"</li>
-<li>Click the "API key" link to view your newly created API key</li>
+<li>Go to your <a href="{{url_for('oauth2server_settings.index')}}">Applications</a>, to <a href="{{url_for('oauth2server_settings.token_new')}}">create a new token</a>.</li>
+<li>Select the OAuth scopes you need (for the quick start tutorial you need <code>deposit:write</code> and <code>deposit:actions</code>).</li>
 </ol>
 </p>
 
-<div class="alert">
-  <strong>Important!</strong> Do not share your API key with anyone else, and only use it over HTTPS.
+<div class="alert alert-danger">
+  <strong>Important!</strong> Do not share your personal access token with anyone else, and only use it over HTTPS.
 </div>
 
-<p><strong>Using API keys</strong></p>
-<p>The API key must be included in all requests as a URL parameter:</p>
+<p><strong>Using access tokens</strong></p>
+<p>A access token must be included in all requests as a URL parameter:</p>
 
 <pre>
-{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?apikey=YOUR_API_KEY_HERE
+{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?access_token=ACCESS_TOKEN
 </pre>
+
+<p><strong>Scopes</strong></p>
+Scopes assigns permissions to your access token to limit access to data and actions in {{config.CFG_SITE_NAME}}.
+
+The following scopes exists:
+
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>deposit:write</code></td>
+<td>Grants write access to depositions, but does not allow publishing the upload.</td>
+</tr>
+<tr>
+<td><code>deposit:actions</code></td>
+<td>Grants access to publish, edit and discard edits for depositions.</td>
+</tr>
+</tbody>
+</table>
+
+
 
 <h2 id="restapi-requests">Requests</h2>
 <p>The base URL of the API is <code>{{config.CFG_SITE_SECURE_URL}}/api/</code>.</p>
@@ -265,12 +291,12 @@ We use the following HTTP status codes to indicate success or failure of a reque
 <tr>
 <td><code>401</code></td>
 <td>Unauthorized</td>
-<td>Request failed, due to an invalid API key. <a href="#restapi-errors">Error response</a> included.</td>
+<td>Request failed, due to an invalid access token. <a href="#restapi-errors">Error response</a> included.</td>
 </tr>
 <tr>
 <td><code>403</code></td>
 <td>Forbidden</td>
-<td>Request failed, due to missing authorization (e.g. deleting an already submitted upload). <a href="#restapi-errors">Error response</a> included.
+<td>Request failed, due to missing authorization (e.g. deleting an already submitted upload or missing scopes for your access token). <a href="#restapi-errors">Error response</a> included.
 </td>
 </tr>
 <tr>
@@ -378,11 +404,11 @@ Error responses for 400 series errors (e.g. 400, 401, 403, ...) are returned as 
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="curl">
-                <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?apikey=YOUR_API_KEY</pre>
+                <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
               </div>
               <div class="tab-pane" id="python">
                 <pre>import requests
-response = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?apikey=YOUR_API_KEY")
+response = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN")
 print response.json()
                 </pre>
               </div>
@@ -422,6 +448,10 @@ print response.json()
     <td>Content-Type: application/json</td>
 </tr>
 <tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
+</tr>
+<tr>
     <th>Data parameters</th>
     <td><p>An empty JSON object <code>{}</code> or a <a href="#restapi-rep-meta">deposition metadata</a> resource. Example:</p>
     <pre>{
@@ -449,17 +479,17 @@ print response.json()
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-create">
-      <pre>$ curl -i -H "Content-Type: application/json" --data '{}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?apikey=YOUR_API_KEY
+      <pre>$ curl -i -H "Content-Type: application/json" --data '{}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN
 
 <em>or</em>
 
-$ curl -i -H "Content-Type: application/json" -X POST --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?apikey=YOUR_API_KEY</pre>
+$ curl -i -H "Content-Type: application/json" -X POST --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-create">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?apikey=YOUR_API_KEY"
+url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 r = requests.post(url, data="{}", headers=headers)
 
@@ -529,12 +559,12 @@ r = requests.post(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-get">
-      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-get">
       <pre>import requests
 
-r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?apikey=YOUR_API_KEY")</pre>
+r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -570,6 +600,10 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ap
 <tr>
     <th>Request headers</th>
     <td>Content-Type: application/json</td>
+</tr>
+<tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
 </tr>
 <tr>
     <th>URL parameters</th>
@@ -611,13 +645,13 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ap
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-put">
-      <pre>$ curl -i -H "Content-Type: application/json" -X PUT --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -H "Content-Type: application/json" -X PUT --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-put">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?apikey=YOUR_API_KEY"
+url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}
 
@@ -653,6 +687,10 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
 <tr>
     <th>Method</th>
     <td>DELETE</td>
+</tr>
+<tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
 </tr>
 <tr>
     <th>URL parameters</th>
@@ -691,12 +729,12 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-del">
-      <pre>$ curl -i -X DELETE {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X DELETE {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-del">
       <pre>import requests
 
-r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?apikey=YOUR_API_KEY")</pre>
+r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -770,12 +808,12 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-list">
-      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-list">
       <pre>import requests
 
-r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?apikey=YOUR_API_KEY")</pre>
+r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -813,6 +851,10 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
     <td>Content-Type: multipart/form-data</td>
 </tr>
 <tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
+</tr>
+<tr>
     <th>URL parameters</th>
     <td>
       <ul>
@@ -846,13 +888,13 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-post">
-      <pre>$ curl -i -F name=myfirstfile.csv -F file=@path/to/local_file.csv {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -F name=myfirstfile.csv -F file=@path/to/local_file.csv {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-post">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?apikey=YOUR_API_KEY"
+url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN"
 data = {'filename': 'myfirstfile.csv'}
 files = {'file': open('path/to/local_file.csv', 'rb')}
 r = requests.post(url, data=data, files=files)</pre>
@@ -893,6 +935,10 @@ r = requests.post(url, data=data, files=files)</pre>
     <td>Content-Type: application/json</td>
 </tr>
 <tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
+</tr>
+<tr>
     <th>URL parameters</th>
     <td>
       <ul>
@@ -931,14 +977,14 @@ r = requests.post(url, data=data, files=files)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-put">
-      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '[{"id":"21fedcba-9876-5432-1fed-cba987654321"}, {"id":"12345678-9abc-def1-2345-6789abcdef12"}]' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?apikey=YOUR_API_KEY
+      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '[{"id":"21fedcba-9876-5432-1fed-cba987654321"}, {"id":"12345678-9abc-def1-2345-6789abcdef12"}]' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN
 </pre>
     </div>
     <div class="tab-pane" id="python-f-put">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?apikey=YOUR_API_KEY"
+url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 data = [{'id': '21fedcba-9876-5432-1fed-cba987654321'}, {'id': '12345678-9abc-def1-2345-6789abcdef12'}]
 
@@ -1006,12 +1052,12 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-get">
-      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-get">
       <pre>import requests
 
-r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?apikey=YOUR_API_KEY")</pre>
+r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1047,6 +1093,10 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
 <tr>
     <th>Request headers</th>
     <td>Content-Type: application/json</td>
+</tr>
+<tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
 </tr>
 <tr>
     <th>URL parameters</th>
@@ -1087,13 +1137,13 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-put-1">
-      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '{"filename": "someothername.csv"}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '{"filename": "someothername.csv"}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-put-1">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?apikey=YOUR_API_KEY"
+url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 data = {"filename": "someothername.csv"}
 
@@ -1129,6 +1179,10 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
 <tr>
     <th>Method</th>
     <td>DELETE</td>
+</tr>
+<tr>
+    <th>Scopes</th>
+    <td><code>deposit:write</code></td>
 </tr>
 <tr>
     <th>URL parameters</th>
@@ -1168,12 +1222,12 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-del">
-      <pre>$ curl -i -X DELETE {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X DELETE {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-del">
       <pre>import requests
 
-r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?apikey=YOUR_API_KEY")</pre>
+r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1219,6 +1273,10 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
     <td><em>None</em></td>
 </tr>
 <tr>
+    <th>Scopes</th>
+    <td><code>deposit:actions</code></td>
+</tr>
+<tr>
     <th>URL parameters</th>
     <td>
       <ul>
@@ -1248,12 +1306,12 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-pub">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-a-pub">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?apikey=YOUR_API_KEY")</pre>
+r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1296,6 +1354,10 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><em>None</em></td>
 </tr>
 <tr>
+    <th>Scopes</th>
+    <td><code>deposit:actions</code></td>
+</tr>
+<tr>
     <th>URL parameters</th>
     <td>
       <ul>
@@ -1330,12 +1392,12 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-edit">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-a-edit">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?apikey=YOUR_API_KEY")</pre>
+r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1378,6 +1440,10 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><em>None</em></td>
 </tr>
 <tr>
+    <th>Scopes</th>
+    <td><code>deposit:actions</code></td>
+</tr>
+<tr>
     <th>URL parameters</th>
     <td>
       <ul>
@@ -1411,12 +1477,12 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-discard">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?apikey=YOUR_API_KEY</pre>
+      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-a-discard">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?apikey=YOUR_API_KEY")</pre>
+r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1888,6 +1954,9 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </dl>#}
 
 <h2 id="restapi-changes">Changes</h2>
+<dl>
+<dt>2014-06-13</dt>
+<dd><p>Authentication changed from API keys to OAuth 2.0. API key authentication is deprecated and will be phased out in October, 2014. Please use <a href="{{ url_for("oauth2server_settings.index")}}">personal access tokens</a> instead of API keys.</p></dd>
 <dt>2013-12-18</dt>
 <dd><p>REST API version 1.0 final release</p><ul>
 <li>Deposition actions moved from <code>deposit/depositions/:id/action</code> to <code>deposit/depositions/:id/actions</code></li>
