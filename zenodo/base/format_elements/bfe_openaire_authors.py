@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-#
+##
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,8 +20,7 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-"""OpenAIRE specific authors printing
-"""
+""" Zenodo specific authors printing. """
 
 import re
 from urllib import quote
@@ -32,15 +31,15 @@ from invenio.base.i18n import gettext_set_language
 
 
 def format_element(bfo, limit, separator=' ; ',
-           extension='[...]',
-           print_links="yes",
-           print_affiliations='no',
-           affiliation_prefix=' (',
-           affiliation_suffix=')',
-           interactive="no",
-           highlight="no",
-           link_author_pages="no",
-           relator_code_pattern=None):
+                   extension='[...]',
+                   print_links="yes",
+                   print_affiliations='no',
+                   affiliation_prefix=' (',
+                   affiliation_suffix=')',
+                   interactive="no",
+                   highlight="no",
+                   link_author_pages="no",
+                   relator_code_pattern=None):
     """
     Prints the list of authors of a record.
 
@@ -79,7 +78,7 @@ def format_element(bfo, limit, separator=' ; ',
     # Process authors to add link, highlight and format affiliation
     for author in authors:
 
-        if author.has_key('a'):
+        if 'a' in author:
             if highlight == 'yes':
                 from invenio import bibformat_utils
                 author['a'] = bibformat_utils.highlight(author['a'],
@@ -90,18 +89,20 @@ def format_element(bfo, limit, separator=' ; ',
                     author['a'] = '<a itemprop="creator" href="' + CFG_SITE_URL + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                   '&amp;ln=' + str(bfo.lang) + \
-                                  '" ><span itemscope itemtype="http://schema.org/Person"><span itemprop="name">' + escape(author['a']) + '</span></span></a>'
+                                  '" ><span itemscope itemtype="http://schema.org/Person"><span itemprop="name">' + \
+                        escape(
+                            author['a']) + '</span></span></a>'
                 else:
                     author['a'] = '<a itemprop="creator" rel="author" href="' + CFG_SITE_URL + \
                                   '/author/' + quote(author['a']) + \
-                                  '?recid=' +  bibrec_id + \
+                                  '?recid=' + bibrec_id + \
                                   '&ln=' + str(bfo.lang) + \
                                   '">' + escape(author['a']) + '</a>'
 
-        if author.has_key('u'):
+        if 'u' in author:
             if print_affiliations == "yes":
                 author['u'] = affiliation_prefix + '<span itemprop="affiliation">' + author['u'] + \
-                              '<span>' + affiliation_suffix
+                    '<span>' + affiliation_suffix
 
     # Flatten author instances
     if print_affiliations == 'yes':
@@ -111,7 +112,7 @@ def format_element(bfo, limit, separator=' ; ',
         authors = [author.get('a', '')
                    for author in authors]
 
-    if limit.isdigit() and  nb_authors > int(limit) and interactive != "yes":
+    if limit.isdigit() and nb_authors > int(limit) and interactive != "yes":
         return separator.join(authors[:int(limit)]) + extension
 
     elif limit.isdigit() and nb_authors > int(limit) and interactive == "yes":
@@ -147,15 +148,17 @@ def format_element(bfo, limit, separator=' ; ',
         }
 
         </script>
-        ''' % {'show_less':_("Hide"),
-             'show_more':_("Show all %i authors") % nb_authors,
-             'extension':extension,
-             'recid': bibrec_id}
+        ''' % {
+            'show_less': _("Hide"),
+            'show_more': _("Show all %(x_num)i authors", xnum=nb_authors),
+            'extension': extension,
+            'recid': bibrec_id}
         out += '<script type="text/javascript">set_up_%s()</script>' % bibrec_id
 
         return out
     elif nb_authors > 0:
         return separator.join(authors)
+
 
 def escape_values(bfo):
     """
