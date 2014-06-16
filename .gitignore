@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -26,8 +26,9 @@ dist
 *.pyc
 build
 .DS_Store
-zenodo/modules/github/static/badges/*.png
+zenodo/modules/github/static/badges/10.*.png
 docs/_build
 bower_components
 node_modules
 zenodo/base/static/js/vendor/
+.coverage
