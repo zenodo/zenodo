@@ -205,7 +205,7 @@ def create_hook(gh, extra_data, full_name):
             for m in e.errors:
                 if m["code"] == "custom" and m["resource"] == "Hook":
                     for h in ghrepo.iter_hooks():
-                        if h.config['url'] == config['url']:
+                        if h.config.get('url', '') == config['url']:
                             extra_data["repos"][full_name]["hook"] = h.id
                             h.edit(
                                 config=config, events=["release"], active=True

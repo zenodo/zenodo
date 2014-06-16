@@ -93,6 +93,19 @@ class GitHubTestCase(CeleryTestCase):
         db.session.expunge_all()
 
 
+# class HookTestCase(GitHubTestCase):
+#     def test_create_hook(self):
+#         from ..utils import create_hook
+#         from ..helpers import get_api
+
+#         gh = get_api(user_id=self.user.id)
+
+#         httpretty.enable()
+#         extra_data = self.remote_token.remote_account.extra_data
+#         assert create_hook(gh, extra_data, 'auser/repo-1')
+#         #assert create_hook(gh, 'auser/repo-2')
+
+
 class HandlePayloadTestCase(GitHubTestCase):
     def test_handle_payload(self):
         from zenodo.modules.github.tasks import handle_github_payload
