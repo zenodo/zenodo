@@ -48,7 +48,7 @@ from invenio.modules.oauthclient.client import oauth
 from .helpers import get_account, get_api
 from .upload import upload
 from .utils import submitted_deposition, get_zenodo_json, is_valid_sender, \
-    get_contributors, init_api, revoke_token, remove_hook
+    get_contributors, init_api, revoke_token, remove_hook, get_owner
 
 
 logger = get_task_logger(__name__)
@@ -180,6 +180,10 @@ def extract_metadata(gh, payload):
         defaults['creators'] = get_contributors(
             gh, repository['owner']['login'], repository['name'],
         )
+        if not defaults['creators']:
+            defaults['creators'] = get_owner(gh, repository['owner']['login'])
+        if not defaults['creators']:
+            defaults['creators'] = [dict(name='UNKNOWN', affliation='')]
 
     return defaults
 

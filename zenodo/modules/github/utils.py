@@ -232,6 +232,18 @@ def get_zenodo_json(gh, owner, repo_name, ref):
         return None
 
 
+def get_owner(gh, owner):
+    """ Get owner of repository as a creator. """
+    try:
+        u = gh.user(owner)
+        name = u.name or u.login
+        company = u.company or ''
+        return [dict(name=name, affliation=company)]
+    except Exception:
+        current_app.logger.exception("Failed to get GitHub owner")
+        return None
+
+
 def get_contributors(gh, owner, repo_name):
     """
     Get list of contributors to a repository

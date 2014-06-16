@@ -1,32 +1,29 @@
 # -*- coding: utf-8 -*-
-#
-# This file is part of ZENODO.
-# Copyright (C) 2014 CERN.
-#
-# ZENODO is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# ZENODO is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
-#
-# In applying this licence, CERN does not waive the privileges and immunities
-# granted to it by virtue of its status as an Intergovernmental Organization
-# or submit itself to any jurisdiction.
+##
+## This file is part of ZENODO.
+## Copyright (C) 2014 CERN.
+##
+## ZENODO is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## ZENODO is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
 
 
 import json
 import httpretty
 from six.moves import urllib_parse
-from flask import current_app
-from datetime import datetime
-from dateutil.tz import tzutc
 
 
 def register_github_api():
@@ -36,8 +33,16 @@ def register_github_api():
         USER('auser', email='auser@invenio-software.org')
     )
     register_endpoint(
+        "/user/orgs",
+        [ORG('inveniosoftware'), ],
+    )
+    register_endpoint(
         "/users/auser/repos",
         [REPO('auser', 'repo-1'), REPO('auser', 'repo-2')]
+    )
+    register_endpoint(
+        "/users/inveniosoftware/repos",
+        [REPO('inveniosoftware', 'myorgrepo'), ]
     )
     register_endpoint(
         "/repos/auser/repo-1/contents/.zenodo.json",
@@ -158,7 +163,6 @@ def register_local_endpoint(endpoint, body, status=200, method=httpretty.GET):
     )
 
 
-
 #
 # Fixture generators
 #
@@ -182,10 +186,11 @@ def USER(login, email=None, bio=True):
         'login': '%s' % l,
         'organizations_url': 'https://api.github.com/users/%s/orgs' % l,
         'owned_private_repos': 0,
-        'plan': {'collaborators': 0,
-         'name': 'free',
-         'private_repos': 0,
-         'space': 307200},
+        'plan': {
+            'collaborators': 0,
+            'name': 'free',
+            'private_repos': 0,
+            'space': 307200},
         'private_gists': 0,
         'public_gists': 0,
         'public_repos': 0,
@@ -484,6 +489,19 @@ def PAYLOAD(sender, repo, tag="v1.0"):
             "type": "User",
             "site_admin": False
         }
+    }
+
+
+def ORG(login):
+    return {
+        'login': login,
+        'id': 1234,
+        'url': "https://api.github.com/orgs/%s" % login,
+        'repos_url': "https://api.github.com/orgs/%s/repos" % login,
+        'events_url': "https://api.github.com/orgs/%s/events" % login,
+        'members_url': "https://api.github.com/orgs/%s/members{/member}" % login,
+        'public_members_url': "https://api.github.com/orgs/%s/public_members{/member}" % login,
+        'avatar_url': "https://avatars.githubusercontent.com/u/1234?"
     }
 
 
