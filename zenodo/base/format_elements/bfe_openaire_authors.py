@@ -150,7 +150,7 @@ def format_element(bfo, limit, separator=' ; ',
         </script>
         ''' % {
             'show_less': _("Hide"),
-            'show_more': _("Show all %(x_num)i authors", xnum=nb_authors),
+            'show_more': _("Show all %(x_num)i authors", x_num=nb_authors),
             'extension': extension,
             'recid': bibrec_id}
         out += '<script type="text/javascript">set_up_%s()</script>' % bibrec_id
