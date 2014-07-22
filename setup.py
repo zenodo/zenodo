@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -22,27 +22,51 @@
 
 """
 ZENODO - Research. Shared.
+
+Links
+-----
+
+* `website <http://zenodo.org/>`_
+* `development version <https://github.com/zenodo/zenodo>`_
+
 """
 
 from setuptools import setup, find_packages
 import os
 
+install_requires = [
+    "Invenio[img,docs]>=1.9999",
+    "qrcode==2.4.2",
+    "altmetric",
+    "beautifulsoup4",
+    "humanize==0.5",
+    "github3.py==0.8.2",
+]
 
-def requirements():
-    req = []
-    dep = []
-    for filename in ['requirements.txt']:
-        with open(os.path.join(os.path.dirname(__file__), filename), 'r') as f:
-            for line in f.readlines():
-                if line.startswith('#'):
-                    continue
-                if '://' in line:
-                    dep.append(str(line[:-1]))
-                else:
-                    req.append(str(line))
-    return req, dep
+extras_require = {
+    "development": [
+        "Invenio[development]>=1.9999",
+        "Invenio-Kwalitee",
+        "ipython",
+        "ipdb",
+    ]
+}
 
-install_requires, dependency_links = requirements()
+tests_require = [
+    "httpretty==0.8.0",
+    "Flask-Testing==0.4.1",
+    "mock",
+    "nose",
+    "selenium",
+    "unittest2==0.5.1",
+]
+
+# Get the version string.  Cannot be done with import!
+g = {}
+with open(os.path.join("zenodo", "version.py"), "rt") as fp:
+    exec(fp.read(), g)
+version = g["__version__"]
+
 
 setup(
     name='zenodo',
@@ -59,11 +83,12 @@ setup(
     zip_safe=False,
     platforms='any',
     install_requires=install_requires,
-    dependency_links=dependency_links,
+    extras_require=extras_require,
     entry_points={
         'invenio.config': [
             "zenodo = zenodo.config"
         ]
     },
-    test_suite='zenodo.testsuite.suite'
+    test_suite='zenodo.testsuite.suite',
+    tests_require=tests_require
 )

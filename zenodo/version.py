@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+#
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -18,26 +20,6 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-v=`git describe --always --abbrev=4 HEAD 2>/dev/null`
-nl='
-'
+"""Zenodo version string."""
 
-if test -n "$v"
-then
-    : # use $v
-else
-    v=UNKNOWN
-fi
-
-git update-index --refresh > /dev/null 2>&1
-dirty=`sh -c 'git diff-index --name-only HEAD' 2>/dev/null` || dirty=
-case "$dirty" in
-    '') ;;
-    *) # Append the suffix only if there isn't one already.
-	case $v in
-	  *-dirty) ;;
-	  *) v="$v-dirty" ;;
-	esac ;;
-esac
-
-echo "$v" | tr -d "$nl"
+__version__ = "dev"
