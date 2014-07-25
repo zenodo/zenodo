@@ -69,7 +69,7 @@ PACKAGES = [
     'invenio.modules.dashboard',
     'invenio.modules.deposit',
     'invenio.modules.documentation',
-    #'invenio.modules.documents',
+    'invenio.modules.documents',
     'invenio.modules.editor',
     'invenio.modules.encoder',
     'invenio.modules.exporter',
@@ -106,6 +106,7 @@ PACKAGES = [
     'invenio.modules.uploader',
     'invenio.modules.webhooks',
     'invenio.modules.workflows',
+    'invenio.base',
 ]
 
 PACKAGES_EXCLUDE = []
@@ -455,6 +456,20 @@ CFG_OPENAIRE_THESIS_TYPES = [
     ('masterThesis', _("Master thesis")),
     ('doctoralThesis', _("Doctoral thesis")),
 ]
+
+
+# Demo site roles
+DEF_DEMO_ROLES = [
+]
+
+DEF_DEMO_USER_ROLES = (
+    ('info@zenodo.org', 'superadmin'),
+)
+
+DEF_DEMO_AUTHS = (
+    ('anyuser', 'viewrestrcoll', {'collection': 'zenodo-public'}),
+    ('superadmin', 'viewrestrcoll', {'collection': 'hidden'}),
+)
 
 try:
     from zenodo.instance_config import *  # noqa

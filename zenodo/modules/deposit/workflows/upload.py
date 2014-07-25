@@ -52,7 +52,6 @@ from invenio.modules.deposit.tasks import render_form, \
 from invenio.modules.deposit.helpers import record_to_draft
 from invenio.modules.deposit.tasks import merge_changes, is_sip_uploaded
 from zenodo.legacy.utils.zenodoutils import create_doi, filter_empty_helper
-from invenio.legacy.bibsched.bibtask import task_low_level_submission
 from invenio.ext.restful import error_codes, ISODate
 from zenodo.modules.deposit.forms import ZenodoForm, \
     ZenodoEditForm
@@ -447,6 +446,8 @@ def run_tasks(update=False):
     Run bibtasklet and webcoll after upload.
     """
     def _run_tasks(obj, dummy_eng):
+        from invenio.legacy.bibsched.bibtask import task_low_level_submission
+
         d = Deposition(obj)
         sip = d.get_latest_sip(sealed=True)
 

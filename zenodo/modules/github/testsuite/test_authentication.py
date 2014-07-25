@@ -26,6 +26,7 @@ from flask import url_for
 from mock import MagicMock
 import httpretty
 
+from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.ext.sqlalchemy import db
 from invenio.modules.oauthclient.testsuite.helpers import OAuth2ClientTestCase
 
@@ -130,3 +131,9 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
 
         httpretty.disable()
         httpretty.reset()
+
+
+TEST_SUITE = make_test_suite(GitHubAuthenticationErrorsTest)
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

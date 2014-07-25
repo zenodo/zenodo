@@ -20,6 +20,13 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+#
+# Install as::
+#
+#   ``pip install -r requirements.txt --exists-action i``
+#
+
+
 # from invenio/requirements.txt
 #
 -e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
@@ -28,7 +35,9 @@
 https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
 -e git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow
 
-# ``pip install -r requirements.txt --exists-action i``
--e git+https://github.com/jirikuncar/invenio-kwalitee.git#egg=Invenio-Kwalitee
--e git+https://github.com/inveniosoftware/invenio@pu#egg=Invenio[img,docs,development]
--e .[development]
+# from invenio/setup.py
+WTForms>=1.0.5,<2.0
+SQLAlchemy>=0.8.3,<0.9
+
+-e git+https://github.com/lnielsen-cern/invenio@pu-zenodo-assets#egg=Invenio
+-e .

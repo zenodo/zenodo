@@ -35,17 +35,20 @@ from setuptools import setup, find_packages
 import os
 
 install_requires = [
-    "Invenio[img,docs]>=1.9999",
+    "Invenio[img,docs]>=1.9999,<1.9999.1",
     "qrcode==2.4.2",
     "altmetric",
     "beautifulsoup4",
     "humanize==0.5",
     "github3.py==0.8.2",
+    "Pillow"
 ]
 
 extras_require = {
     "development": [
-        "Invenio[development]>=1.9999",
+        "Flask-DebugToolbar==0.9.0",
+        "setuptools>=2.0",
+        "setuptools-bower>=0.2,<1.0",
         "Invenio-Kwalitee",
         "ipython",
         "ipdb",
@@ -53,12 +56,12 @@ extras_require = {
 }
 
 tests_require = [
-    "httpretty==0.8.0",
-    "Flask-Testing==0.4.1",
+    "httpretty>=0.8.0",
+    "Flask-Testing>=0.4.1",
     "mock",
     "nose",
     "selenium",
-    "unittest2==0.5.1",
+    "unittest2>=0.5.1",
 ]
 
 # Get the version string.  Cannot be done with import!
@@ -70,7 +73,7 @@ version = g["__version__"]
 
 setup(
     name='zenodo',
-    version='dev',
+    version=version,
     url='http://zenodo.org',
     license='GPLv3',
     author='CERN',
@@ -78,7 +81,6 @@ setup(
     description='Research. Shared',
     long_description=__doc__,
     packages=find_packages(),
-    namespace_packages=['zenodo', 'zenodo.ext', 'zenodo.modules', ],
     include_package_data=True,
     zip_safe=False,
     platforms='any',

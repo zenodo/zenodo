@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -19,3 +19,19 @@
 ## In applying this licence, CERN does not waive the privileges and immunities
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
+
+import unittest
+from invenio.testsuite import iter_suites
+
+
+def suite():
+    """Create the testsuite that has all the tests."""
+    packages = [
+        #'zenodo.base',
+        #'zenodo.modules.github',
+        'zenodo.modules.deposit',
+    ]
+    suite = unittest.TestSuite()
+    for other_suite in iter_suites(packages=packages):
+        suite.addTest(other_suite)
+    return suite

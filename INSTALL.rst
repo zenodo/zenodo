@@ -17,12 +17,12 @@ First follow the section "2. Prerequisites" in `First Steps with Invenio <http:/
 3.1. Getting the source code
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-First go to GitHub and fork (see Step 1 in
-`Fork a Repo <https://help.github.com/articles/fork-a-repo>`_) both Invenio and
-Zenodo repositories if you have not already done so:
+First go to GitHub and fork both Invenio and Zenodo repositories if you have
+not already done so (see Step 1 in
+`Fork a Repo <https://help.github.com/articles/fork-a-repo>`_):
 
-    - `Invenio <https://github.com/inveniosoftware/invenio>`_
-    - `Zenodo <https://github.com/zenodo/zenodo>`_
+- `Invenio <https://github.com/inveniosoftware/invenio>`_
+- `Zenodo <https://github.com/zenodo/zenodo>`_
 
 Next, clone your forks to get development versions of Invenio and Zenodo.
 
@@ -49,20 +49,21 @@ updates to the repository.
 
 We recommend to work using
 `virtual environments <http://www.virtualenv.org/>`_ so packages are installed
-locally and it will make your live easier. ``(zenodo)$`` tells your that the
+in an isolated environemtn . ``(zenodo)$`` tells your that the
 *zenodo* environment is the active one.
 
 .. code-block:: console
 
     $ mkvirtualenv zenodo
-    (zenodo)$ # we are in the invenio environment now and
+    (zenodo)$ # we are in the zenodo environment now and
     (zenodo)$ # can leave it using the deactivate command.
     (zenodo)$ deactivate
     $ # Now join it back, recreating it would fail.
     $ workon zenodo
     (zenodo)$ # That's all there is to know about it.
 
-Let's install Invenio and Zenodo in the environment just created.
+Let's create a working copy of the Invenio and Zenodo source code in the
+just created environment.
 
 .. code-block:: console
 
@@ -70,15 +71,12 @@ Let's install Invenio and Zenodo in the environment just created.
     (zenodo)$ mkdir src; cd src
     (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
     (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo $ZBRANCH
-    (zenodo)$ cd zenodo
 
 
 3.3 Installation
 ~~~~~~~~~~~~~~~~
 The steps for installing Zenodo are nearly identical to a normal Invenio
-installation.
-
-Installing Invenio and Zenodo.
+installation:
 
 .. code-block:: console
 
@@ -87,24 +85,8 @@ Installing Invenio and Zenodo.
 
 .. NOTE::
    The option ``--exists-action i`` for ``pip install` is needed to ensure that
-   the Invenio source code we just cloned will not be overwritten.
-
-Installing the npm dependencies and the external JavaScript and CSS libraries.
-
-.. code-block:: console
-
-    (zenodo)$ npm install
-    (zenodo)$ bower install
-
-``grunt`` and ``inveniomanage collect`` will create the static folder with all
-the required assets (JavaScript, CSS and images) from each module static folder
-and bower.
-
-.. code-block:: console
-
-    (zenodo)$ grunt
-    (zenodo)$ inveniomanage collect
-    (zenodo)$ inveniomanage assets build
+   the Invenio source code we just cloned will not be overwritten. If you
+   omit it, you will be prompted about which action to take.
 
 
 3.4. Configuration
@@ -123,11 +105,14 @@ the following commands.
 
     (zenodo)$ inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail
     (zenodo)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER $USER
-    (zenodo)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
-    (zenodo)$ inveniomanage config set CFG_SITE_SECURE_URL http://0.0.0.0:4000
 
-.. NOTE::
-   By default the database name and database username is set to ``zenodo``.
+By default the database name and username is set to ``zenodo``. You mau want to
+change that especially if you have multiple local installations:
+
+.. code-block:: console
+
+    (zenodo)$ inveniomanage config set CFG_DATABASE_NAME <name>
+    (zenodo)$ inveniomanage config set CFG_DATABASE_USER <username>
 
 3.5. Assets
 ~~~~~~~~~~~
@@ -149,17 +134,40 @@ they are not in the environment ``$PATH`` already.
     (invenio)$ inveniomanage config set UGLIFYJS_BIN `find $PWD/node_modules -iname uglifyjs | head -1`
 
 
-3.6. Development
-~~~~~~~~~~~~~~~~
+Install the external JavaScript and CSS libraries:
+
+.. code-block:: console
+
+    (zenodo)$ cdvirtualenv src/zenodo
+    (zenodo)$ inveniomanage bower -i bower.base.json > bower.json
+    (zenodo)$ bower install
+
+
+``inveniomanage collect`` will create the static folder with all
+the required assets (JavaScript, CSS and images) from each module static folder
+and bower. ``inveniomanage assets build`` will build minified and cleaned
+assets using the once that have been copied to the static folder.
+
+.. code-block:: console
+
+    (zenodo)$ inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link
+    (zenodo)$ inveniomanage collect
+    (zenodo)$ inveniomanage assets build
+
+
+3.6. Initial data
+~~~~~~~~~~~~~~~~~
 
 Once you have everything installed you can create database and populate it
-with demo records.
+with initial data.
 
 .. code-block:: console
 
     (invenio)$ inveniomanage database init --user=root --password=$MYSQL_ROOT --yes-i-know
     (invenio)$ inveniomanage database create
-    (invenio)$ inveniomanage demosite create --packages=zenodo
+    (invenio)$ inveniomanage demosite create --packages=zenodo.demosite
+
+3.7. Background queues
 
 Now you should be able to run the development server. Invenio uses
 `Celery <http://www.celeryproject.org/>`_ and `Redis <http://redis.io/>`_
@@ -177,6 +185,9 @@ which must be running alongside with the web server.
     $ workon zenodo
     (zenodo)$ celeryd -E -A invenio.celery.celery --workdir=$VIRTUAL_ENV
 
+    $ # launch bibsched
+    (zenodo)$ bibsched start
+
     $ # in a new terminal
     $ workon zenodo
     (zenodo)$ inveniomanage runserver
@@ -193,6 +204,9 @@ to monitor the *Celery* tasks.
 .. code-block:: console
 
     (zenodo)$ pip install flower
+
+.. FIXME::
+   Below needs updating
 
 When you have the servers running, it is possible to upload the demo records.
 

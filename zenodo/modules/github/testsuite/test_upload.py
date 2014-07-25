@@ -6,7 +6,7 @@ from flask import url_for
 from invenio.ext.sqlalchemy import db
 from invenio.ext.restful.utils import APITestCase
 from invenio.base.globals import cfg
-from invenio.testsuite import make_pdf_fixture
+from invenio.testsuite import make_pdf_fixture, make_test_suite, run_test_suite
 
 
 def tclient_request_factory(client, method, endpoint, urlargs, data,
@@ -95,3 +95,10 @@ class ZenodoUploadTestCase(APITestCase):
         )
         assert 'record_id' in metadata
         assert 'doi' in metadata
+
+
+TEST_SUITE = make_test_suite(ZenodoUploadTestCase)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)
