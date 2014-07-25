@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,26 +20,22 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
+from __future__ import absolute_import
 
-from invenio.testsuite import make_test_suite, run_test_suite, \
-    InvenioTestCase
-
-class GitHubConnectZenodoTest(InvenioTestCase):
-    
-    def test_github_connect(self):
-        from flask import url_for, current_app
-        
-        with current_app.test_client() as c:
-            response = c.post(
-                url_for("github.index"),
-                base_url=CFG_SITE_SECURE_URL
-            )
-            
-            self.assert_status(response, 200)
+from fixture import DataSet
 
 
-TEST_SUITE = make_test_suite(GitHubConnectZenodoTest)
+class CommunityData(DataSet):
+    class zenodo:
+        id = 'zenodo'
+        title = 'ZENODO'
+        id_user = 2
+        has_logo = False
 
-if __name__ == "__main__":
-    run_test_suite(TEST_SUITE)
-    
+    class ecfunded:
+        id = 'ecfunded'
+        title = 'European Commission Funded Research (OpenAIRE)',
+        curation_policy = 'Uploads must have been fully or partially funded ' \
+                          'by the European Commission.'
+        id_user = 2  # info@zenodo.org
+        has_logo = False

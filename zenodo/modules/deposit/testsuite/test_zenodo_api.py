@@ -19,79 +19,37 @@
 
 from cerberus import Validator
 from invenio.testsuite import make_test_suite, run_test_suite, \
-    InvenioTestCase, make_pdf_fixture
-import json
+    make_pdf_fixture
 from datetime import date, timedelta
 from flask import url_for
 
+from invenio.ext.restful.utils import APITestCase
+from invenio.ext.sqlalchemy import db
 
-class WebDepositApiBaseTestCase(InvenioTestCase):
-    userid = 176
-    headers = [('content-type', 'application/json')]
 
+class DepositApiTestCase(APITestCase):
     def setUp(self):
         """ Create API key """
-        #super(self.__class__, self).setUp()<
-        try:
-            from invenio.modules.apikeys import create_new_web_api_key, \
-                get_available_web_api_keys
-
-            create_new_web_api_key(
-                self.userid,
-                key_description='webdeposit_api_testing'
-            )
-            keys = get_available_web_api_keys(self.userid)
-            self.apikey = keys[0].id
-
-            self.maxDiff = None
-        except Exception as e:
-            print e
-
-    def get(self, *args, **kwargs):
-        return self.make_request(self.client.get, *args, **kwargs)
-
-    def post(self, *args, **kwargs):
-        return self.make_request(self.client.post, *args, **kwargs)
-
-    def put(self, *args, **kwargs):
-        return self.make_request(self.client.put, *args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        return self.make_request(self.client.delete, *args, **kwargs)
-
-    def make_request(self, client_func, endpoint, urlargs={}, data=None,
-                     is_json=True, code=None, headers=None,
-                     follow_redirects=False):
-        if headers is None:
-            headers = self.headers if is_json else []
-
-        if data is not None:
-            request_args = dict(
-                data=json.dumps(data) if is_json else data,
-                headers=headers,
-            )
-        else:
-            request_args = {}
-
-        response = client_func(
-            url_for(
-                endpoint,
-                apikey=self.apikey,
-                **urlargs
-            ),
-            base_url=self.app.config['CFG_SITE_SECURE_URL'],
-            follow_redirects=follow_redirects,
-            **request_args
+        from invenio.modules.accounts.models import User
+        self.user = User(
+            email='info@invenio-software.org', nickname='tester'
         )
-        if code is not None:
-            self.assertStatus(response, code)
-        return response
+        self.user.password = "tester"
+        db.session.add(self.user)
+        db.session.commit()
+
+        self.create_oauth_token(self.user.id, scopes=[
+            "deposit:write", "deposit:actions"
+        ])
+
+    def tearDown(self):
+        self.remove_oauth_token()
+        if self.user:
+            db.session.delete(self.user)
+            db.session.commit()
 
 
-class WebDepositApiTest(WebDepositApiBaseTestCase):
-    #
-    # Tests
-    #
+class WebDepositApiTest(DepositApiTestCase):
     def test_depositions_list_get(self):
         response = self.get('depositionlistresource', code=200)
         # Test cookies are not being set
@@ -396,7 +354,7 @@ class WebDepositApiTest(WebDepositApiBaseTestCase):
                 response = request_func(
                     url_for(
                         endpoint,
-                        apikey=self.apikey,
+                        access_token=self.accesstoken[self.user.id],
                         **methods[1]
                     ),
                     base_url=self.app.config['CFG_SITE_SECURE_URL'],
@@ -426,7 +384,7 @@ class WebDepositApiTest(WebDepositApiBaseTestCase):
                     self.assertEqual(response.json['status'], 401)
 
 
-class WebDepositZenodoApiTest(WebDepositApiBaseTestCase):
+class WebDepositZenodoApiTest(DepositApiTestCase):
     resource_schema = dict(
         files=dict(type="list", required=True),
         created=dict(type="string", required=True),

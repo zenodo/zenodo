@@ -1,0 +1,3 @@
+-r requirements.txt
+-e git+https://github.com/jirikuncar/invenio-kwalitee.git#egg=Invenio-Kwalitee
+-e .[development]

@@ -21,51 +21,59 @@
 ## or submit itself to any jurisdiction.
 
 
-notifications:
-  email: false
+language: python
 
 services:
   - mysql
-  - rabbitmq
   - redis
 
 python:
   - "2.7"
-  - "2.6"
+
+before_install:
+  - "sudo add-apt-repository -y ppa:chris-lea/node.js"
+  - "sudo apt-get update"
 
 install:
-  - "sudo pip install coveralls --use-mirrors"
-  - "sudo apt-get update"
-  - "sudo apt-get install apache2 libapache2-mod-wsgi ssl-cert poppler-utils --fix-missing"
+  - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
   - "sudo a2enmod actions"
+  - "sudo a2enmod version"
   - "sudo a2enmod rewrite"
-  - "sudo mkdir /etc/apache2/ssl"
-  - "sudo /usr/sbin/make-ssl-cert /usr/share/ssl-cert/ssleay.cnf /etc/apache2/ssl/apache.pem"
-  - "travis_retry sudo pip install --upgrade virtualenvwrapper"
-  - ". `which virtualenvwrapper.sh`"
-  - "mkvirtualenv invenio"
-  - "workon invenio"
-  - "travis_retry pip install git+https://github.com/zenodo/invenio-op.git@pu-zenodo --process-dependency-links --allow-all-external"
-  - "travis_retry pip install . --process-dependency-links --allow-all-external"
+  - "sudo mkdir -p /etc/apache2/ssl"
+  - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
+  - "travis_retry pip install -r requirements.txt --exists-action i"
   - "inveniomanage config create secret-key"
+  - "inveniomanage config set DEBUG False"
   - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
   - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
+  - "inveniomanage config set CFG_TMPDIR /tmp"
+  - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
+  - "inveniomanage bower -i bower-base.json > bower.json"
+  - "cat bower.json"
+  - "bower install"
+  - "inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link"
+  - "inveniomanage collect > /dev/null"
+  - "inveniomanage assets build"
+  - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things
+  - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
+  - "inveniomanage config set REQUIREJS_BIN false"
+  - "inveniomanage config set UGLIFYJS_BIN false"
+  - "inveniomanage config set ASSETS_AUTO_BUILD False"
 
 before_script:
-  - "sudo /usr/sbin/a2dissite default || echo ':('"
-  - "sudo /usr/sbin/a2enmod ssl"
+  - "inveniomanage apache create-config"
+  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
+  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
+  - "sudo /usr/sbin/a2dissite *default* || echo ':('"
+  - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
   - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
+  - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
   - "inveniomanage database init --yes-i-know || echo ':('"
   - "inveniomanage database create || echo ':('"
-  #- "inveniomanage demosite create -p zenodo.demosite"
-  #- "inveniomanage demosite populate -p zenodo.demosite"
-  - "sudo ln -s /home/travis/.virtualenvs/invenio/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
-  - "sudo ln -s /home/travis/.virtualenvs/invenio/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
-  - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
-  - "inveniomanage apache create-config"
-
-after_success:
-  - coveralls
+  - "inveniomanage demosite create -p zenodo.demosite"
 
 script:
-  - coverage run --source=zenodo setup.py test
+  - "python setup.py test"
+
+notifications:
+  email: false

@@ -25,6 +25,7 @@ from __future__ import absolute_import
 import httpretty
 import six
 
+from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.celery.testsuite.helpers import CeleryTestCase
 from invenio.ext.sqlalchemy import db
 import json
@@ -182,3 +183,10 @@ class PayloadExtractionTestCase(GitHubTestCase):
         )
 
         assert metadata['upload_type'] == 'dataset'
+
+
+TEST_SUITE = make_test_suite(HandlePayloadTestCase, PayloadExtractionTestCase)
+
+
+if __name__ == "__main__":
+    run_test_suite(TEST_SUITE)

@@ -70,7 +70,6 @@ Let's install Invenio and Zenodo in the environment just created.
     (zenodo)$ mkdir src; cd src
     (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
     (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo $ZBRANCH
-    (zenodo)$ cd zenodo
 
 
 3.3 Installation
@@ -89,23 +88,6 @@ Installing Invenio and Zenodo.
    The option ``--exists-action i`` for ``pip install` is needed to ensure that
    the Invenio source code we just cloned will not be overwritten.
 
-Installing the npm dependencies and the external JavaScript and CSS libraries.
-
-.. code-block:: console
-
-    (zenodo)$ npm install
-    (zenodo)$ bower install
-
-``grunt`` and ``inveniomanage collect`` will create the static folder with all
-the required assets (JavaScript, CSS and images) from each module static folder
-and bower.
-
-.. code-block:: console
-
-    (zenodo)$ grunt
-    (zenodo)$ inveniomanage collect
-    (zenodo)$ inveniomanage assets build
-
 
 3.4. Configuration
 ~~~~~~~~~~~~~~~~~~
@@ -123,8 +105,10 @@ the following commands.
 
     (zenodo)$ inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail
     (zenodo)$ inveniomanage config set CFG_BIBSCHED_PROCESS_USER $USER
-    (zenodo)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
-    (zenodo)$ inveniomanage config set CFG_SITE_SECURE_URL http://0.0.0.0:4000
+    #(zenodo)$ inveniomanage config set CFG_SITE_URL http://0.0.0.0:4000
+    #(zenodo)$ inveniomanage config set CFG_SITE_SECURE_URL http://0.0.0.0:4000
+    #(zenodo)$ inveniomanage config set ASSETS_DEBUG True
+    #(zenodo)$ inveniomanage config set LESS_RUN_IN_DEBUG False
 
 .. NOTE::
    By default the database name and database username is set to ``zenodo``.
@@ -149,6 +133,26 @@ they are not in the environment ``$PATH`` already.
     (invenio)$ inveniomanage config set UGLIFYJS_BIN `find $PWD/node_modules -iname uglifyjs | head -1`
 
 
+Installing the npm dependencies and the external JavaScript and CSS libraries.
+
+.. code-block:: console
+
+    (zenodo)$ cdvirtualenv src/zenodo
+    (zenodo)$ inveniomanage bower -i bower.base.json > bower.json
+    (zenodo)$ bower install
+
+
+``grunt`` and ``inveniomanage collect`` will create the static folder with all
+the required assets (JavaScript, CSS and images) from each module static folder
+and bower.
+
+.. code-block:: console
+
+    #(zenodo)$ inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link
+    (zenodo)$ inveniomanage collect
+    (zenodo)$ inveniomanage assets build
+
+
 3.6. Development
 ~~~~~~~~~~~~~~~~
 
@@ -159,7 +163,7 @@ with demo records.
 
     (invenio)$ inveniomanage database init --user=root --password=$MYSQL_ROOT --yes-i-know
     (invenio)$ inveniomanage database create
-    (invenio)$ inveniomanage demosite create --packages=zenodo
+    (invenio)$ inveniomanage demosite create --packages=zenodo.demosite
 
 Now you should be able to run the development server. Invenio uses
 `Celery <http://www.celeryproject.org/>`_ and `Redis <http://redis.io/>`_

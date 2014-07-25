@@ -25,8 +25,29 @@ from invenio.base.factory import with_app_context
 
 
 @with_app_context(new_context=True)
+def post_handler_demosite_create(sender, default_data='', *args, **kwargs):
+    """
+    Loads data after demosite creation
+    """
+    from invenio.modules.communities.models import Community
+
+    print(">>> Creating collections for communities...")
+    c = Community.query.filter_by(id='zenodo').first()
+    c.save_collections()
+
+    c = Community.query.filter_by(id='ecfunded').first()
+    c.save_collections()
+
+    from invenio.modules.access.models import UserAccROLE
+    from invenio.ext.sqlalchemy import db
+
+    u = UserAccROLE(id_user=2, id_accROLE=17)
+    db.session.add(u)
+    db.session.commit()
+
+
+@with_app_context(new_context=True)
 def post_handler_demosite_populate(sender, default_data='', *args, **kwargs):
     """
     Loads data after records are created.
     """
-    pass

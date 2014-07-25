@@ -20,8 +20,12 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from .receivers import post_handler_demosite_populate
-from invenio.base.scripts.demosite import populate as demosite_populate
+from __future__ import absolute_import
+
+from .receivers import post_handler_demosite_populate, \
+    post_handler_demosite_create
+from invenio.base.scripts.demosite import populate, create
 from invenio.base.signals import post_command
 
-post_command.connect(post_handler_demosite_populate, sender=demosite_populate)
+post_command.connect(post_handler_demosite_populate, sender=populate)
+post_command.connect(post_handler_demosite_create, sender=create)

@@ -22,4 +22,4 @@
 
 """Zenodo version string."""
 
-__version__ = "dev"
+__version__ = "1.0.0.dev0"

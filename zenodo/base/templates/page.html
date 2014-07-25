@@ -23,34 +23,9 @@
 
 {%- extends "page_base.html" %}
 
-{%- block global_css -%}
-  {%- css 'css/jquery-ui.custom.css', '00-invenio' -%}
-  {#- css url_for('static', filename='css/base.css'), '00-invenio' -#}
-  {%- css 'css/bootstrap.min.css', '00-invenio' -%}
-  {%- css 'css/bootstrap-theme.min.css', '00-invenio' -%}
-  {%- css 'css/token-input.css', '00-invenio' -%}
-  {%- css 'css/token-input-facebook.css', '00-invenio' -%}
-  {%- css 'css/datepicker.css', '00-invenio' -%}
-  {%- css 'css/font-awesome.min.css', '00-invenio' -%}
-  {%- css 'css/typeahead.js-bootstrap.css', '00-invenio' -%}
-  {%- css 'css/custom.css', '00-invenio' -%}
-  {%- css 'css/bootstrap-switch.css', '00-invenio' -%}
-{%- endblock global_css -%}
-
-{%- block global_javascript -%}
-  {%- js "js/hogan.js", '00-invenio' -%}
-  {%- js 'js/jquery.min.js', '00-invenio' -%}
-  {%- js 'js/jquery-migrate.min.js', '00-invenio' -%}
-  {%- js 'js/jquery-ui.custom.min.js', '00-invenio' -%}
-  {%- js 'js/bootstrap.js', '00-invenio' -%}
-  {%- js "js/bootstrap-select.js", '00-invenio' -%}
-  {%- js "js/bootstrap-datepicker.js", '00-invenio' -%}
-  {%- js 'js/jquery.tokeninput.js', '00-invenio' -%}
-  {%- js "js/custom.js", '00-invenio' -%}
-  {%- js "js/bootstrap-switch.js", '00-invenio' -%}
-  {%- js 'js/vendor/ZeroClipboard.min.js', '90-invenio' -%}
-{%- endblock global_javascript -%}
-
+{%- block global_bundles %}
+  {%- include "base/bundles.html" %}
+{%- endblock %}
 
 {%- block head_links %}
 {{ super() }}

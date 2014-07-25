@@ -1,7 +1,0 @@
-{
-  "name": "zenodo",
-  "version": "dev",
-  "dependencies": {
-    "zeroclipboard": "~1.3.5"
-  }
-}

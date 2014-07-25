@@ -25,12 +25,17 @@ include requirements*.txt AUTHORS COPYING README.md bower.json setup.cfg
 recursive-include docs *
 recursive-exclude docs/_build *
 
+recursive-include zenodo/testsuite *
+
 recursive-include zenodo/base/static *
 recursive-include zenodo/base/templates *
 recursive-include zenodo/base/format_elements *
 recursive-include zenodo/base/format_templates *
 recursive-include zenodo/base/output_formats *
 recursive-include zenodo/base/recordext *
+recursive-include zenodo/base/testsuite *
+
+recursive-include zenodo/demosite *
 
 recursive-include zenodo/modules/*/static *
 recursive-include zenodo/modules/*/templates *
