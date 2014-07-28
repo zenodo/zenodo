@@ -470,6 +470,26 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         modification_date=dict(type='string', nullable=True),
     )
 
+    def setUp(self):
+        super(WebDepositZenodoApiTest, self).setUp()
+        # Setup a test community
+        from invenio.modules.communities.models import Community
+        from invenio.ext.sqlalchemy import db
+        # userb from zenodo.demosite.fixtures.accounts
+        self.test_community = Community(
+            id='cfa', title='Test Community', id_user=4
+        )
+        db.session.add(self.test_community)
+        db.session.commit()
+
+        self.test_community.save_collections()
+
+    def tearDown(self):
+        super(WebDepositZenodoApiTest, self).tearDown()
+        self.test_community.delete_collections()
+        db.session.delete(self.test_community)
+        db.session.commit()
+
     def get_test_data(self, **extra):
         test_data = dict(
             metadata=dict(
@@ -934,7 +954,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         self.assertTrue(response.json['created'])
         self.assertTrue(response.json['modified'])
         self.assertEqual(response.json['files'], [])
-        self.assertEqual(response.json['owner'], self.userid)
+        self.assertEqual(response.json['owner'], self.user.id)
         self.assertEqual(response.json['state'], 'inprogress')
         post_data = response.json
 

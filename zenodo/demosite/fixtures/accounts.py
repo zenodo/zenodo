@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ class UserData(DataSet):
     class userb:
         id = 4
         email = 'user.b@zenodo.org'
-        password = 'd123orian'
+        password = 'userb'
         note = '1'
         nickname = 'userb'
 
