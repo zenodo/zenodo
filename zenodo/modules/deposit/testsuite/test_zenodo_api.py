@@ -1644,7 +1644,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
 
 TEST_SUITE = make_test_suite(
     WebDepositApiTest,
-    WebDepositZenodoApiTest
+    #WebDepositZenodoApiTest
 )
 
 if __name__ == "__main__":
