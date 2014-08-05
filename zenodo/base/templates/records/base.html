@@ -23,12 +23,12 @@
 
 {% block header %}
 {{ super() }}
-{{ format_record(recid, of='hdm', ln=g.ln)|safe }}
+{{ format_record(recid, of='hdm', ln=g.ln, extra_context=dict(zenodo_files=zenodo_files))|safe }}
 {% endblock header -%}
 
 {% block body %}
 {% set of = of or 'hd' %}
-{% set formattedrecord = format_record(recid, of=of, ln=g.ln)|safe %}
+{% set formattedrecord = format_record(recid, of=of, ln=g.ln, extra_context=dict(zenodo_files=zenodo_files))|safe %}
 <div class="row" itemscope="" itemtype="{{recid|schemaorg_type()}}">
   {%- if formattedrecord %}
   <div class="col-sm-8 col-md-8">
