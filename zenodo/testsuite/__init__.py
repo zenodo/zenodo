@@ -28,7 +28,8 @@ def suite():
     """Create the testsuite that has all the tests."""
     packages = [
         'zenodo.modules.deposit',
-        #'zenodo.modules.github',
+        'zenodo.modules.github',
+        'zenodo.modules.preservationmeter',
         # Run after records have been created by other tests
         'zenodo',
         'zenodo.base',

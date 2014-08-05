@@ -55,6 +55,7 @@ test_marc = """<record><datafield tag="942" ind1="" ind2=""><subfield code="a">2
 <datafield tag="542" ind1="" ind2=""><subfield code="l">open</subfield></datafield>
 <datafield tag="773" ind1="" ind2=""><subfield code="a">10.1234/foo.bar</subfield><subfield code="i">cites</subfield><subfield code="n">doi</subfield></datafield>
 <datafield tag="773" ind1="" ind2=""><subfield code="a">1234.4321</subfield><subfield code="i">cites</subfield><subfield code="n">arxiv</subfield></datafield>
+<datafield tag="347" ind1="" ind2=""><subfield code="p">100</subfield></datafield>
 </record>"""
 
 test_form_json = {
@@ -128,6 +129,7 @@ test_record = dict(
             "arxiv", "relation": "cites"},
     ],
     altmetric_id="9876",
+    preservation_score="100",
 )
 
 

@@ -23,6 +23,7 @@ Simple tasklet that is called after a bibupload of an updated record.
 
 from zenodo.modules.deposit.tasks import openaire_altmetric_update, \
     openaire_update_doi
+from zenodo.modules.preservationmeter.tasks import calculate_preservation_score
 
 
 def bst_openaire_update_upload(recid=None):
@@ -35,6 +36,7 @@ def bst_openaire_update_upload(recid=None):
     # Ship of tasks to Celery for background processing
     openaire_update_doi.delay(recid)
     openaire_altmetric_update.delay([recid])
+    calculate_preservation_score.delay(recid=recid)
 
 
 if __name__ == '__main__':

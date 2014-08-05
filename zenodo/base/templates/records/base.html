@@ -118,6 +118,8 @@
     {%- endif -%}
     {{ format_record(recid, of='HDINFO', ln=g.ln)|safe }}
 
+    {% include "preservationmeter/preservation_meter.html" %}
+
     {%- if current_user.is_guest -%}
     <div class="well">
       <a href="{{ url_for("youraccount.register") }}" class="btn btn-warning signup pull-right btn-lg">{{ _("Sign Up") }}</a>

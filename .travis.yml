@@ -34,7 +34,7 @@ before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
   # Fix for "MySQL Server has gone away" error.
-  - "echo -e '[server]\nmax_allowed_packet=64M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
+  - "echo -e '[server]\nmax_allowed_packet=128M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
   - "sudo service mysql restart"
 
 install:

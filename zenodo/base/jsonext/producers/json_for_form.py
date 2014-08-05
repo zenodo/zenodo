@@ -80,7 +80,7 @@ def produce(self, fields=None):
                                     out[k].append(element)
                             else:
                                 out[k] = v
-            except KeyError:
+            except KeyError as e:
                 self.continuable_errors.append(
                     "Producer CError - Unable to produce '%s' (No rule found).\n %s"
                     % (field, str(e)))
