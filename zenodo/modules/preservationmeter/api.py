@@ -23,7 +23,7 @@
 #import fido
 import os
 from invenio.base.globals import cfg
-# from invenio.modules.records.api import get_record
+from invenio.modules.records.api import get_record
 
 # get_record(recid)
 
@@ -42,7 +42,7 @@ def calculate_score(recid):
         * Pass files by argument
         * Use fido for file verification
     '''
-    cfg['PRESERVATIONMETER_dfdfd']
+    #cfg['PRESERVATIONMETER_dfdfd']
     ## Map of quality per file type per category
     ext_quality = {'.csv': 100,
                    '.pdf': 100,
@@ -53,19 +53,35 @@ def calculate_score(recid):
                    '.xls': 40,
                    '.doc': 40}
 
+    ## Get the files from this record
+    record = get_record(recid)
+    #for ifile in record['files_to_upload']:
+    #    print ifile['url']
+
+    ##TODO: Use this? v
+    #from invenio.legacy.bibdocfile.api import BibRecDocs
+    # files = dict(
+    #     zenodo_files=[f for f in BibRecDocs(
+    #         recid, human_readable=True
+    #     ).list_latest_files(
+    #         list_hidden=False
+    #     ) if not f.is_icon()]
+    # )
+
     ## List of files to parse
     ## Use the API to get the list.
-    file_list = ['text.txt', 'data.csv']
+    #file_list = ['text.txt', 'data.csv']
+    file_list = record['files_to_upload']
 
     ## Storing qualities
     ## Iterate the list and get the file extension and quality associated.
     files_quality = []
-    for file in file_list:
-        file_name, file_ext = os.path.splitext(file)
+    for ifile in file_list:
+        file_name, file_ext = os.path.splitext(ifile['url'])
         files_quality.append(ext_quality[file_ext])
-        # print '[{}{}] preservation status: {}'.format(file_name,
-        #                                               file_ext,
-        #                                               ext_quality[file_ext])
+        print '[{}{}] preservation status: {}'.format(file_name,
+                                                      file_ext,
+                                                      ext_quality[file_ext])
 
     ## Average quality of this submission
     #print files_quality
@@ -74,4 +90,4 @@ def calculate_score(recid):
         sum += quality
 
     #print sum / len(files_quality)
-    sum / len(files_quality)
+    return sum / len(files_quality)

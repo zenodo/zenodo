@@ -35,6 +35,7 @@ PreservationMeter tasks for Zenodo
 from .api import calculate_score
 
 
+@celery.task(ignore_result=True)
 def calculate_preservation_score(recid):
     """ Calculates the preservation score of a given record """
     calculate_score(recid)
