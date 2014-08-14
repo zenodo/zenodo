@@ -19,8 +19,8 @@
 {{- bfe_meta(bfo, tag="020%_a", name="citation_isbn") -}}
 {{- bfe_meta(bfo, tag="502__c", name="citation_dissertation_institution") -}}
 <meta content="{{ bfe_record_url(bfo, with_ln='no', absolute='yes') }}" name="citation_abstract_html_url" />
-{%- if files -%}
-{%- for file in files -%}
+{%- if zenodo_files -%}
+{%- for file in zenodo_files|sort(attribute='comment') -%}
 <link rel="alternate" type="{{file.mime}}" href="{{file.get_url().decode('utf8')}}">
 {%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url().decode('utf8')}}" name="citation_pdf_url" />{%- endif -%}
 {%- endfor -%}
