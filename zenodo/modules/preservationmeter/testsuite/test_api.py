@@ -23,9 +23,10 @@
 from mock import patch
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.base.globals import cfg
-
+from zenodo.modules.preservationmeter.api import calculate_score
 
 class CalculateScoreTest(InvenioTestCase):
+
     @property
     def config(self):
         """Configuration property."""
@@ -44,20 +45,25 @@ class CalculateScoreTest(InvenioTestCase):
 
     @patch('invenio.modules.records.api.get_record')
     def test_json_for_form(self, get_record_mock):
-        from invenio.modules.records.api import Record
+        """Tests the general mocking of records.
+
+        Namely, if the files of the record are accessible and
+        also other general information.
+        """
         # Patch return value of get_record()
+        from invenio.modules.records.api import Record
         get_record_mock.return_value = Record(
             json={
                 'doi': '10.1234/invenio.1234',
                 'files_to_upload': [  # replace with cfg['files_var_name']
                     'path1.xls',
-                    'path2',
-                    'path3'],
+                    'path2.csv ',
+                    'path3.pdf'],
                 'recid': 1,
-                '_files': [  # replace with cfg['files_var_name']
-                    'path1',
-                    'path2',
-                    'path3']
+                # '_files': [  # replace with cfg['files_var_name']
+                #    'path1',
+                #    'path2',
+                #    'path3']
             },
             master_format='marc'
         )
@@ -68,14 +74,42 @@ class CalculateScoreTest(InvenioTestCase):
         assert r['doi'] == '10.1234/invenio.1234'
         assert r['files_to_upload'][0] == 'path1.xls'
 
-        from zenodo.modules.preservationmeter.api import get_extension
-        assert get_extension(r['files_to_upload'][0]) == '.xls'
+        # from zenodo.modules.preservationmeter.api import get_extension
+        # assert get_extension(r['files_to_upload'][0]) == '.xls'
 
-    def test_caculation(self):
-        from zenodo.modules.preservationmeter.api import calculate_score
-        score = calculate_score(8)
-        print score
-        assert score == 100
+    @patch('invenio.modules.records.api.get_record')
+    def test_single_files(self, get_record_mock):
+        """Test a with some basic document types
+
+        Types:
+         - csv
+         - pdf
+         - xlsx
+         - txt
+        """
+        from invenio.modules.records.api import Record
+        get_record_mock.return_value = Record(
+            json={
+                'doi': '10.1234/invenio.1234',
+                'files_to_upload': [  # replace with cfg['files_var_name']
+                    'path1.xls',
+                    'path2.csv',
+                    'path3.pdf'],
+                'recid': 1,
+                # '_files': [  # replace with cfg['files_var_name']
+                #    'path1',
+                #    'path2',
+                #    'path3']
+            },
+            master_format='marc'
+        )
+
+        # Now call get_record() which will return the value we've set above
+        from invenio.modules.records.api import get_record
+        r = get_record(1)
+        score = calculate_score(r['files_to_upload'])
+        ####print score
+        assert score == 80
 
     def test_docx_and_csv(self):
         assert True
