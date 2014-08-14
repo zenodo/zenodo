@@ -21,8 +21,10 @@
 ## or submit itself to any jurisdiction.
 
 #import fido
+from __future__ import print_function
 import os
 from invenio.base.globals import cfg
+from flask import current_app
 from invenio.modules.records.api import get_record
 
 # get_record(recid)
@@ -36,6 +38,8 @@ from invenio.modules.records.api import get_record
 #             ) if not f.is_icon()]
 #         )
 
+
+#def calculate_score(file_path_list):
 def calculate_score(recid):
     '''
     TODO:
@@ -71,6 +75,7 @@ def calculate_score(recid):
     ## List of files to parse
     ## Use the API to get the list.
     #file_list = ['text.txt', 'data.csv']
+    #file_list = record['_files'] -> Doesnt work
     file_list = record['files_to_upload']
 
     ## Storing qualities
@@ -79,15 +84,10 @@ def calculate_score(recid):
     for ifile in file_list:
         file_name, file_ext = os.path.splitext(ifile['url'])
         files_quality.append(ext_quality[file_ext])
-        print '[{}{}] preservation status: {}'.format(file_name,
-                                                      file_ext,
-                                                      ext_quality[file_ext])
+        current_app.logger.info('[{}{}] preservation status: {}'.format(
+                                file_name,
+                                file_ext,
+                                ext_quality[file_ext]))
 
     ## Average quality of this submission
-    #print files_quality
-    sum = 0
-    for quality in files_quality:
-        sum += quality
-
-    #print sum / len(files_quality)
-    return sum / len(files_quality)
+    return sum(files_quality) / len(files_quality)
