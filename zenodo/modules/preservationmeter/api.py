@@ -23,7 +23,7 @@
 from __future__ import print_function
 
 
-def get_extension(file_path):
+def get_file_extension(file_path):
     '''
     Returns only the extension of a given file
     '''
@@ -32,7 +32,7 @@ def get_extension(file_path):
     return file_ext
 
 
-def get_name(file_path):
+def get_file_name(file_path):
     '''
     Returns only the file name of a given file
     '''
@@ -47,7 +47,6 @@ def calculate_score(file_path_list):
         * Pass files by argument
         * Use fido for file verification
     """
-    ## Storing qualities
     ## Iterate the list and get the file extension and quality associated.
     files_quality = []
     for file_p in file_path_list:
@@ -62,7 +61,7 @@ def calculate_file_score(file_name):
 
     As defined on cfg.
     """
-    file_ext = get_extension(file_name)
+    file_ext = get_file_extension(file_name)
     ext_quality = {'.csv': 100,
                    '.pdf': 100,
                    '.txt': 95,
