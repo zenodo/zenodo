@@ -25,12 +25,21 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 class CalculateScoreTest(InvenioTestCase):
-    # @property
- #    def config(self):
- #        """Configuration property."""
- #        cfg = {
- #        }
- #        return cfg
+    @property
+    def config(self):
+        """Configuration property."""
+        cfg = {
+            '.csv': 100,
+            '.pdf': 100,
+            '.txt': 95,
+            '.odt': 95,
+            '.xlsx': 60,
+            '.docx': 60,
+            '.xls': 40,
+            '.doc': 40
+        }
+        return cfg
+
     @patch('invenio.modules.records.api.get_record')
     def test_json_for_form(self, get_record_mock):
         from invenio.modules.records.api import Record
@@ -53,6 +62,8 @@ class CalculateScoreTest(InvenioTestCase):
         score = calculate_score(8)
         print score
         assert score == 100
+
+    #def test_
 
 
 TEST_SUITE = make_test_suite(CalculateScoreTest)
