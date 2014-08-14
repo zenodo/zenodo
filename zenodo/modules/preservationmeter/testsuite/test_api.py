@@ -22,13 +22,14 @@
 
 from mock import patch
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
+from invenio.base.globals import cfg
 
 
 class CalculateScoreTest(InvenioTestCase):
     @property
     def config(self):
         """Configuration property."""
-        cfg = {
+        cfg = {  # Shouldn't do this like this?
             '.csv': 100,
             '.pdf': 100,
             '.txt': 95,
@@ -38,6 +39,7 @@ class CalculateScoreTest(InvenioTestCase):
             '.xls': 40,
             '.doc': 40
         }
+        cfg['files_var_name'] = '_files'
         return cfg
 
     @patch('invenio.modules.records.api.get_record')
@@ -47,7 +49,15 @@ class CalculateScoreTest(InvenioTestCase):
         get_record_mock.return_value = Record(
             json={
                 'doi': '10.1234/invenio.1234',
+                'files_to_upload': [  # replace with cfg['files_var_name']
+                    'path1.xls',
+                    'path2',
+                    'path3'],
                 'recid': 1,
+                '_files': [  # replace with cfg['files_var_name']
+                    'path1',
+                    'path2',
+                    'path3']
             },
             master_format='marc'
         )
@@ -56,6 +66,10 @@ class CalculateScoreTest(InvenioTestCase):
         from invenio.modules.records.api import get_record
         r = get_record(1)
         assert r['doi'] == '10.1234/invenio.1234'
+        assert r['files_to_upload'][0] == 'path1.xls'
+
+        from zenodo.modules.preservationmeter.api import get_extension
+        assert get_extension(r['files_to_upload'][0]) == '.xls'
 
     def test_caculation(self):
         from zenodo.modules.preservationmeter.api import calculate_score
@@ -63,7 +77,20 @@ class CalculateScoreTest(InvenioTestCase):
         print score
         assert score == 100
 
-    #def test_
+    def test_docx_and_csv(self):
+        assert True
+
+    def test_csvs(self):
+        assert True
+
+    def test_zip_with_docx(self):
+        assert True
+
+    def test_tar_with_pdf(self):
+        assert True
+
+    def test_tar_with_apdf(self):
+        assert True
 
 
 TEST_SUITE = make_test_suite(CalculateScoreTest)
