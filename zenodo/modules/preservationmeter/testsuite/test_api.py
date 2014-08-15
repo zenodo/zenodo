@@ -26,6 +26,37 @@ from invenio.base.globals import cfg
 from zenodo.modules.preservationmeter.api import calculate_score
 
 
+class RecordMock(object):
+
+    """ Singleton RecordMocking used on several tests.
+
+    Use to follow DRY principle.
+    """
+
+    record = None
+
+    @staticmethod
+    def get_mocked_record():
+        from invenio.modules.records.api import Record
+        if RecordMock.record is None:
+            RecordMock.record = Record(
+                json={
+                    'doi': '10.1234/invenio.1234',
+                    'files_to_upload': [  # replace with cfg['files_var_name']
+                        'this/is/a/long/path/to/the/file/location/path1.xls',
+                        'path2.csv',
+                        'path3.pdf'],
+                    'recid': 1,
+                    # '_files': [  # replace with cfg['files_var_name']
+                    #    'path1',
+                    #    'path2',
+                    #    'path3']
+                },
+                master_format='marc'
+            )
+        return RecordMock.record
+
+
 class CalculateScoreTest(InvenioTestCase):
 
     @property
@@ -45,59 +76,42 @@ class CalculateScoreTest(InvenioTestCase):
         return cfg
 
     @patch('invenio.modules.records.api.get_record')
-    def test_record_mocking_files(self, get_record_mock):
+    def test_record_mocking(self, get_record_mock):
         """Tests the general mocking of records.
 
         Namely, if the files of the record are accessible and
         also other general information.
         """
-        # Patch return value of get_record()
-        from invenio.modules.records.api import Record
-        get_record_mock.return_value = Record(
-            json={
-                'doi': '10.1234/invenio.1234',
-                'files_to_upload': [  # replace with cfg['files_var_name']
-                    'path1.xls',
-                    'path2.csv ',
-                    'path3.pdf'],
-                'recid': 1,
-                # '_files': [  # replace with cfg['files_var_name']
-                #    'path1',
-                #    'path2',
-                #    'path3']
-            },
-            master_format='marc'
-        )
-
-        # Now call get_record() which will return the value we've set above
-        from invenio.modules.records.api import get_record
-        r = get_record(1)
+        ## First get the mockeed record
+        r = RecordMock.get_mocked_record()
+        ## Assert general information
         assert r['doi'] == '10.1234/invenio.1234'
-        assert r['files_to_upload'][0] == 'path1.xls'
+        assert r['recid'] == 1
 
-        assert calculate_score([r['files_to_upload'][0]]) == 40
+        ## Score calculation testing.
+        ## For each file
+        score1 = calculate_score([r['files_to_upload'][0]])
+        score2 = calculate_score([r['files_to_upload'][1]])
+        score3 = calculate_score([r['files_to_upload'][2]])
+        assert score1 == 40
+        assert score2 == 100
+        assert score3 == 100
+        ## And the average
+        avg = (sum([score1, score2, score3])) / 3  # 80
+        assert calculate_score(r['files_to_upload']) == avg
 
     @patch('invenio.modules.records.api.get_record')
     def test_get_extension(self, get_record_mock):
-        from invenio.modules.records.api import Record
-        get_record_mock.return_value = Record(
-            json={
-                'doi': '10.1234/invenio.1234',
-                'files_to_upload': [
-                    'path1.xls',
-                    'path2.csv ',
-                    'path3.pdf'],
-                'recid': 1
-            },
-            master_format='marc'
-        )
+        """Tests the get_extension method from the API.
+        """
+        r = RecordMock.get_mocked_record()
         from zenodo.modules.preservationmeter.api import get_file_extension
-        from invenio.modules.records.api import get_record
-        r = get_record(1)
         assert get_file_extension(r['files_to_upload'][0]) == '.xls'
+        assert get_file_extension(r['files_to_upload'][1]) == '.csv'
+        assert get_file_extension(r['files_to_upload'][2]) == '.pdf'
+        assert get_file_extension('file/with/no/extension') == ''
 
-    @patch('invenio.modules.records.api.get_record')
-    def test_single_files(self, get_record_mock):
+    def test_single_files(self):
         """Test a with some basic document types
 
         Types:
@@ -106,45 +120,38 @@ class CalculateScoreTest(InvenioTestCase):
          - xlsx
          - txt
         """
-        from invenio.modules.records.api import Record
-        get_record_mock.return_value = Record(
-            json={
-                'doi': '10.1234/invenio.1234',
-                'files_to_upload': [  # replace with cfg['files_var_name']
-                    'path1.xls',
-                    'path2.csv',
-                    'path3.pdf'],
-                'recid': 1,
-                # '_files': [  # replace with cfg['files_var_name']
-                #    'path1',
-                #    'path2',
-                #    'path3']
-            },
-            master_format='marc'
-        )
-
-        # Now call get_record() which will return the value we've set above
-        from invenio.modules.records.api import get_record
-        r = get_record(1)
+        r = RecordMock.get_mocked_record()
         score = calculate_score(r['files_to_upload'])
-        ####print score
         assert score == 80
 
+    """Tests concerning only the score calculation.
+
+    No RecordMock needed, passing only file paths.
+    """
+
     def test_docx_and_csv(self):
-        assert True
+        files = ['something.ble']
+        assert calculate_score(files) == 0
 
     def test_csvs(self):
-        assert True
+        files = ['something.ble']
+        assert calculate_score(files) == 0
 
     def test_zip_with_docx(self):
-        assert True
+        files = ['something.ble']
+        assert calculate_score(files) == 0
 
     def test_tar_with_pdf(self):
-        assert True
+        files = ['something.ble']
+        assert calculate_score(files) == 0
 
     def test_tar_with_apdf(self):
-        assert True
+        files = ['something.ble']
+        assert calculate_score(files) == 0
 
+    def test_unknown_extension(self):
+        files = ['something.ble']
+        assert calculate_score(files) == 0
 
 TEST_SUITE = make_test_suite(CalculateScoreTest)
 
