@@ -20,7 +20,6 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from invenio.config import CFG_SITE_NAME
 from fixture import DataSet
 
 
@@ -28,10 +27,7 @@ from fixture import DataSet
 # Collections
 # ===========
 class CollectionData(DataSet):
-    class zenodo:
-        id = 1
-        name = CFG_SITE_NAME
-        dbquery = '980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'
+    pass
 
 colls = [
     (2, 'Publications', 'publications', '980__a:publication'),
@@ -51,21 +47,22 @@ colls = [
     (16, 'Technical notes', 'technical-notes', '980__b:technicalnote'),
     (17, 'Working papers', 'working-papers', '980__b:workingpaper'),
     (18, 'Other', 'other-publications', '980__a:publication AND 980__b:other'),
-    (20, 'Figures', 'figures', '980__b:figure'),
-    (21, 'Plots', 'plots', '980__b:plot'),
-    (22, 'Drawings', 'drawings', '980__b:drawing'),
-    (23, 'Diagrams', 'diagrams', '980__b:diagram'),
-    (24, 'Photos', 'photos', '980__b:photo'),
-    (25, 'Other', 'other-images', '980__a:image AND 980__b:other'),
-    (26, 'Open access', 'open', '(542__l:open OR 542__l:embargoed) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
-    (27, 'Closed access', 'closed', '(542__l:closed OR 542__l:restricted) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
-    (28, 'Hidden', 'hidden', '980__a:PROVISIONAL OR 980__a:PENDING OR 980__a:SPAM OR 980__a:REJECTED OR 980__a:DARK'),
-    (29, 'Communities', 'communities', '980__a:user-*'),
+    (19, 'Figures', 'figures', '980__b:figure'),
+    (20, 'Plots', 'plots', '980__b:plot'),
+    (21, 'Drawings', 'drawings', '980__b:drawing'),
+    (22, 'Diagrams', 'diagrams', '980__b:diagram'),
+    (23, 'Photos', 'photos', '980__b:photo'),
+    (24, 'Other', 'other-images', '980__a:image AND 980__b:other'),
+    (25, 'Open access', 'open', '(542__l:open OR 542__l:embargoed) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
+    (26, 'Closed access', 'closed', '(542__l:closed OR 542__l:restricted) AND 980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
+    (27, 'Hidden', 'hidden', '980__a:PROVISIONAL OR 980__a:PENDING OR 980__a:SPAM OR 980__a:REJECTED OR 980__a:DARK'),
+    (28, 'Communities', 'communities', '980__a:user-*'),
     # zenodo-public is a restricted collection with access from anyuser. This
     # is to ensure that even though a record belongs to a provisional
     # collection it can still be viewed by guest users.
-    (36, 'zenodo-public', 'zenodo-public', CollectionData.zenodo.dbquery),
-    (153, 'Software', 'software', '980__a:software'),
+    (29, 'zenodo-public', 'zenodo-public', '980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
+    (30, 'Software', 'software', '980__a:software'),
+
 ]
 
 idx = 2
@@ -91,7 +88,7 @@ coll_coll_data = (
     (1, 4, 'r', 3),
     (1, 5, 'r', 4),
     (1, 6, 'r', 5),
-    (1, 29, 'r', 6),
+    (1, 30, 'r', 6),
     (1, 7, 'r', 7),
     (2, 8, 'r', 8),
     (2, 9, 'r', 9),
@@ -110,6 +107,9 @@ coll_coll_data = (
     (6, 22, 'r', 22),
     (6, 23, 'r', 23),
     (6, 24, 'r', 24),
+    (1, 25, 'v', 25),
+    (1, 26, 'v', 26),
+    (1, 28, 'v', 27),
 )
 
 

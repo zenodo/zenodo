@@ -49,6 +49,7 @@ _ = lambda x: x
 
 PACKAGES = [
     'zenodo.base',
+    'zenodo.demosite',
     'zenodo.modules.deposit',
     'zenodo.modules.github',
     'zenodo.modules.communities',

@@ -25,7 +25,7 @@ from invenio.base.factory import with_app_context
 
 
 @with_app_context(new_context=True)
-def post_handler_demosite_create(sender, default_data='', *args, **kwargs):
+def post_handler_database_create(sender, default_data='', *args, **kwargs):
     """
     Loads data after demosite creation
     """
@@ -37,6 +37,16 @@ def post_handler_demosite_create(sender, default_data='', *args, **kwargs):
 
     c = Community.query.filter_by(id='ecfunded').first()
     c.save_collections()
+
+    print(">>> Fixing dbquery for root collection.")
+
+    from invenio.modules.search.models import Collection
+    from invenio.ext.sqlalchemy import db
+    c = Collection.query.filter_by(id=1).first()
+    c.dbquery = '980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT ' \
+                '980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED ' \
+                'AND NOT 980__a:DARK'
+    db.session.commit()
 
 
 @with_app_context(new_context=True)
