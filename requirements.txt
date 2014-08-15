@@ -29,15 +29,16 @@
 
 # from invenio/requirements.txt
 #
--e git+git://github.com/lnielsen-cern/dictdiffer.git#egg=dictdiffer
--e git+https://github.com/david-e/flask-admin.git@bootstrap3#egg=Flask-Admin
+-e git+git://github.com/inveniosoftware/dictdiffer.git#egg=dictdiffer
+-e git+https://github.com/mrjoes/flask-admin#egg=Flask-Admin
 -e git+https://github.com/mitsuhiko/flask-sqlalchemy#egg=Flask-SQLAlchemy-dev
 https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
--e git+git://github.com/romanchyla/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow
+-e git+git://github.com/inveniosoftware/workflow.git@e41299579501704b1486c72cc2509a9f82e63ea6#egg=workflow
 
 # from invenio/setup.py
 WTForms>=1.0.5,<2.0
 SQLAlchemy>=0.8.3,<0.9
+setuptools>=2.2
 
--e git+https://github.com/lnielsen-cern/invenio@pu-zenodo-assets#egg=Invenio
+-e git+https://github.com/zenodo/invenio-op@pu-zenodo-next#egg=Invenio
 -e .

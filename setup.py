@@ -35,19 +35,20 @@ from setuptools import setup, find_packages
 import os
 
 install_requires = [
-    "Invenio[img,docs]>=1.9999,<1.9999.1",
+    "Invenio[img,docs]>=1.9999.2,<1.9999.3",
     "qrcode==2.4.2",
     "altmetric",
     "beautifulsoup4",
     "humanize==0.5",
     "github3.py==0.8.2",
-    "Pillow"
+    "Pillow",
+    "mixer>=4.8.0",
 ]
 
 extras_require = {
     "development": [
         "Flask-DebugToolbar==0.9.0",
-        "setuptools>=2.0",
+        "setuptools>=2.2",
         "setuptools-bower>=0.2,<1.0",
         "Invenio-Kwalitee",
         "ipython",
