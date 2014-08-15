@@ -1,7 +1,0 @@
-{
-    "name": "zenodo",
-    "resolutions": {
-        "jquery": "~1.11",
-        "bootstrap": "~3.2"
-    }
-}
