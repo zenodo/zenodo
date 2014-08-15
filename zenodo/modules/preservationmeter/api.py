@@ -70,4 +70,4 @@ def calculate_file_score(file_name):
                    '.docx': 60,
                    '.xls': 40,
                    '.doc': 40}
-    return ext_quality[file_ext]
+    return ext_quality.get(file_ext) or 0
