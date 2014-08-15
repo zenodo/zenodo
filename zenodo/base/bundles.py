@@ -39,6 +39,7 @@ _j.bower.update({
 # Site-wide styles
 #
 _s.contents.remove("less/base.less")
+_s.contents.remove("less/footer.less")
 _s.contents += [
     "less/zenodo.less",
 ]
