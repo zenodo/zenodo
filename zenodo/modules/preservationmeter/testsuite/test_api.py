@@ -110,6 +110,7 @@ class CalculateScoreTest(InvenioTestCase):
         assert get_file_extension(r['files_to_upload'][1]) == '.csv'
         assert get_file_extension(r['files_to_upload'][2]) == '.pdf'
         assert get_file_extension('file/with/no/extension') == ''
+        assert get_file_extension('file/with/no/name/.csv') == ''
 
     def test_single_files(self):
         """Test a with some basic document types
@@ -118,7 +119,6 @@ class CalculateScoreTest(InvenioTestCase):
          - csv
          - pdf
          - xlsx
-         - txt
         """
         r = RecordMock.get_mocked_record()
         score = calculate_score(r['files_to_upload'])
@@ -130,26 +130,37 @@ class CalculateScoreTest(InvenioTestCase):
     """
 
     def test_docx_and_csv(self):
-        files = ['something.ble']
-        assert calculate_score(files) == 0
+        """ CSV and DOCX should be 80
+        """
+        files = ['some/word_document.docx', 'and/a.csv']
+        assert calculate_score(files) == 80
 
     def test_csvs(self):
-        files = ['something.ble']
-        assert calculate_score(files) == 0
-
-    def test_zip_with_docx(self):
-        files = ['something.ble']
-        assert calculate_score(files) == 0
+        """Everything csv should be 100
+        """
+        files = ['something.csv', 'something-else.csv',
+                 'and/also-this/thing.csv']
+        assert calculate_score(files) == 100
 
     def test_tar_with_pdf(self):
         files = ['something.ble']
         assert calculate_score(files) == 0
 
+    def test_unknown_extension(self):
+        """Test if unknow or invalid extensions produce 0 score
+        """
+        files = ['something.ble', 'something']
+        assert calculate_score(files) == 0
+
     def test_tar_with_apdf(self):
+        """TODO
+        """
         files = ['something.ble']
         assert calculate_score(files) == 0
 
-    def test_unknown_extension(self):
+    def test_zip_with_docx(self):
+        """TODO
+        """
         files = ['something.ble']
         assert calculate_score(files) == 0
 
