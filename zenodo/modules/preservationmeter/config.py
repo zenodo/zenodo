@@ -25,4 +25,4 @@
 # Local name of webhook receiver.
 # """
 
-PRESERVATIONMETER_file = "Quality mapping here"
+PRESERVATIONMETER_FILES_QUALITY = "Quality mapping here"
