@@ -21,13 +21,13 @@
 ## or submit itself to any jurisdiction.
 
 from __future__ import print_function
+from os.path import splitext
 
 
 def get_file_extension(file_path):
     '''
     Returns only the extension of a given file
     '''
-    from os.path import splitext
     file_name, file_ext = splitext(file_path)
     return file_ext
 
@@ -36,15 +36,14 @@ def get_file_name(file_path):
     '''
     Returns only the file name of a given file
     '''
-    from os.path import splitext
     file_name, file_ext = splitext(file_path)
     return file_name
 
 
 def calculate_score(file_path_list):
-    """
+    """Receives a list of file paths and calculates their preservation score.
+    
     TODO:
-        * Pass files by argument
         * Use fido for file verification
     """
     ## Iterate the list and get the file extension and quality associated.
