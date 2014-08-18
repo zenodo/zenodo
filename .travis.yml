@@ -70,7 +70,6 @@ before_script:
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
   - "inveniomanage database init --yes-i-know || echo ':('"
   - "inveniomanage database create || echo ':('"
-  - "inveniomanage demosite create -p zenodo.demosite"
 
 script:
   - "python setup.py test"
