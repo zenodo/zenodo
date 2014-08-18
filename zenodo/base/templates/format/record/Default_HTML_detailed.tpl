@@ -7,7 +7,7 @@
 {{ bfe_openaire_authors(bfo, relator_code_pattern="$", limit="25", interactive="yes", print_affiliations="yes", separator="<br>", affiliation_prefix="<br><small>", affiliation_suffix="</small>") }}
 </p>
 
-<p><small><a href="#" class="text-muted" data-toggle="collapse" data-target=".authors_list">(show affliations)</a></small></p>
+<p><small><a href="#" class="text-muted" data-toggle="collapse" data-target=".authors_list">(show affiliations)</a></small></p>
 
 {{ bfe_openaire_authors(bfo, relator_code_pattern='ths$', prefix='<p id="supervisors_short"><strong>Supervisor(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
 <p><span itemprop="description">{{bfo.field('520__a').decode('utf8')|safe}}</span></p>
