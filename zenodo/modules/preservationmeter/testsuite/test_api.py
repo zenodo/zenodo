@@ -59,21 +59,8 @@ class RecordMock(object):
 
 class CalculateScoreTest(InvenioTestCase):
 
-    @property
-    def config(self):
-        """Configuration property."""
-        cfg = {  # Shouldn't do this like this?
-            '.csv': 100,
-            '.pdf': 100,
-            '.txt': 95,
-            '.odt': 95,
-            '.xlsx': 60,
-            '.docx': 60,
-            '.xls': 40,
-            '.doc': 40
-        }
-        cfg['files_var_name'] = '_files'
-        return cfg
+    def setUp(self):
+        self.app.config
 
     @patch('invenio.modules.records.api.get_record')
     def test_record_mocking(self, get_record_mock):
