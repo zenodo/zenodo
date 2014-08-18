@@ -52,7 +52,10 @@ def calculate_score(file_path_list):
     for file_p in file_path_list:
         if is_file_compressed(file_p):
             ## Try to extract it
-            print('buh')
+            ## Extract one level of files and append them
+            ## compressed_files = extract(file_p)
+            ## for extracted_file in compressed_files:
+                ## files_quality.append(calculate_file_score(extracted_file))
         else:
             files_quality.append(calculate_file_score(file_p))
 
