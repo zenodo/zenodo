@@ -42,14 +42,18 @@ def get_file_name(file_path):
 
 def calculate_score(file_path_list):
     """Receives a list of file paths and calculates their preservation score.
-    
+
     TODO:
         * Use fido for file verification
     """
     ## Iterate the list and get the file extension and quality associated.
     files_quality = []
     for file_p in file_path_list:
-        files_quality.append(calculate_file_score(file_p))
+        if is_file_compressed(file_p):
+            ## Try to extract it
+            print('buh')
+        else:
+            files_quality.append(calculate_file_score(file_p))
 
     ## Average quality of this submission
     return sum(files_quality) / len(files_quality)
@@ -70,3 +74,9 @@ def calculate_file_score(file_name):
                    '.xls': 40,
                    '.doc': 40}
     return ext_quality.get(file_ext) or 0
+
+def is_file_compressed(file_name):
+    """Returns if a file is in a known compressed format
+    """
+    list_of_compressed_formats = ['.zip', 'tar']
+    return get_file_extension(file_name) in list_of_compressed_formats
