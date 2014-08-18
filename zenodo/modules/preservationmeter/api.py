@@ -22,6 +22,7 @@
 
 from __future__ import print_function
 from os.path import splitext
+from invenio.base.globals import cfg
 
 
 def get_file_extension(file_path):
@@ -65,15 +66,7 @@ def calculate_file_score(file_name):
     As defined on cfg.
     """
     file_ext = get_file_extension(file_name)
-    ext_quality = {'.csv': 100,
-                   '.pdf': 100,
-                   '.txt': 95,
-                   '.odt': 95,
-                   '.xlsx': 60,
-                   '.docx': 60,
-                   '.xls': 40,
-                   '.doc': 40}
-    return ext_quality.get(file_ext) or 0
+    return cfg['PRESERVATIONMETER_FILES_QUALITY'].get(file_ext) or 0
 
 def is_file_compressed(file_name):
     """Returns if a file is in a known compressed format

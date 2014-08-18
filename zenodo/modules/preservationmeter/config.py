@@ -25,4 +25,13 @@
 # Local name of webhook receiver.
 # """
 
-PRESERVATIONMETER_FILES_QUALITY = "Quality mapping here"
+PRESERVATIONMETER_FILES_QUALITY = {
+	'.csv': 100,
+	'.pdf': 100,
+	'.txt': 95,
+	'.odt': 95,
+	'.xlsx': 60,
+	'.docx': 60,
+	'.xls': 40,
+	'.doc': 40
+}
