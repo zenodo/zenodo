@@ -41,6 +41,7 @@ updates to the repository.
 
     $ cd $HOME/src/invenio
     $ git remote add upstream git://github.com/inveniosoftware/invenio.git
+    $ git remote add zenodo git://github.com/zenodo/invenio-op.git
     $ cd $HOME/src/zenodo
     $ git remote add upstream git://github.com/zenodo/zenodo.git
 
@@ -69,7 +70,7 @@ just created environment.
 
     (zenodo)$ cdvirtualenv
     (zenodo)$ mkdir src; cd src
-    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio $BRANCH
+    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo
     (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo $ZBRANCH
 
 
@@ -165,7 +166,6 @@ with initial data.
 
     (invenio)$ inveniomanage database init --user=root --password=$MYSQL_ROOT --yes-i-know
     (invenio)$ inveniomanage database create
-    (invenio)$ inveniomanage demosite create --packages=zenodo.demosite
 
 3.7. Background queues
 
@@ -214,7 +214,7 @@ When you have the servers running, it is possible to upload the demo records.
 
     $ # in a new terminal
     $ workon zenodo
-    (zenodo)$ inveniomanage demosite populate --packages=zenodo
+    (zenodo)$ inveniomanage demosite populate --packages=zenodo.demosite
 
 And you may now open your favourite web browser on
 `http://0.0.0.0:4000/ <http://0.0.0.0:4000/>`_
