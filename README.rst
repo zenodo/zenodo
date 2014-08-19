@@ -15,6 +15,10 @@ Powered by Invenio
 ZENODO is a small layer on top of `Invenio <http://invenio-software.org>`, a ​free software suite enabling you to run your own ​digital library or document repository on the web.
 
 
+Installation
+============
+See INSTALL.rst
+
 Testing
 =======
 Running the tests are as simple as: ::

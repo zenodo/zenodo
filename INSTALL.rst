@@ -29,10 +29,8 @@ Next, clone your forks to get development versions of Invenio and Zenodo.
 .. code-block:: console
 
     $ cd $HOME/src/
-    $ export BRANCH=pu
-    $ git clone --branch $BRANCH git://github.com/<username>/invenio.git
-    $ export ZBRANCH=next
-    $ git clone --branch $ZBRANCH git://github.com/<username>/zenodo.git
+    $ git clone git://github.com/<username>/invenio.git
+    $ git clone git://github.com/<username>/zenodo.git
 
 Make sure you configure upstream remote for the repository so you can fetch
 updates to the repository.
@@ -41,9 +39,13 @@ updates to the repository.
 
     $ cd $HOME/src/invenio
     $ git remote add upstream git://github.com/inveniosoftware/invenio.git
+    $ git fetch upstream
     $ git remote add zenodo git://github.com/zenodo/invenio-op.git
+    $ git fetch zenodo
     $ cd $HOME/src/zenodo
     $ git remote add upstream git://github.com/zenodo/zenodo.git
+    $ git fetch upstream
+
 
 3.2 Working environment
 ~~~~~~~~~~~~~~~~~~~~~~~
@@ -70,8 +72,8 @@ just created environment.
 
     (zenodo)$ cdvirtualenv
     (zenodo)$ mkdir src; cd src
-    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo
-    (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo $ZBRANCH
+    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo-next
+    (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo next
 
 
 3.3 Installation
@@ -88,6 +90,16 @@ installation:
    The option ``--exists-action i`` for ``pip install` is needed to ensure that
    the Invenio source code we just cloned will not be overwritten. If you
    omit it, you will be prompted about which action to take.
+
+For development environments you may also wish to install some extra libraries:
+
+.. code-block:: console
+
+    (zenodo)$ pip install -r requirements-dev.txt --exists-action i
+    (zenodo)$ cd $HOME/src/invenio/
+    (zenodo)$ kwalitee githooks install
+    (zenodo)$ cd $HOME/src/zenodo/
+    (zenodo)$ kwalitee githooks install
 
 
 3.4. Configuration
@@ -125,7 +137,7 @@ they are not in the environment ``$PATH`` already.
 .. code-block:: console
 
     # Global installation
-    $ sudo su -c "npm install -g less clean-css requirejs uglify-js"
+    $ sudo npm install -g less clean-css requirejs uglify-js bower
 
     or
     # Local installation
@@ -140,7 +152,7 @@ Install the external JavaScript and CSS libraries:
 .. code-block:: console
 
     (zenodo)$ cdvirtualenv src/zenodo
-    (zenodo)$ inveniomanage bower -i bower.base.json > bower.json
+    (zenodo)$ inveniomanage bower > bower.json
     (zenodo)$ bower install
 
 
