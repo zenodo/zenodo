@@ -29,8 +29,8 @@ Next, clone your forks to get development versions of Invenio and Zenodo.
 .. code-block:: console
 
     $ cd $HOME/src/
-    $ git clone git://github.com/<username>/invenio.git
-    $ git clone git://github.com/<username>/zenodo.git
+    $ git clone https://github.com/<username>/invenio.git
+    $ git clone https://github.com/<username>/zenodo.git
 
 Make sure you configure upstream remote for the repository so you can fetch
 updates to the repository.
@@ -38,13 +38,13 @@ updates to the repository.
 .. code-block:: console
 
     $ cd $HOME/src/invenio
-    $ git remote add upstream git://github.com/inveniosoftware/invenio.git
+    $ git remote add upstream https://github.com/inveniosoftware/invenio.git
     $ git fetch upstream
-    $ git remote add zenodo git://github.com/zenodo/invenio-op.git
+    $ git remote add zenodo https://github.com/zenodo/invenio-op.git
     $ git fetch zenodo
     $ cd $HOME/src/zenodo
-    $ git remote add upstream git://github.com/zenodo/zenodo.git
-    $ git fetch upstream
+    $ git remote add zenodo https://github.com/zenodo/zenodo.git
+    $ git fetch zenodo
 
 
 3.2 Working environment
@@ -271,3 +271,40 @@ Add the following configuration variabled
 .. code-block:: console
 
     (zenodo)$ inveniomanage config set SENTRY_DSN <sentry dsn url>
+
+
+4.4 Fetching pull requests
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. code-block:: console
+
+    $ cd $HOME/src/invenio/
+    $ vim .git/config
+
+Add ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to the remote
+``upstream``.
+
+.. code-block::
+
+    [remote "upstream"]
+        url = git://github.com/inveniosoftware/invenio.git
+        fetch = +refs/heads/*:refs/remotes/upstream/*
+        fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*
+
+
+.. code-block:: console
+
+    $ cd $HOME/src/zenodo/
+    $ vim .git/config
+
+Add ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to the remote
+``zenodo``.
+
+.. code-block::
+
+    [remote "zenodo"]
+        url = https://github.com/zenodo/zenodo.git
+        fetch = +refs/heads/*:refs/remotes/upstream/*
+        fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*
+
+
