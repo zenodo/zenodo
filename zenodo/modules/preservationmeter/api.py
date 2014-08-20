@@ -58,7 +58,8 @@ def calculate_score(file_path_list):
             ## for extracted_file in compressed_files:
                 ## files_quality.append(calculate_file_score(extracted_file))
             z = zipfile.ZipFile(file_p, "r")
-            z.printdir()
+            for extracted_file in z.namelist():
+                files_quality.append(calculate_file_score(extracted_file))    
         else:
             files_quality.append(calculate_file_score(file_p))
 
