@@ -139,7 +139,7 @@ class CalculateScoreTest(InvenioTestCase):
         files = ['something.ble', 'something']
         assert calculate_score(files) == 0
 
-    def test_tar_with_apdf(self):
+    def test_old_tar_with_apdf(self):
         """TODO
         """
         files = ['something.tar']
@@ -152,28 +152,54 @@ class CalculateScoreTest(InvenioTestCase):
 
         ## Create a txt file
         with open(osp.join(tmp_dir, 'file.txt'), 'w') as txt_file:
-            txt_file.write('patata')
+            txt_file.write('batata')
 
         ## Create a csv file
         with open(osp.join(tmp_dir, 'file.csv'), 'w') as csv_file:
             csv_file.write('123, 123')
 
         ## Then compress
-        with ZipFile(osp.join('/tmp/', "spam.zip"), 'w') as tmp_zip:
-            tmp_zip.write(txt_file.name,
-                          osp.join(osp.basename(tmp_dir),
-                          osp.basename(txt_file.name)))
-            tmp_zip.write(csv_file.name,
-                          osp.join(osp.basename(tmp_dir),
-                          osp.basename(csv_file.name)))
+        with ZipFile(osp.join(tmp_dir, "spam.zip"), 'w') as tmp_zip:
+            txt_zipped_name = osp.join(osp.basename(tmp_dir),
+                              osp.basename(txt_file.name))
+            csv_zipped_name = osp.join(osp.basename(tmp_dir),
+                              osp.basename(csv_file.name))
 
-        with ZipFile(osp.join('/tmp/', "spam.zip"), 'r') as tmp_zip:
-            tmp_zip.printdir()
+            tmp_zip.write(txt_file.name, txt_zipped_name)
+            tmp_zip.write(csv_file.name, csv_zipped_name)
+
+        with ZipFile(osp.join(tmp_dir, "spam.zip"), 'r') as tmp_zip:
+           # tmp_zip.printdir()
             print(tmp_zip.namelist())
 
         ## Then test it
-        #assert calculate_score(tmp.name) == 0
+        #assert calculate_score(tmp_zip.namelist()) == 0
         #tmp.close()
+
+    def test_tar_with_apdf(self):
+        import tempfile
+        import os.path as osp
+        from zipfile import ZipFile
+        from shutil import make_archive
+        
+        ## Create a dir to store the files
+        tmp_dir = tempfile.mkdtemp()
+        ## Create a txt file inside tmp_dir
+        with open(osp.join(tmp_dir, 'file.txt'), 'w') as txt_file:
+            txt_file.write('batata')
+        ## Create a csv file inside tmp_dir
+        with open(osp.join(tmp_dir, 'file.csv'), 'w') as csv_file:
+            csv_file.write('123, 123')
+
+        ## Create a temporary zipfile
+        tmp_zip_file = tempfile.NamedTemporaryFile()
+        ## And make an archive out of it
+        zip_file = make_archive(tmp_zip_file.name + '_tar_with_apdf',
+                                'zip',
+                                tmp_dir)
+        assert calculate_score(zip_file) == 100
+
+
 
     def test_zip_with_docx(self):
         """TODO
