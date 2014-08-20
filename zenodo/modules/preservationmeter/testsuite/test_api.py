@@ -170,7 +170,8 @@ class CalculateScoreTest(InvenioTestCase):
 
         with ZipFile(osp.join(tmp_dir, "spam.zip"), 'r') as tmp_zip:
            # tmp_zip.printdir()
-            print(tmp_zip.namelist())
+            #print(tmp_zip.namelist())
+            1
 
         ## Then test it
         #assert calculate_score(tmp_zip.namelist()) == 0
@@ -197,7 +198,7 @@ class CalculateScoreTest(InvenioTestCase):
         zip_file = make_archive(tmp_zip_file.name + '_tar_with_apdf',
                                 'zip',
                                 tmp_dir)
-        assert calculate_score(zip_file) == 100
+        assert calculate_score([zip_file]) == 100
 
 
 

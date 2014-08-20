@@ -28,7 +28,7 @@
 PRESERVATIONMETER_FILES_QUALITY = {
 	'.csv': 100,
 	'.pdf': 100,
-	'.txt': 95,
+	'.txt': 100,
 	'.odt': 95,
 	'.xlsx': 60,
 	'.docx': 60,
