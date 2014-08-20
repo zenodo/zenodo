@@ -142,8 +142,38 @@ class CalculateScoreTest(InvenioTestCase):
     def test_tar_with_apdf(self):
         """TODO
         """
-        files = ['something.ble']
-        assert calculate_score(files) == 0
+        files = ['something.tar']
+        ## First create a dir
+        import tempfile
+        import os.path as osp
+        from zipfile import ZipFile
+        ## Create a dir
+        tmp_dir = tempfile.mkdtemp()
+
+        ## Create a txt file
+        with open(osp.join(tmp_dir, 'file.txt'), 'w') as txt_file:
+            txt_file.write('patata')
+
+        ## Create a csv file
+        with open(osp.join(tmp_dir, 'file.csv'), 'w') as csv_file:
+            csv_file.write('123, 123')
+
+        ## Then compress
+        with ZipFile(osp.join('/tmp/', "spam.zip"), 'w') as tmp_zip:
+            tmp_zip.write(txt_file.name,
+                          osp.join(osp.basename(tmp_dir),
+                          osp.basename(txt_file.name)))
+            tmp_zip.write(csv_file.name,
+                          osp.join(osp.basename(tmp_dir),
+                          osp.basename(csv_file.name)))
+
+        with ZipFile(osp.join('/tmp/', "spam.zip"), 'r') as tmp_zip:
+            tmp_zip.printdir()
+            print(tmp_zip.namelist())
+
+        ## Then test it
+        #assert calculate_score(tmp.name) == 0
+        #tmp.close()
 
     def test_zip_with_docx(self):
         """TODO
