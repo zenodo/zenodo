@@ -246,12 +246,16 @@ And you may now open your favourite web browser on
 4.2. Sign in with GitHub and ORCID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Please see ``invenio/modules/oauthclient/contrib/github.py``, and
+``invenio/modules/oauthclient/contrib/orcid.py`` for how to register remote
+applications.
+
 .. code-block:: console
 
     (zenodo)$ cdvirtualenv
     (zenodo)$ vim var/invenio.base-instance/invenio.cfg
 
-Add the following configuration variabled
+Add the following configuration variable:
 
 .. code-block:: python
 
@@ -263,6 +267,9 @@ Add the following configuration variabled
         consumer_key="",
         consumer_secret="",
     )
+
+Note, that ORCID does not allow localhost to be used in redirect URIs thus
+making testing in development mode difficult.
 
 
 4.3. Logging to Sentry
