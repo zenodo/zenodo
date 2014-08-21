@@ -77,3 +77,6 @@ bower.json
 
 # Badges
 zenodo/modules/github/static/badges/10.*.png
+
+# HTML Code coverage nosetests
+cover/*
