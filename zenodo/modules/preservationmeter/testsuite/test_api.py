@@ -23,7 +23,11 @@
 from mock import patch
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.base.globals import cfg
-from zenodo.modules.preservationmeter.api import calculate_score
+import zenodo.modules.preservationmeter.api as api
+import tempfile
+import os.path as osp
+from zipfile import ZipFile
+from shutil import make_archive, rmtree
 
 
 class RecordMock(object):
@@ -77,27 +81,31 @@ class CalculateScoreTest(InvenioTestCase):
 
         ## Score calculation testing.
         ## For each file
-        score1 = calculate_score([r['files_to_upload'][0]])
-        score2 = calculate_score([r['files_to_upload'][1]])
-        score3 = calculate_score([r['files_to_upload'][2]])
+        score1 = api.calculate_score([r['files_to_upload'][0]])
+        score2 = api.calculate_score([r['files_to_upload'][1]])
+        score3 = api.calculate_score([r['files_to_upload'][2]])
         assert score1 == 40
         assert score2 == 100
         assert score3 == 100
         ## And the average
         avg = (sum([score1, score2, score3])) / 3  # 80
-        assert calculate_score(r['files_to_upload']) == avg
+        assert api.calculate_score(r['files_to_upload']) == avg
 
     @patch('invenio.modules.records.api.get_record')
     def test_get_extension(self, get_record_mock):
         """Tests the get_extension method from the API.
         """
         r = RecordMock.get_mocked_record()
-        from zenodo.modules.preservationmeter.api import get_file_extension
-        assert get_file_extension(r['files_to_upload'][0]) == '.xls'
-        assert get_file_extension(r['files_to_upload'][1]) == '.csv'
-        assert get_file_extension(r['files_to_upload'][2]) == '.pdf'
-        assert get_file_extension('file/with/no/extension') == ''
-        assert get_file_extension('file/with/no/name/.csv') == ''
+        assert api.get_file_extension(r['files_to_upload'][0]) == '.xls'
+        assert api.get_file_extension(r['files_to_upload'][1]) == '.csv'
+        assert api.get_file_extension(r['files_to_upload'][2]) == '.pdf'
+        assert api.get_file_extension('file/with/no/extension') == ''
+        assert api.get_file_extension('file/with/no/name/.csv') == ''
+
+    def test_get_name(self):
+        files = ['first/file.csv', 'and-second/file2.doc']
+        assert api.get_file_name(files[0]) == 'first/file'
+        assert api.get_file_name(files[1]) == 'and-second/file2'
 
     def test_single_files(self):
         """Test a with some basic document types
@@ -108,7 +116,7 @@ class CalculateScoreTest(InvenioTestCase):
          - xlsx
         """
         r = RecordMock.get_mocked_record()
-        score = calculate_score(r['files_to_upload'])
+        score = api.calculate_score(r['files_to_upload'])
         assert score == 80
 
     """Tests concerning only the score calculation.
@@ -120,33 +128,30 @@ class CalculateScoreTest(InvenioTestCase):
         """ CSV and DOCX should be 80
         """
         files = ['some/word_document.docx', 'and/a.csv']
-        assert calculate_score(files) == 80
+        assert api.calculate_score(files) == 80
 
     def test_csvs(self):
         """Everything csv should be 100
         """
         files = ['something.csv', 'something-else.csv',
                  'and/also-this/thing.csv']
-        assert calculate_score(files) == 100
+        assert api.calculate_score(files) == 100
 
     def test_tar_with_pdf(self):
         files = ['something.ble']
-        assert calculate_score(files) == 0
+        assert api.calculate_score(files) == 0
 
     def test_unknown_extension(self):
         """Test if unknow or invalid extensions produce 0 score
         """
         files = ['something.ble', 'something']
-        assert calculate_score(files) == 0
+        assert api.calculate_score(files) == 0
 
     def test_old_tar_with_apdf(self):
         """TODO
         """
         files = ['something.tar']
         ## First create a dir
-        import tempfile
-        import os.path as osp
-        from zipfile import ZipFile
         ## Create a dir
         tmp_dir = tempfile.mkdtemp()
 
@@ -174,14 +179,16 @@ class CalculateScoreTest(InvenioTestCase):
             1
 
         ## Then test it
-        #assert calculate_score(tmp_zip.namelist()) == 0
+        #assert api.calculate_score(tmp_zip.namelist()) == 0
         #tmp.close()
 
+    def test_fake_zip(self):
+        """Tests a fake zip (bad) file.
+        """
+        files = ['this/is/a/fake.zip']
+        assert api.calculate_score(files) == 0
+
     def test_tar_with_apdf(self):
-        import tempfile
-        import os.path as osp
-        from zipfile import ZipFile
-        from shutil import make_archive
         
         ## Create a dir to store the files
         tmp_dir = tempfile.mkdtemp()
@@ -193,12 +200,25 @@ class CalculateScoreTest(InvenioTestCase):
             csv_file.write('123, 123')
 
         ## Create a temporary zipfile
-        tmp_zip_file = tempfile.NamedTemporaryFile()
+        tmp_zip_dir = tempfile.mkdtemp()
         ## And make an archive out of it
-        zip_file = make_archive(tmp_zip_file.name + '_tar_with_apdf',
+        zip_file = make_archive(osp.join(tmp_zip_dir, '_tar_with_apdf'),
                                 'zip',
                                 tmp_dir)
-        assert calculate_score([zip_file]) == 100
+        assert api.calculate_score([zip_file]) == 100
+
+        ## Remove the temporary directories
+        rmtree(tmp_dir)
+        rmtree(tmp_zip_dir)
+
+        ## Test if the files were removed
+        assert osp.isdir(tmp_dir) == False
+        assert osp.isdir(tmp_zip_dir) == False
+
+        ## Redundant.. directory is deleted.
+        assert osp.exists(zip_file) == False
+        assert osp.exists(txt_file.name) == False
+        assert osp.exists(csv_file.name) == False
 
 
 
@@ -206,7 +226,7 @@ class CalculateScoreTest(InvenioTestCase):
         """TODO
         """
         files = ['something.ble']
-        assert calculate_score(files) == 0
+        assert api.calculate_score(files) == 0
 
 TEST_SUITE = make_test_suite(CalculateScoreTest)
 
