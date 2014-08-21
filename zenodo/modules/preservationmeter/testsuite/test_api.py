@@ -188,7 +188,7 @@ class CalculateScoreTest(InvenioTestCase):
         files = ['this/is/a/fake.zip']
         assert api.calculate_score(files) == 0
 
-    def test_tar_with_apdf(self):
+    def test_zip_with_txt_csv(self):
         
         ## Create a dir to store the files
         tmp_dir = tempfile.mkdtemp()
