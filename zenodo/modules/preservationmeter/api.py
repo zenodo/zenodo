@@ -23,7 +23,7 @@
 from __future__ import print_function
 from os.path import splitext
 from invenio.base.globals import cfg
-import zipfile
+import zipfile, tarfile
 
 
 def get_file_extension(file_path):
@@ -63,13 +63,19 @@ def extractor(file_name):
     """Generator to iterate through files inside an archive.
     """
     ## ZipFiles
-    if zipfile.is_zipfile(file_name):
-        z = zipfile.ZipFile(file_name, "r")
-        for file_p in z.namelist():
-            yield file_p
-    else:
+    try:
+        if zipfile.is_zipfile(file_name):
+            z = zipfile.ZipFile(file_name, "r")
+            for file_p in z.namelist():
+                yield file_p
+        elif tarfile.is_tarfile(file_name):
+            print("### oh noes a tar file")
+            print(file_name)
+            yield 'bad/file.bad'
+        else:
+            raise
+    except:
         yield 'bad/file.bad'
-
 
 def calculate_file_score(file_name):
     """Returns the associated score of this extension.
