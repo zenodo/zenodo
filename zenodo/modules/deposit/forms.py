@@ -33,6 +33,7 @@ from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
 from invenio.config import CFG_DATACITE_DOI_PREFIX
 
 from invenio.base.i18n import _
+from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
 from invenio.modules.knowledge.api import get_kb_mapping
 from invenio.modules.deposit.form import WebDepositForm
 from invenio.modules.deposit.field_widgets import date_widget, \
@@ -444,7 +445,9 @@ class ZenodoForm(WebDepositForm):
             removeButtons='',
         ),
         filters=[
-            sanitize_html,
+            sanitize_html(allowed_tag_whitelist=(
+                CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST + ('span',)
+            )),
             strip_string,
         ],
     )
