@@ -52,7 +52,7 @@ def calculate_score(file_path_list):
             ## Try to extract it
             for extracted_file in extractor(file_p):
                 ## Extract one level of files and append them
-                files_quality.append(calculate_file_score(extracted_file))    
+                files_quality.append(calculate_file_score(extracted_file))
         else:
             files_quality.append(calculate_file_score(file_p))
 
@@ -67,6 +67,8 @@ def extractor(file_name):
         z = zipfile.ZipFile(file_name, "r")
         for file_p in z.namelist():
             yield file_p
+    else:
+        yield 'bad/file.bad'
 
 
 def calculate_file_score(file_name):
