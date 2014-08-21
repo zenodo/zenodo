@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ from invenio.base.i18n import _
 from invenio.modules.knowledge.api import get_kb_mapping
 from invenio.modules.deposit.form import WebDepositForm
 from invenio.modules.deposit.field_widgets import date_widget, \
-    plupload_widget, ButtonWidget, ExtendedListWidget, ListItemWidget, \
+    plupload_widget, ButtonWidget, ExtendedListWidget, \
     TagListWidget, TagInput, ItemWidget, CKEditorWidget, ColumnInput
 from invenio.modules.deposit.filter_utils import strip_string, sanitize_html
 from invenio.modules.deposit.validation_utils import doi_syntax_validator, \
@@ -56,7 +56,7 @@ from . import fields as zfields
 from invenio.modules.deposit import fields
 
 
-__all__ = ['ZenodoForm']
+__all__ = ('ZenodoForm', )
 
 
 #
@@ -208,9 +208,7 @@ class RelatedIdentifierForm(WebDepositForm):
     )
 
     def validate_scheme(form, field):
-        """
-        Always set scheme based on value in identifier
-        """
+        """Set scheme based on value in identifier."""
         from invenio.utils import persistentid
         schemes = persistentid.detect_identifier_schemes(
             form.data.get('identifier') or ''
@@ -296,6 +294,9 @@ class GrantForm(WebDepositForm):
 # Form
 #
 class ZenodoForm(WebDepositForm):
+
+    """Zenodo Upload Form."""
+
     #
     # Fields
     #
@@ -431,14 +432,16 @@ class ZenodoForm(WebDepositForm):
             toolbar=[
                 ['PasteText', 'PasteFromWord'],
                 ['Bold', 'Italic', 'Strike', '-',
-                    'Subscript', 'Superscript', ],
-                ['NumberedList', 'BulletedList'],
+                 'Subscript', 'Superscript', ],
+                ['NumberedList', 'BulletedList', 'Blockquote'],
                 ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
-                ['SpecialChar', 'ScientificChar'], ['Source'], ['Maximize'],
+                ['Mathjax', 'SpecialChar', 'ScientificChar'], ['Source'],
+                ['Maximize'],
             ],
             disableNativeSpellChecker=False,
-            extraPlugins='scientificchar',
+            extraPlugins='scientificchar,mathjax,blockquote',
             removePlugins='elementspath',
+            removeButtons='',
         ),
         filters=[
             sanitize_html,
@@ -738,7 +741,6 @@ class ZenodoForm(WebDepositForm):
             if len(form.files) == 0:
                 raise ValidationError("You must provide minimum one file.")
 
-
     #
     # Form configuration
     #
@@ -819,9 +821,9 @@ def filter_fields(groups):
 
 
 class EditFormMixin(object):
-    """
-    Mixin class for forms that needs editing.
-    """
+
+    """Mixin class for forms that needs editing."""
+
     recid = fields.IntegerField(
         validators=[
             unchangeable(),
@@ -839,9 +841,9 @@ class EditFormMixin(object):
 
 
 class ZenodoEditForm(ZenodoForm, EditFormMixin):
-    """
-    Specialized form for editing a record
-    """
+
+    """Specialized form for editing a record."""
+
     # Remove some fields.
     doi = fields.DOIField(
         label="Digital Object Identifier",

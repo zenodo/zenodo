@@ -19,19 +19,22 @@
 
 """Zenodo base bundles."""
 
-from invenio.base.bundles import styles as _s, jquery as _j
+from invenio.base.bundles import styles as _s, jquery as _j, invenio as _i
 
 #
 # Site-wide JS
 #
+_i.contents += [
+    "js/zenodo/init.js",
+]
+
 _j.contents += [
-    "vendors/zeroclipboard/ZeroClipboard.js",
+    #"vendors/zeroclipboard/ZeroClipboard.js",
     "vendors/bootstrap-datepicker/js/bootstrap-datepicker.js",
-    "js/custom.js",
 ]
 
 _j.bower.update({
-    "zeroclipboard": "~1.3.5",
+    "zeroclipboard": "~2.1.6",
     "bootstrap-datepicker": "latest",
 })
 

@@ -17,36 +17,50 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{% js 'js/plupload/plupload.full.js', '50-webdeposit' %}
-{% js 'js/deposit/form.js', '50-webdeposit' %}
-{% js 'js/deposit/templates.js', '50-webdeposit' %}
+{% extends "deposit/index_base.html" %}
 
-{% extends "page.html" %}
-
-{% block title %}{% endblock %}
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "deposit.js", "deposit.css" %}
+{% endblock %}
 
 {% block javascript %}
-
-{{super()}}
 <script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
 <script type="text/javascript">
-$(document).ready(function() {
-    DEPOSIT_FORM.init_plupload(
-        '{{config.CFG_WEBDEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
-        '.pluploader',
-        undefined,
-        '{{ url_for('.upload_file', deposition_type=deposition_type, uuid='-1') }}',
-        '{{ url_for('.delete_file', deposition_type=deposition_type, uuid='-1') }}',
-        '{{ url_for('.get_file', deposition_type=deposition_type, uuid='-1') }}',
-        [],
-        '{{ url_for('.upload_url', deposition_type=deposition_type, uuid='-1') }}',
-        null,
-        '{{ url_for('.create', deposition_type=deposition_type) }}',
-        '{{ url_for('.run', deposition_type=deposition_type, uuid='-1') }}'
-    );
+require(["jquery", "js/deposit/form", "js/zenodo/zenodo"], function($, form, zenodo) {
+    $(function(){
+      var save_url = undefined;
+      var save_all_url = undefined;
+      var complete_url = undefined;
+      var autocomplete_url = undefined;
+
+      var configuration = {
+          plupload: {
+            max_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+            selector:'.pluploader',
+            url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid='-1') }}',
+            delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid='-1') }}',
+            get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid='-1') }}',
+            db_files: null,
+            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid='-1') }}',
+            uuid: null,
+            newdep_url: '{{ url_for('.create', deposition_type=deposition_type) }}',
+            continue_url: '{{ url_for('.run', deposition_type=deposition_type, uuid='-1') }}'
+          },
+          urls: {
+            save_url: save_url,
+            save_all_url: save_all_url,
+            complete_url: complete_url,
+            autocomplete_url: autocomplete_url,
+          },
+          datepicker: zenodo.datepicker_config
+      }
+      // Initialize form
+      form.init(configuration);
+    });
 });
 </script>
-{% endblock %}
+{% endblock javascript %}
 
 {% block body %}
 <div class="row" id="file_container">
