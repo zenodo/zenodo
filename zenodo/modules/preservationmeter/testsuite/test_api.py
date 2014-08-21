@@ -220,7 +220,9 @@ class CalculateScoreTest(InvenioTestCase):
         assert osp.exists(txt_file.name) == False
         assert osp.exists(csv_file.name) == False
 
-
+    def test_tar_with_txt_csv(self):
+        files = ['something.tar']
+        api.calculate_score(files)
 
     def test_zip_with_docx(self):
         """TODO
