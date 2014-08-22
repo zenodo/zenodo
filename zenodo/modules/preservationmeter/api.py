@@ -69,9 +69,11 @@ def extractor(file_name):
             for file_p in z.namelist():
                 yield file_p
         elif tarfile.is_tarfile(file_name):
-            print("### oh noes a tar file")
-            print(file_name)
-            yield 'bad/file.bad'
+            t = tarfile.open(file_name, "r:*")
+            for file_p in t.getnames():
+                print("################")
+                print(file_p)
+                yield file_p
         else:
             raise
     except:
@@ -88,5 +90,5 @@ def calculate_file_score(file_name):
 def is_file_compressed(file_name):
     """Returns if a file is in a known compressed format.
     """
-    list_of_compressed_formats = ['.zip', 'tar']
+    list_of_compressed_formats = ['.zip', '.tar']
     return get_file_extension(file_name) in list_of_compressed_formats
