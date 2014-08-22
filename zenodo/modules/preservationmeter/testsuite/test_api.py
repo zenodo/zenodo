@@ -24,7 +24,7 @@ from mock import patch
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from invenio.base.globals import cfg
 import zenodo.modules.preservationmeter.api as api
-import tempfile
+import tempfile, tarfile
 import os.path as osp
 from zipfile import ZipFile
 from shutil import make_archive, rmtree
@@ -188,8 +188,19 @@ class CalculateScoreTest(InvenioTestCase):
         files = ['this/is/a/fake.zip']
         assert api.calculate_score(files) == 0
 
+    def test_fake_tar(self):
+        files = ['something.tar']
+        api.calculate_score(files)
+
     def test_zip_with_txt_csv(self):
-        
+        """Tests a zip file with a txt and csv.
+
+        Creates a temporary dir and adds the two files inside.
+        Then creates the archive inside another temporary dir.
+        Score should be 100.
+        Deletes directories upon finishing.
+        """
+
         ## Create a dir to store the files
         tmp_dir = tempfile.mkdtemp()
         ## Create a txt file inside tmp_dir
@@ -199,10 +210,10 @@ class CalculateScoreTest(InvenioTestCase):
         with open(osp.join(tmp_dir, 'file.csv'), 'w') as csv_file:
             csv_file.write('123, 123')
 
-        ## Create a temporary zipfile
+        ## Create another temporary dir for the zip file.
         tmp_zip_dir = tempfile.mkdtemp()
         ## And make an archive out of it
-        zip_file = make_archive(osp.join(tmp_zip_dir, '_tar_with_apdf'),
+        zip_file = make_archive(osp.join(tmp_zip_dir, '_zip_with_txt_csv'),
                                 'zip',
                                 tmp_dir)
         assert api.calculate_score([zip_file]) == 100
@@ -221,8 +232,44 @@ class CalculateScoreTest(InvenioTestCase):
         assert osp.exists(csv_file.name) == False
 
     def test_tar_with_txt_csv(self):
-        files = ['something.tar']
-        api.calculate_score(files)
+        """Tests a tar file with a txt and csv.
+
+        Creates a temporary dir and adds the two files inside.
+        Then creates the archive inside another temporary dir.
+        Score should be 100.
+        Deletes directories upon finishing.
+        """
+
+        ## Create a dir to store the files
+        tmp_dir = tempfile.mkdtemp()
+        ## Create a txt file inside tmp_dir
+        with open(osp.join(tmp_dir, 'file.txt'), 'w') as txt_file:
+            txt_file.write('batata')
+        ## Create a csv file inside tmp_dir
+        with open(osp.join(tmp_dir, 'file.csv'), 'w') as csv_file:
+            csv_file.write('123, 123')
+
+        ## Create another temporary dir for the zip file.
+        tmp_tar_dir = tempfile.mkdtemp()
+        ## And make an archive out of it
+        tar_file = make_archive(osp.join(tmp_tar_dir, '_tar_with_txt_csv'),
+                                'tar',
+                                tmp_dir)
+
+        assert api.calculate_score([tar_file]) == 100
+
+        ## Remove the temporary directories
+        rmtree(tmp_dir)
+        rmtree(tmp_tar_dir)
+
+        ## Test if the files were removed
+        assert osp.isdir(tmp_dir) == False
+        assert osp.isdir(tmp_tar_dir) == False
+
+        ## Redundant.. directory is deleted.
+        assert osp.exists(tar_file) == False
+        assert osp.exists(txt_file.name) == False
+        assert osp.exists(csv_file.name) == False
 
     def test_zip_with_docx(self):
         """TODO
