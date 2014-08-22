@@ -52,6 +52,7 @@ PACKAGES = [
     'zenodo.modules.deposit',
     'zenodo.modules.github',
     'zenodo.modules.communities',
+    'zenodo.modules.preservationmeter',
     'invenio.modules.access',
     'invenio.modules.accounts',
     'invenio.modules.alerts',
@@ -106,6 +107,7 @@ PACKAGES = [
     'invenio.modules.uploader',
     'invenio.modules.webhooks',
     'invenio.modules.workflows',
+    'invenio.base',
 ]
 
 PACKAGES_EXCLUDE = []

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,63 +20,18 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
+# INSPIRE_WEBHOOK_RECEIVER_ID = "inspire"
+# """
+# Local name of webhook receiver.
+# """
 
-# C extensions
-*.so
-
-# Distribution / packaging
-bin/
-build/
-develop-eggs/
-dist/
-eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-*.egg-info/
-.installed.cfg
-*.egg
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-.tox/
-.coverage
-.cache
-nosetests.xml
-coverage.xml
-
-# Translations
-*.mo
-
-# Mr Developer
-.mr.developer.cfg
-.project
-.pydevproject
-
-# Rope
-.ropeproject
-
-# Django stuff:
-*.log
-*.pot
-
-# Sphinx documentation
-docs/_build/
-
-# Vendors assets
-bower.json
-**/vendors/*
-
-# Badges
-zenodo/modules/github/static/badges/10.*.png
-
-# HTML Code coverage nosetests
-cover/*
+PRESERVATIONMETER_FILES_QUALITY = {
+	'.csv': 100,
+	'.pdf': 100,
+	'.txt': 100,
+	'.odt': 95,
+	'.xlsx': 60,
+	'.docx': 60,
+	'.xls': 40,
+	'.doc': 40
+}
