@@ -22,6 +22,8 @@
 
 from fixture import DataSet
 
+from invenio.modules.search import fixtures
+
 
 # ===========
 # Collections
@@ -143,3 +145,84 @@ for cid in coll_ids:
         tabs = 'usage;comments;metadata;files'
     obj.__name__ = "ctabs%s" % cid
     setattr(CollectiondetailedrecordpagetabsData, obj.__name__, obj)
+
+
+class Field_18:
+    code = u'doi'
+    id = 18
+    name = u'doi'
+fixtures.FieldData.Field_18 = Field_18
+
+
+class Field_45:
+    code = u'access_rights'
+    id = 45
+    name = u'access rights'
+fixtures.FieldData.Field_45 = Field_45
+
+
+class Field_46:
+    code = u'EU Project'
+    id = 46
+    name = u'project'
+fixtures.FieldData.Field_46 = Field_46
+
+
+class Tag_227:
+    id = 227
+    value = u'0247_a'
+    recjson_value = u'doi'
+    name = u'doi'
+fixtures.TagData.Tag_227 = Tag_227
+
+
+class Tag_228:
+    id = 228
+    value = u'542__l'
+    recjson_value = u'access_right'
+    name = u'access rights'
+fixtures.TagData.Tag_228 = Tag_228
+
+
+class Tag_229:
+    id = 229
+    value = u'536__c'
+    recjson_value = u'grants[n].identifier'
+    name = u'EU Project grant agreement number'
+fixtures.TagData.Tag_229 = Tag_229
+
+
+class Tag_230:
+    id = 230
+    value = u'536__a'
+    recjson_value = u'grants[n].description'
+    name = u'EU Project description'
+fixtures.TagData.Tag_230 = Tag_230
+
+
+class FieldTag_227_18:
+    score = 100
+    id_tag = fixtures.TagData.Tag_227.id
+    id_field = fixtures.FieldData.Field_18.id
+fixtures.FieldTagData.FieldTag_227_18 = FieldTag_227_18
+
+
+class FieldTag_228_45:
+    score = 100
+    id_tag = fixtures.TagData.Tag_228.id
+    id_field = fixtures.FieldData.Field_45.id
+fixtures.FieldTagData.FieldTag_228_45 = FieldTag_228_45
+
+
+class FieldTag_229_46:
+    score = 100
+    id_tag = fixtures.TagData.Tag_229.id
+    id_field = fixtures.FieldData.Field_46.id
+fixtures.FieldTagData.FieldTag_229_46 = FieldTag_229_46
+
+
+class FieldTag_230_46:
+    score = 100
+    id_tag = fixtures.TagData.Tag_230.id
+    id_field = fixtures.FieldData.Field_46.id
+fixtures.FieldTagData.FieldTag_229_46 = FieldTag_230_46

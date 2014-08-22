@@ -28,3 +28,4 @@ from .search import *
 from .formatter import *
 from .oairepository import *
 from .communities import *
+from .indicies import *

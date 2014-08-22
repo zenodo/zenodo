@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -25,8 +25,9 @@ from __future__ import absolute_import
 from .receivers import post_handler_demosite_populate, \
     post_handler_database_create
 from invenio.base.scripts.demosite import populate
-from invenio.base.scripts.database import create
+from invenio.base.scripts.database import create, recreate
 from invenio.base.signals import post_command
 
 post_command.connect(post_handler_demosite_populate, sender=populate)
 post_command.connect(post_handler_database_create, sender=create)
+post_command.connect(post_handler_database_create, sender=recreate)
