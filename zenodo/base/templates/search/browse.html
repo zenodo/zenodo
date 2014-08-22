@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -16,21 +16,4 @@
 ## along with Invenio; if not, write to the Free Software Foundation, Inc.,
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
-{% extends "deposit/run.html" %}
-
-{% macro edit_action_bar(margin="") -%}
-    {% include "deposit/edit_action_bar.html" %}
-{%- endmacro %}
-
-{% block form_header scoped %}{{ edit_action_bar() }}{% endblock form_header%}
-
-{% block instructions %}Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) When ready, press "Submit" to finalize your changes. (iii) Press "Discard" to discard your changes. {% endblock %}
-
-
-{% block form_group_header scoped %}
-    {% if group %}
-        {{ form_group_accordion_start(group, grouploop.index) }}
-    {% else %}
-        {{ edit_action_bar(margin="10px") }}
-    {% endif %}
-{% endblock %}
+{%- extends "search/browse_base.html" -%}

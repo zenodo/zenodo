@@ -182,7 +182,7 @@ def is_record_owner(bfo, tag="8560_f"):
 
 
 @blueprint.app_template_filter('zenodo_curated')
-def zenodo_curated(reclist, length=10, reverse=True, open_only=False):
+def zenodo_curated(reclist, length=10, reverse=False, open_only=False):
     """
     Show only curated publications from reclist
     """
