@@ -26,12 +26,62 @@
 # """
 
 PRESERVATIONMETER_FILES_QUALITY = {
-	'.csv': 100,
+	# Publications
 	'.pdf': 100,
+	'.htm': 100,
+	'.html': 100,
 	'.txt': 100,
 	'.odt': 95,
-	'.xlsx': 60,
+	'.rtf': 90,
 	'.docx': 60,
+	'.doc': 40,
+
+	# Datasets
+	'.xml': 100,
+	'.csv': 100,
+	'.xlsx': 60,
 	'.xls': 40,
-	'.doc': 40
+	'.por': 100,
+	'.tab': 100,
+	'.tfw': 100,
+	'.dwg': 100,
+	'.shp': 100,
+	'.shx': 100,
+	'.dbf': 100,
+	'.sav': 50,
+	'.dta': 50,
+	'.mdb': 50,
+	'.accdb': 50,
+	'.dbf': 50,
+	'.ods': 50,
+	'.mif': 50,
+	'.kml': 50,
+	'.ai': 50,
+	'.dxf': 50,
+	'.svg': 50,
+
+	# Images & Posters
+	'.tif': 100,
+	'.jpeg': 90,
+	'.jpg': 90,
+	'.tiff': 80,
+	'.raw': 70,
+	'.psd': 50,
+
+	# Presentations
+
+	# Videos
+	'.flac': 100,
+	'.mp4': 100,
+	'.mj2': 100,
+	'.mp3': 75,
+	'.aif': 75,
+	'.wav': 75,
+
+	# Compressed, relevant?
+	'.zip': 100,
+	'.tar': 90,
+	'.gz': 100,
+	'.7z': 100,
+	'.rar': 70
 }
