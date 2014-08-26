@@ -36,19 +36,28 @@ from .helpers import tclient_request_factory
 
 
 class GitHubTestCase(CeleryTestCase):
+    @property
+    def config(self):
+        return dict(
+            CACHE_TYPE='null',
+            OAUTH2_CACHE_TYPE='null',
+            CELERY_RESULT_BACKEND='cache',
+            CELERY_CACHE_BACKEND='memory',
+        )
+
     def setUp(self):
         # Create celery application
         self.create_celery_app()
+
+        self.app.extensions['zenodo_github.request_factory'] = partial(
+            tclient_request_factory, self.client
+        )
 
         # Run Flask initialization code - to before_first_request functions
         # being executed
         with self.app.test_request_context(''):
             self.app.try_trigger_before_first_request_functions()
             self.app.preprocess_request()
-
-        self.app.extensions['zenodo_github.request_factory'] = partial(
-            tclient_request_factory, self.client
-        )
 
         # Create a user
         from invenio.modules.accounts.models import User

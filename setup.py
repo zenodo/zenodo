@@ -40,7 +40,7 @@ install_requires = [
     "altmetric",
     "beautifulsoup4",
     "humanize==0.5",
-    "github3.py==0.8.2",
+    "github3.py>=0.9.0",
     "Pillow",
     "mixer>=4.8.0",
 ]
