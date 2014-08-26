@@ -19,10 +19,7 @@
 
 import json
 import requests
-from flask import url_for
-
-
-from invenio.base.globals import cfg
+from flask import url_for, current_app
 
 
 class ZenodoApiException(Exception):
@@ -39,9 +36,7 @@ class ZenodoApiError(ZenodoApiException):
 
 def requests_request_factory(method, endpoint, urlargs, data, is_json, headers,
                              files, verify_ssl):
-    """
-    Make requests with request package
-    """
+    """Make requests with request package."""
     client_func = getattr(requests, method.lower())
 
     if headers is None:
@@ -74,7 +69,8 @@ class ZenodoClient(object):
     def __init__(self, access_token, ssl_verify=True, request_factory=None):
         self.access_token = access_token
         self.ssl_verify = ssl_verify
-        self.request_factory = request_factory or requests_request_factory
+        self.request_factory = request_factory or current_app.extensions.get(
+            'zenodo_github.request_factory', requests_request_factory)
 
     def make_request(self, method, endpoint, urlargs={}, data=None,
                      is_json=True, headers=None, files=None):
@@ -100,9 +96,7 @@ class ZenodoClient(object):
 
 
 def upload(access_token, metadata, files, publish=False, request_factory=None):
-    """
-    Zenodo Upload
-    """
+    """Zenodo Upload."""
     client = ZenodoClient(
         access_token,
         ssl_verify=False,

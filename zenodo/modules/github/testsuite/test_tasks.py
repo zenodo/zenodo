@@ -29,8 +29,10 @@ from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.celery.testsuite.helpers import CeleryTestCase
 from invenio.ext.sqlalchemy import db
 import json
+from functools import partial
 
 from . import fixtures
+from .helpers import tclient_request_factory
 
 
 class GitHubTestCase(CeleryTestCase):
@@ -43,6 +45,10 @@ class GitHubTestCase(CeleryTestCase):
         with self.app.test_request_context(''):
             self.app.try_trigger_before_first_request_functions()
             self.app.preprocess_request()
+
+        self.app.extensions['zenodo_github.request_factory'] = partial(
+            tclient_request_factory, self.client
+        )
 
         # Create a user
         from invenio.modules.accounts.models import User
