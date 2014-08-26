@@ -28,6 +28,7 @@ def suite():
     """Create the testsuite that has all the tests."""
     packages = [
         'zenodo',
+        'zenodo.base',
         #'zenodo.modules.github',
         'zenodo.modules.deposit',
     ]
