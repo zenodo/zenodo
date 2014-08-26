@@ -35,9 +35,9 @@
   <li><a href="#restapi-http">HTTP status codes</i></a></li>
   <li><a href="#restapi-errors">Errors</i></a></li>
   <li><a href="#restapi-res">Resources</i></a></li>
-  <li><a href="#restapi-res-dep"><i class="icon-chevron-right"></i> Depositions</i></a></li>
-  <li><a href="#restapi-res-files"><i class="icon-chevron-right"></i> Deposition files</i></a></li>
-  <li><a href="#restapi-res-actions"><i class="icon-chevron-right"></i> Deposition actions</i></a></li>
+  <li><a href="#restapi-res-dep"><i class="glyphicon glyphicon-chevron-right"></i> Depositions</i></a></li>
+  <li><a href="#restapi-res-files"><i class="glyphicon glyphicon-chevron-right"></i> Deposition files</i></a></li>
+  <li><a href="#restapi-res-actions"><i class="glyphicon glyphicon-chevron-right"></i> Deposition actions</i></a></li>
   <li><a href="#restapi-rep">Representations</i></a></li>
   {#<li><a href="#restapi-faq">FAQ</i></a></li>#}
   <li><a href="#restapi-changes">Changes</i></a></li>
@@ -74,7 +74,7 @@
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-list0">
-          <h4 id="restapi-res-">Quick start <small></small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Quick start <small></small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-list0" class="panel-collapse collapse">
@@ -367,7 +367,7 @@ Error responses for 400 series errors (e.g. 400, 401, 403, ...) are returned as 
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-list">
-          <h4 id="restapi-res-">List <small>GET deposit/depositions</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">List <small>GET deposit/depositions</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-list" class="panel-collapse collapse">
@@ -424,7 +424,7 @@ print response.json()
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-create">
-        <h4 id="restapi-res-">Create <small>POST deposit/depositions</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+        <h4 id="restapi-res-">Create <small>POST deposit/depositions</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-create" class="panel-collapse collapse">
@@ -510,7 +510,7 @@ r = requests.post(url, data=json.dumps(data), headers=headers)</pre>
    <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-get">
-          <h4 id="restapi-res-">Retrieve <small>GET deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Retrieve <small>GET deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-get" class="panel-collapse collapse">
@@ -578,7 +578,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ac
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-update">
-          <h4 id="restapi-res-">Update <small>PUT deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Update <small>PUT deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-update" class="panel-collapse collapse">
@@ -669,7 +669,7 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-delete">
-          <h4 id="restapi-res-">Delete <small>DELETE deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Delete <small>DELETE deposit/depositions/:id</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-delete" class="panel-collapse collapse">
@@ -759,7 +759,7 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-list">
-          <h4 id="restapi-res-">List <small>GET deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">List <small>GET deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-f-list" class="panel-collapse collapse">
@@ -827,7 +827,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-create">
-          <h4 id="restapi-res-">Create (upload) <small>POST deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Create (upload) <small>POST deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-f-create" class="panel-collapse collapse">
@@ -911,7 +911,7 @@ r = requests.post(url, data=data, files=files)</pre>
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-sort">
-          <h4 id="restapi-res-">Sort <small>PUT deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Sort <small>PUT deposit/depositions/:id/files</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-f-sort" class="panel-collapse collapse">
@@ -1002,7 +1002,7 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-get">
-          <h4 id="restapi-res-">Retrieve <small>GET deposit/depositions/:id/files/:file_id</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Retrieve <small>GET deposit/depositions/:id/files/:file_id</small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-f-get" class="panel-collapse collapse">
@@ -1071,7 +1071,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-update">
-          <h4 id="#restapi-obj-deposition-file">Update <small>PUT deposit/depositions/:id/files/:file_id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="#restapi-obj-deposition-file">Update <small>PUT deposit/depositions/:id/files/:file_id</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-f-update" class="panel-collapse collapse">
@@ -1161,7 +1161,7 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-f-delete">
-          <h4 id="restapi-res-">Delete <small>DELETE deposit/depositions/:id/files/:file_id</small><span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Delete <small>DELETE deposit/depositions/:id/files/:file_id</small><span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-f-delete" class="panel-collapse collapse">
@@ -1248,7 +1248,7 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-a-publish">
-          <h4 id="restapi-res-">Publish <small>POST deposit/depositions/:id/actions/publish</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-res-">Publish <small>POST deposit/depositions/:id/actions/publish</small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-a-publish" class="panel-collapse collapse">
@@ -1329,7 +1329,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-a-edit">
-          <h4 id="restapi-a-edit">Edit <small>POST deposit/depositions/:id/actions/edit</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-a-edit">Edit <small>POST deposit/depositions/:id/actions/edit</small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-a-edit" class="panel-collapse collapse">
@@ -1415,7 +1415,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-a-discard">
-          <h4 id="restapi-a-discard">Discard <small>POST deposit/depositions/:id/actions/discard</small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-a-discard">Discard <small>POST deposit/depositions/:id/actions/discard</small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-a-discard" class="panel-collapse collapse">
@@ -1508,7 +1508,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-r-dep">
-          <h4 id="restapi-rep-dep">Deposition <small></small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-rep-dep">Deposition <small></small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-r-dep" class="panel-collapse collapse">
@@ -1613,7 +1613,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-r-meta">
-          <h4 id="restapi-rep-meta">Deposition metadata <small></small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-rep-meta">Deposition metadata <small></small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-r-meta" class="panel-collapse collapse">
@@ -1893,7 +1893,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   <div class="panel panel-default">
     <div class="panel-heading info">
         <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapse-r-files">
-          <h4 id="restapi-rep-files">Deposition file<small></small> <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></h4>
+          <h4 id="restapi-rep-files">Deposition file<small></small> <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></h4>
         </a>
     </div>
     <div id="collapse-r-files" class="panel-collapse collapse">

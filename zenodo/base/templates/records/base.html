@@ -40,8 +40,8 @@
         <div class="panel-heading">
           <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
             Preview
-            <span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span>
-            <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span>
+            <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+            <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
           </a>
         </div>
         <div id="collapseOne" class="collapse in">
@@ -51,7 +51,9 @@
       <div class="panel panel-default" id="files">
         <div class="panel-heading">
           <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
-            {{ _("Files") }}  <b class="caret"></b>
+            {{ _("Files") }}
+            <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+            <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
           </a>
         </div>
         <div class="collapse in" id="collapseTwo">
@@ -83,8 +85,8 @@
     {%- if tab.visible and tab.key != 'record.metadata' and tab.key != 'record.files' and tab.enabled -%}
       <div class="panel panel-default">
         <div class="panel-heading">
-          <a class="panel-toggle collapsed tablink" data-toggle="collapse" data-idx="{{loop.index}}" href="{{ url_for(tab.key, recid=recid)}}#collapse{{loop.index}}">{{ tab.label if tab.label != 'Usage statistics' else 'Related content' }}<span class="pull-right show-on-collapsed"><i class="icon-chevron-right"></i></span>
-            <span class="pull-right hide-on-collapsed"><i class="icon-chevron-down"></i></span></b> <img src="{{ url_for('static',filename='/css/images/ajax-loader.gif') }}"></a>
+          <a class="panel-toggle {{ 'collapsed' if tab.key != request.endpoint }} tablink" data-toggle="collapse" data-idx="{{loop.index}}" href="{{ url_for(tab.key, recid=recid)}}#collapse{{loop.index}}">{{ tab.label if tab.label != 'Usage statistics' else 'Related content' }}<span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+            <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span></b> <img src="{{ url_for('static',filename='/css/images/ajax-loader.gif') }}"></a>
         </div>
         <div id="collapse{{loop.index}}" class="panel-body collapse {{ 'in' if tab.key == request.endpoint }}">
           <div class="panel-inner{{ ' loaded' if tab.key == request.endpoint else ''}}" id="record_content{{loop.index}}">
