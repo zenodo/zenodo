@@ -56,6 +56,14 @@
 
 {%- block index_right -%}
     <div class="col-md-8">
+        {%- if collection.id != 1 %}
+        <div class="row">
+            <div class="col-md-12">
+                {% include 'provisional_warning.html' %}
+                <h1>{{collection.name_ln}}</h1  >
+            </div>
+        </div>
+        {%- endif %}
         {% if collection.collection_children_r %}
         <div class="row">
               <div class="collection panel-group">

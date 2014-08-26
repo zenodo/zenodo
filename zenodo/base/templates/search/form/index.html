@@ -19,14 +19,4 @@
 
 {% extends "search/form/index_base.html" %}
 
-{%- block search_form %}
-{{ super() }}
-{%- if collection.id != 1 %}
-<div class="row">
-    <div class="col-md-12">
-        {% include 'provisional_warning.html' %}
-        <h1>{{collection.name_ln}}</h1  >
-    </div>
-</div>
-{%- endif %}
-{%- endblock search_form %}
+{%- block search_form %}{{ super() }}{%- endblock search_form %}
