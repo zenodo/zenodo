@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,15 +20,15 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-#from fixture import DataSet
+import os
+import shutil
+from flask import current_app
 from invenio.base.factory import with_app_context
 
 
 @with_app_context(new_context=True)
 def post_handler_database_create(sender, default_data='', *args, **kwargs):
-    """
-    Loads data after demosite creation
-    """
+    """Load data after demosite creation."""
     from invenio.modules.communities.models import Community
 
     print(">>> Creating collections for communities...")
@@ -50,7 +50,25 @@ def post_handler_database_create(sender, default_data='', *args, **kwargs):
 
 
 @with_app_context(new_context=True)
+def clean_data_files(sender, *args, **kwargs):
+    """Clean data in directories."""
+    dirs = [
+        current_app.config['DEPOSIT_STORAGEDIR'],
+        current_app.config['CFG_TMPDIR'],
+        current_app.config['CFG_TMPSHAREDDIR'],
+        current_app.config['CFG_LOGDIR'],
+        current_app.config['CFG_CACHEDIR'],
+        current_app.config['CFG_RUNDIR'],
+        current_app.config['CFG_BIBDOCFILE_FILEDIR'],
+    ]
+
+    for d in dirs:
+        print(">>> Cleaning {0}".format(d))
+        if os.path.exists(d):
+            shutil.rmtree(d)
+        os.makedirs(d)
+
+
+@with_app_context(new_context=True)
 def post_handler_demosite_populate(sender, default_data='', *args, **kwargs):
-    """
-    Loads data after records are created.
-    """
+    """Load data after records are created."""
