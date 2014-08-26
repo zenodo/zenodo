@@ -116,9 +116,14 @@ def register_menu_items():
         item = current_menu.submenu("breadcrumbs.webdeposit")
         item._text = "Upload"
 
-        # Remove item
+        # Remove items
         item = current_menu.submenu("main")
         item._child_entries.pop('documentation', None)
+
+        item = current_menu.submenu("settings.groups")
+        item.hide()
+        item = current_menu.submenu("settings.workflows")
+        item.hide()
 
     # Append function to end of before first request functions, to ensure
     # all menu items have been loaded.
