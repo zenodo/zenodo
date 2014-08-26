@@ -31,7 +31,7 @@ class RecordExportTest(InvenioTestCase):
         """ Validate that link tags to files exists in document header. """
         from invenio.modules.records.models import Record
 
-        TEST_FORMATS = ['hm', 'xm']
+        TEST_FORMATS = ['hm', 'xm', ]
         latest_recid = Record.query.order_by(Record.id.desc()).first().id
 
         for fmt in TEST_FORMATS:

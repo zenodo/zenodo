@@ -27,7 +27,7 @@ from invenio.testsuite import iter_suites
 def suite():
     """Create the testsuite that has all the tests."""
     packages = [
-        #'zenodo.base',
+        'zenodo',
         #'zenodo.modules.github',
         'zenodo.modules.deposit',
     ]

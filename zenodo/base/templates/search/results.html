@@ -39,7 +39,7 @@
 
 {%- block search_result_record scoped -%}
 <div class="col-sm-10 col-xs-10">
-  {{ format_record(recid, of, ln=g.ln, qid=qid, extra_context=dict(collection=collection))|safe }}
+  {{ format_record(recid, of, ln=g.ln, qid=qid, collection=collection)|safe }}
   {% if not recordloop.last %}<hr/>{% endif %}
 </div>
 <div class="col-sm-1 col-xs-1">
@@ -50,7 +50,7 @@
 
 
 {%- block search_result_record_nohtml scoped %}
-{{ format_record(recid, of, ln=g.ln, extra_context=dict(collection=collection))|safe }}
+{{ format_record(recid, of, ln=g.ln, collection=collection)|safe }}
 {%- endblock search_result_record_nohtml %}
 
 
