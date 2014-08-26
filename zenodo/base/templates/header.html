@@ -39,7 +39,7 @@
         <div class="row">
           <div class="col-md-12">
             <form class="form-signin" action="{{url_for('webaccount.login')}}" method="POST">
-            <input id="referer" name="referer" type="hidden" value="{{url_for('accounts_settings.profile')}}">
+            <input id="referer" name="referer" type="hidden" value="{{next}}">
             <input id="login_method" name="login_method" type="hidden" value="Local">
             <div class="form-group">
               <input class="form-control" id="nickname" name="nickname" placeholder="Username or email" type="text" value="">
