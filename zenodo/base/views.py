@@ -386,3 +386,10 @@ def privacy_policy():
 @register_breadcrumb(blueprint, 'breadcrumbs.support', _("Support/Feedback"))
 def support():
     return render_template('zenodo/contact.html')
+
+
+@blueprint.route('/preservation-guidelines', methods=['GET', ])
+@register_menu(blueprint, 'footermenu_left.preservation-guidelines', _('Preservation'), order=9)
+@register_breadcrumb(blueprint, 'breadcrumbs.preservation-guidelines', _("Preservation guidelines"))
+def preservation_guidelines():
+    return render_template('zenodo/preservation-guidelines.html')
