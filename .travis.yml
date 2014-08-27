@@ -33,6 +33,9 @@ python:
 before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
+  # Fix MySQL server has gone away error.
+  - echo -e "[server]\nmax_allowed_packet=64M" | sudo tee -a /etc/mysql/conf.d/drupal.cnf
+  - sudo service mysql restart
 
 install:
   - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
