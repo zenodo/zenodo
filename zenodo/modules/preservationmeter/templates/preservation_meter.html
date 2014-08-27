@@ -6,10 +6,13 @@
 
 {%- if score > 66 -%}
   {% set preservation_css_class = 'success'  %}
+  {% set preservation_status = 'Excelent'  %}
 {%- elif score > 33 -%}
   {% set preservation_css_class = 'warning'  %}
+  {% set preservation_status = 'Could be improved'  %}
 {%- else -%}
   {% set preservation_css_class = 'danger'  %}
+  {% set preservation_status = 'Requires attention'  %}
 {%- endif -%}
 
 {# 
@@ -34,8 +37,8 @@
     </div>
   <div class="progress-wrapper collapse" id="preservation-accord">
     <dl>
-      <dt>Status:</dt><dd>Well preserved.</dd>
-      <dt>Suggested actions:</dt><dd>None.</dd>
+      <dt>Status:</dt><dd>{{preservation_status}}.</dd>
+      {#<dt>Suggested actions:</dt><dd>None.</dd>#}
     </dl>
     <p></p>
   </div>
