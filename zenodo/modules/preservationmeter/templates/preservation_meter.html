@@ -1,0 +1,48 @@
+{% block preservation_meter %}
+{% set score = 100  %}
+{# Get integer 1st digit of number and assign css color class #}
+{# Define palette at CSS  #}
+{# Define text strings for status  #}
+
+{%- if score > 66 -%}
+  {% set preservation_css_class = 'success'  %}
+  {% set preservation_status = 'Excelent'  %}
+{%- elif score > 33 -%}
+  {% set preservation_css_class = 'warning'  %}
+  {% set preservation_status = 'Could be improved'  %}
+{%- else -%}
+  {% set preservation_css_class = 'danger'  %}
+  {% set preservation_status = 'Requires attention'  %}
+{%- endif -%}
+
+{# 
+## Some classes that can be used:
+  <p class="bg-primary">...</p>
+  <p class="bg-success">...</p>
+  <p class="bg-info">...</p>
+  <p class="bg-warning">...</p>
+  <p class="bg-danger">...</p> 
+#}
+<div class="panel-group" id="record-preservation">
+  <div class="well">
+    <a data-toggle="collapse" href="#preservation-accord">
+      <h4>Preservation Meter</h4>
+    </a>
+  <p></p>
+    <div class="progress">
+      <div class="progress-bar progress-bar-{{ preservation_css_class }}" role="progressbar" aria-valuenow="{{ score }}" aria-valuemin="0" aria-valuemax="100" style="width: {{ score }}%;">
+        {{ score }}%
+      <span class="sr-only">{{ score }}% Complete</span>
+      </div>
+    </div>
+  <div class="progress-wrapper collapse" id="preservation-accord">
+    <dl>
+      <dt>Status:</dt><dd>{{preservation_status}}.</dd>
+      {#<dt>Suggested actions:</dt><dd>None.</dd>#}
+    </dl>
+    <p></p>
+  </div>
+  <p><small>Further information: <a href={{ url_for('preservation-guidelines') }}>Digital Preservation Best Practices</a>.</small></p>
+  </div>
+</div>
+{% endblock preservation_meter %}
