@@ -46,7 +46,7 @@ class CalculateScoreTaskTest(CeleryTestCase):
         from zenodo.modules.preservationmeter.tasks import \
             calculate_preservation_score
 
-        calculate_preservation_score.delay(recid=1)
+        calculate_preservation_score(recid=1)
         assert get_record.called
         self.assertEqual(
             '<record>\n    <controlfield tag="001">1</controlfield>\n    <datafield tag="347" ind1="" ind2="">\n        <subfield code="p">100</subfield>\n    </datafield>\n    </record>\n    ',
