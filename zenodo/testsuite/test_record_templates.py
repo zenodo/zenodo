@@ -21,22 +21,43 @@
 ## or submit itself to any jurisdiction.
 
 from __future__ import print_function, absolute_import
+import copy
+
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
+from mock import patch, MagicMock, Mock
 from flask import url_for
 from bs4 import BeautifulSoup
 
 
 class HeaderLinksTest(InvenioTestCase):
-    def test_headerlinks_exists(self):
+    @patch('invenio.legacy.bibdocfile.api.BibRecDocs')
+    @patch('invenio.modules.records.views.get_record')
+    def test_headerlinks_exists(self, get_record, BibRecDocs):
         """ Validate that link tags to files exists in document header. """
-        from invenio.modules.records.models import Record
-        latest_recid = Record.query.order_by(Record.id.desc()).first().id
+        # Patch up get record
+        from zenodo.base.testsuite.test_jsonext import test_record
+        record = copy.copy(test_record)
+        get_record.return_value = record
 
-        res = self.client.get(url_for('record.metadata', recid=latest_recid))
+        # Patch BibDocFile
+        base_url = url_for('record.files', recid=1, _external=True)
+        mock_file = MagicMock()
+        mock_file.is_icon = Mock(return_value=False)
+        mock_file.is_restricted = Mock(return_value=(False, False))
+        mock_file.comment = "0"
+        mock_file.mime = "application/pdf"
+        mock_file.get_url = Mock(return_value=base_url+"test.pdf")
+        mock_file.get_superformat = Mock(return_value=".pdf")
+        BibRecDocs.return_value = MagicMock()
+        BibRecDocs.return_value.list_latest_files = Mock(
+            return_value=[mock_file])
 
+        # Request page
+        res = self.client.get(url_for('record.metadata', recid=1))
+
+        # Login to prevent errors fom
         soup = BeautifulSoup(res.data)
-        base_url = url_for('record.files', recid=latest_recid, _external=True)
 
         for l in soup.select('link[rel="alternate"]'):
             if l['href'].startswith(base_url):

@@ -32,7 +32,7 @@ from ..config import PRESERVATIONMETER_FILES_FIELD
 class CalculateScoreTaskTest(CeleryTestCase):
 
     @patch('zenodo.modules.preservationmeter.tasks.get_record')
-    @patch('invenio.legacy.bibupload.utils.bibupload_record')
+    @patch('zenodo.modules.preservationmeter.tasks.bibupload_record')
     def test_task(self, bibupload_record, get_record):
         get_record.return_value = {
             'recid': 1,
@@ -52,6 +52,7 @@ class CalculateScoreTaskTest(CeleryTestCase):
             '<record>\n    <controlfield tag="001">1</controlfield>\n    <datafield tag="347" ind1="" ind2="">\n        <subfield code="p">100</subfield>\n    </datafield>\n    </record>\n    ',
             bibupload_record.call_args[0][0],
         )
+
 
 TEST_SUITE = make_test_suite(CalculateScoreTaskTest)
 

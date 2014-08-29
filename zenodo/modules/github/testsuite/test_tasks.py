@@ -39,10 +39,10 @@ class GitHubTestCase(CeleryTestCase):
     @property
     def config(self):
         return dict(
-            CACHE_TYPE='null',
-            OAUTH2_CACHE_TYPE='null',
-            CELERY_RESULT_BACKEND='cache',
-            CELERY_CACHE_BACKEND='memory',
+            # HTTPretty doesn't play well with Redis.
+            # See gabrielfalcao/HTTPretty#110
+            CACHE_TYPE='simple',
+            OAUTH2_CACHE_TYPE='simple',
         )
 
     def setUp(self):
@@ -140,8 +140,10 @@ class HandlePayloadTestCase(GitHubTestCase):
             payload=fixtures.PAYLOAD('auser', 'repo-1')
         )
 
-        handle_github_payload.delay(e.__getstate__())
+        handle_github_payload(e.__getstate__())
 
+        db.session.expire(self.remote_token.remote_account)
+        extra_data = self.remote_token.remote_account.extra_data
         assert len(extra_data['repos']['auser/repo-1']['depositions']) == 1
         assert len(extra_data['repos']['auser/repo-2']['depositions']) == 0
 
