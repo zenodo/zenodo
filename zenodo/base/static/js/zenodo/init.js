@@ -20,7 +20,7 @@
  * or submit itself to any jurisdiction.
  */
 
-require(['jquery', 'js/zenodo/zenodo'], function() {
+require(['jquery', 'js/zenodo/zenodo', 'vendors/zeroclipboard/dist/ZeroClipboard'], function() {
     /*
      * It preloads js/zenodo/zenodo to give it a name so you're free to use it
      * from any places.

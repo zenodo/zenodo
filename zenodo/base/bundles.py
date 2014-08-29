@@ -29,7 +29,7 @@ _i.contents += [
 ]
 
 _j.contents += [
-    #"vendors/zeroclipboard/ZeroClipboard.js",
+    "vendors/zeroclipboard/dist/ZeroClipboard.js",
     "vendors/bootstrap-datepicker/js/bootstrap-datepicker.js",
 ]
 

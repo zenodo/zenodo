@@ -3,8 +3,9 @@
 {% endblock %}{% endmacro %}
 
 {% macro copy_to_clipboard_js() %}{% block copy_to_clipboard_js scoped %}
-$(function () {
-  ZeroClipboard.config({moviePath: '{{ url_for('static', filename='js/vendor/ZeroClipboard.swf')}}' } );
-  var client = ZeroClipboard($('.clip-button'));
+require(["jquery", "vendors/zeroclipboard/dist/ZeroClipboard"], function($, zeroclipboard){
+    zeroclipboard.config({swfPath: "{{url_for('static', filename='vendors/zeroclipboard/dist/ZeroClipboard.swf')}}" })
+    var client = zeroclipboard();
+    client.clip($('.clip-button'));
 });
 {% endblock %}{% endmacro %}
