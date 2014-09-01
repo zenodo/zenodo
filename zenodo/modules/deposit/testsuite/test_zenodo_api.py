@@ -1524,6 +1524,14 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             embargo_date=(date.today() + timedelta(days=2)).isoformat()
         )
 
+        # Reset certain legacy module level caches which are not being reset
+        # properly when certain tests during a single testrun are creating
+        # restricted collections.
+        from invenio.legacy.search_engine import restricted_collection_cache, \
+            collection_reclist_cache
+        restricted_collection_cache.recreate_cache_if_needed()
+        collection_reclist_cache.recreate_cache_if_needed()
+
         res_id = self._create_and_upload(extra=extra_data, webcoll=True)
 
         # Get deposition
