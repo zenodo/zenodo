@@ -43,11 +43,19 @@ from __future__ import unicode_literals
 import os
 import sys
 from datetime import timedelta
+import pkg_resources
 
 # Define identity function for string extraction
 _ = lambda x: x
 
-PACKAGES = [
+# Check if zenodo-assets is installed, and add it to packages if it is.
+try:
+    pkg_resources.get_distribution('zenodo-assets')
+    PACKAGES = ['zenodo.assets']
+except pkg_resources.DistributionNotFound:
+    PACKAGES = []
+
+PACKAGES += [
     'zenodo.base',
     'zenodo.demosite',
     'zenodo.modules.deposit',

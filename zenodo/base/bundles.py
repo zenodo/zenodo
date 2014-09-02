@@ -37,6 +37,8 @@ _j.bower.update({
     "zeroclipboard": "~2.1.6",
     "bootstrap-datepicker": "latest",
 })
+# Remove MathJax (served from CDN instead).
+del _j.bower['MathJax']
 
 #
 # Site-wide styles
