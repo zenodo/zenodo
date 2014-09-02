@@ -28,7 +28,7 @@ services:
   - redis
 
 python:
-  - "2.7"
+  - "2.6"
 
 before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
