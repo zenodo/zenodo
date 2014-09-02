@@ -96,8 +96,7 @@ def register_github_api():
 
 
 def register_oauth_flow():
-    """ Register URIs used for OAuth flow. """
-
+    """Register URIs used for OAuth flow."""
     # https://developer.github.com/v3/oauth/
     httpretty.register_uri(
         httpretty.GET,
@@ -108,12 +107,13 @@ def register_oauth_flow():
 
     def access_token_callback(request, uri, headers):
         assert request.method == 'POST'
-        assert 'client_id' in request.parsed_body
-        assert 'client_secret' in request.parsed_body
-        assert 'code' in request.parsed_body
-        assert 'redirect_uri' in request.parsed_body
+        parsed_body = request.parse_request_body(request.body)
+        assert 'client_id' in parsed_body
+        assert 'client_secret' in parsed_body
+        assert 'code' in parsed_body
+        assert 'redirect_uri' in parsed_body
 
-        if request.parsed_body['code'][0] == 'bad_verification_code':
+        if parsed_body['code'][0] == 'bad_verification_code':
             body = dict(
                 error_uri='http://developer.github.com/v3/oauth/'
                           '#bad-verification-code',
@@ -123,7 +123,7 @@ def register_oauth_flow():
             )
         else:
             body = dict(
-                access_token='%s_token' % request.parsed_body['code'][0],
+                access_token='%s_token' % parsed_body['code'][0],
                 scope='admin:repo_hook,user:email',
                 token_type='bearer',
             )
@@ -144,7 +144,7 @@ def register_oauth_flow():
 
 
 def register_endpoint(endpoint, body, status=200, method=httpretty.GET):
-    """ Mock GitHub API response. """
+    """Mock GitHub API response."""
     httpretty.register_uri(
         method,
         "https://api.github.com%s" % endpoint,
@@ -154,7 +154,7 @@ def register_endpoint(endpoint, body, status=200, method=httpretty.GET):
 
 
 def register_local_endpoint(endpoint, body, status=200, method=httpretty.GET):
-    """ Mock GitHub API response. """
+    """Mock GitHub API response."""
     httpretty.register_uri(
         method,
         "https://api.github.com%s" % endpoint,

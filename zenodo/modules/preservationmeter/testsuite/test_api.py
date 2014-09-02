@@ -25,7 +25,11 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 import zenodo.modules.preservationmeter.api as api
 import tempfile
 import os.path as osp
-from shutil import make_archive, rmtree
+from shutil import rmtree
+try:
+    from shutil import make_archive
+except ImportError:
+    from .python26 import make_archive
 
 
 class RecordMock(object):

@@ -39,6 +39,7 @@ https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
 WTForms>=1.0.5,<2.0
 SQLAlchemy>=0.8.3,<0.9
 setuptools>=2.2
+reportlab==2.7
 
 -e git+https://github.com/zenodo/invenio-op@pu-zenodo-next#egg=Invenio
 -e .
