@@ -125,6 +125,9 @@ def register_menu_items():
         item = current_menu.submenu("settings.workflows")
         item.hide()
 
+        item = current_menu.submenu("main.getstarted.preservation")
+        item.hide()
+
     # Append function to end of before first request functions, to ensure
     # all menu items have been loaded.
     current_app.before_first_request_funcs.append(menu_fixup)
