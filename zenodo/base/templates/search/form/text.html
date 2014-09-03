@@ -1,0 +1,11 @@
+{%- block search_form_text -%}
+{# Brand and toggle get grouped for better mobile display #}
+{%- set nbrecs = collection.nbrecs -%}
+{%- if not collection.nbrecs -%}
+  {%- set nbrecs = 0 -%}
+{%- endif -%}
+<div class="navbar-header">
+  <span class="navbar-brand hidden-sm hidden-xs" id="search-label">
+  </span>
+</div>
+{%- endblock search_form_text -%}
