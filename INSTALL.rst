@@ -179,7 +179,8 @@ with initial data.
     (invenio)$ inveniomanage database init --user=root --password=$MYSQL_ROOT --yes-i-know
     (invenio)$ inveniomanage database create
 
-3.7. Background queues
+3.7. Background queues (FIXME)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Now you should be able to run the development server. Invenio uses
 `Celery <http://www.celeryproject.org/>`_ and `Redis <http://redis.io/>`_
@@ -217,9 +218,6 @@ to monitor the *Celery* tasks.
 
     (zenodo)$ pip install flower
 
-.. FIXME::
-   Below needs updating
-
 When you have the servers running, it is possible to upload the demo records.
 
 .. code-block:: console
@@ -231,8 +229,8 @@ When you have the servers running, it is possible to upload the demo records.
 And you may now open your favourite web browser on
 `http://0.0.0.0:4000/ <http://0.0.0.0:4000/>`_
 
-4. Extras
----------
+4. Extras (FIXME)
+-----------------
 
 4.1. Minting test DOIs via DataCite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
