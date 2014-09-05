@@ -22,6 +22,12 @@
 {% if not request.is_xhr %}
 {%- extends "accounts/settings/index.html" %}
 
+{% block global_bundles %}
+  {{ super() }}
+  {% bundles "github.js", "github.css" %}
+{% endblock %}
+
+
 {% block title %}{% endblock %}
 
 {% block javascript %}
