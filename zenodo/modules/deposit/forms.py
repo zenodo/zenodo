@@ -443,6 +443,10 @@ class ZenodoForm(WebDepositForm):
             extraPlugins='scientificchar,mathjax,blockquote',
             removePlugins='elementspath',
             removeButtons='',
+            # Must be set, otherwise MathJax tries to include MathJax via the
+            # http on CDN instead of https.
+            mathJaxLib='https://cdn.mathjax.org/mathjax/latest/MathJax.js?'
+                       'config=TeX-AMS-MML_HTMLorMML'
         ),
         filters=[
             sanitize_html(allowed_tag_whitelist=(
@@ -738,7 +742,7 @@ class ZenodoForm(WebDepositForm):
     )
 
     def validate_plupload_file(form, field):
-        """ Ensure minimum one file is attached. """
+        """Ensure minimum one file is attached."""
         if not getattr(request, 'is_api_request', False):
             # Tested in API by a separate workflow task.
             if len(form.files) == 0:
