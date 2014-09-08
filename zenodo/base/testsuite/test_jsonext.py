@@ -56,6 +56,8 @@ test_marc = """<record><datafield tag="942" ind1="" ind2=""><subfield code="a">2
 <datafield tag="773" ind1="" ind2=""><subfield code="a">10.1234/foo.bar</subfield><subfield code="i">cites</subfield><subfield code="n">doi</subfield></datafield>
 <datafield tag="773" ind1="" ind2=""><subfield code="a">1234.4321</subfield><subfield code="i">cites</subfield><subfield code="n">arxiv</subfield></datafield>
 <datafield tag="347" ind1="" ind2=""><subfield code="p">100</subfield></datafield>
+<datafield tag="999" ind1="C" ind2="5"><subfield code="x">Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12</subfield></datafield>
+<datafield tag="999" ind1="C" ind2="5"><subfield code="x">Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34</subfield></datafield>
 </record>"""
 
 test_form_json = {
@@ -85,7 +87,11 @@ test_form_json = {
          'scheme': 'doi'},
         {'identifier': '1234.4321', 'relation': 'cites', 'scheme': 'arxiv'}],
     'title': 'Test title',
-    'upload_type': 'publication'
+    'upload_type': 'publication',
+    'references': [
+        'Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12',
+        'Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34',
+    ]
 }
 
 test_record = dict(
@@ -130,6 +136,12 @@ test_record = dict(
     ],
     altmetric_id="9876",
     preservation_score="100",
+    references=[
+        {'raw_reference': 'Doe, John et al (2012). Some title. ZENODO. '
+                          '10.5281/zenodo.12'},
+        {'raw_reference': 'Smith, Jane et al (2012). Some title. ZENODO. '
+                          '10.5281/zenodo.34'},
+    ]
 )
 
 
@@ -150,7 +162,7 @@ class TestReaders(InvenioTestCase):
 
     def test_marc_export(self):
         from invenio.modules.records.api import Record
-        from invenio.legacy.bibrecord import create_record
+        #from invenio.legacy.bibrecord import create_record
 
         r = Record(json=test_record, master_format='marc')
         # self.assertEqual(
