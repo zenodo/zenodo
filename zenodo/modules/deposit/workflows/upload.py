@@ -189,6 +189,15 @@ def process_recjson(deposition, recjson):
         recjson['journal.year'] = recjson['publication_date'][:4]
 
     # =======================
+    # References
+    # =======================
+    if recjson.get('references', []):
+        recjson['references'] = map(
+            lambda x: dict(raw_reference=x),
+            recjson['references']
+        )
+
+    # =======================
     # Book/chaper/report
     # =======================
     if 'imprint.publisher' in recjson and 'imprint.place' in recjson:

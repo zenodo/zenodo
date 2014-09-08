@@ -39,7 +39,8 @@ from invenio.modules.deposit.form import WebDepositForm
 from invenio.modules.deposit.field_widgets import date_widget, \
     plupload_widget, ButtonWidget, ExtendedListWidget, \
     TagListWidget, TagInput, ItemWidget, CKEditorWidget, ColumnInput
-from invenio.modules.deposit.filter_utils import strip_string, sanitize_html
+from invenio.modules.deposit.filter_utils import strip_string, sanitize_html, \
+    splitlines_list
 from invenio.modules.deposit.validation_utils import doi_syntax_validator, \
     invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
     list_length, not_required_if, pid_validator, minted_doi_validator, \
@@ -733,6 +734,17 @@ class ZenodoForm(WebDepositForm):
     )
 
     #
+    # References
+    #
+    references = zfields.TextAreaListField(
+        label="References",
+        description="Optional. Copy/paste your references here.",
+        validators=[validators.optional(), ],
+        icon='fa fa-bookmark',
+        placeholder="One reference per line.",
+    )
+
+    #
     # File upload field
     #
     plupload_file = fields.FileUploadField(
@@ -786,7 +798,7 @@ class ZenodoForm(WebDepositForm):
             'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!' % CFG_SITE_NAME,
         }),
         ('Related datasets/publications', [
-            'related_identifiers',
+            'related_identifiers', '-', 'references',
         ], {
             'classes': '',
             'indication': 'recommended',

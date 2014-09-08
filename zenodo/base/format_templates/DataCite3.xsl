@@ -287,6 +287,15 @@ exclude-result-prefixes="marc fn dc invenio">
                     <xsl:value-of select="subfield[@code='a']"/>
                 </description>
             </xsl:for-each>
+            <xsl:if test="datafield[@tag='999' and @ind1='C' and @ind2='5']">
+                <description descriptionType="Other">
+                    [
+                    <xsl:for-each select="datafield[@tag='999' and @ind1='C' and @ind2='5']">
+                        "<xsl:value-of select="subfield[@code='x']"/>",
+                    </xsl:for-each>
+                    ]
+                </description>
+            </xsl:if>
         </descriptions>
     </xsl:template>
 </xsl:stylesheet>

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,20 +20,22 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-from .access_rights_field import AccessRightField
-from .license_field import LicenseField
-from .objecttype_field import UploadTypeField
-from .related_identifiers_field import RelatedIdentifiersField
-from .reserve_doi_field import ReserveDOIField
-from .upload_subtype_field import UploadSubtypeField
-from .core import TextAreaListField
+import six
+from wtforms import TextAreaField
+from wtforms.compat import text_type
+from invenio.modules.deposit.field_base import WebDepositField
 
-__all__ = [
-    'AccessRightField',
-    'LicenseField',
-    'UploadTypeField',
-    'RelatedIdentifiersField',
-    'ReserveDOIField',
-    'UploadSubtypeField',
-    'TextAreaListField',
-]
+
+class TextAreaListField(WebDepositField, TextAreaField):
+    def process_formdata(self, valuelist):
+        self.data = []
+        if valuelist and isinstance(valuelist[0], six.string_types):
+            for line in valuelist[0].splitlines():
+                if line.strip():
+                    self.data.append(line.strip())
+
+    def _value(self):
+        return text_type("\n".join(self.data)) if self.data else ''
+
+
+__all__ = ('TextAreaListField')
