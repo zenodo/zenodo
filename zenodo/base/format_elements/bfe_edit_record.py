@@ -49,7 +49,7 @@ def format_element(bfo, style, css_class):
             linkattrd['style'] = style
         if css_class != '':
             linkattrd['class'] = css_class
-        out += create_html_link(current_app.config['CFG_SITE_URL'] +
+        out += create_html_link(current_app.config['CFG_SITE_SECURE_URL'] +
                '/%s/edit/?ln=%s#state=edit&recid=%s' % (current_app.config['CFG_SITE_RECORD'], bfo.lang, str(bfo.recID)),
                {},
                link_label="<i class=\"icon-pencil\"></i> %s" % _("Edit"),

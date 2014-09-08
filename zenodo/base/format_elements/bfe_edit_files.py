@@ -50,7 +50,7 @@ def format_element(bfo, style, css_class):
             linkattrd['style'] = style
         if css_class != '':
             linkattrd['class'] = css_class
-        out += create_html_link(current_app.config['CFG_SITE_URL'] + '/%s/managedocfiles' % current_app.config['CFG_SITE_RECORD'],
+        out += create_html_link(current_app.config['CFG_SITE_SECURE_URL'] + '/%s/managedocfiles' % current_app.config['CFG_SITE_RECORD'],
                          urlargd={'ln': bfo.lang,
                                   'recid': str(bfo.recID)},
                          link_label= """<i class="icon-file"></i> %s""" % _("Manage Files"),

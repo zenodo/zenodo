@@ -27,8 +27,8 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-md-12">{% set next = request.script_root + request.path if request.endpoint != 'webaccount.logout' and request.endpoint != 'webaccount.login' else config.CFG_SITE_SECURE_URL %}
-          <br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next)}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> Sign in with GitHub</a>
-          <br /><a href="{{url_for('oauthclient.login', remote_app='orcid', next=next)}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.png') }}"></i> Sign in with ORCID</a>
+          <br /><a href="{{url_for('oauthclient.login', remote_app='github', next=next, _external=True, _scheme='https')}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> Sign in with GitHub</a>
+          <br /><a href="{{url_for('oauthclient.login', remote_app='orcid', next=next, _external=True, _scheme='https')}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.png') }}"></i> Sign in with ORCID</a>
           </div>
         </div>
       </div>
@@ -38,7 +38,7 @@
       <div class="modal-body">
         <div class="row">
           <div class="col-md-12">
-            <form class="form-signin" action="{{url_for('webaccount.login')}}" method="POST">
+            <form class="form-signin" action="{{url_for('webaccount.login',  _external=True, _scheme='https')}}" method="POST">
             <input id="referer" name="referer" type="hidden" value="{{next}}">
             <input id="login_method" name="login_method" type="hidden" value="Local">
             <div class="form-group">
@@ -106,7 +106,7 @@
           <li class="pull-right">
             {%- if current_user.is_guest %}
               <button class="btn btn-default" data-toggle="modal" data-target="#sign-in-modal"><i class="fa fa-sign-in"></i> Sign In</button>
-              <button class="btn btn-warning" onclick="window.location='{{config.CFG_SITE_URL}}{{url_for('webaccount.register')}}'"><i class="fa fa-edit"></i> Sign Up</button>
+              <button class="btn btn-warning" onclick="window.location='{{url_for('webaccount.register', _external=True, _scheme='https')}}'"><i class="fa fa-edit"></i> Sign Up</button>
             {%- else %}
               <div class="btn-group">
                 <a class="btn btn-default" href="{{ url_for('accounts_settings.profile') }}"><i class="fa fa-user"></i> {{ current_user.email }}</a>

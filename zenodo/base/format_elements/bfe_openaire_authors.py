@@ -56,7 +56,7 @@ def format_element(bfo, limit, separator=' ; ',
     """
     _ = gettext_set_language(bfo.lang)    # load the right message language
 
-    CFG_SITE_URL = current_app.config['CFG_SITE_URL']
+    CFG_SITE_URL = current_app.config['CFG_SITE_SECURE_URL']
     if isinstance(CFG_SITE_URL, six.text_type):
         CFG_SITE_URL = CFG_SITE_URL.encode('utf8')
 
@@ -86,14 +86,14 @@ def format_element(bfo, limit, separator=' ; ',
 
             if print_links.lower() == "yes":
                 if link_author_pages == "no":
-                    author['a'] = '<a itemprop="creator" href="' + CFG_SITE_URL + \
+                    author['a'] = '<a itemprop="creator" href="' + \
                                   '/search?f=author&amp;p=' + quote(author['a']) + \
                                   '&amp;ln=' + str(bfo.lang) + \
                                   '" ><span itemscope itemtype="http://schema.org/Person"><span itemprop="name">' + \
                         escape(
                             author['a']) + '</span></span></a>'
                 else:
-                    author['a'] = '<a itemprop="creator" rel="author" href="' + CFG_SITE_URL + \
+                    author['a'] = '<a itemprop="creator" rel="author" href="' + \
                                   '/author/' + quote(author['a']) + \
                                   '?recid=' + bibrec_id + \
                                   '&ln=' + str(bfo.lang) + \
