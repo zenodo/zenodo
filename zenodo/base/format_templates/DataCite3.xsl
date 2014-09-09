@@ -71,7 +71,7 @@ exclude-result-prefixes="marc fn dc invenio">
                 </creatorName>
                 </creator>
             </xsl:for-each>
-            <xsl:for-each select="datafield[@tag=700]">
+            <xsl:for-each select="datafield[@tag=700][not(subfield[@code='4']='ths')]">
                 <creator>
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
@@ -114,12 +114,17 @@ exclude-result-prefixes="marc fn dc invenio">
             </subjects>
         </xsl:if>
         <!-- 7. Contributor -->
-        <xsl:if test="datafield[@tag=536]">
+        <xsl:if test="datafield[@tag=536] or datafield[@tag=700][subfield[@code='4']='ths']">
             <contributors>
                 <xsl:for-each select="datafield[@tag=536]">
                     <contributor contributorType="Funder">
                         <contributorName>European Commission</contributorName>
                         <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
+                    </contributor>
+                </xsl:for-each>
+                <xsl:for-each select="datafield[@tag=700][subfield[@code='4']='ths']">
+                    <contributor contributorType="Supervisor">
+                        <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
                     </contributor>
                 </xsl:for-each>
             </contributors>
