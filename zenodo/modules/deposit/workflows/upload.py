@@ -658,6 +658,7 @@ class upload(DepositionType):
         prereserve_doi=fields.Raw,
         publication_date=ISODate,
         publication_type=fields.String(default=''),
+        references=fields.List(fields.String, default=[]),
         related_identifiers=fields.Raw(default=[]),
         thesis_supervisors=fields.Raw(default=[]),
         title=fields.String,

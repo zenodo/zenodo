@@ -738,10 +738,10 @@ class ZenodoForm(WebDepositForm):
     #
     references = zfields.TextAreaListField(
         label="References",
-        description="Optional. Copy/paste your references here.",
+        description="Optional. Format: One reference per line.",
         validators=[validators.optional(), ],
         icon='fa fa-bookmark',
-        placeholder="One reference per line.",
+        placeholder="One reference per line...",
     )
 
     #
@@ -798,11 +798,17 @@ class ZenodoForm(WebDepositForm):
             'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!' % CFG_SITE_NAME,
         }),
         ('Related datasets/publications', [
-            'related_identifiers', '-', 'references',
+            'related_identifiers',
         ], {
             'classes': '',
             'indication': 'recommended',
             'description': 'Specify identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs.'
+        }),
+        ('References', [
+            'references',
+        ], {
+            'classes': '',
+            'indication': 'optional',
         }),
         ('Journal', [
             'journal_title', 'journal_volume', 'journal_issue',

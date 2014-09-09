@@ -457,6 +457,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 scheme=dict(type='string'),
             )
         )),
+        references=dict(type='list', schema=dict(type='string')),
         thesis_supervisors=dict(type='list', schema=dict(
             type='dict', schema=dict(
                 name=dict(type='string'),
@@ -476,19 +477,24 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         from invenio.modules.communities.models import Community
         from invenio.ext.sqlalchemy import db
         # userb from zenodo.demosite.fixtures.accounts
-        self.test_community = Community(
-            id='cfa', title='Test Community', id_user=4
-        )
-        db.session.add(self.test_community)
-        db.session.commit()
+        self.test_community_remove = False
+        self.test_community = Community.query.filter_by(id='cfa').first()
+        if not self.test_community:
+            self.test_community = Community(
+                id='cfa', title='Test Community', id_user=4
+            )
+            self.test_community_remove = True
+            db.session.add(self.test_community)
+            db.session.commit()
 
         self.test_community.save_collections()
 
     def tearDown(self):
         super(WebDepositZenodoApiTest, self).tearDown()
-        self.test_community.delete_collections()
-        db.session.delete(self.test_community)
-        db.session.commit()
+        if self.test_community_remove:
+            self.test_community.delete_collections()
+            db.session.delete(self.test_community)
+            db.session.commit()
 
     def get_test_data(self, **extra):
         test_data = dict(
@@ -602,6 +608,10 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 prereserve_doi=True,
                 publication_date="2013-09-12",
                 publication_type="book",
+                references=[
+                    "Reference 1",
+                    "Reference 2",
+                ],
                 related_identifiers=[
                     dict(identifier='10.1234/foo.bar2', relation='isCitedBy'),
                     dict(identifier='10.1234/foo.bar3', relation='cites'),

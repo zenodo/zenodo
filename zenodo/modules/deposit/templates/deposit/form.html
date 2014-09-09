@@ -91,6 +91,8 @@
         {{ field_display(field, field_class="btn  btn-default btn-xs") }}
     {% elif field.short_name == 'plupload_file' %}
         {{ field_display(field, field_size="col-md-12") }}
+    {% elif field.short_name == 'references' %}
+        {{ field_display(field, rows="30", wrap='off') }}
     {% else %}
         {{ field_display(field) }}
     {% endif %}

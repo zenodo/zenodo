@@ -1768,6 +1768,18 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 ]</pre><p>Note the identifier type (e.g. DOI) is automatically detected and validated by our system.</p></td>
 </tr>
 <tr>
+    <td><code>references</code></td>
+    <td>Array of strings</td>
+    <td>No</td>
+    <td><p>List of references.</p>
+    <p>Example:</p>
+    <pre>[
+    "Doe J (2014). Title. Publisher. DOI",
+    "Smith J (2014). Title. Publisher. DOI"
+]</pre>
+    </td>
+</tr>
+<tr>
     <td><code>communities</code></td>
     <td>Array of objects</td>
     <td>No</td>
@@ -1955,6 +1967,8 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 <h2 id="restapi-changes">Changes</h2>
 <dl>
+<dt>2014-09-09</dt>
+<dd><p>Added new optional field <code>references</code> to deposition metadata.</p></dd>
 <dt>2014-06-13</dt>
 <dd><p>Authentication changed from API keys to OAuth 2.0. API key authentication is deprecated and will be phased out in October, 2014. Please use <a href="{{ url_for("oauth2server_settings.index")}}">personal access tokens</a> instead of API keys.</p></dd>
 <dt>2013-12-18</dt>

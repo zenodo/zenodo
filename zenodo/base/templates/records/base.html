@@ -80,6 +80,7 @@
         </div>
       </div>
       {% endif%}
+      {% if record.get('references') %}
       <div class="panel panel-default">
         <div class="panel-heading">
           <a class="panel-toggle collapsed" data-toggle="collapse" href="#collapseThree">
@@ -96,6 +97,7 @@
             </ul>
         </div>
       </div>
+      {% endif %}
     {% block record_tabs %}
     {%- for tab in tabs|sort(attribute='order') -%}
     {%- if tab.visible and tab.key != 'record.metadata' and tab.key != 'record.files' and tab.enabled -%}

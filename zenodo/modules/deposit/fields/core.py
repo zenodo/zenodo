@@ -20,7 +20,6 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-import six
 from wtforms import TextAreaField
 from wtforms.compat import text_type
 from invenio.modules.deposit.field_base import WebDepositField
@@ -29,10 +28,11 @@ from invenio.modules.deposit.field_base import WebDepositField
 class TextAreaListField(WebDepositField, TextAreaField):
     def process_formdata(self, valuelist):
         self.data = []
-        if valuelist and isinstance(valuelist[0], six.string_types):
-            for line in valuelist[0].splitlines():
-                if line.strip():
-                    self.data.append(line.strip())
+        if valuelist and len(valuelist) > 0:
+            for item in valuelist:
+                for line in valuelist[0].splitlines():
+                    if line.strip():
+                        self.data.append(line.strip())
 
     def _value(self):
         return text_type("\n".join(self.data)) if self.data else ''
