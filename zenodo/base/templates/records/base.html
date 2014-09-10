@@ -136,7 +136,7 @@
     {%- endif -%}
     {{ format_record(recid, of='HDINFO', ln=g.ln)|safe }}
 
-    {% include "preservationmeter/preservation_meter.html" %}
+    {# include "preservationmeter/preservation_meter.html" #}
 
     {%- if current_user.is_guest -%}
     <div class="well">
