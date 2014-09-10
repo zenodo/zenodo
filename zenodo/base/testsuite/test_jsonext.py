@@ -181,6 +181,28 @@ class TestReaders(InvenioTestCase):
         for k in test_record.keys():
             self.assertEqual(test_record[k], r[k])
 
+    def test_pre1900_publication_date(self):
+        from invenio.modules.records.api import Record
+        r = Record.create(
+            '<record><datafield tag="260" ind1="" ind2="">'
+            '<subfield code="c">0900-12-31</subfield>'
+            '</datafield></record>', master_format='marc'
+        )
+        self.assertEqual(date(900, 12, 31), r['publication_date'])
+        self.assertEqual('0900-12-31', r.dumps()['publication_date'])
+        assert '0900-12-31' in r.legacy_export_as_marc()
+
+    def test_pre1900_embargo_date(self):
+        from invenio.modules.records.api import Record
+        r = Record.create(
+            '<record><datafield tag="942" ind1="" ind2="">'
+            '<subfield code="a">0900-12-31</subfield>'
+            '</datafield></record>', master_format='marc'
+        )
+        self.assertEqual(date(900, 12, 31), r['embargo_date'])
+        self.assertEqual('0900-12-31', r.dumps()['embargo_date'])
+        assert '0900-12-31' in r.legacy_export_as_marc()
+
 
 TEST_SUITE = make_test_suite(TestReaders)
 
