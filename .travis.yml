@@ -77,4 +77,7 @@ script:
   - "python setup.py test"
 
 notifications:
-  email: false
+  email:
+    - lars.holm.nielsen@cern.ch
+    on_success: always
+    on_failure: always
