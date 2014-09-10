@@ -41,5 +41,5 @@ SQLAlchemy>=0.8.3,<0.9
 setuptools>=2.2
 reportlab==2.7
 
--e git+https://github.com/zenodo/invenio-op@pu-zenodo-next#egg=Invenio
+-e git+https://github.com/zenodo/invenio-op@pu-zenodo#egg=Invenio
 -e .

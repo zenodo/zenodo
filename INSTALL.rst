@@ -72,8 +72,8 @@ just created environment.
 
     (zenodo)$ cdvirtualenv
     (zenodo)$ mkdir src; cd src
-    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo-next
-    (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo next
+    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo
+    (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo master
 
 
 3.3 Installation
