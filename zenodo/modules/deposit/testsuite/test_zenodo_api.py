@@ -1623,6 +1623,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             u'publication_date': u'%s' % date.today().isoformat(),
             u'publication_type': u'',
             u'related_identifiers': [],
+            u'references': [],
             u'thesis_supervisors': [],
             u'title': u'Test empty edit',
             u'upload_type': u'dataset'
