@@ -30,6 +30,7 @@ from invenio.ext.assets import Bundle
 #
 js = Bundle(
     "vendors/bootstrap-switch/dist/js/bootstrap-switch.min.js",
+    "js/github/init.js",
     output="github.js",
     filters="requirejs",
     weight=60,
