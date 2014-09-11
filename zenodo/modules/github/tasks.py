@@ -126,9 +126,10 @@ def handle_github_payload(event_state, verify_sender=True):
 
 
 def extract_title(release, repository):
-    return release['name'] or "%s %s" % (
-        repository['name'], release['tag_name']
-    )
+    if release['name']:
+        return "%s: %s" % (repository['name'], release['name'])
+    else:
+        return "%s %s" % (repository['name'], release['tag_name'])
 
 
 def extract_description(gh, release, repository):
