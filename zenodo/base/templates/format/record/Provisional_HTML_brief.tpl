@@ -11,7 +11,7 @@
         {{ bfe_openaire_access_rights(bfo, as_label="1") }}
         <br/>
         <h4 class="media-heading muted_a"><a href="{{ bfe_record_url(bfo, ) }}">{{ bfe_title_brief(bfo, highlight="no") }}</a></h4>
-        <p>{{ bfe_authors(bfo, limit="4", extension="; <em> et al</em> ", highlight="no") }}</p>
+        <p>{{ bfe_authors(bfo, limit="4", extension="; et al. ", highlight="no") }}</p>
         <p class="muted_a"><a href="{{ bfe_record_url(bfo, ) }}">{{ bfo.field('520__a').decode('utf8')|striptags|truncate }}</a></p>
         {% if bfo.field('8560_y') %}<small class="muted">Uploaded by <a href="{{ url_for('yourmessages.write', sent_to_user_nicks=bfo.field('8560_y')) }}">{{bfo.field('8560_y').decode('utf8')}}</a> on {{ bfe_creation_date(bfo, date_format="%d %M %Y") }}.</small>{% endif %}
     </div>
