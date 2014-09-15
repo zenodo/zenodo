@@ -20,7 +20,6 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-
 language: python
 
 services:
@@ -30,12 +29,20 @@ services:
 python:
   - "2.6"
 
+env:
+    global:
+        - AWS_S3_BUCKET="travis-pip-cache"
+        - secure: "gUjC74EPpS/6Fg/nkw28qrLxEVWtsqOo1LoNLZrr/oa4ZWbcJaxttLxf3dpPQYF0o5Voq1HYs59ieEoZTDuXc6yvrVqdkHTCu1TE7g3CTud0l6USRjmDgyl/OEupQ9qGQOrdQakgMaFae2PC6N1bVy5Kx2kg5W6AdcJs5hBQb8A="
+        - secure: "gc3SOEsARJBQR5Zpm9llZG5uu6W145Pkr02HGQvt9p96I9V/rm4RCMQMOleJFo+3dtlyceJ/B7tPxhVh9bIljGaHO1cgnUyaFwI/gCwPk6MWpDbKXMDSqUnxyp/1oz4UMmmZhx1Ob/0K9adDWTxF0U/mtwc3A4oclRRA2Cd2V4g="
+
+
 before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
   # Fix for "MySQL Server has gone away" error.
   - "echo -e '[server]\nmax_allowed_packet=128M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
   - "sudo service mysql restart"
+  - "pip install boto argparse"
 
 install:
   - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
@@ -44,6 +51,7 @@ install:
   - "sudo a2enmod rewrite"
   - "sudo mkdir -p /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
+  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt get ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/"
   - "travis_retry pip install -r requirements.txt --exists-action i"
   - "inveniomanage config create secret-key"
   - "inveniomanage config set DEBUG False"
@@ -76,8 +84,12 @@ before_script:
 script:
   - "python setup.py test"
 
+after_script:
+  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt set ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/"
+
 notifications:
   email:
-    - lars.holm.nielsen@cern.ch
+    recipients:
+        - "lars.holm.nielsen@cern.ch"
     on_success: always
     on_failure: always
