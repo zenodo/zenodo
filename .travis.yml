@@ -42,33 +42,24 @@ before_install:
   # Fix for "MySQL Server has gone away" error.
   - "echo -e '[server]\nmax_allowed_packet=128M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
   - "sudo service mysql restart"
+  # Required by traviscache.py caching script:
   - "pip install boto argparse"
 
 install:
   - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
+  - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
   - "sudo a2enmod actions"
   - "sudo a2enmod version"
   - "sudo a2enmod rewrite"
   - "sudo mkdir -p /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
-  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt get ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/"
+  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt get ${VIRTUAL_ENV}/ignored/"
   - "travis_retry pip install -r requirements.txt --exists-action i"
-  - "inveniomanage config create secret-key"
-  - "inveniomanage config set DEBUG False"
-  - "inveniomanage config set CFG_EMAIL_BACKEND flask.ext.email.backends.console.Mail"
-  - "inveniomanage config set CFG_BIBSCHED_PROCESS_USER `whoami`"
-  - "inveniomanage config set CFG_TMPDIR /tmp"
-  - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
+  - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
   - "inveniomanage bower > bower.json"
   - "bower install"
-  - "inveniomanage config set COLLECT_STORAGE invenio.ext.collect.storage.link"
   - "inveniomanage collect > /dev/null"
   - "inveniomanage assets build"
-  - "inveniomanage config set CLEANCSS_BIN false"  # deactivate all the things
-  - "inveniomanage config set LESS_BIN false"      # false is /usr/bin/false
-  - "inveniomanage config set REQUIREJS_BIN false"
-  - "inveniomanage config set UGLIFYJS_BIN false"
-  - "inveniomanage config set ASSETS_AUTO_BUILD False"
 
 before_script:
   - "inveniomanage apache create-config"
@@ -85,7 +76,8 @@ script:
   - "python setup.py test"
 
 after_script:
-  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt set ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/"
+  # Cache site-packages, bin scripts and bower components.
+  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt set ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/ `pwd`/zenodo/base/static/vendors/"
 
 notifications:
   email:
