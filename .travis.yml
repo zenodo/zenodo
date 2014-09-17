@@ -44,6 +44,7 @@ before_install:
   - "sudo service mysql restart"
   # Required by traviscache.py caching script:
   - "pip install boto argparse"
+  - "date"
 
 install:
   - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
@@ -53,31 +54,46 @@ install:
   - "sudo a2enmod rewrite"
   - "sudo mkdir -p /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
+  - "date"
+  - "date"
   - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt get ${VIRTUAL_ENV}/ignored/"
+  - "date"
   - "travis_retry pip install -r requirements.txt --exists-action i"
+  - "date"
   - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
+  - "date"
   - "inveniomanage bower > bower.json"
+  - "date"
   - "bower install"
+  - "date"
   - "inveniomanage collect > /dev/null"
+  - "date"
   - "inveniomanage assets build"
+  - "date"
 
 before_script:
   - "inveniomanage apache create-config"
+  - "date"
   - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
   - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
   - "sudo /usr/sbin/a2dissite *default* || echo ':('"
   - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
   - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
+  - "date"
   - "inveniomanage database init --yes-i-know || echo ':('"
+  - "date"
   - "inveniomanage database create || echo ':('"
+  - "date"
 
 script:
   - "python setup.py test"
 
 after_script:
   # Cache site-packages, bin scripts and bower components.
+  - "date"
   - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt set ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/ `pwd`/zenodo/base/static/vendors/"
+  - "date"
 
 notifications:
   email:
