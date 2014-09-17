@@ -37,6 +37,7 @@ env:
 
 
 before_install:
+  - "date"
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
   # Fix for "MySQL Server has gone away" error.
@@ -60,6 +61,7 @@ install:
   - "date"
   - "travis_retry pip install -r requirements.txt --exists-action i"
   - "date"
+  - "mkdir -p ${VIRTUAL_ENV}/var/invenio.base-instance/"
   - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
   - "date"
   - "inveniomanage bower > bower.json"
@@ -89,7 +91,7 @@ before_script:
 script:
   - "python setup.py test"
 
-after_script:
+after_success:
   # Cache site-packages, bin scripts and bower components.
   - "date"
   - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt set ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/ `pwd`/zenodo/base/static/vendors/"
