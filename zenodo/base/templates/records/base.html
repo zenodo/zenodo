@@ -213,4 +213,9 @@ $(function () {
 {{ copy_to_clipboard_js() }}
 {%- endif %}
 </script>
+<script>
+require(['js/citationformatter/citationformatter'], function(formatter) {
+    formatter.attachTo('.citationformat', { lang: '{{config.CITATIONFORMATTER_DEFAULT_LANG}}'});
+});
+</script>
 {% endblock %}
