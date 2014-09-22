@@ -14,6 +14,8 @@
 <script type="text/javascript">var addthis_config = {"data_track_addressbar":true};</script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>
 <!-- AddThis Button END -->
+{% if record.doi %}
   <h4>Cite as </h4>
-  {{ citationformatter('10.5281/zenodo.11741', bfe_authors(bfo, limit="1", extension=" et al.", print_links="nanosensors", interactive="no") + '. (' + bfe_year(bfo, ) +'). ' + bfe_title(bfo, ) + '. ' + (pubinfo if pubinfo else config.CFG_SITE_NAME) + '. ' + bfe_doi(bfo, )) }}
+  {{ citationformatter(record.doi, bfe_authors(bfo, limit="1", extension=" et al.", print_links="nanosensors", interactive="no") + '. (' + bfe_year(bfo, ) +'). ' + bfe_title(bfo, ) + '. ' + (pubinfo if pubinfo else config.CFG_SITE_NAME) + '. ' + bfe_doi(bfo, )) }}
+{% endif %}
 </div>

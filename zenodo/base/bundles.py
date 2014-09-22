@@ -35,6 +35,7 @@ _j.contents += [
     "vendors/zeroclipboard/dist/ZeroClipboard.js",
     "vendors/bootstrap-datepicker/js/bootstrap-datepicker.js",
     "vendors/bootstrap-switch/dist/js/bootstrap-switch.min.js",
+    "js/citationformatter/citationformatter.js",
 ]
 
 _j.bower.update({
