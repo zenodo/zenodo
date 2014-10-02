@@ -36,6 +36,8 @@
       "js/deposit/uploader/uploader",
       "js/deposit/uploader/uploaders/plUploader",
       "js/deposit/uploader/uploaders/dropboxUploader",
+      "js/deposit/uploader/ui/filelist",
+      "js/deposit/uploader/ui/errorList"
     ],
 
     function(
@@ -43,10 +45,56 @@
       form,
       Uploader,
       PlUploader,
-      DropboxUploader
+      DropboxUploader,
+      FileList,
+      ErrorList
     ) {
 
       $(function () {
+
+        var preupload_hooks = {
+
+          resolve_uuid: (function (component) {
+            var new_uuid = -1;
+            var url = '{{ url_for(".create", deposition_type=deposition_type) }}';
+
+            return function (component) {
+              if (new_uuid === -1) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    async: false,
+                    cache: false
+                }).done(function (uuid) {
+                  new_uuid = uuid;
+
+                  if (component.$node.attr("id") === "uploader") {
+                    component.attr.get_file_url = component.attr.get_file_url.replace("-1", new_uuid);
+                    component.attr.delete_url = component.attr.delete_url.replace("-1", new_uuid);
+                    component.attr.continue_url = component.attr.continue_url.replace("-1", new_uuid);
+                  } else if (component.$node.attr("id") === "pluploader") {
+                    component.attr.url = component.attr.url.replace("-1", new_uuid);
+                  } else if (component.$node.attr("id") === "dropboxuploader") {
+                    component.attr.dropbox_url = component.attr.dropbox_url.replace("-1", new_uuid);
+                  }
+                }).fail(function() {
+                  //
+                });
+              } else {
+                if (component.$node.attr("id") === "uploader") {
+                  component.attr.get_file_url = component.attr.get_file_url.replace("-1", new_uuid);
+                  component.attr.delete_url = component.attr.delete_url.replace("-1", new_uuid);
+                  component.attr.continue_url = component.attr.continue_url.replace("-1", new_uuid);
+                } else if (component.$node.attr("id") === "pluploader") {
+                  component.attr.url = component.attr.url.replace("-1", new_uuid);
+                } else if (component.$node.attr("id") === "dropboxuploader") {
+                  component.attr.dropbox_url = component.attr.dropbox_url.replace("-1", new_uuid);
+                }
+              }
+            }
+          }())
+
+        };
 
         var config = {
           form: {
@@ -67,24 +115,31 @@
             resolve_uuid: true,
             autoupload: false,
             continue_url: '{{ url_for('.run', deposition_type=deposition_type, uuid='-1') }}',
-            as_jumbo: true
+            fileListSelector: '#uploader-filelist',
+            errorListSelector: '#uploader-errorlist',
+            preupload_hooks: preupload_hooks
           },
 
           pluploader: {
             url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid='-1') }}',
             max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
             drop_element: $('#uploader')[0],
+            preupload_hooks: preupload_hooks
           },
 
           dropboxuploader: {
-            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid='-1') }}'
+            dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid='-1') }}',
+            preupload_hooks: preupload_hooks
           }
-        }
+        };
 
         form.attachTo("#submitForm", config.form);
         Uploader.attachTo("#uploader", config.uploader);
         PlUploader.attachTo("#pluploader", config.pluploader);
         DropboxUploader.attachTo("#dropboxuploader", config.dropboxuploader);
+        FileList.attachTo("#uploader-filelist");
+        ErrorList.attachTo("#uploader-errorlist");
+
       });
     }
   );
@@ -101,4 +156,3 @@
     </div>
 </div>
 {% endblock %}
-<!-- datepicker -->
