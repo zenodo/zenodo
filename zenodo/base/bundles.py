@@ -29,6 +29,8 @@ from invenio.base.bundles import styles as _s, jquery as _j, invenio as _i
 #
 _i.contents += [
     "js/zenodo/init.js",
+    "vendors/zeroclipboard/dist/ZeroClipboard.js",
+    "js/citationformatter/citationformatter.js"
 ]
 _i.bower.update({
     "zeroclipboard": "~2.1.6",
