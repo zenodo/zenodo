@@ -36,4 +36,4 @@ class FundingFacetBuilder(FacetBuilder):
     def get_facets_for_query(self, *args, **kwargs):
         return super(FundingFacetBuilder, self).get_facets_for_query(*args, **kwargs)
 
-facet = FundingFacetBuilder('project', order=5)
+facet = FundingFacetBuilder('project')

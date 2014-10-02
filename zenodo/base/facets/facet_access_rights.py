@@ -37,4 +37,4 @@ class AccessRightsFacetBuilder(FacetBuilder):
         return super(AccessRightsFacetBuilder, self).get_facets_for_query(
             *args, **kwargs)
 
-facet = AccessRightsFacetBuilder('access_rights', order=2)
+facet = AccessRightsFacetBuilder('access_rights')
