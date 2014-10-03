@@ -58,6 +58,7 @@ def format():
             style=style,
         )
     )
+    r.encoding = 'utf-8'
 
     if r.status_code == 200:
         return (r.text, 200, [('content-type', 'text/plain')])
