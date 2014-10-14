@@ -26,15 +26,9 @@ from invenio.testsuite import iter_suites
 
 def suite():
     """Create the testsuite that has all the tests."""
-    packages = [
-        'zenodo.modules.deposit',
-        'zenodo.modules.github',
-        'zenodo.modules.preservationmeter',
-        # Run after records have been created by other tests
-        'zenodo',
-        'zenodo.base',
-    ]
+    from zenodo.config import TEST_SUITES
+
     suite = unittest.TestSuite()
-    for other_suite in iter_suites(packages=packages):
+    for other_suite in iter_suites(packages=TEST_SUITES):
         suite.addTest(other_suite)
     return suite

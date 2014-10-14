@@ -122,6 +122,16 @@ PACKAGES += [
 
 PACKAGES_EXCLUDE = []
 
+TEST_SUITES = [
+    'zenodo.modules.deposit.testsuite',
+    'zenodo.modules.github.testsuite',
+    'zenodo.modules.preservationmeter.testsuite',
+    'zenodo.modules.citationformatter.testsuite',
+    # Run after records have been created by other tests
+    'zenodo.testsuite',
+    'zenodo.base.testsuite',
+]
+
 
 OAUTHCLIENT_REMOTE_APPS = dict(
     github=dict(
