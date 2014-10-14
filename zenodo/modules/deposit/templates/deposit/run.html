@@ -67,7 +67,11 @@ require(["jquery", "js/zenodo/zenodo", "js/deposit/form"], function($, zenodo, f
         $(selector).click(function(e){
             e.preventDefault();
             $("#submitModal").modal('hide');
-            form.submit(url, form_selector, dialog);
+            $(form_selector).trigger('dataFormSubmit', {
+              url: url,
+              form_selector: form_selector,
+              dialog: dialog
+            });
         });
     }
 

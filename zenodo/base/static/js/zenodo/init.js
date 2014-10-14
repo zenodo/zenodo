@@ -19,8 +19,7 @@
  * granted to it by virtue of its status as an Intergovernmental Organization
  * or submit itself to any jurisdiction.
  */
-
-require(['jquery', 'js/zenodo/zenodo', 'vendors/zeroclipboard/dist/ZeroClipboard'], function() {
+require(['jquery', 'js/zenodo/zenodo', 'vendors/zeroclipboard/dist/ZeroClipboard', 'js/citationformatter/citationformatter'], function() {
     /*
      * It preloads js/zenodo/zenodo to give it a name so you're free to use it
      * from any places.
