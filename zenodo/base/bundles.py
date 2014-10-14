@@ -30,16 +30,16 @@ from invenio.base.bundles import styles as _s, jquery as _j, invenio as _i
 _i.contents += [
     "js/zenodo/init.js",
 ]
+_i.bower.update({
+    "zeroclipboard": "~2.1.6",
+})
 
 _j.contents += [
-    "vendors/zeroclipboard/dist/ZeroClipboard.js",
     "vendors/bootstrap-datepicker/js/bootstrap-datepicker.js",
     "vendors/bootstrap-switch/dist/js/bootstrap-switch.min.js",
-    "js/citationformatter/citationformatter.js",
 ]
 
 _j.bower.update({
-    "zeroclipboard": "~2.1.6",
     "bootstrap-datepicker": "latest",
     "bootstrap-switch": "3.0.2",
 })
