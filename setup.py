@@ -35,7 +35,7 @@ from setuptools import setup, find_packages
 import os
 
 install_requires = [
-    "Invenio[img]>=1.9999.2,<1.9999.3",
+    "Invenio[img]>=1.9999.3,<1.9999.4",
     "qrcode==2.4.2",
     "altmetric",
     "beautifulsoup4",
