@@ -39,8 +39,7 @@ from invenio.modules.deposit.form import WebDepositForm
 from invenio.modules.deposit.field_widgets import date_widget, \
     plupload_widget, ButtonWidget, ExtendedListWidget, \
     TagListWidget, TagInput, ItemWidget, CKEditorWidget, ColumnInput
-from invenio.modules.deposit.filter_utils import strip_string, sanitize_html, \
-    splitlines_list
+from invenio.modules.deposit.filter_utils import strip_string, sanitize_html
 from invenio.modules.deposit.validation_utils import doi_syntax_validator, \
     invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
     list_length, not_required_if, pid_validator, minted_doi_validator, \
@@ -254,10 +253,7 @@ class CommunityForm(WebDepositForm):
     )
     title = fields.TextField(
         placeholder="Start typing a community name...",
-        autocomplete=map_result(
-            community_autocomplete,
-            communityform_mapper
-        ),
+        autocomplete=community_autocomplete,
         widget=TagInput(),
         widget_classes='form-control',
     )

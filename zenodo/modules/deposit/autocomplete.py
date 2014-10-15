@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -36,9 +36,13 @@ def community_autocomplete(dummy_form, dummy_field, term, limit=50):
     return map(
         lambda o: {
             'value': o.title,
-            'id': o.id,
-            'curatedby': o.owner.nickname,
-            'description': o.description,
+            'fields': {
+                'identifier': o.id,
+                'title': o.title,
+                'curatedby': o.owner.nickname,
+                'description': o.description,
+                'provisional': True,
+            }
         },
         objs
     )
