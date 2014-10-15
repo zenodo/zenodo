@@ -23,7 +23,8 @@
 
 """Zenodo GitHub bundles."""
 
-from invenio.ext.assets import Bundle
+from invenio.ext.assets import Bundle, RequireJSFilter
+from invenio.base.bundles import jquery as _j, invenio as _i
 
 #
 # Site-wide JS
@@ -32,7 +33,7 @@ js = Bundle(
     "vendors/bootstrap-switch/dist/js/bootstrap-switch.min.js",
     "js/github/init.js",
     output="github.js",
-    filters="requirejs",
+    filters=RequireJSFilter(exclude=[_j, _i]),
     weight=60,
     bower={
         "bootstrap-switch": "3.0.2",
