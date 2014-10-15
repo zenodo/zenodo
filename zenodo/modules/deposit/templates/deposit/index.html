@@ -25,40 +25,124 @@
 {% endblock %}
 
 {% block javascript %}
-<script type="text/javascript" src="https://www.dropbox.com/static/api/1/dropbox.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
 <script type="text/javascript">
-require(["jquery", "js/deposit/form", "js/zenodo/zenodo"], function($, form, zenodo) {
-    $(function(){
-      var save_url = undefined;
-      var save_all_url = undefined;
-      var complete_url = undefined;
-      var autocomplete_url = undefined;
 
-      var configuration = {
-          plupload: {
-            max_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
-            selector:'.pluploader',
-            url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid='-1') }}',
-            delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid='-1') }}',
+  require(
+
+    [
+      "jquery",
+      "js/deposit/form",
+      "js/deposit/uploader/uploader",
+      "js/deposit/uploader/uploaders/plUploader",
+      "js/deposit/uploader/uploaders/dropboxUploader",
+      "js/deposit/uploader/ui/filelist",
+      "js/deposit/uploader/ui/errorList"
+    ],
+
+    function(
+      $,
+      form,
+      Uploader,
+      PlUploader,
+      DropboxUploader,
+      FileList,
+      ErrorList
+    ) {
+
+      $(function () {
+
+        var preupload_hooks = {
+
+          resolve_uuid: (function (component) {
+            var new_uuid = -1;
+            var url = '{{ url_for(".create", deposition_type=deposition_type) }}';
+
+            return function (component) {
+              if (new_uuid === -1) {
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    async: false,
+                    cache: false
+                }).done(function (uuid) {
+                  new_uuid = uuid;
+
+                  if (component.$node.attr("id") === "uploader") {
+                    component.attr.get_file_url = component.attr.get_file_url.replace("-1", new_uuid);
+                    component.attr.delete_url = component.attr.delete_url.replace("-1", new_uuid);
+                    component.attr.continue_url = component.attr.continue_url.replace("-1", new_uuid);
+                  } else if (component.$node.attr("id") === "pluploader") {
+                    component.attr.url = component.attr.url.replace("-1", new_uuid);
+                  } else if (component.$node.attr("id") === "dropboxuploader") {
+                    component.attr.dropbox_url = component.attr.dropbox_url.replace("-1", new_uuid);
+                  }
+                }).fail(function() {
+                  //
+                });
+              } else {
+                if (component.$node.attr("id") === "uploader") {
+                  component.attr.get_file_url = component.attr.get_file_url.replace("-1", new_uuid);
+                  component.attr.delete_url = component.attr.delete_url.replace("-1", new_uuid);
+                  component.attr.continue_url = component.attr.continue_url.replace("-1", new_uuid);
+                } else if (component.$node.attr("id") === "pluploader") {
+                  component.attr.url = component.attr.url.replace("-1", new_uuid);
+                } else if (component.$node.attr("id") === "dropboxuploader") {
+                  component.attr.dropbox_url = component.attr.dropbox_url.replace("-1", new_uuid);
+                }
+              }
+            }
+          }())
+
+        };
+
+        var config = {
+          form: {
+            save_url: undefined,
+            save_all_url: undefined,
+            complete_url: undefined,
+            autocomplete_url: undefined,
+            datepicker_element: '.datepicker',
+            datepicker_options: {dateFormat: "yy-mm-dd"}
+          },
+
+          uploader: {
             get_file_url: '{{ url_for('.get_file', deposition_type=deposition_type, uuid='-1') }}',
-            db_files: null,
+            delete_url: '{{ url_for('.delete_file', deposition_type=deposition_type, uuid='-1') }}',
+            form_selector: "#submitForm",
+            form_files: {{ form.files|default([])|safe }},
+            resolve_uuid_url: '{{ url_for('.create', deposition_type=deposition_type) }}',
+            resolve_uuid: true,
+            autoupload: false,
+            continue_url: '{{ url_for('.run', deposition_type=deposition_type, uuid='-1') }}',
+            fileListSelector: '#uploader-filelist',
+            errorListSelector: '#uploader-errorlist',
+            preupload_hooks: preupload_hooks
+          },
+
+          pluploader: {
+            url: '{{ url_for('.upload_file', deposition_type=deposition_type, uuid='-1') }}',
+            max_file_size: '{{config.DEPOSIT_MAX_UPLOAD_SIZE|default('10mb')}}',
+            drop_element: $('#uploader')[0],
+            preupload_hooks: preupload_hooks
+          },
+
+          dropboxuploader: {
             dropbox_url: '{{ url_for('.upload_url', deposition_type=deposition_type, uuid='-1') }}',
-            uuid: null,
-            newdep_url: '{{ url_for('.create', deposition_type=deposition_type) }}',
-            continue_url: '{{ url_for('.run', deposition_type=deposition_type, uuid='-1') }}'
-          },
-          urls: {
-            save_url: save_url,
-            save_all_url: save_all_url,
-            complete_url: complete_url,
-            autocomplete_url: autocomplete_url,
-          },
-          datepicker: zenodo.datepicker_config
-      }
-      // Initialize form
-      form.init(configuration);
-    });
-});
+            preupload_hooks: preupload_hooks
+          }
+        };
+
+        form.attachTo("#submitForm", config.form);
+        Uploader.attachTo("#uploader", config.uploader);
+        PlUploader.attachTo("#pluploader", config.pluploader);
+        DropboxUploader.attachTo("#dropboxuploader", config.dropboxuploader);
+        FileList.attachTo("#uploader-filelist");
+        ErrorList.attachTo("#uploader-errorlist");
+
+      });
+    }
+  );
 </script>
 {% endblock javascript %}
 
