@@ -1230,7 +1230,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
+            res_id, ObjectVersion.WAITING, WorkflowStatus.HALTED
         )
 
         # Edit deposition - check for consistency in result being returned
@@ -1251,7 +1251,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
+            res_id, ObjectVersion.WAITING, WorkflowStatus.HALTED
         )
 
         # Edit deposition - second request should return bad request (state of
@@ -1315,7 +1315,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
+            res_id, ObjectVersion.WAITING, WorkflowStatus.HALTED
         )
 
         # Update deposition - cannot edit recid and modification_date (hidden)
@@ -1384,7 +1384,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.HALTED, WorkflowStatus.HALTED
+            res_id, ObjectVersion.WAITING, WorkflowStatus.HALTED
         )
 
         # Integrate record

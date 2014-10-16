@@ -128,8 +128,8 @@ TEST_SUITES = [
     'zenodo.modules.preservationmeter.testsuite',
     'zenodo.modules.citationformatter.testsuite',
     # Run after records have been created by other tests
-    'zenodo.testsuite',
     'zenodo.base.testsuite',
+    'zenodo.testsuite',
 ]
 
 

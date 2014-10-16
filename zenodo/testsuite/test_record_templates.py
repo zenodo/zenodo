@@ -54,11 +54,11 @@ class HeaderLinksTest(InvenioTestCase):
             return_value=[mock_file])
 
         # Request page
-        res = self.client.get(url_for('record.metadata', recid=1))
+        res = self.client.get(url_for('record.metadata', recid=3))
+        self.assertEqual(res.status_code, 200)
 
         # Login to prevent errors fom
         soup = BeautifulSoup(res.data)
-
         for l in soup.select('link[rel="alternate"]'):
             if l['href'].startswith(base_url):
                 return
