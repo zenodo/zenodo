@@ -197,8 +197,9 @@ $(function () {
   $('.preview-link').on('click', function(event) {
     $('#preview').show();
     var frameurl = $(event.target).data('url');
+    var filename = frameurl.substr(frameurl.lastIndexOf('/')+1);
     frameurl = encodeURIComponent(frameurl);
-    $('#preview-iframe').attr("src","https://docs.google.com/viewer?url=" + frameurl +"&embedded=true");
+    $('#preview-iframe').attr("src","{{request.base_url}}/preview?filename="+filename);
   });
 
   var previewbutton = $('.preview-link:first');
