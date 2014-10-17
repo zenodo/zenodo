@@ -194,6 +194,11 @@ ORCID_APP_CREDENTIALS = dict(
     consumer_secret="changeme",
 )
 
+CFG_PREVIEW_PREFERENCE = {
+    '.pdf': ['pdfjs'],
+    '.zip': ['zip'],
+}
+
 
 DEPOSIT_TYPES = [
     "zenodo.modules.deposit.workflows.upload:upload",

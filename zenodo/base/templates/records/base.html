@@ -72,7 +72,7 @@
               <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
               <td>{{ file.md.strftime('%d %b %Y') }}</td>
               <td>{{ file.size|filesizeformat }}</td>
-              <td><span class="pull-right">{% if file.get_superformat() == '.pdf' %}<button class="btn preview-link btn-default" data-url="{{file.get_url()}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-default" href="{{file.get_url()}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+              <td><span class="pull-right">{% if file.get_superformat().lower() in config.CFG_PREVIEW_PREFERENCE %}<button class="btn preview-link btn-default" data-filename="{{file.get_full_name()}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-default" href="{{file.get_url()}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
             </tr>
           {%- endfor -%}
           </tbody>
@@ -196,10 +196,8 @@ $(function () {
 $(function () {
   $('.preview-link').on('click', function(event) {
     $('#preview').show();
-    var frameurl = $(event.target).data('url');
-    var filename = frameurl.substr(frameurl.lastIndexOf('/')+1);
-    frameurl = encodeURIComponent(frameurl);
-    $('#preview-iframe').attr("src","{{request.base_url}}/preview?filename="+filename);
+    var filename = encodeURIComponent($(event.target).data('filename'));
+    $('#preview-iframe').attr("src","{{ url_for('previewer.preview', recid=recid) }}?filename="+filename);
   });
 
   var previewbutton = $('.preview-link:first');
