@@ -34,15 +34,6 @@ _i.bower.update({
     "zeroclipboard": "~2.1.6",
 })
 
-_j.contents += [
-    "vendors/bootstrap-datepicker/js/bootstrap-datepicker.js",
-    "vendors/bootstrap-switch/dist/js/bootstrap-switch.min.js",
-]
-
-_j.bower.update({
-    "bootstrap-datepicker": "latest",
-    "bootstrap-switch": "3.0.2",
-})
 # Remove MathJax (served from CDN instead).
 del _j.bower['MathJax']
 

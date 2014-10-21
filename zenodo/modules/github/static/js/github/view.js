@@ -23,7 +23,7 @@ define(function(require, exports, module) {
     'use strict';
 
     var $ = require('jquery');
-    require('../../vendors/bootstrap-switch/dist/js/bootstrap-switch.min');
+    require('bootstrap-switch');
 
     return function(config) {
         init_switches(config);

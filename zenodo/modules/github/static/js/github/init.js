@@ -20,10 +20,10 @@
  * or submit itself to any jurisdiction.
  */
 
-require(['jquery', 'js/github/view', 'vendors/bootstrap-switch/dist/js/bootstrap-switch.min'], function() {
+require(['jquery', 'bootstrap-switch', 'js/github/view'], function() {
     /*
      * It preloads js/github/github to give it a name so you're free to use it
      * from any places.
      */
-    console.info("js/github/view is loaded");
+    console.info("js/github/init is loaded");
 })

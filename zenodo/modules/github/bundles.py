@@ -30,7 +30,6 @@ from invenio.base.bundles import jquery as _j, invenio as _i
 # Site-wide JS
 #
 js = Bundle(
-    "vendors/bootstrap-switch/dist/js/bootstrap-switch.min.js",
     "js/github/init.js",
     output="github.js",
     filters=RequireJSFilter(exclude=[_j, _i]),
