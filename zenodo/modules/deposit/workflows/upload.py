@@ -637,6 +637,8 @@ class upload(DepositionType):
         conference_place=fields.String,
         conference_title=fields.String,
         conference_url=fields.String,
+        conference_session=fields.String,
+        conference_session_part=fields.String,
         creators=fields.Raw(default=[]),
         description=fields.String,
         doi=fields.String(default=''),

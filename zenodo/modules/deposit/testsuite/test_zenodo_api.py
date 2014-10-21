@@ -415,6 +415,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         conference_place=dict(type='string'),
         conference_title=dict(type='string'),
         conference_url=dict(type='string'),
+        conference_session=dict(type='string'),
+        conference_session_part=dict(type='string'),
         creators=dict(type='list', schema=dict(
             type='dict', schema=dict(
                 name=dict(type='string'),
@@ -585,6 +587,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 conference_place='Some place',
                 conference_title='Some title',
                 conference_url='http://someurl.com',
+                conference_session='VI',
+                conference_session_part='1',
                 creators=[
                     dict(name="Doe, John", affiliation="Atlantis"),
                     dict(name="Smith, Jane", affiliation="Atlantis")
@@ -653,6 +657,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 conference_place='Սա փորձություն',
                 conference_title='Гэта тэст',
                 conference_url='http://someurl.com',
+                conference_session='5',
+                conference_session_part='a',
                 creators=[
                     dict(name="Doe, John", affiliation="Това е тест"),
                     dict(name="Smith, Jane", affiliation="Tio ĉi estas testo")
@@ -1150,6 +1156,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 conference_place='Some place',
                 conference_title='Some title',
                 conference_url='http://someurl.com',
+                conference_session='VI',
+                conference_session_part='2',
                 imprint_isbn="Some isbn",
                 imprint_place="Some place",
                 imprint_publisher="Some publisher",
@@ -1600,6 +1608,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             u'conference_place': None,
             u'conference_title': None,
             u'conference_url': None,
+            u'conference_session': None,
+            u'conference_session_part': None,
             u'creators': [
                 {u'affiliation': u'Atlantis', u'name': u'Doe, John'},
                 {u'affiliation': u'Atlantis', u'name': u'Smith, Jane'}

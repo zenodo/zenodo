@@ -728,6 +728,18 @@ class ZenodoForm(WebDepositForm):
         description="Optional. E.g. http://zenodo.org",
         validators=[validators.optional(), validators.URL()]
     )
+    conference_session = fields.TextField(
+        label="Session",
+        description="Optional. Number of session within the conference.",
+        placeholder="e.g VI",
+        export_key="meetings.session",
+    )
+    conference_session_part = fields.TextField(
+        label="Part",
+        description="Optional. Number of part within a session.",
+        placeholder="e.g 1",
+        export_key="meetings.session_part",
+    )
 
     #
     # References
@@ -815,7 +827,8 @@ class ZenodoForm(WebDepositForm):
         }),
         ('Conference', [
             'conference_title', 'conference_acronym', 'conference_dates',
-            'conference_place', 'conference_url',
+            'conference_place', 'conference_url', '-', 'conference_session',
+            'conference_session_part'
         ], {
             'classes': '',
             'indication': 'optional',

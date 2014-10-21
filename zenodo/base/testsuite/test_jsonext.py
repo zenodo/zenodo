@@ -27,37 +27,125 @@ from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from datetime import date
 
 
-test_marc = """<record><datafield tag="942" ind1="" ind2=""><subfield code="a">2014-02-27</subfield></datafield>
-<datafield tag="520" ind1="" ind2=""><subfield code="a">Test Description</subfield></datafield>
-<datafield tag="100" ind1="" ind2=""><subfield code="u">CERN</subfield><subfield code="a">Doe, John</subfield></datafield>
-<datafield tag="980" ind1="" ind2=""><subfield code="a">provisional-user-ecfunded</subfield></datafield>
-<datafield tag="035" ind1="" ind2=""><subfield code="a">4</subfield><subfield code="9">CERN</subfield></datafield>
-<datafield tag="980" ind1="" ind2=""><subfield code="a">user-zenodo</subfield></datafield>
-<datafield tag="536" ind1="" ind2=""><subfield code="c">1234</subfield><subfield code="a">Grant Title</subfield></datafield>
-<datafield tag="536" ind1="" ind2=""><subfield code="c">4321</subfield><subfield code="a">Title Grant</subfield></datafield>
-<datafield tag="980" ind1="" ind2=""><subfield code="b">book</subfield><subfield code="a">publication</subfield></datafield>
-<datafield tag="653" ind1="1" ind2=""><subfield code="a">kw1</subfield></datafield>
-<datafield tag="653" ind1="1" ind2=""><subfield code="a">kw2</subfield></datafield>
-<datafield tag="653" ind1="1" ind2=""><subfield code="a">kw3</subfield></datafield>
-<datafield tag="260" ind1="" ind2=""><subfield code="c">2014-02-27</subfield></datafield>
-<datafield tag="035" ind1="" ind2=""><subfield code="9">Altmetric</subfield><subfield code="a">9876</subfield></datafield>
-<datafield tag="970" ind1="" ind2=""><subfield code="d">3</subfield><subfield code="a">2</subfield></datafield>
-<datafield tag="024" ind1="7" ind2=""><subfield code="2">DOI</subfield><subfield code="a">10.1234/foo.bar</subfield></datafield>
-<datafield tag="540" ind1="" ind2=""><subfield code="u">http://zenodo.org</subfield><subfield code="a">Creative Commons</subfield></datafield>
-<datafield tag="650" ind1="1" ind2="7"><subfield code="a">cc-by</subfield><subfield code="2">opendefinition.org</subfield></datafield>
-<datafield tag="245" ind1="" ind2=""><subfield code="a">Test title</subfield></datafield>
-<datafield tag="500" ind1="" ind2=""><subfield code="a">notes</subfield></datafield>
-<datafield tag="909" ind1="C" ind2="O"><subfield code="o">oai:zenodo.org:1</subfield><subfield code="p">user-zenodo</subfield><subfield code="p">user-ecfunded</subfield></datafield>
-<datafield tag="700" ind1="" ind2=""><subfield code="u">CERN</subfield><subfield code="a">Doe, Jane</subfield></datafield>
-<datafield tag="700" ind1="" ind2=""><subfield code="u">CERN</subfield><subfield code="a">Smith, John</subfield></datafield>
-<datafield tag="980" ind1="" ind2=""><subfield code="b">secondary</subfield><subfield code="a">pri</subfield></datafield>
-<controlfield tag="001">1</controlfield>
-<datafield tag="542" ind1="" ind2=""><subfield code="l">open</subfield></datafield>
-<datafield tag="773" ind1="" ind2=""><subfield code="a">10.1234/foo.bar</subfield><subfield code="i">cites</subfield><subfield code="n">doi</subfield></datafield>
-<datafield tag="773" ind1="" ind2=""><subfield code="a">1234.4321</subfield><subfield code="i">cites</subfield><subfield code="n">arxiv</subfield></datafield>
-<datafield tag="347" ind1="" ind2=""><subfield code="p">100</subfield></datafield>
-<datafield tag="999" ind1="C" ind2="5"><subfield code="x">Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12</subfield></datafield>
-<datafield tag="999" ind1="C" ind2="5"><subfield code="x">Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34</subfield></datafield>
+test_marc = """<record>
+  <controlfield tag="001">1</controlfield>
+  <datafield tag="942" ind1=" " ind2=" ">
+    <subfield code="a">2014-02-27</subfield>
+  </datafield>
+  <datafield tag="520" ind1=" " ind2=" ">
+    <subfield code="a">Test Description</subfield>
+  </datafield>
+  <datafield tag="711" ind1=" " ind2=" ">
+    <subfield code="c">Harvard-Smithsonian Center for Astrophysics</subfield>
+    <subfield code="a">The 13th Biennial HITRAN Conference</subfield>
+    <subfield code="g">HITRAN13</subfield>
+    <subfield code="d">23-25 June, 2014</subfield>
+    <subfield code="n">VI</subfield>
+    <subfield code="p">1</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">provisional-user-ecfunded</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="a">4</subfield>
+    <subfield code="9">CERN</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="a">user-zenodo</subfield>
+  </datafield>
+  <datafield tag="536" ind1=" " ind2=" ">
+    <subfield code="c">1234</subfield>
+    <subfield code="a">Grant Title</subfield>
+  </datafield>
+  <datafield tag="536" ind1=" " ind2=" ">
+    <subfield code="c">4321</subfield>
+    <subfield code="a">Title Grant</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="x">Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12</subfield>
+  </datafield>
+  <datafield tag="999" ind1="C" ind2="5">
+    <subfield code="x">Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="b">book</subfield>
+    <subfield code="a">publication</subfield>
+  </datafield>
+  <datafield tag="653" ind1="1" ind2=" ">
+    <subfield code="a">kw1</subfield>
+  </datafield>
+  <datafield tag="653" ind1="1" ind2=" ">
+    <subfield code="a">kw2</subfield>
+  </datafield>
+  <datafield tag="653" ind1="1" ind2=" ">
+    <subfield code="a">kw3</subfield>
+  </datafield>
+  <datafield tag="260" ind1=" " ind2=" ">
+    <subfield code="c">2014-02-27</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="a">Doe, Jane</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="a">Smith, John</subfield>
+  </datafield>
+  <datafield tag="035" ind1=" " ind2=" ">
+    <subfield code="9">Altmetric</subfield>
+    <subfield code="a">9876</subfield>
+  </datafield>
+  <datafield tag="024" ind1="7" ind2=" ">
+    <subfield code="2">DOI</subfield>
+    <subfield code="a">10.1234/foo.bar</subfield>
+  </datafield>
+  <datafield tag="540" ind1=" " ind2=" ">
+    <subfield code="u">http://zenodo.org</subfield>
+    <subfield code="a">Creative Commons</subfield>
+  </datafield>
+  <datafield tag="650" ind1="1" ind2="7">
+    <subfield code="a">cc-by</subfield>
+    <subfield code="2">opendefinition.org</subfield>
+  </datafield>
+  <datafield tag="245" ind1=" " ind2=" ">
+    <subfield code="a">Test title</subfield>
+  </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">notes</subfield>
+  </datafield>
+  <datafield tag="909" ind1="C" ind2="O">
+    <subfield code="o">oai:zenodo.org:1</subfield>
+    <subfield code="p">user-zenodo</subfield>
+    <subfield code="p">user-ecfunded</subfield>
+  </datafield>
+  <datafield tag="970" ind1=" " ind2=" ">
+    <subfield code="d">3</subfield>
+    <subfield code="a">2</subfield>
+  </datafield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="b">secondary</subfield>
+    <subfield code="a">pri</subfield>
+  </datafield>
+  <datafield tag="100" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="a">Doe, John</subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="a">10.1234/foo.bar</subfield>
+    <subfield code="i">cites</subfield>
+    <subfield code="n">doi</subfield>
+  </datafield>
+  <datafield tag="773" ind1=" " ind2=" ">
+    <subfield code="a">1234.4321</subfield>
+    <subfield code="i">cites</subfield>
+    <subfield code="n">arxiv</subfield>
+  </datafield>
+  <datafield tag="542" ind1=" " ind2=" ">
+    <subfield code="l">open</subfield>
+  </datafield>
+  <datafield tag="347" ind1=" " ind2=" ">
+    <subfield code="p">100</subfield>
+  </datafield>
 </record>"""
 
 test_form_json = {
@@ -91,7 +179,13 @@ test_form_json = {
     'references': [
         'Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12',
         'Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34',
-    ]
+    ],
+    'conference_title': 'The 13th Biennial HITRAN Conference',
+    'conference_place': 'Harvard-Smithsonian Center for Astrophysics',
+    'conference_dates': '23-25 June, 2014',
+    'conference_acronym': 'HITRAN13',
+    'conference_session': 'VI',
+    'conference_session_part': '1',
 }
 
 test_record = dict(
@@ -134,6 +228,14 @@ test_record = dict(
         {"identifier": "1234.4321", "scheme":
             "arxiv", "relation": "cites"},
     ],
+    meetings={
+        'title': 'The 13th Biennial HITRAN Conference',
+        'place': 'Harvard-Smithsonian Center for Astrophysics',
+        'dates': '23-25 June, 2014',
+        'acronym': 'HITRAN13',
+        'session': 'VI',
+        'session_part': '1',
+    },
     altmetric_id="9876",
     preservation_score="100",
     references=[
@@ -162,15 +264,31 @@ class TestReaders(InvenioTestCase):
 
     def test_marc_export(self):
         from invenio.modules.records.api import Record
-        #from invenio.legacy.bibrecord import create_record
+        from invenio.legacy.bibrecord import create_record, record_xml_output
 
-        r = Record(json=test_record, master_format='marc')
-        # self.assertEqual(
-        #     r.legacy_create_recstruct(),
-        #     create_record(test_marc)[0],
-        # )
+        rec = Record(json=test_record, master_format='marc')
 
-        form_json = r.produce('json_for_form')
+        # Needed to properly set authors when generating MARC
+        first = rec['authors'][0]
+        additional = rec['authors'][1:]
+        rec['_first_author'] = first
+        rec['_additional_authors'] = additional
+
+        output_marc = record_xml_output(
+            create_record(rec.legacy_export_as_marc())[0]
+        )
+        try:
+            self.assertEqual(test_marc, output_marc)
+        except AssertionError:
+            # Print diff in case of errors.
+            import difflib
+            diff = "".join(difflib.unified_diff(
+                test_marc.splitlines(1),
+                output_marc.splitlines(1)
+            ))
+            raise AssertionError(diff)
+
+        form_json = rec.produce('json_for_form')
         for k, v in test_form_json.items():
             self.assertEqual(form_json[k], test_form_json[k])
 

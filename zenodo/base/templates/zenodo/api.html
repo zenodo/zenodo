@@ -1856,6 +1856,18 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>URL of conference (e.g. http://www.chep2013.org/).</td>
 </tr>
 <tr>
+    <td><code>conference_session</code></td>
+    <td>String</td>
+    <td>No</td>
+    <td>Number of session within the conference (e.g. VI).</td>
+</tr>
+<tr>
+    <td><code>conference_session_part</code></td>
+    <td>String</td>
+    <td>No</td>
+    <td>Number of part within a session (e.g. 1).</td>
+</tr>
+<tr>
     <td><code>imprint_publisher</code></td>
     <td>String</td>
     <td>No</td>
@@ -1967,6 +1979,8 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 <h2 id="restapi-changes">Changes</h2>
 <dl>
+<dt>2014-10-21</dt>
+<dd><p>Added new optional fields <code>conference_session</code> and <code>conference_session_part</code> to deposition metadata.</p></dd>
 <dt>2014-09-09</dt>
 <dd><p>Added new optional field <code>references</code> to deposition metadata.</p></dd>
 <dt>2014-06-13</dt>
