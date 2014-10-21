@@ -25,7 +25,7 @@
 {% endblock %}
 
 {% block javascript %}
-<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="{{config.CFG_DROPBOX_API_KEY}}"></script>
+<script type="text/javascript" src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="{{config.DEPOSIT_DROPBOX_API_KEY}}"></script>
 <script type="text/javascript">
 
   require(
@@ -34,10 +34,10 @@
       "jquery",
       "js/deposit/form",
       "js/deposit/uploader/uploader",
-      "js/deposit/uploader/uploaders/plUploader",
-      "js/deposit/uploader/uploaders/dropboxUploader",
+      "js/deposit/uploader/uploaders/pluploader",
+      "js/deposit/uploader/uploaders/dropboxuploader",
       "js/deposit/uploader/ui/filelist",
-      "js/deposit/uploader/ui/errorList"
+      "js/deposit/uploader/ui/errorlist"
     ],
 
     function(
@@ -103,7 +103,7 @@
             complete_url: undefined,
             autocomplete_url: undefined,
             datepicker_element: '.datepicker',
-            datepicker_options: {dateFormat: "yy-mm-dd"}
+            datepicker_options: {dateFormat: "YYYY-MM-DD", pickTime: false}
           },
 
           uploader: {
