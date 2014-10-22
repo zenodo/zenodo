@@ -224,7 +224,10 @@ When you have the servers running, it is possible to upload the demo records.
 
     $ # in a new terminal
     $ workon zenodo
-    (zenodo)$ inveniomanage demosite populate --packages=zenodo.demosite
+    (zenodo)$ cdvirtualenv src/zenodo
+    (zenodo)$ inveniomanage demosite populate --packages=zenodo.demosite \
+              -f zenodo/testsuite/demo_zenodo_record_marc_data.xml \
+              -e force-recids
 
 And you may now open your favourite web browser on
 `http://0.0.0.0:4000/ <http://0.0.0.0:4000/>`_
