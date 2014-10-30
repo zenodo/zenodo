@@ -21,13 +21,16 @@
 
 {%- block results_actions scoped -%}{% endblock %}
 
+
 {% block render_search_results %}
 {% if collection.id != 1 %}
     {% include 'provisional_warning.html' %}
     <h1>{{collection.name_ln}}</h1>
 {% endif %}{{ super() }}{% endblock %}
 
-{% block search_result_settings scoped %}{% endblock %}
+
+{% block search_result_settings_display scoped %}{% endblock %}
+
 
 {%- block search_result_prefix -%}
 <div class="col-sm-1 col-xs-1">
@@ -35,7 +38,6 @@
   {{ recordloop.index+(pagination.page-1)*rg }}
 </div>
 {%- endblock search_result_prefix -%}
-
 
 {%- block search_result_record scoped -%}
 <div class="col-sm-10 col-xs-10">

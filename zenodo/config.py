@@ -199,6 +199,10 @@ CFG_PREVIEW_PREFERENCE = {
     '.zip': ['zip'],
 }
 
+CFG_SORTER_CONFIGURATION = pkg_resources.resource_filename(
+    'zenodo.base.sorterext', 'sorter.cfg'
+)
+
 
 DEPOSIT_TYPES = [
     "zenodo.modules.deposit.workflows.upload:upload",
