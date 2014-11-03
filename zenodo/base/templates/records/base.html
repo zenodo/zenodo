@@ -164,50 +164,52 @@
 {{ super() }}
 <script>
 {%- if of == 'hd' %}
-$(function () {
-  var reloadTab = function(target, path, idx) {
-    if( !$('#record_content' + idx).hasClass("loaded") ){
-      $.post(path, function(data) {
-        $('#record_content' + idx).html(data);
-        $('#record_content' + idx).addClass("loaded");
-        $(target).removeClass("loading");
+require(['jquery'], function($) {
+  $(function () {
+    var reloadTab = function(target, path, idx) {
+      if( !$('#record_content' + idx).hasClass("loaded") ){
+        $.post(path, function(data) {
+          $('#record_content' + idx).html(data);
+          $('#record_content' + idx).addClass("loaded");
+          $(target).removeClass("loading");
+        });
+      }
+    };
+
+    $('#record_detail a.tablink').on('click', function(event) {
+      var path = $(event.target).attr('href');
+      var idx = $(event.target).data('idx');
+      //event.preventDefault();
+      //event.stopImmediatePropagation();
+      if (typeof(window.history.pushState) == 'function') {
+        window.history.pushState({path:path}, document.title, path);
+      } else {
+        window.location.hash = '#!' + path;
+      }
+      if( !$('#record_content' + idx).hasClass("loaded") ){
+        $(event.target).addClass("loading");
+        reloadTab(event.target, path, idx);
+      }
+    });
+  });
+
+  {% if zenodo_files %}
+    $(function () {
+      $('.preview-link').on('click', function(event) {
+        $('#preview').show();
+        var filename = encodeURIComponent($(event.target).data('filename'));
+        $('#preview-iframe').attr("src","{{ url_for('previewer.preview', recid=recid) }}?filename="+filename);
       });
-    }
-  };
 
-  $('#record_detail a.tablink').on('click', function(event) {
-    var path = $(event.target).attr('href');
-    var idx = $(event.target).data('idx');
-    //event.preventDefault();
-    //event.stopImmediatePropagation();
-    if (typeof(window.history.pushState) == 'function') {
-      window.history.pushState({path:path}, document.title, path);
-    } else {
-      window.location.hash = '#!' + path;
-    }
-    if( !$('#record_content' + idx).hasClass("loaded") ){
-      $(event.target).addClass("loading");
-      reloadTab(event.target, path, idx);
-    }
-  });
+      var previewbutton = $('.preview-link:first');
+      if (previewbutton.html()) {
+        previewbutton.click();
+      } else {
+        $('#preview').hide();
+      }
+    });
+  {% endif %}
 });
-
-{% if zenodo_files %}
-$(function () {
-  $('.preview-link').on('click', function(event) {
-    $('#preview').show();
-    var filename = encodeURIComponent($(event.target).data('filename'));
-    $('#preview-iframe').attr("src","{{ url_for('previewer.preview', recid=recid) }}?filename="+filename);
-  });
-
-  var previewbutton = $('.preview-link:first');
-  if (previewbutton.html()) {
-    previewbutton.click();
-  } else {
-    $('#preview').hide();
-  }
-});
-{% endif %}
 {%- else %}
 {{ copy_to_clipboard_js() }}
 {%- endif %}
