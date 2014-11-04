@@ -504,4 +504,99 @@
     </datafield>
   </record>
 
+  <record>
+    <controlfield tag="001">12167</controlfield>
+    <controlfield tag="005">20141014104100.0</controlfield>
+    <datafield tag="520" ind1=" " ind2=" ">
+      <subfield code="a">
+        <p>Before now, models have not been successful in predicting the rapid growth of rocky cores of gas giant planets at large separations from their host stars. Timescales for growth have far outstripped the lifetime of the gaseous disk surrounding the young star, creating a paradox between the need for the core to accrete material and the depleted supply of gas and dust. I present a model for planetary core accretion taking into account the effect of surrounding gas on the dynamics between the core and the accretable material, thus altering the characteristics of the effective cross section of accretion of the planet. By replacing the Hill radius with a wind shearing (WISH) radius, which tracks the point at which a small particle is not sheared away from a core by differential gas drag force, and by imposing additional energy constraints which determine whether a particle will successfully decouple from the gas during its encounter with the core, I recalculate the timescales of growth of a planetary core under a number of varying parameters. I apply the results to the A-type HR8799 star system, including HR8799b, c, and d, roughly 10M<sub>J</sub> planets located at a separation of 68, 38, and 24 AU, respectively. Using the model, I reduce the &quot;last doubling&quot; timescales of growth predicted by classical gravitational focusing models by a factor of 1000, from 10<sup>7</sup> years to 10<sup>4</sup> years for HR8799b, c, and d, placing timescales of growth in all three cases within acceptable limits to agree with the lifetime of a gaseous disk and the deduced lifetimes of the planets. These results place within the realm of possibility that these 3 planets are formed by core accretion instead of gravitational instability. In exploring the timescales for growth of planetary cores in systems with varying parameters such as star size, disk density, and dust particle size distributions, I provide a model for predicting the possibility of driftless formation of a gas giant given the protoplanetary system&#39;s characteristics, which will help in future observational exoplanet discovery work.</p>
+      </subfield>
+    </datafield>
+    <datafield tag="540" ind1=" " ind2=" ">
+      <subfield code="u">http://www.opendefinition.org/licenses/cc-by</subfield>
+      <subfield code="a">Creative Commons Attribution</subfield>
+    </datafield>
+    <datafield tag="650" ind1="1" ind2="7">
+      <subfield code="a">cc-by</subfield>
+      <subfield code="2">opendefinition.org</subfield>
+    </datafield>
+    <datafield tag="245" ind1=" " ind2=" ">
+      <subfield code="a">
+        Are You There Gas? It's Me, Planet: The Effects of Gas on Growth of Gas Giant Cores through Planetesimal Accretion
+      </subfield>
+    </datafield>
+    <datafield tag="502" ind1=" " ind2=" ">
+      <subfield code="c">Harvard University</subfield>
+    </datafield>
+    <datafield tag="700" ind1=" " ind2=" ">
+      <subfield code="u">Harvard-Smithsonian Center for Astrophysics</subfield>
+      <subfield code="4">ths</subfield>
+      <subfield code="a">Murray-Clay, Ruth</subfield>
+    </datafield>
+    <datafield tag="773" ind1=" " ind2=" ">
+      <subfield code="a">10.5281/zenodo.12168</subfield>
+      <subfield code="i">isSupplementedBy</subfield>
+      <subfield code="n">doi</subfield>
+    </datafield>
+    <datafield tag="856" ind1="4" ind2=" ">
+      <subfield code="s">5897</subfield>
+      <subfield code="u">
+        https://zenodo.org/record/12167/files/wolansky_thesis_final.png?subformat=icon-90
+      </subfield>
+      <subfield code="x">icon-90</subfield>
+    </datafield>
+    <datafield tag="856" ind1="4" ind2=" ">
+      <subfield code="s">7146316</subfield>
+      <subfield code="u">
+        https://zenodo.org/record/12167/files/wolansky_thesis_final.pdf
+      </subfield>
+      <subfield code="z">0</subfield>
+    </datafield>
+    <datafield tag="909" ind1="C" ind2="O">
+      <subfield code="o">oai:zenodo.org:12167</subfield>
+      <subfield code="p">user-zenodo</subfield>
+      <subfield code="p">user-cfa-theses</subfield>
+      <subfield code="p">openaire</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">user-cfa-theses</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="a">user-zenodo</subfield>
+    </datafield>
+    <datafield tag="980" ind1=" " ind2=" ">
+      <subfield code="b">thesis</subfield>
+      <subfield code="a">publication</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">Gas giants</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">Accretion</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">Planetesimals</subfield>
+    </datafield>
+    <datafield tag="653" ind1="1" ind2=" ">
+      <subfield code="a">Gravitational force</subfield>
+    </datafield>
+    <datafield tag="260" ind1=" " ind2=" ">
+      <subfield code="c">2014-04-11</subfield>
+    </datafield>
+    <datafield tag="347" ind1=" " ind2=" ">
+      <subfield code="p">50</subfield>
+    </datafield>
+    <datafield tag="542" ind1=" " ind2=" ">
+      <subfield code="l">open</subfield>
+    </datafield>
+    <datafield tag="024" ind1="7" ind2=" ">
+      <subfield code="2">DOI</subfield>
+      <subfield code="a">10.5281/zenodo.12167</subfield>
+    </datafield>
+    <datafield tag="100" ind1=" " ind2=" ">
+      <subfield code="u">Harvard University</subfield>
+      <subfield code="a">Wolansky, Natania R.</subfield>
+    </datafield>
+  </record>
+
 </collection>
