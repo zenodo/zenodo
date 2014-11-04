@@ -69,6 +69,11 @@ exclude-result-prefixes="marc fn dc invenio">
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
                 </creatorName>
+                <xsl:if test="subfield[@code='u']">
+                <affiliation>
+                    <xsl:value-of select="subfield[@code='u']"/>
+                </affiliation>
+                </xsl:if>
                 </creator>
             </xsl:for-each>
             <xsl:for-each select="datafield[@tag=700][not(subfield[@code='4']='ths')]">
@@ -76,6 +81,11 @@ exclude-result-prefixes="marc fn dc invenio">
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
                 </creatorName>
+                <xsl:if test="subfield[@code='u']">
+                <affiliation>
+                    <xsl:value-of select="subfield[@code='u']"/>
+                </affiliation>
+                </xsl:if>
                 </creator>
             </xsl:for-each>
         </creators>
@@ -125,6 +135,11 @@ exclude-result-prefixes="marc fn dc invenio">
                 <xsl:for-each select="datafield[@tag=700][subfield[@code='4']='ths']">
                     <contributor contributorType="Supervisor">
                         <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
+                        <xsl:if test="subfield[@code='u']">
+                        <affiliation>
+                            <xsl:value-of select="subfield[@code='u']"/>
+                        </affiliation>
+                        </xsl:if>
                     </contributor>
                 </xsl:for-each>
             </contributors>
