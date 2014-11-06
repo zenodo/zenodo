@@ -307,13 +307,13 @@ CFG_WEB_API_KEY_ALLOWED_URL = [('api/deposit/\?', 0, False), ]
 CFG_WEB_API_KEY_ENABLE_SIGNATURE = False
 
 CFG_OAI_METADATA_FORMATS = {
-    'marcxml': (
-        'XOAIMARC',
+    'oai_dc': (
+        'XOAIDC',
         'http://www.openarchives.org/OAI/1.1/dc.xsd',
         'http://purl.org/dc/elements/1.1/'
     ),
-    'oai_dc': (
-        'XOAIDC',
+    'marcxml': (
+        'XOAIMARC',
         'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
         'http://www.loc.gov/MARC21/slim'
     ),
