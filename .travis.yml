@@ -49,10 +49,11 @@ before_install:
   - "sudo ln -s ${VIRTUAL_ENV}/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
   - "mkdir -p ${VIRTUAL_ENV}/var/invenio.base-instance/"
   - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
+  - "if test -e requirements.${TRAVIS_BRANCH}.txt; then REQUIREMENTS=requirements.${TRAVIS_BRANCH}.txt; else REQUIREMENTS=requirements.master.txt; fi;"
 
 # Build/install steps
 install:
-  - "travis_retry pip install -r requirements.${TRAVIS_BRANCH}.txt --exists-action i"
+  - "travis_retry pip install -r ${REQUIREMENTS} --exists-action i"
   - "inveniomanage bower > bower.json"
   - "bower install"
   - "inveniomanage collect > /dev/null"
