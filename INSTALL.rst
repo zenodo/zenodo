@@ -1,15 +1,16 @@
-Zenodo installation
-====================
+Installation
+=============
 
 1. About
 --------
 
-This document specifies how to install Zenodo for the first time.
+This document specifies how to install a development version of Zenodo for the
+first time. Production grade deployment is not covered here.
 
 2. Prerequisites
 ----------------
 
-First follow the section "2. Prerequisites" in `First Steps with Invenio <http://invenio.readthedocs.org/en/latest/getting-started/first-steps.html>`_.
+First follow the section "2. Prerequisites" in `First Steps with Invenio <http://invenio.readthedocs.org/en/latest/getting-started/first-steps.html#prerequisites>`_.
 
 3. Quick start
 --------------
@@ -40,7 +41,7 @@ updates to the repository.
     $ cd $HOME/src/invenio
     $ git remote add upstream https://github.com/inveniosoftware/invenio.git
     $ git fetch upstream
-    $ git remote add zenodo https://github.com/zenodo/invenio-op.git
+    $ git remote add zenodo https://github.com/zenodo/invenio.git
     $ git fetch zenodo
     $ cd $HOME/src/zenodo
     $ git remote add zenodo https://github.com/zenodo/zenodo.git
@@ -52,7 +53,7 @@ updates to the repository.
 
 We recommend to work using
 `virtual environments <http://www.virtualenv.org/>`_ so packages are installed
-in an isolated environemtn . ``(zenodo)$`` tells your that the
+in an isolated environment . ``(zenodo)$`` tells that your
 *zenodo* environment is the active one.
 
 .. code-block:: console
@@ -75,6 +76,9 @@ just created environment.
     (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo
     (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo master
 
+By default we checkout the development branches ``master`` for Zenodo and
+``pu-zenodo`` for Invenio (see :ref:`branches` for other possibilities).
+
 
 3.3 Installation
 ~~~~~~~~~~~~~~~~
@@ -87,15 +91,15 @@ installation:
     (zenodo)$ pip install -r requirements.txt --exists-action i
 
 .. NOTE::
-   The option ``--exists-action i`` for ``pip install` is needed to ensure that
+   The option ``--exists-action i`` for ``pip install`` is needed to ensure that
    the Invenio source code we just cloned will not be overwritten. If you
    omit it, you will be prompted about which action to take.
 
-For development environments you may also wish to install some extra libraries:
+For development environments you should install our git commit hooks that checks
+code according to our code quality standards:
 
 .. code-block:: console
 
-    (zenodo)$ pip install -r requirements-dev.txt --exists-action i
     (zenodo)$ cd $HOME/src/invenio/
     (zenodo)$ kwalitee githooks install
     (zenodo)$ cd $HOME/src/zenodo/
@@ -171,7 +175,7 @@ assets using the once that have been copied to the static folder.
 3.6. Initial data
 ~~~~~~~~~~~~~~~~~
 
-Once you have everything installed you can create database and populate it
+Once you have everything installed you can create the database and populate it
 with initial data.
 
 .. code-block:: console
@@ -232,53 +236,6 @@ When you have the servers running, it is possible to upload the demo records.
 And you may now open your favourite web browser on
 `http://0.0.0.0:4000/ <http://0.0.0.0:4000/>`_
 
-4. Extras (FIXME)
------------------
-
-4.1. Minting test DOIs via DataCite
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: console
-
-    (zenodo)$ inveniomanage config set CFG_DATACITE_USERNAME CERN.ZENODO
-    (zenodo)$ inveniomanage config set CFG_DATACITE_PASSWORD <password>
-
-
-4.2. Sign in with GitHub and ORCID
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Please see ``invenio/modules/oauthclient/contrib/github.py``, and
-``invenio/modules/oauthclient/contrib/orcid.py`` for how to register remote
-applications.
-
-.. code-block:: console
-
-    (zenodo)$ cdvirtualenv
-    (zenodo)$ vim var/invenio.base-instance/invenio.cfg
-
-Add the following configuration variable:
-
-.. code-block:: python
-
-    GITHUB_APP_CREDENTIALS = dict(
-        consumer_key="",
-        consumer_secret="",
-    )
-    ORCID_APP_CREDENTIALS = dict(
-        consumer_key="",
-        consumer_secret="",
-    )
-
-Note, that ORCID does not allow localhost to be used in redirect URIs thus
-making testing in development mode difficult.
-
-
-4.3. Logging to Sentry
-~~~~~~~~~~~~~~~~~~~~~~
-
-.. code-block:: console
-
-    (zenodo)$ inveniomanage config set SENTRY_DSN <sentry dsn url>
 
 
 4.4 Fetching pull requests

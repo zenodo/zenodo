@@ -18,13 +18,13 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-#################
-## Development ##
-#################
+## Base + test requirements
+-r test.requirements.txt
 
-## Requirements
--r dev.requirements.txt
-
-## Invenio and ZENODO
--e git+https://github.com/zenodo/invenio@pu-zenodo#egg=Invenio
--e .[development]
+## Development extras
+Flask-DebugToolbar==0.9.0
+ipython==2.3.0
+ipdb==0.8
+pip-tools==0.3.5
+sphinx_rtd_theme==0.1.6
+-e git+https://github.com/jirikuncar/invenio-kwalitee.git#egg=Invenio-Kwalitee

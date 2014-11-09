@@ -36,20 +36,16 @@ import os
 
 install_requires = [
     "Invenio[img]>=1.9999.3,<1.9999.4",
-    "qrcode==2.4.2",
     "altmetric",
     "beautifulsoup4",
-    "humanize==0.5",
+    "humanize",
     "github3.py>=0.9.0",
     "Pillow",
-    "mixer>=4.8.0",
 ]
 
 extras_require = {
     "development": [
         "Flask-DebugToolbar==0.9.0",
-        "setuptools>=2.2",
-        "setuptools-bower>=0.2,<1.0",
         "Invenio-Kwalitee",
         "ipython",
         "ipdb",
@@ -65,7 +61,7 @@ tests_require = [
     "unittest2>=0.5.1",
 ]
 
-# Get the version string.  Cannot be done with import!
+# Get the version string. Cannot be done with import!
 g = {}
 with open(os.path.join("zenodo", "version.py"), "rt") as fp:
     exec(fp.read(), g)

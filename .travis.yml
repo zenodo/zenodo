@@ -27,57 +27,47 @@ services:
   - redis
 
 python:
-  - "2.6"
+  - "2.7"
 
-# env:
-#     global:
-#         - AWS_S3_BUCKET="travis-pip-cache"
-#         - secure: "gUjC74EPpS/6Fg/nkw28qrLxEVWtsqOo1LoNLZrr/oa4ZWbcJaxttLxf3dpPQYF0o5Voq1HYs59ieEoZTDuXc6yvrVqdkHTCu1TE7g3CTud0l6USRjmDgyl/OEupQ9qGQOrdQakgMaFae2PC6N1bVy5Kx2kg5W6AdcJs5hBQb8A="
-#         - secure: "gc3SOEsARJBQR5Zpm9llZG5uu6W145Pkr02HGQvt9p96I9V/rm4RCMQMOleJFo+3dtlyceJ/B7tPxhVh9bIljGaHO1cgnUyaFwI/gCwPk6MWpDbKXMDSqUnxyp/1oz4UMmmZhx1Ob/0K9adDWTxF0U/mtwc3A4oclRRA2Cd2V4g="
-
-
+# Provisioning steps
 before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
-  # Fix for "MySQL Server has gone away" error.
-  - "echo -e '[server]\nmax_allowed_packet=256M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
+  - "echo -e '[server]\nmax_allowed_packet=1G' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
   - "sudo service mysql restart"
-#  # Required by traviscache.py caching script:
-#  - "pip install boto argparse"
-
-install:
-  - "sudo apt-get -qy install apache2 libapache2-mod-wsgi ssl-cert poppler-utils git subversion nodejs --fix-missing"
+  - "sudo apt-get -qy install apache2 libapache2-mod-wsgi libapache2-mod-xsendfile ssl-cert poppler-utils git subversion nodejs --fix-missing"
   - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
   - "sudo a2enmod actions"
   - "sudo a2enmod version"
   - "sudo a2enmod rewrite"
+  - "sudo a2enmod ssl"
+  - "sudo a2enmod xsendfile"
+  - "sudo a2dissite *default*"
   - "sudo mkdir -p /etc/apache2/ssl"
   - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
-  - "travis_retry pip install -r requirements.txt --exists-action i"
+  - "sudo ln -s ${VIRTUAL_ENV}/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
+  - "sudo ln -s ${VIRTUAL_ENV}/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
   - "mkdir -p ${VIRTUAL_ENV}/var/invenio.base-instance/"
   - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
+
+# Build/install steps
+install:
+  - "travis_retry pip install -r requirements.${TRAVIS_BRANCH}.txt --exists-action i"
   - "inveniomanage bower > bower.json"
   - "bower install"
   - "inveniomanage collect > /dev/null"
   - "inveniomanage assets build"
 
+# Post installation and database initialization
 before_script:
   - "inveniomanage apache create-config"
-  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
-  - "sudo ln -s $VIRTUAL_ENV/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
-  - "sudo /usr/sbin/a2dissite *default* || echo ':('"
-  - "sudo /usr/sbin/a2enmod ssl" # enable SSL module
-  - "sudo /usr/sbin/a2enmod xsendfile || echo ':('"
   - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
-  - "inveniomanage database init --yes-i-know || echo ':('"
-  - "inveniomanage database create || echo ':('"
+  - "inveniomanage database init --yes-i-know"
+  - "inveniomanage database create"
 
+# Tests
 script:
   - "python setup.py test"
-
-#after_success:
-#  # Cache site-packages, bin scripts and bower components.
-#  - "python traviscache.py -f ${TRAVIS_REPO_SLUG} -n cachepack-${TRAVIS_PYTHON_VERSION} -b ${AWS_S3_BUCKET} -c requirements.txt set ${VIRTUAL_ENV}/bin/ ${VIRTUAL_ENV}/lib/python${TRAVIS_PYTHON_VERSION}/site-packages/ `pwd`/zenodo/base/static/vendors/"
 
 notifications:
   email:
