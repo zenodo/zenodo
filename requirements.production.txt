@@ -26,5 +26,5 @@
 -r base.requirements.txt
 
 ## Invenio and ZENODO
--e git+https://github.com/zenodo/invenio@production#egg=Invenio
+-e git+https://github.com/zenodo/invenio.git@production#egg=Invenio
 -e .
