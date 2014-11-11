@@ -6,7 +6,7 @@ Reporting issues
 Please report all issues to our help desk by sending an email to
 info@zenodo.org.
 
-Developers should report issues via our either our issue tracking system on
+Developers should report issues via either our issue tracking system on
 https://its.cern.ch/jira/ or directly to Invenio on http://github.com/inveniosoftware/invenio/issues depending on the nature of the issue.
 
 .. _branches:
@@ -19,7 +19,7 @@ Zenodo has three active branches:
 * ``qa`` - Quality assurance branch (https://github.com/zenodo/zenodo/tree/qa).
 * ``production`` - Production branch (https://github.com/zenodo/zenodo/tree/production).
 
-Zenodo is further depend on specific versions of Invenio, which are managed using
+Zenodo depends on specific versions of Invenio, which are managed using
 an Invenio fork located at https://github.com/zenodo/invenio. The Invenio fork has
 three branches:
 
@@ -30,7 +30,7 @@ three branches:
 The main purpose of the Invenio fork is to 1) manage which specific version of Invenio that Zenodo works with, and 2) allow for applying hot and quick fixes prior to their integration in upstream Invenio. Deviations from upstream must be kept at a bare minimum to make rebasing to latest upstream Invenio as easy as possible and prevent the fork from diverging.
 
 .. note::
-    Our Invenio fork is regularly rebased to latest Invenio development version, thus be careful when fetching updates to not overwrite your own changes.
+    Our Invenio fork is regularly rebased to the latest Invenio development version, thus be careful when fetching updates to not overwrite your own changes.
 
 Tags
 ~~~~
