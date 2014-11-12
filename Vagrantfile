@@ -35,6 +35,10 @@ CFG_INVENIO2_DATABASE_NAME=zenodo \
 CFG_INVENIO2_DEMOSITE_POPULATE="-f zenodo/testsuite/demo_zenodo_record_marc_data.xml \
                                 -e force-recids" \
 ./invenio2-kickstart --yes-i-know --yes-i-really-know
+
+source /usr/local/bin/virtualenvwrapper.sh
+workon zenodo
+bibsched start
 SCRIPT
 
 Vagrant.configure("2") do |config|
