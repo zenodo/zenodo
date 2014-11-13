@@ -53,31 +53,24 @@ def badge(doi):
     badge_path = os.path.join(
         current_app.config['COLLECT_STATIC_ROOT'],
         "badges",
-        "%s.png" % doi_encoded
-    )
-
-    font_path = os.path.join(
-        blueprint.static_folder, "badges", "Trebuchet MS.ttf"
-    )
-    template_path = os.path.join(
-        blueprint.static_folder, "badges", "template.png"
+        "%s.svg" % doi_encoded
     )
 
     if not os.path.exists(os.path.dirname(badge_path)):
         os.makedirs(os.path.dirname(badge_path))
 
     if not os.path.isfile(badge_path):
-        create_badge(doi, badge_path, font_path, template_path)
+        create_badge(doi, badge_path)
 
     resp = make_response(open(badge_path, 'r').read())
-    resp.content_type = "image/png"
+    resp.content_type = "image/svg+xml"
     return resp
 
 
 #
 # Views
 #
-@blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
+@blueprint.route("/<int:user_id>/<path:repository>.svg", methods=["GET"])
 @ssl_required
 def index(user_id, repository):
     """ Generate a badge for a specific GitHub repository. """
@@ -98,7 +91,7 @@ def index(user_id, repository):
     return badge(doi)
 
 
-@blueprint.route("/doi/<path:doi>.png", methods=["GET"])
+@blueprint.route("/doi/<path:doi>.svg", methods=["GET"])
 @ssl_required
 def doi_badge(doi):
     """ Generate a badge for a specific DOI. """
