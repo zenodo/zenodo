@@ -20,8 +20,10 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-import urllib2
-
+try:
+    import urllib2
+except ImportError:
+    import urllib.request as urllib2
 
 def create_badge(text, output_path):
     """
@@ -29,5 +31,5 @@ def create_badge(text, output_path):
     """
     text = text.replace('/', '%2F')
     response = urllib2.urlopen('http://img.shields.io/badge/DOI-%s-blue.svg' % text)
-    with open(output_path, 'w') as f:
+    with open(output_path, 'wb') as f:
         f.write(response.read())
