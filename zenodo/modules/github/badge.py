@@ -20,47 +20,14 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-
-import numpy as np
-from PIL import Image
-from PIL import ImageFont
-from PIL import ImageDraw
+import urllib2
 
 
-def create_badge(text, output_path, font_path, template_path):
+def create_badge(text, output_path):
     """
-    Create a DOI badge
+    Retrieve an SVG DOI badge from shields.io
     """
-    font = ImageFont.truetype(font_path, 11)
-
-    # Open template
-    arr = np.asarray(Image.open(template_path))
-
-    # Get left vertical strip for the DOI label
-    label_strip = arr[:, 2]
-    value_strip = arr[:, 3]
-
-    # Splice into array
-    label_width = 28
-    value_width = 6 + font.getsize(text)[0]
-
-    for i in xrange(label_width):
-        arr = np.insert(arr, 3, label_strip, 1)
-    for i in xrange(value_width):
-        arr = np.insert(arr, label_width + 4, value_strip, 1)
-
-    im = Image.fromarray(arr)
-    draw = ImageDraw.Draw(im)
-    draw.text(
-        (6, 4),
-        "DOI",
-        (255, 255, 255),
-        font=font
-    )
-    draw.text(
-        (label_width + 8, 4),
-        text,
-        (255, 255, 255),
-        font=font
-    )
-    im.save(output_path)
+    text = text.replace('/', '%2F')
+    response = urllib2.urlopen('http://img.shields.io/badge/DOI-%s-blue.svg' % text)
+    with open(output_path, 'w') as f:
+        f.write(response.read())
