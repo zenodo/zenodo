@@ -32,7 +32,6 @@ UPLOAD_TYPES = [
     ('poster', 'Poster', [], 'fa fa-columns fa-2x fa-fw'),
     ('presentation', 'Presentation', [], 'fa fa-group fa-2x fa-fw'),
     ('dataset', 'Dataset', [], 'fa fa-table fa-2x fa-fw'),
-    #('Software', []),
     ('image', 'Image', [], 'fa fa-bar-chart-o fa-2x fa-fw'),
     ('video', 'Video/Audio', [], 'fa fa-film fa-2x fa-fw'),
     ('software', 'Software', [], 'fa fa-cogs fa-2x fa-fw'),

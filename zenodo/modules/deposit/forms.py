@@ -309,6 +309,7 @@ class ZenodoForm(WebDepositForm):
             ('article', 'Journal article'),
             ('patent', 'Patent'),
             ('preprint', 'Preprint'),
+            ('proposal', 'Proposal'),
             ('report', 'Report'),
             ('softwaredocumentation', 'Software documentation'),
             ('thesis', 'Thesis'),
