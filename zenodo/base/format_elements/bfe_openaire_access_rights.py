@@ -25,9 +25,10 @@ import time
 
 from flask import current_app
 from invenio.base.i18n import gettext_set_language
+from flask import url_for
 
 
-def format_element(bfo, as_label=False, only_restrictions=False):
+def format_element(bfo, as_label=False, only_restrictions=False, brief=False):
     CFG_ACCESS_RIGHTS = current_app.config['CFG_ACCESS_RIGHTS']
     ln = bfo.lang
     _ = gettext_set_language(ln)
@@ -42,6 +43,7 @@ def format_element(bfo, as_label=False, only_restrictions=False):
     submitter = bfo.field('8560_f')
     email = """<a href="mailto:%s">%s</a>""" % (cgi.escape(submitter, True), cgi.escape(submitter))
     access = _(dict(current_app.config['CFG_ACCESS_RIGHTS'])[access_rights])
+    url = url_for('record.metadata', recid=bfo.recID)
 
     if only_restrictions:
         if access_rights in ('embargoedAccess', 'embargoed'):
@@ -50,13 +52,25 @@ def format_element(bfo, as_label=False, only_restrictions=False):
             return """<dt>Restricted access</dt><dd>Please contact %s to access the files.</dd>""" % email
     elif as_label:
         if access_rights in ('embargoedAccess', 'embargoed'):
-            return """<a href="/search?p=542__l:embargoed" class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</a>""" % (embargo, _(access))
+            if brief:
+                return """<a href="%s" class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</a>""" % (url, embargo, _(access))
+            else:
+                return """<a href="/search?p=542__l:embargoed" class="label label-warning" rel="tooltip" title="Available as Open Access after %s">%s</a>""" % (embargo, _(access))
         elif access_rights in ('closedAccess', 'closed'):
-            return """<a href="/search?p=542__l:closed" class="label label-danger">%s</a>""" % _(access)
+            if brief:
+                return """<a href="%s" class="label label-danger">%s</a>""" % (url, access)
+            else:
+                return """<a href="/search?p=542__l:closed" class="label label-danger">%s</a>""" % _(access)
         elif access_rights in ('openAccess', 'open'):
-            return """<a href="/search?p=542__l:open" class="label label-success">%s</a>""" % _(access)
+            if brief:
+                return """<a href="%s" class="label label-success">%s</a>""" % (url, access)
+            else:
+                return """<a href="/search?p=542__l:open" class="label label-success">%s</a>""" % _(access)
         elif access_rights in ('restricteDaccess', 'restricted'):
-            return """<a href="/search?p=542__l:restricted" class="label label-warning">%s</a>""" % _(access)
+            if brief:
+                return """<a href="%s" class="label label-warning">%s</a>""" % (url, access)
+            else:
+                return """<a href="/search?p=542__l:restricted" class="label label-warning">%s</a>""" % _(access)
         elif access_rights == 'cc0':
             return """<a class="label label-success">%s</a>""" % _(access)
     else:
