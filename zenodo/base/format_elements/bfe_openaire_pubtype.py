@@ -22,8 +22,9 @@
 
 from flask import current_app
 from invenio.base.i18n import _
+from flask import url_for
 
-def format_element(bfo, as_label=False):
+def format_element(bfo, as_label=False, brief=False):
     ln = bfo.lang
     collections = bfo.fields('980__')
 
@@ -42,13 +43,16 @@ def format_element(bfo, as_label=False):
 
             name = _(dict(CFG_OPENAIRE_PUBTYPE_MAP)[collection])
             query = "980__a:%s" % collection
+            url = url_for('record.metadata', recid=bfo.recID)
 
             if subcollection:
                 name = _(dict(CFG_OPENAIRE_PUBTYPE_MAP)[subcollection])
                 query = "980__b:%s" % subcollection
-
             if as_label:
-                return """<a href="/search?p=%s" class="label label-inverse">%s</a>""" % (query, name)
+                if brief:
+                    return """<a href="%s" class="label label-inverse">%s</a>""" % (url, name)
+                else:
+                    return """<a href="/search?p=%s" class="label label-inverse">%s</a>""" % (query, name)
             else:
                 return name
         except KeyError:
