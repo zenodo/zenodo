@@ -30,7 +30,7 @@ class IdxPHRASE29F(db.Model):
 
     """Represents a IdxPHRASE29F record."""
 
-    __tablename__ = 'IdxPHRASE29F'
+    __tablename__ = 'idxPHRASE29F'
 
     id = db.Column(db.MediumInteger(9, unsigned=True),
                    primary_key=True,
@@ -43,7 +43,7 @@ class IdxPHRASE29R(db.Model):
 
     """Represents a IdxPHRASE29R record."""
 
-    __tablename__ = 'IdxPHRASE29R'
+    __tablename__ = 'idxPHRASE29R'
 
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                           db.ForeignKey(Bibrec.id),
@@ -59,7 +59,7 @@ class IdxWORD29F(db.Model):
 
     """Represents a IdxWORD29F record."""
 
-    __tablename__ = 'IdxWORD29F'
+    __tablename__ = 'idxWORD29F'
 
     id = db.Column(db.MediumInteger(9, unsigned=True),
                    primary_key=True,
@@ -73,7 +73,7 @@ class IdxWORD29R(db.Model):
 
     """Represents a IdxWORD29R record."""
 
-    __tablename__ = 'IdxWORD29R'
+    __tablename__ = 'idxWORD29R'
 
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                           db.ForeignKey(Bibrec.id),
@@ -89,7 +89,7 @@ class IdxPAIR29F(db.Model):
 
     """Represents a IdxPAIR29F record."""
 
-    __tablename__ = 'IdxPAIR29F'
+    __tablename__ = 'idxPAIR29F'
 
     id = db.Column(db.MediumInteger(9, unsigned=True),
                    primary_key=True,
@@ -103,7 +103,7 @@ class IdxPAIR29R(db.Model):
 
     """Represents a IdxPAIR28R record."""
 
-    __tablename__ = 'IdxPAIR29R'
+    __tablename__ = 'idxPAIR29R'
 
     id_bibrec = db.Column(db.MediumInteger(8, unsigned=True),
                           db.ForeignKey(Bibrec.id),
