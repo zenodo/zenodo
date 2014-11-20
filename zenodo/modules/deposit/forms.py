@@ -242,6 +242,21 @@ class CreatorForm(WebDepositForm):
         widget_classes='form-control',
         widget=ColumnInput(class_="col-xs-4 col-pad-0"),
     )
+    orcid = fields.TextField(
+        widget=widgets.HiddenInput(),
+        processors=[
+            PidNormalize(scheme='orcid'),
+        ],
+    )
+
+    def validate_orcid(form, field):
+        if field.data:
+            from invenio.utils import persistentid
+            schemes = persistentid.detect_identifier_schemes(
+                field.data or ''
+            )
+            if 'orcid' not in schemes:
+                raise ValidationError("Not a valid ORCID-identifier.")
 
 
 class CommunityForm(WebDepositForm):

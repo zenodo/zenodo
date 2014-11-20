@@ -67,9 +67,11 @@ test_marc = """<record>
   <datafield tag="999" ind1="C" ind2="5">
     <subfield code="x">Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34</subfield>
   </datafield>
-  <datafield tag="980" ind1=" " ind2=" ">
-    <subfield code="b">book</subfield>
-    <subfield code="a">publication</subfield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="4">ths</subfield>
+    <subfield code="a">Smith, Jane</subfield>
+    <subfield code="0">(orcid)0000000218250097</subfield>
   </datafield>
   <datafield tag="653" ind1="1" ind2=" ">
     <subfield code="a">kw1</subfield>
@@ -86,6 +88,7 @@ test_marc = """<record>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="a">Doe, Jane</subfield>
+    <subfield code="0">(orcid)0000000218250097</subfield>
   </datafield>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
@@ -110,8 +113,9 @@ test_marc = """<record>
   <datafield tag="245" ind1=" " ind2=" ">
     <subfield code="a">Test title</subfield>
   </datafield>
-  <datafield tag="500" ind1=" " ind2=" ">
-    <subfield code="a">notes</subfield>
+  <datafield tag="980" ind1=" " ind2=" ">
+    <subfield code="b">book</subfield>
+    <subfield code="a">publication</subfield>
   </datafield>
   <datafield tag="909" ind1="C" ind2="O">
     <subfield code="o">oai:zenodo.org:1</subfield>
@@ -126,9 +130,13 @@ test_marc = """<record>
     <subfield code="b">secondary</subfield>
     <subfield code="a">pri</subfield>
   </datafield>
+  <datafield tag="500" ind1=" " ind2=" ">
+    <subfield code="a">notes</subfield>
+  </datafield>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="a">Doe, John</subfield>
+    <subfield code="0">(orcid)000000021694233X</subfield>
   </datafield>
   <datafield tag="773" ind1=" " ind2=" ">
     <subfield code="a">10.1234/foo.bar</subfield>
@@ -154,9 +162,16 @@ test_form_json = {
         {'identifier': 'ecfunded', 'provisional': True},
         {'identifier': 'zenodo', 'provisional': False}],
     'creators': [
-        {'affiliation': 'CERN', 'name': 'Doe, John'},
-        {'affiliation': 'CERN', 'name': 'Doe, Jane'},
-        {'affiliation': 'CERN', 'name': 'Smith, John'}
+        {'affiliation': 'CERN', 'name': 'Doe, John',
+         'orcid': '000000021694233X'},
+        {'affiliation': 'CERN', 'name': 'Doe, Jane',
+         'orcid': '0000000218250097'},
+        {'affiliation': 'CERN', 'name': 'Smith, John',
+         'orcid': ''}
+    ],
+    'thesis_supervisors': [
+        {'affiliation': 'CERN', 'name': 'Smith, Jane',
+         'orcid': '0000000218250097'},
     ],
     'description': 'Test Description',
     'doi': '10.1234/foo.bar',
@@ -202,9 +217,15 @@ test_record = dict(
     publication_date="2014-02-27",
     title="Test title",
     authors=[
-        {'name': 'Doe, John', 'affiliation': 'CERN'},
-        {'name': 'Doe, Jane', 'affiliation': 'CERN'},
+        {'name': 'Doe, John', 'affiliation': 'CERN',
+         'orcid': '000000021694233X'},
+        {'name': 'Doe, Jane', 'affiliation': 'CERN',
+         'orcid': '0000000218250097'},
         {'name': 'Smith, John', 'affiliation': 'CERN'},
+    ],
+    thesis_supervisors=[
+        {'affiliation': 'CERN', 'name': 'Smith, Jane',
+         'orcid': '0000000218250097'},
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],

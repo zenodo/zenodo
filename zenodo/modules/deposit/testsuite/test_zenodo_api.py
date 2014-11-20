@@ -421,6 +421,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             type='dict', schema=dict(
                 name=dict(type='string'),
                 affiliation=dict(type='string'),
+                orcid=dict(type='string', nullable=True),
             )
         )),
         description=dict(type='string'),
@@ -464,6 +465,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             type='dict', schema=dict(
                 name=dict(type='string'),
                 affiliation=dict(type='string'),
+                orcid=dict(type='string', nullable=True),
             )
         )),
         thesis_university=dict(type='string'),
@@ -590,7 +592,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 conference_session='VI',
                 conference_session_part='1',
                 creators=[
-                    dict(name="Doe, John", affiliation="Atlantis"),
+                    dict(name="Doe, John", affiliation="Atlantis",
+                         orcid="0000-0002-1825-0097"),
                     dict(name="Smith, Jane", affiliation="Atlantis")
                 ],
                 description="Some description",
@@ -622,7 +625,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 ],
                 thesis_supervisors=[
                     dict(name="Doe Sr., John", affiliation="Atlantis"),
-                    dict(name="Smith Sr., Jane", affiliation="Atlantis")
+                    dict(name="Smith Sr., Jane", affiliation="Atlantis",
+                         orcid="http://orcid.org/0000-0002-1825-0097")
                 ],
                 thesis_university="Some thesis_university",
                 title="Test title",
@@ -842,6 +846,24 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             'depositionresource', urlargs=dict(resource_id=res_id), code=204
         )
 
+    def test_orcid(self):
+        response = self.post(
+            'depositionlistresource', data=self.get_test_data(
+                creators=[
+                    {'name': 'Lars', 'affiliation': 'CERN',
+                     'orcid': 'http://orcid.org/0000-0001-8135-3489'}
+                ],
+            ),
+            code=201,
+        )
+        res_id = response.json['id']
+        creator = response.json['metadata']['creators'][0]
+        self.assertEqual(creator['orcid'], '0000-0001-8135-3489')
+
+        response = self.delete(
+            'depositionresource', urlargs=dict(resource_id=res_id), code=204
+        )
+
     def test_grants(self):
         response = self.post(
             'depositionlistresource', data=self.get_test_data(
@@ -923,6 +945,15 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         response = self.post(
             'depositionlistresource', data=self.get_test_data(
                 creators=[{'affiliation': 'TEST'}, ]
+            ),
+            code=400,
+        )
+        self.assert_error('creators', response)
+
+        response = self.post(
+            'depositionlistresource', data=self.get_test_data(
+                creators=[{'name': 'TEST', 'affiliation': 'TEST',
+                           'orcid': 'INVALID'}, ]
             ),
             code=400,
         )
@@ -1611,8 +1642,10 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             u'conference_session': None,
             u'conference_session_part': None,
             u'creators': [
-                {u'affiliation': u'Atlantis', u'name': u'Doe, John'},
-                {u'affiliation': u'Atlantis', u'name': u'Smith, Jane'}
+                {u'affiliation': u'Atlantis', u'name': u'Doe, John',
+                 u'orcid': u''},
+                {u'affiliation': u'Atlantis', u'name': u'Smith, Jane',
+                 u'orcid': u''},
             ],
             u'description': u'<p>Test <em>Description</em></p>',
             u'embargo_date': None,
