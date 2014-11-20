@@ -21,14 +21,15 @@
 ## or submit itself to any jurisdiction.
 
 
-""" DOI Badge Blueprint. """
+"""DOI Badge Blueprint."""
 
 from __future__ import absolute_import
 
 import os
 import urllib
 
-from flask import Blueprint, make_response, abort, current_app
+from flask import Blueprint, make_response, abort, current_app, redirect, \
+    url_for
 
 from invenio.modules.pidstore.models import PersistentIdentifier
 from invenio.ext.sslify import ssl_required
@@ -46,7 +47,7 @@ blueprint = Blueprint(
 
 
 def badge(doi):
-    """ Helper method to generate DOI badge. """
+    """Helper method to generate DOI badge."""
     doi_encoded = urllib.quote(doi, '')
 
     # Check if badge already exists
@@ -73,7 +74,7 @@ def badge(doi):
 @blueprint.route("/<int:user_id>/<path:repository>.svg", methods=["GET"])
 @ssl_required
 def index(user_id, repository):
-    """ Generate a badge for a specific GitHub repository. """
+    """Generate a badge for a specific GitHub repository."""
     account = get_account(user_id=user_id)
 
     if repository not in account.extra_data["repos"]:
@@ -94,9 +95,23 @@ def index(user_id, repository):
 @blueprint.route("/doi/<path:doi>.svg", methods=["GET"])
 @ssl_required
 def doi_badge(doi):
-    """ Generate a badge for a specific DOI. """
+    """Generate a badge for a specific DOI."""
     pid = PersistentIdentifier.get("doi", doi)
 
     if pid is None:
         return abort(404)
     return badge(doi)
+
+
+@blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
+@ssl_required
+def index_old(user_id, repository):
+    """Legacy support for old badge icons."""
+    return redirect(url_for('.index', user_id=user_id, repository=repository))
+
+
+@blueprint.route("/doi/<path:doi>.png", methods=["GET"])
+@ssl_required
+def doi_badge_old(doi):
+    """Legacy support for old badge icons."""
+    return redirect(url_for('.doi_badge', doi=doi))
