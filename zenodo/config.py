@@ -197,6 +197,7 @@ ORCID_APP_CREDENTIALS = dict(
 CFG_PREVIEW_PREFERENCE = {
     '.pdf': ['pdfjs'],
     '.zip': ['zip'],
+    '.md': ['mistune'],
 }
 
 CFG_SORTER_CONFIGURATION = pkg_resources.resource_filename(

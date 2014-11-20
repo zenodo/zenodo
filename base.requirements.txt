@@ -95,6 +95,7 @@ kombu==3.0.21
 libmagic==1.0
 lxml==3.3.6
 mechanize==0.2.5
+mistune==0.4.1
 mixer==4.8.1
 msgpack-python==0.4.2
 nydus==0.10.8
