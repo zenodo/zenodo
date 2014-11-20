@@ -30,11 +30,13 @@ class KnwKBData(DataSet):
     class json_projects:
         id = 1
         name = "json_projects"
+        description = ""
         type = "w"
 
     class licenses:
         id = 2
         name = "licenses"
+        description = ""
         type = "w"
 
 
