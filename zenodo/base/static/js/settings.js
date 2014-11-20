@@ -37,14 +37,29 @@ require.config({
     "jquery-tokeninput": "vendors/jquery-tokeninput/src/jquery.tokeninput",
     "jquery-jeditable": "vendors/jquery.jeditable/index",
     "moment": "vendors/moment/moment",
+    "datatables": "vendors/datatables/media/js/jquery.dataTables",
+    "datatables-plugins": "vendors/datatables-plugins/integration/bootstrap/3/dataTables.bootstrap",
+    "datatables-tabletools": "vendors/datatables-tabletools/js/dataTables.tableTools",
     "bootstrap-datetimepicker": "vendors/eonasdan-bootstrap-datetimepicker/src/js/bootstrap-datetimepicker",
+    "bootstrap-tagsinput": "vendors/bootstrap-tagsinput/src/bootstrap-tagsinput",
     bootstrap: "vendors/bootstrap/dist/js/bootstrap",
+    prism: "vendors/prism/prism",
+    d3: "vendors/d3/d3.js",
+    "jasmine-jquery": "vendors/jasmine-jquery/lib/jasmine-jquery",
+    "jasmine-core": "vendors/jasmine/lib/jasmine-core/jasmine",
+    "jasmine-html": "vendors/jasmine/lib/jasmine-core/jasmine-html",
+    "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
+    "jasmine-boot": "js/jasmine/boot",
+    "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
     /* Zenodo extras */
     "bootstrap-switch": "vendors/bootstrap-switch/dist/js/bootstrap-switch"
   },
   shim: {
     jquery: {
       exports: "$"
+    },
+    d3: {
+      exports: "d3"
     },
     "jqueryui-timepicker/jquery-ui-sliderAccess": {
       deps: ["jquery"]
@@ -77,12 +92,47 @@ require.config({
       deps: ["jquery"],
       exports: "$.fn.editable"
     },
+    "bootstrap-tagsinput": {
+      deps: ["jquery"],
+      exports: "$.fn.tagsinput"
+    },
+    "datatables": {
+      deps: ["jquery"],
+      exports: "$.fn.dataTable"
+    },
     bootstrap: {
       deps: ["jquery"]
+    },
+    "datatables-plugins": {
+      deps: ["jquery", "bootstrap", "datatables"]
+    },
+    "datatables-tabletools": {
+      deps: ["jquery", "datatables"],
+      exports: "$.fn.dataTable.TableTools"
     },
     "bootstrap-datetimepicker": {
       deps: ["jquery", "bootstrap", "moment"],
       exports: "$.fn.datetimepicker"
+    },
+    prism: {
+      exports: "Prism"
+    },
+    "jasmine-core": {
+      exports: "jasmineRequire"
+    },
+    "jasmine-jquery": {
+      deps: ["jquery", "jasmine-boot"]
+    },
+    "jasmine-ajax": {
+      deps: ["jasmine-boot"],
+    },
+    "jasmine-html": {
+      deps: ["jasmine-core"],
+      exports: "jasmineRequire"
+    },
+    "vendors/jasmine/lib/jasmine-core/boot": {
+      deps: ['jasmine-html'],
+      exports: "window.onload",
     },
     /* Zenodo extras */
     "bootstrap-switch": {
