@@ -110,11 +110,11 @@
           </div>
         {%- endfor %}
         {%- if collection.reclist|length > 10 %}
-        <div class="row">
-            <ul class="pager">
-                <li><a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}" class="btn btn-info">{{ _('View all')}}  &rarr;</a></li>
-            </ul>
+        </br>
+        <div class="row" align="center">
+          <a href="{{ url_for('search.search', cc=collection.name, jrec=11)|safe }}" class="btn btn-info">{{ _('View all')}}  &rarr;</a>
         </div>
+        </br>
         {%- endif %}
         {%- else %}
         <div class="row">

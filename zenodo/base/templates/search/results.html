@@ -46,7 +46,7 @@
 </div>
 <div class="col-sm-1 col-xs-1">
 {%- if not collection.name.startswith('provisional-') %}
-  <ul class="pager pull-right view-record hidden-sm"><li><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></li></ul>{% endif %}
+  <div class="pull-right view-record hidden-sm"><a href="{{ url_for('record.metadata', recid=recid, ln=g.ln) }}" class="btn btn-info">{{ _('View')}}</a></div>{% endif %}
 </div>
 {%- endblock search_result_record -%}
 
