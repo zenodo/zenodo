@@ -131,19 +131,6 @@ def json_projects_kb_mapper(val):
     }
 
 
-def dummy_autocomplete(form, field, term, limit=50):
-    return [
-        {
-            'name': 'Nielsen, Lars',
-            'affiliation': 'CERN',
-        },
-        {
-            'name': 'Mele, Salvatore',
-            'affiliation': 'CERN',
-        }
-    ]
-
-
 def grants_validator(form, field):
     if field.data:
         for item in field.data:
@@ -224,10 +211,6 @@ class CreatorForm(WebDepositForm):
     name = fields.TextField(
         placeholder="Family name, First name",
         widget_classes='form-control',
-        #autocomplete=map_result(
-        #    dummy_autocomplete,
-        #    authorform_mapper
-        #),
         widget=ColumnInput(class_="col-xs-6"),
         validators=[
             required_if(
