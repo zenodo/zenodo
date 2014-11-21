@@ -33,7 +33,7 @@ python:
 before_install:
   - "sudo add-apt-repository -y ppa:chris-lea/node.js"
   - "sudo apt-get update"
-  - "echo -e '[mysqld]\nmax_allowed_packet = 1G\nquery_cache_limit = 3M\nquery_cache_size = 128M\nmax_connections = 10\ntmp_table_size = 256M\nmax_heap_table_size = 128M\ntable_open_cache = 1024\ncharacter-set-server = utf8\njoin_buffer_size = 1M\nkey_buffer_size = 64M\nopen_files_limit = 4096\nread_buffer_size = 1M\nread_rnd_buffer_size = 2M\nsort_buffer_size = 6M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
+  - "echo -e '[mysqld]\nmax_allowed_packet = 1G\nquery_cache_limit = 3M\nquery_cache_size = 128M\ntmp_table_size = 256M\nmax_heap_table_size = 128M\ntable_open_cache = 1024\ncharacter-set-server = utf8\njoin_buffer_size = 1M\nkey_buffer_size = 64M\nopen_files_limit = 4096\nread_buffer_size = 1M\nread_rnd_buffer_size = 2M\nsort_buffer_size = 6M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
   - "sudo service mysql restart"
   - "sudo apt-get -qy install apache2 libapache2-mod-wsgi libapache2-mod-xsendfile ssl-cert poppler-utils git subversion nodejs --fix-missing"
   - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""

@@ -1693,7 +1693,8 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><p>The creators/authors of the deposition. Each array element is an object with the attributes:</p>
     <ul>
       <li><code>name</code>: Name of creator in the format <em>Family name, First names</em></li>
-      <li><code>affiliation</code>: Affiliation of creator.</li>
+      <li><code>affiliation</code>: Affiliation of creator (optional).</li>
+      <li><code>orcid</code>: ORCID identifier of creator (optional).</li>
     </ul>
     <p>Example:</p>
     <pre>[{'name':'Doe, John', 'affiliation': 'ZENODO'},
@@ -1979,6 +1980,8 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 <h2 id="restapi-changes">Changes</h2>
 <dl>
+<dt>2014-11-20</dt>
+<dd><p>Added new optional subfield <code>orcid</code> to <code>creators</code> in deposition metadata.</p></dd>
 <dt>2014-10-21</dt>
 <dd><p>Added new optional fields <code>conference_session</code> and <code>conference_session_part</code> to deposition metadata.</p></dd>
 <dt>2014-09-09</dt>
