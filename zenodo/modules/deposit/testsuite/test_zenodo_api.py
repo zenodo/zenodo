@@ -1435,13 +1435,13 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         self.assertEqual(record['title'], "My new title")
         self.assertEqual(record['access_right'], "closed")
         self.assertEqual(record['authors'], [
-            dict(name="Smith, Jane", affiliation="Atlantis"),
-            dict(name="Doe, John", affiliation="Atlantis"),
+            dict(name="Smith, Jane", affiliation="Atlantis", orcid=''),
+            dict(name="Doe, John", affiliation="Atlantis", orcid=''),
         ])
         self.assertEqual(record['thesis_supervisors'], [
-            dict(name="Doe Jr., John", affiliation="Atlantis"),
-            dict(name="Smith Sr., Jane", affiliation="CERN"),
-            dict(name="Doe Sr., John", affiliation="CERN"),
+            dict(name="Doe Jr., John", affiliation="Atlantis", orcid=''),
+            dict(name="Smith Sr., Jane", affiliation="CERN", orcid=''),
+            dict(name="Doe Sr., John", affiliation="CERN", orcid=''),
         ])
         self.assertEqual(record.get('embargo_date'), None)
         self.assertEqual(record.get('license'), None)
