@@ -40,7 +40,7 @@ from invenio.modules.deposit.field_widgets import date_widget, \
     plupload_widget, ButtonWidget, ExtendedListWidget, \
     TagListWidget, TagInput, ItemWidget, CKEditorWidget, ColumnInput
 from invenio.modules.deposit.filter_utils import strip_string, sanitize_html
-from invenio.modules.deposit.validation_utils import doi_syntax_validator, \
+from invenio.modules.deposit.validation_utils import DOISyntaxValidator, \
     invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
     list_length, not_required_if, pid_validator, minted_doi_validator, \
     unchangeable
@@ -370,7 +370,7 @@ class ZenodoForm(WebDepositForm):
         " your upload.",
         placeholder="e.g. 10.1234/foo.bar...",
         validators=[
-            doi_syntax_validator,
+            DOISyntaxValidator(),
             pre_reserved_doi_validator(
                 'prereserve_doi',
                 prefix=CFG_DATACITE_DOI_PREFIX
@@ -902,7 +902,7 @@ class ZenodoEditForm(ZenodoForm, EditFormMixin):
         " your upload.",
         placeholder="e.g. 10.1234/foo.bar...",
         validators=[
-            doi_syntax_validator,
+            DOISyntaxValidator(),
             minted_doi_validator(prefix=CFG_DATACITE_DOI_PREFIX),
             invalid_doi_prefix_validator(prefix=CFG_DATACITE_DOI_PREFIX),
         ],
