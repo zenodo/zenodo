@@ -71,7 +71,7 @@ test_marc = """<record>
     <subfield code="u">CERN</subfield>
     <subfield code="4">ths</subfield>
     <subfield code="a">Smith, Jane</subfield>
-    <subfield code="0">(orcid)0000000218250097</subfield>
+    <subfield code="0">(orcid)0000-0002-1825-0097</subfield>
   </datafield>
   <datafield tag="653" ind1="1" ind2=" ">
     <subfield code="a">kw1</subfield>
@@ -88,7 +88,7 @@ test_marc = """<record>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="a">Doe, Jane</subfield>
-    <subfield code="0">(orcid)0000000218250097</subfield>
+    <subfield code="0">(orcid)0000-0002-1825-0097</subfield>
   </datafield>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
@@ -136,7 +136,7 @@ test_marc = """<record>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="a">Doe, John</subfield>
-    <subfield code="0">(orcid)000000021694233X</subfield>
+    <subfield code="0">(orcid)0000-0002-1694-233X</subfield>
   </datafield>
   <datafield tag="773" ind1=" " ind2=" ">
     <subfield code="a">10.1234/foo.bar</subfield>
@@ -163,15 +163,15 @@ test_form_json = {
         {'identifier': 'zenodo', 'provisional': False}],
     'creators': [
         {'affiliation': 'CERN', 'name': 'Doe, John',
-         'orcid': '000000021694233X'},
+         'orcid': '0000-0002-1694-233X'},
         {'affiliation': 'CERN', 'name': 'Doe, Jane',
-         'orcid': '0000000218250097'},
+         'orcid': '0000-0002-1825-0097'},
         {'affiliation': 'CERN', 'name': 'Smith, John',
          'orcid': ''}
     ],
     'thesis_supervisors': [
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
-         'orcid': '0000000218250097'},
+         'orcid': '0000-0002-1825-0097'},
     ],
     'description': 'Test Description',
     'doi': '10.1234/foo.bar',
@@ -218,14 +218,14 @@ test_record = dict(
     title="Test title",
     authors=[
         {'name': 'Doe, John', 'affiliation': 'CERN',
-         'orcid': '000000021694233X'},
+         'orcid': '0000-0002-1694-233X'},
         {'name': 'Doe, Jane', 'affiliation': 'CERN',
-         'orcid': '0000000218250097'},
+         'orcid': '0000-0002-1825-0097'},
         {'name': 'Smith, John', 'affiliation': 'CERN'},
     ],
     thesis_supervisors=[
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
-         'orcid': '0000000218250097'},
+         'orcid': '0000-0002-1825-0097'},
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],
@@ -282,6 +282,16 @@ class TestReaders(InvenioTestCase):
         form_json = r.produce('json_for_form')
         for k, v in test_form_json.items():
             self.assertEqual(form_json[k], test_form_json[k])
+
+    def test_json_for_ld(self):
+        from invenio.modules.records.api import Record
+        r = Record.create({'title': 'Test'}, 'json')
+
+        import copy
+        r = Record(json=copy.copy(test_record), master_format='marc')
+
+        ld = r.produce('json_for_ld')
+        print(ld)
 
     def test_marc_export(self):
         from invenio.modules.records.api import Record
