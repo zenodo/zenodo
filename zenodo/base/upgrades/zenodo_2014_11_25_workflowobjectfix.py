@@ -25,7 +25,11 @@ from sqlalchemy import *
 import logging
 
 
-depends_on = [u'zenodo_2014_03_18_hstrecord_autoincrement']
+depends_on = [
+    u'zenodo_2014_03_18_hstrecord_autoincrement',
+    u'oauth2server_2014_10_21_encrypted_token_columns',
+    u'oauthclient_2014_10_21_encrypted_token_column',
+]
 logger = logging.getLogger('invenio_upgrader')
 
 
