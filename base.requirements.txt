@@ -114,7 +114,6 @@ pep257==0.3.2
 pep8==1.5.7
 py==1.4.23
 pyPdf==1.13
-pyRXP==1.16
 pycparser==2.10
 pycrypto==2.6.1
 pyflakes==0.8.1
