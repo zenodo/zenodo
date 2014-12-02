@@ -93,8 +93,6 @@ importlib==1.0.3
 infinity==1.3
 intbitset==2.1.1
 intervals==0.3.1
-ipdb==0.8
-ipython==2.3.0
 isodate==0.5.0
 itsdangerous==0.24
 jellyfish==0.3.2
