@@ -36,6 +36,7 @@ Contents
    getting_started
    installation
    configuration
+   requirements
    contributing
    changes
    license

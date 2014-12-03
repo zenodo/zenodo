@@ -1,0 +1,39 @@
+#
+#
+#
+#
+#
+#
+# (at your option) any later version.
+# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# Copyright (C) 2014 CERN.
+# GNU General Public License for more details.
+# granted to it by virtue of its status as an Intergovernmental Organization
+# In applying this licence, CERN does not waive the privileges and immunities
+# Invenio, the packge itself or backward incompatible changes in newer versions
+# it under the terms of the GNU General Public License as published by
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# not be updated without also fixing the problem in Invenio or verifying that
+# of the package.
+# or submit itself to any jurisdiction.
+# Requirements in this file cannot easily be upgraded due to problems in
+# the Free Software Foundation, either version 3 of the License, or
+# the problem has been fixed in the newer version.
+# This file is part of ZENODO.
+# This means that when running ``pip-review`` these packages should in general
+# You should have received a copy of the GNU General Public License
+# ZENODO is distributed in the hope that it will be useful,
+# ZENODO is free software: you can redistribute it and/or modify
+
+## Pinned base requirements
+-e git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0
+https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
+
+Cerberus==0.7         # Invenio is locked on this version
+Flask-OAuthlib==0.6.0 # Issue in v0.7.0
+cryptography==0.6.0   # SQLAlchemy-Utils has locked on this version
+oauthlib==0.6.3       # Dependency of Flask-OAuthlib
+pyparsing==2.0.1      # Invenio is locked on this version
+requests==2.3.0       # Invenio is locked on this version
+urllib3==1.7.1        # httpretty is locked on this version

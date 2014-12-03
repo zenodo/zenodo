@@ -7,7 +7,18 @@ Please report all issues to our help desk by sending an email to
 info@zenodo.org.
 
 Developers should report issues via either our issue tracking system on
-https://its.cern.ch/jira/ or directly to Invenio on http://github.com/inveniosoftware/invenio/issues depending on the nature of the issue.
+http://github.com/zenodo/zenodo/issues or directly to Invenio on http://github.com/inveniosoftware/invenio/issues depending on the nature of the issue.
+
+Security issues
+~~~~~~~~~~~~~~~
+If you discover any security issue, please report it
+directly to info@zenodo.org (specifically **do not** report it to our GitHub
+repository). We will acknowledge the issue as fast as possible,
+and keep you updated on the progress of fixing the issue. We additional ask you
+to not publicize the issue until after we have fixed it. After we have fixed
+the issue we will publicly open and close an issue in our GitHub repository to
+document the issue and publicly credit you for finding it (with your permission
+of course).
 
 .. _branches:
 
