@@ -41,6 +41,7 @@ install_requires = [
     "humanize",
     "github3.py>=0.9.0",
     "Pillow",
+    "pyoai>=2.4.2",
 ]
 
 extras_require = {
