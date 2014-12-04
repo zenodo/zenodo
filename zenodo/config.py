@@ -199,6 +199,7 @@ CFG_PREVIEW_PREFERENCE = {
     '.pdf': ['pdfjs'],
     '.zip': ['zip'],
     '.md': ['mistune'],
+    '.csv': ['csv_dthreejs'],
 }
 
 CFG_SORTER_CONFIGURATION = pkg_resources.resource_filename(
