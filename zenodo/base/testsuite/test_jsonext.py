@@ -221,7 +221,7 @@ test_record = dict(
          'orcid': '0000-0002-1694-233X'},
         {'name': 'Doe, Jane', 'affiliation': 'CERN',
          'orcid': '0000-0002-1825-0097'},
-        {'name': 'Smith, John', 'affiliation': 'CERN'},
+        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': ''},
     ],
     thesis_supervisors=[
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
