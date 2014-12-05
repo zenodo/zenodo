@@ -58,7 +58,9 @@ tests_require = [
     "Flask-Testing>=0.4.1",
     "mock",
     "nose",
+    "nose-exclude",
     "selenium",
+    "coverage",
     "unittest2>=0.5.1",
 ]
 
@@ -89,6 +91,6 @@ setup(
             "zenodo = zenodo.config"
         ]
     },
-    test_suite='zenodo.testsuite.suite',
-    tests_require=tests_require
+    test_suite='nose.collector',
+    tests_require=tests_require,
 )

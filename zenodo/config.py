@@ -128,6 +128,7 @@ TEST_SUITES = [
     'zenodo.modules.github.testsuite',
     'zenodo.modules.preservationmeter.testsuite',
     'zenodo.modules.citationformatter.testsuite',
+    'zenodo.modules.grants.testsuite',
     # Run after records have been created by other tests
     'zenodo.base.testsuite',
     'zenodo.testsuite',
