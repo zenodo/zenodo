@@ -2,8 +2,8 @@
 ZENODO
 ======
 
-.. image:: https://travis-ci.org/zenodo/zenodo.png?branch=master
-    :target: https://travis-ci.org/zenodo/zenodo
+.. image:: https://api.shippable.com/projects/5477dd61d46935d5fbbed43b/badge?branchName=master
+    :target: https://app.shippable.com/projects/5477dd61d46935d5fbbed43b/builds/latest
 .. image:: https://coveralls.io/repos/zenodo/zenodo/badge.png?branch=master
     :target: https://coveralls.io/r/zenodo/zenodo
 

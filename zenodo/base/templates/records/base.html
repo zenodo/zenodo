@@ -69,10 +69,10 @@
         <tbody>
         {%- for file in zenodo_files|sort(attribute='comment') -%}
           <tr class="">
-              <td><a href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
-              <td>{{ file.md.strftime('%d %b %Y') }}</td>
-              <td>{{ file.size|filesizeformat }}</td>
-              <td><span class="pull-right">{% if file.get_superformat().lower() in config.CFG_PREVIEW_PREFERENCE %}<button class="btn preview-link btn-default" data-filename="{{file.get_full_name()}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-default" href="{{file.get_url()}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+              <td><a class="forcewrap" href="{{file.get_url()}}">{{ file.get_full_name() }}</a></td>
+              <td class="nowrap">{{ file.md.strftime('%d %b %Y') }}</td>
+              <td class="nowrap">{{ file.size|filesizeformat }}</td>
+              <td class="nowrap"><span class="pull-right">{% if file.get_superformat().lower() in config.CFG_PREVIEW_PREFERENCE %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.get_full_name()}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-xs btn-default" href="{{file.get_url()}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
             </tr>
           {%- endfor -%}
           </tbody>
