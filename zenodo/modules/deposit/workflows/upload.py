@@ -516,12 +516,15 @@ def api_validate_files():
             d = Deposition(obj)
             if len(d.files) < 1:
                 d.set_render_context(dict(
-                    message="Bad request",
+                    response=dict(
+                        message="Bad request",
+                        status=400,
+                        errors=[dict(
+                            message="Minimum one file must be provided.",
+                            code=error_codes['validation_error']
+                        )],
+                    ),
                     status=400,
-                    errors=[dict(
-                        message="Minimum one file must be provided.",
-                        code=error_codes['validation_error']
-                    )],
                 ))
                 d.update()
                 eng.halt("API: No files provided")

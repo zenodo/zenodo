@@ -1596,6 +1596,45 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
         self.assertStatus(response, 401)
 
+    def test_missing_file(self):
+        # Test data
+        test_data = dict(
+            metadata=dict(
+                upload_type="presentation",
+                title="Test title",
+                creators=[
+                    dict(name="Doe, John", affiliation="Atlantis"),
+                    dict(name="Smith, Jane", affiliation="Atlantis")
+                ],
+                description="Test Description",
+                publication_date="2013-05-08",
+            )
+        )
+
+        # Create deposition
+        response = self.post(
+            'depositionlistresource',
+            data=test_data,
+            code=201,
+        )
+        res_id = response.json['id']
+
+        # Publish edited deposition (missing file)
+        response = self.post(
+            'depositionactionresource',
+            urlargs=dict(resource_id=res_id, action_id='publish'),
+            code=400
+        )
+
+        self.assertTrue(response.json['message'])
+        self.assertTrue(response.json['errors'])
+        self.assertEqual(response.json['status'], 400)
+        self.assertEqual(len(response.json['errors']), 1)
+        self.assertEqual(
+            response.json['errors'][0],
+            dict(message="Minimum one file must be provided.", code=10)
+        )
+
     def test_empty_edit(self):
         """
         Test case when uploaded record has no changes, causing version id of
