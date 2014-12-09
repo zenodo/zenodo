@@ -27,7 +27,6 @@
 # ZENODO is free software: you can redistribute it and/or modify
 
 ## Pinned base requirements
--e git+git://github.com/mrjoes/flask-admin.git#egg=Flask-Admin-1.0.9.dev0
 https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP
 
 Cerberus==0.7         # Invenio is locked on this version

@@ -89,3 +89,60 @@ If an upgraded package causes issues, and the problem cannot easily be fixed,
 it should be moved from ``base.requirements.txt`` into
 ``base-pinned.requirements.txt`` so it is clear which packages can easily be
 updated and which cannot.
+
+Rebasing Invenio fork
+----------------------
+Zenodo depends on specific version of Invenio, which is managed using an
+Invenio fork located at https://github.com/zenodo/invenio. The Invenio fork
+must be rebased to the latest Invenio development version regularly to
+prevent it from diverging.
+
+First update your local *pu* branch with upstream changes:
+
+.. code-block:: console
+
+    (zenodo)$ cdvirtualenv src/invenio
+    (zenodo)$ git fetch upstream
+    (zenodo)$ git checkout pu
+    (zenodo)$ git merge --ff-only upstream/pu
+    (zenodo)$ git checkout pu-zenodo
+
+Review which of the commits in ``pu-zenodo`` that have already been integrated
+in Invenio:
+
+.. code-block:: console
+
+    (zenodo)$ git log --oneline pu..pu-zenodo
+
+Note, commits from pu-zenodo that was integrated in Invenio, will not
+automatically be filtered out since they usually have a different SHA.
+
+Review changes in ``pu``:
+
+.. code-block:: console
+
+    (zenodo)$ git log --oneline pu-zenodo..pu
+    (zenodo)$ git log -u pu-zenodo..pu
+
+Checklist:
+- Commit log (look for ``NOTE`` bullet points).
+- Requirements changes (``setup.py`` or ``requirements.txt``) must usually be
+  updated in ``base.requirements.txt``.
+- Bower shim changes (``invenio/base/static/js/settings.js``) must be updated
+  in ``zenodo/base/static/js/settings.js``.
+- New and/or changed database models (``models.py`` + upgrade scripts).
+- New modules which might need to be included in ``zenodo/config.py``.
+- New configuration variables (``config.py`` and ``invenio.conf``).
+
+Rebase Invenio fork:
+
+.. code-block:: console
+
+    (zenodo)$ git rebase -i pu
+
+Once rebased, make a pull request against Invenio with the commits in
+``pu-zenodo`` that are ready for integration:
+
+.. code-block:: console
+
+    (zenodo)$ git log --oneline pu..pu-zenodo
