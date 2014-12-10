@@ -158,13 +158,13 @@ def grant_kb_value(key_name):
 # Subforms
 #
 class RelatedIdentifierForm(WebDepositForm):
-    scheme = fields.TextField(
+    scheme = fields.StringField(
         label="",
         default='',
         widget_classes='',
         widget=widgets.HiddenInput(),
     )
-    identifier = fields.TextField(
+    identifier = fields.StringField(
         label="",
         placeholder="e.g. 10.1234/foo.bar...",
         validators=[
@@ -211,7 +211,7 @@ class RelatedIdentifierForm(WebDepositForm):
 
 
 class CreatorForm(WebDepositForm):
-    name = fields.TextField(
+    name = fields.StringField(
         placeholder="Family name, First name",
         widget_classes='form-control',
         widget=ColumnInput(class_="col-xs-6"),
@@ -223,12 +223,12 @@ class CreatorForm(WebDepositForm):
             ),
         ],
     )
-    affiliation = fields.TextField(
+    affiliation = fields.StringField(
         placeholder="Affiliation",
         widget_classes='form-control',
         widget=ColumnInput(class_="col-xs-4 col-pad-0"),
     )
-    orcid = fields.TextField(
+    orcid = fields.StringField(
         widget=widgets.HiddenInput(),
         processors=[
             PidNormalize(scheme='orcid'),
@@ -246,13 +246,13 @@ class CreatorForm(WebDepositForm):
 
 
 class CommunityForm(WebDepositForm):
-    identifier = fields.TextField(
+    identifier = fields.StringField(
         widget=widgets.HiddenInput(),
         processors=[
             replace_field_data('title', community_obj_value('title')),
         ],
     )
-    title = fields.TextField(
+    title = fields.StringField(
         placeholder="Start typing a community name...",
         autocomplete=community_autocomplete,
         widget=TagInput(),
@@ -268,17 +268,17 @@ class CommunityForm(WebDepositForm):
 
 
 class GrantForm(WebDepositForm):
-    id = fields.TextField(
+    id = fields.StringField(
         widget=widgets.HiddenInput(),
         processors=[
             replace_field_data('acronym', grant_kb_value('acronym')),
             replace_field_data('title', grant_kb_value('title'))
         ],
     )
-    acronym = fields.TextField(
+    acronym = fields.StringField(
         widget=widgets.HiddenInput(),
     )
-    title = fields.TextField(
+    title = fields.StringField(
         placeholder="Start typing a grant number, name or abbreviation...",
         autocomplete=kb_autocomplete(
             'json_projects',
@@ -455,7 +455,7 @@ class ZenodoForm(WebDepositForm):
         ],
     )
     keywords = fields.DynamicFieldList(
-        fields.TextField(
+        fields.StringField(
             widget_classes='form-control',
             widget=ColumnInput(class_="col-xs-10"),
         ),
@@ -585,7 +585,7 @@ class ZenodoForm(WebDepositForm):
     #
     # Journal
     #
-    journal_title = fields.TextField(
+    journal_title = fields.StringField(
         label="Journal title",
         description="Optional.",
         validators=[
@@ -607,44 +607,44 @@ class ZenodoForm(WebDepositForm):
         ],
         export_key='journal.title',
     )
-    journal_volume = fields.TextField(
+    journal_volume = fields.StringField(
         label="Volume", description="Optional.", export_key='journal.volume',
     )
-    journal_issue = fields.TextField(
+    journal_issue = fields.StringField(
         label="Issue", description="Optional.", export_key='journal.issue',
     )
-    journal_pages = fields.TextField(
+    journal_pages = fields.StringField(
         label="Pages", description="Optional.", export_key='journal.pages',
     )
 
     #
     # Book/report/chapter
     #
-    partof_title = fields.TextField(
+    partof_title = fields.StringField(
         label="Book title",
         description="Optional. "
                     "Title of the book or report which this "
                     "upload is part of.",
         export_key='part_of.title',
     )
-    partof_pages = fields.TextField(
+    partof_pages = fields.StringField(
         label="Pages",
         description="Optional.",
         export_key='part_of.pages',
     )
 
-    imprint_isbn = fields.TextField(
+    imprint_isbn = fields.StringField(
         label="ISBN",
         description="Optional.",
         placeholder="e.g 0-06-251587-X",
         export_key='isbn',
     )
-    imprint_publisher = fields.TextField(
+    imprint_publisher = fields.StringField(
         label="Publisher",
         description="Optional.",
         export_key='imprint.publisher',
     )
-    imprint_place = fields.TextField(
+    imprint_place = fields.StringField(
         label="Place",
         description="Optional.",
         placeholder="e.g city, country...",
@@ -668,7 +668,7 @@ class ZenodoForm(WebDepositForm):
         widget_classes='',
         min_entries=1,
     )
-    thesis_university = fields.TextField(
+    thesis_university = fields.StringField(
         description="Optional.",
         label='Awarding University',
         validators=[validators.optional()],
@@ -678,7 +678,7 @@ class ZenodoForm(WebDepositForm):
     #
     # Conference
     #
-    conference_title = fields.TextField(
+    conference_title = fields.StringField(
         label="Conference title",
         description="Optional.",
         validators=[
@@ -696,7 +696,7 @@ class ZenodoForm(WebDepositForm):
         ],
         export_key="meetings.title"
     )
-    conference_acronym = fields.TextField(
+    conference_acronym = fields.StringField(
         label="Acronym",
         description="Optional.",
         validators=[
@@ -714,29 +714,29 @@ class ZenodoForm(WebDepositForm):
         ],
         export_key="meetings.acronym",
     )
-    conference_dates = fields.TextField(
+    conference_dates = fields.StringField(
         label="Dates", description="Optional.",
         placeholder="e.g 21-22 November 2012...",
         export_key="meetings.dates",
     )
-    conference_place = fields.TextField(
+    conference_place = fields.StringField(
         label="Place",
         description="Optional.",
         placeholder="e.g city, country...",
         export_key="meetings.place",
     )
-    conference_url = fields.TextField(
+    conference_url = fields.StringField(
         label="Website",
         description="Optional. E.g. http://zenodo.org",
         validators=[validators.optional(), validators.URL()]
     )
-    conference_session = fields.TextField(
+    conference_session = fields.StringField(
         label="Session",
         description="Optional. Number of session within the conference.",
         placeholder="e.g VI",
         export_key="meetings.session",
     )
-    conference_session_part = fields.TextField(
+    conference_session_part = fields.StringField(
         label="Part",
         description="Optional. Number of part within a session.",
         placeholder="e.g 1",
