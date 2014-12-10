@@ -1760,13 +1760,13 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><p>Persistent identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs. Each array element is an object with the attributes:</p>
     <ul>
       <li><code>identifier</code>: The persistent identifier</li>
-      <li><code>relation</code>: Relationship. Controlled vocabulary (<code>isCitedBy</code>, <code>cites</code>, <code>isSupplementTo</code>, <code>isSupplementedBy</code>, <code>isNewVersionOf</code>, <code>isPreviousVersionOf</code>).</li>
+      <li><code>relation</code>: Relationship. Controlled vocabulary (<code>isCitedBy</code>, <code>cites</code>, <code>isSupplementTo</code>, <code>isSupplementedBy</code>, <code>isNewVersionOf</code>, <code>isPreviousVersionOf</code>, <code>isIdenticalTo</code>, <code>isPartOf</code>, <code>hasPart</code>).</li>
     </ul>
     <p>Example:</p>
     <pre>[
   {'relation': 'isSupplementTo', 'identifier':'10.1234/foo'},
-  {'relation': 'cites', 'identifier':'doi10.1234/bar'}
-]</pre><p>Note the identifier type (e.g. DOI) is automatically detected and validated by our system.</p></td>
+  {'relation': 'cites', 'identifier':'http://dx.doi.org/10.1234/bar'}
+]</pre><p>Note the identifier type (e.g. DOI) is automatically detected, and used to validate and normalize the identifier into a standard form.</p></td>
 </tr>
 <tr>
     <td><code>references</code></td>
