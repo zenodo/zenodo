@@ -135,8 +135,8 @@ change that especially if you have multiple local installations:
 ~~~~~~~~~~~
 
 Assets in non-development mode may be combined and minified using various
-filters (see :ref:`ext_assets`). We need to set the path to the binaries if
-they are not in the environment ``$PATH`` already.
+filters. We need to set the path to the binaries if they are not in the
+environment ``$PATH`` already.
 
 .. code-block:: console
 
@@ -249,7 +249,7 @@ And you may now open your favourite web browser on
 Add ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to the remote
 ``upstream``.
 
-.. code-block::
+.. code-block:: ini
 
     [remote "upstream"]
         url = git://github.com/inveniosoftware/invenio.git
@@ -265,7 +265,7 @@ Add ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to the remote
 Add ``fetch = +refs/pull/*/head:refs/remotes/upstream/pr/*`` to the remote
 ``zenodo``.
 
-.. code-block::
+.. code-block:: ini
 
     [remote "zenodo"]
         url = https://github.com/zenodo/zenodo.git

@@ -97,6 +97,10 @@ Invenio fork located at https://github.com/zenodo/invenio. The Invenio fork
 must be rebased to the latest Invenio development version regularly to
 prevent it from diverging.
 
+.. note::
+
+    This is normally done by an integrator, and not by every developer.
+
 First update your local *pu* branch with upstream changes:
 
 .. code-block:: console
@@ -114,7 +118,7 @@ in Invenio:
 
     (zenodo)$ git log --oneline pu..pu-zenodo
 
-Note, commits from pu-zenodo that was integrated in Invenio, will not
+Note, commits from ``pu-zenodo`` that was integrated in Invenio, will not
 automatically be filtered out since they usually have a different SHA.
 
 Review changes in ``pu``:
@@ -125,20 +129,28 @@ Review changes in ``pu``:
     (zenodo)$ git log -u pu-zenodo..pu
 
 Checklist:
-- Commit log (look for ``NOTE`` bullet points).
-- Requirements changes (``setup.py`` or ``requirements.txt``) must usually be
-  updated in ``base.requirements.txt``.
-- Bower shim changes (``invenio/base/static/js/settings.js``) must be updated
-  in ``zenodo/base/static/js/settings.js``.
-- New and/or changed database models (``models.py`` + upgrade scripts).
-- New modules which might need to be included in ``zenodo/config.py``.
-- New configuration variables (``config.py`` and ``invenio.conf``).
+ - Commit log (search for ``NOTE`` bullet points in commit messages).
+ - Requirements changes (i.e. changes to ``invenio/setup.py`` or
+   ``invenio/requirements.txt``) must usually be updated in Zenodo's
+   ``zenodo/base.requirements.txt``.
+ - Bower shim changes (i.e. ``invenio/base/static/js/settings.js``) must be
+   updated in ``zenodo/base/static/js/settings.js``.
+ - New and/or changed database models (i.e. ``models.py`` + upgrade scripts)
+   needs to properly tested prior to production deployment.
+ - New Invenio modules which might need to be included in
+   ``zenodo/config.py:PACKAGES``.
+ - New configuration variables (``config.py`` and ``invenio.conf``).
 
-Rebase Invenio fork:
+Rebase the Invenio fork's ``pu-zenodo`` branch (it is advisable to create a
+working branch and rebase that branch, since you may need several rebase
+iterations in case of conflicting changes):
 
 .. code-block:: console
 
+    (zenodo)$ git checkout -b aaa pu-zenodo
     (zenodo)$ git rebase -i pu
+    (zenodo)$ git branch -m pu-zenodo pu-zenodo-old
+    (zenodo)$ git branch -m aaa pu-zenodo
 
 Once rebased, make a pull request against Invenio with the commits in
 ``pu-zenodo`` that are ready for integration:

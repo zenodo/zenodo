@@ -19,6 +19,10 @@ Installation
 ============
 See INSTALL.rst
 
+Developer documentation
+=======================
+See http://zenodo.readthedocs.org
+
 Testing
 =======
 Running the tests are as simple as: ::

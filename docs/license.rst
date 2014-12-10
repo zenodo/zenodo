@@ -25,4 +25,10 @@ In applying this licence, CERN does not waive the privileges and immunities
 granted to it by virtue of its status as an Intergovernmental Organization
 or submit itself to any jurisdiction.
 
+Documentation
+-------------
+The Zenodo source code documentation as displayed on
+http://zenodo.readthedocs.org/ is licensed under `Creative Commons Attribution
+4.0 International (CC-BY) <https://creativecommons.org/licenses/by/4.0/>`_
+
 .. include:: ../AUTHORS

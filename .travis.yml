@@ -68,6 +68,7 @@ before_script:
 
 # Tests
 script:
+  - "sphinx-build -qnNW docs docs/_build/html"
   - "python setup.py test"
 
 notifications:
