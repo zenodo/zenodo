@@ -238,6 +238,12 @@ RULES = {
         'scheme': 'url',
         'text': 'Available in',
         'image': 'img/github.png',
+        }, {
+        'prefix': 'https://github.com',
+        'relation': 'isSupplementedBy',
+        'scheme': 'url',
+        'text': 'Available in',
+        'image': 'img/github.png',
         }],
 }
 
