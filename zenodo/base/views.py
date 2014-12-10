@@ -217,21 +217,28 @@ RULES = {
         'scheme': 'doi',
         'text': 'Published in',
         'image': 'img/f1000research.jpg',
-    }],
+        }],
     'inspire': [{
         'prefix': 'http://inspirehep.net/record/',
         'relation': 'isSupplementedBy',
         'scheme': 'url',
         'text': 'Available in',
         'image': 'img/inspirehep.png',
-    }],
+        }],
+    'briefideas': [{
+        'prefix': 'http://ideas.theoj.org/',
+        'relation': 'isIdenticalTo',
+        'scheme': 'url',
+        'text': 'Published in',
+        'image': 'img/briefideas.png',
+        }],
     'zenodo': [{
         'prefix': 'https://github.com',
         'relation': 'isSupplementTo',
         'scheme': 'url',
         'text': 'Available in',
         'image': 'img/github.png',
-    }]
+        }],
 }
 
 
