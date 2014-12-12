@@ -739,7 +739,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+            res_id, ObjectVersion.COMPLETED, WorkflowStatus.COMPLETED
         )
 
         self.run_deposition_tasks(res_id)
@@ -1087,7 +1087,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         from invenio.modules.workflows.engine import ObjectVersion, \
             WorkflowStatus
         self.assert_workflow_status(
-            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+            res_id, ObjectVersion.COMPLETED, WorkflowStatus.COMPLETED
         )
 
         # Second request will return forbidden since it's already published
@@ -1161,7 +1161,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+            res_id, ObjectVersion.COMPLETED, WorkflowStatus.COMPLETED
         )
 
         self.run_deposition_tasks(res_id)
@@ -1258,7 +1258,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         from invenio.modules.workflows.engine import ObjectVersion, \
             WorkflowStatus
         self.assert_workflow_status(
-            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+            res_id, ObjectVersion.COMPLETED, WorkflowStatus.COMPLETED
         )
 
         # Edit deposition - not possible yet (until fully integrated)
@@ -1412,7 +1412,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+            res_id, ObjectVersion.COMPLETED, WorkflowStatus.COMPLETED
         )
 
         # Edit deposition - not possible yet (until fully integrated)
@@ -1499,7 +1499,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
 
         self.assert_workflow_status(
-            res_id, ObjectVersion.FINAL, WorkflowStatus.COMPLETED
+            res_id, ObjectVersion.COMPLETED, WorkflowStatus.COMPLETED
         )
 
         # Discard changes - state of resource changed (no longer a valid
