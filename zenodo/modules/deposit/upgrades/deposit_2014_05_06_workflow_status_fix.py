@@ -100,18 +100,18 @@ def do_upgrade():
                     del sip.metadata[k]
             d.run_workflow(headless=True)
         elif is_done(d):
-            if o.version != ObjectVersion.FINAL or o.workflow.status != WorkflowStatus.COMPLETED:
+            if o.version != ObjectVersion.COMPLETED or o.workflow.status != WorkflowStatus.COMPLETED:
                 if o.version == ObjectVersion.HALTED and o.workflow.status == ObjectVersion.HALTED:
                     warn(o, 'DONE', "wf status %s -> %s" % (o.workflow.status, WorkflowStatus.COMPLETED))
-                    warn(o, 'DONE', "obj version %s -> %s" % (o.version, ObjectVersion.FINAL))
+                    warn(o, 'DONE', "obj version %s -> %s" % (o.version, ObjectVersion.COMPLETED))
                     o.workflow.status = WorkflowStatus.COMPLETED
-                    o.version = ObjectVersion.FINAL
-                elif o.version == ObjectVersion.FINAL and o.workflow.status == 5:
+                    o.version = ObjectVersion.COMPLETED
+                elif o.version == ObjectVersion.COMPLETED and o.workflow.status == 5:
                     warn(o, 'DONE', "wf status %s -> %s" % (o.workflow.status, WorkflowStatus.COMPLETED))
                     o.workflow.status = WorkflowStatus.COMPLETED
                 elif o.version == ObjectVersion.HALTED and o.workflow.status == WorkflowStatus.COMPLETED:
-                    warn(o, 'DONE', "obj version %s -> %s" % (o.version, ObjectVersion.FINAL))
-                    o.version = ObjectVersion.FINAL
+                    warn(o, 'DONE', "obj version %s -> %s" % (o.version, ObjectVersion.COMPLETED))
+                    o.version = ObjectVersion.COMPLETED
                 else:
                     warn(o, 'DONE', "Unmatched version %s status %s" % (o.version, o.workflow.status if o.workflow else None))
             else:
