@@ -265,7 +265,7 @@ CFG_SITE_LANGS = ["en"]
 CFG_SITE_TAG = "LOCAL"
 CFG_SITE_EMERGENCY_EMAIL_ADDRESSES = {'*': 'team@zenodo.org'}
 
-CFG_SITE_ADMIN_EMAIL = "admin@zenodo.org"
+CFG_SITE_ADMIN_EMAIL = "zenodo-admin@cern.ch"
 CFG_SITE_SUPPORT_EMAIL = "info@zenodo.org"
 CFG_OPENAIRE_CURATORS = ["team@zenodo.org"]
 

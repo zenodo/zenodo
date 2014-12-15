@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of ZENODO.
-## Copyright (C) 2012, 2013 CERN.
+## Copyright (C) 2012, 2013, 2014 CERN.
 ##
 ## ZENODO is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ def large_file_notification(sender, deposition=None, deposition_file=None,
     if deposition_file and deposition_file.size > 10485760:
         current_app.logger.info(deposition_file.__getstate__())
         send_email(
-            cfg['CFG_SITE_ADMIN_EMAIL'],
+            cfg['CFG_SITE_SUPPORT_EMAIL'],
             cfg['CFG_SITE_ADMIN_EMAIL'],
             subject="%s: %s file uploaded" % (
                 cfg['CFG_SITE_NAME'], nice_size(deposition_file.size)
