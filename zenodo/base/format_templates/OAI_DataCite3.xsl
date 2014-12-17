@@ -42,8 +42,8 @@ exclude-result-prefixes="marc fn dc invenio">
         <xsl:if test="record">
             <oai_datacite xsi:schemaLocation="http://schema.datacite.org/oai/oai-1.0/ http://schema.datacite.org/oai/oai-1.0/oai.xsd">
                 <isReferenceQuality>true</isReferenceQuality>
-                <schemaVersion>3.0</schemaVersion>
-                <datacentreSymbol>DK.OPENAIRE</datacentreSymbol>
+                <schemaVersion>3.1</schemaVersion>
+                <datacentreSymbol>CERN.ZENODO</datacentreSymbol>
                 <payload>
                     <resource xmlns="http://datacite.org/schema/kernel-3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-3 http://schema.datacite.org/meta/kernel-3/metadata.xsd">
                     <xsl:apply-templates />
@@ -53,16 +53,19 @@ exclude-result-prefixes="marc fn dc invenio">
         </xsl:if>
     </xsl:template>
     <xsl:template match="record" xmlns="http://datacite.org/schema/kernel-3">
+        <xsl:variable name="access" select="datafield[@tag=542]/subfield[@code='l']"/>
         <!-- 1. Identifier -->
         <xsl:choose>
             <xsl:when test="datafield[@tag=024 and @ind1=7]">
                 <xsl:for-each select="datafield[@tag=024 and @ind1=7]">
-                    <identifier>
-                        <xsl:attribute name="identifierType">
-                            <xsl:value-of select="subfield[@code='2']"/>
-                     </xsl:attribute>
-                        <xsl:value-of select="subfield[@code='a']"/>
-                    </identifier>
+                    <xsl:if test="subfield[@code='2'] = 'DOI'">
+                        <identifier>
+                            <xsl:attribute name="identifierType">
+                                <xsl:value-of select="subfield[@code='2']"/>
+                         </xsl:attribute>
+                            <xsl:value-of select="subfield[@code='a']"/>
+                        </identifier>
+                    </xsl:if>
                 </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
@@ -76,13 +79,23 @@ exclude-result-prefixes="marc fn dc invenio">
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
                 </creatorName>
+                <xsl:if test="subfield[@code='u']">
+                <affiliation>
+                    <xsl:value-of select="subfield[@code='u']"/>
+                </affiliation>
+                </xsl:if>
                 </creator>
             </xsl:for-each>
-            <xsl:for-each select="datafield[@tag=700]">
+            <xsl:for-each select="datafield[@tag=700][not(subfield[@code='4']='ths')]">
                 <creator>
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
                 </creatorName>
+                <xsl:if test="subfield[@code='u']">
+                <affiliation>
+                    <xsl:value-of select="subfield[@code='u']"/>
+                </affiliation>
+                </xsl:if>
                 </creator>
             </xsl:for-each>
         </creators>
@@ -121,12 +134,22 @@ exclude-result-prefixes="marc fn dc invenio">
             </subjects>
         </xsl:if>
         <!-- 7. Contributor -->
-        <xsl:if test="datafield[@tag=536]">
+        <xsl:if test="datafield[@tag=536] or datafield[@tag=700][subfield[@code='4']='ths']">
             <contributors>
                 <xsl:for-each select="datafield[@tag=536]">
                     <contributor contributorType="Funder">
                         <contributorName>European Commission</contributorName>
                         <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
+                    </contributor>
+                </xsl:for-each>
+                <xsl:for-each select="datafield[@tag=700][subfield[@code='4']='ths']">
+                    <contributor contributorType="Supervisor">
+                        <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
+                        <xsl:if test="subfield[@code='u']">
+                        <affiliation>
+                            <xsl:value-of select="subfield[@code='u']"/>
+                        </affiliation>
+                        </xsl:if>
                     </contributor>
                 </xsl:for-each>
             </contributors>
@@ -189,9 +212,24 @@ exclude-result-prefixes="marc fn dc invenio">
             <xsl:for-each select="datafield[@tag=020]">
                 <alternateIdentifier alternateIdentifierType="ISBN"><xsl:value-of select="subfield[@code='a']"/></alternateIdentifier>
             </xsl:for-each>
+            <xsl:for-each select="datafield[@tag=024 and @ind1='7']">
+                <xsl:if test="subfield[@code='2'] != 'DOI'">
+                    <alternateIdentifier>
+                    <xsl:attribute name="alternateIdentifierType">
+                        <xsl:choose>
+                            <xsl:when test="subfield[@code='2']='handle'">Handle</xsl:when>
+                            <xsl:when test="subfield[@code='2']='ads'">bibcode</xsl:when>
+                            <xsl:when test="subfield[@code='2']='arxiv'">arXiv</xsl:when>
+                            <xsl:otherwise><xsl:value-of select="translate(subfield[@code='2'], $LOWERCASE, $UPPERCASE)"/></xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:value-of select="subfield[@code='a']"/>
+                    </alternateIdentifier>
+                </xsl:if>
+            </xsl:for-each>
         </alternateIdentifiers>
         <!-- 12 RelatedIdentifier -->
-        <xsl:if test="datafield[@tag=773]/subfield[@code='n']">
+        <xsl:if test="datafield[@tag=773]/subfield[@code='n'] or datafield[@tag=856 and @ind1=4]">
             <xsl:if test="datafield[@tag=773]/subfield[@code='n']='doi' or
                 datafield[@tag=773]/subfield[@code='n']='ark' or
                 datafield[@tag=773]/subfield[@code='n']='ean13' or
@@ -205,11 +243,16 @@ exclude-result-prefixes="marc fn dc invenio">
                 datafield[@tag=773]/subfield[@code='n']='purl' or
                 datafield[@tag=773]/subfield[@code='n']='upc' or
                 datafield[@tag=773]/subfield[@code='n']='url' or
-                datafield[@tag=773]/subfield[@code='n']='urn'">
+                datafield[@tag=773]/subfield[@code='n']='urn' or
+                datafield[@tag=773]/subfield[@code='n']='ads' or
+                datafield[@tag=773]/subfield[@code='n']='arxiv' or
+                ($access = 'open' and (not(datafield[@tag=856 and @ind1=4]/subfield[@code='x']) or
+                not(datafield[@tag=856 and @ind1=4]/subfield[@code='y'])))">
                 <relatedIdentifiers>
                     <xsl:for-each select="datafield[@tag=773]">
                         <xsl:choose>
-                            <xsl:when test="subfield[@code='n']='doi' or subfield[@code='n']='ark' or subfield[@code='n']='ean13' or subfield[@code='n']='eissn' or subfield[@code='n']='handle' or subfield[@code='n']='isbn' or subfield[@code='n']='issn' or subfield[@code='n']='istc' or subfield[@code='n']='lissn' or subfield[@code='n']='lsid' or subfield[@code='n']='purl' or subfield[@code='n']='upc' or subfield[@code='n']='url' or subfield[@code='n']='urn'">
+                            <xsl:when test="subfield[@code='n']='doi' or subfield[@code='n']='ark' or subfield[@code='n']='ean13' or subfield[@code='n']='eissn' or subfield[@code='n']='handle' or subfield[@code='n']='isbn' or subfield[@code='n']='issn' or subfield[@code='n']='istc' or subfield[@code='n']='lissn' or subfield[@code='n']='lsid' or subfield[@code='n']='purl' or subfield[@code='n']='upc' or
+                            subfield[@code='n']='ads' or subfield[@code='n']='arxiv' or subfield[@code='n']='url' or subfield[@code='n']='urn'">
                                 <relatedIdentifier relationType="IsReferencedBy">
                                     <xsl:attribute name="relationType">
                                     <xsl:choose>
@@ -220,6 +263,8 @@ exclude-result-prefixes="marc fn dc invenio">
                                     <xsl:attribute name="relatedIdentifierType">
                                     <xsl:choose>
                                         <xsl:when test="subfield[@code='n']='handle'">Handle</xsl:when>
+                                        <xsl:when test="subfield[@code='n']='ads'">bibcode</xsl:when>
+                                        <xsl:when test="subfield[@code='n']='arxiv'">arXiv</xsl:when>
                                         <xsl:otherwise><xsl:value-of select="translate(subfield[@code='n'],$LOWERCASE,$UPPERCASE)"/></xsl:otherwise>
                                     </xsl:choose>
                                     </xsl:attribute><xsl:value-of select="subfield[@code='a']"/>
@@ -227,6 +272,18 @@ exclude-result-prefixes="marc fn dc invenio">
                             </xsl:when>
                         </xsl:choose>
                     </xsl:for-each>
+                    <xsl:if test="datafield[@tag=856 and @ind1=4] and $access='open'">
+                        <xsl:for-each select="datafield[@tag=856 and @ind1=4]">
+                            <xsl:choose>
+                                <xsl:when test="not(subfield[@code='x']) and not(subfield[@code='y'])">
+                                    <relatedIdentifier relationType="HasPart" relatedIdentifierType="URL">
+                                        <xsl:value-of select="subfield[@code='u']"/>
+
+                                    </relatedIdentifier>
+                                </xsl:when>
+                            </xsl:choose>
+                        </xsl:for-each>
+                    </xsl:if>
                 </relatedIdentifiers>
             </xsl:if>
         </xsl:if>
@@ -294,6 +351,15 @@ exclude-result-prefixes="marc fn dc invenio">
                     <xsl:value-of select="subfield[@code='a']"/>
                 </description>
             </xsl:for-each>
+            <xsl:if test="datafield[@tag='999' and @ind1='C' and @ind2='5']">
+                <description descriptionType="Other">
+                    {'references' : [
+                    <xsl:for-each select="datafield[@tag='999' and @ind1='C' and @ind2='5']">
+                        "<xsl:value-of select="subfield[@code='x']"/>",
+                    </xsl:for-each>
+                    ]}
+                </description>
+            </xsl:if>
         </descriptions>
     </xsl:template>
 </xsl:stylesheet>

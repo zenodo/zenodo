@@ -38,7 +38,16 @@
         {% if related_url %}<a href="{{related_id|pid_url}}">{{related_id.identifier}}</a>{% else %}<i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}){% endif %}{% if not loop.last %}, {% endif %}
     {%- endfor %}
     {%- endfor %}
-
+    {%- for alternateid in record.alternate_identifiers %}
+    {%- set alternate_url = alternateid|pid_url -%}
+    {%- if loop.first %}<dt>Alternate identifiers:</dt><dd>{% endif %}
+        {%- if alternate_url -%}
+            <a href="{{alternate_url}}">{{alternateid.scheme}}:{{alternateid.identifier}}</a>
+        {%- else -%}
+            {{alternateid.scheme}}:{{alternateid.identifier}}
+        {%- endif -%}
+    {%- if loop.last %}</dd>{% endif %}
+    {%- endfor %}
     {{ bfe_appears_in_collections(bfo, prefix='<dt>Collections:</dt><dd>', suffix='</dd>') }}
     {{ bfe_openaire_license(bfo, prefix='<dt>License (for files):</dt><dd>', suffix='</dd>') }}
     {% if bfo.field('8560_y') %}

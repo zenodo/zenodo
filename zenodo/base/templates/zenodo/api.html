@@ -1760,7 +1760,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><p>Persistent identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs. Each array element is an object with the attributes:</p>
     <ul>
       <li><code>identifier</code>: The persistent identifier</li>
-      <li><code>relation</code>: Relationship. Controlled vocabulary (<code>isCitedBy</code>, <code>cites</code>, <code>isSupplementTo</code>, <code>isSupplementedBy</code>, <code>isNewVersionOf</code>, <code>isPreviousVersionOf</code>, <code>isIdenticalTo</code>, <code>isPartOf</code>, <code>hasPart</code>).</li>
+      <li><code>relation</code>: Relationship. Controlled vocabulary (<code>isCitedBy</code>, <code>cites</code>, <code>isSupplementTo</code>, <code>isSupplementedBy</code>, <code>isNewVersionOf</code>, <code>isPreviousVersionOf</code>, <code>isPartOf</code>, <code>hasPart</code>, <code>isIdenticalTo</code>, <code>isAlternateIdentifier</code>).</li>
     </ul>
     <p>Example:</p>
     <pre>[
@@ -1980,6 +1980,10 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 <h2 id="restapi-changes">Changes</h2>
 <dl>
+<dt>2014-12-20</dt>
+<dd><p>Added new relationship <code>isAlternateIdentifier</code> in subfield <code>relation</code> to <code>related_identifiers</code> in deposition metadata.</p></dd>
+<dt>2014-12-10</dt>
+<dd><p>Added new relationships <code>hasPart</code>, <code>isPartOf</code> &amp; <code>isIdenticalTo</code> in subfield <code>relation</code> to <code>related_identifiers</code> in deposition metadata.</p></dd>
 <dt>2014-11-20</dt>
 <dd><p>Added new optional subfield <code>orcid</code> to <code>creators</code> in deposition metadata.</p></dd>
 <dt>2014-10-21</dt>

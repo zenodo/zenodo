@@ -622,6 +622,9 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 related_identifiers=[
                     dict(identifier='10.1234/foo.bar2', relation='isCitedBy'),
                     dict(identifier='10.1234/foo.bar3', relation='cites'),
+                    dict(
+                        identifier='2011ApJS..192...18K',
+                        relation='isAlternativeIdentifier'),
                 ],
                 thesis_supervisors=[
                     dict(name="Doe Sr., John", affiliation="Atlantis"),
@@ -687,6 +690,9 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 publication_date="2013-09-12",
                 publication_type="book",
                 related_identifiers=[
+                    dict(
+                        identifier='2011ApJS..192...18K',
+                        relation='isAlternativeIdentifier'),
                     dict(identifier='10.1234/foo.bar2', relation='isCitedBy'),
                     dict(identifier='10.1234/foo.bar3', relation='cites'),
                 ],
@@ -1202,6 +1208,9 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 partof_title="Some part of title",
                 publication_type="book",
                 related_identifiers=[
+                    dict(
+                        identifier='2011ApJS..192...18K',
+                        relation='isAlternativeIdentifier'),
                     dict(identifier='10.1234/foo.bar2', relation='isCitedBy'),
                     dict(identifier='10.1234/foo.bar3', relation='cites'),
                 ],
@@ -1447,6 +1456,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         self.assertEqual(record.get('license'), None)
         self.assertEqual(record['owner']['deposition_id'], str(res_id))
         self.assertEqual(record.get('url'), None)
+        self.assertEqual(record['alternate_identifiers'][0]['scheme'], "ads")
 
         # Communities
         self.assertEqual(record.get('communities'), ['zenodo'])
@@ -1489,6 +1499,12 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         self.assertEqual(
             response.json['metadata']['title'],
             "To be discarded"
+        )
+        # Test if alternate identifiers was loaded correctly.
+        self.assertEqual(
+            response.json['metadata']['related_identifiers'][0],
+            {u'scheme': u'ads', u'identifier': u'2011ApJS..192...18K',
+             u'relation': u'isAlternativeIdentifier'},
         )
 
         # Discard changes.

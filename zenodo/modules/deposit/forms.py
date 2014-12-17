@@ -187,9 +187,10 @@ class RelatedIdentifierForm(WebDepositForm):
             ('isSupplementedBy', 'is a supplement to this upload'),
             ('isNewVersionOf', 'is previous version of this upload'),
             ('isPreviousVersionOf', 'is new version of this upload'),
-            ('isIdenticalTo', 'is identical to upload'),
             ('isPartOf', 'has this upload as part'),
             ('hasPart', 'is part of this upload'),
+            ('isIdenticalTo', 'is identical to upload'),
+            ('isAlternativeIdentifier', 'is alternate identifier'),
         ],
         default='isSupplementTo',
         widget_classes='form-control',
@@ -807,7 +808,7 @@ class ZenodoForm(WebDepositForm):
             'indication': 'recommended',
             'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!' % CFG_SITE_NAME,
         }),
-        ('Related datasets/publications', [
+        ('Related/alternate identifiers', [
             'related_identifiers',
         ], {
             'classes': '',

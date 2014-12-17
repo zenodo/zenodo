@@ -43,7 +43,7 @@ exclude-result-prefixes="marc fn dc invenio">
             <oai_datacite xsi:schemaLocation="http://schema.datacite.org/oai/oai-1.0/ http://schema.datacite.org/oai/oai-1.0/oai.xsd">
                 <isReferenceQuality>true</isReferenceQuality>
                 <schemaVersion>2.2</schemaVersion>
-                <datacentreSymbol>DK.OPENAIRE</datacentreSymbol>
+                <datacentreSymbol>CERN.ZENODO</datacentreSymbol>
                 <payload>
                     <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
                     <xsl:apply-templates />
@@ -57,12 +57,14 @@ exclude-result-prefixes="marc fn dc invenio">
         <xsl:choose>
             <xsl:when test="datafield[@tag=024 and @ind1=7]">
                 <xsl:for-each select="datafield[@tag=024 and @ind1=7]">
-                    <identifier>
-                        <xsl:attribute name="identifierType">
-                            <xsl:value-of select="subfield[@code='2']"/>
-                     </xsl:attribute>
-                        <xsl:value-of select="subfield[@code='a']"/>
-                    </identifier>
+                    <xsl:if test="subfield[@code='2'] = 'DOI'">
+                        <identifier>
+                            <xsl:attribute name="identifierType">
+                                <xsl:value-of select="subfield[@code='2']"/>
+                         </xsl:attribute>
+                            <xsl:value-of select="subfield[@code='a']"/>
+                        </identifier>
+                    </xsl:if>
                 </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>

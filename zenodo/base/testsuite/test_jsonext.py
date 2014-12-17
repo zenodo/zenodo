@@ -35,6 +35,14 @@ test_marc = """<record>
   <datafield tag="520" ind1=" " ind2=" ">
     <subfield code="a">Test Description</subfield>
   </datafield>
+  <datafield tag="024" ind1="7" ind2=" ">
+    <subfield code="2">lsid</subfield>
+    <subfield code="a">urn:lsid:ubio.org:namebank:11815</subfield>
+  </datafield>
+  <datafield tag="024" ind1="7" ind2=" ">
+    <subfield code="2">ads</subfield>
+    <subfield code="a">2011ApJS..192...18K</subfield>
+  </datafield>
   <datafield tag="711" ind1=" " ind2=" ">
     <subfield code="c">Harvard-Smithsonian Center for Astrophysics</subfield>
     <subfield code="a">The 13th Biennial HITRAN Conference</subfield>
@@ -185,10 +193,17 @@ test_form_json = {
     'publication_type': 'book',
     'recid': 1,
     'related_identifiers': [
+        {'identifier': 'urn:lsid:ubio.org:namebank:11815',
+         'relation': 'isAlternativeIdentifier',
+         'scheme': 'lsid'},
+        {'identifier': '2011ApJS..192...18K',
+         'relation': 'isAlternativeIdentifier',
+         'scheme': 'ads'},
         {'identifier': '10.1234/foo.bar',
          'relation': 'cites',
          'scheme': 'doi'},
-        {'identifier': '1234.4321', 'relation': 'cites', 'scheme': 'arxiv'}],
+        {'identifier': '1234.4321', 'relation': 'cites', 'scheme': 'arxiv'},
+    ],
     'title': 'Test title',
     'upload_type': 'publication',
     'references': [
@@ -248,6 +263,12 @@ test_record = dict(
             "scheme": "doi", "relation": "cites"},
         {"identifier": "1234.4321", "scheme":
             "arxiv", "relation": "cites"},
+    ],
+    alternate_identifiers=[
+        {"identifier": "urn:lsid:ubio.org:namebank:11815",
+            "scheme": "lsid", },
+        {"identifier": "2011ApJS..192...18K", "scheme":
+            "ads", },
     ],
     meetings={
         'title': 'The 13th Biennial HITRAN Conference',

@@ -165,6 +165,25 @@ def process_recjson(deposition, recjson):
         # Happens on re-run
         pass
 
+    # =============================
+    # Related/alternate identifiers
+    # =============================
+    if recjson.get('related_identifiers', []):
+        related_identifiers = recjson.get('related_identifiers', [])
+
+        recjson['related_identifiers'] = filter(
+            lambda x: x.get('relation', '') != 'isAlternativeIdentifier',
+            related_identifiers
+        )
+
+        recjson['alternate_identifiers'] = map(
+            lambda x: {'scheme': x['scheme'], 'identifier': x['identifier']},
+            filter(
+                lambda x: x.get('relation', '') == 'isAlternativeIdentifier',
+                related_identifiers
+            )
+        )
+
     # =================
     # License
     # =================

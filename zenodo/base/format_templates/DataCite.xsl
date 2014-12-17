@@ -50,12 +50,14 @@ exclude-result-prefixes="marc fn dc invenio">
         <xsl:choose>
             <xsl:when test="datafield[@tag=024 and @ind1=7]">
                 <xsl:for-each select="datafield[@tag=024 and @ind1=7]">
-                    <identifier>
-                        <xsl:attribute name="identifierType">
-                            <xsl:value-of select="subfield[@code='2']"/>
-                     </xsl:attribute>
-                        <xsl:value-of select="subfield[@code='a']"/>
-                    </identifier>
+                    <xsl:if test="subfield[@code='2'] = 'DOI'">
+                        <identifier>
+                            <xsl:attribute name="identifierType">
+                                <xsl:value-of select="subfield[@code='2']"/>
+                         </xsl:attribute>
+                            <xsl:value-of select="subfield[@code='a']"/>
+                        </identifier>
+                    </xsl:if>
                 </xsl:for-each>
             </xsl:when>
             <xsl:otherwise>
