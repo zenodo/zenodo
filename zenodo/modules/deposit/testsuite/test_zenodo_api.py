@@ -247,6 +247,51 @@ class WebDepositApiTest(DepositApiTestCase):
             code=404,
         )
 
+    def test_delete(self):
+        # Test data
+        test_data = dict(
+            metadata=dict(
+                upload_type="presentation",
+                title="Test title",
+                creators=[
+                    dict(name="Doe, John", affiliation="Atlantis"),
+                    dict(name="Smith, Jane", affiliation="Atlantis")
+                ],
+                description="Test Description",
+                publication_date="2013-05-08",
+            )
+        )
+
+        # Create deposition
+        response = self.post(
+            'depositionlistresource', data=test_data, code=201,
+        )
+        res_id1 = response.json['id']
+
+        # Create deposition
+        response = self.post(
+            'depositionlistresource', data=test_data, code=201,
+        )
+        res_id2 = response.json['id']
+
+        self.get(
+            'depositionresource', urlargs=dict(resource_id=res_id1), code=200
+        )
+        self.get(
+            'depositionresource', urlargs=dict(resource_id=res_id2), code=200
+        )
+
+        # Delete one
+        response = self.delete(
+            'depositionresource',
+            urlargs=dict(resource_id=res_id2),
+            code=204
+        )
+        # Get the other
+        self.get(
+            'depositionresource', urlargs=dict(resource_id=res_id1), code=200
+        )
+
     def test_depositions_non_existing(self):
         # Get non-existing
         response = self.get(
