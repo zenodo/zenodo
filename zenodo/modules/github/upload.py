@@ -1,21 +1,24 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of ZENODO.
+# Copyright (C) 2014, 2015 CERN.
+#
+# ZENODO is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# ZENODO is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 import json
 import requests
@@ -106,7 +109,7 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
     # Create deposition
     r = client.post('depositionlistresource', data={})
     if r.status_code != 201:
-        raise ZenodoApiError("Could not create deposition.")
+        raise ZenodoApiError("Could not create deposition.", response=r)
 
     deposition_id = r.json()['id']
 
@@ -120,7 +123,8 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
             files={'file': fileobj},
         )
         if r.status_code != 201:
-            raise ZenodoApiWarning(deposition_id, "Could not add file")
+            raise ZenodoApiWarning("Could not add file", deposition_id,
+                                   response=r)
 
     # Set metadata (being set here to ensure file is fetched)
     r = client.put(
@@ -129,9 +133,11 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
         data={"metadata": metadata}
     )
     if r.status_code != 200:
+        errors = {}
         if r.status_code == 400:
             errors = r.json()
-        raise ZenodoApiWarning(deposition_id, "Problem with metadata", errors)
+        raise ZenodoApiWarning("Problem with metadata", deposition_id, errors,
+                               response=r, metadata=metadata)
 
     if publish:
         r = client.post(
@@ -139,7 +145,8 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
             urlargs=dict(resource_id=deposition_id, action_id='publish'),
         )
         if r.status_code != 202:
-            raise ZenodoApiWarning(deposition_id, "Could not publish deposition")
+            raise ZenodoApiWarning("Could not publish deposition",
+                                   deposition_id, response=r)
 
         return r.json()
     else:
@@ -148,5 +155,6 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
             urlargs=dict(resource_id=deposition_id),
         )
         if r.status_code != 200:
-            raise ZenodoApiWarning(deposition_id, "Could not get deposition")
+            raise ZenodoApiWarning("Could not get deposition", deposition_id,
+                                   response=r)
         return r.json()
