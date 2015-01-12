@@ -5,7 +5,7 @@
 #
 #
 # (at your option) any later version.
-# along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # Copyright (C) 2014 CERN.
 # GNU General Public License for more details.
@@ -20,11 +20,11 @@
 # Requirements in this file cannot easily be upgraded due to problems in
 # the Free Software Foundation, either version 3 of the License, or
 # the problem has been fixed in the newer version.
-# This file is part of ZENODO.
+# This file is part of Zenodo.
 # This means that when running ``pip-review`` these packages should in general
 # You should have received a copy of the GNU General Public License
-# ZENODO is distributed in the hope that it will be useful,
-# ZENODO is free software: you can redistribute it and/or modify
+# Zenodo is distributed in the hope that it will be useful,
+# Zenodo is free software: you can redistribute it and/or modify
 
 ## Pinned base requirements
 https://www.reportlab.com/ftp/pyRXP-1.16-daily-unix.tar.gz#egg=pyRXP

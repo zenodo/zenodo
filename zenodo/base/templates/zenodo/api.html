@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -146,7 +146,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 <li><p>Last thing missing, is just to add some metadata:</p>
 <pre>
->>> data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}
+>>> data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}
 >>> r = requests.put("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s?access_token=ACCESS_TOKEN" % deposition_id, data=json.dumps(data), headers=headers)
 >>> r.status_code
 200
@@ -179,7 +179,7 @@ The REST API is versioned. We strive not to make backward incompatible changes t
 
 <p><strong>Acquiring a personal access token</strong>
 <ol>
-<li><a href="{{url_for('youraccount.register')}}">Register</a> for a ZENODO account if you don't already have one.</li>
+<li><a href="{{url_for('youraccount.register')}}">Register</a> for a Zenodo account if you don't already have one.</li>
 <li>Go to your <a href="{{url_for('oauth2server_settings.index')}}">Applications</a>, to <a href="{{url_for('oauth2server_settings.token_new')}}">create a new token</a>.</li>
 <li>Select the OAuth scopes you need (for the quick start tutorial you need <code>deposit:write</code> and <code>deposit:actions</code>).</li>
 </ol>
@@ -483,7 +483,7 @@ print response.json()
 
 <em>or</em>
 
-$ curl -i -H "Content-Type: application/json" -X POST --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
+$ curl -i -H "Content-Type: application/json" -X POST --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-create">
       <pre>import json
@@ -495,7 +495,7 @@ r = requests.post(url, data="{}", headers=headers)
 
 <span class="muted"># or</span>
 
-data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}
+data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}
 r = requests.post(url, data=json.dumps(data), headers=headers)</pre>
     </div>
   </div>
@@ -645,7 +645,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ac
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-put">
-      <pre>$ curl -i -H "Content-Type: application/json" -X PUT --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -H "Content-Type: application/json" -X PUT --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-put">
       <pre>import json
@@ -653,7 +653,7 @@ import requests
 
 url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
-data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "ZENODO"}]}}
+data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}
 
 r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
     </div>
@@ -1697,8 +1697,8 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
       <li><code>orcid</code>: ORCID identifier of creator (optional).</li>
     </ul>
     <p>Example:</p>
-    <pre>[{'name':'Doe, John', 'affiliation': 'ZENODO'},
-{'name':'Smith, Jane', 'affiliation': 'ZENODO'}]</pre></td>
+    <pre>[{'name':'Doe, John', 'affiliation': 'Zenodo'},
+{'name':'Smith, Jane', 'affiliation': 'Zenodo'}]</pre></td>
 </tr>
 <tr>
     <td><code>description</code></td>
@@ -2051,7 +2051,7 @@ Metadata for each record is available in several formats. The available formats 
 <p>We support both harvesting of the <em>entire repository</em> as well as <em>selective harvesting</em> of communities.</p>
 <dl>
 <dt><code>zenodo</code></dt>
-<dd><p>All of ZENODO</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=zenodo">See example</a></p></dd>
+<dd><p>All of Zenodo</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=zenodo">See example</a></p></dd>
 <dt><code>user-<em>&lt;identifier&gt;</em></code></dt>
 <dd><p>Community sets &mdash; allows selective harvesting of specific communities. Replace <code><em>&lt;identifier&gt;</em></code> with the community identifier. Alternatively each community provides a direct harvesting API link on their front-page, which includes the correct community identifier.</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=user-cfa">See example</a></p></dd>
 </dl>

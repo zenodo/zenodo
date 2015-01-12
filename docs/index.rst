@@ -7,18 +7,18 @@ Zenodo
    :width: 300
    :class: pull-right
 
-ZENODO is an open dependable home for the long-tail of science, enabling
+Zenodo is an open dependable home for the long-tail of science, enabling
 researchers to share and preserve any research outputs in any size, any
 format and from any science.
 
 **Powered by Invenio**
 
-ZENODO is a small layer on top of `Invenio <http://invenio-software.org>`_, a
+Zenodo is a small layer on top of `Invenio <http://invenio-software.org>`_, a
 ​free software suite enabling you to run your own ​digital library or document
 repository on the web.
 
 .. note::
-   ZENODO (R) and the ZENODO logo are trademarked by CERN and are not covered
+   Zenodo (R) and the Zenodo logo are trademarked by CERN and are not covered
    by the GPLv3 license. Thus, if you instantiate Zenodo on your own servers you
    must change the branding to your own.
 

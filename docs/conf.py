@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# ZENODO documentation build configuration file, created by
+# Zenodo documentation build configuration file, created by
 # sphinx-quickstart on Thu Nov 21 14:30:47 2013.
 #
 # This file is execfile()d with the current directory set to its containing dir.
@@ -59,7 +59,7 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'ZENODO'
+project = u'Zenodo'
 copyright = u'{0}, CERN'.format(datetime.now().year)
 
 # The version info for the project you're documenting, acts as replacement for
@@ -187,7 +187,7 @@ html_static_path = ['_static']
 #html_file_suffix = None
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'ZENODOdoc'
+htmlhelp_basename = 'Zenododoc'
 
 
 # -- Options for LaTeX output --------------------------------------------------
@@ -206,7 +206,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'ZENODO.tex', u'ZENODO Documentation',
+  ('index', 'Zenodo.tex', u'Zenodo Documentation',
    u'CERN', 'manual'),
 ]
 
@@ -236,7 +236,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'zenodo', u'ZENODO Documentation',
+    ('index', 'zenodo', u'Zenodo Documentation',
      [u'CERN'], 1)
 ]
 
@@ -250,8 +250,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'ZENODO', u'ZENODO Documentation',
-   u'CERN', 'ZENODO', 'One line description of project.',
+  ('index', 'Zenodo', u'Zenodo Documentation',
+   u'CERN', 'Zenodo', 'One line description of project.',
    'Miscellaneous'),
 ]
 

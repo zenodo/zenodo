@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 ##
-## This file is part of ZENODO.
-## Copyright (C) 2014 CERN.
+## This file is part of Zenodo.
+## Copyright (C) 2014, 2015 CERN.
 ##
-## ZENODO is free software: you can redistribute it and/or modify
+## Zenodo is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
 ## the Free Software Foundation, either version 3 of the License, or
 ## (at your option) any later version.
 ##
-## ZENODO is distributed in the hope that it will be useful,
+## Zenodo is distributed in the hope that it will be useful,
 ## but WITHOUT ANY WARRANTY; without even the implied warranty of
 ## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ## GNU General Public License for more details.
 ##
 ## You should have received a copy of the GNU General Public License
-## along with ZENODO. If not, see <http://www.gnu.org/licenses/>.
+## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
 ##
 ## In applying this licence, CERN does not waive the privileges and immunities
 ## granted to it by virtue of its status as an Intergovernmental Organization
@@ -70,10 +70,10 @@ test_marc = """<record>
     <subfield code="a">Title Grant</subfield>
   </datafield>
   <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="x">Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12</subfield>
+    <subfield code="x">Doe, John et al (2012). Some title. Zenodo. 10.5281/zenodo.12</subfield>
   </datafield>
   <datafield tag="999" ind1="C" ind2="5">
-    <subfield code="x">Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34</subfield>
+    <subfield code="x">Smith, Jane et al (2012). Some title. Zenodo. 10.5281/zenodo.34</subfield>
   </datafield>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
@@ -207,8 +207,8 @@ test_form_json = {
     'title': 'Test title',
     'upload_type': 'publication',
     'references': [
-        'Doe, John et al (2012). Some title. ZENODO. 10.5281/zenodo.12',
-        'Smith, Jane et al (2012). Some title. ZENODO. 10.5281/zenodo.34',
+        'Doe, John et al (2012). Some title. Zenodo. 10.5281/zenodo.12',
+        'Smith, Jane et al (2012). Some title. Zenodo. 10.5281/zenodo.34',
     ],
     'conference_title': 'The 13th Biennial HITRAN Conference',
     'conference_place': 'Harvard-Smithsonian Center for Astrophysics',
@@ -281,9 +281,9 @@ test_record = dict(
     altmetric_id="9876",
     preservation_score="100",
     references=[
-        {'raw_reference': 'Doe, John et al (2012). Some title. ZENODO. '
+        {'raw_reference': 'Doe, John et al (2012). Some title. Zenodo. '
                           '10.5281/zenodo.12'},
-        {'raw_reference': 'Smith, Jane et al (2012). Some title. ZENODO. '
+        {'raw_reference': 'Smith, Jane et al (2012). Some title. Zenodo. '
                           '10.5281/zenodo.34'},
     ]
 )
