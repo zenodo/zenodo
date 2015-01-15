@@ -19,7 +19,6 @@
 
 """Standardise on Zenodo collection names."""
 
-from sqlalchemy import *
 from invenio.legacy.dbquery import run_sql
 
 
@@ -33,8 +32,10 @@ def info():
 def do_upgrade():
     run_sql("UPDATE collection SET name='Zenodo' WHERE name='ZENODO'")
     run_sql("UPDATE collectionname SET value='Zenodo' WHERE value='ZENODO'")
-    run_sql("UPDATE collectionname SET value='Provisional: Zenodo' WHERE value='Provisional: ZENODO'")
+    run_sql("UPDATE collectionname SET value='Provisional: Zenodo' "
+            "WHERE value='Provisional: ZENODO'")
     run_sql("UPDATE accARGUMENT SET value='Zenodo' WHERE value='ZENODO'")
+    run_sql("UPDATE community SET title='Zenodo' WHERE id='zenodo'")
 
 
 def estimate():
