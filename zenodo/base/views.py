@@ -26,17 +26,19 @@ Base blueprint for Zenodo
 
 import copy
 import time
-from flask import Blueprint, render_template, current_app
-from flask.ext.menu import register_menu, current_menu
+
+from flask import Blueprint, current_app, render_template
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.login import current_user
-from invenio.base.i18n import _
-from invenio.base.globals import cfg
-from invenio.base.signals import pre_template_render
-from invenio.ext.template.context_processor import \
-    register_template_context_processor
+from flask.ext.menu import current_menu, register_menu
 
+from invenio.base.globals import cfg
+from invenio.base.i18n import _
+from invenio.base.signals import pre_template_render
+from invenio.ext.template. \
+    context_processor import register_template_context_processor
 from invenio.utils import persistentid
+from zenodo.base.format_elements.bfe_zenodo_bibtex import Bibtex
 
 blueprint = Blueprint(
     'zenodo_base',
@@ -167,6 +169,11 @@ def register_receivers():
 @blueprint.app_template_filter('timefmt')
 def timefmt_filter(value, format="%d %b %Y, %H:%M"):
     return time.strftime(format, value)
+
+
+@blueprint.app_template_filter('bibtex')
+def bibtex_filter(record):
+    return Bibtex(record).format()
 
 
 @blueprint.app_template_filter('is_local_doi')
