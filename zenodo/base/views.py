@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Zenodo is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -20,9 +20,7 @@
 ## granted to it by virtue of its status as an Intergovernmental Organization
 ## or submit itself to any jurisdiction.
 
-"""
-Base blueprint for Zenodo
-"""
+"""Base blueprint for Zenodo."""
 
 import copy
 import time
@@ -38,7 +36,7 @@ from invenio.base.signals import pre_template_render
 from invenio.ext.template. \
     context_processor import register_template_context_processor
 from invenio.utils import persistentid
-from zenodo.base.format_elements.bfe_zenodo_bibtex import Bibtex
+from zenodo.base.utils.bibtex import Bibtex
 
 blueprint = Blueprint(
     'zenodo_base',
@@ -51,9 +49,7 @@ blueprint = Blueprint(
 
 @blueprint.before_app_first_request
 def register_menu_items():
-    """
-    Setup menu for Zenodo
-    """
+    """Setup menu for Zenodo."""
     item = current_menu.submenu('breadcrumbs.zenodo_base')
     item.register('', '')
 
@@ -136,9 +132,7 @@ def register_menu_items():
 
 
 def add_bibdoc_files(sender, **kwargs):
-    """
-    Adds a variable 'zenodo_files' into record templates
-    """
+    """Add a variable 'zenodo_files' into record templates."""
     if 'recid' not in kwargs:
         return
 
@@ -178,15 +172,14 @@ def bibtex_filter(record):
 
 @blueprint.app_template_filter('is_local_doi')
 def is_local_doi(value):
-    """ Convert DOI to a link. """
+    """Convert DOI to a link."""
     return value.startswith(cfg['CFG_DATACITE_DOI_PREFIX']) or \
         value.startswith("10.5281/")
 
 
 @blueprint.app_template_filter('is_record_owner')
 def is_record_owner(bfo, tag="8560_f"):
-    """
-    Determine if current user is owner of a given record
+    """Determine if current user is owner of a given record.
 
     @param bfo: BibFormat Object
     @param tag: Tag to use for extracting the email from the record.
@@ -198,9 +191,7 @@ def is_record_owner(bfo, tag="8560_f"):
 
 @blueprint.app_template_filter('zenodo_curated')
 def zenodo_curated(reclist, length=10, reverse=False, open_only=False):
-    """
-    Show only curated publications from reclist
-    """
+    """Show only curated publications from reclist."""
     from invenio.legacy.search_engine import search_pattern_parenthesised
 
     if open_only:

@@ -42,6 +42,7 @@ install_requires = [
     "github3.py>=0.9.0",
     "Pillow",
     "pyoai>=2.4.2",
+    "awesome-slugify>=1.6",
 ]
 
 extras_require = {

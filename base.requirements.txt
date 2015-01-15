@@ -65,6 +65,7 @@ amqp==1.4.6
 aniso8601==0.90
 anyjson==0.3.3
 async==0.6.2
+awesome-slugify==1.6
 bagit==1.5.2
 beautifulsoup4==4.3.2
 billiard==3.3.0.19
@@ -120,6 +121,7 @@ rauth==0.7.0
 raven==5.1.1
 rdflib==4.1.2
 redis==2.10.3
+regex==2014.12.24
 reportlab==3.1.8
 requests-oauthlib==0.4.2
 rq==0.4.6
