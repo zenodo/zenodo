@@ -25,7 +25,7 @@
 import copy
 import time
 
-from flask import Blueprint, current_app, render_template
+from flask import Blueprint, current_app, render_template, request
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.login import current_user
 from flask.ext.menu import current_menu, register_menu
@@ -54,7 +54,10 @@ def register_menu_items():
     item.register('', '')
 
     item = current_menu.submenu('main.browse')
-    item.register('', _('Browse'), order=3)
+    item.register(
+        '', _('Browse'), order=3,
+        active_when=lambda: request.endpoint.startswith("search.collection")
+    )
 
     item = current_menu.submenu('main.browse.datasets')
     item.register(
@@ -99,7 +102,10 @@ def register_menu_items():
     )
 
     item = current_menu.submenu('main.getstarted')
-    item.register('', _('Get started'), order=5)
+    item.register(
+        '', _('Get started'), order=5,
+        active_when=lambda: request.endpoint.startswith("zenodo_base.")
+    )
 
     def menu_fixup():
         # Change order
