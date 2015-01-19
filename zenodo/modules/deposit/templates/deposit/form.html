@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -21,6 +21,10 @@
 {% macro submit_dialog_body() %}
 <ul>
     <li>Your upload will be <strong>publicly available</strong> shortly after you submit &mdash; uploaded files are only publicly available if you have chosen Open Access and/or Embargoed Access (subject to the embargo date).</li>
+    <br>
+    <li>Uploaded files <strong>cannot</strong> be modified/added/removed after upload. Metadata (title, description, etc.) <strong>can</strong> be modified.</li>
+    <br>
+    <li>A Digital Object Identifier (DOI) will be registered for your upload, unless you provide an existing one.</li>
 </ul>
 {% endmacro %}
 
