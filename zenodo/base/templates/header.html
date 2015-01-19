@@ -1,6 +1,6 @@
 {#
 ## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Zenodo is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -95,12 +95,20 @@
         <ul class="nav nav-tabs">
           {%- for item in current_menu.submenu('main').children if item.visible recursive %}
           {%- if item.children -%}
+          {%- if item.active -%}
+          <li class="dropdown active">
+          {%- else -%}
           <li class="dropdown">
-            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ item.url }}">{{ item.text|safe }} <b class="caret"></b></a>
+          {%- endif -%}
+            <a class="dropdown-toggle" data-toggle="dropdown" href="{{ item.url }}">{{ item.text|safe }}<b class="caret"></b></a>
             <ul class="dropdown-menu">{{ loop(item.children|sort(attribute='order')) }}</ul>
           </li>
           {%- else -%}
-          <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            {%- if item.active and loop.depth == 1 -%}
+            <li class="active"><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            {%- else -%}
+            <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
+            {%- endif -%}
           {%- endif %}
           {%- endfor %}
           <li class="pull-right">

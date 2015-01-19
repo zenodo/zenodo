@@ -2,7 +2,7 @@
  * -*- mode: text; coding: utf-8; -*-
  *
  * This file is part of Zenodo.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Zenodo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -263,6 +263,12 @@ header .container .nav > li > a.dropdown-toggle b {
   border-bottom-color: #fff;
 }
 
+header .container .nav > li.active > a.dropdown-toggle b {
+  color: black;
+  border-top-color: #000;
+  border-bottom-color: #000;
+}
+
 header .container .nav > li > a, footer a {
   color: #ffffff;
 }
@@ -309,10 +315,6 @@ header .container .nav .open a.dropdown-toggle b {
 
 header .container .nav .active a {
   color: #000000;
-}
-
-header .container .nav .active a:hover {
-  color: #fff;
 }
 
 header .container .nav .open a :hover{
