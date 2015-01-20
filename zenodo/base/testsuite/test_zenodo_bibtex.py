@@ -26,16 +26,12 @@
 import datetime
 
 from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-from invenio.base.wrappers import lazy_import
 from invenio.base.globals import cfg
 from zenodo.base.utils.bibtex import Bibtex, \
     MissingRequiredFieldError
 
-Record = lazy_import('invenio.modules.records.models.Record')
-get_record = lazy_import('invenio.modules.records.api.get_record')
-
 test_record = dict(
-    recid=1,
+    recid=12345,
     system_number={"system_number": 2, "recid": 3},
     system_control_number={
         "system_control_number": "4", "institute": "CERN"},
@@ -45,20 +41,20 @@ test_record = dict(
     upload_type={'type': 'publication', 'subtype': 'book'},
     collections=[{'primary': "pri", "secondary": "secondary", }],
     publication_date=datetime.date(2014, 2, 27),
+    creation_date=datetime.datetime.now(),
+    modification_date=datetime.datetime.now(),
     title="Test title",
     authors=[
-        {'name': 'Doe, John', 'affiliation': 'CERN'},
-        {'name': 'Smith, John', 'affiliation': 'CERN'},
+        {'name': 'Doe, John', 'affiliation': 'CERN', 'orcid': '',
+         'familyname': 'Doe', 'givennames': 'John'},
+        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '',
+         'familyname': 'Smith', 'givennames': 'John'},
     ],
-    _first_author={
-        "familyname": "Test"
-    },
-    _id="12345",
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],
     notes="notes",
     access_right="open",
-    embargo_date="2014-02-27",
+    embargo_date=datetime.date(2014, 2, 27),
     license={'identifier': 'cc-by', 'url': 'http://zenodo.org',
              'source': 'opendefinition.org',
              'license': 'Creative Commons', },
@@ -112,36 +108,36 @@ test_record = dict(
 )
 
 test_bad_record = dict(
-    _id="12345",
-    _first_author={
-        "familyname": "Test Test"
-    },
+    recid="12345",
+    creation_date=datetime.datetime.now(),
+    modification_date=datetime.datetime.now(),
 )
 
 
 class BibTexFormatterTest(InvenioTestCase):
 
     def setUp(self):
+        from invenio.modules.records.api import Record
+        self.record_good = Bibtex(Record.create(test_record, 'json'))
+        self.record_bad = Bibtex(Record.create(test_bad_record, 'json'))
+        self.record_empty = Bibtex({})
+
+    def test_get_entry_type(self):
+        from invenio.modules.records.models import Record
+        from invenio.modules.records.api import get_record
+
         records = []
         record_list = Record.query.all()
         for rec in record_list:
             rec = get_record(rec.id)
             if rec:
                 records.append(rec)
-        self.dbrecords = records
-        self.record_good = Bibtex(test_record)
-        self.record_bad = Bibtex(test_bad_record)
-        self.record_empty = Bibtex({})
 
-    def test_get_entry_type(self):
-        try:
-            for r in self.dbrecords:
-                b = Bibtex(r)
-                self.assertEqual(r['upload_type']['type'],
-                                 b._get_entry_type())
-        except TypeError:
-            import ipdb
-            ipdb.set_trace()
+        for r in records:
+            b = Bibtex(r)
+            self.assertEqual(r['upload_type']['type'],
+                             b._get_entry_type())
+
         self.assertEqual(test_record['upload_type']['type'],
                          self.record_good._get_entry_type())
         self.assertEqual('default', self.record_bad._get_entry_type())
@@ -153,12 +149,9 @@ class BibTexFormatterTest(InvenioTestCase):
                          self.record_bad._get_entry_subtype())
 
     def test_get_citation_key(self):
-        good_id = test_record['_first_author']['familyname'] +\
-            ":" + test_record['_id']
-
-        self.assertEqual(good_id, self.record_good._get_citation_key())
-        self.assertEqual(test_bad_record['_id'],
-                         self.record_bad._get_citation_key())
+        self.assertEqual("doe_2014_12345",
+                         self.record_good._get_citation_key())
+        self.assertEqual("12345", self.record_bad._get_citation_key())
         self.assertRaises(MissingRequiredFieldError,
                           self.record_empty._get_citation_key)
 

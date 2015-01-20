@@ -1489,8 +1489,10 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         self.assertEqual(record['title'], "My new title")
         self.assertEqual(record['access_right'], "closed")
         self.assertEqual(record['authors'], [
-            dict(name="Smith, Jane", affiliation="Atlantis", orcid=''),
-            dict(name="Doe, John", affiliation="Atlantis", orcid=''),
+            dict(name="Smith, Jane", affiliation="Atlantis", orcid='',
+                 familyname="Smith", givennames="Jane"),
+            dict(name="Doe, John", affiliation="Atlantis", orcid='',
+                 familyname="Doe", givennames="John"),
         ])
         self.assertEqual(record['thesis_supervisors'], [
             dict(name="Doe Jr., John", affiliation="Atlantis", orcid=''),

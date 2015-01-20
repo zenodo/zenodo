@@ -23,8 +23,9 @@
 
 """ Unit tests jsonext """
 
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 from datetime import date
+
+from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
 
 
 test_marc = """<record>
@@ -233,10 +234,16 @@ test_record = dict(
     title="Test title",
     authors=[
         {'name': 'Doe, John', 'affiliation': 'CERN',
-         'orcid': '0000-0002-1694-233X'},
+         'orcid': '0000-0002-1694-233X',
+         'familyname': 'Doe', 'givennames': 'John',
+         },
         {'name': 'Doe, Jane', 'affiliation': 'CERN',
-         'orcid': '0000-0002-1825-0097'},
-        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': ''},
+         'orcid': '0000-0002-1825-0097',
+         'familyname': 'Doe', 'givennames': 'Jane',
+         },
+        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '',
+         'familyname': 'Smith', 'givennames': 'John',
+         },
     ],
     thesis_supervisors=[
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
