@@ -141,7 +141,7 @@ environment ``$PATH`` already.
 .. code-block:: console
 
     # Global installation
-    $ sudo npm install -g less clean-css requirejs uglify-js bower
+    $ sudo npm install -g less@1.7.5 clean-css requirejs uglify-js bower
 
     or
     # Local installation

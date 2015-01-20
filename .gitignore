@@ -41,6 +41,7 @@ var/
 *.egg-info/
 .installed.cfg
 *.egg
+*.eggs
 
 # Installer logs
 pip-log.txt
@@ -80,3 +81,6 @@ zenodo/modules/github/static/badges/10.*.png
 
 # HTML Code coverage nosetests
 cover/*
+
+# Redis dump
+dump.rdb
