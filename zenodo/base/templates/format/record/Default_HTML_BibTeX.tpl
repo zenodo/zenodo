@@ -21,5 +21,7 @@
 #}
 
 {% from "helpers.html" import copy_to_clipboard -%}
-<h1>BibTeX Export {{copy_to_clipboard(clipboard_target='clipboard_text')}}</h1>
+<h1>{{record.title}}</h1>
+<br>
+<h2>BibTeX Export {{copy_to_clipboard(clipboard_target='clipboard_text')}}</h2>
 <pre id="clipboard_text">{{ record|bibtex }}</pre>
