@@ -48,8 +48,6 @@ def format_element(bfo, as_label=False, only_restrictions=False, brief=False):
     if only_restrictions:
         if access_rights in ('embargoedAccess', 'embargoed'):
             return """<dt>Embargoed</dt><dd>Files available as <span class="label label-success">Open Access</span> after %s</dd>""" % embargo
-        elif access_rights in ('restricteDaccess', 'restricted'):
-            return """<dt>Restricted access</dt><dd>Please contact %s to access the files.</dd>""" % email
     elif as_label:
         if access_rights in ('embargoedAccess', 'embargoed'):
             if brief:

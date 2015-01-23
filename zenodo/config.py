@@ -64,6 +64,7 @@ PACKAGES += [
     'zenodo.modules.preservationmeter',
     'zenodo.modules.citationformatter',
     'zenodo.modules.grants',
+    'zenodo.modules.accessrequests',
     'invenio.modules.access',
     'invenio.modules.accounts',
     'invenio.modules.alerts',

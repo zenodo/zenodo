@@ -30,6 +30,7 @@ __all__ = ['AccessRightField']
 ACCESS_RIGHTS_CHOICES = [
     ('open', 'Open Access'),
     ('embargoed', 'Embargoed Access'),
+    ('restricted', 'Restricted Access'),
     ('closed', 'Closed Access'),
 ]
 
@@ -37,6 +38,7 @@ ACCESS_RIGHTS_CHOICES = [
 ACCESS_RIGHTS_ICONS = {
     'open': 'fa fa-unlock fa-fw',
     'closed': 'fa fa-lock fa-fw',
+    'restricted': 'fa fa-warning fa-fw',
     'embargoed': 'fa fa-warning fa-fw',
 }
 
@@ -100,10 +102,16 @@ def access_right_processor(form, field, submit=False, fields=None):
     form.embargo_date.flags.disabled = True
     form.license.flags.hidden = True
     form.license.flags.disabled = True
+    form.access_conditions.flags.hidden = True
+    form.access_conditions.flags.disabled = True
 
     if field.data == 'embargoed':
         form.embargo_date.flags.hidden = False
         form.embargo_date.flags.disabled = False
+
+    if field.data == 'restricted':
+        form.access_conditions.flags.hidden = False
+        form.access_conditions.flags.disabled = False
 
     if field.data in ['open', 'embargoed']:
         form.license.flags.hidden = False

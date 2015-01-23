@@ -1,0 +1,56 @@
+{#
+## This file is part of Zenodo.
+## Copyright (C) 2015 CERN.
+##
+## Zenodo is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+##
+## Zenodo is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+##
+## In applying this licence, CERN does not waive the privileges and immunities
+## granted to it by virtue of its status as an Intergovernmental Organization
+## or submit itself to any jurisdiction.
+#}
+{% macro render_pagination(pagination, endpoint) %}
+<nav>
+  <ul class="pagination" align="center">
+    {% if pagination.has_prev %}
+    <li>
+      <a href="{{ url_for(endpoint, page=pagination.prev_num) }}" aria-label="Previous">
+        <span aria-hidden="true">&laquo;</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="disabled"><span aria-hidden="true">&laquo;</span></li>
+    {% endif %}
+    {%- for page in pagination.iter_pages() %}
+    {%- if page %}
+      {%- if page != pagination.page %}
+        <li><a href="{{ url_for('.index', page=page) }}">{{ page }}</a></li>
+      {%- else %}
+        <li class="active"><span>{{page}}</span></li>
+      {%- endif %}
+    {%- else %}
+        <li class="disabled"><span>&hellip;</span></li>
+    {%- endif %}
+    {%- endfor %}
+    {% if pagination.has_next %}
+    <li>
+      <a href="{{ url_for('.index', page=pagination.next_num) }}" aria-label="Next">
+        <span aria-hidden="true">&raquo;</span>
+      </a>
+    </li>
+    {% else %}
+    <li class="disabled"><span aria-hidden="true">&raquo;</span></li>
+    {% endif %}
+  </ul>
+</nav>
+{% endmacro %}

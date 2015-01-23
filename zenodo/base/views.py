@@ -36,7 +36,10 @@ from invenio.base.signals import pre_template_render
 from invenio.ext.template. \
     context_processor import register_template_context_processor
 from invenio.utils import persistentid
+
 from zenodo.base.utils.bibtex import Bibtex
+from zenodo.modules.accessrequests.models import SecretLink
+
 
 blueprint = Blueprint(
     'zenodo_base',
@@ -145,13 +148,31 @@ def add_bibdoc_files(sender, **kwargs):
     @register_template_context_processor
     def _add_bibdoc_files():
         from invenio.legacy.bibdocfile.api import BibRecDocs
-        return dict(
+
+        ctx = dict(
             zenodo_files=[f for f in BibRecDocs(
-                kwargs['recid'], human_readable=True
-            ).list_latest_files(
-                list_hidden=False
-            ) if not f.is_icon() and f.is_restricted(current_user)[0] == 0]
+                    kwargs['recid'], human_readable=True
+                ).list_latest_files(
+                    list_hidden=False
+                ) if not f.is_icon()],
+            file_token=None,
         )
+
+        token = request.args.get('token')
+        if token:
+            if SecretLink.validate_token(token,
+                                         dict(recid=kwargs['recid'])):
+                ctx["file_token"] = token
+                return ctx
+            else:
+                pass  # Flash a message that token is invalid.
+
+        ctx["zenodo_files"] = filter(
+            lambda f: f.is_restricted(current_user)[0] == 0,
+            ctx["zenodo_files"]
+        )
+
+        return ctx
 
 
 @blueprint.before_app_first_request
@@ -243,8 +264,14 @@ RULES = {
         'text': 'Available in',
         'image': 'img/github.png',
         }, {
+        'prefix': '10.1109/JBHI',
+        'relation': 'isCitedBy',
+        'scheme': 'doi',
+        'text': 'Published in',
+        'image': 'img/ieee.jpg',
+        }, {
         'prefix': 'https://github.com',
-        'relation': 'isSupplementedBy',
+        'relation': 'isSupplementTo',
         'scheme': 'url',
         'text': 'Available in',
         'image': 'img/github.png',

@@ -1,0 +1,134 @@
+{%- if zenodo_files -%}
+
+{%- set state = "default" %}
+{%- if record|is_restricted or record.get('access_right') == 'closed' %}
+  {%- set state = "danger" %}
+{%- elif record|is_embargoed %}
+  {%- set state = "warning" %}
+{%- endif -%}
+<div class="panel panel-{{state}}" id="preview">
+  <div class="panel-heading">
+    <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
+      Preview
+      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+    </a>
+  </div>
+  <div id="collapseOne" class="collapse in">
+      <iframe id="preview-iframe" width="100%" height="400" style="border: none;"></iframe>
+  </div>
+</div>
+<div class="panel panel-{{state}}" id="files">
+  <div class="panel-heading">
+    <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
+      {{ _("Files") }}
+      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+    </a>
+  </div>
+  <div class="collapse in" id="collapseTwo">
+  {% if record|is_restricted %}
+    <div class="panel-body">
+      <h5><i class="fa fa-ban" style="color: red;"></i> Restricted access</h5>
+      <p><small class="text-muted">
+      {% if file_token %}
+      You have access to the files in this upload subject to the conditions below because the owner granted you access.
+      {% else %}
+      You have access to the files in this upload because you are the owner. Other users may request access to the files in this upload, provided that they fulfil the conditions below:
+      {% endif %}
+      </small></p>
+      <hr />
+      {{record.get('access_conditions')|safe}}
+      <hr />
+    </div>
+  {% elif record|is_embargoed %}
+     <div class="panel-body">
+      <h5><i class="fa fa-warning"></i> Embargoed access</h5>
+      <p><small class="text-muted">Files are currently under embargo but will be publicly available after {{ record['embargo_date'] }}. {% if file_token %}You have access to the files in this upload because the owner shared a secret link with you.{% else %}You have access to the files in this upload because you are the owner.{% endif %}
+      </small></p>
+    </div>
+  {% elif record.get('access_right') == 'closed' %}
+     <div class="panel-body">
+      <h5><i class="fa fa-lock"></i> Closed access</h5>
+      <p><small class="text-muted">Files are not publicly accessible. {% if file_token %}You have access to the files in this upload because the owner shared a secret link with you.{% else %}You have access to the files in this upload because you are the owner.{% endif %}</small></p>
+    </div>
+  {% endif %}
+  <table class="table table-striped" >
+  <thead>
+    <tr class="">
+      <th>Name</th>
+      <th>Date</th>
+      <th>Size</th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+  {%- for file in zenodo_files|sort(attribute='comment') -%}
+  {%- set file_url = url_for('zenodo_accessrequests.file', recid=recid, token=file_token, filename=file.get_full_name()) if file_token else file.get_url() %}
+    <tr class="">
+        <td><a class="forcewrap" href="{{file_url}}">{{ file.get_full_name() }}</a></td>
+        <td class="nowrap">{{ file.md.strftime('%d %b %Y') }}</td>
+        <td class="nowrap">{{ file.size|filesizeformat }}</td>
+        <td class="nowrap"><span class="pull-right">{% if file.get_superformat().lower() in config.CFG_PREVIEW_PREFERENCE %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.get_full_name()}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %} <a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+      </tr>
+    {%- endfor -%}
+    </tbody>
+  </table>
+  </div>
+</div>
+{% elif record|is_restricted %}
+<div class="panel panel-danger" id="conditions">
+  <div class="panel-heading">
+    <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
+      Files
+      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+    </a>
+  </div>
+  <div class="collapse in" id="collapseTwo">
+    <div class="panel-body">
+      <h5><i class="fa fa-ban" style="color: red;"></i> {{ _("Restricted access") }}</h5>
+      <p><small class="text-muted">You may request access to the files in this upload, provided that you fulfil the conditions below. It is fully the decision of the owner to grant/deny access to the files.</small></p>
+      <hr />
+      {{record.get('access_conditions')|safe}}
+      <hr />
+
+      <div align="center">
+        <a href="{{ url_for('zenodo_accessrequests.access_request', recid=recid)}}" class="btn btn-primary"><i class="fa fa-edit"></i> Request access...</a>
+      </div>
+    </div>
+  </div>
+</div>
+{% elif record|is_embargoed %}
+<div class="panel panel-warning" id="conditions">
+  <div class="panel-heading">
+    <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
+      {{ _("Files") }}
+      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+    </a>
+  </div>
+  <div class="collapse in" id="collapseTwo">
+    <div class="panel-body">
+      <h5><i class="fa fa-warning"></i> {{ _("Embargoed access") }}</h5>
+      <p><small class="text-muted">Files are currently under embargo but will be publicly accessible after {{ record['embargo_date'] }}.</small></p>
+    </div>
+  </div>
+</div>
+{% elif record.get('access_right') == 'closed' %}
+<div class="panel panel-danger" id="conditions">
+  <div class="panel-heading">
+    <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
+      {{ _("Files") }}
+      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+    </a>
+  </div>
+  <div class="collapse in" id="collapseTwo">
+    <div class="panel-body">
+      <h5><i class="fa fa-lock"></i> {{ _("Closed access") }}</h5>
+      <p><small class="text-muted">Files are not publicly accessible.</small></p>
+    </div>
+  </div>
+</div>
+{% endif%}

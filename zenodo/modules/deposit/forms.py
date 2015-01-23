@@ -524,6 +524,49 @@ class ZenodoForm(WebDepositForm):
         placeholder="Start typing a license name or abbreviation...",
         icon='fa fa-certificate fa-fw',
     )
+    access_conditions = fields.TextAreaField(
+        label=_('Conditions'),
+        icon='fa fa-pencil fa-fw',
+        description='Specify the conditions under which you grant users '
+                    'access to the files in your upload. User requesting '
+                    'access will be asked to justify how they fulfil the '
+                    'conditions. Based on the justification, you decide '
+                    'who to grant/deny access. You are not allowed to '
+                    'charge users for granting access to data hosted on '
+                    'Zenodo.',
+        default="",
+        validators=[
+            required_if('access_right', ['restricted']),
+            validators.optional()
+        ],
+        widget=CKEditorWidget(
+            toolbar=[
+                ['PasteText', 'PasteFromWord'],
+                ['Bold', 'Italic', 'Strike', '-',
+                 'Subscript', 'Superscript', ],
+                ['NumberedList', 'BulletedList', 'Blockquote'],
+                ['Undo', 'Redo', '-', 'Find', 'Replace', '-', 'RemoveFormat'],
+                ['Mathjax', 'SpecialChar', 'ScientificChar'], ['Source'],
+                ['Maximize'],
+            ],
+            disableNativeSpellChecker=False,
+            extraPlugins='scientificchar,mathjax,blockquote',
+            removePlugins='elementspath',
+            removeButtons='',
+            # Must be set, otherwise MathJax tries to include MathJax via the
+            # http on CDN instead of https.
+            mathJaxLib='https://cdn.mathjax.org/mathjax/latest/MathJax.js?'
+                       'config=TeX-AMS-MML_HTMLorMML'
+        ),
+        filters=[
+            sanitize_html(allowed_tag_whitelist=(
+                CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST + ('span',)
+            )),
+            strip_string,
+        ],
+        hidden=True,
+        disabled=True,
+    )
 
     #
     # Collection
@@ -789,7 +832,7 @@ class ZenodoForm(WebDepositForm):
             'keywords', 'notes',
         ], {'indication': 'required', }),
         ('License', [
-            'access_right', 'embargo_date', 'license',
+            'access_right', 'embargo_date', 'license', 'access_conditions'
         ], {
             'indication': 'required',
             #'description': 'Unless you explicitly specify the license conditions below for Open Access and Embargoed Access uploads,'
