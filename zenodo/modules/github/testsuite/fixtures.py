@@ -87,6 +87,10 @@ def register_github_api():
         "/users/cuser",
         USER('cuser', email='cuser@invenio-software.org')
     )
+    register_endpoint(
+        "/user/repos",
+        [REPO('auser', 'repo-1'), REPO('auser', 'repo-2')]
+    )
     httpretty.register_uri(
         httpretty.GET,
         "https://api.github.com/repos/auser/repo-1/zipball/v1.0",

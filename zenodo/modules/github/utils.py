@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Invenio.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -126,13 +126,17 @@ def sync(gh, extra_data, sync_hooks=True):
         depositions=[],
         errors=None,
     )
-    login = extra_data["login"]
 
     existing_set = set(extra_data['repos'].keys())
     new_set = set()
 
-    for u in [login] + [x.login for x in gh.iter_orgs()]:
-        for r in gh.iter_user_repos(u, type='owner', sort='full_name'):
+    repos = gh.iter_repos(type='all', sort='full_name')
+    repos.headers['Accept'] = 'application/vnd.github.moondragon+json'
+
+    for r in repos:
+        # Next line to be replaced with "r.permissions['admin']" once
+        # fix has been integrated in github3.py
+        if r.to_json()['permissions']['admin']:
             # Add if not in list
             if r.full_name not in extra_data["repos"]:
                 extra_data["repos"][r.full_name] = copy.copy(repo_data)
@@ -140,11 +144,11 @@ def sync(gh, extra_data, sync_hooks=True):
             extra_data["repos"][r.full_name]["description"] = r.description
             new_set.add(r.full_name)
 
-            # # TODO:
-            # if sync_hooks:
-            #     for h in r.iter_hooks():
-            #         if h.name == 'web' and 'url' in h.config:
-            #             h.config['url'] ==
+        # # TODO:
+        # if sync_hooks:
+        #     for h in r.iter_hooks():
+        #         if h.name == 'web' and 'url' in h.config:
+        #             h.config['url'] ==
 
     # Remove repositories no longer available in github
     for full_name in (existing_set-new_set):
