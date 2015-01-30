@@ -12,11 +12,58 @@ first time. Production grade deployment is not covered here.
 
 First follow the section "2. Prerequisites" in `First Steps with Invenio <http://invenio.readthedocs.org/en/latest/getting-started/first-steps.html#prerequisites>`_.
 
+2.2 OS X prerequisites
+~~~~~~~~~~~~~~~~~~~~~~
+For OS X it is recommended to install dependencies via Homebrew. First install Homebrew and make sure you have the XCode command-line tools (note you may need to install XCode via AppStore if you did not already do so):
+
+.. code-block:: console
+
+   $ ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+   $ xcode-select --install
+
+Next install dependencies via Homebrew:
+
+.. code-block:: console
+
+   $ brew install python redis mysql libxml2 libxslt nodejs git rabbitmq
+   $ npm install -g less@1.7.5 clean-css requirejs uglify-js bower
+   $ pip install virtualenv virtualenv-wrapper
+
+2.3 MySQL configuration
+~~~~~~~~~~~~~~~~~~~~~~~
+The default MySQL configuration needs to be modified otherwise the database
+loading will fail. Please add the following lines to ``my.cnf`` (located in ``/etc/my.cnf`` or ``/usr/local/etc/my.cnf``):
+
+.. code-block:: ini
+
+   [mysqld]
+   max_allowed_packet=1G
+   open_files_limit=4096
+
+Additionally on OS X developer machines you will need to limit number of open files (defaults to 256 per process in OS X):
+
+.. code-block:: ini
+
+   [mysqld]
+   # ...
+   table_open_cache=250
+
+Alternatively, you can also increase number of allowed files per process using:
+
+.. code-block:: console
+
+   $ launchctl limit maxfiles 65536
+
+See http://stackoverflow.com/a/22773887 and
+http://docs.basho.com/riak/latest/ops/tuning/open-files-limit/#Mac-OS-X for how
+to persist the change.
+
+
 3. Quick start
 --------------
 
 3.1. Getting the source code
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 First go to GitHub and fork both Invenio and Zenodo repositories if you have
 not already done so (see Step 1 in

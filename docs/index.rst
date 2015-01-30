@@ -35,8 +35,9 @@ Contents
 
    getting_started
    installation
-   configuration
-   requirements
+   technicaloverview
    contributing
+   development
+   projectlifecycle
    changes
    license

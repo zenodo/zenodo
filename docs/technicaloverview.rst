@@ -1,7 +1,13 @@
-Configuration
-=============
+Technical Overview
+==================
 
-4.1. Minting test DOIs via DataCite
+Following is a STUB until documentation has been finalized.
+
+Configuration
+-------------
+Base, module, site, instance
+
+Minting test DOIs via DataCite
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
@@ -10,7 +16,7 @@ Configuration
     (zenodo)$ inveniomanage config set CFG_DATACITE_PASSWORD <password>
 
 
-4.2. Sign in with GitHub and ORCID
+Sign in with GitHub and ORCID
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Please see ``invenio/modules/oauthclient/contrib/github.py``, and
@@ -39,9 +45,29 @@ Note, that ORCID does not allow localhost to be used in redirect URIs thus
 making testing in development mode difficult.
 
 
-4.3. Logging to Sentry
+Logging to Sentry
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: console
 
     (zenodo)$ inveniomanage config set SENTRY_DSN <sentry dsn url>
+
+
+Customization
+-------------
+
+Templates
+~~~~~~~~~
+
+Views
+~~~~~
+
+Menus
+~~~~~
+
+Assets
+------
+Bower, RequireJS, Less, Building, settings.js
+
+Modules
+-------
