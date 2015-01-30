@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 ##
 ## This file is part of Zenodo.
-## Copyright (C) 2014 CERN.
+## Copyright (C) 2014, 2015 CERN.
 ##
 ## Zenodo is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ from __future__ import absolute_import
 from flask import url_for
 from mock import MagicMock
 import httpretty
+from urlparse import parse_qs, urlparse
 
 from invenio.testsuite import make_test_suite, run_test_suite
 from invenio.ext.sqlalchemy import db
@@ -34,6 +35,10 @@ from . import fixtures
 
 
 class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
+    @classmethod
+    def get_state(cls, url):
+        return parse_qs(urlparse(url).query)['state'][0]
+
     @property
     def config(self):
         return dict(
@@ -66,6 +71,7 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
         assert resp.location.startswith(
             "https://github.com/login/oauth/authorize"
         )
+        state = self.get_state(resp.location)
 
         httpretty.enable()
         fixtures.register_github_api()
@@ -75,7 +81,8 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
             url_for(
                 "oauthclient.authorized",
                 remote_app='github',
-                code='bad_verification_code'
+                code='bad_verification_code',
+                state=state,
             )
         )
 
@@ -90,12 +97,13 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
     def test_no_public_email(self):
         # Test redirect
         resp = self.client.get(
-            url_for("oauthclient.login", remote_app='github')
+            url_for("oauthclient.login", remote_app='github', next='/mytest/')
         )
         self.assertStatus(resp, 302)
         assert resp.location.startswith(
             "https://github.com/login/oauth/authorize"
         )
+        state = self.get_state(resp.location)
 
         httpretty.enable()
         fixtures.register_oauth_flow()
@@ -109,12 +117,13 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
             url_for(
                 "oauthclient.authorized",
                 remote_app='github',
-                code='test_no_email'
+                code='test_no_email',
+                state=state,
             )
         )
         self.assertRedirects(
             resp,
-            url_for("oauthclient.signup", remote_app='github', next='/')
+            url_for("oauthclient.signup", remote_app='github', )
         )
 
         # Mock account setup to prevent GitHub queries
@@ -125,7 +134,6 @@ class GitHubAuthenticationErrorsTest(OAuth2ClientTestCase):
             url_for(
                 "oauthclient.signup",
                 remote_app='github',
-                next='/mytest/',
             ),
             data={'email': 'noemailuser@invenio-software.org'}
         )
