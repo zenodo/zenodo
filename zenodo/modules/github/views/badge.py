@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2014 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 
 """DOI Badge Blueprint."""
@@ -29,7 +29,7 @@ import os
 import urllib
 
 from flask import Blueprint, make_response, abort, current_app, redirect, \
-    url_for
+    url_for, request
 
 from invenio.modules.pidstore.models import PersistentIdentifier
 from invenio.ext.sslify import ssl_required
@@ -46,22 +46,27 @@ blueprint = Blueprint(
 )
 
 
-def badge(doi):
+def badge(doi, style=None):
     """Helper method to generate DOI badge."""
     doi_encoded = urllib.quote(doi, '')
+
+    if style not in ["flat",
+                     "flat-square",
+                     "plastic"]:
+        style = "default"
 
     # Check if badge already exists
     badge_path = os.path.join(
         current_app.config['COLLECT_STATIC_ROOT'],
         "badges",
-        "%s.svg" % doi_encoded
+        "%s-%s.svg" % (doi_encoded, style)
     )
 
     if not os.path.exists(os.path.dirname(badge_path)):
         os.makedirs(os.path.dirname(badge_path))
 
     if not os.path.isfile(badge_path):
-        create_badge(doi, badge_path)
+        create_badge(doi, badge_path, style)
 
     resp = make_response(open(badge_path, 'r').read())
     resp.content_type = "image/svg+xml"
@@ -89,7 +94,9 @@ def index(user_id, repository):
 
     doi = dep["doi"]
 
-    return badge(doi)
+    style = request.args.get('style', None)
+
+    return badge(doi, style)
 
 
 @blueprint.route("/doi/<path:doi>.svg", methods=["GET"])
