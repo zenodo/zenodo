@@ -37,3 +37,4 @@ requests==2.3.0       # Invenio is locked on this version
 urllib3==1.7.1        # httpretty is locked on this version
 github3.py==0.9.3     # Major upgrade that requires careful review
 mistune==0.4.1        # Major upgrade that requires careful review
+mixer==4.10.2         # Major upgrade that requires careful review
