@@ -31,11 +31,12 @@ Links
 
 """
 
-from setuptools import setup, find_packages
 import os
 
+from setuptools import find_packages, setup
+
 install_requires = [
-    "Invenio[img]>=1.9999.3,<1.9999.4",
+    "Invenio[img]>=1.9999.4,<1.9999.5",
     "altmetric",
     "beautifulsoup4",
     "humanize",
