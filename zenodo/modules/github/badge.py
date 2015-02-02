@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Zenodo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,25 +20,39 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-try:
-    import urllib2
-except ImportError:
-    import urllib.request as urllib2
+"""Utility module to create badge."""
+
+from six.moves.urllib import parse, request
+
+from invenio.base.globals import cfg
 
 
-def create_badge(text, output_path, style=None):
+def shieldsio_encode(text):
+    """Encode text for shields.io."""
+    return parse.quote_plus(text.replace('-', '--').replace('_', '__'))
+
+
+def create_badge(subject, status, color, output_path, style=None):
     """Retrieve an SVG DOI badge from shields.io."""
-    text = text.replace('/', '%2F')
-    options = ""
-    if style == "flat":
-        options = "?style=flat"
-    elif style == "flat-square":
-        options = "?style=flat-square"
-    elif style == "plastic":
-        options = "?style=plastic"
+    subject = shieldsio_encode(subject)
+    status = shieldsio_encode(status)
 
-    response = urllib2.urlopen(
-        'http://img.shields.io/badge/DOI-%s-blue.svg%s' % (text, options))
+    if style not in cfg["GITHUB_BADGE_STYLES"]:
+        style = cfg["GITHUB_BADGE_DEFAULT_STYLE"]
+    if color not in cfg["GITHUB_BADGE_COLORS"]:
+        color = cfg["GITHUB_BADGE_DEFAULT_COLOR"]
+
+    options = "?{}".format(parse.urlencode(dict(style=style)))
+
+    url = '{url}{subject}-{status}-{color}.svg{style}'.format(
+        url=cfg['GITHUB_SHIELDSIO_BASE_URL'],
+        subject=subject,
+        status=status,
+        color=color,
+        style=options,
+    )
+
+    response = request.urlopen(url)
 
     with open(output_path, 'wb') as f:
         f.write(response.read())

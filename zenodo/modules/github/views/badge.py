@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2014, 2015 CERN.
 #
 # Zenodo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -28,14 +28,13 @@ from __future__ import absolute_import
 import os
 import urllib
 
-from flask import Blueprint, make_response, abort, current_app, redirect, \
-    url_for, request
-
-from invenio.modules.pidstore.models import PersistentIdentifier
+from flask import (abort, Blueprint, current_app, make_response, redirect,
+                   request, url_for)
 from invenio.ext.sslify import ssl_required
+from invenio.modules.pidstore.models import PersistentIdentifier
 
-from ..helpers import get_account
 from ..badge import create_badge
+from ..helpers import get_account
 
 blueprint = Blueprint(
     'zenodo_github_badge',
@@ -50,10 +49,8 @@ def badge(doi, style=None):
     """Helper method to generate DOI badge."""
     doi_encoded = urllib.quote(doi, '')
 
-    if style not in ["flat",
-                     "flat-square",
-                     "plastic"]:
-        style = "default"
+    if style not in current_app.config['GITHUB_BADGE_STYLES']:
+        style = current_app.config['GITHUB_BADGE_DEFAULT_STYLE']
 
     # Check if badge already exists
     badge_path = os.path.join(
@@ -66,7 +63,7 @@ def badge(doi, style=None):
         os.makedirs(os.path.dirname(badge_path))
 
     if not os.path.isfile(badge_path):
-        create_badge(doi, badge_path, style)
+        create_badge("DOI", doi, "blue", badge_path, style=style)
 
     resp = make_response(open(badge_path, 'r').read())
     resp.content_type = "image/svg+xml"
