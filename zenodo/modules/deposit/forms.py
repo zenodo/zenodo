@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 ## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014 CERN.
+## Copyright (C) 2012, 2013, 2014, 2015 CERN.
 ##
 ## Zenodo is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -301,7 +301,7 @@ class ZenodoForm(WebDepositForm):
     # Fields
     #
     upload_type = zfields.UploadTypeField(
-        validators=[validators.required()],
+        validators=[validators.DataRequired()],
         export_key='upload_type.type',
     )
     publication_type = fields.SelectField(
@@ -392,12 +392,12 @@ class ZenodoForm(WebDepositForm):
         description='Required. Format: YYYY-MM-DD. The date your upload was '
         'made available in case it was already published elsewhere.',
         default=date.today(),
-        validators=[validators.required()],
+        validators=[validators.DataRequired()],
         widget=date_widget,
         widget_classes='input-sm',
     )
     title = fields.TitleField(
-        validators=[validators.required()],
+        validators=[validators.DataRequired()],
         description='Required.',
         filters=[
             strip_string,
@@ -419,7 +419,7 @@ class ZenodoForm(WebDepositForm):
         widget_classes='',
         min_entries=1,
         export_key='authors',
-        validators=[validators.required(), list_length(
+        validators=[validators.DataRequired(), list_length(
             min_num=1, element_filter=filter_empty_helper(),
         )],
     )
@@ -428,7 +428,7 @@ class ZenodoForm(WebDepositForm):
         description='Required.',
         default='',
         icon='fa fa-pencil fa-fw',
-        validators=[validators.required(), ],
+        validators=[validators.DataRequired(), ],
         widget=CKEditorWidget(
             toolbar=[
                 ['PasteText', 'PasteFromWord'],
@@ -486,7 +486,7 @@ class ZenodoForm(WebDepositForm):
         description="Required. Open access uploads have considerably higher "
         "visibility on %s." % CFG_SITE_NAME,
         default="open",
-        validators=[validators.required()]
+        validators=[validators.DataRequired()]
     )
     embargo_date = fields.Date(
         label=_('Embargo date'),
@@ -507,7 +507,7 @@ class ZenodoForm(WebDepositForm):
     license = zfields.LicenseField(
         validators=[
             required_if('access_right', ['embargoed', 'open', ]),
-            validators.required()
+            validators.DataRequired()
         ],
         default='cc-zero',
         domain_data=True,
