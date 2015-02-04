@@ -104,18 +104,25 @@ def doi_badge(doi):
 
     if pid is None:
         return abort(404)
-    return badge(doi)
+    style = request.args.get('style', None)
+
+    return badge(doi, style)
 
 
 @blueprint.route("/<int:user_id>/<path:repository>.png", methods=["GET"])
 @ssl_required
 def index_old(user_id, repository):
     """Legacy support for old badge icons."""
-    return redirect(url_for('.index', user_id=user_id, repository=repository))
+    style = request.args.get('style', None)
+    full_url = url_for('.index', user_id=user_id,
+                       repository=repository, style=style)
+    return redirect(full_url)
 
 
 @blueprint.route("/doi/<path:doi>.png", methods=["GET"])
 @ssl_required
 def doi_badge_old(doi):
     """Legacy support for old badge icons."""
-    return redirect(url_for('.doi_badge', doi=doi))
+    style = request.args.get('style', None)
+    full_url = url_for('.doi_badge', doi=doi, style=style)
+    return redirect(full_url)
