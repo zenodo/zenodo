@@ -26,6 +26,6 @@ Flask-DebugToolbar==0.9.0
 ipython==2.3.0
 ipdb==0.8
 pip-tools==0.3.5
--e git+https://github.com/jirikuncar/invenio-kwalitee.git#egg=Invenio-Kwalitee
+kwalitee==0.2.0c4
 flower==0.7.3
 honcho==0.5.0
