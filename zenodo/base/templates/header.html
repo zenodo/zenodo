@@ -84,7 +84,7 @@
       <div class="container">
         <div class="row">
           <div class="col-md-3">
-            <a href="{{ url_for('search.index') }}"><img id="logoimg" src="{{ url_for('static', filename='img/zenodo.png') }}" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"></a><br>
+            <a href="{{ url_for('search.index') }}"><img id="logoimg" src="{{ url_for('static', filename='img/zenodo.svg') }}" onerror="this.src={{ url_for('static', filename='img/zenodo.png') }}; this.src=null;" alt="{{ config.CFG_SITE_NAME_INTL[g.ln] }}"></a><br>
           </div>
           <div class="col-md-9 pull-right hidden-sm hidden-xs">
             <h1 style="padding-top: 50px; color: #00488c; font-size: 60px; line-height: 60px; text-align:right;">Research. Shared.</h1>
