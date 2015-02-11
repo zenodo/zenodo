@@ -255,7 +255,7 @@ class CommunityForm(WebDepositForm):
     )
     title = fields.StringField(
         placeholder="Start typing a community name...",
-        autocomplete=community_autocomplete,
+        autocomplete_fn=community_autocomplete,
         widget=TagInput(),
         widget_classes='form-control',
     )
@@ -281,7 +281,7 @@ class GrantForm(WebDepositForm):
     )
     title = fields.StringField(
         placeholder="Start typing a grant number, name or abbreviation...",
-        autocomplete=kb_autocomplete(
+        autocomplete_fn=kb_autocomplete(
             'json_projects',
             mapper=json_projects_kb_mapper
         ),
