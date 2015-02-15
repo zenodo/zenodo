@@ -30,7 +30,6 @@ class CommunityData(DataSet):
         id = 'zenodo'
         title = 'Zenodo'
         id_user = 2
-        has_logo = False
 
     class ecfunded:
         id = 'ecfunded'
@@ -38,4 +37,3 @@ class CommunityData(DataSet):
         curation_policy = 'Uploads must have been fully or partially funded ' \
                           'by the European Commission.'
         id_user = 2  # info@zenodo.org
-        has_logo = False
