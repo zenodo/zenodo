@@ -65,7 +65,8 @@ from invenio.ext.sslify import ssl_required
 from invenio.modules.webhooks.models import Receiver, CeleryReceiver
 
 from ..tasks import handle_github_payload
-from ..utils import sync, utcnow, parse_timestamp, remove_hook, create_hook
+from ..utils import sync, utcnow, parse_timestamp, remove_hook, create_hook, \
+    init_account
 from ..helpers import get_api, get_token, get_account, check_token
 
 
@@ -123,16 +124,21 @@ def index():
     if token is not None and check_token(token):
         # The user is authenticated and the token we have is still valid.
         extra_data = token.remote_account.extra_data
+        if extra_data.get("login") is None:
+            init_account(token)
+            extra_data = token.remote_account.extra_data
 
         # Check if sync is needed - should probably not be done here
-        last_sync = parse_timestamp(extra_data["last_sync"])
         now = utcnow()
         yesterday = now - timedelta(days=1)
+        last_sync = parse_timestamp(extra_data["last_sync"])
 
         if last_sync < yesterday:
             sync(get_api(), extra_data)
             token.remote_account.extra_data.changed()
             db.session.commit()
+            last_sync = utcnow()
+            extra_data = token.remote_account.extra_data
 
         ctx.update({
             "connected": True,
