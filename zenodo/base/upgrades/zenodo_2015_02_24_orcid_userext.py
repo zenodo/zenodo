@@ -52,17 +52,19 @@ def do_upgrade():
     for orcid, users in data.items():
         if len(users) == 1:
             id_user = users[0]
-            orcid_obj = UserEXT.query.filter_by(id=orcid, method='orcid').one()
+            orcid_obj = UserEXT.query.filter_by(id=orcid, method='orcid').first()
             user_obj = UserEXT.query.filter_by(id_user=id_user,
-                                               method='orcid').one()
+                                               method='orcid').first()
 
             if not (orcid_obj or user_obj):
                 ue = UserEXT(id=orcid, method='orcid', id_user=id_user)
                 db.session.add(ue)
                 db.session.commit()
             else:
-                warnings.warn("ORCID %s or user %s already assigned." %
-                              (orcid, id_user))
+                if orcid_obj.id != user_obj.id or \
+                   orcid_obj.id_user != user_obj.id_user:
+                    warnings.warn("ORCID %s or user %s already assigned." %
+                                  (orcid, id_user))
         else:
             warnings.warn("ORCID %s has multiple users %s" % (orcid, users))
 
