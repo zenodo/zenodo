@@ -54,5 +54,5 @@ def post_curation_reject_listener(sender, action=None, recid=None, record=None,
     DOI for a rejected record.
     """
     if sender.id == "zenodo" and action == "reject" and not pretend:
-        from zenodo.modules.deposit.tasks import openaire_delete_doi
-        openaire_delete_doi.delay(recid)
+        from invenio.modules.pidstore.tasks import datacite_delete
+        datacite_delete.delay(recid)

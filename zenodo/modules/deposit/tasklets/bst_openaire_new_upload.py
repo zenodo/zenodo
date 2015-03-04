@@ -24,21 +24,19 @@
 Simple tasklet that is called after a bibupload of a new record
 """
 
+from invenio.modules.pidstore.tasks import datacite_register
 from zenodo.modules.deposit.tasks import openaire_create_icon, \
-    openaire_altmetric_update, openaire_register_doi, \
-    openaire_upload_notification
+    openaire_altmetric_update, openaire_upload_notification
 from zenodo.modules.preservationmeter.tasks import calculate_preservation_score
 
 
 def bst_openaire_new_upload(recid=None):
-    """
-    Tasklet to run after a new record has been uploaded.
-    """
+    """Tasklet to run after a new record has been uploaded."""
     if recid is None:
         return
 
     # Ship of tasks to Celery for background processing
-    openaire_register_doi.delay(recid=recid)
+    datacite_register.delay(recid)
     openaire_create_icon.delay(recid=recid)
     openaire_altmetric_update.delay([recid])
     openaire_upload_notification.delay(recid=recid)
