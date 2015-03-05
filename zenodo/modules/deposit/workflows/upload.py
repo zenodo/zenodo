@@ -70,7 +70,7 @@ CFG_ECFUNDED_USER_COLLECTION_ID = "ecfunded"
 # =======
 # Helpers
 # =======
-def file_firerole(email, access_right, embargo_date):
+def file_firerole(uid, access_right, embargo_date):
     """
     Compute file firerole for a file given access_right, embargo_date.
     """
@@ -78,24 +78,25 @@ def file_firerole(email, access_right, embargo_date):
     fft_status = []
     if access_right == 'open':
         # Access to everyone
-        fft_status = [
-            'allow any',
-        ]
+        fft_status = []
     elif access_right == 'embargoed':
         # Access to submitter, deny everyone else until embargo date,
         # then allow all
         fft_status = [
-            'allow email "%s"' % email,
+            'allow uid "%s"' % uid,
             'deny until "%s"' % embargo_date,
             'allow any',
         ]
     elif access_right in ('closed', 'restricted',):
         # Access to submitter, deny everyone else
         fft_status = [
-            'allow email "%s"' % email,
+            'allow uid "%s"' % uid,
             'deny all',
         ]
-    return "firerole: %s" % "\n".join(fft_status)
+    if fft_status:
+        return "firerole: %s" % "\n".join(fft_status)
+    else:
+        return ""
 
 
 def check_existing_pid(pid, recjson):
@@ -325,7 +326,9 @@ def process_recjson_new(deposition, recjson):
     # Files (sorting + restrictions)
     # ==============================
     fft_status = file_firerole(
-        email, recjson['access_right'], recjson.get('embargo_date', None)
+        deposition.user_id,
+        recjson['access_right'],
+        recjson.get('embargo_date', None)
     )
 
     # Calculate number of leading zeros needed in the comment.
@@ -363,7 +366,7 @@ def process_files(deposition, bibrecdocs):
     sip = deposition.get_latest_sip(sealed=False)
 
     fft_status = file_firerole(
-        sip.metadata['owner']['email'],
+        sip.metadata['owner']['id'],
         sip.metadata['access_right'],
         sip.metadata.get('embargo_date'),
     )
