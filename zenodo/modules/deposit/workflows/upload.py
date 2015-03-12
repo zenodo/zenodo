@@ -31,7 +31,7 @@ from flask.ext.login import current_user
 
 from workflow import patterns as p
 
-from invenio.config import CFG_DATACITE_DOI_PREFIX
+from invenio.base.globals import cfg
 from invenio.modules.formatter import format_record
 from invenio.modules.knowledge.api import get_kb_mapping
 from invenio.ext.login import UserInfo
@@ -756,7 +756,8 @@ class upload(DepositionType):
                         _external=True
                     ))
                 if recjson.get('doi') and \
-                   recjson.get('doi').startswith(CFG_DATACITE_DOI_PREFIX+"/"):
+                   recjson.get('doi').startswith(cfg['CFG_DATACITE_DOI_PREFIX']
+                                                +"/"):
                     obj['doi'] = fields.String().format(recjson.get('doi'))
                     obj['doi_url'] = fields.String().format(
                         "http://dx.doi.org/%s" % obj['doi']

@@ -30,6 +30,8 @@ class UserData(DataSet):
         id = 1
         email = CFG_SITE_ADMIN_EMAIL
         password = ''
+        password_salt = ''
+        password_scheme = 'sha512_crypt'
         note = '1'
         nickname = 'admin'
 
@@ -37,6 +39,8 @@ class UserData(DataSet):
         id = 2
         email = 'info@zenodo.org'
         password = 'info'
+        password_salt = ''
+        password_scheme = 'sha512_crypt'
         note = '1'
         nickname = 'info'
 
@@ -44,6 +48,8 @@ class UserData(DataSet):
         id = 3
         email = 'user.a@zenodo.org'
         password = 'usera'
+        password_salt = ''
+        password_scheme = 'sha512_crypt'
         note = '1'
         nickname = 'usera'
 
@@ -51,6 +57,8 @@ class UserData(DataSet):
         id = 4
         email = 'user.b@zenodo.org'
         password = 'userb'
+        password_salt = ''
+        password_scheme = 'sha512_crypt'
         note = '1'
         nickname = 'userb'
 
@@ -58,6 +66,8 @@ class UserData(DataSet):
         id = 5
         email = 'inactive@zenodo.org'
         password = 'inactive'
+        password_salt = ''
+        password_scheme = 'sha512_crypt'
         note = '2'  # Email confirm required
         nickname = 'inactive'
 
@@ -65,5 +75,7 @@ class UserData(DataSet):
         id = 6
         email = 'blocked@zenodo.org'
         password = 'blocked'
+        password_salt = ''
+        password_scheme = 'sha512_crypt'
         note = '0'  # Administrator approval required
         nickname = 'blocked'

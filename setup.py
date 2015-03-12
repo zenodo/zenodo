@@ -36,7 +36,7 @@ import os
 from setuptools import find_packages, setup
 
 install_requires = [
-    "Invenio[img]>=1.9999.4,<1.9999.5",
+    "Invenio",
     "altmetric",
     "beautifulsoup4",
     "humanize",
