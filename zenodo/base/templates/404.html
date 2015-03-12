@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -20,28 +20,15 @@
 {% set title = None %}
 {% block body %}
 <div class="row">
-  {% if g.bibrec and g.bibrec.id %}
-  <div class="col-lg-offset-3 col-sm-6 col-md-6">
-    <div class="alert alert-warning">
-        <h3>New record</h3>
-        <p>This record was just uploaded, and will be available here shortly.</p>
-        <br/>
-    </div>
-  </div>
-  {% else %}
   <div class="alert alert-danger col-lg-offset-3 col-sm-6 col-md-6 alert-warning" align="center">
     <div class="page-header">
-      <h1>{{ _("Page Not Found") }}</h1>
+      <h1><i class="fa fa-warning"></i> {{ _("Page Not Found") }}</h1>
     </div>
-    <p>
-    {{ _("The page you were looking for doesn't exist.") }}<br>
-    {{ _("Click the following link to go to the main page:") }}
-    </p>
-    <p>
-      <a href="/">{{ _("Main page") }}</a>
+    <p>{{ _("The page you were looking for doesn't exist.") }}
+    {% if g.bibrec and g.bibrec.id %}
+    {{ _("If you just submitted a new upload, your record may still be in process of being uploaded. Do not hesitate to contact us if it takes longer than 5 minutes.") }}
+    {% endif %}
     </p>
   </div>
-  {% endif %}
 </div>
-
 {% endblock %}
