@@ -473,9 +473,7 @@ def transfer_ownership(deposition, user_id):
 # Workflow tasks
 # ==============
 def run_tasks(update=False):
-    """
-    Run bibtasklet and webcoll after upload.
-    """
+    """Run bibtasklet and webcoll after upload."""
     def _run_tasks(obj, dummy_eng):
         from invenio.legacy.bibsched.bibtask import task_low_level_submission
 
@@ -483,7 +481,6 @@ def run_tasks(update=False):
         sip = d.get_latest_sip(sealed=True)
 
         recid = sip.metadata['recid']
-        communities = sip.metadata.get('provisional_communities', [])
 
         common_args = []
         sequenceid = getattr(d.workflow_object, 'task_sequence_id', None)
@@ -501,12 +498,6 @@ def run_tasks(update=False):
         )
         sip.task_ids.append(task_id)
 
-        for c in communities:
-            task_id = task_low_level_submission(
-                'webcoll', 'webdeposit', '-c', 'provisional-user-%s' % c,
-                *common_args
-            )
-            sip.task_ids.append(task_id)
         d.update()
     return _run_tasks
 

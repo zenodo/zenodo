@@ -1514,11 +1514,18 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
 
         # File restrictions
         # - check file availability after changing to closed access
-        # - file is not publicly accessible.
-        # response = self.client.get(
-        #     url_for('record.files', recid=record_id) + "/test.pdf"
-        # )
-        # self.assertStatus(response, 401)
+        # - file *is* accessible by uploader.
+        response = self.client.get(
+            url_for('record.files', recid=record_id) + "/test.pdf"
+        )
+        self.assertStatus(response, 200)
+        # - file *is not* publicly accessible.
+        self.logout()
+        response = self.client.get(
+            url_for('record.files', recid=record_id) + "/test.pdf"
+        )
+        self.assertStatus(response, 404)
+
 
         # Edit deposition - now possible again
         response = self.post(
@@ -1654,10 +1661,11 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
         record_id = response.json['record_id']
 
+
         response = self.client.get(
             url_for('record.files', recid=record_id) + "/test.pdf"
         )
-        self.assertStatus(response, 401)
+        self.assertStatus(response, 404)
 
     def test_missing_file(self):
         # Test data
