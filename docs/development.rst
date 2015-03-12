@@ -94,7 +94,7 @@ Zenodo depends on specific versions of Invenio, which are managed using
 an Invenio fork located at https://github.com/zenodo/invenio. The Invenio fork has
 three branches:
 
-* ``pu-zenodo`` -- Default development branch that works with Zenodo ``master`` branch (https://github.com/zenodo/invenio/tree/master).
+* ``zenodo-master`` -- Default development branch that works with Zenodo ``master`` branch (https://github.com/zenodo/invenio/tree/zenodo-master).
 * ``qa`` -- Quality assurance branch that works with Zenodo ``qa`` branch (https://github.com/zenodo/invenio/tree/qa).
 * ``production`` -- Production branch that works with Zenodo ``production`` branch (https://github.com/zenodo/invenio/tree/production).
 
@@ -200,11 +200,11 @@ requirements files which broadly falls in two categories:
 **Zenodo/Invenio branch requirements:**
 
  - ``requirements.txt``: Default development setup requirements (includes
-   ``dev.requirements.txt`` as well as ``master``/``pu-zenodo`` branches of
+   ``dev.requirements.txt`` as well as ``master``/``zenodo-master`` branches of
    Zenodo/Invenio.)
  - ``requirements.master.txt``: Default master requirements (includes
-   ``base.requirements.txt`` as well as ``master``/``pu-zenodo`` branches of
-   Zenodo/Invenio.)
+   ``base.requirements.txt`` as well as ``master``/``zenodo-master`` branches
+   of Zenodo/Invenio.)
  - ``requirements.qa.txt``: Default QA requirements (includes
    ``base.requirements.txt`` as well as ``qa`` branches of
    Zenodo/Invenio.)
@@ -277,32 +277,32 @@ that potential issues are detected early.
 
     This is normally done by an integrator, and not by every developer.
 
-First update your local *pu* branch with upstream changes:
+First update your local *master* branch with upstream changes:
 
 .. code-block:: console
 
     (zenodo)$ cdvirtualenv src/invenio
     (zenodo)$ git fetch upstream
-    (zenodo)$ git checkout pu
-    (zenodo)$ git merge --ff-only upstream/pu
-    (zenodo)$ git checkout pu-zenodo
+    (zenodo)$ git checkout master
+    (zenodo)$ git merge --ff-only upstream/master
+    (zenodo)$ git checkout zenodo-master
 
-Review which of the commits in ``pu-zenodo`` that have already been integrated
-in Invenio:
+Review which of the commits in ``zenodo-master`` that have already been
+integrated in Invenio:
 
 .. code-block:: console
 
-    (zenodo)$ git log --oneline pu..pu-zenodo
+    (zenodo)$ git log --oneline master..zenodo-master
 
-Note, commits from ``pu-zenodo`` that was integrated in Invenio, will not
+Note, commits from ``zenodo-master`` that was integrated in Invenio, will not
 automatically be filtered out since they usually have a different SHA.
 
-Review changes in ``pu``:
+Review changes in ``master``:
 
 .. code-block:: console
 
-    (zenodo)$ git log --oneline pu-zenodo..pu
-    (zenodo)$ git log -u pu-zenodo..pu
+    (zenodo)$ git log --oneline zenodo-master..master
+    (zenodo)$ git log -u zenodo-master..master
 
 Checklist:
  - Commit log (search for ``NOTE`` bullet points in commit messages).
@@ -317,20 +317,20 @@ Checklist:
    ``zenodo/config.py:PACKAGES``.
  - New configuration variables (``config.py`` and ``invenio.conf``).
 
-Rebase the Invenio fork's ``pu-zenodo`` branch (it is advisable to create a
+Rebase the Invenio fork's ``zenodo-master`` branch (it is advisable to create a
 working branch and rebase that branch, since you may need several rebase
 iterations in case of conflicting changes):
 
 .. code-block:: console
 
-    (zenodo)$ git checkout -b aaa pu-zenodo
-    (zenodo)$ git rebase -i pu
-    (zenodo)$ git branch -m pu-zenodo pu-zenodo-old
-    (zenodo)$ git branch -m aaa pu-zenodo
+    (zenodo)$ git checkout -b aaa zenodo-master
+    (zenodo)$ git rebase -i master
+    (zenodo)$ git branch -m zenodo-master zenodo-master-old
+    (zenodo)$ git branch -m aaa zenodo-master
 
 Once rebased, make a pull request against Invenio with the commits in
-``pu-zenodo`` that are ready for integration:
+``zenodo-master`` that are ready for integration:
 
 .. code-block:: console
 
-    (zenodo)$ git log --oneline pu..pu-zenodo
+    (zenodo)$ git log --oneline master..zenodo-master

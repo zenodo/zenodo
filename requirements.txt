@@ -26,5 +26,5 @@
 -r dev.requirements.txt
 
 ## Invenio and Zenodo
--e git+https://github.com/zenodo/invenio@pu-zenodo#egg=Invenio
+-e git+https://github.com/zenodo/invenio@zenodo-master#egg=Invenio
 -e .[development]

@@ -120,11 +120,11 @@ just created environment.
 
     (zenodo)$ cdvirtualenv
     (zenodo)$ mkdir src; cd src
-    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio pu-zenodo
+    (zenodo)$ git-new-workdir $HOME/src/invenio/ invenio zenodo-master
     (zenodo)$ git-new-workdir $HOME/src/zenodo/ zenodo master
 
 By default we checkout the development branches ``master`` for Zenodo and
-``pu-zenodo`` for Invenio (see :ref:`branches` for other possibilities).
+``zenodo-master`` for Invenio (see :ref:`branches` for other possibilities).
 
 
 3.3 Installation

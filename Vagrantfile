@@ -27,7 +27,7 @@ chmod u+x ./invenio2-kickstart
 
 CFG_INVENIO2_REPOSITORY_GENERAL="git://github.com/zenodo/invenio" \
 CFG_INVENIO2_REPOSITORY_OVERLAY="git://github.com/zenodo/zenodo" \
-CFG_INVENIO2_REPOSITORY_GENERAL_BRANCH="pu-zenodo" \
+CFG_INVENIO2_REPOSITORY_GENERAL_BRANCH="zenodo-master" \
 CFG_INVENIO2_REPOSITORY_OVERLAY_BRANCH="master" \
 CFG_INVENIO2_VIRTUAL_ENV=zenodo \
 CFG_INVENIO2_DATABASE_USER=zenodo \

@@ -82,10 +82,10 @@ All in all a new feature roughly go through the following process:
 - Week 1-2:
     - Sprint planning
     - Package upgrades / Invenio rebasing.
-    - Feature development and maturing through ``zenodo/master`` and ``invenio/pu-zenodo``.
+    - Feature development and maturing through ``zenodo/master`` and ``invenio/zenodo-master``.
 - Week 3 (on Monday):
     - Sprint close-out
-    - Merge ``zenodo/master`` to ``zenodo/qa`` and ``invenio/pu-zenodo`` to ``invenio/qa``.
+    - Merge ``zenodo/master`` to ``zenodo/qa`` and ``invenio/zenodo-master`` to ``invenio/qa``.
     - Deploy ``zenodo/qa`` to QA cluster.
     - Test plan (prepare list of new features from closed sprint milestone)
     - Communication plan (prepare e.g. Twitter message to be send after production deployment).
