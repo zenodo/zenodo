@@ -1,6 +1,6 @@
 /*
  * This file is part of Zenodo.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Zenodo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -100,10 +100,10 @@
     module.exports.datepicker_config = datepicker_config;
 
     function community_approval(btn, action) {
-        recid = $(btn).data('recid');
-        coll = $(btn).data('collection');
-        url = $(btn).data('url');
-        spanid = "#curate_"+recid+"_"+coll;
+        var recid = $(btn).data('recid');
+        var coll = $(btn).data('collection');
+        var url = $(btn).data('url');
+        var spanid = "#curate_"+recid+"_"+coll;
         if(action == 'remove'){
             spanid = spanid + "_rm";
         }
