@@ -230,8 +230,8 @@ with initial data.
     (invenio)$ inveniomanage database init --user=root --password=$MYSQL_ROOT --yes-i-know
     (invenio)$ inveniomanage database create
 
-3.7. Background queues (FIXME)
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+3.7. Background queues
+~~~~~~~~~~~~~~~~~~~~~~
 
 Now you should be able to run the development server. Invenio uses
 `Celery <http://www.celeryproject.org/>`_ and `Redis <http://redis.io/>`_
@@ -283,6 +283,21 @@ When you have the servers running, it is possible to upload the demo records.
 And you may now open your favourite web browser on
 `http://0.0.0.0:4000/ <http://0.0.0.0:4000/>`_
 
+Also following background tasks is needed for regular operation of Zenodo:
+
+.. code-block:: console
+
+    $ bibindex -s5m -u admin
+    $ bibrank -s5m -u admin
+    $ bibrank -f50000 -R -wwrd -s14d -L Sunday -u admin
+    $ bibreformat -s5m -o HB,HD -u admin
+    $ bibsort -R -s7d -L Sunday 01:00-05:00 -u admin
+    $ bibsort -s5m -u admin
+    $ dbdump -s20h -L 22:00-06:00 --params="--max_allowed_packet=2G" -o /opt/zenodo/var/dbdump/ -n10 -u admin
+    $ inveniogc -a -s7d -L Sunday 01:00-05:00 -u admin
+    $ inveniogc -g -s1d -u admin
+    $ oairepositoryupdater -s1h -u admin
+    $ webcoll -s5m -u admin
 
 
 4.4 Fetching pull requests
