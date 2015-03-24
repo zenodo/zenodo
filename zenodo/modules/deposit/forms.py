@@ -389,8 +389,9 @@ class ZenodoForm(WebDepositForm):
     publication_date = fields.Date(
         label=_('Publication date'),
         icon='fa fa-calendar fa-fw',
-        description='Required. Format: YYYY-MM-DD. The date your upload was '
-        'made available in case it was already published elsewhere.',
+        description='Required. Format: YYYY-MM-DD. In case your upload '
+        'was already published elsewhere, please use the date of first'
+        ' publication.',
         default=date.today(),
         validators=[validators.DataRequired()],
         widget=date_widget,
