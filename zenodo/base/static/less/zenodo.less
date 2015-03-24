@@ -781,17 +781,20 @@ h1, h2, h3 {
 
 .comments hr { margin: 0px;}
 
-
-.altmetric-embed {
-    padding-left: 20px;
-}
-
 .well .altmetric-popover-content {
     background-color: transparent!important;
 }
 
 #_altmetric_popover_inner {
     width: auto!important;
+}
+
+.altmetric-embed:empty {
+  display: none;
+}
+
+#_altmetric_popover_inner {
+  width: 180px!important;
 }
 
 .field-desc {

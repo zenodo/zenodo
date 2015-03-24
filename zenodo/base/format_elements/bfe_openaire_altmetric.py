@@ -21,23 +21,26 @@
 ## or submit itself to any jurisdiction.
 
 
-def format_element(bfo, badgetype='donut', popover='', details='', css_class='', no_script=False):
+def format_element(bfo, badgetype='donut', hide=True, popover='', details='', css_class='', no_script=False):
     altmetric_id = bfo.field('035__a')
     doi = bfo.field('0247_a')
 
-    if altmetric_id and doi:
+    mentions = ''
+    if altmetric_id or doi:
         if popover:
             popover = " data-badge-popover=\"%s\"" % popover
         if details:
             details = " data-badge-details=\"%s\"" % details
+        if hide:
+            mentions = " data-hide-no-mentions=\"true\""
         if css_class:
             css_class = " %s" % css_class
 
         if no_script:
-            return """<div class="altmetric-embed%s" data-badge-type="%s"%s%s data-doi="%s"></div>""" % (css_class, badgetype, popover, details, doi)
+            return """<div class="altmetric-embed%s" data-badge-type="%s"%s%s%s data-doi="%s"></div>""" % (css_class, badgetype, popover, details, mentions, doi)
         else:
             return "<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>" \
-            "<div class='altmetric-embed%s' data-badge-type='%s'%s%s data-doi=\"%s\"></div>" % (css_class, badgetype, popover, details, doi)
+            "<div class='altmetric-embed%s' data-badge-type='%s'%s%s%s data-doi=\"%s\"></div>" % (css_class, badgetype, popover, details, mentions, doi)
     else:
         return ""
 

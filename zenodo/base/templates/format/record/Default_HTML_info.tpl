@@ -1,6 +1,6 @@
 {%- from "github/helpers.html" import doi_badge with context %}
 
-{{ bfe_openaire_altmetric(bfo, prefix='<div class="well metadata">', suffix="</div>", badgetype='donut', details='left', no_script='1') }}
+{{ bfe_openaire_altmetric(bfo, css_class=' well', badgetype='donut', details='left', no_script='1') }}
 
 {% set published_in = record|zenodo_related_links %}
 
