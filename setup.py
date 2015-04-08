@@ -49,7 +49,7 @@ install_requires = [
 extras_require = {
     "development": [
         "Flask-DebugToolbar==0.9.0",
-        "Invenio-Kwalitee",
+        "kwalitee",
         "ipython",
         "ipdb",
     ]
