@@ -24,7 +24,10 @@
 
 import textwrap
 
+from invenio.utils.date import strftime
+
 import six
+
 from slugify import slugify
 
 
@@ -294,7 +297,7 @@ class Bibtex(object):
         try:
             return self._format_entry(name, req_fileds,
                                       opt_fileds, ign_fields)
-        except:
+        except Exception:
             return "This record cannot be exported to BibTEX."
 
     def _fetch_fields(self, req_fileds, opt_fileds=[], ign_fields=[]):
@@ -356,6 +359,8 @@ class Bibtex(object):
                     out += u" {0:<16} {1:<} and\n".format("", line)
                 out += u" {0:<16} {1:<}}},\n".format("", value[-1])
         elif len(value) >= 50:
+            if isinstance(value, basestring):
+                value = value.strip()
             wrapped = textwrap.wrap(value, 50)
             out += u"  {0:<12} = {{{{{1} \n".format(field, wrapped[0])
             for line in wrapped[1:-1]:
@@ -457,7 +462,7 @@ class Bibtex(object):
     def _get_year(self):
         """Return the year of publication."""
         if "publication_date" in self.record:
-            return self.record["publication_date"].strftime("%Y")
+            return strftime("%Y", self.record["publication_date"])
         else:
             return ""
 
