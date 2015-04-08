@@ -1,6 +1,6 @@
 /*
  * This file is part of Zenodo.
- * Copyright (C) 2014 CERN.
+ * Copyright (C) 2014, 2015 CERN.
  *
  * Zenodo is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ require.config({
   baseUrl: "/",
   paths: {
     jquery: "vendors/jquery/dist/jquery",
+    "jquery.ui": "vendors/jquery-ui/jquery-ui",
     ui: "vendors/jquery-ui/ui",
     "jqueryui-timepicker": "vendors/jqueryui-timepicker-addon/dist",
     "jquery-form": "vendors/jquery-form/jquery.form",

@@ -54,6 +54,7 @@ before_install:
 # Build/install steps
 install:
   - "travis_retry pip install -r ${REQUIREMENTS} --exists-action i"
+  - "travis_retry pip install unittest2"
   - "inveniomanage bower > bower.json"
   - "bower install"
   - "inveniomanage collect > /dev/null"
