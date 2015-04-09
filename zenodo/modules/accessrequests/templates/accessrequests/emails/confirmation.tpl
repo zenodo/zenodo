@@ -19,9 +19,9 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 #}
-Your access request has been completed and sent to the owner of the record. It is fully the decision of the owner if they grant/deny access. In particular, Zenodo staff is not involved in this decision.
+Your access request has been successfully sent to the record owner. The decision whether to grant/deny access is solely under the responsibility of the record owner. Hence, please note that {{config.CFG_SITE_NAME}} staff are not involved in this decision.
 
-Also note that the owner not allowed to charge you for granting access to the record hosted on Zenodo. Please notify us if this happens.
+Also note that the record owner is not allowed to charge you for granting access to the record hosted on {{config.CFG_SITE_NAME}}. Please notify us if this happens.
 
 Record:
 {{ record["title"] }}

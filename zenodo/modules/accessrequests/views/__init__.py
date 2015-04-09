@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Access requests blueprints."""
+
 from __future__ import absolute_import
 
 from .requests import blueprint as requests_blueprint

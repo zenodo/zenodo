@@ -24,11 +24,10 @@
 
 from __future__ import absolute_import
 
-from datetime import datetime, date
+from datetime import date, datetime
 
 from flask import url_for
 from sqlalchemy_utils.types import ChoiceType, EncryptedType
-
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
@@ -38,14 +37,15 @@ from invenio.modules.accounts.models import User
 
 from .errors import InvalidRequestStateError
 from .receivers import connect_receivers
-from .signals import request_accepted, request_rejected, request_created, \
-    request_confirmed, link_created, link_revoked
+from .signals import link_created, link_revoked, request_accepted, \
+    request_confirmed, request_created, request_rejected
 from .tokens import SecretLinkFactory
 
 
 class RequestStatus(object):
 
-    """Request status representation."""
+    """Access request status representation."""
+
     EMAIL_VALIDATION = u'C'
     PENDING = u'P'
     ACCEPTED = u'A'
@@ -119,7 +119,8 @@ class SecretLink(db.Model):
         """Validate a secret link token.
 
         Only queries the database if token is valid to determine that the token
-        has not been revoked."""
+        has not been revoked.
+        """
         data = SecretLinkFactory.validate_token(
             token, expected_data=expected_data
         )
@@ -164,7 +165,7 @@ class SecretLink(db.Model):
         )
 
     def revoke(self):
-        """Create a new secret link."""
+        """Revoken a secret link."""
         if self.revoked_at is None:
             self.revoked_at = datetime.now()
             db.session.commit()

@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Test signal receivers."""
+
 from __future__ import absolute_import
 
 from flask_email.backends import locmem as mail
@@ -33,6 +35,8 @@ from .helpers import BaseTestCase
 
 class ReceiversTestCase(BaseTestCase):
 
+    """Test signal receivers."""
+
     config = {
         "EMAIL_BACKEND": "flask.ext.email.backends.locmem.Mail"
     }
@@ -40,11 +44,13 @@ class ReceiversTestCase(BaseTestCase):
     render_templates = False
 
     def tearDown(self):
+        """Clean test mailbox."""
         if len(mail.outbox) != 0:
             mail.outbox = []
         super(ReceiversTestCase, self).tearDown()
 
     def test_send_notification(self):
+        """Test sending of notifications."""
         from zenodo.modules.accessrequests.receivers import \
             _send_notification
 
@@ -65,6 +71,7 @@ class ReceiversTestCase(BaseTestCase):
 
     @patch('zenodo.modules.accessrequests.receivers.get_record')
     def test_create_secret_link(self, get_record):
+        """Test creation of secret link."""
         from zenodo.modules.accessrequests.receivers import \
             create_secret_link
 
@@ -86,6 +93,7 @@ class ReceiversTestCase(BaseTestCase):
 
     @patch('zenodo.modules.accessrequests.receivers.get_record')
     def test_create_secret_link_norecord(self, get_record):
+        """Test creation of secret link with no record."""
         from zenodo.modules.accessrequests.errors import RecordNotFound
         from zenodo.modules.accessrequests.receivers import \
             create_secret_link

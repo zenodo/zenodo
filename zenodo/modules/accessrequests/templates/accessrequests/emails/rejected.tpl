@@ -19,7 +19,7 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 #}
-Your access request has been rejected by the owner of the record.
+Your access request has been rejected by the record owner.
 
 Message from owner:
 {{message}}
@@ -28,4 +28,4 @@ Record:
 {{ record["title"] }}
 {{ url_for('record.metadata', recid=record['recid'], _external=True) }}
 
-Please note that this is fully the decision of the owner, and that in particular {{config.CFG_SITE_NAME}} staff is not involved in this decision.
+The decision to reject the request is solely under the responsibility of the record owner. Hence, please note that {{config.CFG_SITE_NAME}} staff are not involved in this decision.

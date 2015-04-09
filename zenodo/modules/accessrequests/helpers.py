@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Helper classes to make working with column ordering in templates easier."""
+
 from sqlalchemy.sql.expression import desc
 
 
@@ -28,6 +30,12 @@ class Ordering(object):
     """Helper class for column sorting."""
 
     def __init__(self, options, selected):
+        """Initialize ordering with possible options the selected option.
+
+        :param options: List of column options.
+        :param selected: Selected column. Prefix name with ``-`` to denote
+            descending ordering.
+        """
         self.options = options
         if selected in options:
             self._selected = selected
@@ -40,6 +48,7 @@ class Ordering(object):
             self.asc = None
 
     def reverse(self, col):
+        """Get reverse direction of ordering."""
         if col in self.options:
             if self.is_selected(col):
                 return col if not self.asc else '-{0}'.format(col)
@@ -48,24 +57,35 @@ class Ordering(object):
         return None
 
     def dir(self, col, asc='asc', desc='desc'):
+        """Get direction (ascending/descending) of ordering."""
         if col == self._selected and self.asc is not None:
             return asc if self.asc else desc
         else:
             return None
 
     def is_selected(self, col):
+        """Determine if column is being order by."""
         return col == self._selected
 
     def selected(self):
-        return self._selected if self.asc else "-{0}".format(self._selected)
+        """Get column which is being order by."""
+        if self._selected:
+            return self._selected if self.asc else \
+                "-{0}".format(self._selected)
+        return None
 
 
 class QueryOrdering(Ordering):
+
+    """Helper class for column sorting based on SQLAlchemy queries."""
+
     def __init__(self, query, options, selected):
+        """Initialize with SQLAlchemy query."""
         super(QueryOrdering, self).__init__(options, selected)
         self.query = query
 
     def items(self):
+        """Get query with correct ordering."""
         if self.asc is not None:
             if self._selected and self.asc:
                 return self.query.order_by(self._selected)

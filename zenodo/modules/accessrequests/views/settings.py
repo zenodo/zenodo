@@ -20,6 +20,7 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Accounts settings views for pending access requests and shared links."""
 
 from __future__ import absolute_import
 
@@ -27,20 +28,18 @@ import re
 
 from flask import Blueprint, abort, flash, redirect, render_template, \
     request, url_for
-from flask_login import login_required, current_user
 from flask_breadcrumbs import register_breadcrumb
+from flask_login import current_user, login_required
 from flask_menu import register_menu
-from jinja2 import evalcontextfilter, Markup, escape
-
+from jinja2 import Markup, escape, evalcontextfilter
 
 from invenio.base.i18n import _
-from invenio.ext.sqlalchemy import db
 from invenio.ext.sslify import ssl_required
 from invenio.modules.records.api import get_record
 
 from ..forms import ApprovalForm, DeleteForm
-from ..models import AccessRequest, SecretLink, RequestStatus
 from ..helpers import QueryOrdering
+from ..models import AccessRequest, RequestStatus, SecretLink
 
 
 blueprint = Blueprint(
@@ -58,6 +57,7 @@ _paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @blueprint.app_template_filter()
 @evalcontextfilter
 def nl2br(eval_ctx, value):
+    """Template filter to convert newlines to <br>-tags."""
     result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n')
                           for p in _paragraph_re.split(escape(value)))
     if eval_ctx.autoescape:
@@ -79,6 +79,7 @@ def nl2br(eval_ctx, value):
     blueprint, 'breadcrumbs.settings.sharedlinks', _('Shared links')
 )
 def index():
+    """List pending access requests and shared links."""
     query = request.args.get('query', '')
     order = request.args.get('sort', '-created')
     try:
@@ -93,7 +94,7 @@ def index():
         link = SecretLink.query_by_owner(current_user).filter_by(
             id=form.link.data).first()
         if link.revoke():
-            flash(_("Shared link deleted."), category='success')
+            flash(_("Shared link revoked."), category='success')
 
     # Links
     links = SecretLink.query_by_owner(current_user).filter(
@@ -134,6 +135,7 @@ def index():
     _('Access request')
 )
 def accessrequest(request_id):
+    """Accept/reject access request."""
     r = AccessRequest.get_by_receiver(request_id, current_user)
     if not r or r.status != RequestStatus.PENDING:
         abort(404)

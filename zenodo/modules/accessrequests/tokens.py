@@ -25,6 +25,7 @@
 import binascii
 import os
 
+from base64 import urlsafe_b64encode
 from datetime import datetime
 
 from itsdangerous import BadData, JSONWebSignatureSerializer, \
@@ -34,7 +35,8 @@ from invenio.base.globals import cfg
 
 
 class TokenMixin(object):
-    """Mixin class for token serializers."""
+
+    """Mix-in class for token serializers."""
 
     def create_token(self, obj_id, extra_data):
         """Create a token referencing the object id with extra data.
@@ -84,10 +86,12 @@ class TokenMixin(object):
 
 
 class EncryptedTokenMixIn(TokenMixin):
-    """Mixin class for token serializers that generate encrypted tokens."""
+
+    """Mix-in class for token serializers that generate encrypted tokens."""
 
     @property
     def engine(self):
+        """Get cryptographic engine."""
         if not hasattr(self, '_engine'):
             from cryptography.fernet import Fernet
             from cryptography.hazmat.backends import default_backend
@@ -95,15 +99,12 @@ class EncryptedTokenMixIn(TokenMixin):
 
             digest = hashes.Hash(hashes.SHA256(), backend=default_backend())
             digest.update(cfg['SECRET_KEY'].encode('utf8'))
-            fernet_key = digest.finalize()
+            fernet_key = urlsafe_b64encode(digest.finalize())
             self._engine = Fernet(fernet_key)
         return self._engine
 
     def create_token(self, obj_id, extra_data):
-        """Create a token referencing the object id with extra data.
-
-        Note random data is added to ensure that no two tokens are identical.
-        """
+        """Create a token referencing the object id with extra data."""
         return self.engine.encrypt(
             super(EncryptedTokenMixIn, self).create_token(obj_id, extra_data)
         )
@@ -148,7 +149,6 @@ class SecretLinkSerializer(JSONWebSignatureSerializer,
 
     def __init__(self):
         """Initialize underlying JSONWebSignatureSerializer."""
-
         super(SecretLinkSerializer, self).__init__(
             cfg['SECRET_KEY'],
             salt='accessrequests-link',

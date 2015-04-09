@@ -66,9 +66,9 @@ def format_element(bfo, as_label=False, only_restrictions=False, brief=False):
                 return """<a href="/search?p=542__l:open" class="label label-success">%s</a>""" % _(access)
         elif access_rights in ('restricteDaccess', 'restricted'):
             if brief:
-                return """<a href="%s" class="label label-warning">%s</a>""" % (url, access)
+                return """<a href="%s" class="label label-danger">%s</a>""" % (url, access)
             else:
-                return """<a href="/search?p=542__l:restricted" class="label label-warning">%s</a>""" % _(access)
+                return """<a href="/search?p=542__l:restricted" class="label label-danger">%s</a>""" % _(access)
         elif access_rights == 'cc0':
             return """<a class="label label-success">%s</a>""" % _(access)
     else:

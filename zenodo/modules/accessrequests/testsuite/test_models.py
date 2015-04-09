@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Model tests."""
+
 from __future__ import absolute_import
 
 from datetime import datetime, timedelta
@@ -30,7 +32,11 @@ from .helpers import BaseTestCase
 
 
 class AccessRequestTestCase(BaseTestCase):
+
+    """Test of access request model."""
+
     def test_create_nouser(self):
+        """Test access request creation without user."""
         from zenodo.modules.accessrequests.models import AccessRequest, \
             RequestStatus
         from zenodo.modules.accessrequests.signals import \
@@ -57,7 +63,8 @@ class AccessRequestTestCase(BaseTestCase):
                 self.assertIsNotNone(self.called['created'])
                 self.assertIsNone(self.called['confirmed'])
 
-    def test_create_user(self):
+    def test_create_withuser(self):
+        """Test access request creation with user."""
         from zenodo.modules.accessrequests.models import AccessRequest, \
             RequestStatus
         from zenodo.modules.accessrequests.signals import \
@@ -87,6 +94,7 @@ class AccessRequestTestCase(BaseTestCase):
                 self.assertIsNotNone(self.called['confirmed'])
 
     def test_accept(self):
+        """Test accept signal and state."""
         from zenodo.modules.accessrequests.errors import \
             InvalidRequestStateError
         from zenodo.modules.accessrequests.models import RequestStatus
@@ -114,6 +122,7 @@ class AccessRequestTestCase(BaseTestCase):
             self.assertRaises(InvalidRequestStateError, r.confirm_email)
 
     def test_reject(self):
+        """Test reject signal and state."""
         from zenodo.modules.accessrequests.errors import \
             InvalidRequestStateError
         from zenodo.modules.accessrequests.models import RequestStatus
@@ -137,6 +146,7 @@ class AccessRequestTestCase(BaseTestCase):
             self.assertRaises(InvalidRequestStateError, r.confirm_email)
 
     def test_confirm_email(self):
+        """Test confirm email signal and state."""
         from zenodo.modules.accessrequests.models import RequestStatus
 
         from zenodo.modules.accessrequests.signals import \
@@ -151,7 +161,8 @@ class AccessRequestTestCase(BaseTestCase):
                 self.called['confirmed']['args'][0]
             )
 
-    def test_get_query_by_receiver(self):
+    def test_query_by_receiver(self):
+        """Test query by receiver."""
         from zenodo.modules.accessrequests.models import AccessRequest
         self.assertEqual(
             AccessRequest.query_by_receiver(self.receiver).count(),
@@ -176,6 +187,7 @@ class AccessRequestTestCase(BaseTestCase):
             r.id, self.sender))
 
     def test_create_secret_link(self):
+        """Test creation of secret link via token."""
         r = self.get_request(confirmed=False)
         l = r.create_secret_link(
             "My link", "Link description",
@@ -189,7 +201,11 @@ class AccessRequestTestCase(BaseTestCase):
 
 
 class SecretLinkTestCase(BaseTestCase):
+
+    """Test of secret link model."""
+
     def test_creation(self):
+        """Test link creation."""
         from zenodo.modules.accessrequests.models import SecretLink
 
         from zenodo.modules.accessrequests.signals import \
@@ -209,6 +225,7 @@ class SecretLinkTestCase(BaseTestCase):
             assert not SecretLink.validate_token(l.token, dict(recid=2))
 
     def test_revoked(self):
+        """Test link revocation."""
         from zenodo.modules.accessrequests.models import SecretLink
 
         from zenodo.modules.accessrequests.signals import \
@@ -227,7 +244,10 @@ class SecretLinkTestCase(BaseTestCase):
 
             self.assertIsNotNone(self.called['revoked'])
 
+            self.assertFalse(l.revoke())
+
     def test_expired(self):
+        """Test link expiry date."""
         from zenodo.modules.accessrequests.models import SecretLink
 
         l = SecretLink.create(
@@ -245,6 +265,7 @@ class SecretLinkTestCase(BaseTestCase):
         assert l.is_valid()
 
     def test_query_by_owner(self):
+        """Test query by owner."""
         from zenodo.modules.accessrequests.models import SecretLink
 
         self.assertEqual(
@@ -264,6 +285,7 @@ class SecretLinkTestCase(BaseTestCase):
             0)
 
     def test_get_absolute_url(self):
+        """Test absolute url."""
         from zenodo.modules.accessrequests.models import SecretLink
 
         l = SecretLink.create("Testing", self.receiver, dict(recid=1))

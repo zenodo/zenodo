@@ -19,16 +19,17 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 #}
-Your access request has been accepted by the owner of the record. To access the record please open your private link:
+Your access request has been accepted by the record owner. To access the record please open your private link:
 
 {{record_link}}
 
 {%- if expires_at %}
 The link expires on {{expires_at}}.{% endif -%}
 {% if message %}
+
 Message from owner:
 {{message}}{% endif %}
 
-IMPORTANT! Do not share above link. The link is private to you.
+IMPORTANT! Do not share above link. The link is private to you. Instead please redirect collaborators to request a link for themselves.
 
 Please note that the owner may revoke the link at any anytime without prior notification.

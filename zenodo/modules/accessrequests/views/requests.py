@@ -20,19 +20,20 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Views for creating access requests and sending access restricted files."""
+
 from datetime import date
 
-from flask import Blueprint, current_app, request, abort, render_template, \
-    flash, url_for, redirect, send_file
+from flask import Blueprint, abort, current_app, flash, redirect, \
+    render_template, request, send_file, url_for
 from flask_login import current_user
 
 from invenio.base.i18n import _
 from invenio.ext.sslify import ssl_required
+from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
 from invenio.modules.accounts.models import User
 from invenio.modules.records.api import get_record
 from invenio.modules.records.views import request_record
-from invenio.legacy.bibdocfile.api import BibRecDocs, InvenioBibDocFileError
-
 
 from ..forms import AccessRequestForm
 from ..models import AccessRequest, RequestStatus, SecretLink
@@ -65,6 +66,7 @@ def get_bibdocfile(bibarchive, filename):
 
 @blueprint.app_template_filter(name="is_restricted")
 def is_restricted(record):
+    """Template filter to check if a record is restricted."""
     return record.get('access_right') == 'restricted' and \
         record.get('access_conditions') and \
         record.get('owner', {}).get('id')
@@ -72,9 +74,16 @@ def is_restricted(record):
 
 @blueprint.app_template_filter()
 def is_embargoed(record):
+    """Template filter to check if a record is embargoed."""
     return record.get('access_right') == 'embargoed' and \
         record.get('embargo_date') and \
         record.get('embargo_date') > date.today()
+
+
+@blueprint.app_template_filter()
+def is_removed(record):
+    """Template filter to check if a record is removed."""
+    return {'primary': 'SPAM'} in record.get('collections', [])
 
 #
 # Views
@@ -177,6 +186,8 @@ def file(recid=None, filename=None):
 
     This is a simple reimplementation of legacy bibdocfile file serving. Only
     the latest version of a file can be served.
+
+    Note a generated link is independent of
     """
     if not SecretLink.validate_token(request.args.get('token'),
                                      dict(recid=recid)):

@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Access request signals."""
+
 from blinker import Namespace
 _signals = Namespace()
 

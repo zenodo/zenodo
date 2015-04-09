@@ -34,4 +34,5 @@ class InvalidRequestStateError(AccessRequestError):
 
 
 class RecordNotFound(AccessRequestError):
+
     """Record for recid was not found."""

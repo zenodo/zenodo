@@ -23,8 +23,8 @@
 
 """Button widget for WTForms."""
 
-from wtforms.widgets import HTMLString, html_params
 from wtforms.compat import text_type
+from wtforms.widgets import HTMLString, html_params
 
 
 class Button(object):
@@ -34,9 +34,11 @@ class Button(object):
     input_type = 'submit'
 
     def __init__(self, icon=None):
+        """Initialize button."""
         self._icon = icon
 
     def __call__(self, field, **kwargs):
+        """Render button."""
         kwargs.setdefault('id', field.id)
         kwargs.setdefault('type', self.input_type)
         kwargs.setdefault('value', "y")

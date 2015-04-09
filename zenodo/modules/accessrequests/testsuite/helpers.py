@@ -20,6 +20,8 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
+"""Base test case for access requests."""
+
 from __future__ import absolute_import
 
 from invenio.testsuite import InvenioTestCase
@@ -27,7 +29,11 @@ from invenio.ext.sqlalchemy import db
 
 
 class BaseTestCase(InvenioTestCase):
+
+    """Access request base test case."""
+
     def setUp(self):
+        """Setup needed related models."""
         from zenodo.modules.accessrequests.models import AccessRequest, \
             SecretLink
         from invenio.modules.accounts.models import User
@@ -60,10 +66,19 @@ class BaseTestCase(InvenioTestCase):
         self.called = dict()
 
     def tearDown(self):
+        """Clear db session."""
         db.session.expunge_all()
 
     def get_receiver(self, name):
-        """Create a signal receiver."""
+        """Create a signal receiver.
+
+        Asserting that the receiver has been called can be done with::
+
+            self.called[name]
+
+        The value of above attribute will contain the latest arguments that
+        the receiver was called with.
+        """
         self.called[name] = None
 
         def _receiver(*args, **kwargs):
@@ -72,6 +87,7 @@ class BaseTestCase(InvenioTestCase):
         return _receiver
 
     def get_request(self, confirmed=False):
+        """Create an access request."""
         from zenodo.modules.accessrequests.models import AccessRequest
 
         return AccessRequest.create(

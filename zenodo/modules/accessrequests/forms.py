@@ -21,17 +21,17 @@
 # or submit itself to any jurisdiction.
 
 
-""" Forms for module. """
+"""Forms for module."""
 
 from datetime import date, timedelta
 
-from wtforms import TextField, TextAreaField, SubmitField, HiddenField, \
-    DateField
+from wtforms import DateField, HiddenField, StringField, SubmitField, \
+    TextAreaField
 from wtforms import validators
 
 from invenio.base.i18n import _
-from invenio.utils.forms import InvenioBaseForm
 from invenio.modules.accounts.forms import email_validator
+from invenio.utils.forms import InvenioBaseForm
 
 from .widgets import Button
 
@@ -41,7 +41,11 @@ def validate_expires_at(form, field):
     if form.accept.data:
         if not field.data or date.today() >= field.data:
             raise validators.StopValidation(_(
-                "Please provide a date in the future."
+                "Please provide a future date."
+            ))
+        if not field.data or date.today()+timedelta(days=365) < field.data:
+            raise validators.StopValidation(_(
+                "Please provide a date no more than 1 year into the future."
             ))
 
 
@@ -49,13 +53,13 @@ class AccessRequestForm(InvenioBaseForm):
 
     """Form for requesting access to a record."""
 
-    full_name = TextField(
+    full_name = StringField(
         label=_("Full name"),
         description=_("Required."),
         validators=[validators.DataRequired()]
     )
 
-    email = TextField(
+    email = StringField(
         label=_("Email address"),
         description=_(
             "Required. Please carefully check your email address. If the owner"
@@ -89,7 +93,8 @@ class ApprovalForm(InvenioBaseForm):
         label=_('Expires'),
         description=_(
             'Format: YYYY-MM-DD. Required if you accept the request. The '
-            ' access will automatically be revoked on this date.'
+            'access will automatically be revoked on this date. Date must be '
+            'within next year.'
         ),
         default=lambda: date.today() + timedelta(days=31),
         validators=[validate_expires_at, validators.Optional()],
@@ -97,6 +102,20 @@ class ApprovalForm(InvenioBaseForm):
 
     accept = SubmitField(_("Accept"), widget=Button(icon="fa fa-check"))
     reject = SubmitField(_("Reject"), widget=Button(icon="fa fa-times"))
+
+    def validate_accept(form, field):
+        """Validate that accept have not been set."""
+        if field.data and form.reject.data:
+            raise validators.ValidationError(
+                _("Both reject and accept cannot be set at the same time.")
+            )
+
+    def validate_reject(form, field):
+        """Validate that accept have not been set."""
+        if field.data and form.accept.data:
+            raise validators.ValidationError(
+                _("Both reject and accept cannot be set at the same time.")
+            )
 
     def validate_message(form, field):
         """Validate message."""
@@ -113,4 +132,4 @@ class DeleteForm(InvenioBaseForm):
 
     link = HiddenField()
 
-    delete = SubmitField(_("Delete"), widget=Button(icon="fa fa-trash-o"))
+    delete = SubmitField(_("Revoke"), widget=Button(icon="fa fa-trash-o"))

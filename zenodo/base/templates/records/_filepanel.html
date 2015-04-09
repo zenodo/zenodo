@@ -32,7 +32,7 @@
       <h5><i class="fa fa-ban" style="color: red;"></i> Restricted access</h5>
       <p><small class="text-muted">
       {% if file_token %}
-      You have access to the files in this upload subject to the conditions below because the owner granted you access.
+      The owner has granted you access to the files in this record, subject to the conditions below:
       {% else %}
       You have access to the files in this upload because you are the owner. Other users may request access to the files in this upload, provided that they fulfil the conditions below:
       {% endif %}
@@ -88,7 +88,7 @@
   <div class="collapse in" id="collapseTwo">
     <div class="panel-body">
       <h5><i class="fa fa-ban" style="color: red;"></i> {{ _("Restricted access") }}</h5>
-      <p><small class="text-muted">You may request access to the files in this upload, provided that you fulfil the conditions below. It is fully the decision of the owner to grant/deny access to the files.</small></p>
+      <p><small class="text-muted">You may request access to the files in this upload, provided that you fulfil the conditions below. The decision whether to grant/deny access is solely under the responsibility of the record owner.</small></p>
       <hr />
       {{record.get('access_conditions')|safe}}
       <hr />
