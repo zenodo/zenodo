@@ -347,17 +347,6 @@ CFG_OAI_ID_PREFIX = "zenodo.org"
 CFG_OAI_SAMPLE_IDENTIFIER = "oai:zenodo.org:103"
 CFG_OAI_FILTER_RESTRICTED_RECORDS = False
 CFG_OAI_IDENTIFY_DESCRIPTION = """<description>
-   <oai-identifier xmlns="http://www.openarchives.org/OAI/2.0/oai-identifier"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.openarchives.org/OAI/2.0/oai-identifier
-                                       http://www.openarchives.org/OAI/2.0/oai-identifier.xsd">
-      <scheme>oai</scheme>
-      <repositoryIdentifier>zenodo.org</repositoryIdentifier>
-      <delimiter>:</delimiter>
-      <sampleIdentifier>oai:zenodo.org:103</sampleIdentifier>
-   </oai-identifier>
- </description>
- <description>
   <eprints xmlns="http://www.openarchives.org/OAI/1.1/eprints"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xsi:schemaLocation="http://www.openarchives.org/OAI/1.1/eprints
