@@ -424,6 +424,8 @@ def merge(deposition, dest, a, b):
         a['provisional_communities'].append(CFG_ECFUNDED_USER_COLLECTION_ID)
         b['provisional_communities'].append(CFG_ECFUNDED_USER_COLLECTION_ID)
 
+    b["doi"] = a["doi"]
+
     # Now proceed, with normal merging.
     data = merge_changes(deposition, dest, a, b)
 

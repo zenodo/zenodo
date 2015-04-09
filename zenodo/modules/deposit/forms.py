@@ -942,6 +942,7 @@ class ZenodoEditForm(ZenodoForm, EditFormMixin):
             local_datacite_lookup
         ],
         export_key='doi',
+        readonly="true"
     )
     prereserve_doi = None
     plupload_file = None
