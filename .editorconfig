@@ -11,6 +11,10 @@ charset = utf-8
 [*.py]
 indent_style = space
 indent_size = 4
+#isort
+known_first_party=invenio,zenodo
+multi_line_output=2
+default_section=THIRDPARTY
 
 # JS files
 [*.js]
