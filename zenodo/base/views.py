@@ -127,8 +127,6 @@ def register_menu_items():
         item = current_menu.submenu("main")
         item._child_entries.pop('documentation', None)
 
-        item = current_menu.submenu("settings.groups")
-        item.hide()
         item = current_menu.submenu("settings.workflows")
         item.hide()
 
