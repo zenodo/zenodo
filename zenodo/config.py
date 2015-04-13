@@ -244,7 +244,7 @@ RECORDS_BREADCRUMB_TITLE_KEY = 'title'
 DEBUG = True
 DEBUG_TB_ENABLED = True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
-CFG_EMAIL_BACKEND = "flask.ext.email.backends.console.Mail"
+CFG_EMAIL_BACKEND = "flask_email.backends.console.Mail"
 
 APACHE_CERTIFICATE_FILE = os.path.join(sys.prefix, 'etc/certs/localhost.crt')
 APACHE_CERTIFICATE_KEYFILE = os.path.join(

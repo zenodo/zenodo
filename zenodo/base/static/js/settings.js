@@ -50,8 +50,12 @@ require.config({
     "jasmine-core": "vendors/jasmine/lib/jasmine-core/jasmine",
     "jasmine-html": "vendors/jasmine/lib/jasmine-core/jasmine-html",
     "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
+    "jasmine-flight": "vendors/jasmine-flight/lib/jasmine-flight",
     "jasmine-boot": "js/jasmine/boot",
     "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
+    "jasmine-events": "js/jasmine/events_checker",
+    "jasmine-initialization": "js/jasmine/initialization_checker",
+    "select2": "vendor/select2/select2.min",
     /* Zenodo extras */
     "bootstrap-switch": "vendors/bootstrap-switch/dist/js/bootstrap-switch"
   },
@@ -121,19 +125,39 @@ require.config({
     "jasmine-core": {
       exports: "jasmineRequire"
     },
+    "jasmine-boot": {
+      exports: "jasmine",
+    },
     "jasmine-jquery": {
-      deps: ["jquery", "jasmine-boot"]
+      deps: ["jquery", "jasmine-boot"],
+      exports: "jasmine"
     },
     "jasmine-ajax": {
       deps: ["jasmine-boot"],
+      exports: "jasmine"
     },
     "jasmine-html": {
       deps: ["jasmine-core"],
       exports: "jasmineRequire"
     },
+    "jasmine-flight": {
+      deps: ["jasmine-boot", "jasmine-jquery"],
+      exports: "jasmine"
+    },
     "vendors/jasmine/lib/jasmine-core/boot": {
-      deps: ['jasmine-html'],
-      exports: "window.onload",
+      deps: ["jasmine-html"],
+      exports: "window.onload"
+    },
+    "jasmine-events": {
+      deps: ["jasmine-jquery"],
+      exports: "jasmine.EventsChecker"
+    },
+    "jasmine-initialization": {
+      deps: ["jasmine-boot"]
+    },
+    select2: {
+      deps: ["jquery"],
+      exports: "select2"
     },
     /* Zenodo extras */
     "bootstrap-switch": {

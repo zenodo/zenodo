@@ -30,7 +30,7 @@ Flask-Breadcrumbs==0.2.0
 Flask-Cache==0.13.1
 Flask-Collect==1.2.1
 Flask-Email==1.4.4
-Flask-Gravatar==0.4.1
+Flask-Gravatar==0.4.2
 Flask-Login==0.2.11
 Flask-Menu==0.2.0
 Flask-Principal==0.4.0
