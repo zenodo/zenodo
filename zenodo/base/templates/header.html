@@ -126,7 +126,6 @@
                   <li><a href="{{ item.url }}">{{ item.text|safe }}</a></li>
                   {%- endfor %}
                   <li><a href="{{ url_for('webdeposit.index')}}"><i class="fa fa-upload fa-fw"></i> {{ _("My uploads") }}</a></li>
-                  <li><a href="{{ url_for('communities.index')}}"><i class="fa fa-group fa-fw"></i> {{ _("My communities") }}</a></li>
                   <li class="divider"></li>
                   <li><a href="{{ url_for('youraccount.logout') }}">
                     <i class="fa fa-sign-out"></i> {{ _("Sign out") }}

@@ -215,6 +215,7 @@ DEPOSIT_DEFAULT_TYPE = "zenodo.modules.deposit.workflows.upload:upload"
 COMMUNITIES_PARENT_NAME = 'Communities'
 COMMUNITIES_PARENT_NAME_PROVISIONAL = 'Communities'
 COMMUNITIES_PORTALBOXES = [
+    'communities/portalbox_manage.html',
     'communities/portalbox_main.html',
     'communities/portalbox_upload.html'
 ]

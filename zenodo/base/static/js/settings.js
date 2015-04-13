@@ -52,6 +52,8 @@ require.config({
     "jasmine-ajax": "vendors/jasmine-ajax/lib/mock-ajax",
     "jasmine-boot": "js/jasmine/boot",
     "searchtypeahead-configuration": "js/search/default_typeahead_configuration",
+    "ckeditor-core": "vendors/ckeditor/ckeditor",
+    "ckeditor-jquery": "vendors/ckeditor/adapters/jquery",
     /* Zenodo extras */
     "bootstrap-switch": "vendors/bootstrap-switch/dist/js/bootstrap-switch"
   },
@@ -134,6 +136,9 @@ require.config({
     "vendors/jasmine/lib/jasmine-core/boot": {
       deps: ['jasmine-html'],
       exports: "window.onload",
+    },
+    "ckeditor-jquery": {
+      deps: ["jquery", "ckeditor-core"]
     },
     /* Zenodo extras */
     "bootstrap-switch": {
