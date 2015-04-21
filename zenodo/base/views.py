@@ -269,12 +269,6 @@ RULES = {
         'scheme': 'doi',
         'text': 'Published in',
         'image': 'img/ieee.jpg',
-        }, {
-        'prefix': 'https://github.com',
-        'relation': 'isSupplementTo',
-        'scheme': 'url',
-        'text': 'Available in',
-        'image': 'img/github.png',
         }],
 }
 
