@@ -251,7 +251,7 @@ RULES = {
         'image': 'img/inspirehep.png',
         }],
     'briefideas': [{
-        'prefix': 'http://ideas.theoj.org/',
+        'prefix': 'http://beta.briefideas.org/',
         'relation': 'isIdenticalTo',
         'scheme': 'url',
         'text': 'Published in',
