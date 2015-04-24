@@ -42,20 +42,19 @@ from __future__ import unicode_literals
 
 import os
 import sys
+
 from datetime import timedelta
+
 import pkg_resources
 
-# Define identity function for string extraction
-_ = lambda x: x
+from celery.schedules import crontab
 
-# Check if zenodo-assets is installed, and add it to packages if it is.
-try:
-    pkg_resources.get_distribution('zenodo-assets')
-    PACKAGES = ['zenodo.assets']
-except pkg_resources.DistributionNotFound:
-    PACKAGES = []
 
-PACKAGES += [
+def _(x):
+    """Identity function for string extraction."""
+    return x
+
+PACKAGES = [
     'zenodo.base',
     'zenodo.demosite',
     'zenodo.modules.deposit',
@@ -65,6 +64,7 @@ PACKAGES += [
     'zenodo.modules.citationformatter',
     'zenodo.modules.grants',
     'zenodo.modules.accessrequests',
+    'zenodo.modules.quotas',
     'invenio.modules.access',
     'invenio.modules.accounts',
     'invenio.modules.alerts',
@@ -288,6 +288,31 @@ CFG_OPENAIRE_FILESIZE_NOTIFICATION = 10485760
 #    "openairenext_vhost"
 CFG_CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 
+CELERYBEAT_SCHEDULE = {
+    # Every 15 minutes
+    'communities-ranking': dict(
+        task='invenio.modules.communities.tasks.RankingTask',
+        schedule=timedelta(minutes=15),
+    ),
+    # Every 15 minutes
+    'metrics-afs': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute='*/15'),
+        args=('zenodo.modules.quotas.metrics.afs:AFSVolumeMetric', ),
+    ),
+    # Every 12 hours
+    'metrics-deposit': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute=1),
+        args=('zenodo.modules.quotas.metrics.deposit:DepositMetric', ),
+    ),
+    # Every Sunday
+    'harvest-grants': dict(
+        task='zenodo.modules.grants.tasks.harvest_openaire_grants',
+        schedule=crontab(minute='3', hour='0', day_of_week='mon'),
+        args=(),
+    ),
+}
 
 CFG_WEBSEARCH_ENABLE_OPENGRAPH = True
 CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS = False
