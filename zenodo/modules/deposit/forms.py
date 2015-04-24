@@ -380,8 +380,8 @@ class ZenodoForm(WebDepositForm):
             icon='fa fa-barcode',
             tooltip=_(
                 'Pre-reserve a Digital Object Identifier for your upload. This'
-                ' allows you know the DOI before you submit your upload, and'
-                ' can thus include it in e.g. publications. The DOI is not'
+                ' allows you to know the DOI before you submit your upload, '
+                'and can thus include it in e.g. publications. The DOI is not'
                 ' finally registered until submit your upload.'
             ),
         ),
