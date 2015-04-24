@@ -38,7 +38,7 @@ def do_upgrade():
     db.Column('object_type', db.String(length=40), nullable=True),
     db.Column('object_id', db.String(length=250), nullable=True),
     db.Column('metric', db.String(length=40), nullable=True),
-    db.Column('value', db.Integer(display_width=15), nullable=False),
+    db.Column('value', db.BigInteger(), nullable=False),
     db.Column('modified', db.DateTime(), nullable=False),
     db.PrimaryKeyConstraint('id'),
     db.UniqueConstraint('object_type', 'object_id', 'metric'),

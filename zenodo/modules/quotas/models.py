@@ -78,7 +78,7 @@ class ResourceUsage(db.Model):
     metric = db.Column(db.String(40))
     """Metric."""
 
-    value = db.Column(db.Integer(15, unsigned=True), nullable=False, default=0)
+    value = db.Column(db.BigInteger(), nullable=False, default=0)
 
     modified = db.Column(db.DateTime, nullable=False, default=datetime.now,
                          onupdate=datetime.now)

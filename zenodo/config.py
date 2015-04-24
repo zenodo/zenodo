@@ -303,13 +303,13 @@ CELERYBEAT_SCHEDULE = {
     # Every 12 hours
     'metrics-deposit': dict(
         task='zenodo.modules.quotas.tasks.collect_metric',
-        schedule=crontab(minute=0, hour='*/12'),
+        schedule=crontab(minute=1),
         args=('zenodo.modules.quotas.metrics.deposit:DepositMetric', ),
     ),
     # Every Sunday
     'harvest-grants': dict(
         task='zenodo.modules.grants.tasks.harvest_openaire_grants',
-        schedule=crontab(minute='0', hour='0', day_of_week='sun'),
+        schedule=crontab(minute='3', hour='0', day_of_week='mon'),
         args=(),
     ),
 }
