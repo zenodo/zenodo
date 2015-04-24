@@ -48,7 +48,7 @@ def update_kb(kb_name, data, key_fun, value_fun=lambda x: x, update=False):
             update_kb_mapping(kb_name, k, k, v)
 
 
-@celery.task
+@celery.task(ignore_result=True)
 def harvest_openaire_grants():
     """Harvest grants from OpenAIRE and store in knowledge base."""
     # OAI-PMH harvester client
