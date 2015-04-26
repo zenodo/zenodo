@@ -97,7 +97,7 @@ class Bibtex(object):
             'workingpaper': [self._format_unpublished,
                              self._format_misc],
             'other': [self._format_misc],
-            'default': [self._format_misc],
+            'default': self._format_misc,
         }
         subtype = self._get_entry_subtype()
         if subtype in formats:
