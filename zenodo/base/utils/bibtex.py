@@ -211,7 +211,7 @@ class Bibtex(object):
         """
         name = "inproceedings"
         req_fileds = ['author', 'title', 'booktitle', 'year']
-        opt_fileds = ['editor', 'pages', 'organization', 'publisher'
+        opt_fileds = ['editor', 'pages', 'organization', 'publisher',
                       'address', 'month', 'note', 'key']
         ign_fields = ['doi', 'url']
         try:
