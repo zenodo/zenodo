@@ -431,7 +431,7 @@ class Bibtex(object):
         if "doi" in self.record:
             return self.record['doi']
         else:
-            raise MissingRequiredFieldError("doi")
+            return None
 
     def _get_author(self):
         """Return list of name(s) of the author(s)."""

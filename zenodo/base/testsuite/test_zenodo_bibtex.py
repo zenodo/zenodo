@@ -158,8 +158,7 @@ class BibTexFormatterTest(InvenioTestCase):
     def test_get_doi(self):
         self.assertEqual(test_record['doi'],
                          self.record_good._get_doi())
-        self.assertRaises(MissingRequiredFieldError,
-                          self.record_empty._get_doi)
+        self.assertIsNone(self.record_empty._get_doi())
 
     def test_get_author(self):
         authors = []
