@@ -1,6 +1,6 @@
 {#
 ## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
+## Copyright (C) 2013, 2014, 2015 CERN.
 ##
 ## Invenio is free software; you can redistribute it and/or
 ## modify it under the terms of the GNU General Public License as
@@ -18,6 +18,7 @@
 #}
 
 {%- import "accounts/settings/helpers.html" as helpers with context %}
+{%- from "github/helpers.html" import doi_badge with context %}
 
 {% if not request.is_xhr %}
 {%- extends "accounts/settings/index.html" %}
@@ -108,35 +109,8 @@ require(['jquery', 'js/github/view'], function($, view) {
       <div class="repo-container">
       {% set latest_dep = description.depositions[-1] if description.depositions else '' %}
 
-      {% if latest_dep %}
-          {% set doi_url = "http://dx.doi.org/" + latest_dep.doi %}
-          {% set image_url = config.CFG_SITE_SECURE_URL + url_for('zenodo_github_badge.index', user_id=current_user.get_id(), repository=repo) %}
-          <span class="get-badge" data-toggle="tooltip" data-placement="bottom" title="Get a DOI badge!">
-            <img data-toggle="modal" data-target="[data-modal='{{ repo | replace('/', '-') }}']" src="{{image_url}}" />
-          </span>
-
-          <div class="modal fade badge-modal" data-modal='{{ repo | replace("/", "-") }}'>
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-body">
-                  <h4>DOI Badge</h4>
-
-                  <h4><small>Markdown</small><h4>
-                  <pre>[![DOI]({{image_url}})]({{doi_url}})</pre>
-
-                  <h4><small>reStructedText</small><h4>
-                  <pre>.. image:: {{image_url}}   :target: {{doi_url}}</pre>
-
-                  <h4><small>Image URL</small><h4>
-                  <pre>{{image_url}}</pre>
-
-                  <h4><small>HTML</small><h4>
-                  <pre>&lt;a href="{{doi_url}}"&gt;&lt;img src="{{image_url}}"&gt;&lt;a&gt;</pre>
-                </div>
-              </div>
-            </div>
-
-          </div>
+        {% if latest_dep %}
+          {{doi_badge(latest_dep.doi)}}
         {% endif %}
         <h4 class="repo"><a href="https://github.com/{{repo}}">{{repo}}</a>{% if latest_dep and description.hook %} <i class="fa fa-check" style="color: #5cb85c;"></i>{% endif %}</h4>
 
