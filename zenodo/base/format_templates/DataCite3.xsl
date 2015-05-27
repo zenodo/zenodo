@@ -348,7 +348,7 @@ exclude-result-prefixes="marc fn dc invenio">
                 <description descriptionType="Other">
                     {"references" : [
                     <xsl:for-each select="datafield[@tag='999' and @ind1='C' and @ind2='5']">
-                        "<xsl:value-of select="subfield[@code='x']"/>",
+                        "<xsl:value-of select="subfield[@code='x']"/>"<xsl:if test="position() != last()">,</xsl:if>
                     </xsl:for-each>
                     ]}
                 </description>
