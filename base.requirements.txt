@@ -124,7 +124,7 @@ python-twitter==2.2
 pytz==2015.2
 qrcode==5.1
 rauth==0.7.1
-raven==5.2.0
+raven==5.0.0
 rdflib==4.2.0
 redis==2.10.3
 regex==2015.3.18
