@@ -38,3 +38,6 @@ urllib3==1.7.1        # httpretty is locked on this version
 github3.py==0.9.3     # Major upgrade that requires careful review
 mistune==0.4.1        # Major upgrade that requires careful review
 mixer==4.10.2         # Major upgrade that requires careful review
+SQLAlchemy==0.9.9     # Maint-2.0 dependency
+SQLAlchemy-Utils==0.29.9  # Maint-2.0 dependency
+WTForms-Alchemy==0.13.0   # Maint-2.0 dependency
