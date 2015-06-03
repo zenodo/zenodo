@@ -351,7 +351,7 @@ class Bibtex(object):
         out = ""  # FIXME handle all fields
         if field == "author":
             if len(value) == 1:
-                out += u"  {0:<12} = {{{1}}}\n".format(field, value[0])
+                out += u"  {0:<12} = {{{1}}},\n".format(field, value[0])
             else:
                 out += u"  {0:<12} = {{{1} and\n".format(field, value[0])
             if len(value) > 1:
