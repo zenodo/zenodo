@@ -42,7 +42,7 @@
     {%- set alternate_url = alternateid|pid_url -%}
     {%- if loop.first %}<dt>Alternate identifiers:</dt><dd>{% endif %}
         {%- if alternate_url -%}
-            <a href="{{alternate_url}}">{{alternateid.scheme}}:{{alternateid.identifier}}</a>
+            <a href="{{alternate_url}}">{%- if alternateid.scheme != "url" %}{{alternateid.scheme}}:{%- endif %}{{alternateid.identifier}}</a>
         {%- else -%}
             {{alternateid.scheme}}:{{alternateid.identifier}}
         {%- endif -%}
