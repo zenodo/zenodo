@@ -23,5 +23,8 @@
 {% from "helpers.html" import copy_to_clipboard -%}
 <h1>{{record.title}}</h1>
 <br>
-<h2>BibTeX Export {{copy_to_clipboard(clipboard_target='clipboard_text')}}</h2>
+<h2>BibTeX Export
+{{copy_to_clipboard(clipboard_target='clipboard_text')}}
+<a class="btn btn-default btn-xs" href="{{url_for('record.metadata', recid=recid)}}"><i class="fa fa-file-text fa-fw"></i> View record</a>
+</h2>
 <pre id="clipboard_text">{{ record|bibtex }}</pre>
