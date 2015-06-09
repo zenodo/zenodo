@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014, 2015 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 """
 Zenodo configuration.
@@ -45,9 +45,9 @@ import sys
 
 from datetime import timedelta
 
-import pkg_resources
-
 from celery.schedules import crontab
+
+import pkg_resources
 
 
 def _(x):
@@ -284,8 +284,8 @@ CFG_BIBFORMAT_ADD_THIS_ID = "ra-4dc80cde118f4dad"
 DEPOSIT_MAX_UPLOAD_SIZE = 2147483648
 CFG_OPENAIRE_FILESIZE_NOTIFICATION = 10485760
 
-#CFG_BROKER_URL = "amqp://openairenext:openairenext@localhost:5672/" \
-#    "openairenext_vhost"
+# CFG_BROKER_URL = "amqp://openairenext:openairenext@localhost:5672/" \
+#     "openairenext_vhost"
 CFG_CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 
 CELERYBEAT_SCHEDULE = {
@@ -321,7 +321,7 @@ CFG_WEBSEARCH_PUBLIC_RECORD_EXTRA_CHECK = True
 CFG_BIBDOCFILE_FILESYSTEM_BIBDOC_GROUP_LIMIT = 1000
 
 CFG_OPENAIRE_SITE = 1
-#CFG_WEBSTYLE_TEMPLATE_SKIN = "openaire"
+# CFG_WEBSTYLE_TEMPLATE_SKIN = "openaire"
 CFG_WEBSTYLE_HTTP_USE_COMPRESSION = 1
 
 CFG_WEBCOMMENT_ALLOW_SHORT_REVIEWS = 0
@@ -440,6 +440,8 @@ SCHEMAORG_MAP = dict(
     section='http://schema.org/ScholarlyArticle',
     conferencepaper='http://schema.org/ScholarlyArticle',
     article='http://schema.org/ScholarlyArticle',
+    deliverable='http://schema.org/CreativeWork',
+    milestone='http://schema.org/CreativeWork',
     patent='http://schema.org/CreativeWork',
     preprint='http://schema.org/ScholarlyArticle',
     proposal='http://schema.org/CreativeWork',
@@ -495,6 +497,8 @@ CFG_OPENAIRE_PUBTYPE_MAP = [
     ('section', _('Book section')),
     ('conferencepaper', _('Conference paper')),
     ('article', _('Journal article')),
+    ('deliverable', _('Project Deliverable')),
+    ('milestone', _('Project Milestone')),
     ('patent', _('Patent')),
     ('preprint', _('Preprint')),
     ('proposal', _('Proposal')),
