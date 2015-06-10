@@ -39,10 +39,17 @@ test_marc = """<record>
   <datafield tag="024" ind1="7" ind2=" ">
     <subfield code="2">lsid</subfield>
     <subfield code="a">urn:lsid:ubio.org:namebank:11815</subfield>
+    <subfield code="q">alternateIdentifier</subfield>
   </datafield>
   <datafield tag="024" ind1="7" ind2=" ">
     <subfield code="2">ads</subfield>
     <subfield code="a">2011ApJS..192...18K</subfield>
+    <subfield code="q">alternateIdentifier</subfield>
+  </datafield>
+  <datafield tag="024" ind1="7" ind2=" ">
+    <subfield code="2">doi</subfield>
+    <subfield code="a">10.1234/alternate.doi</subfield>
+    <subfield code="q">alternateIdentifier</subfield>
   </datafield>
   <datafield tag="711" ind1=" " ind2=" ">
     <subfield code="c">Harvard-Smithsonian Center for Astrophysics</subfield>
@@ -200,6 +207,9 @@ test_form_json = {
         {'identifier': '2011ApJS..192...18K',
          'relation': 'isAlternativeIdentifier',
          'scheme': 'ads'},
+        {'identifier': '10.1234/alternate.doi',
+         'relation': 'isAlternativeIdentifier',
+         'scheme': 'doi'},
         {'identifier': '10.1234/foo.bar',
          'relation': 'cites',
          'scheme': 'doi'},
@@ -276,6 +286,8 @@ test_record = dict(
             "scheme": "lsid", },
         {"identifier": "2011ApJS..192...18K", "scheme":
             "ads", },
+        {"identifier": "10.1234/alternate.doi", "scheme":
+            "doi", },
     ],
     meetings={
         'title': 'The 13th Biennial HITRAN Conference',

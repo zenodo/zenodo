@@ -200,8 +200,10 @@ def bibtex_filter(record):
 @blueprint.app_template_filter('is_local_doi')
 def is_local_doi(value):
     """Convert DOI to a link."""
-    return value.startswith(cfg['CFG_DATACITE_DOI_PREFIX']) or \
-        value.startswith("10.5281/")
+    if isinstance(value, basestring):
+        return value.startswith(cfg['CFG_DATACITE_DOI_PREFIX']) or \
+            value.startswith("10.5281/")
+    return False
 
 
 @blueprint.app_template_filter('is_record_owner')
