@@ -49,6 +49,10 @@ from celery.schedules import crontab
 
 import pkg_resources
 
+from invenio.base.config import EXTENSIONS
+
+DEPRECATION_WARNINGS = True
+
 
 def _(x):
     """Identity function for string extraction."""
@@ -119,6 +123,10 @@ PACKAGES = [
     'invenio.modules.webhooks',
     'invenio.modules.workflows',
     'invenio.base',
+]
+
+EXTENSIONS += [
+    'zenodo.ext.deprecation_warnings:disable_deprecation_warnings',
 ]
 
 PACKAGES_EXCLUDE = []
