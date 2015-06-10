@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Zenodo.
-## Copyright (C) 2014, 2015 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+#
+# This file is part of Zenodo.
+# Copyright (C) 2014, 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 
 """ Unit tests jsonext """
@@ -89,6 +89,12 @@ test_marc = """<record>
     <subfield code="a">Smith, Jane</subfield>
     <subfield code="0">(orcid)0000-0002-1825-0097</subfield>
   </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="4">ths</subfield>
+    <subfield code="a">Kowalski, Jane</subfield>
+    <subfield code="0">(gnd)170118216</subfield>
+  </datafield>
   <datafield tag="653" ind1="1" ind2=" ">
     <subfield code="a">kw1</subfield>
   </datafield>
@@ -109,6 +115,11 @@ test_marc = """<record>
   <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="a">Smith, John</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="a">Nowak, Jack</subfield>
+    <subfield code="0">(gnd)170118215</subfield>
   </datafield>
   <datafield tag="035" ind1=" " ind2=" ">
     <subfield code="9">Altmetric</subfield>
@@ -152,6 +163,7 @@ test_marc = """<record>
   <datafield tag="100" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="a">Doe, John</subfield>
+    <subfield code="0">(gnd)170118215</subfield>
     <subfield code="0">(orcid)0000-0002-1694-233X</subfield>
   </datafield>
   <datafield tag="773" ind1=" " ind2=" ">
@@ -179,15 +191,19 @@ test_form_json = {
         {'identifier': 'zenodo', 'provisional': False}],
     'creators': [
         {'affiliation': 'CERN', 'name': 'Doe, John',
-         'orcid': '0000-0002-1694-233X'},
+         'gnd': '170118215', 'orcid': '0000-0002-1694-233X'},
         {'affiliation': 'CERN', 'name': 'Doe, Jane',
-         'orcid': '0000-0002-1825-0097'},
+         'gnd': '', 'orcid': '0000-0002-1825-0097'},
         {'affiliation': 'CERN', 'name': 'Smith, John',
-         'orcid': ''}
+         'gnd': '', 'orcid': ''},
+        {'affiliation': 'CERN', 'name': 'Nowak, Jack',
+         'gnd': '170118215', 'orcid': ''},
     ],
     'thesis_supervisors': [
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
-         'orcid': '0000-0002-1825-0097'},
+         'gnd': '', 'orcid': '0000-0002-1825-0097'},
+        {'affiliation': 'CERN', 'name': 'Kowalski, Jane',
+         'gnd': '170118216', 'orcid': ''},
     ],
     'description': 'Test Description',
     'doi': '10.1234/foo.bar',
@@ -244,20 +260,27 @@ test_record = dict(
     title="Test title",
     authors=[
         {'name': 'Doe, John', 'affiliation': 'CERN',
-         'orcid': '0000-0002-1694-233X',
+         'gnd': '170118215', 'orcid': '0000-0002-1694-233X',
          'familyname': 'Doe', 'givennames': 'John',
          },
         {'name': 'Doe, Jane', 'affiliation': 'CERN',
-         'orcid': '0000-0002-1825-0097',
+         'gnd': '', 'orcid': '0000-0002-1825-0097',
          'familyname': 'Doe', 'givennames': 'Jane',
          },
-        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '',
+        {'name': 'Smith, John', 'affiliation': 'CERN',
+         'gnd': '',  'orcid': '',
          'familyname': 'Smith', 'givennames': 'John',
+         },
+        {'name': 'Nowak, Jack', 'affiliation': 'CERN',
+         'gnd': '170118215',  'orcid': '',
+         'familyname': 'Nowak', 'givennames': 'Jack',
          },
     ],
     thesis_supervisors=[
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
-         'orcid': '0000-0002-1825-0097'},
+         'gnd': '', 'orcid': '0000-0002-1825-0097'},
+        {'affiliation': 'CERN', 'name': 'Kowalski, Jane',
+         'gnd': '170118216', 'orcid': ''},
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],

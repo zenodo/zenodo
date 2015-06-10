@@ -84,6 +84,14 @@ exclude-result-prefixes="marc fn dc invenio">
                     <xsl:value-of select="subfield[@code='u']"/>
                 </affiliation>
                 </xsl:if>
+                <xsl:for-each select="subfield[@code='0']">
+                    <xsl:if test="substring(., 2, 5) = 'orcid'">
+                        <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                            <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                            <xsl:value-of select="substring(., 8)"/>
+                        </nameIdentifier>
+                    </xsl:if>
+                </xsl:for-each>
                 </creator>
             </xsl:for-each>
             <xsl:for-each select="datafield[@tag=700][not(subfield[@code='4']='ths')]">
@@ -96,6 +104,14 @@ exclude-result-prefixes="marc fn dc invenio">
                     <xsl:value-of select="subfield[@code='u']"/>
                 </affiliation>
                 </xsl:if>
+                <xsl:for-each select="subfield[@code='0']">
+                    <xsl:if test="substring(., 2, 5) = 'orcid'">
+                        <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                            <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                            <xsl:value-of select="substring(., 8)"/>
+                        </nameIdentifier>
+                    </xsl:if>
+                </xsl:for-each>
                 </creator>
             </xsl:for-each>
         </creators>
@@ -150,6 +166,14 @@ exclude-result-prefixes="marc fn dc invenio">
                             <xsl:value-of select="subfield[@code='u']"/>
                         </affiliation>
                         </xsl:if>
+                        <xsl:for-each select="subfield[@code='0']">
+                            <xsl:if test="substring(., 2, 5) = 'orcid'">
+                                <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                                    <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                                    <xsl:value-of select="substring(., 8)"/>
+                                </nameIdentifier>
+                            </xsl:if>
+                        </xsl:for-each>
                     </contributor>
                 </xsl:for-each>
             </contributors>

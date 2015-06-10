@@ -71,6 +71,14 @@ exclude-result-prefixes="marc fn dc invenio">
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
                 </creatorName>
+                <xsl:for-each select="subfield[@code='0']">
+                    <xsl:if test="substring(., 2, 5) = 'orcid'">
+                        <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                            <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                            <xsl:value-of select="substring(., 8)"/>
+                        </nameIdentifier>
+                    </xsl:if>
+                </xsl:for-each>
                 </creator>
             </xsl:for-each>
             <xsl:for-each select="datafield[@tag=700]">
@@ -78,6 +86,14 @@ exclude-result-prefixes="marc fn dc invenio">
                 <creatorName>
                     <xsl:value-of select="subfield[@code='a']"/>
                 </creatorName>
+                <xsl:for-each select="subfield[@code='0']">
+                    <xsl:if test="substring(., 2, 5) = 'orcid'">
+                        <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                            <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                            <xsl:value-of select="substring(., 8)"/>
+                        </nameIdentifier>
+                    </xsl:if>
+                </xsl:for-each>
                 </creator>
             </xsl:for-each>
         </creators>
@@ -116,12 +132,30 @@ exclude-result-prefixes="marc fn dc invenio">
             </subjects>
         </xsl:if>
         <!-- 7. Contributor -->
-        <xsl:if test="datafield[@tag=536]">
+        <xsl:if test="datafield[@tag=536] or datafield[@tag=700][subfield[@code='4']='ths']">
             <contributors>
                 <xsl:for-each select="datafield[@tag=536]">
                     <contributor contributorType="Funder">
                         <contributorName>European Commission</contributorName>
                         <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
+                    </contributor>
+                </xsl:for-each>
+                <xsl:for-each select="datafield[@tag=700][subfield[@code='4']='ths']">
+                    <contributor contributorType="Supervisor">
+                        <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
+                        <xsl:if test="subfield[@code='u']">
+                        <affiliation>
+                            <xsl:value-of select="subfield[@code='u']"/>
+                        </affiliation>
+                        </xsl:if>
+                        <xsl:for-each select="subfield[@code='0']">
+                            <xsl:if test="substring(., 2, 5) = 'orcid'">
+                                <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                                    <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                                    <xsl:value-of select="substring(., 8)"/>
+                                </nameIdentifier>
+                            </xsl:if>
+                        </xsl:for-each>
                     </contributor>
                 </xsl:for-each>
             </contributors>

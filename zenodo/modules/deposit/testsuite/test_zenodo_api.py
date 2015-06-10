@@ -467,6 +467,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 name=dict(type='string'),
                 affiliation=dict(type='string'),
                 orcid=dict(type='string', nullable=True),
+                gnd=dict(type='string', nullable=True),
             )
         )),
         description=dict(type='string'),
@@ -511,6 +512,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 name=dict(type='string'),
                 affiliation=dict(type='string'),
                 orcid=dict(type='string', nullable=True),
+                gnd=dict(type='string', nullable=True),
             )
         )),
         thesis_university=dict(type='string'),
@@ -638,7 +640,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 conference_session_part='1',
                 creators=[
                     dict(name="Doe, John", affiliation="Atlantis",
-                         orcid="0000-0002-1825-0097"),
+                         orcid="0000-0002-1825-0097", gnd="170118215"),
                     dict(name="Smith, Jane", affiliation="Atlantis")
                 ],
                 description="Some description",
@@ -674,7 +676,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 thesis_supervisors=[
                     dict(name="Doe Sr., John", affiliation="Atlantis"),
                     dict(name="Smith Sr., Jane", affiliation="Atlantis",
-                         orcid="http://orcid.org/0000-0002-1825-0097")
+                         orcid="http://orcid.org/0000-0002-1825-0097",
+                         gnd="http://d-nb.info/gnd/170118215")
                 ],
                 thesis_university="Some thesis_university",
                 title="Test title",
@@ -915,6 +918,24 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             'depositionresource', urlargs=dict(resource_id=res_id), code=204
         )
 
+    def test_gnd(self):
+        response = self.post(
+            'depositionlistresource', data=self.get_test_data(
+                creators=[
+                    {'name': 'Lars', 'affiliation': 'CERN',
+                     'gnd': 'http://d-nb.info/gnd/170118215'}
+                ],
+            ),
+            code=201,
+        )
+        res_id = response.json['id']
+        creator = response.json['metadata']['creators'][0]
+        self.assertEqual(creator['gnd'], '170118215')
+
+        response = self.delete(
+            'depositionresource', urlargs=dict(resource_id=res_id), code=204
+        )
+
     def test_grants(self):
         response = self.post(
             'depositionlistresource', data=self.get_test_data(
@@ -1005,6 +1026,15 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             'depositionlistresource', data=self.get_test_data(
                 creators=[{'name': 'TEST', 'affiliation': 'TEST',
                            'orcid': 'INVALID'}, ]
+            ),
+            code=400,
+        )
+        self.assert_error('creators', response)
+
+        response = self.post(
+            'depositionlistresource', data=self.get_test_data(
+                creators=[{'name': 'TEST', 'affiliation': 'TEST',
+                           'gnd': 'INVALID'}, ]
             ),
             code=400,
         )
@@ -1489,15 +1519,15 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         self.assertEqual(record['title'], "My new title")
         self.assertEqual(record['access_right'], "closed")
         self.assertEqual(record['authors'], [
-            dict(name="Smith, Jane", affiliation="Atlantis", orcid='',
+            dict(name="Smith, Jane", affiliation="Atlantis", gnd='', orcid='',
                  familyname="Smith", givennames="Jane"),
-            dict(name="Doe, John", affiliation="Atlantis", orcid='',
+            dict(name="Doe, John", affiliation="Atlantis", gnd='', orcid='',
                  familyname="Doe", givennames="John"),
         ])
         self.assertEqual(record['thesis_supervisors'], [
-            dict(name="Doe Jr., John", affiliation="Atlantis", orcid=''),
-            dict(name="Smith Sr., Jane", affiliation="CERN", orcid=''),
-            dict(name="Doe Sr., John", affiliation="CERN", orcid=''),
+            dict(name="Doe Jr., John", affiliation="Atlantis", gnd='', orcid=''),
+            dict(name="Smith Sr., Jane", affiliation="CERN", gnd='', orcid=''),
+            dict(name="Doe Sr., John", affiliation="CERN", gnd='', orcid=''),
         ])
         self.assertEqual(record.get('embargo_date'), None)
         self.assertEqual(record.get('license'), None)
@@ -1753,9 +1783,9 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             u'conference_session_part': None,
             u'creators': [
                 {u'affiliation': u'Atlantis', u'name': u'Doe, John',
-                 u'orcid': u''},
+                 u'gnd': u'', u'orcid': u''},
                 {u'affiliation': u'Atlantis', u'name': u'Smith, Jane',
-                 u'orcid': u''},
+                 u'gnd': u'', u'orcid': u''},
             ],
             u'description': u'<p>Test <em>Description</em></p>',
             u'embargo_date': None,
