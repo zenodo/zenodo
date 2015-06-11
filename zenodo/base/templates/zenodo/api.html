@@ -1713,6 +1713,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>Controlled vocabulary:<ul>
       <li><code>open</code>: Open Access</li>
 <li><code>embargoed</code>: Embargoed Access</li>
+<li><code>restricted</code>: Restricted Access</li>
 <li><code>closed</code>: Closed Access</li>
     </ul>Defaults to <code>open</code>.</td>
 </tr>
@@ -1728,6 +1729,12 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td></td>
     <td>Yes, if <code>access_right</code> is <code>"embargoed"</code>.</td>
     <td>Date in ISO8601 format (<code>YYYY-MM-DD</code>) when the deposited files will be made automatically made publicly available by the system. Defaults to current date.</td>
+</tr>
+<tr>
+    <td><code>access_conditions</code></td>
+    <td>String</td>
+    <td>Yes, if <code>access_right</code> is <code>"restricted"</code>.</td>
+    <td>Specify the conditions under which you grant users access to the files in your upload. User requesting access will be asked to justify how they fulfil the conditions. Based on the justification, you decide who to grant/deny access. You are not allowed to charge users for granting access to data hosted on Zenodo. Following HTML tags are allowed: <code>a</code>, <code>p</code>, <code>br</code>, <code>blockquote</code>, <code>strong</code>, <code>b</code>, <code>u</code>, <code>i</code>, <code>em</code>, <code>ul</code>, <code>ol</code>, <code>li</code>, <code>sub</code>, <code>sup</code>, <code>div</code>, <code>strike</code>.</td>
 </tr>
 <tr>
     <td><code>doi</code></td>

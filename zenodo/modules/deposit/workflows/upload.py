@@ -649,6 +649,7 @@ class upload(DepositionType):
 
     marshal_metadata_fields = dict(
         access_right=fields.String,
+        access_conditions=fields.String,
         communities=fields.List(fields.Raw),
         conference_acronym=fields.String,
         conference_dates=fields.String,
