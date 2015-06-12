@@ -95,7 +95,10 @@ def index(user_id, repository):
         return abort(404)
 
     # Get the latest deposition
-    dep = account.extra_data["repos"][repository]['depositions'][-1]
+    try:
+        dep = account.extra_data["repos"][repository]['depositions'][-1]
+    except IndexError:
+        return abort(404)
 
     # Extract DOI
     if "doi" not in dep:
