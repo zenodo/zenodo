@@ -28,8 +28,10 @@ from __future__ import absolute_import
 import os
 import urllib
 
-from flask import (abort, Blueprint, current_app, make_response, redirect,
-                   request, url_for)
+from flask import Blueprint, abort, current_app, make_response, redirect, \
+    request, url_for
+
+from invenio.base.globals import cfg
 from invenio.ext.sslify import ssl_required
 from invenio.modules.pidstore.models import PersistentIdentifier
 
@@ -63,7 +65,17 @@ def badge(doi, style=None):
         os.makedirs(os.path.dirname(badge_path))
 
     if not os.path.isfile(badge_path):
-        create_badge("DOI", doi, "blue", badge_path, style=style)
+        try:
+            create_badge("DOI", doi, "blue", badge_path, style=style)
+        except Exception:
+            current_app.logger.warning(
+                "%s is down." % cfg['GITHUB_SHIELDSIO_BASE_URL'],
+                exc_info=True
+            )
+            return make_response(
+                "%s is down." % cfg['GITHUB_SHIELDSIO_BASE_URL'],
+                503
+            )
 
     resp = make_response(open(badge_path, 'r').read())
     resp.content_type = "image/svg+xml"
