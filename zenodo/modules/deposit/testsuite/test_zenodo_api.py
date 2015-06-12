@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
-##
-## This file is part of Invenio.
-## Copyright (C) 2013, 2014 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# This file is part of Invenio.
+# Copyright (C) 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 from cerberus import Validator
 from invenio.testsuite import make_test_suite, run_test_suite, \
@@ -489,6 +489,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         journal_title=dict(type='string'),
         journal_volume=dict(type='string'),
         keywords=dict(type='list'),
+        subjects=dict(type='list'),
         license=dict(type='string'),
         notes=dict(type='string'),
         partof_pages=dict(type='string'),
@@ -655,6 +656,10 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 journal_title="Some journal name",
                 journal_volume="Some volume",
                 keywords=["Keyword 1", "keyword 2"],
+                subjects=[
+                    dict(scheme="gnd", identifier="1234567899", term="Astronaut"),
+                    dict(scheme="gnd", identifier="1234567898", term="Amish"),
+                ],
                 license="cc-zero",
                 notes="Some notes",
                 partof_pages="SOme part of",
@@ -730,6 +735,10 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 journal_title="यह एक परीक्षण है",
                 journal_volume="Þetta er prófun",
                 keywords=["これはテストです", "ಇದು ಪರೀಕ್ಷೆ"],
+                subjects=[
+                    dict(scheme="gnd", identifier="1234567899", term="これはです"),
+                    dict(scheme="gnd", identifier="1234567898", term="ಇ"),
+                ],
                 license="cc-zero",
                 notes="이것은 테스트입니다",
                 partof_pages="ນີ້ແມ່ນການທົດສອບ",
@@ -1278,6 +1287,10 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 journal_title="Some journal name",
                 journal_volume="Some volume",
                 keywords=["Keyword 1", "keyword 2"],
+                subjects=[
+                    dict(scheme="gnd", identifier="1234567899", term="Astronaut"),
+                    dict(scheme="gnd", identifier="1234567898", term="Amish"),
+                ],
                 notes="Some notes",
                 partof_pages="SOme part of",
                 partof_title="Some part of title",
@@ -1799,6 +1812,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             u'journal_title': None,
             u'journal_volume': None,
             u'keywords': [],
+            u'subjects': [],
             u'license': u'cc-by-sa',
             u'notes': u'',
             u'partof_pages': None,

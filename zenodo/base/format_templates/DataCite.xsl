@@ -124,10 +124,18 @@ exclude-result-prefixes="marc fn dc invenio">
                 <xsl:value-of select="fn:eval_bibformat(controlfield[@tag=001],'&lt;BFE_YEAR >')"/>
         </publicationYear>
         <!-- 6. Subject -->
-        <xsl:if test="datafield[@tag=653 and @ind1='1']">
+        <xsl:if test="datafield[@tag=653 and @ind1='1'] or datafield[@tag=650 and @ind1='1' and @ind2=' ']">
             <subjects>
                 <xsl:for-each select="datafield[@tag=653 and @ind1='1']">
                     <subject><xsl:value-of select="subfield[@code='a']"/></subject>
+                </xsl:for-each>
+                <xsl:for-each select="datafield[@tag=650 and @ind1='1' and @ind2=' ']">
+                    <subject>
+                        <xsl:attribute name="subjectScheme">
+                            <xsl:value-of select="substring-after(substring-before(subfield[@code='0'], ')'), '(')"/>
+                        </xsl:attribute>
+                        <xsl:value-of select="substring-after(subfield[@code='0'], ')')"/>
+                    </subject>
                 </xsl:for-each>
             </subjects>
         </xsl:if>

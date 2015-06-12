@@ -23,6 +23,7 @@
     {{ bfe_isbn(bfo, prefix='<dt>ISBN:</dt><dd itemprop="isbn">', suffix='</dd>') }}
     {{ bfe_report_numbers(bfo, prefix='<dt>Report number(s):</dt><dd>', suffix='</dd>') }}
     {{ bfe_keywords(bfo, prefix='<dt>Keyword(s):</dt><dd>', suffix='</dd>', keyword_prefix='<span class="label label-default" itemprop="keywords">', keyword_suffix='</span>', separator=' ') }}
+    {{ bfe_subjects(bfo, prefix='<dt>Subjects(s):</dt><dd>', suffix='</dd>', subjects_prefix='<span class="label label-default" itemprop="subjects">', subjects_suffix='</span>', separator=' ') }}
     {{ bfe_publi_info(bfo, prefix='<dt>Published in:</dt><dd>', suffix='</dd>') }}
     {{ bfe_openaire_published_in_book(bfo, prefix='<dt>Published in:</dt><dd>', suffix='</dd>') }}
     {{ bfe_publisher(bfo, prefix='<dt>Publisher:</dt><dd>', suffix='</dd>') }}

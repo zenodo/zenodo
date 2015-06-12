@@ -261,6 +261,52 @@ class CreatorForm(WebDepositForm):
                 raise ValidationError("Not a valid GND-identifier.")
 
 
+class SubjectsForm(WebDepositForm):
+    term = fields.StringField(
+        placeholder="Term",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-5"),
+        validators=[
+            required_if(
+                'identifier',
+                [lambda x: bool(x.strip()), ],  # non-empty
+                message="Term is required if you specify identifier."
+            ),
+        ],
+    )
+    scheme = fields.StringField(
+        label="",
+        default='',
+        widget_classes='',
+        widget=widgets.HiddenInput(),
+    )
+    identifier = fields.StringField(
+        label="",
+        placeholder="Identifier",
+        validators=[
+            validators.optional(),
+            pid_validator(),
+        ],
+        processors=[
+            PidSchemeDetection(set_field='scheme'),
+            PidNormalize(scheme_field='scheme'),
+        ],
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-5 col-pad-0"),
+    )
+
+    def validate_scheme(form, field):
+        """Set scheme based on value in identifier."""
+        from invenio.utils import persistentid
+        schemes = persistentid.detect_identifier_schemes(
+            form.data.get('identifier') or ''
+        )
+        if schemes:
+            field.data = schemes[0]
+        else:
+            field.data = ''
+
+
 class CommunityForm(WebDepositForm):
     identifier = fields.StringField(
         widget=widgets.HiddenInput(),
@@ -645,6 +691,24 @@ class ZenodoForm(WebDepositForm):
     )
 
     #
+    # Subjects
+    #
+    subjects = fields.DynamicFieldList(
+        fields.FormField(
+            SubjectsForm,
+            widget=ExtendedListWidget(
+                item_widget=ItemWidget(),
+                html_tag='div'
+            ),
+        ),
+        label="Subjects",
+        add_label='Add another subject',
+        icon='fa fa-tags fa-fw',
+        widget_classes='',
+        min_entries=1,
+    )
+
+    #
     # Journal
     #
     journal_title = fields.StringField(
@@ -928,6 +992,13 @@ class ZenodoForm(WebDepositForm):
         ], {
             'classes': '',
             'indication': 'optional',
+        }),
+        ('Subjects', [
+            'subjects'
+        ], {
+            'classes': '',
+            'indication': 'optional',
+            'description': 'Thsi field contains a topical subject used as a subject added entry.',
         }),
     ]
 

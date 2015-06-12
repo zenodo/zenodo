@@ -153,6 +153,10 @@ test_marc = """<record>
     <subfield code="d">3</subfield>
     <subfield code="a">2</subfield>
   </datafield>
+  <datafield tag="650" ind1="1" ind2=" ">
+    <subfield code="a">test_term</subfield>
+    <subfield code="0">(gnd)1234567899</subfield>
+  </datafield>
   <datafield tag="980" ind1=" " ind2=" ">
     <subfield code="b">secondary</subfield>
     <subfield code="a">pri</subfield>
@@ -284,6 +288,9 @@ test_record = dict(
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],
+    subjects=[
+        {'term': 'test_term', 'identifier': '1234567899', 'scheme': 'gnd'},
+    ],
     notes="notes",
     access_right="open",
     embargo_date="2014-02-27",
