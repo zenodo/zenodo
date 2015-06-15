@@ -22,7 +22,7 @@
 
 from invenio.legacy.dbquery import run_sql
 
-depends_on = [u'zenodo_2015_03_04_firerole_email_to_uid']
+depends_on = [u'base_2014_11_17_new_subtype_proposal']
 
 
 def info():
@@ -37,6 +37,8 @@ def do_upgrade():
         "INSERT INTO collection (name, dbquery) VALUES (%s, %s)",
         ('deliverable', '980__b:deliverable')
     )
+    parent_id = 2
+    pos = 13
     coll_id = run_sql(
         "SELECT id FROM collection WHERE name='deliverable'")[0][0]
     run_sql(
@@ -44,12 +46,17 @@ def do_upgrade():
         VALUES (%s, 'usage;comments;metadata;files')", (coll_id,)
     )
     run_sql(
+        "UPDATE collection_collection SET score=score+1 "
+        "WHERE id_dad=%s AND score>=%s",
+        (parent_id, pos)
+    )
+    run_sql(
         "INSERT INTO collection_collection (id_dad, id_son, type, score)\
-        VALUES (%s, %s, %s, %s)", (2, coll_id, 'r', coll_id)
+        VALUES (%s, %s, %s, %s)", (parent_id, coll_id, 'r', pos)
     )
     run_sql(
         "INSERT INTO collectionname (id_collection, ln, type, value)\
-        VALUES (%s, %s, %s, %s)", (coll_id, 'en', 'ln', 'Project Deliverable')
+        VALUES (%s, %s, %s, %s)", (coll_id, 'en', 'ln', 'Project Deliverables')
     )
 
     # milestone addition
@@ -57,6 +64,8 @@ def do_upgrade():
         "INSERT INTO collection (name, dbquery) VALUES (%s, %s)",
         ('milestone', '980__b:milestone')
     )
+    parent_id = 2
+    pos = 14
     coll_id = run_sql(
         "SELECT id FROM collection WHERE name='milestone'")[0][0]
     run_sql(
@@ -64,12 +73,17 @@ def do_upgrade():
         VALUES (%s, 'usage;comments;metadata;files')", (coll_id,)
     )
     run_sql(
+        "UPDATE collection_collection SET score=score+1 "
+        "WHERE id_dad=%s AND score>=%s",
+        (parent_id, pos)
+    )
+    run_sql(
         "INSERT INTO collection_collection (id_dad, id_son, type, score)\
-        VALUES (%s, %s, %s, %s)", (2, coll_id, 'r', coll_id)
+        VALUES (%s, %s, %s, %s)", (parent_id, coll_id, 'r', pos)
     )
     run_sql(
         "INSERT INTO collectionname (id_collection, ln, type, value)\
-        VALUES (%s, %s, %s, %s)", (coll_id, 'en', 'ln', 'Project Milestone')
+        VALUES (%s, %s, %s, %s)", (coll_id, 'en', 'ln', 'Project Milestones')
     )
 
 
