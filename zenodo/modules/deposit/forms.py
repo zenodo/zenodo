@@ -1,60 +1,60 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014, 2015 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 from __future__ import absolute_import
 
 import json
 from datetime import date
-from jinja2 import Markup
+
 from flask import request
+
+from invenio.base.i18n import _
+from invenio.config import CFG_DATACITE_DOI_PREFIX
+from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
+from invenio.modules.deposit import fields
+from invenio.modules.deposit.autocomplete_utils import kb_autocomplete
+from invenio.modules.deposit.field_widgets import ButtonWidget, \
+    CKEditorWidget, ColumnInput, ExtendedListWidget, ItemWidget, TagInput, \
+    TagListWidget, date_widget, plupload_widget
+from invenio.modules.deposit.filter_utils import sanitize_html, strip_string
+from invenio.modules.deposit.form import WebDepositForm
+from invenio.modules.deposit.processor_utils import PidNormalize, \
+    PidSchemeDetection, datacite_lookup, replace_field_data
+from invenio.modules.deposit.validation_utils import DOISyntaxValidator, \
+    invalid_doi_prefix_validator, list_length, minted_doi_validator, \
+    not_required_if, pid_validator, pre_reserved_doi_validator, required_if, \
+    unchangeable
+from invenio.modules.knowledge.api import get_kb_mapping
+from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
+
+from jinja2 import Markup
+
 from wtforms import validators, widgets
 from wtforms.validators import ValidationError
 
-from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
-from invenio.config import CFG_DATACITE_DOI_PREFIX
-
-from invenio.base.i18n import _
-from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
-from invenio.modules.knowledge.api import get_kb_mapping
-from invenio.modules.deposit.form import WebDepositForm
-from invenio.modules.deposit.field_widgets import date_widget, \
-    plupload_widget, ButtonWidget, ExtendedListWidget, \
-    TagListWidget, TagInput, ItemWidget, CKEditorWidget, ColumnInput
-from invenio.modules.deposit.filter_utils import strip_string, sanitize_html
-from invenio.modules.deposit.validation_utils import DOISyntaxValidator, \
-    invalid_doi_prefix_validator, pre_reserved_doi_validator, required_if, \
-    list_length, not_required_if, pid_validator, minted_doi_validator, \
-    unchangeable
-from invenio.modules.deposit.processor_utils import datacite_lookup, \
-    PidSchemeDetection, PidNormalize, replace_field_data
-from invenio.modules.deposit.autocomplete_utils import kb_autocomplete
-from ...legacy.utils.zenodoutils import create_doi, filter_empty_helper
-
+from . import fields as zfields
 from .autocomplete import community_autocomplete
 from .validators import community_validator
-from . import fields as zfields
-
-
-from invenio.modules.deposit import fields
+from ...legacy.utils.zenodoutils import create_doi, filter_empty_helper
 
 
 __all__ = ('ZenodoForm', )
@@ -311,6 +311,8 @@ class ZenodoForm(WebDepositForm):
             ('section', 'Book section'),
             ('conferencepaper', 'Conference paper'),
             ('article', 'Journal article'),
+            ('deliverable', _('Project Deliverable')),
+            ('milestone', _('Project Milestone')),
             ('patent', 'Patent'),
             ('preprint', 'Preprint'),
             ('proposal', 'Proposal'),
@@ -829,35 +831,57 @@ class ZenodoForm(WebDepositForm):
             ['upload_type', 'publication_type', 'image_type', ],
             {'indication': 'required'}),
         ('Basic information', [
-            'doi', 'prereserve_doi', 'publication_date', 'title',  'creators', 'description',
-            'keywords', 'notes',
+            'doi', 'prereserve_doi', 'publication_date', 'title',  'creators',
+            'description', 'keywords', 'notes',
         ], {'indication': 'required', }),
         ('License', [
             'access_right', 'embargo_date', 'license', 'access_conditions'
         ], {
             'indication': 'required',
-            #'description': 'Unless you explicitly specify the license conditions below for Open Access and Embargoed Access uploads,'
-            #' you agree to release your data files under the terms of the Creative Commons Zero (CC0) waiver.'
-            #' All authors of the data and publications have agreed to the terms of this waiver and license.'
+            # 'description': (
+            #     'Unless you explicitly specify the license conditions below'
+            #     ' for Open Access and Embargoed Access uploads, you agree to'
+            #     ' release your data files under the terms of the Creative'
+            #     ' Commons Zero (CC0) waiver. All authors of the data and'
+            #     ' publications have agreed to the terms of this waiver and'
+            #     ' license.')
         }),
         ('Communities', [
             'communities',
         ], {
             'indication': 'recommended',
-            'description': Markup('Any user can create a community collection on %(CFG_SITE_NAME)s (<a href="/communities/">browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.' % {'CFG_SITE_NAME': CFG_SITE_NAME})
+            'description': Markup(
+                'Any user can create a community collection on'
+                ' %(CFG_SITE_NAME)s (<a href="/communities/">browse'
+                ' communities</a>). Specify communities which you wish your'
+                ' upload to appear in. The owner of the community will'
+                ' be notified, and can either accept or reject your'
+                ' request.' % {'CFG_SITE_NAME': CFG_SITE_NAME}),
         }),
         ('Funding', [
             'grants',
         ], {
             'indication': 'recommended',
-            'description': '%s is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!' % CFG_SITE_NAME,
+            'description': (
+                '%s is integrated into reporting lines for research funded'
+                ' by the European Commission via OpenAIRE'
+                ' (http://www.openaire.eu). Specify grants which have funded'
+                ' your research, and we will let your funding agency'
+                ' know!' % CFG_SITE_NAME
+            ),
         }),
         ('Related/alternate identifiers', [
             'related_identifiers',
         ], {
             'classes': '',
             'indication': 'recommended',
-            'description': 'Specify identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs.'
+            'description': (
+                'Specify identifiers of related publications and datasets.'
+                ' Supported identifiers include: DOI, Handle, ARK, PURL,'
+                ' ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic'
+                ' Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC,'
+                ' URNs and URLs.'
+            ),
         }),
         ('References', [
             'references',
