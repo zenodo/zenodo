@@ -31,7 +31,17 @@
 
 <p><small><a href="#" class="text-muted" data-toggle="collapse" data-target=".authors_list">(show affiliations)</a></small></p>
 
+{{ bfe_openaire_authors(bfo, relator_code_pattern='prc$', prefix='<p id="contactpersons_short"><strong>Contact Person(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='cur$', prefix='<p id="datacurators_short"><strong>Data Curator(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='col$', prefix='<p id="datacollectors_short"><strong>Data Collector(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='dtm$', prefix='<p id="datamanagers_short"><strong>Data Manager(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='edt$', prefix='<p id="editors_short"><strong>Editor(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='pro$', prefix='<p id="producers_short"><strong>Producer(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='res$', prefix='<p id="researchers_short"><strong>Researcher(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='cph$', prefix='<p id="rightsholders_short"><strong>Rights Holder(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='spn$', prefix='<p id="sponsors_short"><strong>Sponsor(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
 {{ bfe_openaire_authors(bfo, relator_code_pattern='ths$', prefix='<p id="supervisors_short"><strong>Supervisor(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
+{{ bfe_openaire_authors(bfo, relator_code_pattern='oth$', prefix='<p id="others_short><strong>Other(s):</strong><br>', suffix='</p>', limit="25", interactive="yes", print_affiliations="no") }}
 <p><span itemprop="description">{{bfo.field('520__a').decode('utf8')|safe}}</span></p>
 
 {{ bfe_notes(bfo, prefix='<div class="alert alert-warning">', suffix='</div>') }}

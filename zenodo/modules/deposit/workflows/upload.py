@@ -270,7 +270,7 @@ def process_recjson(deposition, recjson):
 
 def filter_empty_elements(recjson):
     list_fields = [
-        'authors', 'keywords', 'thesis_supervisors', 'subjects'
+        'authors', 'keywords', 'thesis_supervisors', 'subjects', 'contributors'
     ]
     for key in list_fields:
         recjson[key] = filter(
@@ -684,6 +684,7 @@ class upload(DepositionType):
         thesis_supervisors=fields.Raw(default=[]),
         title=fields.String,
         upload_type=fields.String,
+        contributors=fields.Raw(default=[]),
     )
 
     marshal_metadata_edit_fields = marshal_metadata_fields.copy()

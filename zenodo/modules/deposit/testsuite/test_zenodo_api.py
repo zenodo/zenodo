@@ -517,6 +517,15 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             )
         )),
         thesis_university=dict(type='string'),
+        contributors=dict(type='list', schema=dict(
+            type='dict', schema=dict(
+                name=dict(type='string'),
+                affiliation=dict(type='string'),
+                type=dict(type='string'),
+                orcid=dict(type='string', nullable=True),
+                gnd=dict(type='string', nullable=True),
+            )
+        )),
         title=dict(type='string'),
         upload_type=dict(type='string'),
         recid=dict(type='integer', nullable=True),
@@ -685,6 +694,13 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                          gnd="http://d-nb.info/gnd/170118215")
                 ],
                 thesis_university="Some thesis_university",
+                contributors=[
+                    dict(name="Doe Sr., Jochen", affiliation="Atlantis",
+                         type="oth"),
+                    dict(name="Smith Sr., Marco", affiliation="Atlantis",
+                         orcid="http://orcid.org/0000-0002-1825-0097",
+                         gnd="http://d-nb.info/gnd/170118215", type="cur")
+                ],
                 title="Test title",
                 upload_type="publication",
             )
@@ -758,6 +774,12 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                     dict(name="Это Sr., Jane", affiliation="Atlantis")
                 ],
                 thesis_university="இந்த ஒரு சோதனை",
+                contributors=[
+                    dict(name="Doe Sr.,  ن یک تست", affiliation="Atlantis",
+                         type="oth"),
+                    dict(name="SmЭтith Sr., Marco", affiliation="Atlantis",
+                         type="cur")
+                ],
                 title="Đây là một thử nghiệm",
                 upload_type="publication",
             )
@@ -1307,6 +1329,12 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                     dict(name="Smith Sr., Jane", affiliation="Atlantis")
                 ],
                 thesis_university="Some thesis_university",
+                contributors=[
+                    dict(name="Doe Sr., Jochen", affiliation="atlantis",
+                         type="oth"),
+                    dict(name="Smith Sr., Marco", affiliation="atlantis",
+                         type="cur")
+                ],
             )
         )
 
@@ -1435,6 +1463,11 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                     dict(name="Smith Sr., Jane", affiliation="CERN"),
                     dict(name="Doe Sr., John", affiliation="CERN"),
                 ],
+                contributors=[
+                    dict(name="Doe Jr., Jochen", affiliation="Atlantis", type="oth"),
+                    dict(name="Smith Sr., Marco", affiliation="CERN", type="cur"),
+                    dict(name="Doe Sr., Jochen", affiliation="CERN", type="oth"),
+                ],
             )),
             code=200,
         )
@@ -1541,6 +1574,11 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             dict(name="Doe Jr., John", affiliation="Atlantis", gnd='', orcid=''),
             dict(name="Smith Sr., Jane", affiliation="CERN", gnd='', orcid=''),
             dict(name="Doe Sr., John", affiliation="CERN", gnd='', orcid=''),
+        ])
+        self.assertEqual(record['contributors'], [
+            dict(name="Doe Jr., Jochen", affiliation="Atlantis", type='oth', gnd='', orcid=''),
+            dict(name="Smith Sr., Marco", affiliation="CERN", type='cur', gnd='', orcid=''),
+            dict(name="Doe Sr., Jochen", affiliation="CERN", type='oth', gnd='', orcid=''),
         ])
         self.assertEqual(record.get('embargo_date'), None)
         self.assertEqual(record.get('license'), None)
@@ -1822,6 +1860,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             u'related_identifiers': [],
             u'references': [],
             u'thesis_supervisors': [],
+            u'contributors': [],
             u'title': u'Test empty edit',
             u'upload_type': u'dataset'
         }

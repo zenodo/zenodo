@@ -32,10 +32,23 @@ xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
 xmlns:invenio="http://invenio-software.org/elements/1.0"
-exclude-result-prefixes="marc fn dc invenio">
+xmlns:contributors="marc.contributors"
+exclude-result-prefixes="marc fn dc invenio contributors">
     <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>
     <xsl:variable name="LOWERCASE" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="UPPERCASE" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
+    <contributors:map>
+        <entry key="prc">Process contact</entry>
+        <entry key="col">Collector</entry>
+        <entry key="cur">Curator</entry>
+        <entry key="dtm">Data manager</entry>
+        <entry key="pro">Producer</entry>
+        <entry key="res">Researcher</entry>
+        <entry key="cph">Copyright holder</entry>
+        <entry key="spn">Sponsor</entry>
+        <entry key="ths">Supervisor</entry>
+        <entry key="oth">Other</entry>
+    </contributors:map>
     <xsl:template match="/">
         <xsl:if test="collection">
         </xsl:if>
@@ -151,7 +164,7 @@ exclude-result-prefixes="marc fn dc invenio">
             </subjects>
         </xsl:if>
         <!-- 7. Contributor -->
-        <xsl:if test="datafield[@tag=536] or datafield[@tag=700][subfield[@code='4']='ths']">
+        <xsl:if test="datafield[@tag=536] or datafield[@tag=700]">
             <contributors>
                 <xsl:for-each select="datafield[@tag=536]">
                     <contributor contributorType="Funder">
@@ -159,23 +172,29 @@ exclude-result-prefixes="marc fn dc invenio">
                         <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
                     </contributor>
                 </xsl:for-each>
-                <xsl:for-each select="datafield[@tag=700][subfield[@code='4']='ths']">
-                    <contributor contributorType="Supervisor">
-                        <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
-                        <xsl:if test="subfield[@code='u']">
-                        <affiliation>
-                            <xsl:value-of select="subfield[@code='u']"/>
-                        </affiliation>
-                        </xsl:if>
-                        <xsl:for-each select="subfield[@code='0']">
-                            <xsl:if test="substring(., 2, 5) = 'orcid'">
-                                <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
-                                    <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
-                                    <xsl:value-of select="substring(., 8)"/>
-                                </nameIdentifier>
+                <xsl:for-each select="datafield[@tag=700]">
+                    <xsl:if test="string-length(subfield[@code='4']) = 3 and subfield[@code='a']">
+                        <contributor>
+                            <xsl:variable name="contributorCode" select="subfield[@code='4']"/>
+                            <xsl:attribute name="contributorType">
+                                <xsl:value-of select="document('')/*/contributors:map/entry[@key=$contributorCode]"/>
+                            </xsl:attribute>
+                            <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
+                            <xsl:if test="subfield[@code='u']">
+                            <affiliation>
+                                <xsl:value-of select="subfield[@code='u']"/>
+                            </affiliation>
                             </xsl:if>
-                        </xsl:for-each>
-                    </contributor>
+                            <xsl:for-each select="subfield[@code='0']">
+                                <xsl:if test="substring(., 2, 5) = 'orcid'">
+                                    <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
+                                        <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
+                                        <xsl:value-of select="substring(., 8)"/>
+                                    </nameIdentifier>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </contributor>
+                    </xsl:if>
                 </xsl:for-each>
             </contributors>
         </xsl:if>

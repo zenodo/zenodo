@@ -129,6 +129,18 @@ test_marc = """<record>
     <subfield code="2">DOI</subfield>
     <subfield code="a">10.1234/foo.bar</subfield>
   </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="4">oth</subfield>
+    <subfield code="a">Smith, Other</subfield>
+    <subfield code="0">(orcid)0000-0002-1825-0097</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u">CERN</subfield>
+    <subfield code="4">dtm</subfield>
+    <subfield code="a">Kowalski, Manager</subfield>
+    <subfield code="0">(gnd)170118216</subfield>
+  </datafield>
   <datafield tag="540" ind1=" " ind2=" ">
     <subfield code="u">http://zenodo.org</subfield>
     <subfield code="a">Creative Commons</subfield>
@@ -209,6 +221,12 @@ test_form_json = {
         {'affiliation': 'CERN', 'name': 'Kowalski, Jane',
          'gnd': '170118216', 'orcid': ''},
     ],
+    'contributors': [
+        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'oth',
+         'gnd': '', 'orcid': '0000-0002-1825-0097'},
+        {'affiliation': 'CERN', 'name': 'Kowalski, Manager', 'type': 'dtm',
+         'gnd': '170118216', 'orcid': ''},
+    ],
     'description': 'Test Description',
     'doi': '10.1234/foo.bar',
     'embargo_date': date(2014, 2, 27),
@@ -284,6 +302,12 @@ test_record = dict(
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
          'gnd': '', 'orcid': '0000-0002-1825-0097'},
         {'affiliation': 'CERN', 'name': 'Kowalski, Jane',
+         'gnd': '170118216', 'orcid': ''},
+    ],
+    contributors=[
+        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'oth',
+         'gnd': '', 'orcid': '0000-0002-1825-0097'},
+        {'affiliation': 'CERN', 'name': 'Kowalski, Manager', 'type': 'dtm',
          'gnd': '170118216', 'orcid': ''},
     ],
     description="Test Description",

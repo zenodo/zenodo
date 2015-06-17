@@ -1923,6 +1923,12 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>No</td>
     <td>Awarding university of thesis.</td>
 </tr>
+<tr>
+    <td><code>contributors</code></td>
+    <td>Array of objects</td>
+    <td>No</td>
+    <td>Same format as for <code>creators</code>.</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -1993,6 +1999,8 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 
 <h2 id="restapi-changes">Changes</h2>
 <dl>
+<dt>2015-10-06</dt>
+<dd><p>Added new optional field <code>contributors</code> to deposition metadata.</p></dd>
 <dt>2015-10-06</dt>
 <dd><p>Added new optional field <code>subjects</code> to deposition metadata.</p></dd>
 <dt>2015-10-06</dt>
