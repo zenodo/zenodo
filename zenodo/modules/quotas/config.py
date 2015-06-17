@@ -28,7 +28,30 @@ QUOTAS_METRICS = [
     'zenodo.modules.quotas.metrics.deposit:DepositMetric',
 ]
 
+QUOTAS_PUBLISH_METRICS = []
+"""Determine which metrics to publish."""
+
 QUOTAS_AFSMETRIC_DIRECTORIES = [
     "var/data/deposit/",
     "var/data/files/",
 ]
+"""AFS directories for AFS metric."""
+
+#
+# XSLS related variables.
+#
+
+QUOTAS_XSLS_API_URL = "http://xsls-dev.cern.ch"
+"""XSLS API endpoint."""
+
+QUOTAS_XSLS_SERVICE_ID = None
+"""XSLS service id."""
+
+QUOTAS_XSLS_AVAILABILITY = 'zenodo.base.metrics.availability'
+"""Import path to callable that will compute an availability value (0-100).
+
+The callable must take one argument which is the ServiceDocument that will
+be sent to the XSLS service.
+
+See http://itmon.web.cern.ch/itmon/recipes/how_to_create_a_service_xml.html
+"""

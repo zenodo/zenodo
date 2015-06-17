@@ -34,7 +34,7 @@ from .signals import resource_usage_updated
 
 class Metric(object):
 
-    """Metric."""
+    """Metric interface."""
 
     metric_class = ""
     object_type = None
@@ -47,6 +47,16 @@ class Metric(object):
     @classmethod
     def all(cls):
         """Compute metrics for all resources."""
+        raise NotImplementedError()
+
+
+class Publisher(object):
+
+    """Publisher interface."""
+
+    @classmethod
+    def publish(cls, metrics):
+        """Send metrics to external service."""
         raise NotImplementedError()
 
 

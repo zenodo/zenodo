@@ -44,6 +44,7 @@ install_requires = [
     "Pillow",
     "pyoai>=2.4.2",
     "awesome-slugify>=1.6",
+    "cernservicexml>=0.1.2",
 ]
 
 extras_require = {

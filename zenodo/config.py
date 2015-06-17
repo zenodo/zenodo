@@ -308,6 +308,34 @@ CELERYBEAT_SCHEDULE = {
         schedule=crontab(minute='*/15'),
         args=('zenodo.modules.quotas.metrics.afs:AFSVolumeMetric', ),
     ),
+    # Every 5
+    'metrics-bibsched': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute='*/5'),
+        args=('zenodo.modules.quotas.metrics.bibsched:BibSchedMetric', ),
+    ),
+    # Every hour
+    'metrics-accounts': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute=0, hour='*/1'),
+        args=('zenodo.modules.quotas.metrics.accounts:AccountsMetric', ),
+    ),
+    # Every 3 hour
+    'metrics-communities': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute=1, hour='*/3'),
+        args=('zenodo.base.metrics.communities:CommunitiesMetric', ),
+    ),
+    'metrics-pidstore': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute=1, hour='*/3'),
+        args=('zenodo.base.metrics.pidstore:PIDStoreMetric', ),
+    ),
+    'publish-metrics': dict(
+        task='zenodo.modules.quotas.tasks.publish_metrics',
+        schedule=crontab(minute='*/15'),
+        args=('zenodo.modules.quotas.publishers.cern:CERNPublisher', ),
+    ),
     # # Every 12 hours
     # 'metrics-deposit': dict(
     #     task='zenodo.modules.quotas.tasks.collect_metric',
@@ -321,6 +349,17 @@ CELERYBEAT_SCHEDULE = {
         args=(),
     ),
 }
+
+QUOTAS_PUBLISH_METRICS = [
+    dict(type='System', id=CFG_SITE_NAME, metric='bibsched.tasks'),
+    dict(type='System', id=CFG_SITE_NAME, metric='accounts.num'),
+    dict(type='System', id=CFG_SITE_NAME, metric='accounts.logins6h'),
+    dict(type='System', id=CFG_SITE_NAME, metric='communities.num'),
+    dict(type='System', id=CFG_SITE_NAME, metric='pidstore.numdois'),
+]
+QUOTAS_XSLS_API_URL = "http://xsls-dev.cern.ch"
+QUOTAS_XSLS_SERVICE_ID = "zenododev"
+QUOTAS_XSLS_AVAILABILITY = 'zenodo.base.metrics:availability'
 
 CFG_WEBSEARCH_ENABLE_OPENGRAPH = True
 CFG_WEBSEARCH_DISPLAY_NEAREST_TERMS = False

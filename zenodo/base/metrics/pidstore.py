@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2012, 2013 CERN.
 #
 # Zenodo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -20,31 +20,31 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-"""Registry of metric classes."""
+"""PIDStore metrics."""
 
-from flask_registry import ImportPathRegistry, RegistryProxy, RegistryError
+from __future__ import absolute_import
 
-from invenio.base.globals import cfg
+from flask import current_app
 
-from .models import Metric
+from invenio.modules.pidstore.models import PersistentIdentifier
 
-
-class MetricsRegistry(ImportPathRegistry):
-
-    """Metrics registry."""
-
-    def __init__(self):
-        """Set defaults."""
-        super(MetricsRegistry, self).__init__(
-            initial=cfg.get('QUOTAS_METRICS', []),
-            load_modules=True,
-        )
-
-    def _load_import_path(self, import_path):
-        """Load module behind an import path."""
-        m = super(MetricsRegistry, self)._load_import_path(import_path)
-        if not issubclass(Metric, m):
-            raise RegistryError("{0} is not a subclass of Metric.")
+from zenodo.modules.quotas.models import Metric
 
 
-metrics_registry = RegistryProxy('quotas_metrics', MetricsRegistry)
+class PIDStoreMetric(Metric):
+
+    """Aggregated metrics for pidstore."""
+
+    metric_class = "pidstore"
+    object_type = "System"
+
+    @classmethod
+    def all(cls):
+        """Compute bibsched queue length."""
+        system_name = current_app.config.get('CFG_SITE_NAME', 'Invenio')
+        dois = PersistentIdentifier.query.filter_by(pid_type='doi',
+                                                    status='R').count()
+        data = {system_name: {
+            'numdois': dois,
+        }}
+        return data.items()
