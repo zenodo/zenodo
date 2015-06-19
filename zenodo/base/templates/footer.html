@@ -18,18 +18,22 @@
       </div>
       {%- endfor %}
       <div class="col-lg-offset-1 col-sm-2 col-md-2 hidden-sm">
-        <p><small>{{ _("Powered by") }}:</small></p>
-        <a href="http://invenio-software.org"><img src="{{ url_for('static', filename='img/logo_white.png') }}" width="100px"></a>
+        <p align="center"><small>{{ _("Powered by") }}:</small></p>
+        <div align="center">
+        <a href="http://invenio-software.org"><img src="{{ url_for('static', filename='img/logo_white.png') }}" width="100px"></a><br />
+        <a href="http://information-technology.web.cern.ch/about/computer-centre" style="font-size:19px;">CERN Data Centre</a><br />
+        </div>
       </div>
       <div class="col-sm-5 col-md-5"><span class="pull-right partners hidden-sm">
-        <a href="http://www.openaire.eu"><img src="{{ url_for('static', filename='img/openaire.png') }}" width="80px" height="60px"></a>
+        <p align="right"><small>{{ _("Funded by") }}:</small></p>
         <a href="http://cern.ch"><img src="{{ url_for('static', filename='img/cern.png') }}" width="60px" height="60px"></a>
-        <a href="http://cordis.europa.eu/projects/rcn/100079_en.html"><img src="{{ url_for('static', filename='img/fp7.png') }}" width="80px" height="60px"></a>
-        <a href="http://cordis.europa.eu/fp7/ict/e-infrastructure/"><img src="{{ url_for('static', filename='img/e-infra.png') }}" width="100px" height="60px"></a></span>
+        <a href="http://www.openaire.eu"><img src="{{ url_for('static', filename='img/openaire.png') }}" width="80px" height="60px"></a>
+        <a href="http://ec.europa.eu/programmes/horizon2020/"><img src="{{ url_for('static', filename='img/eu.png') }}" width="88px" height="60px"></a><br>
+        </span>
       </div>
     </div>
     <div class="row">
-      <div class="col-sm-12 col-md-12" style="text-align: center;">
+      <div class="col-sm-12 col-md-12" style="text-align: center; padding-top: 20px">
         <p><small>
           {%- for item in current_menu.submenu('footermenu_bottom').children if item.visible recursive -%}<a href="{{ item.url }}">{{ item.text|safe }}</a>{% if not loop.last%} | {% endif %}{%- endfor -%}
         </small></p>

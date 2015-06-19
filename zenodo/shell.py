@@ -24,6 +24,8 @@
 
 import os
 
+from werkzeug.utils import secure_filename
+
 from invenio.base.globals import cfg
 from invenio.ext.cache import cache
 from invenio.ext.login import UserInfo
@@ -37,7 +39,7 @@ from invenio.modules.pidstore.tasks import datacite_delete, \
     datacite_register, datacite_sync, datacite_update
 from invenio.modules.records.api import get_record
 from invenio.utils.serializers import ZlibPickle as Serializer
-from werkzeug.utils import secure_filename
+from zenodo.modules.deposit.workflows.upload import transfer_ownership
 
 
 def ban_user(user_id):
