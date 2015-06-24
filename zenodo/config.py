@@ -47,9 +47,9 @@ from datetime import timedelta
 
 from celery.schedules import crontab
 
-import pkg_resources
-
 from invenio.base.config import EXTENSIONS
+
+import pkg_resources
 
 DEPRECATION_WARNINGS = True
 
@@ -562,6 +562,7 @@ CFG_OPENAIRE_PUBTYPE_MAP = [
     ('photo', _('Photo')),
     ('other', _('Other')),
     ('software', _('Software')),
+    ('lessons', _('Lessons')),
 ]
 
 CFG_OPENAIRE_THESIS_TYPES = [
