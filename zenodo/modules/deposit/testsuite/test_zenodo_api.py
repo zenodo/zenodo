@@ -454,7 +454,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             type='string',
             allowed=['open', 'closed', 'embargoed', 'restricted'],
         ),
-        access_conditions=dict(type='string'),
+        access_conditions=dict(type='string', nullable=True),
         communities=dict(type='list'),
         conference_acronym=dict(type='string'),
         conference_dates=dict(type='string'),
@@ -473,7 +473,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )),
         description=dict(type='string'),
         doi=dict(type='string'),
-        embargo_date=dict(type='string'),
+        embargo_date=dict(type='string', nullable=True),
         grants=dict(type='list', schema=dict(
             type="dict", schema=dict(
                 id=dict(type='string'),
@@ -491,7 +491,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         journal_volume=dict(type='string'),
         keywords=dict(type='list'),
         subjects=dict(type='list'),
-        license=dict(type='string'),
+        license=dict(type='string', nullable=True),
         notes=dict(type='string'),
         partof_pages=dict(type='string'),
         partof_title=dict(type='string'),
@@ -1826,6 +1826,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
 
         expected_marshal = {
             u'access_right': u'open',
+            u'access_conditions': None,
             u'communities': [],
             u'conference_acronym': None,
             u'conference_dates': None,

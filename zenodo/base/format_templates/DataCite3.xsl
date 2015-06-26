@@ -38,13 +38,14 @@ exclude-result-prefixes="marc fn dc invenio contributors">
     <xsl:variable name="LOWERCASE" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="UPPERCASE" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <contributors:map>
-        <entry key="prc">Process contact</entry>
-        <entry key="col">Collector</entry>
-        <entry key="cur">Curator</entry>
-        <entry key="dtm">Data manager</entry>
+        <entry key="prc">ContactPerson</entry>
+        <entry key="col">DataCollector</entry>
+        <entry key="cur">DataCurator</entry>
+        <entry key="dtm">DataManager</entry>
+        <entry key="edt">Editor</entry>
         <entry key="pro">Producer</entry>
         <entry key="res">Researcher</entry>
-        <entry key="cph">Copyright holder</entry>
+        <entry key="cph">RightsHolder</entry>
         <entry key="spn">Sponsor</entry>
         <entry key="ths">Supervisor</entry>
         <entry key="oth">Other</entry>

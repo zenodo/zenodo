@@ -282,13 +282,13 @@ class ContributorsForm(WebDepositForm):
     type = fields.SelectField(
         label="",
         choices=[
-            ('prc', 'ContactPerson'),
-            ('col', 'DataCollector'),
-            ('cur', 'DataCurator'),
-            ('dtm', 'DataManager'),
+            ('prc', 'Contact person'),
+            ('col', 'Data collector'),
+            ('cur', 'Data curator'),
+            ('dtm', 'Data manager'),
             ('edt', 'Editor'),
             ('res', 'Researcher'),
-            ('cph', 'RightsHolder'),
+            ('cph', 'Rights holder'),
             ('spn', 'Sponsor'),
             ('oth', 'Other'),
         ],

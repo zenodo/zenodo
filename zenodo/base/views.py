@@ -74,6 +74,12 @@ def register_menu_items():
         endpoint_arguments_constructor=lambda: dict(name='images')
     )
 
+    item = current_menu.submenu('main.browse.lessons')
+    item.register(
+        'search.collection', _('Lessons'), order=2,
+        endpoint_arguments_constructor=lambda: dict(name='lessons')
+    )
+
     item = current_menu.submenu('main.browse.posters')
     item.register(
         'search.collection', _('Posters'), order=3,

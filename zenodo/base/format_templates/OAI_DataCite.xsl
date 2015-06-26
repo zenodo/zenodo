@@ -38,16 +38,15 @@ exclude-result-prefixes="marc fn dc invenio contributors">
     <xsl:variable name="LOWERCASE" select="'abcdefghijklmnopqrstuvwxyz'"/>
     <xsl:variable name="UPPERCASE" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'"/>
     <contributors:map>
-        <entry key="prc">Process contact</entry>
-        <entry key="col">Collector</entry>
-        <entry key="cur">Curator</entry>
-        <entry key="dtm">Data manager</entry>
+        <entry key="prc">ContactPerson</entry>
+        <entry key="col">DataCollector</entry>
+        <entry key="dtm">DataManager</entry>
+        <entry key="edt">Editor</entry>
         <entry key="pro">Producer</entry>
         <entry key="res">Researcher</entry>
-        <entry key="cph">Copyright holder</entry>
+        <entry key="cph">RightsHolder</entry>
         <entry key="spn">Sponsor</entry>
         <entry key="ths">Supervisor</entry>
-        <entry key="oth">Other</entry>
     </contributors:map>
     <xsl:template match="/">
         <xsl:if test="collection">
@@ -160,37 +159,13 @@ exclude-result-prefixes="marc fn dc invenio contributors">
             </subjects>
         </xsl:if>
         <!-- 7. Contributor -->
-        <xsl:if test="datafield[@tag=536] or datafield[@tag=700]">
+        <xsl:if test="datafield[@tag=536]">
             <contributors>
                 <xsl:for-each select="datafield[@tag=536]">
                     <contributor contributorType="Funder">
                         <contributorName>European Commission</contributorName>
                         <nameIdentifier nameIdentifierScheme="info">info:eu-repo/grantAgreement/EC/FP7/<xsl:value-of select="subfield[@code='c']"/></nameIdentifier>
                     </contributor>
-                </xsl:for-each>
-                <xsl:for-each select="datafield[@tag=700]">
-                    <xsl:if test="string-length(subfield[@code='4']) = 3 and subfield[@code='a']">
-                        <contributor>
-                            <xsl:variable name="contributorCode" select="subfield[@code='4']"/>
-                            <xsl:attribute name="contributorType">
-                                <xsl:value-of select="document('')/*/contributors:map/entry[@key=$contributorCode]"/>
-                            </xsl:attribute>
-                            <contributorName><xsl:value-of select="subfield[@code='a']"/></contributorName>
-                            <xsl:if test="subfield[@code='u']">
-                            <affiliation>
-                                <xsl:value-of select="subfield[@code='u']"/>
-                            </affiliation>
-                            </xsl:if>
-                            <xsl:for-each select="subfield[@code='0']">
-                                <xsl:if test="substring(., 2, 5) = 'orcid'">
-                                    <nameIdentifier schemeURI="http://orcid.org" nameIdentifierScheme="ORCID">
-                                        <!-- parse only id from (orcid)xxxx-xxxx-xxxx -->
-                                        <xsl:value-of select="substring(., 8)"/>
-                                    </nameIdentifier>
-                                </xsl:if>
-                            </xsl:for-each>
-                        </contributor>
-                    </xsl:if>
                 </xsl:for-each>
             </contributors>
         </xsl:if>

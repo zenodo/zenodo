@@ -383,9 +383,7 @@ class TestReaders(InvenioTestCase):
 
         import copy
         r = Record(json=copy.copy(test_record), master_format='marc')
-
-        ld = r.produce('json_for_ld')
-        print(ld)
+        r.produce('json_for_ld')
 
     def test_marc_export(self):
         from invenio.modules.records.api import Record
