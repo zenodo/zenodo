@@ -176,7 +176,7 @@ exclude-result-prefixes="marc fn dc invenio">
                 <xsl:when test="subfield[@code='a']='software'">
                     <resourceType><xsl:attribute name="resourceTypeGeneral">Software</xsl:attribute></resourceType>
                 </xsl:when>
-                <xsl:when test="subfield[@code='a']='lessons'">
+                <xsl:when test="subfield[@code='a']='lesson'">
                     <resourceType><xsl:attribute name="resourceTypeGeneral">InteractiveResource</xsl:attribute></resourceType>
                 </xsl:when>
             </xsl:choose>

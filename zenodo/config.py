@@ -562,7 +562,7 @@ CFG_OPENAIRE_PUBTYPE_MAP = [
     ('photo', _('Photo')),
     ('other', _('Other')),
     ('software', _('Software')),
-    ('lessons', _('Lessons')),
+    ('lesson', _('Lesson')),
 ]
 
 CFG_OPENAIRE_THESIS_TYPES = [

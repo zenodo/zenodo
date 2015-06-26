@@ -36,7 +36,7 @@ UPLOAD_TYPES = [
     ('image', 'Image', [], 'fa fa-bar-chart-o fa-2x fa-fw'),
     ('video', 'Video/Audio', [], 'fa fa-film fa-2x fa-fw'),
     ('software', 'Software', [], 'fa fa-cogs fa-2x fa-fw'),
-    ('lessons', 'Lessons', [], 'fa fa-graduation-cap fa-2x fa-fw'),
+    ('lesson', 'Lesson', [], 'fa fa-graduation-cap fa-2x fa-fw'),
 ]
 
 UPLOAD_TYPE_ICONS = dict([(t[0], t[3]) for t in UPLOAD_TYPES])

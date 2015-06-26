@@ -34,20 +34,15 @@ def do_upgrade():
     """Implement your upgrades here."""
     run_sql(
         "INSERT INTO collection (name, dbquery) VALUES (%s, %s)",
-        ('lessons', '980__a:lessons')
+        ('lessons', '980__a:lesson')
     )
     parent_id = 1
-    pos = 13
+    pos = 26
     coll_id = run_sql(
         "SELECT id FROM collection WHERE name='lessons'")[0][0]
     run_sql(
         "INSERT INTO collectiondetailedrecordpagetabs (id_collection, tabs)\
         VALUES (%s, 'usage;comments;metadata;files')", (coll_id,)
-    )
-    run_sql(
-        "UPDATE collection_collection SET score=score+1 "
-        "WHERE id_dad=%s AND score>=%s",
-        (parent_id, pos)
     )
     run_sql(
         "INSERT INTO collection_collection (id_dad, id_son, type, score)\

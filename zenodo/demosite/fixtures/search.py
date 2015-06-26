@@ -65,9 +65,9 @@ colls = [
     (29, 'zenodo-public', 'zenodo-public', '980__a:0->Z AND NOT 980__a:PROVISIONAL AND NOT 980__a:PENDING AND NOT 980__a:SPAM AND NOT 980__a:REJECTED AND NOT 980__a:DARK'),
     (30, 'Software', 'software', '980__a:software'),
     (31, 'Proposal', 'proposal', '980__b:proposal'),
-    (32, 'Project Deliverable', 'deliverable', '980__b:deliverable'),
-    (33, 'Project Milestone', 'milestone', '980__b:milestone'),
-    (34, 'Lessons', 'lessons', '980__a:lessons'),
+    (32, 'Project Deliverables', 'deliverables', '980__b:deliverable'),
+    (33, 'Project Milestones', 'milestones', '980__b:milestone'),
+    (34, 'Lessons', 'lessons', '980__a:lesson'),
 
 ]
 
@@ -95,7 +95,8 @@ coll_coll_data = (
     (1, 5, 'r', 4),
     (1, 6, 'r', 5),
     (1, 30, 'r', 6),
-    (1, 7, 'r', 7),
+    (1, 34, 'r', 7),
+    (1, 7, 'r', 8),
     (2, 8, 'r', 8),
     (2, 9, 'r', 9),
     (2, 10, 'r', 10),
