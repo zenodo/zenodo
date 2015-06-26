@@ -235,6 +235,12 @@ class CreatorForm(WebDepositForm):
             PidNormalize(scheme='orcid'),
         ],
     )
+    gnd = fields.StringField(
+        widget=widgets.HiddenInput(),
+        processors=[
+            PidNormalize(scheme='gnd'),
+        ],
+    )
 
     def validate_orcid(form, field):
         if field.data:
@@ -244,6 +250,130 @@ class CreatorForm(WebDepositForm):
             )
             if 'orcid' not in schemes:
                 raise ValidationError("Not a valid ORCID-identifier.")
+
+    def validate_gnd(form, field):
+        if field.data:
+            from invenio.utils import persistentid
+            schemes = persistentid.detect_identifier_schemes(
+                field.data or ''
+            )
+            if 'gnd' not in schemes:
+                raise ValidationError("Not a valid GND-identifier.")
+
+
+class ContributorsForm(WebDepositForm):
+    name = fields.StringField(
+        placeholder="Family name, First name",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-4 col-pad-0"),
+        validators=[
+            required_if(
+                'affiliation',
+                [lambda x: bool(x.strip()), ],  # non-empty
+                message="Contributor name is required if you specify affiliation."
+            ),
+        ],
+    )
+    affiliation = fields.StringField(
+        placeholder="Affiliation",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-3 col-pad-0"),
+    )
+    type = fields.SelectField(
+        label="",
+        choices=[
+            ('prc', 'ContactPerson'),
+            ('col', 'DataCollector'),
+            ('cur', 'DataCurator'),
+            ('dtm', 'DataManager'),
+            ('edt', 'Editor'),
+            ('res', 'Researcher'),
+            ('cph', 'RightsHolder'),
+            ('spn', 'Sponsor'),
+            ('oth', 'Other'),
+        ],
+        default='cur',
+        widget_classes='form-control',
+        widget=ColumnInput(
+            class_="col-xs-3 col-pad-0", widget=widgets.Select()
+        ),
+    )
+    orcid = fields.StringField(
+        widget=widgets.HiddenInput(),
+        processors=[
+            PidNormalize(scheme='orcid'),
+        ],
+    )
+    gnd = fields.StringField(
+        widget=widgets.HiddenInput(),
+        processors=[
+            PidNormalize(scheme='gnd'),
+        ],
+    )
+
+    def validate_orcid(form, field):
+        if field.data:
+            from invenio.utils import persistentid
+            schemes = persistentid.detect_identifier_schemes(
+                field.data or ''
+            )
+            if 'orcid' not in schemes:
+                raise ValidationError("Not a valid ORCID-identifier.")
+
+    def validate_gnd(form, field):
+        if field.data:
+            from invenio.utils import persistentid
+            schemes = persistentid.detect_identifier_schemes(
+                field.data or ''
+            )
+            if 'gnd' not in schemes:
+                raise ValidationError("Not a valid GND-identifier.")
+
+
+class SubjectsForm(WebDepositForm):
+    term = fields.StringField(
+        placeholder="Term",
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-5"),
+        validators=[
+            required_if(
+                'identifier',
+                [lambda x: bool(x.strip()), ],  # non-empty
+                message="Term is required if you specify identifier."
+            ),
+        ],
+    )
+    scheme = fields.StringField(
+        label="",
+        default='',
+        widget_classes='',
+        widget=widgets.HiddenInput(),
+    )
+    identifier = fields.StringField(
+        label="",
+        placeholder="Identifier",
+        validators=[
+            validators.optional(),
+            pid_validator(),
+        ],
+        processors=[
+            PidSchemeDetection(set_field='scheme'),
+            PidNormalize(scheme_field='scheme'),
+        ],
+        widget_classes='form-control',
+        widget=ColumnInput(class_="col-xs-5 col-pad-0"),
+    )
+
+    def validate_scheme(form, field):
+        """Set scheme based on value in identifier."""
+        from invenio.utils import persistentid
+        schemes = persistentid.detect_identifier_schemes(
+            form.data.get('identifier') or ''
+        )
+        if schemes:
+            field.data = schemes[0]
+        else:
+            field.data = ''
 
 
 class CommunityForm(WebDepositForm):
@@ -630,6 +760,24 @@ class ZenodoForm(WebDepositForm):
     )
 
     #
+    # Subjects
+    #
+    subjects = fields.DynamicFieldList(
+        fields.FormField(
+            SubjectsForm,
+            widget=ExtendedListWidget(
+                item_widget=ItemWidget(),
+                html_tag='div'
+            ),
+        ),
+        label="Subjects",
+        add_label='Add another subject',
+        icon='fa fa-tags fa-fw',
+        widget_classes='',
+        min_entries=1,
+    )
+
+    #
     # Journal
     #
     journal_title = fields.StringField(
@@ -720,6 +868,24 @@ class ZenodoForm(WebDepositForm):
         label='Awarding University',
         validators=[validators.optional()],
         icon='fa fa-building fa-fw',
+    )
+
+    #
+    # Contributors
+    #
+    contributors = fields.DynamicFieldList(
+        fields.FormField(
+            ContributorsForm,
+            widget=ExtendedListWidget(
+                item_widget=ItemWidget(),
+                html_tag='div'
+            ),
+        ),
+        label='Contributors',
+        add_label='Add another contributor',
+        icon='fa fa-users fa-fw',
+        widget_classes='',
+        min_entries=0,
     )
 
     #
@@ -910,6 +1076,19 @@ class ZenodoForm(WebDepositForm):
         ], {'classes': '', 'indication': 'optional', }),
         ('Thesis', [
             'thesis_university', 'thesis_supervisors',
+        ], {
+            'classes': '',
+            'indication': 'optional',
+        }),
+        ('Subjects', [
+            'subjects'
+        ], {
+            'classes': '',
+            'indication': 'optional',
+            'description': 'Thsi field contains a topical subject used as a subject added entry.',
+        }),
+        ('Contributors', [
+            'contributors'
         ], {
             'classes': '',
             'indication': 'optional',

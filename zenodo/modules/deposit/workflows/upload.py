@@ -1,24 +1,24 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014, 2015 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2012, 2013, 2014, 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
 from __future__ import absolute_import
 
@@ -270,7 +270,7 @@ def process_recjson(deposition, recjson):
 
 def filter_empty_elements(recjson):
     list_fields = [
-        'authors', 'keywords', 'thesis_supervisors'
+        'authors', 'keywords', 'thesis_supervisors', 'subjects', 'contributors'
     ]
     for key in list_fields:
         recjson[key] = filter(
@@ -672,6 +672,7 @@ class upload(DepositionType):
         journal_title=fields.String,
         journal_volume=fields.String,
         keywords=fields.Raw(default=[]),
+        subjects=fields.Raw(default=[]),
         license=fields.String,
         notes=fields.String(default=''),
         partof_pages=fields.String,
@@ -684,6 +685,7 @@ class upload(DepositionType):
         thesis_supervisors=fields.Raw(default=[]),
         title=fields.String,
         upload_type=fields.String,
+        contributors=fields.Raw(default=[]),
     )
 
     marshal_metadata_edit_fields = marshal_metadata_fields.copy()
