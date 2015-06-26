@@ -454,6 +454,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
             type='string',
             allowed=['open', 'closed', 'embargoed', 'restricted'],
         ),
+        access_conditions=dict(type='string'),
         communities=dict(type='list'),
         conference_acronym=dict(type='string'),
         conference_dates=dict(type='string'),
@@ -702,7 +703,8 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
     def test_unicode(self):
         test_data = dict(
             metadata=dict(
-                access_right='embargoed',
+                access_right='restricted',
+                access_conditions='Αυτή είναι μια δοκιμή',
                 communities=[{'identifier': 'cfa'}],
                 conference_acronym='Αυτή είναι μια δοκιμή',
                 conference_dates='هذا هو اختبار',
