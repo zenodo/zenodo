@@ -67,6 +67,7 @@ colls = [
     (31, 'Proposal', 'proposal', '980__b:proposal'),
     (32, 'Project Deliverable', 'deliverable', '980__b:deliverable'),
     (33, 'Project Milestone', 'milestone', '980__b:milestone'),
+    (34, 'Lessons', 'lessons', '980__a:lessons'),
 
 ]
 
@@ -118,6 +119,7 @@ coll_coll_data = (
     (2, 31, 'r', 28),
     (2, 32, 'r', 29),
     (2, 33, 'r', 30),
+    (1, 34, 'r', 31),
 )
 
 
