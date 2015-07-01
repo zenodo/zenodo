@@ -41,6 +41,9 @@ class ReceiversTestCase(BaseTestCase):
         "EMAIL_BACKEND": "flask.ext.email.backends.locmem.Mail"
     }
 
+    # Note Flask-Testing 0.4.2 has a bug that causes render_templates to switch
+    # off template rendering not only for this test case but for all subsequent
+    # ones as well. Thus this test case should be run last.
     render_templates = False
 
     def tearDown(self):
