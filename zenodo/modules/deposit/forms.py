@@ -27,6 +27,8 @@ from datetime import date
 
 from flask import request
 
+import idutils
+
 from invenio.base.i18n import _
 from invenio.config import CFG_DATACITE_DOI_PREFIX
 from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
@@ -201,8 +203,7 @@ class RelatedIdentifierForm(WebDepositForm):
 
     def validate_scheme(form, field):
         """Set scheme based on value in identifier."""
-        from invenio.utils import persistentid
-        schemes = persistentid.detect_identifier_schemes(
+        schemes = idutils.detect_identifier_schemes(
             form.data.get('identifier') or ''
         )
         if schemes:
@@ -244,8 +245,7 @@ class CreatorForm(WebDepositForm):
 
     def validate_orcid(form, field):
         if field.data:
-            from invenio.utils import persistentid
-            schemes = persistentid.detect_identifier_schemes(
+            schemes = idutils.detect_identifier_schemes(
                 field.data or ''
             )
             if 'orcid' not in schemes:
@@ -253,8 +253,7 @@ class CreatorForm(WebDepositForm):
 
     def validate_gnd(form, field):
         if field.data:
-            from invenio.utils import persistentid
-            schemes = persistentid.detect_identifier_schemes(
+            schemes = idutils.detect_identifier_schemes(
                 field.data or ''
             )
             if 'gnd' not in schemes:
@@ -313,8 +312,7 @@ class ContributorsForm(WebDepositForm):
 
     def validate_orcid(form, field):
         if field.data:
-            from invenio.utils import persistentid
-            schemes = persistentid.detect_identifier_schemes(
+            schemes = idutils.detect_identifier_schemes(
                 field.data or ''
             )
             if 'orcid' not in schemes:
@@ -322,8 +320,7 @@ class ContributorsForm(WebDepositForm):
 
     def validate_gnd(form, field):
         if field.data:
-            from invenio.utils import persistentid
-            schemes = persistentid.detect_identifier_schemes(
+            schemes = idutils.detect_identifier_schemes(
                 field.data or ''
             )
             if 'gnd' not in schemes:
@@ -366,8 +363,7 @@ class SubjectsForm(WebDepositForm):
 
     def validate_scheme(form, field):
         """Set scheme based on value in identifier."""
-        from invenio.utils import persistentid
-        schemes = persistentid.detect_identifier_schemes(
+        schemes = idutils.detect_identifier_schemes(
             form.data.get('identifier') or ''
         )
         if schemes:
