@@ -435,7 +435,7 @@ class ZenodoForm(WebDepositForm):
         export_key='upload_type.type',
     )
     publication_type = fields.SelectField(
-        label='Type of publication',
+        label='Publication Type',
         choices=[
             ('book', 'Book'),
             ('section', 'Book section'),
