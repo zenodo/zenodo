@@ -1,25 +1,526 @@
-{#
-## This file is part of Invenio.
-## Copyright (C) 2013, 2014, 2015 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
-#}
-{% extends "page.html" %}
+# -*- coding: utf-8 -*-
+#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
-{% block body %}
+import warnings
+from sqlalchemy import *
+from invenio.ext.sqlalchemy import db
+from invenio.modules.upgrader.api import op
+from invenio.utils.text import wait_for_user
 
+
+depends_on = [u'zenodo_2015_06_24_new_type_lessons']
+
+from invenio.modules.pages.models import Page
+
+def info():
+    return "Re-adds static pages as pages in the pages modul module."
+
+
+def do_upgrade():
+    """Implement your upgrades here."""
+    # content starts at l74
+
+    pgs = [
+            ['about', pc_about],
+            ['faq', pc_faq],
+            ['terms', pc_terms],
+            ['use-data', pc_use_data],
+            ['deposit-data', pc_use_data],
+            ['privacy', pc_privacy],
+            ['policies', pc_policies],
+            ['contact', pc_contact],
+            ['support', pc_contact],
+            ['features', pc_features],
+            ['dev', pc_api]
+          ]
+
+    for pg in pgs:
+        add_page(pg[0], pg[1])
+    pass
+
+def add_page(title, content, template='pages/default.html'):
+    tp = Page()
+    # set url to '/$title' with 'title' in lowercase'
+    tp.url = "/{}".format(title.lower())
+    tp.template_name = template
+    db.session.add(tp)
+    db.session.commit()
+
+def estimate():
+    """Estimate running time of upgrade in seconds (optional)."""
+    return 1
+
+
+def pre_upgrade():
+    """Run pre-upgrade checks (optional)."""
+    # Example of raising errors:
+    # raise RuntimeError("Description of error 1", "Description of error 2")
+
+
+def post_upgrade():
+    """Run post-upgrade checks (optional)."""
+    # Example of issuing warnings:
+    # warnings.warn("A continuable error occurred")
+
+pc_contact = """
+<h1>Contact</h1>
+
+<p>
+<strong>Support and general information</strong><br />
+Email: <a href="mailto:info@zenodo.org">info@zenodo.org</a><br />
+</p>
+<p>
+<strong>Questions related to European Commission funded research and OpenAIRE</strong><br />
+OpenAIRE HelpDesk: <a href="http://www.openaire.eu/support/helpdesk">http://www.openaire.eu/support/helpdesk</a>
+</p>
+
+<p>
+<strong>Frequently Asked Questions</strong><br />
+Zenodo: <a href="/faq">http://zenodo.org/faq</a><br />
+OpenAIRE and Open Access in general: <a href="http://www.openaire.eu/support/faq">http://www.openaire.eu/support/faq</a><br />
+</p>
+
+<p>
+<strong>Address</strong><br />
+European Organization for Nuclear Research<br />
+CH-1211 CERN<br />
+Genève 23<br />
+Switzerland<br />
+</p>
+"""
+
+pc_deposit_data = """
+<div class="alert alert-danger"><strong>TODO:</strong> After first beta release</div>
+<h1>Deposit data</h1>
+"""
+
+pc_use_data = """
+<div class="alert alert-danger"><strong>TODO:</strong> After first beta release</div>
+<h1>Use data</h1>
+"""
+
+pc_privacy = """
+<div class="row">
+    <div class="span12">
+<h1>Privacy policy</h1>
+
+<p>The Zenodo collaboration does not track, collect or retain personal information from users of Zenodo, except as otherwise provided herein.  In order to enhance Zenodo and monitor traffic, non-personal information such as IP addresses and cookies may be tracked and retained, as well as log files shared in aggregation with other community services (in particular OpenAIREplus partners). User provided information, like corrections of metadata or paper claims, will be integrated into the database without displaying its source and may shared with other services.</p>
+
+<p>Zenodo will take all reasonable measures to protect the privacy of its users and to resist service interruptions, intentional attacks, or other events that may compromise the security of the Zenodo website.</p>
+
+<p>If you have any questions about the Zenodo privacy policy, please contact <a href="mailto:info@zenodo.org">info@zenodo.org</a>.</p>
+</div>
+</div>
+"""
+
+pc_features = """
+    <div class="jumbotron page-features" align="center">
+        <h1>Introducing Zenodo!</h1>
+    </div>
+
+
+        <div class="features-page row" align="center">
+                <div class="col-sm-4 col-md-4">
+                <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+                  <h1>(All) Research.<br> Shared.</h1>
+                  <h4>— your one stop research shop!</h4>
+                  <p>All research outputs from across all fields of science are welcome! Zenodo accept any file format as well as both positive and negative results. However, we do promote peer-reviewed openly accessible research, and we do curate your upload before putting it on the front-page.</p>
+                </div>
+                <div class="col-sm-4 col-md-4">
+                    <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+                  <h1>Citeable.<br>Discoverable.</h1>
+                  <h4>— be found!</h4>
+                  <p>Zenodo assigns all publicly available uploads a Digital Object Identifier (DOI) to make the upload easily and uniquely citeable. Zenodo further supports harvesting of all content via the OAI-PMH protocol.</p>
+               </div>
+               <div class="col-sm-4 col-md-4">
+                  <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+                  <h1>Community<br>Collections</h1>
+                  <h4>— create your own repository</h4>
+                  <p>Zenodo allows you to create your own collection and accept or reject all uploads to it. Creating a space for your next workshop or project have never been easier. Plus, everything is citeable and discoverable.</p>
+                </div>
+        </div>
+    </div>
+<div class="marketing-bg">
+    <div class="container">
+    <div class="features-page row" align="center">
+
+            <div class="col-sm-4 col-md-4">
+                <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+              <h1>Safe</h1>
+              <h4>— more than just a drop box!</h4>
+              <p>Your research output is stored safely for the future in same cloud infrastructure as research data from CERN's <a href="http://home.web.cern.ch/about/accelerators/large-hadron-collider">Large Hadron Collider</a> using a CERN's battle-tested repository software <a href="http://invenio-software.org">INVENIO</a> used by some of the world's largest repositories such as <a href="http://inspirehep.net">INSPIRE HEP</a> and <a href="http://cds.cern.ch">CERN Document Server</a>.</p>
+            </div>
+            <div class="col-sm-4 col-md-4">
+                <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+              <h1>Reporting</h1>
+              <h4>— tell your funding agency!</h4>
+              <p>Zenodo is integrated into reporting lines for research funded by the European Commission via <a href="http://www.openaire.eu">OpenAIRE</a>. Just upload your research on Zenodo and we will take care of the reporting for you. We plan to extend with futher funding agencies in the future so stay tuned!</p>
+           </div>
+           <div class="col-sm-4 col-md-4">
+                <img class="img-circle hide" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+              <h1>Flexible<br>Licensing</h1>
+              <h4>— not everything is under Creative Commons</h4>
+              <p>Zenodo encourage you to share your research as openly as possible to maximize use and re-use of your research results. However, we also acknowledge that one size does not fit all, and therefore allow for uploading under a multitude of different licenses and access levels<super>*</super>.<br><small class="text-muted">* You are responsible for respecting applicable copyright and license conditions for the files you upload.</small></p>
+            </div>
+            <!--<div class="span4">
+                <img class="img-circle" data-src="holder.js/140x140" alt="140x140" style="width: 140px; height: 140px;">
+              <h1>Integration</h1>
+              <h4>&mdash; upload straight from DropBox!</h4>
+              <p>Already got your files in DropBox? Save your bandwidth and let Zenodo grab your uploads securely from your DropBox.</p>
+            </div>-->
+          </div>
+</div>
+</div>
+
+    <div class="jumbotron page-features" align="center">
+        <h1>Upcoming Features</h1>
+    </div>
+    <div class="container">
+        <div class="features-page row" align="center">
+            <div class="col-sm-4 col-md-4">
+              <h1>Metadata Extraction</h1>
+              <h4>— DRY, don't repeat yourself!</h4>
+              <p>Zenodo will automatically discover basic information like title, description, authors and publication date about your upload so you just have to validate our findings instead of copy/pasting or re-typing everything.</p>
+            </div>
+            <div class="col-sm-4 col-md-4">
+              <h1>Authentication</h1>
+              <h4>— use your existing account.</h4>
+              <p>Zenodo will allow authentication via other services such as Google, Twitter, ORCID and OpenAIRE, so that you do not have to remember yet another username and password for yet another service.</p>
+           </div>
+           <div class="col-sm-4 col-md-4">
+              <h1>Your opinion...</h1>
+              <h4>— tell us what to do!</h4>
+              <p>We have tons of ideas for the future of Zenodo but your opinions, ideas and needs decide what we will work on, so give us your <a href="contact">feedback.</a></p>
+           </div>
+          </div>
+    </div>
+"""
+
+pc_terms = """
+<h1>Terms of use</h1>
+
+<p>
+Use of the Zenodo service (hereafter “Zenodo”) denotes agreement with the following terms:
+</p>
+
+<ol>
+<li>Zenodo is provided free of charge for educational and informational use.</li>
+<li>The contents of Zenodo will be updated or otherwise modified on a regular basis. Zenodo reserves the right to alter or delete information without notice.</li>
+<li>All information is provided “as-is” and the user shall hold Zenodo and information providers supplying data to Zenodo free and harmless in connection with the use of such information.</li>
+<li>Users shall respect copyright and applicable license conditions. In particular, reconstructing the fulltexts of articles from snippets is not allowed. Download and use of information from Zenodo does not amount to a transfer of intellectual property.</li>
+<li>Information obtained from the metadata of the Zenodo collection specified here may be freely reused under the <a href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a> waiver unless explicitly specified otherwise. With the exception of email addresses whose bulk download is not allowed all metadata of the other Zenodo collections are available under the <a href="http://creativecommons.org/publicdomain/zero/1.0/">CC0</a> waiver.</li>
+<li>Any use of Zenodo that interferes with its regular operations or violates these terms of use or applicable laws may, at the sole discretion of Zenodo, result in restriction or removal of user access.</li>
+</ol>
+
+<p>
+Please contact <a href="mailto:info@zenodo.org">info@zenodo.org</a> if you have any questions or comments with respect to Zenodo; if you are unsure whether your intended use meets these terms; or, if you seek permission for use that does not fall within these terms.
+</p>
+"""
+
+
+pc_policies = """
+<h1>Policies</h1>
+<div class="row">
+<div class="col-md-6">
+    <h4>Content</h4>
+<dl>
+<dt>Scope</dt>
+<dd>All fields of science. All types of research artifacts. Content must not violate privacy or copyright, or breach confidentiality or non-disclosure for data collected from human subjects.</dd>
+
+<dt>Status of research data</dt>
+<dd>Any status is accepted, from any stage of the research lifecycle.</dd>
+
+<dt>Eligible depositors</dt>
+<dd>Anyone may register as user of Zenodo. All users are allowed to deposit content for which they possess the appropriate rights.</dd>
+
+<dt>Ownership</dt>
+<dd>By uploading content, no change of ownership is implied, and no property rights are transfer to CERN. All uploaded content remains the property of the parties prior to submission.</dd>
+
+<dt>Versions</dt>
+<dd>Data files are versioned. Records are not versioned. The uploaded data is archived as a Submission Information Package. Derivatives of data files are generated, but original content is never modified.
+Records can be retracted from public view, however the data files and record is preserved.</dd>
+
+<dt>Data file formats</dt>
+<dd>All formats are allowed - even preservation unfriendly. We are working on guidelines and features that will help people deposit in preservation friendly formats.</dd>
+
+<dt>Volume and size limitations</dt>
+<dd>2GB per file size constraint. Higher quotas per file can be requested. Quotas are likely to be introduced at a later stage. All data files are stored in CERN Data Centres, primarily Geneva, with replicas in Budapest. Data files are kept in multiple replicas in a distributed file system which is backed up to tape on a nightly basis.</dd>
+
+<dt>Data quality</dt>
+<dd>All information is provided “as-is” and the user shall hold Zenodo and information providers supplying data to Zenodo free and harmless in connection with the use of such information.</dd>
+
+</dl>
+
+<h4>Withdrawal of data and revocation of DOIs</h4>
+<dl>
+<dt>Revocation</dt>
+<dd>Content not considered to fall under the scope of the repository will be removed and associated DOIs issued by Zenodo revoked. Please signal promptly any suspected policy violation, ideally no later than 24 hours from upload. Alternatively, content found to already have an external DOI, will have the Zenodo DOI invalidated, and the record updated to indicate the original external DOI. User access may be revoked on violation of Terms of Use.</dd>
+
+<dt>Withdrawal</dt>
+<dd>If the uploaded research object must later be withdrawn, the reason for the withdrawal will be indicated on a tombstone page which will henceforth be served in its place. Withdrawal is considered an exceptional action which normally should be requested and fully justified by the original uploader. In any other circumstance reasonable attempts will be made to contact the original uploader to obtain consent. The DOI and the URL of the original object are retained.</dd>
+</dl>
+
+</div>
+
+<div class="col-md-6">
+<h4>Metadata</h4>
+
+<dl>
+<dt>Metadata access</dt>
+<dd>Zenodo is provided free of charge for educational and informational use.
+Metadata is licensed under CC0, except for email addresses.</dd>
+
+<dt>Metadata reuse</dt>
+<dd>Metadata is licensed under CC0, except for email addresses.
+All metadata is exported via OAI-PMH and can be harvested.</dd>
+
+<dt>Metadata types and sources</dt>
+<dd>All metadata is stored internally in MARC according to the schema defined in <a href="http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup">http://invenio-software.org/wiki/Project/OpenAIREplus/DevelopmentRecordMarkup</a>. Metadata is exported in several standard formats such as MARCXML, Dublin Core and DataCite Metadata Schema according to OpenAIRE Guidelines.</dd>
+
+<dt>Language</dt>
+<dd>For textual items, English is preferred, but all languages accepted.</dd>
+
+<dt>Embargo status</dt>
+<dd>Users may deposit content under an embargo status and provide and end date for the embargo. The repository will initially restrict access to the data, and then automatically make the content publicly available after the end of the embargo period. User may deposit restricted data files, which will not be made publicly available.</dd>
+
+<dt>Licenses</dt>
+<dd>Users must specify a license for all publicly available files. User may specify a license for all closed access files.</dd>
+
+<!--
+<dt>Moderation by repository</dt>
+<dd>All content is checked after upload by repository staff. Content not considered to fall under the scope of the repository will be removed, and the depositor notified. Content will also be removed in case of (but not excluded to) copyright violation, legal requirements and proven violations, national security and confidentiality concerns. All records are assigned a Digital Object Identifier. User access may be revoked on violation of Terms of Use.
+</dd>
+-->
+
+</dl>
+
+
+
+    <h4>Access and reuse of data</h4>
+<dl>
+
+<dt>Access to data objects</dt>
+<dd>Files may be deposited under closed, open, or embargoed access. Data files deposited under closed access are protected against unauthorized access at all levels. Access to metadata and data files is provided over standard protocols such as HTTP and OAI-PMH.</dd>
+
+<dt>Use and re-use of data objects</dt>
+<dd>Use and re-use is subject to the license under which the data objects were deposited.</dd>
+
+<dt>Tracking users and statistics</dt>
+<dd>Zenodo does not track, collect or retain personal information from users of Zenodo, except as otherwise provided herein. In order to enhance Zenodo and monitor traffic, non-personal information such as IP addresses and cookies may be tracked and retained, as well as log files shared in aggregation with other community services (in particular OpenAIREplus partners). User provided information, like corrections of metadata or paper claims, will be integrated into the database without displaying its source and may be shared with other services.
+Zenodo will take all reasonable measures to protect the privacy of its users and to resist service interruptions, intentional attacks, or other events that may compromise the security of the Zenodo website.</dd>
+</dl>
+
+<h4>Preservation of data</h4>
+<dl>
+
+<dt>Retention period</dt>
+<dd>Items will be retained for the lifetime of the repository, which is currently the lifetime of the host laboratory CERN, which currently has an experimental programme defined for the next 20 years at least.</dd>
+
+<dt>Functional preservation</dt>
+<dd>Zenodo makes no promises of usability and understandability of deposited objects over time.</dd>
+
+<dt>File preservation</dt>
+<dd>Data files and metadata is backed up on a nightly basis, as well as replicated in multiple copies in the online system.</dd>
+
+<dt>Fixity and authenticity</dt>
+<dd>All data files are stored along with a MD5 checksum of the file content. Regular checks of files against their checksums are made.</dd>
+</dl>
+
+<h4>Succession plans</h4>
+<dl>
+<dd>In case of closure of the repository, best efforts will be made to integrate all content into suitable alternative institutional and/or subject based repositories.</dd>
+</dl>
+</div>
+</div>
+
+
+
+
+
+"""
+
+pc_faq = """
+<h1>FAQ</h1>
+
+<p>See also <a href="http://www.openaire.eu/support/faq">OpenAIRE FAQ</a> for general information on Open Access and European Commission funded research.</p>
+
+<div class="row">
+    <div class="col-md-6">
+<ul>
+
+    <li>
+        <h5>What is the maximum file size I can upload?</h5>
+        <p>We currently accept files up to 2GB. If you would like to upload larger files, please <a href="contact">contact us</a>, and we will do our best to help you.</p>
+    </li>
+    <li>
+        <h5>What are the size limits in Zenodo?</h5>
+        <p>Currently there's a per file size limit of 2GB (you can have several 2GB files per dataset) and no limit on communities. Since we target the long-tail of science, we want this slice to be always free. We don’t want to turn away larger use cases either, but naturally we cant offer infinite space for free (!) so there must be a ceiling to this free slice, above which we will introduce paid for slices according to the business model developed within the sustainability plan. N.b. The current infrastructure has been tested with 10GB files, so possibly we can also raise the file limit either per community or for the whole of Zenodo if needed.</p>
+    </li>
+    <li>
+        <h5>What can I upload?</h5>
+        <p>All research outputs from all fields of science are welcome. In the upload form you can choose between types of files: publications (book, book section, conference paper, journal article, patent, preprint, report, thesis, technical note, working paper), posters, presentations, images (figures, plots, drawings, diagrams, photos) and videos/audio. We do check every piece of content being uploaded to ensure it is research related. Please see further information in our <a href="terms">Terms of Use</a> and <a href="policies">Policies</a>.</p>
+    </li>
+    <li>
+        <h5>Is Zenodo only for EU-funded research?</h5>
+        <p>No. We are open to all research outputs from all fields of science regardless of funding source. Given that Zenodo was launched within an EU funded project, the knowledge bases were first filled with EU project codes, but we are keen to extend this to other funders with your help.</p>
+    </li>
+    <li>
+        <h5>How do you plan to secure ongoing funding for Zenodo?</h5>
+        <p>Zenodo is still in its infancy, so whilst this is a good question to ask, we don’t have just one definitive answer since we are exploring several avenues as we mature the services. Zenodo was launched within the <a href="http://www.openaire.eu">OpenAIREplus</a> project as part of a European-wide research infrastructure. OpenAIREplus will deliver a sustainability plan for this infrastructure, with the optic of services for the future Horizon 2020 projects, and so this is definitely one possible funding source. Another possibility is CERN itself - Zenodo is developed and hosted by CERN in synergy with other large services running on the same software such as <a href="http://cds.cern.ch">CERN Document Server</a> and <a href="http://inspirehep.net">INSPIRE-HEP</a>. And CERN is familiar with large research datasets, managing the Large Hadron Collier data archive of 100 petabytes. Lastly Zenodo is developed on a fully open platform and, if found beneficial in a sustainability plan, could be migrated to a third party entity outside CERN. No matter which direction Zenodo will take, we are fully dedicated to delivering an open service and preserving your research for the future.</p>
+    </li>
+    <li>
+        <h5>Is my data safe with you / What will happen to my uploads in the unlikely event that Zenodo has to close?</h5>
+        <p>Yes, your data is stored in CERN Data Centre. Both data files and metadata is kept in multiple online replicas, as well as backed up to tape every night. CERN has considerable knowledge and experience in building and operating large scale digital repositories, and a commitment to maintain this data centre to collect and store 100s of PBs of LHC data as it grows over the next 20 years. In the highly unlikely event that Zenodo will have to close operations, we guarantee that we will migrate all content to other suitable repositories, and since all uploads have DOIs all citations and links to the dataset will not be affected.
+        </p>
+    </li>
+    <li>
+        <h5>What does it cost / Can we pay for Zenodo services? </h5>
+        <p>Zenodo is free for the long tail of Science. In order to offer services to the more resource hungry research, we will introduce a ceiling to the free slice and offer paid for slices above, according to the business model developed within the sustainability plan. If you can't wait but immediately want to explore these paid for options, please <a href="/contact">contact us</a> and we will look at interim measures with you.</p>
+    </li>
+    <li>
+        <h5>Really, who pays for this?</h5>
+        <p>Zenodo is developed by <a href="http://www.cern.ch">CERN</a> under the EU FP7 project <a href="http://www.openaire.eu">OpenAIREplus</a> (grant agreement no. 283595).</p>
+    </li>
+
+</ul>
+</div>
+    <div class="col-md-6">
+<ul>
+    <li>
+        <h5>Why is my upload not on the front-page?</h5>
+        <p>All uploads go through a quick spam check by our staff prior to going on the front-page.</p>
+    </li>
+    <li>
+        <h5>Why is my closed access upload not on the front-page?</h5>
+        <p>Zenodo is a strong supporter of open data in all its forms (meaning data that anyone is free to use, reuse, and redistribute), and takes an incentives approach to encourage deposition under an open licence. We therefore only display Open Access uploads on the front-page. Your Closed Access upload is still discoverable through search queries, its DOI and community collections where it is included.</p>
+    </li>
+    <li>
+        <h5>Why do you allow closed access uploads?</h5>
+        <p>Zenodo is a strong supporter of open data in all its forms (meaning data that anyone is free to use, reuse, and redistribute), and takes an incentives approach to encourage deposition under an open licence. Since there isn't a unique way of licensing openly, and no consensus on the practice of adding attribution restrictions, we accept data under a variety of licences in order to be inclusive. We will however take an active lead in signalling the extra benefits of the most open licences, in terms of visibility and credit, and offer additional services and upload quotas on such data to encourage using them. This follows naturally from the publications policy of the <a href="http://www.openaire.eu">OpenAIRE initiative</a> which has been supporting Open Access throughout, but since it aims to gather all European Commission/European Research Area research results, it allows submission of the material which is not yet Open Access.</p>
+    </li>
+    <li>
+        <h5>What happened to the OpenAIRE Orphan Record Repository?</h5>
+        <p>OpenAIRE Orphan Record Repository got a make-over and was re-branded as Zenodo. If you happened to deposit your article in OpenAIRE Orphan Record Repository it is also available in Zenodo. You user account, was however not transferred to Zenodo, so you will have to <a href="/youraccount/register">register</a> again. If you register with the same email address in Zenodo as you used in OpenAIRE Orphan Record Repository, you will still have access to your publications. Don't hesitate to <a href="contact">contact us</a> for further information.</p>
+    </li>
+    <li>
+        <h5>Where does the name come from?</h5>
+        <p>Zenodo is derived from <a href="http://en.wikipedia.org/wiki/Zenodotus">Zenodotus</a>, the first librarian of the Ancient Library of Alexandria and father of the first recorded use of metadata, a landmark in library history.</p>
+    </li>
+    <li>
+        <h5>How much storage do CERN have available?</h5>
+        <p>Zenodo is currently a drop in the ocean. CERN currently stores more than 100PB of physics data from the <a href="http://home.web.cern.ch/about/accelerators/large-hadron-collider">Large Hadron Collider (LHC)</a>, and produces roughly 25PB per year when the LHC is running.</p>
+    </li>
+
+</ul>
+</div>
+</div>
+"""
+
+pc_about = """
+<h1>About Zenodo</h1>
+
+<div class="row">
+    <div class="col-md-6 col-lg-7">
+        <p>Zenodo builds and operate a simple and innovative service that enables researchers, scientists, EU projects and institutions to share and showcase multidisciplinary research results (data and publications) that are not part of the existing institutional or subject-based repositories of the research communities.</p>
+
+<p>Zenodo enables researchers, scientists, EU projects and institutions to:</p>
+<ul>
+<li>easily share the long tail of small research results in a wide variety of formats including text, spreadsheets, audio, video, and images across all fields of science.</li>
+<li>display their research results and get credited by making the research results citable and integrate them into existing reporting lines to funding agencies like the European Commission.</li>
+<li>easily access and reuse shared research results.</li>
+</ul>
+
+<p><strong>Deliverables:</strong></p>
+<ul>
+    <li>An open digital repository for everyone and everything that isn’t served by a dedicated service; the so called “long tail” of research results.
+    </li><li>A modern look and feel in line with current trends for state-of-the-art online services.</li>
+    <li>Integration with OpenAIRE infrastructure, and assured inclusion in OpenAIRE corpus.</li>
+    <li>Easy upload and semi-automatic metadata completion by communication with existing online services such as DropBox for upload, Mendeley/ORCID/CrossRef/OpenAIRE for upload and pre-filling metadata.</li>
+    <li>Easy access to research results via innovative viewing and as well as open APIs and integration with existing online services and preservation of community independent data formats.</li>
+    <li>A safe and trusted service by providing sound curation, archival and digital preservation strategies according to best practices.</li>
+    <li>Persistent identifier minting (such as DOI) for shared research results.</li>
+    <li>Service hosting according to industry best practices in CERN’s professional data centres.</li>
+    <li>Easy means to link research results with other results, funding sources, institutes, and licenses.</li>
+</ul>
+    </div>
+    <div class="col-md-6 col-lg-5">
+        <div class="well"><h4>The name</h4>
+        <p>Zenodo is derived from <a href="http://en.wikipedia.org/wiki/Zenodotus">Zenodotus</a>, the first librarian of the Ancient Library of Alexandria and father of the first recorded use of metadata, a landmark in library history.</p></div>
+
+        <div class="well">
+        <h4>Logo</h4>
+<table class="table table-hover">
+<thead>
+<tr>
+    <th></th>
+    <th></th>
+    <th>PNG</th>
+    <th>JPEG</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>Color</td>
+    <td><img class="img-rounded" src="img/logos/zenodo-gradient-200.png"></td>
+    <td>
+        <a href="img/logos/zenodo-gradient-2500.png">2500px</a><br>
+        <a href="img/logos/zenodo-gradient-1000.png">1000px</a><br>
+        <a href="img/logos/zenodo-gradient-200.png">200px</a><br>
+    </td>
+    <td>
+        <a href="img/logos/zenodo-gradient-2500.jpg">2500px</a><br>
+        <a href="img/logos/zenodo-gradient-1000.jpg">1000px</a><br>
+        <a href="img/logos/zenodo-gradient-200.jpg">200px</a><br>
+    </td>
+</tr>
+<tr>
+    <td>Black</td>
+    <td><img class="img-rounded" style="background-color: white;" src="img/logos/zenodo-black-200.png"></td>
+    <td>
+        <a href="img/logos/zenodo-black-2500.png">2500px</a><br>
+        <a href="img/logos/zenodo-black-1000.png">1000px</a><br>
+        <a href="img/logos/zenodo-black-200.png">200px</a><br>
+    </td>
+    <td>
+        <small class="text-muted">Not available</small>
+    </td>
+</tr>
+<tr>
+    <td>White</td>
+    <td><img class="img-rounded" style="background-color: #555555;" src="img/logos/zenodo-white-200.png"></td>
+    <td>
+        <a href="img/logos/zenodo-white-2500.png">2500px</a><br>
+        <a href="img/logos/zenodo-white-1000.png">1000px</a><br>
+        <a href="img/logos/zenodo-white-200.png">200px</a><br>
+    </td>
+    <td>
+        <small class="text-muted">Not available</small>
+    </td>
+</tr>
+</tbody>
+</table>
+        </div>
+    </div>
+</div>
+"""
+
+pc_api = """
 <div class="row">
 <div class="col-sm-3 col-md-3 hidden-print">
 <ul class="nav nav-list well ">
@@ -39,7 +540,7 @@
   <li><a href="#restapi-res-files"><i class="glyphicon glyphicon-chevron-right"></i> Deposition files</i></a></li>
   <li><a href="#restapi-res-actions"><i class="glyphicon glyphicon-chevron-right"></i> Deposition actions</i></a></li>
   <li><a href="#restapi-rep">Representations</i></a></li>
-  {#<li><a href="#restapi-faq">FAQ</i></a></li>#}
+  <!--<li><a href="#restapi-faq">FAQ</i></a></li>-->
   <li><a href="#restapi-changes">Changes</i></a></li>
   <li class="nav-header">OAI-PMH API</li>
   <li><a href="#harvest-baseurl">Base URL</i></a></li>
@@ -48,27 +549,27 @@
   <li><a href="#harvest-schedule">Update schedule</i></a></li>
   <li><a href="#harvest-ratelimit">Rate limit</i></a></li>
   <li><a href="#harvest-changes">Changes</i></a></li>
-  {#<li class="nav-header">Metadata API</li>
+  <!--<li class="nav-header">Metadata API</li>
   <li><a href="#metadata-url">URL structure</i></a></li>
   <li><a href="#metadata-metadata">Metadata formats</i></a></li>
-  <li><a href="#metadata-changes">Changes</i></a></li>#}
+  <li><a href="#metadata-changes">Changes</i></a></li>-->
 </ul>
 </div>
 <div class="col-sm-9 col-md-9" data-spy="scroll" data-target=".navmenu">
 <h1 id="intro"><strong>API Documentation</strong> <small>for developers</small></h1>
 <hr />
-{{config.CFG_SITE_NAME}} currently offers two different APIs:
+Zenodo currently offers two different APIs:
 <p>
 <ul>
 <li><strong>REST API</strong> &mdash; includes support for uploading your research outputs.</li>
-<li><strong>OAI-PMH API</strong> &mdash; allows you to harvest all or parts of {{config.CFG_SITE_NAME}} via the OAI-PMH protocol.</li>
-{#<li><strong>Metadata API</strong> &mdash; machine readable records in several different formats.</li>#}
+<li><strong>OAI-PMH API</strong> &mdash; allows you to harvest all or parts of Zenodo via the OAI-PMH protocol.</li>
+<!--<li><strong>Metadata API</strong> &mdash; machine readable records in several different formats.</li>-->
 </ul>
 </p>
 
 <h2 id="restapi"><strong>REST API</strong> <small>upload your research outputs</small></h2><hr />
 <h2 id="restapi-intro">Introduction</h2>
-<p>The REST API allows you to programmatically upload and publish research outputs on {{config.CFG_SITE_NAME}}, with the same functionality which is available in our <a href="{{url_for('webdeposit.index')}}">Upload</a> user interface.</p>
+<p>The REST API allows you to programmatically upload and publish research outputs on Zenodo, with the same functionality which is available in our <a href="/deposit">Upload</a> user interface.</p>
 
 <div class="panel-group dep-accord" id="dep-accord-0">
   <div class="panel panel-default">
@@ -79,7 +580,7 @@
     </div>
     <div id="collapse-list0" class="panel-collapse collapse">
       <div style="padding: 9px 15px;">
-          <p>This short guide will give a quick overview of how to upload and publish on {{config.CFG_SITE_NAME}}, and will be using Python together with the <a href="http://www.python-requests.org/en/latest/user/install/">Requests</a> package.</p>
+          <p>This short guide will give a quick overview of how to upload and publish on Zenodo, and will be using Python together with the <a href="http://www.python-requests.org/en/latest/user/install/">Requests</a> package.</p>
 
 <ol>
 
@@ -102,7 +603,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 </li>
 
 <li><p>Try to access the API:</p>
-<pre>>>> r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions")
+<pre>>>> r = requests.get("https://zenodo.org/api/deposit/depositions")
 >>> r.status_code
 401
 >>> r.json()
@@ -113,7 +614,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li>All API access requires an access token, so <a href="#restapi-auth">create</a> one.</li>
 
 <li><p>Let's try again (replace <code>ACCESS_TOKEN</code> with your newly created personal access token):</p>
-<pre>>>> r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?access_token=ACCESS_TOKEN")
+<pre>>>> r = requests.get("https://zenodo.org/api/deposit/depositions?access_token=ACCESS_TOKEN")
 >>> r.status_code
 200
 >>> r.json()
@@ -123,7 +624,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 <li><p>Next, let's create a new empty upload:</p>
 <pre>>>> headers = {"Content-Type": "application/json"}
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?access_token=ACCESS_TOKEN", data="{}", headers=headers)
+>>> r = requests.post("https://zenodo.org/api/deposit/depositions?access_token=ACCESS_TOKEN", data="{}", headers=headers)
 >>> r.status_code
 201
 >>> r.json()
@@ -135,7 +636,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>Now, let's upload a new file:</p>
 <pre>>>> data = {'filename': 'myfirstfile.csv'}
 >>> files = {'file': open('/path/to/myfirstfile.csv', 'rb')}
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/files?access_token=ACCESS_TOKEN" % deposition_id, data=data, files=files)
+>>> r = requests.post("https://zenodo.org/api/deposit/depositions/%s/files?access_token=ACCESS_TOKEN" % deposition_id, data=data, files=files)
 >>> r.status_code
 201
 >>> r.json()
@@ -147,7 +648,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>Last thing missing, is just to add some metadata:</p>
 <pre>
 >>> data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}
->>> r = requests.put("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s?access_token=ACCESS_TOKEN" % deposition_id, data=json.dumps(data), headers=headers)
+>>> r = requests.put("https://zenodo.org/api/deposit/depositions/%s?access_token=ACCESS_TOKEN" % deposition_id, data=json.dumps(data), headers=headers)
 >>> r.status_code
 200
 </pre>
@@ -156,7 +657,7 @@ Type "help", "copyright", "credits" or "license" for more information.
 <li><p>and, we're ready to publish:</p>
 <div class="alert alert-danger">Don't execute this last step - it will put your test upload straight online.</div>
 <pre>
->>> r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/%s/actions/publish?access_token=ACCESS_TOKEN" % deposition_id)
+>>> r = requests.post("https://zenodo.org/api/deposit/depositions/%s/actions/publish?access_token=ACCESS_TOKEN" % deposition_id)
 >>> r.status_code
 202
 </pre>
@@ -172,15 +673,15 @@ Type "help", "copyright", "credits" or "license" for more information.
 
 <h2 id="restapi-versioning">Versioning</h2>
 <p>
-The REST API is versioned. We strive not to make backward incompatible changes to the API, but if we do, we release a new version. {# By default our URL endpoint always provide the latest version. A client can force a specific API version by including the <code>X-API-Version</code> header in the request.</p>#} <a href="#restapi-changes">Changes</a> to the API are documented on this page, and advance notification is given on our <a href="http://twitter.com/zenodo_org">Twitter account</a>.</p>
+The REST API is versioned. We strive not to make backward incompatible changes to the API, but if we do, we release a new version. <!-- By default our URL endpoint always provide the latest version. A client can force a specific API version by including the <code>X-API-Version</code> header in the request.</p>--> <a href="#restapi-changes">Changes</a> to the API are documented on this page, and advance notification is given on our <a href="http://twitter.com/zenodo_org">Twitter account</a>.</p>
 
 <h2 id="restapi-auth">Authentication</h2>
 <p>All API requests must be authenticated and over HTTPS. Any request over plain HTTP will fail. We support authentication with via OAuth 2.0.</p>
 
 <p><strong>Acquiring a personal access token</strong>
 <ol>
-<li><a href="{{url_for('youraccount.register')}}">Register</a> for a Zenodo account if you don't already have one.</li>
-<li>Go to your <a href="{{url_for('oauth2server_settings.index')}}">Applications</a>, to <a href="{{url_for('oauth2server_settings.token_new')}}">create a new token</a>.</li>
+<li><a href="/youraccount/register">Register</a> for a Zenodo account if you don't already have one.</li>
+<li>Go to your <a href="https://zenodo.org/account/settings/applications/">Applications</a>, to <a href="https://zenodo.org/account/settings/applications/tokens/new/">create a new token</a>.</li>
 <li>Select the OAuth scopes you need (for the quick start tutorial you need <code>deposit:write</code> and <code>deposit:actions</code>).</li>
 </ol>
 </p>
@@ -193,11 +694,11 @@ The REST API is versioned. We strive not to make backward incompatible changes t
 <p>A access token must be included in all requests as a URL parameter:</p>
 
 <pre>
-{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions?access_token=ACCESS_TOKEN
+https://zenodo.org/api/deposit/depositions?access_token=ACCESS_TOKEN
 </pre>
 
 <p><strong>Scopes</strong></p>
-Scopes assigns permissions to your access token to limit access to data and actions in {{config.CFG_SITE_NAME}}.
+Scopes assigns permissions to your access token to limit access to data and actions in Zenodo.
 
 The following scopes exists:
 
@@ -223,7 +724,7 @@ The following scopes exists:
 
 
 <h2 id="restapi-requests">Requests</h2>
-<p>The base URL of the API is <code>{{config.CFG_SITE_SECURE_URL}}/api/</code>.</p>
+<p>The base URL of the API is <code>https://zenodo.org/api/</code>.</p>
 
 <p>All <code>POST</code> and <code>PUT</code> request bodies must be JSON encoded, and must have content type of <code>application/json</code> unless specified otherwise in the specific resource (e.g. in the case of file uploads). The API will return a <code>415</code> error (see <a href="#restapi-http">HTTP status codes</a> and <a href="#restapi-errors">error responses</a>) if the wrong content type is provided.</p>
 
@@ -327,7 +828,7 @@ We use the following HTTP status codes to indicate success or failure of a reque
 <tr>
 <td><code>500</code></td>
 <td>Internal Server Error</td>
-<td>Request failed, due to an internal server error. Error response <em>NOT</em> included. Don't worry, {{config.CFG_SITE_NAME}} admins have been notified and will be dealing with the problem ASAP.</td>
+<td>Request failed, due to an internal server error. Error response <em>NOT</em> included. Don't worry, Zenodo admins have been notified and will be dealing with the problem ASAP.</td>
 </tr>
 </tbody>
 </table>
@@ -380,7 +881,7 @@ Error responses for 400 series errors (e.g. 400, 401, 403, ...) are returned as 
           </tr>
           <tr>
               <th class="span2">URL</th>
-              <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions</td>
+              <td>https://zenodo.org/api/deposit/depositions</td>
           </tr>
           <tr>
               <th>Method</th>
@@ -404,11 +905,11 @@ Error responses for 400 series errors (e.g. 400, 401, 403, ...) are returned as 
             </ul>
             <div class="tab-content">
               <div class="tab-pane active" id="curl">
-                <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
+                <pre>$ curl -i https://zenodo.org/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
               </div>
               <div class="tab-pane" id="python">
                 <pre>import requests
-response = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN")
+response = requests.get("https://zenodo.org/api/deposit/depositions/?access_token=ACCESS_TOKEN")
 print response.json()
                 </pre>
               </div>
@@ -437,7 +938,7 @@ print response.json()
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions</td>
+    <td>https://zenodo.org/api/deposit/depositions</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -479,17 +980,17 @@ print response.json()
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-create">
-      <pre>$ curl -i -H "Content-Type: application/json" --data '{}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN
+      <pre>$ curl -i -H "Content-Type: application/json" --data '{}' https://zenodo.org/api/deposit/depositions/?access_token=ACCESS_TOKEN
 
 <em>or</em>
 
-$ curl -i -H "Content-Type: application/json" -X POST --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
+$ curl -i -H "Content-Type: application/json" -X POST --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}' https://zenodo.org/api/deposit/depositions/?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-create">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/?access_token=ACCESS_TOKEN"
+url = "https://zenodo.org/api/deposit/depositions/?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 r = requests.post(url, data="{}", headers=headers)
 
@@ -523,7 +1024,7 @@ r = requests.post(url, data=json.dumps(data), headers=headers)</pre>
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -559,12 +1060,12 @@ r = requests.post(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-get">
-      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i https://zenodo.org/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-get">
       <pre>import requests
 
-r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN")</pre>
+r = requests.get("https://zenodo.org/api/deposit/depositions/1234?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -591,7 +1092,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ac
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -645,13 +1146,13 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?ac
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-put">
-      <pre>$ curl -i -H "Content-Type: application/json" -X PUT --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -H "Content-Type: application/json" -X PUT --data '{"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}' https://zenodo.org/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-put">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN"
+url = "https://zenodo.org/api/deposit/depositions/1234?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 data = {"metadata": {"title": "My first upload", "upload_type": "poster", "description": "This is my first upload", "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]}}
 
@@ -682,7 +1183,7 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -729,12 +1230,12 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-d-del">
-      <pre>$ curl -i -X DELETE {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -X DELETE https://zenodo.org/api/deposit/depositions/1234?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-d-del">
       <pre>import requests
 
-r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234?access_token=ACCESS_TOKEN")</pre>
+r = requests.delete("https://zenodo.org/api/deposit/depositions/1234?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -772,7 +1273,7 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/files</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/files</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -808,12 +1309,12 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-list">
-      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i https://zenodo.org/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-list">
       <pre>import requests
 
-r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN")</pre>
+r = requests.get("https://zenodo.org/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -840,7 +1341,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/files</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/files</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -888,13 +1389,13 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-post">
-      <pre>$ curl -i -F name=myfirstfile.csv -F file=@path/to/local_file.csv {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -F name=myfirstfile.csv -F file=@path/to/local_file.csv https://zenodo.org/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-post">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN"
+url = "https://zenodo.org/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN"
 data = {'filename': 'myfirstfile.csv'}
 files = {'file': open('path/to/local_file.csv', 'rb')}
 r = requests.post(url, data=data, files=files)</pre>
@@ -924,7 +1425,7 @@ r = requests.post(url, data=data, files=files)</pre>
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/files</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/files</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -977,14 +1478,14 @@ r = requests.post(url, data=data, files=files)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-put">
-      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '[{"id":"21fedcba-9876-5432-1fed-cba987654321"}, {"id":"12345678-9abc-def1-2345-6789abcdef12"}]' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN
+      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '[{"id":"21fedcba-9876-5432-1fed-cba987654321"}, {"id":"12345678-9abc-def1-2345-6789abcdef12"}]' https://zenodo.org/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN
 </pre>
     </div>
     <div class="tab-pane" id="python-f-put">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN"
+url = "https://zenodo.org/api/deposit/depositions/1234/files?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 data = [{'id': '21fedcba-9876-5432-1fed-cba987654321'}, {'id': '12345678-9abc-def1-2345-6789abcdef12'}]
 
@@ -1015,7 +1516,7 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/files/:file_id</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/files/:file_id</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1052,12 +1553,12 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-get">
-      <pre>$ curl -i {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i https://zenodo.org/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-get">
       <pre>import requests
 
-r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?access_token=ACCESS_TOKEN")</pre>
+r = requests.get("https://zenodo.org/api/deposit/depositions/1234/files/12345678-9abc-def1-2345-6789abcdef12?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1084,7 +1585,7 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/files/:file_id</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/files/:file_id</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1137,13 +1638,13 @@ r = requests.get("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/fi
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-put-1">
-      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '{"filename": "someothername.csv"}' {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -X PUT -H "Content-Type: application/json" --data '{"filename": "someothername.csv"}' https://zenodo.org/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-put-1">
       <pre>import json
 import requests
 
-url = "{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN"
+url = "https://zenodo.org/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN"
 headers = {"Content-Type": "application/json"}
 data = {"filename": "someothername.csv"}
 
@@ -1174,7 +1675,7 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/files/:file_id</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/files/:file_id</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1222,12 +1723,12 @@ r = requests.put(url, data=json.dumps(data), headers=headers)</pre>
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-f-del">
-      <pre>$ curl -i -X DELETE {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -X DELETE https://zenodo.org/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-f-del">
       <pre>import requests
 
-r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN")</pre>
+r = requests.delete("https://zenodo.org/api/deposit/depositions/1234/files/21fedcba-9876-5432-1fed-cba987654321?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1262,7 +1763,7 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/actions/publish</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/actions/publish</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1306,12 +1807,12 @@ r = requests.delete("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-pub">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -X POST https://zenodo.org/api/deposit/depositions/1234/actions/publish?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-a-pub">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/publish?access_token=ACCESS_TOKEN")</pre>
+r = requests.post("https://zenodo.org/api/deposit/depositions/1234/actions/publish?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1343,7 +1844,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/actions/edit</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/actions/edit</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1392,12 +1893,12 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-edit">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -X POST https://zenodo.org/api/deposit/depositions/1234/actions/edit?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-a-edit">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/edit?access_token=ACCESS_TOKEN")</pre>
+r = requests.post("https://zenodo.org/api/deposit/depositions/1234/actions/edit?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1429,7 +1930,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 </tr>
 <tr>
     <th class="span2">URL</th>
-    <td>{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/:id/actions/discard</td>
+    <td>https://zenodo.org/api/deposit/depositions/:id/actions/discard</td>
 </tr>
 <tr>
     <th>Method</th>
@@ -1477,12 +1978,12 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   </ul>
   <div class="tab-content">
     <div class="tab-pane active" id="curl-a-discard">
-      <pre>$ curl -i -X POST {{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?access_token=ACCESS_TOKEN</pre>
+      <pre>$ curl -i -X POST https://zenodo.org/api/deposit/depositions/1234/actions/discard?access_token=ACCESS_TOKEN</pre>
     </div>
     <div class="tab-pane" id="python-a-discard">
       <pre>import requests
 
-r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/actions/discard?access_token=ACCESS_TOKEN")</pre>
+r = requests.post("https://zenodo.org/api/deposit/depositions/1234/actions/discard?access_token=ACCESS_TOKEN")</pre>
     </div>
   </div>
 </div>
@@ -1695,12 +2196,10 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
       <li><code>name</code>: Name of creator in the format <em>Family name, First names</em></li>
       <li><code>affiliation</code>: Affiliation of creator (optional).</li>
       <li><code>orcid</code>: ORCID identifier of creator (optional).</li>
-      <li><code>gnd</code>: GND identifier of creator (optional).</li>
     </ul>
     <p>Example:</p>
     <pre>[{'name':'Doe, John', 'affiliation': 'Zenodo'},
-{'name':'Smith, Jane', 'affiliation': 'Zenodo', 'orcid': '0000-0002-1694-233X'},
-{'name': 'Kowalski, Jack', 'affiliation': 'Zenodo', 'gnd': '170118215'}]</pre></td>
+{'name':'Smith, Jane', 'affiliation': 'Zenodo'}]</pre></td>
 </tr>
 <tr>
     <td><code>description</code></td>
@@ -1715,7 +2214,6 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>Controlled vocabulary:<ul>
       <li><code>open</code>: Open Access</li>
 <li><code>embargoed</code>: Embargoed Access</li>
-<li><code>restricted</code>: Restricted Access</li>
 <li><code>closed</code>: Closed Access</li>
     </ul>Defaults to <code>open</code>.</td>
 </tr>
@@ -1723,7 +2221,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><code>license</code></td>
     <td>String</td>
     <td>Yes, if <code>access_right</code> is <code>"open"</code> or <code>"embargoed"</code>.</td>
-    <td><p>Controlled vocabulary based on <a href="http://licenses.opendefinition.org/licenses/groups/all.json">http://licenses.opendefinition.org</a>. The selected license applies to all files in this deposition, but not to the metadata which is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>. Further information about licenses is available at <a href="http://licenses.opendefinition.org/">Open Definition Licenses Service</a>.</p>
+    <td><p>Controlled vocabulary based on <a href="http://licenses.opendefinition.org/licenses/groups/all.json">http://licenses.opendefinition.org</a>. The selected license applies to all files in this deposition, but not to the metadata which is licensed under <a href="terms">Creative Commons Zero</a>. Further information about licenses is available at <a href="http://licenses.opendefinition.org/">Open Definition Licenses Service</a>.</p>
     <p>Defaults to <code>cc-by</code> for non-datasets and <code>cc-zero</code> for datasets.</p></td>
 </tr>
 <tr>
@@ -1731,12 +2229,6 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td></td>
     <td>Yes, if <code>access_right</code> is <code>"embargoed"</code>.</td>
     <td>Date in ISO8601 format (<code>YYYY-MM-DD</code>) when the deposited files will be made automatically made publicly available by the system. Defaults to current date.</td>
-</tr>
-<tr>
-    <td><code>access_conditions</code></td>
-    <td>String</td>
-    <td>Yes, if <code>access_right</code> is <code>"restricted"</code>.</td>
-    <td>Specify the conditions under which you grant users access to the files in your upload. User requesting access will be asked to justify how they fulfil the conditions. Based on the justification, you decide who to grant/deny access. You are not allowed to charge users for granting access to data hosted on Zenodo. Following HTML tags are allowed: <code>a</code>, <code>p</code>, <code>br</code>, <code>blockquote</code>, <code>strong</code>, <code>b</code>, <code>u</code>, <code>i</code>, <code>em</code>, <code>ul</code>, <code>ol</code>, <code>li</code>, <code>sub</code>, <code>sup</code>, <code>div</code>, <code>strike</code>.</td>
 </tr>
 <tr>
     <td><code>doi</code></td>
@@ -1755,17 +2247,6 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>Array of strings</td>
     <td>No</td>
     <td><p>Free form keywords for this deposition. Example: </p><code>["Keyword 1", "Keyword 2"]</code></td>
-</tr>
-<tr>
-    <td><code>subjects</code></td>
-    <td>Array of objects</td>
-    <td>No</td>
-    <td>
-        <div class="alert alert-warning " role="alert">
-            <strong>Preview!</strong> This field is part of new api preview.
-        </div>
-        <p>Subject added entry in which the entry element is a topical term. Example: </p><code>[{"term": "Astronaut", "scheme": "gnd",  "id": "1234567899"}]</code>
-    </td>
 </tr>
 <tr>
     <td><code>notes</code></td>
@@ -1930,12 +2411,6 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>No</td>
     <td>Awarding university of thesis.</td>
 </tr>
-<tr>
-    <td><code>contributors</code></td>
-    <td>Array of objects</td>
-    <td>No</td>
-    <td>Same format as for <code>creators</code>.</td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -1991,7 +2466,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   </div>
 </div>
 
-{#<h2 id="restapi-faq">FAQ</h2>
+<!--<h2 id="restapi-faq">FAQ</h2>
 
 <dl>
   <dt>What is the difference between <em>deposition id</em> and <em>record id</em>?</dt>
@@ -2002,16 +2477,10 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   <dd></dd>
   <dt>Can I replace a file after a deposition is published?</dt>
   <dd></dd>
-</dl>#}
+</dl>-->
 
 <h2 id="restapi-changes">Changes</h2>
 <dl>
-<dt>2015-10-06</dt>
-<dd><p>Added new optional field <code>contributors</code> to deposition metadata.</p></dd>
-<dt>2015-10-06</dt>
-<dd><p>Added new optional field <code>subjects</code> to deposition metadata.</p></dd>
-<dt>2015-10-06</dt>
-<dd><p>Added new optional subfield <code>gnd</code> to <code>creators</code> in deposition metadata.</p></dd>
 <dt>2014-12-20</dt>
 <dd><p>Added new relationship <code>isAlternateIdentifier</code> in subfield <code>relation</code> to <code>related_identifiers</code> in deposition metadata.</p></dd>
 <dt>2014-12-10</dt>
@@ -2023,7 +2492,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 <dt>2014-09-09</dt>
 <dd><p>Added new optional field <code>references</code> to deposition metadata.</p></dd>
 <dt>2014-06-13</dt>
-<dd><p>Authentication changed from API keys to OAuth 2.0. API key authentication is deprecated and will be phased out in October, 2014. Please use <a href="{{ url_for("oauth2server_settings.index")}}">personal access tokens</a> instead of API keys.</p></dd>
+<dd><p>Authentication changed from API keys to OAuth 2.0. API key authentication is deprecated and will be phased out in October, 2014. Please use <a href="https://zenodo.org/account/settings/applications/">personal access tokens</a> instead of API keys.</p></dd>
 <dt>2013-12-18</dt>
 <dd><p>REST API version 1.0 final release</p><ul>
 <li>Deposition actions moved from <code>deposit/depositions/:id/action</code> to <code>deposit/depositions/:id/actions</code></li>
@@ -2036,19 +2505,19 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 <dd><p>REST API initial release candidate</p></dd>
 </dl>
 
-<h2 id="harvest"><strong>OAI-PMH API</strong> <small>use OAI-PMH to harvest {{config.CFG_SITE_NAME}}</small></h2>
+<h2 id="harvest"><strong>OAI-PMH API</strong> <small>use OAI-PMH to harvest Zenodo</small></h2>
 <hr/>
 <p>
-{{config.CFG_SITE_NAME}} allows you to harvest our entire repository via
+Zenodo allows you to harvest our entire repository via
 the Open Archives Initiative Protocol for Metadata Harvesting (<a href="http://www.openarchives.org/pmh/">OAI-PMH</a>). OAI-PMH is a widely used protocol for harvesting metadata and most popular repository software provide support for this protocol.
 </p>
 <p>
-All metadata is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
+All metadata is licensed under <a href="terms">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
 </p>
 <h3 id="harvest-baseurl">Base URL</h3>
 <p>
 <pre align="center">
-{{config.CFG_SITE_SECURE_URL}}/oai2d
+https://zenodo.org/oai2d
 </pre>
 </p>
 
@@ -2059,41 +2528,41 @@ Metadata for each record is available in several formats. The available formats 
 <dt><code>oai_datacite3</code></dt>
 <dd><p>OAI DataCite &mdash; This metadata format has been specifically established for the dissemination of DataCite records using OAI-PMH. In addition to the original DataCite v3.0 metadata, this format contains several other elements describing the version of the metadata, whether it is of reference quality, and the registering datacentre. For more information about this format and its schema please see the <a href="http://oai.datacite.org/">DataCite OAI schema</a> web site.</p>
 <p><span class="label label-info">Recommended</span> We recommend you harvest using this metadata format. The format contains the most complete metadata and is our primary supported format.</p>
-<p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite3&set=openaire_data">See example</a></p>
+<p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=oai_datacite3&set=openaire_data">See example</a></p>
 </dd>
 <dt><code>oai_datacite</code></dt>
 <dd><p>OAI DataCite &mdash; This metadata format has been specifically established for the dissemination of DataCite records using OAI-PMH. In addition to the original DataCite metadata, this format contains several other elements describing the version of the metadata, whether it is of reference quality, and the registering datacentre. For more information about this format and its schema please see the <a href="http://oai.datacite.org/">DataCite OAI schema</a> web site.</p>
-<p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=openaire_data">See example</a></p>
+<p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=openaire_data">See example</a></p>
 </dd>
 <dt><code>datacite3</code></dt>
 <dd><p>DataCite v3.0 &mdash; This metadata format contains only the original DataCite metadata without additions or alterations. The schema for this format does not exist and metadata will not validate against it. Please note that this format is not OAI-PMH version 2.0 compliant.</p>
-<p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=datacite3&set=openaire_data">See example</a></p>
+<p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=datacite3&set=openaire_data">See example</a></p>
 </dd>
 <dt><code>datacite</code></dt>
 <dd><p>DataCite v2.2 &mdash; This metadata format contains only the original DataCite metadata without additions or alterations. The schema for this format does not exist and metadata will not validate against it. Please note that this format is not OAI-PMH version 2.0 compliant.</p> <p>
 <span class="label">Heads up!</span> We will be upgrading to <a href="http://schema.datacite.org/meta/kernel-3/index.html">DataCite Metadata Schema v3.0</a> and discontinue support for DataCite v2.2, hence please ensure your OAI-PMH client are capable of reading both versions. There are only few backwards incompatible changes between v3.0 and v2.2.
 </p>
-<p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=datacite&set=openaire_data">See example</a></p>
+<p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=datacite&set=openaire_data">See example</a></p>
 </dd>
 <dt><code>oai_dc</code></dt>
-<dd><p>Dublin Core &mdash; only minimal metadata is included in this format, and is primarily provided for clients which does not support <code>oai_datacite</code>.</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_dc&set=openaire">See example</a></p></dd>
+<dd><p>Dublin Core &mdash; only minimal metadata is included in this format, and is primarily provided for clients which does not support <code>oai_datacite</code>.</p><p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=oai_dc&set=openaire">See example</a></p></dd>
 </dl>
 
 <h3 id="harvest-sets">Sets</h3>
 <p>We support both harvesting of the <em>entire repository</em> as well as <em>selective harvesting</em> of communities.</p>
 <dl>
 <dt><code>zenodo</code></dt>
-<dd><p>All of Zenodo</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=zenodo">See example</a></p></dd>
+<dd><p>All of Zenodo</p><p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=zenodo">See example</a></p></dd>
 <dt><code>user-<em>&lt;identifier&gt;</em></code></dt>
-<dd><p>Community sets &mdash; allows selective harvesting of specific communities. Replace <code><em>&lt;identifier&gt;</em></code> with the community identifier. Alternatively each community provides a direct harvesting API link on their front-page, which includes the correct community identifier.</p><p><a href="view-source:{{config.CFG_SITE_SECURE_URL}}/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=user-cfa">See example</a></p></dd>
+<dd><p>Community sets &mdash; allows selective harvesting of specific communities. Replace <code><em>&lt;identifier&gt;</em></code> with the community identifier. Alternatively each community provides a direct harvesting API link on their front-page, which includes the correct community identifier.</p><p><a href="view-source:https://zenodo.org/oai2d?verb=ListRecords&metadataPrefix=oai_datacite&set=user-cfa">See example</a></p></dd>
 </dl>
-<p>If you need selective harvesting and your use case is not supported by above sets, please <a href="{{url_for('zenodo_base.contact')}}">contact us</a> and we may possible set a specific set for you.</p>
+<p>If you need selective harvesting and your use case is not supported by above sets, please <a href="contact">contact us</a> and we may possible set a specific set for you.</p>
 
 <h3 id="harvest-schedule">Update schedule</h3>
 Sets are updated once an hour.
 
 <h3 id="harvest-ratelimit">Rate limit</h3>
-The OAI-PMH API is rated limited to one request per 2 seconds. We would be grateful if you <a href="{{url_for('invenio_opeanire.contact')}}">notify us</a> that you are harvesting us and in which context. It allows us to take your use case into consideration for future developments.
+The OAI-PMH API is rated limited to one request per 2 seconds. We would be grateful if you <a href="/contact">notify us</a> that you are harvesting us and in which context. It allows us to take your use case into consideration for future developments.
 
 <h3 id="harvest-changes">Changes</h3>
 <dl>
@@ -2103,15 +2572,15 @@ The OAI-PMH API is rated limited to one request per 2 seconds. We would be grate
 <dd><p>Initial release of OAI-PMH API</p></dd>
 </dl>
 
-{#
+<!--
 <h2 id="metadata"><strong>Metadata API</strong> <small>machine readable formats of records</small></h2>
 <hr/>
-<p>Metadata for individual records are exportable in several different machine readable formats. All metadata is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
+<p>Metadata for individual records are exportable in several different machine readable formats. All metadata is licensed under <a href="terms">Creative Commons Zero</a>, while the data files may be either open access and subject to a license described in the metadata or closed access and not available for download.
 </p>
 
 <h3 id="metadata-url">URL pattern</h3>
 <pre align="center">
-{{config.CFG_SITE_SECURE_URL}}/record/<em>&lt;record id&gt;</em>/export/<em>&lt;format id&gt;</em>
+https://zenodo.org/record/<em>&lt;record id&gt;</em>/export/<em>&lt;format id&gt;</em>
 </pre>
 <p>Please replace <code>&lt;record id&gt;</code> with the record id of interest (e.g. obtained from the REST API), and replace <code>&lt;format id&gt;</code> with one of the metadata formats listed below.</p>
 
@@ -2136,11 +2605,8 @@ The following metadata formats are supported:
 <dt>2013-05-08</dt>
 <dd><p>Initial release of Metadata API</p></dd>
 </dl>
-#}
+-->
 </div>
 </div>
 
-
-
-
-{% endblock %}
+"""

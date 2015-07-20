@@ -102,6 +102,7 @@ PACKAGES = [
     'invenio.modules.oairepository',
     'invenio.modules.oauth2server',
     'invenio.modules.oauthclient',
+    'invenio.modules.pages',
     'invenio.modules.pidstore',
     'invenio.modules.previewer',
     'invenio.modules.ranker',
