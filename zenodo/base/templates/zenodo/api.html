@@ -1692,7 +1692,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>Yes</td>
     <td><p>The creators/authors of the deposition. Each array element is an object with the attributes:</p>
     <ul>
-      <li><code>name</code>: Name of creator in the format <em>Family name, First names</em></li>
+      <li><code>name</code>: Name of creator in the format <em>Family name, Given names</em></li>
       <li><code>affiliation</code>: Affiliation of creator (optional).</li>
       <li><code>orcid</code>: ORCID identifier of creator (optional).</li>
       <li><code>gnd</code>: GND identifier of creator (optional).</li>
@@ -1757,17 +1757,6 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><p>Free form keywords for this deposition. Example: </p><code>["Keyword 1", "Keyword 2"]</code></td>
 </tr>
 <tr>
-    <td><code>subjects</code></td>
-    <td>Array of objects</td>
-    <td>No</td>
-    <td>
-        <div class="alert alert-warning " role="alert">
-            <strong>Preview!</strong> This field is part of new api preview.
-        </div>
-        <p>Subject added entry in which the entry element is a topical term. Example: </p><code>[{"term": "Astronaut", "scheme": "gnd",  "id": "1234567899"}]</code>
-    </td>
-</tr>
-<tr>
     <td><code>notes</code></td>
     <td>String</td>
     <td>No</td>
@@ -1787,6 +1776,21 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
   {'relation': 'isSupplementTo', 'identifier':'10.1234/foo'},
   {'relation': 'cites', 'identifier':'http://dx.doi.org/10.1234/bar'}
 ]</pre><p>Note the identifier type (e.g. DOI) is automatically detected, and used to validate and normalize the identifier into a standard form.</p></td>
+</tr>
+<tr>
+    <td><code>contributors</code></td>
+    <td>Array of objects</td>
+    <td>No</td>
+    <td><p>The contributors of the deposition (e.g. editors, data curators, etc.). Each array element is an object with the attributes:</p>
+    <ul>
+      <li><code>name</code>: Name of creator in the format <em>Family name, Given names</em></li>
+      <li><code>type</code>: Contributor type. Controlled vocabulary ({% for x in config.get('DEPOSIT_CONTRIBUTOR_TYPES') %}<code>{{x['datacite']}}</code>{% if not loop.last %},{% endif %}{% endfor %}).</li>
+      <li><code>affiliation</code>: Affiliation of creator (optional).</li>
+      <li><code>orcid</code>: ORCID identifier of creator (optional).</li>
+      <li><code>gnd</code>: GND identifier of creator (optional).</li>
+    </ul>
+    <p>Example:</p>
+    <pre>[{'name':'Doe, John', 'affiliation': 'Zenodo', 'type': 'Editor' }, ...]</pre></td>
 </tr>
 <tr>
     <td><code>references</code></td>
@@ -1931,10 +1935,24 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td>Awarding university of thesis.</td>
 </tr>
 <tr>
-    <td><code>contributors</code></td>
+    <td><code>subjects</code></td>
     <td>Array of objects</td>
     <td>No</td>
-    <td>Same format as for <code>creators</code>.</td>
+    <td>
+        <p>Specify subjects from a taxonomy or controlled vocabulary. Each term must be uniquely identified (e.g. a URL). For free form text, use the keywords field.
+
+        Each array element is an object with the attributes:
+        <ul>
+          <li><code>term</code>: Term from taxonomy or controlled vocabulary.</li>
+          <li><code>id</code>: Unique identifier for term.</li>
+          <li><code>scheme</code>: Persistent identifier scheme for id (automatically detected).</li>
+        </ul>
+
+        Example:
+        <pre>[{"term": "Astronomy",
+ "id": "http://id.loc.gov/authorities/subjects/sh85009003",
+ "scheme": "url"}]</pre></p>
+    </td>
 </tr>
 </tbody>
 </table>
@@ -2007,11 +2025,11 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
 <h2 id="restapi-changes">Changes</h2>
 <dl>
 <dt>2015-10-06</dt>
-<dd><p>Added new optional field <code>contributors</code> to deposition metadata.</p></dd>
-<dt>2015-10-06</dt>
-<dd><p>Added new optional field <code>subjects</code> to deposition metadata.</p></dd>
-<dt>2015-10-06</dt>
-<dd><p>Added new optional subfield <code>gnd</code> to <code>creators</code> in deposition metadata.</p></dd>
+<dd>
+<p>Added new optional field <code>contributors</code> to deposition metadata.</p>
+<p>Added new optional field <code>subjects</code> to deposition metadata.</p>
+<p>Added new optional subfield <code>gnd</code> to <code>creators</code> in deposition metadata.</p>
+</dd>
 <dt>2014-12-20</dt>
 <dd><p>Added new relationship <code>isAlternateIdentifier</code> in subfield <code>relation</code> to <code>related_identifiers</code> in deposition metadata.</p></dd>
 <dt>2014-12-10</dt>

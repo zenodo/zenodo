@@ -221,6 +221,29 @@ DEPOSIT_TYPES = [
 ]
 DEPOSIT_DEFAULT_TYPE = "zenodo.modules.deposit.workflows.upload:upload"
 
+DEPOSIT_CONTRIBUTOR_TYPES = [
+    dict(label='Contact person', marc='prc', datacite='ContactPerson'),
+    dict(label='Data collector', marc='col', datacite='DataCollector'),
+    dict(label='Data curator', marc='cur', datacite='DataCurator'),
+    dict(label='Data manager', marc='dtm', datacite='DataManager'),
+    dict(label='Editor', marc='edt', datacite='Editor'),
+    dict(label='Researcher', marc='res', datacite='Researcher'),
+    dict(label='Rights holder', marc='cph', datacite='RightsHolder'),
+    dict(label='Sponsor', marc='spn', datacite='Sponsor'),
+    dict(label='Other', marc='oth', datacite='Other'),
+]
+# DataCite XSLs must also be updated.
+
+DEPOSIT_CONTRIBUTOR_TYPE_CHOICES = [(x['datacite'], x['label'])
+                                    for x in DEPOSIT_CONTRIBUTOR_TYPES]
+
+DEPOSIT_CONTRIBUTOR_MARC2DATACITE = dict(
+    [(x['marc'], x['datacite']) for x in DEPOSIT_CONTRIBUTOR_TYPES])
+
+DEPOSIT_CONTRIBUTOR_DATACITE2MARC = dict(
+    [(x['datacite'], x['marc']) for x in DEPOSIT_CONTRIBUTOR_TYPES])
+
+
 COMMUNITIES_PARENT_NAME = 'Communities'
 COMMUNITIES_PARENT_NAME_PROVISIONAL = 'Communities'
 COMMUNITIES_PORTALBOXES = [
@@ -476,6 +499,41 @@ CFG_DATACITE_DOI_PREFIX = "10.5072"
 PIDSTORE_DATACITE_RECORD_DOI_FIELD = 'doi'
 PIDSTORE_DATACITE_OUTPUTFORMAT = 'dcite3'
 PIDSTORE_DATACITE_SITE_URL = "http://zenodo.org"
+
+
+UPLOAD_TYPES = [
+    dict(type='publication', subtypes=[
+        dict(type="book"),
+        dict(type="section"),
+        dict(type="conferencepaper"),
+        dict(type="article"),
+        dict(type="deliverable"),
+        dict(type="milestone"),
+        dict(type="patent"),
+        dict(type="preprint"),
+        dict(type="proposal"),
+        dict(type="report"),
+        dict(type="thesis"),
+        dict(type="technicalnote"),
+        dict(type="softwaredocumentation"),
+        dict(type="workingpaper"),
+        dict(type="other"),
+    ]),
+    dict(type='poster', subtypes=[]),
+    dict(type='presentation', subtypes=[]),
+    dict(type='dataset', subtypes=[]),
+    dict(type='video', subtypes=[]),
+    dict(type='image', subtypes=[
+        dict(type="figure"),
+        dict(type="plot"),
+        dict(type="drawing"),
+        dict(type="diagram"),
+        dict(type="photo"),
+        dict(type="other"),
+    ]),
+    dict(type='software', subtypes=[]),
+    dict(type='lesson', subtypes=[]),
+]
 
 SCHEMAORG_MAP = dict(
     publication='http://schema.org/ScholarlyArticle',

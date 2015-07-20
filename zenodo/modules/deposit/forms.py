@@ -25,13 +25,16 @@ from __future__ import absolute_import
 import json
 from datetime import date
 
-from flask import request
-
 import idutils
+from flask import request
+from jinja2 import Markup
+from wtforms import validators, widgets
+from wtforms.validators import ValidationError
 
+from invenio.base.globals import cfg
 from invenio.base.i18n import _
-from invenio.config import CFG_DATACITE_DOI_PREFIX
-from invenio.config import CFG_SITE_NAME, CFG_SITE_SUPPORT_EMAIL
+from invenio.config import CFG_DATACITE_DOI_PREFIX, CFG_SITE_NAME, \
+    CFG_SITE_SUPPORT_EMAIL
 from invenio.modules.deposit import fields
 from invenio.modules.deposit.autocomplete_utils import kb_autocomplete
 from invenio.modules.deposit.field_widgets import ButtonWidget, \
@@ -48,16 +51,10 @@ from invenio.modules.deposit.validation_utils import DOISyntaxValidator, \
 from invenio.modules.knowledge.api import get_kb_mapping
 from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
 
-from jinja2 import Markup
-
-from wtforms import validators, widgets
-from wtforms.validators import ValidationError
-
 from . import fields as zfields
 from .autocomplete import community_autocomplete
 from .validators import community_validator
 from ...legacy.utils.zenodoutils import create_doi, filter_empty_helper
-
 
 __all__ = ('ZenodoForm', )
 
@@ -269,7 +266,8 @@ class ContributorsForm(WebDepositForm):
             required_if(
                 'affiliation',
                 [lambda x: bool(x.strip()), ],  # non-empty
-                message="Contributor name is required if you specify affiliation."
+                message="Contributor name is required if you specify"
+                        " affiliation."
             ),
         ],
     )
@@ -280,18 +278,8 @@ class ContributorsForm(WebDepositForm):
     )
     type = fields.SelectField(
         label="",
-        choices=[
-            ('prc', 'Contact person'),
-            ('col', 'Data collector'),
-            ('cur', 'Data curator'),
-            ('dtm', 'Data manager'),
-            ('edt', 'Editor'),
-            ('res', 'Researcher'),
-            ('cph', 'Rights holder'),
-            ('spn', 'Sponsor'),
-            ('oth', 'Other'),
-        ],
-        default='cur',
+        choices=cfg['DEPOSIT_CONTRIBUTOR_TYPE_CHOICES'],
+        default=cfg['DEPOSIT_CONTRIBUTOR_TYPE_CHOICES'][0][0],
         widget_classes='form-control',
         widget=ColumnInput(
             class_="col-xs-3 col-pad-0", widget=widgets.Select()
@@ -350,6 +338,11 @@ class SubjectsForm(WebDepositForm):
         label="",
         placeholder="Identifier",
         validators=[
+            required_if(
+                'term',
+                [lambda x: bool(x.strip()), ],  # non-empty
+                message="Identifier is required if you specify term."
+            ),
             validators.optional(),
             pid_validator(),
         ],
@@ -881,7 +874,7 @@ class ZenodoForm(WebDepositForm):
         add_label='Add another contributor',
         icon='fa fa-users fa-fw',
         widget_classes='',
-        min_entries=0,
+        min_entries=1,
     )
 
     #
@@ -1045,6 +1038,12 @@ class ZenodoForm(WebDepositForm):
                 ' URNs and URLs.'
             ),
         }),
+        ('Contributors', [
+            'contributors'
+        ], {
+            'classes': '',
+            'indication': 'optional',
+        }),
         ('References', [
             'references',
         ], {
@@ -1081,13 +1080,10 @@ class ZenodoForm(WebDepositForm):
         ], {
             'classes': '',
             'indication': 'optional',
-            'description': 'Thsi field contains a topical subject used as a subject added entry.',
-        }),
-        ('Contributors', [
-            'contributors'
-        ], {
-            'classes': '',
-            'indication': 'optional',
+            'description': 'Specify subjects from a taxonomy or controlled '
+                           'vocabulary. Each term must be uniquely identified '
+                           '(e.g. a URL). For free form text, use the keywords'
+                           ' field in basic information section.',
         }),
     ]
 

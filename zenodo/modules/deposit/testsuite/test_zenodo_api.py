@@ -697,10 +697,11 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 thesis_university="Some thesis_university",
                 contributors=[
                     dict(name="Doe Sr., Jochen", affiliation="Atlantis",
-                         type="oth"),
+                         type="Other"),
                     dict(name="Smith Sr., Marco", affiliation="Atlantis",
                          orcid="http://orcid.org/0000-0002-1825-0097",
-                         gnd="http://d-nb.info/gnd/170118215", type="cur")
+                         gnd="http://d-nb.info/gnd/170118215",
+                         type="DataCurator")
                 ],
                 title="Test title",
                 upload_type="publication",
@@ -778,9 +779,9 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 thesis_university="இந்த ஒரு சோதனை",
                 contributors=[
                     dict(name="Doe Sr.,  ن یک تست", affiliation="Atlantis",
-                         type="oth"),
+                         type="Other"),
                     dict(name="SmЭтith Sr., Marco", affiliation="Atlantis",
-                         type="cur")
+                         type="DataCurator")
                 ],
                 title="Đây là một thử nghiệm",
                 upload_type="publication",
@@ -1333,9 +1334,9 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                 thesis_university="Some thesis_university",
                 contributors=[
                     dict(name="Doe Sr., Jochen", affiliation="atlantis",
-                         type="oth"),
+                         type="Other"),
                     dict(name="Smith Sr., Marco", affiliation="atlantis",
-                         type="cur")
+                         type="DataCurator")
                 ],
             )
         )
@@ -1466,9 +1467,12 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                     dict(name="Doe Sr., John", affiliation="CERN"),
                 ],
                 contributors=[
-                    dict(name="Doe Jr., Jochen", affiliation="Atlantis", type="oth"),
-                    dict(name="Smith Sr., Marco", affiliation="CERN", type="cur"),
-                    dict(name="Doe Sr., Jochen", affiliation="CERN", type="oth"),
+                    dict(name="Doe Jr., Jochen", affiliation="Atlantis",
+                         type="Other"),
+                    dict(name="Smith Sr., Marco", affiliation="CERN",
+                         type="DataCurator"),
+                    dict(name="Doe Sr., Jochen", affiliation="CERN",
+                         type="Other"),
                 ],
             )),
             code=200,
@@ -1573,14 +1577,18 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
                  familyname="Doe", givennames="John"),
         ])
         self.assertEqual(record['thesis_supervisors'], [
-            dict(name="Doe Jr., John", affiliation="Atlantis", gnd='', orcid=''),
+            dict(name="Doe Jr., John", affiliation="Atlantis", gnd='',
+                 orcid=''),
             dict(name="Smith Sr., Jane", affiliation="CERN", gnd='', orcid=''),
             dict(name="Doe Sr., John", affiliation="CERN", gnd='', orcid=''),
         ])
         self.assertEqual(record['contributors'], [
-            dict(name="Doe Jr., Jochen", affiliation="Atlantis", type='oth', gnd='', orcid=''),
-            dict(name="Smith Sr., Marco", affiliation="CERN", type='cur', gnd='', orcid=''),
-            dict(name="Doe Sr., Jochen", affiliation="CERN", type='oth', gnd='', orcid=''),
+            dict(name="Doe Jr., Jochen", affiliation="Atlantis", type='Other',
+                 gnd='', orcid=''),
+            dict(name="Smith Sr., Marco", affiliation="CERN",
+                 type='DataCurator', gnd='', orcid=''),
+            dict(name="Doe Sr., Jochen", affiliation="CERN", type='Other',
+                 gnd='', orcid=''),
         ])
         self.assertEqual(record.get('embargo_date'), None)
         self.assertEqual(record.get('license'), None)

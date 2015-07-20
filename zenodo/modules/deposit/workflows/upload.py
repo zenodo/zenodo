@@ -270,7 +270,7 @@ def process_recjson(deposition, recjson):
 
 def filter_empty_elements(recjson):
     list_fields = [
-        'authors', 'keywords', 'thesis_supervisors', 'subjects', 'contributors'
+        'authors', 'keywords', 'thesis_supervisors', 'subjects',
     ]
     for key in list_fields:
         recjson[key] = filter(
@@ -280,6 +280,11 @@ def filter_empty_elements(recjson):
     recjson['related_identifiers'] = filter(
         filter_empty_helper(keys=['identifier']),
         recjson.get('related_identifiers', [])
+    )
+
+    recjson['contributors'] = filter(
+        filter_empty_helper(keys=['name', 'affiliation']),
+        recjson.get('contributors', [])
     )
 
     return recjson

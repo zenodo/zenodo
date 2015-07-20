@@ -25,8 +25,8 @@
 
 from datetime import date
 
-from invenio.testsuite import make_test_suite, run_test_suite, InvenioTestCase
-
+from invenio.base.globals import cfg
+from invenio.testsuite import InvenioTestCase, make_test_suite, run_test_suite
 
 test_marc = """<record>
   <controlfield tag="001">1</controlfield>
@@ -136,6 +136,11 @@ test_marc = """<record>
     <subfield code="0">(orcid)0000-0002-1825-0097</subfield>
   </datafield>
   <datafield tag="700" ind1=" " ind2=" ">
+    <subfield code="u"></subfield>
+    <subfield code="4">oth</subfield>
+    <subfield code="a">Hansen, Viggo</subfield>
+  </datafield>
+  <datafield tag="700" ind1=" " ind2=" ">
     <subfield code="u">CERN</subfield>
     <subfield code="4">dtm</subfield>
     <subfield code="a">Kowalski, Manager</subfield>
@@ -222,10 +227,12 @@ test_form_json = {
          'gnd': '170118216', 'orcid': ''},
     ],
     'contributors': [
-        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'oth',
+        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
          'gnd': '', 'orcid': '0000-0002-1825-0097'},
-        {'affiliation': 'CERN', 'name': 'Kowalski, Manager', 'type': 'dtm',
-         'gnd': '170118216', 'orcid': ''},
+        {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
+         'gnd': '', 'orcid': ''},
+        {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
+         'type': 'DataManager', 'gnd': '170118216', 'orcid': ''},
     ],
     'description': 'Test Description',
     'doi': '10.1234/foo.bar',
@@ -305,10 +312,12 @@ test_record = dict(
          'gnd': '170118216', 'orcid': ''},
     ],
     contributors=[
-        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'oth',
+        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
          'gnd': '', 'orcid': '0000-0002-1825-0097'},
-        {'affiliation': 'CERN', 'name': 'Kowalski, Manager', 'type': 'dtm',
-         'gnd': '170118216', 'orcid': ''},
+        {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
+         'gnd': '', 'orcid': ''},
+        {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
+         'type': 'DataManager', 'gnd': '170118216', 'orcid': ''},
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],
@@ -444,6 +453,57 @@ class TestReaders(InvenioTestCase):
         self.assertEqual('0900-12-31', r.dumps()['embargo_date'])
         assert '0900-12-31' in r.legacy_export_as_marc()
 
+    def test_types(self):
+        """Test upload_type rules."""
+        from invenio.modules.records.api import Record
+
+        for t in cfg['UPLOAD_TYPES']:
+            if t['subtypes']:
+                for st in t['subtypes']:
+                    r = Record.create(
+                        '<record><datafield tag="980" ind1=" " ind2=" ">'
+                        '<subfield code="b">{1}</subfield>'
+                        '<subfield code="a">{0}</subfield>'
+                        '</datafield></record>'.format(t['type'], st['type']),
+                        master_format='marc'
+                    )
+                    assert r['upload_type'] == {"type": t['type'],
+                                                "subtype": st['type']}
+                    assert len(r.get('collections', [])) == 0
+            else:
+                r = Record.create(
+                    '<record><datafield tag="980" ind1=" " ind2=" ">'
+                    '<subfield code="a">{0}</subfield>'
+                    '</datafield></record>'.format(t['type']),
+                    master_format='marc'
+                )
+                assert r['upload_type'] == {"type": t['type']}
+                assert len(r.get('collections', [])) == 0
+
+    def test_formjson_for_contributors(self):
+        """Test contributor rules."""
+        from invenio.modules.records.api import Record
+        r = Record.create(
+            '<record>'
+            '<datafield tag="700" ind1=" " ind2=" ">'
+            '<subfield code="u">Test</subfield>'
+            '<subfield code="4">cph</subfield>'
+            '<subfield code="a">Nielsen, Lars</subfield>'
+            '</datafield>'
+            '<datafield tag="700" ind1=" " ind2=" ">'
+            '<subfield code="u">Hansen</subfield>'
+            '<subfield code="4">edt</subfield>'
+            '<subfield code="a">Viggo</subfield>'
+            '</datafield>'
+            '<datafield tag="700" ind1=" " ind2=" ">'
+            '<subfield code="4">edt</subfield>'
+            '<subfield code="a">Hansen</subfield>'
+            '</datafield>'
+            '</record>',
+            master_format='marc'
+        )
+        assert len(r['contributors']) == 3
+        assert len(r.produce('json_for_form')['contributors']) == 3
 
 TEST_SUITE = make_test_suite(TestReaders)
 
