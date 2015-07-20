@@ -3,7 +3,7 @@
 # This file is part of Zenodo.
 # Copyright (C) 2014, 2015 CERN.
 #
-# Zenodo is free software: you can redistribute it and/or modify
+# Zenodo is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -132,6 +132,25 @@ def index_old(user_id, repository):
     full_url = url_for('.index', user_id=user_id,
                        repository=repository, style=style)
     return redirect(full_url)
+
+
+@blueprint.route("/latestdoi/<int:user_id>/<path:repository>", methods=["GET"])
+@ssl_required
+def latest_doi(user_id, repository):
+    """Redirect to the newest record version."""
+
+    account = get_account(user_id=user_id)
+    if account is None:
+        return abort(404)
+
+    # Get the latest deposition and extract doi
+    try:
+        dep = account.extra_data["repos"][repository]['depositions'][-1]
+        doi = dep["doi"]
+    except (IndexError, KeyError):
+        return abort(404)
+
+    return redirect("http://dx.doi.org/{0}".format(doi))
 
 
 @blueprint.route("/doi/<path:doi>.png", methods=["GET"])

@@ -17,11 +17,15 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
-{%- macro doi_badge(doi, modal_name='') %}
+{%- macro doi_badge(doi, user_id='', repository='', modal_name='') %}
 {%- block doi_badge scoped %}
       {% set modal_name = modal_name if modal_name else doi %}
-      {% set doi_url = "http://dx.doi.org/" + doi %}
-      {% set image_url = config.CFG_SITE_SECURE_URL + url_for('zenodo_github_badge.doi_badge', doi=doi) %}
+      {% if not user_id or not repository %}
+        {% set doi_url = "http://dx.doi.org/" + doi %}
+      {% else  %}
+        {% set doi_url = url_for('zenodo_github_badge.latest_doi', user_id=user_id, repository=repository, _external=True, _scheme='https') %}
+      {% endif %}
+      {% set image_url = url_for('zenodo_github_badge.index', user_id=user_id, repository=repository, _external=True, _scheme='https') %}
       <span class="get-badge" data-toggle="tooltip" data-placement="bottom" title="Get the DOI badge!">
         <img data-toggle="modal" data-target="[data-modal='{{ modal_name | replace('/', '-') }}']" src="{{image_url}}" alt="{{doi}}"/>
       </span>

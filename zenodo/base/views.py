@@ -3,7 +3,7 @@
 # This file is part of Zenodo.
 # Copyright (C) 2012, 2013, 2014, 2015 CERN.
 #
-# Zenodo is free software: you can redistribute it and/or modify
+# Zenodo is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
@@ -159,10 +159,10 @@ def add_bibdoc_files(sender, **kwargs):
 
         ctx = dict(
             zenodo_files=[f for f in BibRecDocs(
-                    kwargs['recid'], human_readable=True
-                ).list_latest_files(
-                    list_hidden=False
-                ) if not f.is_icon()],
+                kwargs['recid'], human_readable=True
+            ).list_latest_files(
+                list_hidden=False
+            ) if not f.is_icon()],
             file_token=None,
         )
 

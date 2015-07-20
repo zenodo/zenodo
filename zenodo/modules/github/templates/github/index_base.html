@@ -1,20 +1,20 @@
 {#
-## This file is part of Invenio.
-## Copyright (C) 2013, 2014, 2015 CERN.
-##
-## Invenio is free software; you can redistribute it and/or
-## modify it under the terms of the GNU General Public License as
-## published by the Free Software Foundation; either version 2 of the
-## License, or (at your option) any later version.
-##
-## Invenio is distributed in the hope that it will be useful, but
-## WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-## General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Invenio; if not, write to the Free Software Foundation, Inc.,
-## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+# This file is part of Invenio.
+# Copyright (C) 2013, 2014, 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 #}
 
 {%- import "accounts/settings/helpers.html" as helpers with context %}
@@ -110,12 +110,13 @@ require(['jquery', 'js/github/view'], function($, view) {
       {% set latest_dep = description.depositions[-1] if description.depositions else '' %}
 
         {% if latest_dep %}
-          {{doi_badge(latest_dep.doi)}}
+          {{doi_badge(latest_dep.doi, user_id=current_user.id, repository=repo)}}
         {% endif %}
         <h4 class="repo"><a href="https://github.com/{{repo}}">{{repo}}</a>{% if latest_dep and description.hook %} <i class="fa fa-check" style="color: #5cb85c;"></i>{% endif %}</h4>
 
         <small class="text-muted repo-description"> {{description.description}}</small>
         {% if latest_dep %}
+        {% set doi_url = url_for('zenodo_github_badge.latest_doi', user_id=current_user.id, repository=repo, _external=True, _scheme='https') %}
         <p><small class="text-muted">Latest release ({{latest_dep.github_ref}}): <i class="fa fa-eye"></i> <a href="{{doi_url}}" class="">{{config.CFG_SITE_NAME}}</a>, <i class="fa fa-github"></i> <a href="https://github.com/{{repo}}/tree/{{latest_dep.github_ref}}" class="">GitHub</a></small></p>
         {% endif %}
       </div>
