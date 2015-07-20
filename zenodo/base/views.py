@@ -25,6 +25,8 @@
 import copy
 import time
 
+import idutils
+
 from flask import Blueprint, current_app, render_template, request
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.login import current_user
@@ -35,7 +37,7 @@ from invenio.base.i18n import _
 from invenio.base.signals import pre_template_render
 from invenio.ext.template. \
     context_processor import register_template_context_processor
-from invenio.utils import persistentid
+
 
 from zenodo.base.utils.bibtex import Bibtex
 from zenodo.modules.accessrequests.models import SecretLink
@@ -285,7 +287,7 @@ RULES = {
 def zenodo_related_links(record):
     def apply_rule(item, rule):
         r = copy.deepcopy(rule)
-        r['link'] = persistentid.to_url(item['identifier'], item['scheme'])
+        r['link'] = idutils.to_url(item['identifier'], item['scheme'])
         return r
 
     def match_rules(item, communities):
@@ -336,7 +338,7 @@ def pid_url(related_identifier):
     identifier = related_identifier.get('identifier')
     scheme = related_identifier.get('scheme')
     if scheme and identifier:
-        return persistentid.to_url(identifier, scheme)
+        return idutils.to_url(identifier, scheme)
     return ""
 
 

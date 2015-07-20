@@ -23,7 +23,7 @@
 
 import requests
 from flask import Blueprint, request, current_app, abort
-from invenio.utils.persistentid import is_doi
+from idutils import is_doi
 
 blueprint = Blueprint(
     'zenodo_citationformatter',
