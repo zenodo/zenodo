@@ -28,6 +28,7 @@
   <li class="nav-header">REST API</li>
   <li><a href="#restapi-intro">Introduction</i></a></li>
   <li><a href="#restapi-quick">Quick start</i></a></li>
+  <li><a href="#restapi-testing">Testing</i></a></li>
   <li><a href="#restapi-versioning">Versioning</i></a></li>
   <li><a href="#restapi-auth">Authentication</i></a></li>
   <li><a href="#restapi-requests">Requests</i></a></li>
@@ -168,7 +169,12 @@ Type "help", "copyright", "credits" or "license" for more information.
   </div>
 </div>
 
+<h2 id="restapi-testing">Testing</h2>
+<p>We provide a sandbox environment where you can test your API integration
+during development. The sandbox environment is available at <a href="http://sandbox.zenodo.org">http://sandbox.zenodo.org</a>.</p>
 
+<p>Please note that the sandbox environment can be cleaned at anytime. Also, the sandbox
+environment will issue test DOIs using the 10.5072 prefix instead of {{config.CFG_SITE_NAME}}'s normal prefix (10.5281).<p>
 
 <h2 id="restapi-versioning">Versioning</h2>
 <p>
@@ -357,7 +363,6 @@ Error responses for 400 series errors (e.g. 400, 401, 403, ...) are returned as 
 }
 </pre>
 <p>The attribute <code>errors</code> is a JSON array of objects, with the attributes <code>message</code> and <code>code</code>, and possibly <code>field</code> for validation errors.</p>
-
 
 <h2 id="restapi-res">Resources</h2>
 
