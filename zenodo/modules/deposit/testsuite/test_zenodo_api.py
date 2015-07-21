@@ -964,7 +964,7 @@ class WebDepositZenodoApiTest(DepositApiTestCase):
         )
         res_id = response.json['id']
         creator = response.json['metadata']['creators'][0]
-        self.assertEqual(creator['gnd'], '170118215')
+        self.assertEqual(creator['gnd'], 'gnd:170118215')
 
         response = self.delete(
             'depositionresource', urlargs=dict(resource_id=res_id), code=204

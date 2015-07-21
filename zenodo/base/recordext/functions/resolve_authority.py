@@ -50,5 +50,7 @@ def resolve_authority(values, authority_control):
     for value in values:
         result = extract_authority_value(value, authority_control)
         if result:
+            if authority_control == "gnd":
+                return "gnd:{0}".format(result)
             return result
     return ''

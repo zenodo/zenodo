@@ -93,7 +93,7 @@ test_marc = """<record>
     <subfield code="u">CERN</subfield>
     <subfield code="4">ths</subfield>
     <subfield code="a">Kowalski, Jane</subfield>
-    <subfield code="0">(gnd)170118216</subfield>
+    <subfield code="0">(gnd)170118215</subfield>
   </datafield>
   <datafield tag="653" ind1="1" ind2=" ">
     <subfield code="a">kw1</subfield>
@@ -144,7 +144,7 @@ test_marc = """<record>
     <subfield code="u">CERN</subfield>
     <subfield code="4">dtm</subfield>
     <subfield code="a">Kowalski, Manager</subfield>
-    <subfield code="0">(gnd)170118216</subfield>
+    <subfield code="0">(gnd)170118215</subfield>
   </datafield>
   <datafield tag="540" ind1=" " ind2=" ">
     <subfield code="u">http://zenodo.org</subfield>
@@ -172,7 +172,7 @@ test_marc = """<record>
   </datafield>
   <datafield tag="650" ind1="1" ind2=" ">
     <subfield code="a">test_term</subfield>
-    <subfield code="0">(gnd)1234567899</subfield>
+    <subfield code="0">(gnd)170118215</subfield>
   </datafield>
   <datafield tag="980" ind1=" " ind2=" ">
     <subfield code="b">secondary</subfield>
@@ -212,19 +212,19 @@ test_form_json = {
         {'identifier': 'zenodo', 'provisional': False}],
     'creators': [
         {'affiliation': 'CERN', 'name': 'Doe, John',
-         'gnd': '170118215', 'orcid': '0000-0002-1694-233X'},
+         'gnd': 'gnd:170118215', 'orcid': '0000-0002-1694-233X'},
         {'affiliation': 'CERN', 'name': 'Doe, Jane',
          'gnd': '', 'orcid': '0000-0002-1825-0097'},
         {'affiliation': 'CERN', 'name': 'Smith, John',
          'gnd': '', 'orcid': ''},
         {'affiliation': 'CERN', 'name': 'Nowak, Jack',
-         'gnd': '170118215', 'orcid': ''},
+         'gnd': 'gnd:170118215', 'orcid': ''},
     ],
     'thesis_supervisors': [
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
          'gnd': '', 'orcid': '0000-0002-1825-0097'},
         {'affiliation': 'CERN', 'name': 'Kowalski, Jane',
-         'gnd': '170118216', 'orcid': ''},
+         'gnd': 'gnd:170118215', 'orcid': ''},
     ],
     'contributors': [
         {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
@@ -232,7 +232,7 @@ test_form_json = {
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
          'gnd': '', 'orcid': ''},
         {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
-         'type': 'DataManager', 'gnd': '170118216', 'orcid': ''},
+         'type': 'DataManager', 'gnd': 'gnd:170118215', 'orcid': ''},
     ],
     'description': 'Test Description',
     'doi': '10.1234/foo.bar',
@@ -289,7 +289,7 @@ test_record = dict(
     title="Test title",
     authors=[
         {'name': 'Doe, John', 'affiliation': 'CERN',
-         'gnd': '170118215', 'orcid': '0000-0002-1694-233X',
+         'gnd': 'gnd:170118215', 'orcid': '0000-0002-1694-233X',
          'familyname': 'Doe', 'givennames': 'John',
          },
         {'name': 'Doe, Jane', 'affiliation': 'CERN',
@@ -301,7 +301,7 @@ test_record = dict(
          'familyname': 'Smith', 'givennames': 'John',
          },
         {'name': 'Nowak, Jack', 'affiliation': 'CERN',
-         'gnd': '170118215',  'orcid': '',
+         'gnd': 'gnd:170118215',  'orcid': '',
          'familyname': 'Nowak', 'givennames': 'Jack',
          },
     ],
@@ -309,7 +309,7 @@ test_record = dict(
         {'affiliation': 'CERN', 'name': 'Smith, Jane',
          'gnd': '', 'orcid': '0000-0002-1825-0097'},
         {'affiliation': 'CERN', 'name': 'Kowalski, Jane',
-         'gnd': '170118216', 'orcid': ''},
+         'gnd': 'gnd:170118215', 'orcid': ''},
     ],
     contributors=[
         {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
@@ -317,12 +317,12 @@ test_record = dict(
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
          'gnd': '', 'orcid': ''},
         {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
-         'type': 'DataManager', 'gnd': '170118216', 'orcid': ''},
+         'type': 'DataManager', 'gnd': 'gnd:170118215', 'orcid': ''},
     ],
     description="Test Description",
     keywords=["kw1", "kw2", "kw3"],
     subjects=[
-        {'term': 'test_term', 'identifier': '1234567899', 'scheme': 'gnd'},
+        {'term': 'test_term', 'identifier': 'gnd:170118215', 'scheme': 'gnd'},
     ],
     notes="notes",
     access_right="open",
@@ -504,6 +504,73 @@ class TestReaders(InvenioTestCase):
         )
         assert len(r['contributors']) == 3
         assert len(r.produce('json_for_form')['contributors']) == 3
+
+    def test_gnd(self):
+        """Test contributor rules."""
+        from invenio.modules.records.api import Record
+        r = Record.create({'contributors': [
+                {'name': 'Smith, John',
+                 'gnd': 'gnd:118604740',
+                 'type': 'DataCurator'},
+            ]}, 'json')
+
+        print r.produce('json_for_marc')
+        # Test that "gnd:" is not added in MARC
+        assert {'700__0': ['(gnd)118604740', None],
+                '700__4': 'cur',
+                '700__a': 'Smith, John'} \
+            in r.produce('json_for_marc')
+
+        r = Record.create(
+            '<record>'
+            '<datafield tag="700" ind1=" " ind2=" ">'
+            '<subfield code="4">cur</subfield>'
+            '<subfield code="a">Smith, John</subfield>'
+            '<subfield code="0">(gnd)118604740</subfield>'
+            '</datafield>'
+            '</record>',
+            master_format='marc'
+        )
+
+        # Test that "gnd:" is added back in JSON
+        print r['contributors']
+        assert r['contributors'] == [{
+            'gnd': 'gnd:118604740',
+            'name': 'Smith, John',
+            'orcid': '',
+            'type': 'DataCurator'
+        }]
+
+    def test_subjects_gnd(self):
+        """Test contributor rules."""
+        from invenio.modules.records.api import Record
+        r = Record.create({'subjects': [
+                {'term': 'Smith, John',
+                 'identifier': 'gnd:118604740',
+                 'scheme': 'gnd'},
+            ]}, 'json')
+
+        # Test that "gnd:" is not added in MARC
+        print(r.produce('json_for_marc'))
+        assert {'6501_a': 'Smith, John', '6501_0': '(gnd)118604740'} \
+            in r.produce('json_for_marc')
+
+        r = Record.create(
+            '<record>'
+            '<datafield tag="650" ind1="1" ind2=" ">'
+            '<subfield code="a">Smith, John</subfield>'
+            '<subfield code="0">(gnd)118604740</subfield>'
+            '</datafield>'
+            '</record>',
+            master_format='marc'
+        )
+
+        # Test that "gnd:" is added back in JSON
+        assert r['subjects'] == [{
+            'identifier': 'gnd:118604740',
+            'scheme': 'gnd',
+            'term': 'Smith, John'}]
+
 
 TEST_SUITE = make_test_suite(TestReaders)
 

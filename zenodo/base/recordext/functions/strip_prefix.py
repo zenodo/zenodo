@@ -18,26 +18,11 @@
 # 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 
-"""Resolve Subject helper functions."""
-
-import re
+"""Strip a prefix off a value."""
 
 
-resolver_regexp = "\((?P<scheme>\w+)\)(?P<identifier>\S+)"
-
-
-def resolve_subject(val, part):
-    p = re.compile(resolver_regexp)
-    m = p.search(val)
-    if m:
-        if part == 'identifier':
-            identifier = m.group('identifier')
-            if m.group('scheme') == 'gnd':
-                return "gnd:{0}".format(identifier)
-            return identifier
-        elif part == 'scheme':
-            return m.group('scheme')
-        else:
-            return ""
-    else:
-        return ""
+def strip_prefix(val, prefix):
+    """Strip a prefix off a value."""
+    if val and val.lower().startswith(prefix):
+        return val[len(prefix):]
+    return val
