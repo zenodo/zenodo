@@ -56,8 +56,10 @@ require.config({
     "jasmine-events": "js/jasmine/events_checker",
     "jasmine-initialization": "js/jasmine/initialization_checker",
     "select2": "vendor/select2/select2.min",
+    "bootstrap-datarangepicker":"vendor/bootstrap-daterangepicker/daterangepicker",
     /* Zenodo extras */
-    "bootstrap-switch": "vendors/bootstrap-switch/dist/js/bootstrap-switch"
+    "bootstrap-switch": "vendors/bootstrap-switch/dist/js/bootstrap-switch",
+    "jquery-pin": "vendors/jquery.pin/jquery.pin.min"
   },
   shim: {
     jquery: {
