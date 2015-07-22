@@ -330,6 +330,10 @@ def relation_title(relation):
         return 'Previous versions'
     elif relation == 'isPreviousVersionOf':
         return 'New versions'
+    elif relation == 'compiles':
+        return 'Compiled/created:'
+    elif relation == 'isCompiledBy':
+        return 'Compiled/created by'
     return relation
 
 
