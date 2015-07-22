@@ -174,7 +174,7 @@ OAUTHCLIENT_REMOTE_APPS = dict(
         icon='',
         authorized_handler="invenio.modules.oauthclient.handlers"
                            ":authorized_signup_handler",
-        disconnect_handler="invenio.modules.oauthclient.handlers"
+        disconnect_handler="invenio.modules.oauthclient.contrib.orcid"
                            ":disconnect_handler",
         signup_handler=dict(
             info="invenio.modules.oauthclient.contrib.orcid:account_info",
