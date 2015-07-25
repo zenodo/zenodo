@@ -366,10 +366,16 @@ CELERYBEAT_SCHEDULE = {
     #     schedule=crontab(minute=1),
     #     args=('zenodo.modules.quotas.metrics.deposit:DepositMetric', ),
     # ),
-    # Every Sunday
+    # Every Sunday night
     'harvest-grants': dict(
         task='zenodo.modules.grants.tasks.harvest_openaire_grants',
         schedule=crontab(minute='3', hour='0', day_of_week='mon'),
+        args=(),
+    ),
+    # Every morning
+    'doi-registration-check': dict(
+        task='zenodo.base.tasks.doi_registration_check',
+        schedule=crontab(minute='30', hour='6'),
         args=(),
     ),
 }
