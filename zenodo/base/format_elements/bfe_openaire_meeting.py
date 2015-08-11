@@ -1,43 +1,43 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2012, 2013, 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
+#
+# In applying this licence, CERN does not waive the privileges and immunities
+# granted to it by virtue of its status as an Intergovernmental Organization
+# or submit itself to any jurisdiction.
 
-import cgi
-import time
-from invenio.base.i18n import gettext_set_language
 
 def format_element(bfo):
-    ln = bfo.lang
-    _ = gettext_set_language(ln)
 
     info = bfo.field('711__')
+    conf_link = bfo.field('8564_u')
 
     if not info:
         return ""
 
     ret = []
-    if 'a' in info and 'g' in info:
-        ret.append("%(a)s (%(g)s)")
-    elif 'a' in info:
-        ret.append("%(a)s")
+    if 'a' in info:
+        if 'g' in info:
+            name_format = "%(a)s (%(g)s)"
+        else:
+            name_format = "%(a)s"
+        if conf_link:
+            name_format = "<a href='%s'>%s</a>" % (conf_link, name_format)
+        ret.append(name_format)
 
     if 'c' in info:
         ret.append("%(c)s")
