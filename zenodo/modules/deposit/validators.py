@@ -79,3 +79,13 @@ def community_validator(form, field):
         for i in ids:
             if i not in found:
                 raise ValidationError("Invalid community identifier: %s" % i)
+
+
+def existing_doi_validator(form, field):
+    """Test if DOI already exists in Zenodo."""
+    from invenio.legacy.bibupload.engine import find_record_from_doi
+    from invenio.config import CFG_SITE_NAME
+
+    if field.data:
+        if find_record_from_doi(field.data) is not None:
+            raise ValidationError("DOI already exists in %s." % CFG_SITE_NAME)

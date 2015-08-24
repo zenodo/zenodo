@@ -53,7 +53,7 @@ from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
 
 from . import fields as zfields
 from .autocomplete import community_autocomplete
-from .validators import community_validator
+from .validators import community_validator, existing_doi_validator
 from ...legacy.utils.zenodoutils import create_doi, filter_empty_helper
 
 __all__ = ('ZenodoForm', )
@@ -487,6 +487,7 @@ class ZenodoForm(WebDepositForm):
                 prefix=CFG_DATACITE_DOI_PREFIX
             ),
             invalid_doi_prefix_validator(prefix=CFG_DATACITE_DOI_PREFIX),
+            existing_doi_validator,
         ],
         processors=[
             local_datacite_lookup
