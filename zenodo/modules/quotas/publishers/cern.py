@@ -59,7 +59,7 @@ class CERNPublisher(Publisher):
                 'QUOTAS_XSLS_AVAILABILITY')
             if avail_imp:
                 avail_func = import_string(avail_imp)
-                doc.availability = avail_func(doc)
+                doc.status = avail_func(doc)
         except Exception:
             current_app.logger.exception("Could not compute availability")
 

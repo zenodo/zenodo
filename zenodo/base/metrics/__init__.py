@@ -26,8 +26,8 @@ def availability(doc):
     for d in doc.data:
         if d['name'] == 'bibsched.tasks':
             if d['value'] > 20:
-                return 10
+                return 'unavailable'
             elif d['value'] > 10:
-                return 60
+                return 'degraded'
 
     return 100
