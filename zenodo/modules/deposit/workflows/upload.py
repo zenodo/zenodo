@@ -25,39 +25,29 @@ from __future__ import absolute_import
 import json
 from datetime import date
 
-from flask import render_template, url_for, request
-from flask.ext.restful import fields, marshal
+from flask import render_template, request, url_for
 from flask.ext.login import current_user
-
+from flask.ext.restful import fields, marshal
 from workflow import patterns as p
 
 from invenio.base.globals import cfg
+from invenio.base.helpers import unicodifier
+from invenio.ext.login import UserInfo
+from invenio.ext.restful import ISODate, error_codes
+from invenio.ext.sqlalchemy import db
+from invenio.modules.communities.models import Community
+from invenio.modules.deposit.helpers import record_to_draft
+from invenio.modules.deposit.models import Deposition, DepositionType, \
+    InvalidApiAction
+from invenio.modules.deposit.tasks import create_recid, finalize_record_sip, \
+    has_submission, is_sip_uploaded, load_record, merge_changes, \
+    merge_record, mint_pid, prefill_draft, prepare_sip, process_bibdocfile, \
+    process_sip_metadata, render_form, upload_record_sip
 from invenio.modules.formatter import format_record
 from invenio.modules.knowledge.api import get_kb_mapping
-from invenio.ext.login import UserInfo
-from invenio.modules.deposit.models import DepositionType, Deposition, \
-    InvalidApiAction
-from invenio.modules.deposit.tasks import render_form, \
-    create_recid, \
-    prepare_sip, \
-    finalize_record_sip, \
-    upload_record_sip, \
-    mint_pid, \
-    prefill_draft, \
-    has_submission, \
-    load_record, \
-    merge_record, \
-    process_sip_metadata, \
-    process_bibdocfile
-from invenio.modules.deposit.helpers import record_to_draft
-from invenio.modules.deposit.tasks import merge_changes, is_sip_uploaded
-from zenodo.legacy.utils.zenodoutils import create_doi, filter_empty_helper
-from invenio.ext.restful import error_codes, ISODate
-from zenodo.modules.deposit.forms import ZenodoForm, \
-    ZenodoEditForm
-from invenio.ext.sqlalchemy import db
-from invenio.base.helpers import unicodifier
 from invenio.modules.records.api import Record
+from zenodo.legacy.utils.zenodoutils import create_doi, filter_empty_helper
+from zenodo.modules.deposit.forms import ZenodoEditForm, ZenodoForm
 
 __all__ = ['upload']
 
@@ -150,6 +140,12 @@ def process_recjson(deposition, recjson):
     # ===========
     try:
         communities = recjson.get('provisional_communities', [])
+
+        # Auto-approve community if it's owned by the uploader
+        for c in communities:
+            if Community.query.get(c['identifier']).id_user == \
+               current_user.get_id():
+                c['provisional'] = False
 
         # Extract identifier (i.e. elements are mapped from dict ->
         # string)
