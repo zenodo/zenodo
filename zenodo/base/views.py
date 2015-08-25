@@ -26,8 +26,8 @@ import copy
 import time
 
 import idutils
-
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, current_app, redirect, render_template, request, \
+    url_for, abort
 from flask.ext.breadcrumbs import register_breadcrumb
 from flask.ext.login import current_user
 from flask.ext.menu import current_menu, register_menu
@@ -35,13 +35,10 @@ from flask.ext.menu import current_menu, register_menu
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
 from invenio.base.signals import pre_template_render
-from invenio.ext.template. \
-    context_processor import register_template_context_processor
-
-
+from invenio.ext.template.context_processor import \
+    register_template_context_processor
 from zenodo.base.utils.bibtex import Bibtex
 from zenodo.modules.accessrequests.models import SecretLink
-
 
 blueprint = Blueprint(
     'zenodo_base',
@@ -362,6 +359,16 @@ def schemaorg_type(recid=None, bfo=None):
             if res:
                 return res
     return 'http://schema.org/CreativeWork'
+
+
+@blueprint.route('/doi/<path:doi>', methods=['GET', 'HEAD'])
+def doi_redirect(doi):
+    """Redirect to record for DOI."""
+    from invenio.legacy.bibupload.engine import find_record_from_doi
+    recid = find_record_from_doi(doi)
+    if recid is None:
+        return render_template("404.html"), 404
+    return redirect(url_for('record.metadata', recid=recid))
 
 
 #

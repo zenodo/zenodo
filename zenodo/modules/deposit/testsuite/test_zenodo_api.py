@@ -72,12 +72,12 @@ class WebDepositApiTest(DepositApiTestCase):
             self.assertEqual(response.json['status'], 400)
             self.assertEqual(len(response.json['errors']), num_errors)
 
-        num_deps_before = len(Deposition.get_depositions())
+        num_deps_before = len(list(Deposition.get_depositions()))
         # Invalid form data
         response = self.post(
             'depositionlistresource', data={'metadata': {}}, code=400
         )
-        num_deps_after = len(Deposition.get_depositions())
+        num_deps_after = len(list(Deposition.get_depositions()))
         self.assertEqual(num_deps_before, num_deps_after)
 
     def test_deposition_file_operations(self):
