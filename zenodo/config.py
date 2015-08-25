@@ -323,10 +323,11 @@ CFG_OPENAIRE_FILESIZE_NOTIFICATION = 10485760
 CFG_CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 
 CELERYBEAT_SCHEDULE = {
-    # Every 15 minutes
-    'communities-ranking': dict(
-        task='invenio.modules.communities.tasks.RankingTask',
-        schedule=timedelta(minutes=15),
+    # Every 5 minutes
+    'metrics-bibsched': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute='*/5'),
+        args=('zenodo.modules.quotas.metrics.bibsched:BibSchedMetric', ),
     ),
     # Every 15 minutes
     'metrics-afs': dict(
@@ -334,11 +335,15 @@ CELERYBEAT_SCHEDULE = {
         schedule=crontab(minute='*/15'),
         args=('zenodo.modules.quotas.metrics.afs:AFSVolumeMetric', ),
     ),
-    # Every 5
-    'metrics-bibsched': dict(
-        task='zenodo.modules.quotas.tasks.collect_metric',
-        schedule=crontab(minute='*/5'),
-        args=('zenodo.modules.quotas.metrics.bibsched:BibSchedMetric', ),
+    'publish-metrics': dict(
+        task='zenodo.modules.quotas.tasks.publish_metrics',
+        schedule=crontab(minute='*/15'),
+        args=('zenodo.modules.quotas.publishers.cern:CERNPublisher', ),
+    ),
+    # Every 15 minutes
+    'communities-ranking': dict(
+        task='invenio.modules.communities.tasks.RankingTask',
+        schedule=timedelta(minutes=15),
     ),
     # Every hour
     'metrics-accounts': dict(
@@ -357,27 +362,22 @@ CELERYBEAT_SCHEDULE = {
         schedule=crontab(minute=1, hour='*/3'),
         args=('zenodo.base.metrics.pidstore:PIDStoreMetric', ),
     ),
-    'publish-metrics': dict(
-        task='zenodo.modules.quotas.tasks.publish_metrics',
-        schedule=crontab(minute='*/15'),
-        args=('zenodo.modules.quotas.publishers.cern:CERNPublisher', ),
-    ),
-    # # Every 12 hours
-    # 'metrics-deposit': dict(
-    #     task='zenodo.modules.quotas.tasks.collect_metric',
-    #     schedule=crontab(minute=1),
-    #     args=('zenodo.modules.quotas.metrics.deposit:DepositMetric', ),
-    # ),
-    # Every Sunday night
-    'harvest-grants': dict(
-        task='zenodo.modules.grants.tasks.harvest_openaire_grants',
-        schedule=crontab(minute='3', hour='0', day_of_week='mon'),
-        args=(),
+    # Every 6 hours
+    'metrics-deposit': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute=45, hour='*/6'),
+        args=('zenodo.modules.quotas.metrics.deposit:DepositMetric', ),
     ),
     # Every morning
     'doi-registration-check': dict(
         task='zenodo.base.tasks.doi_registration_check',
         schedule=crontab(minute='30', hour='6'),
+        args=(),
+    ),
+    # Every Sunday night
+    'harvest-grants': dict(
+        task='zenodo.modules.grants.tasks.harvest_openaire_grants',
+        schedule=crontab(minute='3', hour='0', day_of_week='mon'),
         args=(),
     ),
 }

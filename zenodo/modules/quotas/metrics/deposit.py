@@ -40,7 +40,7 @@ class DepositMetric(Metric):
 
         for d in Deposition.get_depositions():
             if str(d.user_id) not in data:
-                data[str(d.user_id)] = dict(num=0, size=0)
+                data[str(d.user_id)] = dict(num=0, size=0, files=0)
 
             # Count number of deposits
             data[str(d.user_id)]['num'] += 1
@@ -48,5 +48,6 @@ class DepositMetric(Metric):
             # Collected file sizes
             for f in d.files:
                 data[str(d.user_id)]['size'] += f.size
+                data[str(d.user_id)]['files'] += 1
 
         return data.items()
