@@ -30,4 +30,4 @@ def availability(doc):
             elif d['value'] > 10:
                 return 'degraded'
 
-    return 100
+    return 'available'
