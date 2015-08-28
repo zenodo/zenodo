@@ -189,6 +189,20 @@ def register_receivers():
     pre_template_render.connect(add_bibdoc_files, 'record.usage')
 
 
+def ban_on_inactivation(sender=None, user=None):
+    """Ban user when they are inactivated."""
+    from zenodo.shell import ban_user
+    if sender and user:
+        ban_user(sender)
+
+
+@blueprint.before_app_first_request
+def register_user_signals():
+    """Register a user signal."""
+    from invenio.modules.accounts.signals import user_inactivated
+    user_inactivated.connect(ban_on_inactivation)
+
+
 #
 # Template filters
 #
