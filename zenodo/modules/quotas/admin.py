@@ -44,7 +44,7 @@ class ResourceUsageAdmin(ModelView):
         'object_type', 'object_id', 'metric', 'value', 'modified',
     )
 
-    column_filters = ['object_type', 'metric']
+    column_filters = ['object_type', 'object_id', 'metric']
 
     column_searchable_list = ['object_type', 'object_id', 'metric']
 
