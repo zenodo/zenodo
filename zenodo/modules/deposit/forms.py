@@ -33,6 +33,7 @@ from wtforms.validators import ValidationError
 
 from invenio.base.globals import cfg
 from invenio.base.i18n import _
+from invenio.ext.login import current_user
 from invenio.config import CFG_DATACITE_DOI_PREFIX, CFG_SITE_NAME, \
     CFG_SITE_SUPPORT_EMAIL
 from invenio.modules.deposit import fields
@@ -50,11 +51,12 @@ from invenio.modules.deposit.validation_utils import DOISyntaxValidator, \
     unchangeable
 from invenio.modules.knowledge.api import get_kb_mapping
 from invenio.utils.html import CFG_HTML_BUFFER_ALLOWED_TAG_WHITELIST
+from zenodo.modules.spam import check_email_domain, check_text
 
 from . import fields as zfields
+from ...legacy.utils.zenodoutils import create_doi, filter_empty_helper
 from .autocomplete import community_autocomplete
 from .validators import community_validator, existing_doi_validator
-from ...legacy.utils.zenodoutils import create_doi, filter_empty_helper
 
 __all__ = ('ZenodoForm', )
 
@@ -151,6 +153,14 @@ def grant_kb_value(key_name):
                 return data['fields'][key_name]
         return ''
     return _getter
+
+
+def spam_check(message):
+    def _spam_check(form, field):
+        if check_email_domain(current_user.get('email', '')):
+            if check_text(field.data):
+                raise ValidationError(message)
+    return _spam_check
 
 
 #
@@ -522,7 +532,9 @@ class ZenodoForm(WebDepositForm):
         widget_classes='input-sm',
     )
     title = fields.TitleField(
-        validators=[validators.DataRequired()],
+        validators=[validators.DataRequired(), spam_check(
+            "The title has too large similarity to recent spam on Zenodo. "
+            "Please contact us if you believe this is incorrect."), ],
         description='Required.',
         filters=[
             strip_string,
@@ -553,7 +565,9 @@ class ZenodoForm(WebDepositForm):
         description='Required.',
         default='',
         icon='fa fa-pencil fa-fw',
-        validators=[validators.DataRequired(), ],
+        validators=[validators.DataRequired(), spam_check(
+            "The description has too large similarity to recent spam on "
+            "Zenodo. Please contact us if you believe this is incorrect."), ],
         widget=CKEditorWidget(
             toolbar=[
                 ['PasteText', 'PasteFromWord'],

@@ -70,6 +70,7 @@ PACKAGES = [
     'zenodo.modules.accessrequests',
     'zenodo.modules.quotas',
     'zenodo.modules.pages',
+    'zenodo.modules.spam',
     'invenio.modules.access',
     'invenio.modules.accounts',
     'invenio.modules.alerts',
