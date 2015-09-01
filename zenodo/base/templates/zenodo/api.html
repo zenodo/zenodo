@@ -1728,7 +1728,7 @@ r = requests.post("{{config.CFG_SITE_SECURE_URL}}/api/deposit/depositions/1234/a
     <td><code>license</code></td>
     <td>String</td>
     <td>Yes, if <code>access_right</code> is <code>"open"</code> or <code>"embargoed"</code>.</td>
-    <td><p>Controlled vocabulary based on <a href="http://licenses.opendefinition.org/licenses/groups/all.json">http://licenses.opendefinition.org</a>. The selected license applies to all files in this deposition, but not to the metadata which is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>. Further information about licenses is available at <a href="http://licenses.opendefinition.org/">Open Definition Licenses Service</a>.</p>
+    <td><p>Controlled vocabulary (see vocabulary <a href="https://zenodo.org/kb/export?kbname=licenses&format=kba">here</a>). The selected license applies to all files in this deposition, but not to the metadata which is licensed under <a href="{{url_for('zenodo_base.terms')}}">Creative Commons Zero</a>. Further information about licenses is available at <a href="http://licenses.opendefinition.org/">Open Definition Licenses Service</a>.</p>
     <p>Defaults to <code>cc-by</code> for non-datasets and <code>cc-zero</code> for datasets.</p></td>
 </tr>
 <tr>
