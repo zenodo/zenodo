@@ -816,9 +816,9 @@ class upload(DepositionType):
                 None if d.type.is_default() else d.type.get_identifier()
             ),
             uuid=d.id,
-            my_depositions=Deposition.get_depositions(
+            my_depositions=list(Deposition.get_depositions(
                 current_user, type=d.type
-            ),
+            )),
             sip=d.get_latest_sip(),
             format_record=format_record,
         )
