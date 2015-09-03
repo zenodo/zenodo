@@ -189,7 +189,7 @@ def register_receivers():
     pre_template_render.connect(add_bibdoc_files, 'record.usage')
 
 
-def ban_on_inactivation(sender=None, user=None):
+def ban_on_inactivation(sender, user=None):
     """Ban user when they are inactivated."""
     from zenodo.shell import ban_user
     if sender and user:

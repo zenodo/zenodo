@@ -663,6 +663,12 @@ DEF_DEMO_AUTHS = (
     ('superadmin', 'viewrestrcoll', {'collection': 'hidden'}),
 )
 
+
+RECAPTCHA_PUBLIC_KEY = ""
+RECAPTCHA_PRIVATE_KEY = ""
+RECAPTCHA_USE_SSL = True
+RECAPTCHA_OPTIONS = dict()
+
 try:
     from zenodo.instance_config import *  # noqa
 except ImportError:
