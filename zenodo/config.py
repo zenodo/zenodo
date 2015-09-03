@@ -336,6 +336,11 @@ CELERYBEAT_SCHEDULE = {
         schedule=crontab(minute='*/15'),
         args=('zenodo.modules.quotas.metrics.afs:AFSVolumeMetric', ),
     ),
+    'metrics-filesystem': dict(
+        task='zenodo.modules.quotas.tasks.collect_metric',
+        schedule=crontab(minute='*/15'),
+        args=('zenodo.modules.quotas.metrics.filesystem:FilesystemMetric', ),
+    ),
     'publish-metrics': dict(
         task='zenodo.modules.quotas.tasks.publish_metrics',
         schedule=crontab(minute='*/15'),
@@ -386,9 +391,14 @@ CELERYBEAT_SCHEDULE = {
 QUOTAS_PUBLISH_METRICS = [
     dict(type='System', id=CFG_SITE_NAME, metric='bibsched.tasks'),
     dict(type='System', id=CFG_SITE_NAME, metric='accounts.num'),
+    dict(type='System', id=CFG_SITE_NAME, metric='accounts.num.blocked'),
+    dict(type='System', id=CFG_SITE_NAME, metric='accounts.num.active'),
+    dict(type='System', id=CFG_SITE_NAME, metric='accounts.num.unconfirmed'),
     dict(type='System', id=CFG_SITE_NAME, metric='accounts.logins6h'),
     dict(type='System', id=CFG_SITE_NAME, metric='communities.num'),
     dict(type='System', id=CFG_SITE_NAME, metric='pidstore.numdois'),
+    dict(type='System', id=CFG_SITE_NAME, metric='filesystem.tmpshared.files'),
+    dict(type='AFS Volume', id='p.zenodo.d1', metric='afs.usage'),
 ]
 QUOTAS_XSLS_API_URL = "http://xsls-dev.cern.ch"
 QUOTAS_XSLS_SERVICE_ID = "zenododev"

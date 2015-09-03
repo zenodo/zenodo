@@ -21,33 +21,30 @@
 
 from __future__ import absolute_import
 
-from datetime import datetime, timedelta
+import os
 
 from flask import current_app
-
-from invenio.modules.accounts.models import User
 
 from ..models import Metric
 
 
-class AccountsMetric(Metric):
+class FilesystemMetric(Metric):
 
-    """Aggregated metrics for number of accounts."""
+    """Aggregated metrics for filesystem."""
 
-    metric_class = "accounts"
+    metric_class = "filesystem"
     object_type = "System"
 
     @classmethod
     def all(cls):
-        """Compute bibsched queue length."""
-        dt = datetime.now() - timedelta(hours=6)
+        """Compute file system properties."""
+        tmpshared_files = len(
+            os.listdir(current_app.config.get("CFG_TMPSHAREDDIR"))
+        )
 
         system_name = current_app.config.get('CFG_SITE_NAME', 'Invenio')
         data = {system_name: {
-            'num': User.query.count(),
-            'num.blocked': User.query.filter_by(note='0').count(),
-            'num.unconfirmed': User.query.filter_by(note='2').count(),
-            'num.active': User.query.filter_by(note='1').count(),
-            'logins6h': User.query.filter(User.last_login >= dt).count(),
+            'tmpshared.files': tmpshared_files,
         }}
+
         return data.items()
