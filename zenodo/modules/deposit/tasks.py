@@ -312,12 +312,15 @@ def openaire_upload_notification(recid):
                 })
                 content = render_template_to_string(
                     "communities/new_upload_email.html", **ctx)
+                title = c.title if isinstance(c.title, unicode) else \
+                    unicode(c.title, 'utf8')
+
                 send_email(
                     CFG_SITE_SUPPORT_EMAIL,
                     c.owner.email.encode('utf8'),
                     "[%s] New upload to %s" % (
                         CFG_SITE_NAME,
-                        unicode(c.title, 'utf8').encode('utf8')
+                        title.encode('utf8')
                     ),
                     content=content.encode('utf8')
                 )
