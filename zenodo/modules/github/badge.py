@@ -22,7 +22,9 @@
 
 """Utility module to create badge."""
 
-from six.moves.urllib import parse, request
+import requests
+
+from six.moves.urllib import parse
 
 from invenio.base.globals import cfg
 
@@ -52,7 +54,10 @@ def create_badge(subject, status, color, output_path, style=None):
         style=options,
     )
 
-    response = request.urlopen(url)
+    response = requests.get(url)
+
+    if response.status_code != 200:
+        raise RuntimeError("Couldn't get image from shields.io", response)
 
     with open(output_path, 'wb') as f:
-        f.write(response.read())
+        f.write(response.content)
