@@ -47,7 +47,7 @@ set to True in a production environment, but can be useful for development and
 integration servers.
 """
 
-GITHUB_SHIELDSIO_BASE_URL = "https://img.shields.io/badge/"
+GITHUB_SHIELDSIO_BASE_URL = "http://img.shields.io/badge/"
 """Base URL for shields.io."""
 
 GITHUB_BADGE_STYLES = [
