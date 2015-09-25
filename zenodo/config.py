@@ -272,6 +272,7 @@ CFG_BIBSCHED_TASKLET_PACKAGES = [
     'invenio.legacy.bibsched.tasklets',
     'zenodo.legacy.tasklets',
 ]
+CFG_BIBSCHED_NEVER_STOPS = True
 
 RECORDS_BREADCRUMB_TITLE_KEY = 'title'
 
