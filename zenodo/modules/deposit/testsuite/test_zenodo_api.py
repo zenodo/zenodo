@@ -52,6 +52,7 @@ class DepositApiTestCase(APITestCase):
 class WebDepositApiTest(DepositApiTestCase):
     def test_depositions_list_get(self):
         response = self.get('depositionlistresource', code=200)
+        response.get_data()
         # Test cookies are not being set
         self.assertFalse('Set-Cookie' in response.headers)
 
