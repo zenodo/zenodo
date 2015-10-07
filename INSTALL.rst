@@ -243,7 +243,7 @@ which must be running alongside with the web server.
     $ sudo service redis-server status
     redis-server is running
     $ # or start it with start
-    $ sudo service redis-start start
+    $ sudo service redis-server start
 
     $ # launch celery
     $ workon zenodo
