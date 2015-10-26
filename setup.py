@@ -45,6 +45,10 @@ install_requires = [
     "pyoai>=2.4.2",
     "awesome-slugify>=1.6",
     "cernservicexml>=0.1.2",
+    # Required for requests to connect to SSLv3 services on Linux.
+    "pyopenssl",
+    "ndg-httpsclient",
+    "pyasn1",
 ]
 
 extras_require = {
