@@ -1,97 +1,200 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014, 2015 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""
-Zenodo - Research. Shared.
-
-Links
------
-
-* `website <http://zenodo.org/>`_
-* `development version <https://github.com/zenodo/zenodo>`_
-
-"""
+"""Zenodo - Research. Shared."""
 
 import os
+import sys
 
 from setuptools import find_packages, setup
+from setuptools.command.test import test as TestCommand
 
-install_requires = [
-    "Invenio",
-    "altmetric",
-    "beautifulsoup4",
-    "humanize",
-    "github3.py>=0.9.0",
-    "Pillow",
-    "pyoai>=2.4.2",
-    "awesome-slugify>=1.6",
-    "cernservicexml>=0.1.2",
+readme = open('README.rst').read()
+history = open('CHANGES.rst').read()
+
+tests_require = [
+    'check-manifest>=0.25',
+    'coverage>=4.0',
+    'isort>=4.2.2',
+    'pep257>=0.7.0',
+    'pytest-cache>=1.0',
+    'pytest-cov>=1.8.0',
+    'pytest-pep8>=1.0.6',
+    'pytest>=2.8.0',
+    'six>=1.10.0',
 ]
 
 extras_require = {
-    "development": [
-        "Flask-DebugToolbar==0.9.0",
-        "kwalitee",
-        "ipython",
-        "ipdb",
-    ]
+    'docs': [
+        'Sphinx>=1.3',
+    ],
+    'postgresql': [
+        'invenio-db[postgresql]>=1.0.0a6',
+    ],
+    'mysql': [
+        'invenio-db[mysql]>=1.0.0a6',
+    ],
+    'sqlite': [
+        'invenio-db>=1.0.0a6',
+    ],
+    'tests': tests_require,
 }
 
-tests_require = [
-    "httpretty>=0.8.0",
-    "Flask-Testing>=0.4.1",
-    "mock",
-    "nose",
-    "selenium",
-    "unittest2>=0.5.1",
+extras_require['all'] = []
+for name, reqs in extras_require.items():
+    if name in ('postgresql', 'mysql', 'sqlite'):
+        continue
+    extras_require['all'].extend(reqs)
+
+setup_requires = [
+    'Babel>=1.3',
 ]
+
+install_requires = [
+    # 'invenio-search-ui',
+    'Flask-BabelEx>=0.9.2',
+    'Flask-Debugtoolbar>=0.10.0',
+    'idutils>=0.1.1',
+    'invenio-access',
+    'invenio-accounts',
+    'invenio-admin',
+    'invenio-assets',
+    'invenio-base',
+    'invenio-celery',
+    'invenio-config',
+    'invenio-formatter',
+    'invenio-i18n',
+    'invenio-logging',
+    'invenio-mail',
+    'invenio-pidstore',
+    'invenio-records',
+    'invenio-records-rest',
+    'invenio-records-ui',
+    'invenio-rest',
+    'invenio-search',
+    'invenio-theme',
+    'invenio-userprofiles',
+    'invenio>=3.0.0a1,<3.1.0',
+    'jsonref>=0.1',
+    'zenodo-migrationkit>=1.0.0.dev20150000',
+]
+
+packages = find_packages()
+
+
+class PyTest(TestCommand):
+    """PyTest Test."""
+
+    user_options = [('pytest-args=', 'a', "Arguments to pass to py.test")]
+
+    def initialize_options(self):
+        """Init pytest."""
+        TestCommand.initialize_options(self)
+        self.pytest_args = []
+        try:
+            from ConfigParser import ConfigParser
+        except ImportError:
+            from configparser import ConfigParser
+        config = ConfigParser()
+        config.read('pytest.ini')
+        self.pytest_args = config.get('pytest', 'addopts').split(' ')
+
+    def finalize_options(self):
+        """Finalize pytest."""
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        """Run tests."""
+        # import here, cause outside the eggs aren't loaded
+        import pytest
+        errno = pytest.main(self.pytest_args)
+        sys.exit(errno)
 
 # Get the version string. Cannot be done with import!
 g = {}
-with open(os.path.join("zenodo", "version.py"), "rt") as fp:
+with open(os.path.join('zenodo', 'version.py'), 'rt') as fp:
     exec(fp.read(), g)
-version = g["__version__"]
-
+    version = g['__version__']
 
 setup(
     name='zenodo',
     version=version,
-    url='http://zenodo.org',
-    license='GPLv3',
+    description=__doc__,
+    long_description=readme + '\n\n' + history,
+    keywords='zenodo research data repository',
+    license='GPLv2',
     author='CERN',
     author_email='info@zenodo.org',
-    description='Research. Shared',
-    long_description=__doc__,
-    packages=find_packages(),
-    include_package_data=True,
+    url='https://github.com/zenodo/zenodo',
+    packages=packages,
     zip_safe=False,
+    include_package_data=True,
     platforms='any',
-    install_requires=install_requires,
-    extras_require=extras_require,
     entry_points={
-        'invenio.config': [
-            "zenodo = zenodo.config"
+        'console_scripts': [
+            'zenodo = zenodo.cli:cli',
+        ],
+        'invenio_base.apps': [
+            'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
+            'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
+        ],
+        'invenio_base.blueprints': [
+            'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
+            'zenodo_theme = zenodo.modules.theme.views:blueprint',
+        ],
+        'invenio_i18n.translations': [
+            'messages = zenodo',
+        ],
+        'invenio_assets.bundles': [
+            'zenodo_theme_css = zenodo.modules.theme.bundles:css',
+            'zenodo_theme_js = zenodo.modules.theme.bundles:js',
+        ],
+        'invenio_jsonschemas.schemas': [
+            'zenodo_records = zenodo.modules.records.jsonschemas',
         ]
     },
-    test_suite='zenodo.testsuite.suite',
-    tests_require=tests_require
+    extras_require=extras_require,
+    install_requires=install_requires,
+    setup_requires=setup_requires,
+    tests_require=tests_require,
+    classifiers=[
+        'Environment :: Web Environment',
+        'Intended Audience :: Developers',
+        'License :: OSI Approved :: GNU General Public License v2 (GPLv2)',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python',
+        'Topic :: Internet :: WWW/HTTP :: Dynamic Content',
+        'Topic :: Software Development :: Libraries :: Python Modules',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 2.7',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.3',
+        'Programming Language :: Python :: 3.4',
+        'Programming Language :: Python :: 3.5',
+        'Development Status :: 1 - Planning',
+    ],
+    cmdclass={'test': PyTest},
 )

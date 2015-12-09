@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "http://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "type": "object",
+  "definitions": {
+    "title": {
+      "type": "object",
+      "title": "Mapping of language code to translation of title",
+      "patternProperties": {
+        "^([a-z_]){2,5}$": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "interal_id",
+    "id",
+    "title",
+    "title_plural",
+    "schema.org"
+  ],
+  "properties": {
+    "internal_id": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string",
+      "format": "uri"
+    },
+    "title": {
+      "$ref": "#/definitions/title"
+    },
+    "title_plural": {
+      "$ref": "#/definitions/title"
+    },
+    "schema.org": {
+      "type": "string",
+      "format": "uri"
+    },
+    "parent": {
+      "type": "object"
+    },
+    "children": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

@@ -1,0 +1,58 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+FIXME:
+  - List of authors should be injected into the template.
+  - PDF URLS in highwire
+  - <link rel="alternate" type="application/pdf" href="https://zenodo.org/record/19169/files/WDS_Strategic_Plan_2014-2018.pdf">
+
+-#}
+
+{%- from "invenio_formatter/macros/meta.html" import meta_twittercard, meta_opengraph, meta_highwire -%}
+
+{%- set meta_title = record.title|striptags -%}
+{%- set meta_description = record.description|striptags -%}
+{%- set meta_url = url_for(request.endpoint, pid_value=pid.pid_value, _external=True) -%}
+{%- set meta_authors = record.authors|map(attribute='familyname') -%}
+{%- set meta_publication_date = record.publication_date|from_isodate -%}
+
+{{ meta_highwire(
+  meta_title,
+  meta_description,
+  authors=meta_authors,
+  url=meta_url,
+  doi=record.doi,
+  keywords=record.keywords,
+  publication_date=publication_date,
+) }}
+{{ meta_opengraph(meta_title, meta_description, url=meta_url) }}
+{{ meta_twittercard(meta_title, meta_description) }}
+    <link rel="canonical" href="{{ meta_url }}">
+{# FIXME
+{%- if zenodo_files -%}
+{%- for file in zenodo_files|sort(attribute='comment') -%}
+<link rel="alternate" type="{{file.mime}}" href="{{file.get_url().decode('utf8')}}">
+{%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url().decode('utf8')}}" name="citation_pdf_url" />{%- endif -%}
+{%- endfor -%}
+{%- endif -%}
+#}

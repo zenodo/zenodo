@@ -1,0 +1,70 @@
+web:
+  build: .
+  command: zenodo --debug run -h 0.0.0.0 -p 5000
+  ports:
+    - "5000:5000"
+  environment:
+    - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
+    - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
+    - "APP_CACHE_TYPE=redis"
+    - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
+    - "APP_ELASTICSEARCH_HOST=es:9200"
+    - "APP_SECRET_KEY=CHANGE_ME"
+    - "APP_SESSION_TYPE=redis"
+    - "APP_SESSION_REDIS_URL=redis://cache:6379/1"
+    - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
+  read_only: true
+  links:
+    - cache
+    - es
+    - mq
+    - db
+  volumes:
+    - ".:/code"
+worker:
+  build: .
+  command: "celery worker -A zenodo.celery --loglevel=INFO"
+  environment:
+    - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
+    - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
+    - "APP_CACHE_TYPE=redis"
+    - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
+    - "APP_ELASTICSEARCH_HOST=es:9200"
+    - "APP_SECRET_KEY=CHANGE_ME"
+    - "APP_SESSION_TYPE=redis"
+    - "APP_SESSION_REDIS_URL=redis://cache:6379/1"
+    - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
+  read_only: true
+  links:
+    - cache
+    - es
+    - mq
+    - db
+  volumes_from:
+    - web
+cache:
+  image: redis
+  read_only: true
+  ports:
+    - "6379:6379"
+db:
+  image: postgres
+  command: postgres
+  environment:
+    - "POSTGRES_USER=zenodo"
+    - "POSTGRES_PASSWORD=zenodo"
+    - "POSTGRES_DB=zenodo"
+  ports:
+    - "5432:5432"
+  read_only: false
+mq:
+  image: rabbitmq:3-management
+  ports:
+    - "15672:15672"
+    - "5672:5672"
+  read_only: true
+es:
+  build: ./docker/es/
+  ports:
+    - "9200:9200"
+    - "9300:9300"

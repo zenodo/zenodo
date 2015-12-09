@@ -1,7 +1,0 @@
-Changes
-=======
-
-Please refer to our git repository in order to see a detailed list of changes::
-
-    git clone https://github.com/zenodo/zenodo.git -b master
-    git log --oneline

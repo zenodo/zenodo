@@ -1,0 +1,81 @@
+// This file is part of Zenodo.
+// Copyright (C) 2015 CERN.
+//
+// Zenodo is free software; you can redistribute it
+// and/or modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Zenodo is distributed in the hope that it will be
+// useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Zenodo; if not, write to the
+// Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// MA 02111-1307, USA.
+//
+// In applying this license, CERN does not
+// waive the privileges and immunities granted to it by virtue of its status
+// as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+@mixin navbar-gradient() {
+  @include gradient-horizontal(
+    $start-color: $color1,
+    $end-color: $color1-gradient);
+}
+
+.navbar-static-top {
+  border-width: 0 0 0;
+}
+
+.navbar-toggle {
+  background-color: darken(#fff, 5%);
+}
+
+.navbar-brand {
+  font-family: $brand-font-family;
+  font-weight: $brand-font-weight;
+  font-size: $brand-font-size;
+  padding: ($navbar-brand-padding-vertical)-4 $navbar-padding-horizontal+10 $navbar-brand-padding-vertical+4 $navbar-padding-horizontal;
+}
+
+.navbar-default {
+  @include navbar-gradient();
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+  // Header background image
+  // .container {
+  //   background-image: url('/static/img/header2.png');
+  //   background-repeat: repeat-x;
+  // }
+  .navbar-collapse.in {
+    overflow-y: visible;
+  }
+
+  .navbar-collapse.in, .navbar-collapse.collapsing {
+    .navbar-form {
+      margin-top: 0;
+      margin-bottom: 0;
+    }
+  }
+  .navbar-collapse, .navbar-form {
+    border-color: $color1;
+  }
+}
+
+header {
+    .alert {
+      margin-top: -$navbar-margin-bottom;
+      border-radius: 0;
+      border-left-width: 0;
+      border-right-width: 0;
+    }
+
+    @media (max-width: $screen-xs-max) {
+      .alert {
+        padding-left: 0;
+      }
+    }
+}

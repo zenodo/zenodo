@@ -1,80 +1,71 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013, 2014 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+addons:
+  postgresql: "9.4"
+
+notifications:
+  email: false
+
+sudo: false
 
 language: python
 
+cache:
+  directories:
+    - $HOME/.cache/pip
+
 services:
-  - mysql
-  - redis
+  - posgresql
+
+env:
+  #- REQUIREMENTS=base SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  #- REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  #- REQUIREMENTS=base SQLALCHEMY_DATABASE_URI="sqlite:///tmp/zenodo.db"
+  #- REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="sqlite:///tmp/zenodo.db"
+  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db"
 
 python:
   - "2.7"
+  - "3.3"
+  - "3.4"
+  - "3.5"
 
-# Provisioning steps
 before_install:
-  - "sudo add-apt-repository -y ppa:chris-lea/node.js"
-  - "sudo apt-get update"
-  - "echo -e '[mysqld]\nmax_allowed_packet = 1G\nquery_cache_limit = 3M\nquery_cache_size = 128M\ntmp_table_size = 256M\nmax_heap_table_size = 128M\ntable_open_cache = 1024\ncharacter-set-server = utf8\njoin_buffer_size = 1M\nkey_buffer_size = 64M\nopen_files_limit = 4096\nread_buffer_size = 1M\nread_rnd_buffer_size = 2M\nsort_buffer_size = 6M' | sudo tee -a /etc/mysql/conf.d/zenodo.cnf"
-  - "sudo service mysql restart"
-  - "sudo apt-get -qy install apache2 libapache2-mod-wsgi libapache2-mod-xsendfile ssl-cert poppler-utils git subversion nodejs --fix-missing"
-  - "sudo su -c \"npm install --silent -g bower less clean-css uglify-js requirejs\""
-  - "sudo a2enmod actions"
-  - "sudo a2enmod version"
-  - "sudo a2enmod rewrite"
-  - "sudo a2enmod ssl"
-  - "sudo a2enmod xsendfile"
-  - "sudo a2dissite *default*"
-  - "sudo mkdir -p /etc/apache2/ssl"
-  - "sudo /usr/sbin/make-ssl-cert generate-default-snakeoil /etc/apache2/ssl/apache.pem"
-  - "sudo ln -s ${VIRTUAL_ENV}/var/invenio.base-instance/apache/invenio-apache-vhost.conf /etc/apache2/sites-enabled/invenio.conf"
-  - "sudo ln -s ${VIRTUAL_ENV}/var/invenio.base-instance/apache/invenio-apache-vhost-ssl.conf /etc/apache2/sites-enabled/invenio-ssl.conf"
-  - "mkdir -p ${VIRTUAL_ENV}/var/invenio.base-instance/"
-  - "cp .travis.invenio.cfg ${VIRTUAL_ENV}/var/invenio.base-instance/invenio.cfg"
-  - "if test -e requirements.${TRAVIS_BRANCH}.txt; then REQUIREMENTS=requirements.${TRAVIS_BRANCH}.txt; else REQUIREMENTS=requirements.master.txt; fi;"
+  - "travis_retry pip install --upgrade pip setuptools py"
+  - "travis_retry pip install twine wheel coveralls requirements-builder"
+  - "cat requirements.txt > .travis-base-requirements.txt"
+  - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"
+  - "requirements-builder --level=dev --req requirements.devel.txt setup.py > .travis-devel-requirements.txt"
 
-# Build/install steps
 install:
-  - "travis_retry pip install -r ${REQUIREMENTS} --exists-action i"
-  - "travis_retry pip install unittest2"
-  - "inveniomanage bower > bower.json"
-  - "bower install"
-  - "inveniomanage collect > /dev/null"
-  - "inveniomanage assets build"
+  - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
+  - "travis_retry pip install -e .[all,postgresql]"
 
-# Post installation and database initialization
-before_script:
-  - "inveniomanage apache create-config"
-  - "sudo apachectl configtest && sudo service apache2 restart || echo 'Apache failed ...'"
-  - "inveniomanage database init --yes-i-know"
-  - "inveniomanage database create"
-
-# Tests
 script:
-  - "sphinx-build -qnNW docs docs/_build/html"
-  - "python setup.py test"
+  - "./run-tests.sh"
 
-notifications:
-  email:
-    recipients:
-        - "lars.holm.nielsen@cern.ch"
-    on_success: always
-    on_failure: always
+after_success:
+  - coveralls

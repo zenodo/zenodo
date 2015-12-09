@@ -1,0 +1,80 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends config.ACCOUNTS_COVER_TEMPLATE %}
+
+{% from "invenio_accounts/_macros.html" import render_field, form_errors %}
+
+{% block panel %}
+{%- with form = register_user_form %}
+<div class="col-xs-12 col-md-10 col-md-offset-1">
+  {%- block signup_slogan %}
+  <h1>{{_('Research. Shared! Sign up for free today.')}}</h1>
+  {%- endblock signup_slogan %}
+  <hr />
+  <div class="row">
+    <div class="col-sm-6 col-sm-push-6 sign-up">
+      <form action="{{ url_for_security('register') }}" method="POST" name="register_user_form">
+      {{form_errors(form)}}
+      {{ form.hidden_tag()}}
+      {{ render_field(form.email, icon="glyphicon glyphicon-user", autofocus=True, errormsg=False) }}
+      {{ render_field(form.password, icon="glyphicon glyphicon-lock", errormsg=False) }}
+      {%- if form.password_confirm %}
+        {{ render_field(form.password_confirm, icon="glyphicon glyphicon-lock", errormsg=False) }}
+      {%- endif %}
+      {%- if form.recaptcha %}
+        <div class="form-group form-group-lg">{{ form.recaptcha() }}</div>
+      {%- endif %}
+      <button type="submit" class="btn btn-warning btn-lg btn-block"><i class="fa fa-edit"></i> {{_('Sign Up')}}</button>
+      </form>
+      <p align="center">
+      {{_('Already have an account?')}} <a href="{{url_for_security('login')}}">{{_('Log In')}}</a>
+      </p>
+    </div>
+    <div class="col-sm-6 col-sm-pull-6 sign-up sign-up-benefits">
+      {%- block signup_benefits %}
+      <h4>{{_('Citeable. Discoverable.')}}</h4>
+      <p>{{_('Uploads gets a Digital Object Identifier (DOI) to make them easily and uniquely citeable.')}}</p>
+      <h4>{{_('Communities')}}</h4>
+      <p>{{_('Accept or reject uploads to your own community collections (e.g workshops, EU projects or you')}}</p>
+      {%- endblock signup_benefits %}
+      <h4>{{_('Trusted Research Data Management')}}</h4>
+      <p>{{_('Built on top of CERN\'s expertise in managing 100s of petabytes of research data from the Large Hadron Collider.')}}</p>
+    </div>
+  </div>
+</div>
+{%- endwith %}
+{% endblock panel %}
+
+{% block page_footer %}
+<footer>
+<div>
+  <ul class="list-inline">
+    <li><a href="http://www.openaire.eu"><img src="{{ url_for('static', filename='img/openaire.png') }}"></a></li>
+    <li><a href="http://home.cern"><img src="{{ url_for('static', filename='img/cern.png') }}"></a></li>
+    <li><a href="https://ec.europa.eu/programmes/horizon2020/"><img src="{{ url_for('static', filename='img/eu.png') }}"></a></li>
+  </ul>
+</div>
+</footer>
+{% endblock page_footer %}

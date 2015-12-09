@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+  "type": "object",
+  "properties": {
+    "doi": { "type": "string" },
+    "alternateIdentifiers": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+          "type": "object",
+          "properties": {
+            "id": { "type": "string" },
+            "scheme": { "type": "string" }
+          }
+      }
+    },
+    "title": { "type": "string" },
+    "acronym": { "type": "string" },
+    "country": { "type": "string" },
+    "type": { "type": "string" },
+    "subtype": { "type": "string" },
+    "children": { "type": "string" },
+    "parent": { "type": "string" }
+  }
+}

@@ -1,0 +1,159 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+  <dl>
+  {%- if publication_date %}
+    <dt>{{_('Publication date')}}:</dt>
+    <dd>{{ publication_date|dateformat(format='long') }}</dd>
+  {%- endif %}
+
+  {%- if embargo_date is embargoed(record.accessright) %}
+    <dt>{{_('Embargoed')}}:</dt>
+    <dd>
+      {% trans open_access_label=accessright_label('open'), embargo_date=embargo_date|dateformat('long') %}Files available as {{open_access_label}} after {{embargo_date}}.{% endtrans %}
+    </dd>
+  {%- endif %}
+
+  {%- if record.doi %}
+    <dt>{{_('DOI')}}:</dt>
+    {%- if record.doi is local_doi %}
+    {# FIXME record.doi #}
+    <dd itemprop="doi">{{ record.doi }}</dd>
+    {%- else %}
+    <dd itemprop="doi"><a href="{{record.doi|pid_url(scheme='doi')}}">{{ record.doi }}</a></dd>
+    {%- endif %}
+    {# FIXME record.doi|badge_doi
+    {%- from "github/helpers.html" import doi_badge with context %}
+    {% if record.doi|is_local_doi %}{{doi_badge(record.doi)}}{% else %}{{ record.doi|doi_link }}{% endif %}</dd>
+      {% endif%}
+    <span class="get-badge" data-toggle="tooltip" data-placement="bottom" title="Get the DOI badge!">
+          <img data-toggle="modal" data-target="[data-modal='10.5281-zenodo.32481']" src="https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg" alt="10.5281/zenodo.32481">
+        </span>
+        <div class="modal fade badge-modal" data-modal="10.5281-zenodo.32481">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-body">
+                <h4>Zenodo DOI Badge</h4>
+
+                <h4><small>Markdown</small></h4><h4>
+                <pre>[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg)](http://dx.doi.org/10.5281/zenodo.32481)</pre>
+
+                </h4><h4><small>reStructedText</small></h4><h4>
+                <pre>.. image:: https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg
+     :target: http://dx.doi.org/10.5281/zenodo.32481</pre>
+
+                </h4><h4><small>HTML</small></h4><h4>
+                <pre>&lt;a href="http://dx.doi.org/10.5281/zenodo.32481"&gt;&lt;img src="https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg" alt="10.5281/zenodo.32481"&gt;&lt;/a&gt;</pre>
+
+                </h4><h4><small>Image URL</small></h4><h4>
+                <pre>https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg</pre>
+
+                </h4><h4><small>DOI URL</small></h4><h4>
+                <pre>http://dx.doi.org/10.5281/zenodo.32481</pre>
+              </h4></div>
+            </div>
+          </div>
+        </div>
+        #}
+  {%- endif %}
+
+  {%- if record.isbn %}
+    <dt>{{_('ISBN')}}:</dt>
+    <dd itemprop="isbn">{{ record.isbn }}</dd>
+  {%- endif %}
+
+  {%- if record.keywords %}
+    <dt>{{_('Keyword(s)')}}:</dt>
+    <dd>
+    {%- for keyword in record.keywords %}
+      <a href="#FIXME">
+        <span class="label label-default" itemprop="keywords">{{keyword}}</span>
+      </a>
+    {%- endfor %}
+    </dd>
+  {%- endif %}
+
+  {#- FIXME: Book -#}
+  {#- FIXME: Publisher -#}
+  {%- if record.journal %}
+  {% with j=record.journal %}
+    <dt>{{_('Published in')}}:</dt>
+    <dd>
+      {{j.title}}:{% if j.volume %} {{j.volume}}{% endif%}{% if j.year %} ({{j.year}}){% endif %}{% if j.number %} no. {{j.number}},{% endif %}{% if j.pages %} pp. {{j.pages}}{% endif %}.
+    </dd>
+  {%- endwith %}
+  {%- endif %}
+
+  {%- if record.grants %}
+    <dt>{{_('Grants')}}:</dt>
+    <dd>
+      {%- for grant in record.grants %}
+        {{grant.title}}{% if not loop.last %}<br />{% endif %}
+      {%- endfor %}
+    </dd>
+  {%- endif %}
+
+  {#- FIXME: University -#}
+  {#- FIXME: Meeting -#}
+  {#- FIXME: Number of pages  -#}
+
+  {%- for group in record.related_identifiers|groupby('relation') %}
+    {%- if loop.first %}
+    <dt>{{ _('Related identifiers') }}:</dt>
+    {%- endif %}
+    <dd>{{group.grouper|relation_title}}:<br />
+    {%- for related_id in group.list %}
+      {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}{#  #}
+
+      {%- if related_url %}
+      <a href="{{related_url}}">{{related_id.identifier}}</a>{%- if not loop.last %}, {% endif %}
+      {%- else %}
+      <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}){%- if not loop.last %}, {% endif %}
+      {%- endif %}
+    {%- endfor %}
+    </dd>
+  {%- endfor %}
+
+  {#- FIXME: Communities -#}
+
+  {%- if record.license %}
+    <dt>{{_('License (for files)')}}:</dt>
+    <dd><a href="{{record.license.url}}">{{record.license.license}}</a></dd>
+  {%- endif %}
+
+  {%- set userprofile = record.owner.id|userprofile if record.owner else None %}
+  {%- if userprofile %}
+    <dt>{{_('Uploaded by')}}:</dt>
+    <dd>
+      {{ userprofile.displayname }}
+      {%- if record.get('creation_date') %}
+        {%- trans upload_date=record.get('creation_date')|from_isodatetime|dateformat('long') %}
+          (on {{upload_date}})
+        {%- endtrans %}
+      {%- endif %}
+    </dd>
+    {% elif record.get('creation_date') %}
+    <dt>{{_('Uploaded on')}}:</dt>
+    <dd>{{ record.get('creation_date')|from_isodatetime|dateformat('long') }}</dd>
+  {%- endif %}
+  </dl>

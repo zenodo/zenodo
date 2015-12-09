@@ -47,7 +47,6 @@ The beginning of each sprint cycle roughly follows the following pattern:
     - Close milestone (progress should be 100%).
 * Requirements update
     - Update Python package requirements. Needed in order to ensure security fixes from packages are integrated (see :ref:`updateing_requirements`).
-    - Rebase to latest Invenio development branch. Needed to ensure a controlled Invenio upgrade process with enough time to test and detect issues in the Invenio development branch (see :ref:`invenio_rebasing`).
 * Sprint planning
     - Create new milestone and assign end-date.
     - Assign issues to milestone (see below).
@@ -81,20 +80,19 @@ All in all a new feature roughly go through the following process:
 
 - Week 1-2:
     - Sprint planning
-    - Package upgrades / Invenio rebasing.
-    - Feature development and maturing through ``zenodo/master`` and ``invenio/zenodo-master``.
+    - Package upgrades.
+    - Feature development and maturing through ``master``.
 - Week 3 (on Monday):
     - Sprint close-out
-    - Merge ``zenodo/master`` to ``zenodo/qa`` and ``invenio/zenodo-master`` to ``invenio/qa``.
-    - Deploy ``zenodo/qa`` to QA cluster.
+    - Merge ``master`` to ``qa``.
+    - Deploy ``qa`` to QA cluster.
     - Test plan (prepare list of new features from closed sprint milestone)
     - Communication plan (prepare e.g. Twitter message to be send after production deployment).
     - Start next sprint.
 - Week 4 (on Monday):
-    - Merge ``zenodo/qa`` to ``zenodo/production`` and ``invenio/qa`` to ``invenio/production``.
-    - Deploy ``zenodo/production`` to production cluster.
+    - Merge ``qa`` to ``production``.
+    - Deploy ``production`` to production cluster.
     - Rerun test plan.
     - Run communication plan.
 
 Note that, sprints and the release process run in parallel.
-

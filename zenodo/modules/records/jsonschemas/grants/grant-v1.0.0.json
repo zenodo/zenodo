@@ -1,0 +1,44 @@
+{
+  "$schema": "http://json-schema.org/schema#",
+  "id": "http://zenodo.org/schemas/grants/grant-v1.0.0.json",
+  "type": "object",
+  "properties": {
+    "identifiers": {
+      "type": "object",
+      "title": "Unique identifiers",
+      "description": "Unique persistent identifiers for grant.",
+      "default": {},
+      "properties": {
+        "internal": { "type": "string" },
+        "oai": { "type": "string" },
+        "eurepo": { "type": "string" },
+      }
+    },
+    "title": {
+      "type": "string",
+      "title": "Title.",
+      "description": "Title of grant.",
+      "default": ""
+    },
+    "acronym": { "type": "string" },
+    "code": { "type": "string" },
+    "funder": {
+      "type": "string",
+      "title": "Funder",
+      "description": "Funder of grant.",
+      "default": null
+    },
+    "start_date": {
+      "type": "string",
+      "title": "Start date",
+      "description": "Start date of grant.",
+      "default" : null
+    },
+    "end_date": {
+      "type": "string",
+      "title": "End date",
+      "description": "End date of grant.",
+      "default": null
+    },
+  }
+}

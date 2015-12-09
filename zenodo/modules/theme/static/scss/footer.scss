@@ -1,0 +1,94 @@
+// This file is part of Zenodo.
+// Copyright (C) 2015 CERN.
+//
+// Zenodo is free software; you can redistribute it
+// and/or modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Zenodo is distributed in the hope that it will be
+// useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Zenodo; if not, write to the
+// Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// MA 02111-1307, USA.
+//
+// In applying this license, CERN does not
+// waive the privileges and immunities granted to it by virtue of its status
+// as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+$footer-height: 200px;
+$footer-height-xs: 335px;
+$footer-height-sm: 300px;
+$footer-background-color1: #0067c9;
+$footer-background-color2: darken($color1, 0%); //lighten($footer-background-color1, 4%);
+$footer-text-color: lighten($footer-background-color1, 50%);
+$footer-heading-text-color: #fff;
+
+html {
+  //@media(min-width: $screen-md-min) {
+    position: relative;
+    min-height: 100%;
+  //}
+}
+
+body {
+  @media(min-width: $screen-md-min) {
+    margin-bottom: $footer-height;
+  }
+  @media(max-width: $screen-sm-max) and (min-width: $screen-sm-min) {
+    margin-bottom: $footer-height-sm;
+  }
+  @media(max-width: $screen-xs-max) {
+    margin-bottom: $footer-height-xs;
+  }
+}
+
+.footer {
+  @media(min-width: $screen-md-min) {
+    height: $footer-height;
+  }
+  @media (max-width: $screen-sm-max) and (min-width: $screen-sm-min) {
+    height: $footer-height-sm;
+  }
+  @media(max-width: $screen-xs-max) {
+    height: $footer-height-xs;
+  }
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background-color: $footer-background-color2;
+  color: $footer-text-color;
+
+  a {
+    color: $footer-heading-text-color;
+  }
+}
+
+.footer > .menu-wrapper {
+  background-color: $footer-background-color1;
+  color: darken($footer-background-color1, 40%);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+
+  a {
+    color: $footer-text-color;
+  }
+
+  .container {
+    padding-bottom: 20px;
+  }
+}
+
+.footer .row {
+  padding-top: 15px;
+}
+
+.footer-menu {
+  h5 {
+    font-weight: 400;
+    color: $footer-heading-text-color;
+  }
+}

@@ -1,0 +1,67 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_theme/page.html" %}
+
+{%- set html_css_classes=['cover-page'] %}
+{%- set body_css_classes=['cover-page'] %}
+
+{%- block body %}
+{%- block browserupgrade %}
+<!--[if lt IE 8]>
+  <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+<![endif]-->
+{%- endblock browserupgrade %}
+<div class="site-wrapper">
+  {% block page_header %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 col-md-offset-3">
+        {% block brand %}<a href="/"><img class="text-center masthead-brand" src="{{ url_for('static', filename='img/zenodo.svg')}}" onerror="this.src={{ url_for('static', filename='img/zenodo.png')}}; this.src=null;" alt="{{_(config.THEME_SITENAME)}}" width="250px"/></a>{% endblock %}
+      </div>
+    </div>
+  </div>
+  {% endblock page_header%}
+  {%- block page_body %}
+  <div class="container">
+    <div class="row">
+      {% block panel %}
+      <div class="col-md-6 col-md-offset-3">
+        <div class="panel panel-default">
+          <div class="panel-body">
+            {% block panel_content %}
+            <h3 class="text-center panel-free-title">{{_(panel_title)}}</h3>
+            {% endblock panel_content %}
+          </div>
+        </div>
+      </div>
+      {% endblock panel %}
+    </div>
+  </div>
+  {%- endblock page_body %}
+  {% block page_footer %}{% endblock page_footer %}
+</div>
+{%- block javascript %}{% include "zenodo_theme/javascript.html" %}{% endblock javascript %}
+{%- block trackingcode %}{% include "zenodo_theme/trackingcode.html" %}{% endblock %}
+{%- endblock body %}

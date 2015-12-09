@@ -1,0 +1,87 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+<footer class="footer">
+  <div class="menu-wrapper">
+    <div class="container">
+      <div class="row footer-menu">
+        <div class="col-xs-3 col-md-2">
+          <h5>{{_('About')}}</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">{{_('About')}}</a></li>
+            <li><a href="#">{{_('Contact')}}</a></li>
+            <li><a href="#">{{_('Polcies')}}</a></li>
+          </ul>
+        </div>
+        <div class="col-xs-3 col-md-2">
+          <h5>{{_('Resources')}}</h5>
+          <ul class="list-unstyled">
+            <li><a href="#">{{_('Get started')}}</a></li>
+            <li><a href="#">{{_('Features')}}</a></li>
+            <li><a href="#">{{_('FAQ')}}</a></li>
+          </ul>
+        </div>
+        <div class="col-xs-3 col-md-2">
+          <h5>{{_('Developers')}}</h5>
+          <ul class="list-unstyled">
+          <li><a href="#">{{_('REST API')}}</a></li>
+          <li><a href="#">{{_('OAI-PMH')}}</a></li>
+          </ul>
+        </div>
+        <div class="col-xs-3 col-md-2">
+          <h5>{{_('Contribute')}}</h5>
+          <ul class="list-unstyled">
+          <li><a href="#">{{_('GitHub')}}</a></li>
+          <li><a href="#">{{_('Donate')}}</a></li>
+          </ul>
+        </div>
+        <div class="col-xs-12 text-center-sm col-md-4">
+          <div class="pull-right-md text-center-xs">
+            <h5>{{_('Funded by')}}</h5>
+            <ul class="list-inline">
+              <li><a href="http://home.cern"><img src="{{ url_for('static', filename='img/cern.png') }}"></a></li>
+              <li><a href="http://www.openaire.eu"><img src="{{ url_for('static', filename='img/openaire.png') }}"></a></li>
+              <li><a href="https://ec.europa.eu/programmes/horizon2020/"><img src="{{ url_for('static', filename='img/eu.png') }}"></a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="row">
+      <div class="col-xs-12 col-sm-6 col-sm-push-6">
+        <div class="pull-right-sm text-center-xs">
+          <ul class="list-inline">
+            <li><a href="#">{{_('Privacy policy')}}</a></li>
+            <li><a href="#">{{_('Terms of Use')}}</a></li>
+            <li><a href="#">{{_('Support')}}</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="col-xs-12 col-sm-6 col-sm-pull-6 text-center-xs">
+        <p>Powered by <a href="http://information-technology.web.cern.ch/about/computer-centre">CERN Data Centre</a> &amp; <a href="http://invenio-software.org">Invenio</a></p>
+      </div>
+    </div>
+  </div>
+</footer>

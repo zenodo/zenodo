@@ -1,55 +1,56 @@
 # -*- coding: utf-8 -*-
 #
-## This file is part of Zenodo.
-## Copyright (C) 2012, 2013 CERN.
-##
-## Zenodo is free software: you can redistribute it and/or modify
-## it under the terms of the GNU General Public License as published by
-## the Free Software Foundation, either version 3 of the License, or
-## (at your option) any later version.
-##
-## Zenodo is distributed in the hope that it will be useful,
-## but WITHOUT ANY WARRANTY; without even the implied warranty of
-## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-## GNU General Public License for more details.
-##
-## You should have received a copy of the GNU General Public License
-## along with Zenodo. If not, see <http://www.gnu.org/licenses/>.
-##
-## In applying this licence, CERN does not waive the privileges and immunities
-## granted to it by virtue of its status as an Intergovernmental Organization
-## or submit itself to any jurisdiction.
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-include requirements*.txt AUTHORS COPYING README.md bower.json setup.cfg
+include *.rst
+include *.sh
+include *.txt
+include *.yml
+include .dockerignore
+include .editorconfig
+include babel.ini
+include Dockerfile
+include LICENSE
+include pytest.ini
+recursive-include .tx *
+recursive-include docker *
+recursive-include docker *.yml
+recursive-include docs *.bat
+recursive-include docs *.py
+recursive-include docs *.rst
+recursive-include docs Makefile
+recursive-include misc *.py
+recursive-include misc *.rst
+recursive-include tests *.py
+recursive-include zenodo *.html
+recursive-include zenodo *.jpeg
+recursive-include zenodo *.jpg
+recursive-include zenodo *.js
+recursive-include zenodo *.json
+recursive-include zenodo *.png
+recursive-include zenodo *.scss
+recursive-include zenodo *.svg
+recursive-include zenodo *.xcf
 
-recursive-include docs *
-recursive-exclude docs/_build *
-
-recursive-include zenodo/testsuite *
-
-recursive-include zenodo/base/static *
-recursive-include zenodo/base/templates *
-recursive-include zenodo/base/format_elements *
-recursive-include zenodo/base/format_templates *
-recursive-include zenodo/base/output_formats *
-recursive-include zenodo/base/recordext *
-recursive-include zenodo/base/testsuite *
-
-recursive-include zenodo/demosite *
-
-recursive-include zenodo/modules/*/static *
-recursive-include zenodo/modules/*/templates *
-recursive-include zenodo/modules/*/testsuite *
-recursive-include zenodo/modules/*/recordext/* *
-recursive-include zenodo/modules/*/converterext *
-recursive-include zenodo/modules/*/documentext *
-recursive-include zenodo/modules/*/editorext *
-recursive-include zenodo/modules/*/exportext *
-recursive-include zenodo/modules/*/format_elements *
-recursive-include zenodo/modules/*/format_templates *
-recursive-include zenodo/modules/*/output_formats *
-recursive-include zenodo/modules/*/rankext *
-
-recursive-include zenodo/legacy/resources *
-
-recursive-exclude * *.pyc *.pyo
+# added by check_manifest.py
+recursive-include docs *.png

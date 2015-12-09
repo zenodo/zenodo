@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+# Pinned requirements which cannot be upgraded without breaking changes.
+-r requirements.txt
+
+# -e git+https://github.com/inveniosoftware/invenio-search-ui.git#egg=invenio-search-ui
+-e git+https://github.com/inveniosoftware/invenio-access.git#egg=invenio-access
+-e git+https://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
+-e git+https://github.com/inveniosoftware/invenio-admin.git#egg=invenio-admin
+-e git+https://github.com/inveniosoftware/invenio-assets.git#egg=invenio-assets
+-e git+https://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
+-e git+https://github.com/inveniosoftware/invenio-celery.git#egg=invenio-celery
+-e git+https://github.com/inveniosoftware/invenio-config.git#egg=invenio-config
+-e git+https://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
+-e git+https://github.com/lnielsen/invenio-formatter.git@refactoring#egg=invenio-formatter
+-e git+https://github.com/inveniosoftware/invenio-i18n.git#egg=invenio-i18n
+-e git+https://github.com/inveniosoftware/invenio-jsonschemas.git#egg=invenio-jsonschemas
+-e git+https://github.com/inveniosoftware/invenio-logging.git#egg=invenio-logging
+-e git+https://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
+-e git+https://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
+-e git+https://github.com/inveniosoftware/invenio-records-rest.git#egg=invenio-records-rest
+-e git+https://github.com/inveniosoftware/invenio-records-ui.git#egg=invenio-records-ui
+-e git+https://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
+-e git+https://github.com/inveniosoftware/invenio-rest.git#egg=invenio-rest
+-e git+https://github.com/inveniosoftware/invenio-search.git#egg=invenio-search
+-e git+https://github.com/inveniosoftware/invenio-theme.git#egg=invenio-theme
+-e git+https://github.com/inveniosoftware/invenio-userprofiles.git#egg=invenio-userprofiles
+-e git+https://github.com/inveniosoftware/invenio.git#egg=invenio
+-e git+https://github.com/zenodo/zenodo-migrationkit.git#egg=zenodo-migrationkit
+
+-e .[all,postgresql]

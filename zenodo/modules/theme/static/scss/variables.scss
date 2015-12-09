@@ -1,0 +1,56 @@
+// This file is part of Zenodo.
+// Copyright (C) 2015 CERN.
+//
+// Zenodo is free software; you can redistribute it
+// and/or modify it under the terms of the GNU General Public License as
+// published by the Free Software Foundation; either version 2 of the
+// License, or (at your option) any later version.
+//
+// Zenodo is distributed in the hope that it will be
+// useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+// General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Zenodo; if not, write to the
+// Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+// MA 02111-1307, USA.
+//
+// In applying this license, CERN does not
+// waive the privileges and immunities granted to it by virtue of its status
+// as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+$btn-font-weight: 300;
+
+$color1-gradient: #2BBCFF; //lighten(@color1, 15%);
+$color1: #0047A8;
+$color2: #0067c9;
+$color3: #7A9A95;
+$color4: #EF6D3B;
+$color5: #FA8B60;
+
+$cover-panel-padding: 40px;
+
+$font-family-sans-serif:  Roboto, "Helvetica Neue", Helvetica, Arial, sans-serif;
+$font-weight: 300;
+
+$headings-font-weight: $font-weight;
+$headings45-font-weight: 400;
+
+$navbar-brand-padding-vertical: 20px;
+$navbar-default-bg: $color1;
+$navbar-default-brand-color: #fff;
+$navbar-default-link-color: lighten($color1, 60%);
+$navbar-default-link-active-color: #fff;
+$navbar-default-link-active-bg: transparentize(#fff, 0.9);
+$navbar-default-link-hover-color: #fff;
+$navbar-default-link-hover-bg: transparentize(#fff, 0.8);
+$navbar-height: 96px;
+
+$text-white: #fff;
+
+$brand-font-family: $font-family-sans-serif;
+$brand-font-size: 40px;
+$brand-font-weight: 400;
+$brand-primary: #428bca;// lighten($color2, 4%);
+$brand-info: lighten($brand-primary, 10%);
