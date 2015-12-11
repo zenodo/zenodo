@@ -40,8 +40,10 @@ tests_require = [
     'pep257>=0.7.0',
     'pytest-cache>=1.0',
     'pytest-cov>=1.8.0',
+    'pytest-flask>=0.10.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
+    'selenium>=2.48.0',
     'six>=1.10.0',
 ]
 

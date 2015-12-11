@@ -1,4 +1,5 @@
-{#
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
 # Copyright (C) 2015 CERN.
 #
@@ -20,13 +21,5 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
-{# FIXME #}
-  <h4>{{_('Export')}}</h4>
-  <ul class="list-inline">
-    <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='hx') }}">BibTeX</a></li>
-    <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='json') }}">JSON</a></li>
-    <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='dcite3') }}">DataCite</a></li>
-    <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='xd') }}">Dublin Core</a></li>
-    <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='xm') }}">MARCXML</a></li>
-  </ul>
+
+npm update && npm install --silent -g node-sass clean-css uglify-js requirejs

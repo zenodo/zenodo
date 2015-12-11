@@ -24,6 +24,9 @@
 
 addons:
   postgresql: "9.4"
+  apt:
+    packages:
+      - nodejs
 
 notifications:
   email: false
@@ -35,17 +38,19 @@ language: python
 cache:
   directories:
     - $HOME/.cache/pip
+    - $HOME/.nvm
 
 services:
-  - posgresql
+  - postgresql
 
 env:
   #- REQUIREMENTS=base SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
   #- REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
-  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  - REQUIREMENTS=devel E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
   #- REQUIREMENTS=base SQLALCHEMY_DATABASE_URI="sqlite:///tmp/zenodo.db"
   #- REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="sqlite:///tmp/zenodo.db"
-  - REQUIREMENTS=devel SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db"
+  - REQUIREMENTS=devel E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db"
+  - REQUIREMENTS=devel E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
 
 python:
   - "2.7"
@@ -56,6 +61,7 @@ python:
 before_install:
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
+  - "if [ ${E2E} == 'yes' ]; then ./scripts/setup-npm.sh; fi"
   - "cat requirements.txt > .travis-base-requirements.txt"
   - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"
   - "requirements-builder --level=dev --req requirements.devel.txt setup.py > .travis-devel-requirements.txt"
@@ -63,9 +69,13 @@ before_install:
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -e .[all,postgresql]"
+  - "if [ ${E2E} == 'yes' ]; then ./scripts/setup-assets.sh; fi"
+
+before_script:
+  - "if [ ${E2E} == 'yes' ]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; export E2E_WEBDRIVER_BROWSERS='Firefox PhantomJS'; fi"
 
 script:
-  - "./run-tests.sh"
+  - "if [ ${E2E} == 'yes' ]; then py.test tests/e2e/; else ./run-tests.sh; fi"
 
 after_success:
   - coveralls
