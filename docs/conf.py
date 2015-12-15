@@ -142,7 +142,7 @@ html_theme_options = {
                    ' long-tail of science, enabling researchers to share and '
                    'preserve any research outputs in any size, any format and '
                    'from any science.',
-    'github_user': 'inveniosoftware',
+    'github_user': 'zenodo',
     'github_repo': 'zenodo',
     'github_button': False,
     'github_banner': True,

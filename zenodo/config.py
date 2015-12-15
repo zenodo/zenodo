@@ -125,7 +125,6 @@ RECORDS_REST_ENDPOINTS = dict(
     ), )
 
 # DebugToolbar
-DEBUG_TB_ENABLED = True
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 # DataCite DOI minting:
