@@ -52,13 +52,13 @@ extras_require = {
         'Sphinx>=1.3',
     ],
     'postgresql': [
-        'invenio-db[postgresql]>=1.0.0a6',
+        'invenio-db[postgresql]>=1.0.0a9',
     ],
     'mysql': [
-        'invenio-db[mysql]>=1.0.0a6',
+        'invenio-db[mysql]>=1.0.0a9',
     ],
     'sqlite': [
-        'invenio-db>=1.0.0a6',
+        'invenio-db>=1.0.0a9',
     ],
     'tests': tests_require,
 }
@@ -89,6 +89,7 @@ install_requires = [
     'invenio-i18n',
     'invenio-logging',
     'invenio-mail',
+    'invenio-pages',
     'invenio-pidstore',
     'invenio-records',
     'invenio-records-rest',
@@ -160,15 +161,25 @@ setup(
             'zenodo = zenodo.cli:cli',
         ],
         'invenio_base.apps': [
+            'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
         ],
         'invenio_base.blueprints': [
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
+            'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
         ],
         'invenio_i18n.translations': [
             'messages = zenodo',
+        ],
+        'invenio_pidstore.minters': [
+            'zenodo_record_minter '
+            '= zenodo.modules.records.minters:zenodo_record_minter',
+        ],
+        'invenio_pidstore.fetchers': [
+            'zenodo_record_fetcher '
+            '= zenodo.modules.records.fetchers:zenodo_record_fetcher',
         ],
         'invenio_assets.bundles': [
             'zenodo_theme_css = zenodo.modules.theme.bundles:css',
@@ -176,6 +187,9 @@ setup(
         ],
         'invenio_jsonschemas.schemas': [
             'zenodo_records = zenodo.modules.records.jsonschemas',
+        ],
+        'invenio_search.mappings': [
+            'records = zenodo.modules.records.mappings',
         ]
     },
     extras_require=extras_require,

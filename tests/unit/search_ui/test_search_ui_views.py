@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,10 +22,11 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-CWD=`pwd`
-zenodo npm
-cd ${VIRTUAL_ENV}/var/instance/static
-npm install
-cd ${CWD}
-zenodo collect -v
-zenodo assets build
+"""Zenodo search ui views."""
+
+
+def test_temporary_search_view(app, es):
+    """Test search view."""
+    with app.test_client() as client:
+        res = client.get('/search2/api')
+        assert res.status_code == 200

@@ -141,7 +141,7 @@
     <dd><a href="{{record.license.url}}">{{record.license.license}}</a></dd>
   {%- endif %}
 
-  {%- set userprofile = record.owner.id|userprofile if record.owner else None %}
+  {%- set userprofile = record.owner.id|userprofile if record.owner and record.owner.id else None %}
   {%- if userprofile %}
     <dt>{{_('Uploaded by')}}:</dt>
     <dd>

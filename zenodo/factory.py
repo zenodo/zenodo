@@ -38,10 +38,10 @@ env_prefix = 'APP'
 conf_loader = create_conf_loader(config=config, env_prefix=env_prefix)
 
 instance_path = os.getenv(env_prefix + '_INSTANCE_PATH') or \
-    os.path.join(sys.prefix, 'var', 'zenodo-instance')
+    os.path.join(sys.prefix, 'var', 'instance')
 """Path to instance folder.
 
-Defaults to ``<virtualenv>/var/zenodo-instance/``. Can be overwritten using the
+Defaults to ``<virtualenv>/var/instance/``. Can be overwritten using the
 environment variable ``APP_INSTANCE_PATH``.
 """
 
@@ -49,7 +49,7 @@ static_folder = os.getenv(env_prefix + '_STATIC_FOLDER') or \
     os.path.join(instance_path, 'static')
 """Path to static folder.
 
-Defaults to ``<virtualenv>/var/zenodo-instance/static/``. Can be overwritten
+Defaults to ``<virtualenv>/var/instance/static/``. Can be overwritten
 using the environment variable ``APP_STATIC_FOLDER``
 """
 

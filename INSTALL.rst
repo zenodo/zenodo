@@ -8,17 +8,19 @@ using Docker Compose:
 .. code-block:: console
 
     $ git clone https://github.com/zenodo/zenodo.git
-    $ git checkout next
+    $ git checkout master
     $ docker-compose build
     $ docker-compose up
 
 
-Next, create the database and an admin user:
+Next, create the database and indexes and an admin user:
 
 .. code-block:: console
 
     $ docker-compose run web zenodo db init
     $ docker-compose run web zenodo db create
+    $ docker-compose run web zenodo index init
+    $ docker-compose run web zenodo fixtures loadpages
     $ docker-compose run web zenodo users create -e info@zenodo.org -a
 
 
@@ -30,4 +32,4 @@ Now visit the following URL in your browser:
 
 **Dependencies**
 
-Zenodo depends on PostgreSQL, Elasticsearch , Redis and RabbitMQ.
+Zenodo depends on PostgreSQL, Elasticsearch, Redis and RabbitMQ.

@@ -26,35 +26,56 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, render_template, flash
-from flask_menu import register_menu
+from flask import Blueprint, render_template, request
+from flask_babelex import gettext as _
+from flask_menu import current_menu, register_menu
+from invenio_search import Query, current_search_client
 
 blueprint = Blueprint(
     'zenodo_frontpage',
     __name__,
     url_prefix='',
     template_folder='templates',
-    static_folder='static',
 )
 
 
+@blueprint.before_app_first_request
+def setup_menu():
+    """Setup menu."""
+    item = current_menu.submenu('main.search')
+    item.register(
+        'invenio_search_ui.search', _('Search'), order=1,
+        active_when=lambda: request.endpoint.startswith("invenio_search_ui")
+    )
+
+
 @blueprint.route('/')
-@register_menu(blueprint, 'main.index', 'Search', order=1)
 def index():
     """Frontpage blueprint."""
-    flash('Just a test.', category='info')
-    return render_template('zenodo_theme/page.html')
+    query = Query("")
+    query.body["size"] = 10
+    query.body["sort"] = [{"creation_date": "desc"}]
+
+    response = current_search_client.search(
+        index='records',
+        body=query.body,
+    )
+
+    return render_template(
+        'zenodo_frontpage/index.html',
+        records=(h['_source'] for h in response['hits']['hits'])
+    )
 
 
-@blueprint.route('/2')
-@register_menu(blueprint, 'main.search', 'Upload', order=2)
+@blueprint.route('/deposit/')
+@register_menu(blueprint, 'main.upload', 'Upload', order=2)
 def index2():
     """Frontpage blueprint."""
-    return render_template('zenodo_theme/page.html')
+    return render_template('zenodo_frontpage/coming_soon.html')
 
 
-@blueprint.route('/3')
+@blueprint.route('/communities/')
 @register_menu(blueprint, 'main.communities', 'Communities', order=3)
 def index3():
     """Frontpage blueprint."""
-    return render_template('zenodo_theme/page.html')
+    return render_template('zenodo_frontpage/coming_soon.html')

@@ -34,6 +34,7 @@ import os
 
 import pytest
 from invenio_db import db
+from invenio_search import current_search
 from selenium import webdriver
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
@@ -63,10 +64,12 @@ def app(request):
             create_database(str(db.engine.url))
         db.drop_all()
         db.create_all()
+        list(current_search.create())
 
     def teardown():
         with app.app_context():
             drop_database(str(db.engine.url))
+            list(current_search.delete(ignore=[404]))
 
     request.addfinalizer(teardown)
 

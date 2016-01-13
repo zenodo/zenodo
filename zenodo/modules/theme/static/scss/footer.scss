@@ -45,6 +45,10 @@ body {
   @media(max-width: $screen-xs-max) {
     margin-bottom: $footer-height-xs;
   }
+
+  .body-container > .row {
+    margin-bottom: 20px;
+  }
 }
 
 .footer {

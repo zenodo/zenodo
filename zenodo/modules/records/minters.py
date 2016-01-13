@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,10 +22,17 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-CWD=`pwd`
-zenodo npm
-cd ${VIRTUAL_ENV}/var/instance/static
-npm install
-cd ${CWD}
-zenodo collect -v
-zenodo assets build
+"""PID minters."""
+
+from __future__ import absolute_import, print_function
+
+from invenio_pidstore.providers.recordid import RecordIdProvider
+
+
+def zenodo_record_minter(record_uuid, data):
+    """Mint record identifiers."""
+    assert 'recid' not in data
+    provider = RecordIdProvider.create(
+        object_type='rec', object_uuid=record_uuid)
+    data['recid'] = int(provider.pid.pid_value)
+    return provider.pid

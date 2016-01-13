@@ -34,7 +34,8 @@ from .models import AccessRight, ObjectType
 blueprint = Blueprint(
     'zenodo_records',
     __name__,
-    template_folder='templates'
+    template_folder='templates',
+    url_prefix='/search'
 )
 
 

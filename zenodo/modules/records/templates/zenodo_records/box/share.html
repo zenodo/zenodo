@@ -23,7 +23,7 @@
 -#}
   <h4>{{_('Share')}}</h4>
   <!-- AddThis Button BEGIN -->
-  <div class="addthis_toolbox addthis_default_style addthis_32x32_style"{% if record.doi is local_doi %} addthis:url="{{record.doi|pid_url}}{%- endif %}">
+  <div class="addthis_toolbox addthis_default_style addthis_32x32_style"{% if record.doi and record.doi is local_doi %} addthis:url="{{record.doi|pid_url}}{% else %}{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value)}}{%- endif %}">
   <a class="addthis_button_mendeley"></a>
   <a class="addthis_button_citeulike"></a>
   <a class="addthis_button_twitter"></a>
