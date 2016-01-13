@@ -36,11 +36,13 @@
 -e git+https://github.com/inveniosoftware/invenio-jsonschemas.git#egg=invenio-jsonschemas
 -e git+https://github.com/inveniosoftware/invenio-logging.git#egg=invenio-logging
 -e git+https://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
+-e git+https://github.com/inveniosoftware/invenio-pages.git#egg=invenio-pages
 -e git+https://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
 -e git+https://github.com/inveniosoftware/invenio-records-rest.git#egg=invenio-records-rest
 -e git+https://github.com/inveniosoftware/invenio-records-ui.git#egg=invenio-records-ui
 -e git+https://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
 -e git+https://github.com/inveniosoftware/invenio-rest.git#egg=invenio-rest
+-e git+https://github.com/inveniosoftware/invenio-search-ui.git#egg=invenio-search-ui
 -e git+https://github.com/inveniosoftware/invenio-search.git#egg=invenio-search
 -e git+https://github.com/inveniosoftware/invenio-theme.git#egg=invenio-theme
 -e git+https://github.com/inveniosoftware/invenio-userprofiles.git#egg=invenio-userprofiles

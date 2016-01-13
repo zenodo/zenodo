@@ -35,3 +35,23 @@
 .inline-orcid {
     height: $font-size-base;
 }
+
+.record-elem {
+    h4 {
+        a {
+            color: black;
+        }
+        a:hover {
+            color: #777;
+        }
+    }
+    p {
+        a {
+            color: black;
+        }
+        a:hover {
+            color: #777;
+            text-decoration: none;
+        }
+    }
+}

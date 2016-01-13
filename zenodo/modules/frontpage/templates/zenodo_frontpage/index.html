@@ -1,0 +1,104 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+#}
+
+{% extends "zenodo_theme/page.html" %}
+
+{% set title = config.THEME_SITENAME + " - Research. Shared." %}
+
+{%- from "zenodo_records/macros/accessright.html" import accessright_label -%}
+{%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
+{%- from "zenodo_records/macros/altmetric.html" import almetric_badge -%}
+{%- from "zenodo_records/macros/authors.html" import authors -%}
+
+{%- block page_body %}
+<div class="container body-container">
+  <div class="row">
+    <div class="col-md-8">
+      <div class="row">
+        <div class="col-xs-12">
+          <h2>{{_('Recent uploads')}}</h2>
+        </div>
+      </div>
+
+      {%- for r in records %}
+        {%- set publication_date = r.publication_date|from_isodate -%}
+        {%- set creation_date = r.creation_date|from_isodatetime -%}
+        {%- set embargo_date = r.get('embargo_date', None)|from_isodate -%}
+        {%- set object_type = r.upload_type|objecttype %}
+        {%- set record_url = url_for('invenio_records_ui.recid', pid_value=r['recid']) %}
+        <div class="row record-elem">
+          <div class="col-xs-12">
+            <div class="pull-right view-record hidden-xs">
+              <a href="{{ record_url }}" class="btn btn-default">{{_('View')}}</a>
+            </div>
+            {%- if r.get('doi') %}
+              <span class="pull-right hidden-xs">
+                  <br><div class="altmetric-embed altmetric-hidden" data-badge-type="donut" data-badge-popover="left" data-hide-no-mentions="true" data-doi="{{r.doi}}"></div>
+              </span>
+            {% endif %}
+            <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{publication_date|dateformat(format='long')}}</span>
+            {{ objecttype_label(object_type, lang=current_i18n.language) }}
+            {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
+            <br />
+            <h4><a href="{{ record_url }}">{{r.title}}</a></h4>
+            <p>{{ authors(r.authors) }}</p>
+            <p class="hidden-xs"><a href="{{record_url}}">{{ r.description|striptags|truncate(300) }}</a></p>
+            <small class="text-muted hidden-xs">
+              {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}.{% endtrans %}
+            </small>
+          </div>
+        </div>
+        {%- if not loop.last %}<hr class="hidden-xs" />{% endif %}
+      {%- endfor %}
+    </div>
+    <div class="col-md-4">
+      <div class="well">
+        <span class="pull-right"><i class="fa fa-github fa-5x"></i></span>
+        <h4>{{_('Using GitHub?')}}</h4>
+        {% if current_user.is_authenticated %}
+        <a href="{#url_for('zenodo_github.index')#}">Check out</a> our GitHub integration. Software Preservation Made Simple!
+        {% else %}
+        Just <a href="{{ url_for('security.login') }}" data-toggle="modal">Log in</a> with your GitHub account and <a href="{#url_for('zenodo_github.index')#}">click here</a> to start preserving your repositories.
+        {% endif %}
+      </div>
+      <div class="well">
+        <h4>New to {{config.THEME_SITENAME}}?</h4>
+        {% include "zenodo_frontpage/benefits.html" %}
+      </div>
+
+      <div class="well">
+        {{_('Zenodo, a CERN service, is an open dependable home for the long-tail of science, enabling researchers to share and preserve any research outputs in any size, any format and from any science.')}}
+      </div>
+
+      <div class="hidden-xs">
+        <a class="twitter-timeline" href="https://twitter.com/ZENODO_ORG" data-widget-id="331751059422855169"></a>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endblock page_body %}
+
+{% block javascript %}
+<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
+{{ super() }}
+{% endblock javascript %}

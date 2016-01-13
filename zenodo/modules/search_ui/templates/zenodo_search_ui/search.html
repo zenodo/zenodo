@@ -1,0 +1,155 @@
+{#
+# This file is part of Invenio.
+# Copyright (C) 2015 CERN.
+#
+# Invenio is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Invenio is distributed in the hope that it will be useful, but
+# WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Invenio; if not, write to the Free Software Foundation, Inc.,
+# 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+#}
+
+{% extends "invenio_search_ui/search.html" %}
+
+{%- block page_body %}
+  <div id="invenio-search">
+    <!-- Searchbar -->
+    <div class="invenio-search-bar">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+            <invenio-search search-endpoint="/api/records/">
+              <div class="row">
+                <div class="col-md-3">
+                  <invenio-search-facets
+                   template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/facets.html') }}">
+                  </invenio-search-facets>
+                </div> <!-- /.col-md-3 -->
+                <div class="col-md-9">
+                  <!-- SEARCHBAR -->
+                  <invenio-search-bar
+                   template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/searchBar.html') }}"
+                   placeholder="{{ _('Start typing') }}">
+                  </invenio-search-bar>
+                  <!-- ERROR -->
+                  <invenio-search-error
+                   template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/error.html') }}"
+                   message="{{ _('Error') }}">
+                  </invenio-search-error>
+                  <!-- LOADING -->
+                  <invenio-search-loading
+                   template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/loading.html') }}"
+                   message="{{ _('Loading...') }}">
+                  </invenio-search-loading>
+                  <!-- COUNT -->
+                  <center>
+                    <invenio-search-count
+                     template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/count.html') }}">
+                    </invenio-search-count>
+                  </center>
+                  <!-- RESULTS -->
+                  <invenio-search-results
+                   template="{{ url_for('static', filename='templates/zenodo_search_ui/default.html') }}">
+                  </invenio-search-results>
+                  <!-- PAGINATION -->
+                  <center>
+                    <invenio-search-pagination
+                     template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/pagination.html') }}">
+                    </invenio-search-pagination>
+                  </center>
+                </div> <!-- /.col-md-12 -->
+              </div>
+            </invenio-search>
+          </div> <!-- /.col-md-12 -->
+        </div> <!-- /.row -->
+      </div> <!-- /.container -->
+    </div> <!-- ./searchbar -->
+  </div> <!-- /#invenio-search -->
+{%- endblock page_body -%}
+
+
+{#- block page_body %}
+  {{ super() }}
+  <div id="invenio-search">
+    <div ng-controller="invenioSearchController as search">
+      <!-- Searchbar -->
+      <div class="invenio-search-bar">
+        <div class="container">
+          <div class="row">
+            <div class="col-md-12">
+              <div invenio-search-bar
+                invenio-search-query="search.invenioSearchQuery"
+                invenio-search-args="search.invenioSearchArgs"
+                invenio-search-do="search.invenioDoSearch(query)"
+                search-doctype=""
+                search-method="GET"
+                search-endpoint="/api/records/"
+                search-extra-params='{}'
+                search-page="1"
+                search-size="5"
+                search-bar-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchBar.html') }}"
+                search-bar-input-placeholder="{{ _('Type something') }}"
+              ></div>
+            </div> <!-- /.col-md-12 -->
+          </div> <!-- /.row -->
+        </div> <!-- /.container -->
+      </div>
+
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12">
+
+            <!-- Count -->
+            <div class="invenio-search-count">
+              <div invenio-search-results-count
+                invenio-search-items="search.invenioResults"
+                search-count-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchResultsCount.html') }}"
+              ></div>
+            </div>
+            <!-- /Count -->
+
+            <!-- Loading -->
+            <div class="invenio-search-count">
+              <div invenio-search-results-loading
+                invenio-search-loading="search.invenioSearchLoading"
+                search-loading-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchLoading.html') }}"
+                search-loading-message="{{ _('Loading results') }}"
+              ></div>
+            </div>
+            <!-- /Loading -->
+
+            <!-- Search results-->
+            <div invenio-search-results
+              invenio-search-items="search.invenioResults.hits.hits"
+              search-results-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchResults.html') }}"
+              search-results-record-template="{{ url_for('static', filename='templates/zenodo_search_ui/default.html') }}"
+            ></div>
+            <!-- /Search results-->
+
+            <!-- Search pagination -->
+            <div invenio-search-results-pagination
+              invenio-search-items="search.invenioResults"
+              invenio-search-args="search.invenioSearchArgs"
+              invenio-search-do="search.invenioDoSearch(query)"
+              search-pagination-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchResultsPagination.html') }}"
+            ></div>
+            <!-- /Search pagination -->
+          </div> <!-- /.col-md-12 -->
+        </div> <!-- /.row -->
+      </div> <!-- /.container -->
+    </div> <!-- /controller -->
+  </div> <!-- /#invenio-search -->
+{%- endblock page_body -#}
+

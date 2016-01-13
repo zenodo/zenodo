@@ -31,7 +31,9 @@ import shutil
 import tempfile
 
 import pytest
+from flask_cli import ScriptInfo
 from invenio_db import db as db_
+from invenio_search import current_search
 from sqlalchemy_utils.functions import create_database, database_exists, \
     drop_database
 
@@ -65,6 +67,12 @@ def app(request):
 
 
 @pytest.yield_fixture(scope='session')
+def script_info(app):
+    """Ensure that the database schema is created."""
+    yield ScriptInfo(create_app=lambda info: app)
+
+
+@pytest.yield_fixture(scope='session')
 def database(app):
     """Ensure that the database schema is created."""
     if not database_exists(str(db_.engine.url)):
@@ -75,6 +83,14 @@ def database(app):
     yield db_
 
     drop_database(str(db_.engine.url))
+
+
+@pytest.yield_fixture(scope='session')
+def es(app):
+    """Provide elasticsearch access."""
+    list(current_search.create())
+    yield current_search
+    list(current_search.delete(ignore=[404]))
 
 
 @pytest.yield_fixture

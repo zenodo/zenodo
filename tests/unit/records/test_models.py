@@ -78,3 +78,5 @@ def test_object_type():
 
     for t in types:
         _assert_obj(ObjectType.get(t))
+
+    assert ObjectType.get('invalid') is None

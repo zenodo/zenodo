@@ -1,0 +1,331 @@
+{"mappings": {
+  "record-v1.0.0": {
+    "properties": {
+        "title": {
+            "type": "string"
+        },
+        "license": {
+            "properties": {
+                "identifier": {
+                    "type": "string"
+                },
+                "license": {
+                    "type": "string"
+                },
+                "source": {
+                    "type": "string"
+                },
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "notes": {
+            "type": "string"
+        },
+        "altmetric_id": {
+            "type": "string"
+        },
+        "description": {
+            "type": "string"
+        },
+        "creation_date": {
+            "type": "date"
+        },
+        "language": {
+            "type": "string"
+        },
+        "publication_date": {
+            "type": "date"
+        },
+        "keywords": {
+            "type": "string"
+        },
+        "references": {
+            "properties": {
+                "raw_reference": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "access_right": {
+            "type": "string"
+        },
+        "modification_date": {
+            "type": "date"
+        },
+        "fft": {
+            "properties": {
+                "url": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "filesize": {
+                    "type": "double"
+                }
+            },
+            "type": "object"
+        },
+        "restriction": {
+            "properties": {
+                "email": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "thesis_university": {
+            "type": "string"
+        },
+        "thesis_supervisors": {
+            "properties": {
+                "orcid": {
+                    "type": "string"
+                },
+                "affiliation": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "upload_type": {
+            "properties": {
+                "type": {
+                    "type": "string"
+                },
+                "subtype": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "recid": {
+            "type": "double"
+        },
+        "authors": {
+            "properties": {
+                "orcid": {
+                    "type": "string"
+                },
+                "familyname": {
+                    "type": "string"
+                },
+                "affiliation": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "givennames": {
+                    "type": "string"
+                },
+                "gnd": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "oai": {
+            "properties": {
+                "indicator": {
+                    "type": "string"
+                },
+                "oai": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "doi": {
+            "type": "string"
+        },
+        "embargo_date": {
+            "type": "string"
+        },
+        "files_to_upload": {
+            "properties": {
+                "url": {
+                    "type": "string"
+                },
+                "comment": {
+                    "type": "string"
+                },
+                "file_size": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "owner": {
+            "properties": {
+                "deposition_id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "imprint": {
+            "properties": {
+                "publisher": {
+                    "type": "string"
+                },
+                "place": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "contributors": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "orcid": {
+                    "type": "string"
+                },
+                "affiliation": {
+                    "type": "string"
+                },
+                "gnd": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "conference_url": {
+            "type": "string"
+        },
+        "related_identifiers": {
+            "properties": {
+                "identifier": {
+                    "type": "string"
+                },
+                "scheme": {
+                    "type": "string"
+                },
+                "relation": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "system_control_number": {
+            "properties": {
+                "system_control_number": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "communities": {
+            "type": "string"
+        },
+        "url": {
+            "properties": {
+                "url": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "meetings": {
+            "properties": {
+                "dates": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "place": {
+                    "type": "string"
+                },
+                "acronym": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "journal": {
+            "properties": {
+                "issue": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "pages": {
+                    "type": "string"
+                },
+                "volume": {
+                    "type": "string"
+                },
+                "year": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "version_history": {
+            "type": "string"
+        },
+        "part_of": {
+            "properties": {
+                "publisher": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "provisional_communities": {
+            "type": "string"
+        },
+        "grants": {
+            "properties": {
+                "identifier": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "preservation_score": {
+            "type": "string"
+        },
+        "collections": {
+            "properties": {
+                "primary": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    }
+}
+}}
