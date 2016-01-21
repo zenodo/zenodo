@@ -76,10 +76,6 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Other', marc='oth', datacite='Other'),
 ]
 
-# ElasticSearch
-# =========
-ELASTICSEARCH_HOST = "localhost"
-
 # Frontpage
 # =========
 FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
