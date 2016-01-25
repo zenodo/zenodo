@@ -1,6 +1,18 @@
+frontend:
+  build: ./docker/nginx/
+  restart: "always"
+  ports:
+    - "80:80"
+    - "443:443"
+  links:
+    - web
+  volumes_from:
+    - static
 web:
   build: .
+  restart: "always"
   command: zenodo --debug run -h 0.0.0.0 -p 5000
+  #command: gunicorn zenodo.wsgi --workers 1 -b 0.0.0.0:5000
   ports:
     - "5000:5000"
   environment:
@@ -13,16 +25,16 @@ web:
     - "APP_SESSION_TYPE=redis"
     - "APP_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-  read_only: true
   links:
     - cache
     - es
     - mq
     - db
-  volumes:
-    - ".:/code"
+  volumes_from:
+    - static
 worker:
   build: .
+  restart: "always"
   command: "celery worker -A zenodo.celery --loglevel=INFO"
   environment:
     - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
@@ -34,22 +46,23 @@ worker:
     - "APP_SESSION_TYPE=redis"
     - "APP_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-  read_only: true
   links:
     - cache
     - es
     - mq
     - db
   volumes_from:
-    - web
+    - static
 cache:
   image: redis
+  restart: "always"
   read_only: true
   ports:
     - "6379:6379"
 db:
   image: postgres
   command: postgres
+  restart: "always"
   environment:
     - "POSTGRES_USER=zenodo"
     - "POSTGRES_PASSWORD=zenodo"
@@ -59,12 +72,22 @@ db:
   read_only: false
 mq:
   image: rabbitmq:3-management
+  restart: "always"
   ports:
     - "15672:15672"
     - "5672:5672"
   read_only: true
 es:
   build: ./docker/es/
+  restart: "always"
   ports:
     - "9200:9200"
     - "9300:9300"
+static:
+  restart: "no"
+  build: .
+  command: /bin/true
+  user: zenodo
+  volumes:
+    - "/usr/local/var/zenodo-instance/static"
+    - ".:/code"
