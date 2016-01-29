@@ -1,331 +1,370 @@
-{"mappings": {
-  "record-v1.0.0": {
-    "properties": {
+{
+  "mappings": {
+    "record-v1.0.0": {
+      "date_detection": false,
+      "numeric_detection": false,
+      "properties": {
         "title": {
-            "type": "string"
+          "type": "string"
         },
         "license": {
-            "properties": {
-                "identifier": {
-                    "type": "string"
-                },
-                "license": {
-                    "type": "string"
-                },
-                "source": {
-                    "type": "string"
-                },
-                "url": {
-                    "type": "string"
-                }
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "license": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "source": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "url": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "notes": {
-            "type": "string"
+          "type": "string"
         },
         "altmetric_id": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "description": {
-            "type": "string"
+          "type": "string"
         },
         "creation_date": {
-            "type": "date"
+          "type": "date"
         },
         "language": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "publication_date": {
-            "type": "date"
+          "type": "date"
         },
         "keywords": {
-            "type": "string"
+          "type": "string"
         },
         "references": {
-            "properties": {
-                "raw_reference": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+          "properties": {
+            "raw_reference": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "access_right": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "modification_date": {
-            "type": "date"
+          "type": "date"
         },
         "fft": {
-            "properties": {
-                "url": {
-                    "type": "string"
-                },
-                "comment": {
-                    "type": "string"
-                },
-                "filesize": {
-                    "type": "double"
-                }
+          "properties": {
+            "url": {
+              "type": "string"
             },
-            "type": "object"
+            "comment": {
+              "type": "string"
+            },
+            "filesize": {
+              "type": "double"
+            }
+          },
+          "type": "object"
         },
         "restriction": {
-            "properties": {
-                "email": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+          "properties": {
+            "email": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "thesis_university": {
-            "type": "string"
+          "type": "string"
         },
         "thesis_supervisors": {
-            "properties": {
-                "orcid": {
-                    "type": "string"
-                },
-                "affiliation": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                }
+          "properties": {
+            "orcid": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "affiliation": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "upload_type": {
-            "properties": {
-                "type": {
-                    "type": "string"
-                },
-                "subtype": {
-                    "type": "string"
-                }
+          "properties": {
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "subtype": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "recid": {
-            "type": "double"
+          "type": "integer"
         },
         "authors": {
-            "properties": {
-                "orcid": {
-                    "type": "string"
-                },
-                "familyname": {
-                    "type": "string"
-                },
-                "affiliation": {
-                    "type": "string"
-                },
-                "name": {
-                    "type": "string"
-                },
-                "givennames": {
-                    "type": "string"
-                },
-                "gnd": {
-                    "type": "string"
-                }
+          "properties": {
+            "orcid": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "familyname": {
+              "type": "string"
+            },
+            "affiliation": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "givennames": {
+              "type": "string"
+            },
+            "gnd": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "oai": {
-            "properties": {
-                "indicator": {
-                    "type": "string"
-                },
-                "oai": {
-                    "type": "string"
-                }
+          "properties": {
+            "indicator": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "oai": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "doi": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "embargo_date": {
-            "type": "string"
+          "type": "string"
         },
         "files_to_upload": {
-            "properties": {
-                "url": {
-                    "type": "string"
-                },
-                "comment": {
-                    "type": "string"
-                },
-                "file_size": {
-                    "type": "string"
-                }
+          "properties": {
+            "url": {
+              "type": "string"
             },
-            "type": "object"
+            "comment": {
+              "type": "string"
+            },
+            "file_size": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "owner": {
-            "properties": {
-                "deposition_id": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "id": {
-                    "type": "string"
-                },
-                "username": {
-                    "type": "string"
-                }
+          "properties": {
+            "deposition_id": {
+              "type": "integer"
             },
-            "type": "object"
+            "email": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "id": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "username": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "imprint": {
-            "properties": {
-                "publisher": {
-                    "type": "string"
-                },
-                "place": {
-                    "type": "string"
-                },
-                "year": {
-                    "type": "string"
-                }
+          "properties": {
+            "publisher": {
+              "type": "string"
             },
-            "type": "object"
+            "place": {
+              "type": "string"
+            },
+            "year": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "contributors": {
-            "properties": {
-                "name": {
-                    "type": "string"
-                },
-                "type": {
-                    "type": "string"
-                },
-                "orcid": {
-                    "type": "string"
-                },
-                "affiliation": {
-                    "type": "string"
-                },
-                "gnd": {
-                    "type": "string"
-                }
+          "properties": {
+            "name": {
+              "type": "string"
             },
-            "type": "object"
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "orcid": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "affiliation": {
+              "type": "string"
+            },
+            "gnd": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "conference_url": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "related_identifiers": {
-            "properties": {
-                "identifier": {
-                    "type": "string"
-                },
-                "scheme": {
-                    "type": "string"
-                },
-                "relation": {
-                    "type": "string"
-                }
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "scheme": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "relation": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "system_control_number": {
-            "properties": {
-                "system_control_number": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+          "properties": {
+            "system_control_number": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "communities": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "url": {
-            "properties": {
-                "url": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+          "properties": {
+            "url": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "meetings": {
-            "properties": {
-                "dates": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "place": {
-                    "type": "string"
-                },
-                "acronym": {
-                    "type": "string"
-                }
+          "properties": {
+            "dates": {
+              "type": "string"
             },
-            "type": "object"
+            "title": {
+              "type": "string"
+            },
+            "place": {
+              "type": "string"
+            },
+            "acronym": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "journal": {
-            "properties": {
-                "issue": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "pages": {
-                    "type": "string"
-                },
-                "volume": {
-                    "type": "string"
-                },
-                "year": {
-                    "type": "string"
-                }
+          "properties": {
+            "issue": {
+              "type": "string"
             },
-            "type": "object"
+            "title": {
+              "type": "string"
+            },
+            "pages": {
+              "type": "string"
+            },
+            "volume": {
+              "type": "string"
+            },
+            "year": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "version_history": {
-            "type": "string"
+          "type": "string"
         },
         "part_of": {
-            "properties": {
-                "publisher": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
+          "properties": {
+            "publisher": {
+              "type": "string"
             },
-            "type": "object"
+            "title": {
+              "type": "string"
+            }
+          },
+          "type": "object"
         },
         "provisional_communities": {
-            "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "grants": {
-            "properties": {
-                "identifier": {
-                    "type": "string"
-                },
-                "title": {
-                    "type": "string"
-                }
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "index": "not_analyzed"
             },
-            "type": "object"
+            "title": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         },
         "preservation_score": {
-            "type": "string"
+          "type": "string"
         },
         "collections": {
-            "properties": {
-                "primary": {
-                    "type": "string"
-                }
-            },
-            "type": "object"
+          "properties": {
+            "primary": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          },
+          "type": "object"
         }
+      }
     }
+  }
 }
-}}

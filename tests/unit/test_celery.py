@@ -30,6 +30,7 @@ from __future__ import absolute_import, print_function
 def test_celery():
     """Test celery application."""
     from zenodo.celery import celery
+    celery.loader.import_default_modules()
     assert 'invenio_accounts.tasks.send_security_email' in celery.tasks
     assert 'invenio_mail.tasks.send_email' in celery.tasks
     assert 'invenio_records.tasks.api.create_record' in celery.tasks

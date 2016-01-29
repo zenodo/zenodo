@@ -53,6 +53,15 @@ Defaults to ``<virtualenv>/var/instance/static/``. Can be overwritten
 using the environment variable ``APP_STATIC_FOLDER``
 """
 
+create_celery = create_app_factory(
+    'zenodo',
+    config_loader=conf_loader,
+    extension_entry_points=['invenio_base.apps'],
+    blueprint_entry_points=['invenio_base.blueprints'],
+    instance_path=instance_path,
+    static_folder=static_folder,
+)
+"""Create CLI/Celery application."""
 
 create_api = create_app_factory(
     'zenodo',

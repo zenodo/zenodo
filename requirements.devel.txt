@@ -23,6 +23,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 # Requirements for testing development version of important packages.
+-e git+https://github.com/inveniosoftware/dojson.git#egg=dojson
 -e git+https://github.com/inveniosoftware/invenio-access.git#egg=invenio-access
 -e git+https://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
 -e git+https://github.com/inveniosoftware/invenio-admin.git#egg=invenio-admin
@@ -36,6 +37,10 @@
 -e git+https://github.com/inveniosoftware/invenio-jsonschemas.git#egg=invenio-jsonschemas
 -e git+https://github.com/inveniosoftware/invenio-logging.git#egg=invenio-logging
 -e git+https://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail
+-e git+https://github.com/inveniosoftware/invenio-oaiserver.git#egg=invenio-oaiserver
+-e git+https://github.com/inveniosoftware/invenio-oauth2server.git#egg=invenio-oauth2server
+-e git+https://github.com/inveniosoftware/invenio-oauthclient.git#egg=invenio-oauthclient
+-e git+https://github.com/inveniosoftware/invenio-openaire.git#egg=invenio-openaire
 -e git+https://github.com/inveniosoftware/invenio-pages.git#egg=invenio-pages
 -e git+https://github.com/inveniosoftware/invenio-pidstore.git#egg=invenio-pidstore
 -e git+https://github.com/inveniosoftware/invenio-records-rest.git#egg=invenio-records-rest

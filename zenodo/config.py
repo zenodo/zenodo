@@ -28,6 +28,8 @@ from __future__ import absolute_import, print_function
 
 import os
 
+from invenio_openaire.config import OPENAIRE_REST_ENDPOINTS
+
 
 def _(x):
     """Identity function for string extraction."""
@@ -186,6 +188,7 @@ RECORDS_UI_ENDPOINTS = dict(
     ),
 )
 
+
 RECORDS_REST_ENDPOINTS = dict(
     recid=dict(
         pid_type='recid',
@@ -196,20 +199,77 @@ RECORDS_REST_ENDPOINTS = dict(
         search_index='records',
         search_type=None,
         record_serializers={
-            'application/json': ('zenodo.modules.records.serializers'
-                                 ':record_to_json_serializer'),
+            'application/json': (
+                'zenodo.modules.records.serializers.json_v1_response'),
+            'application/marcxml+xml': (
+                'zenodo.modules.records.serializers.marcxml_v1_response'),
+            # 'application/x-datacite+xml': (
+            #     'zenodo.modules.records.serializers.datacite_v1_response'),
+            # 'application/x-bibtex': (
+            #     'zenodo.modules.records.serializers.bibtex_v1_response'),
         },
         search_serializers={
-            'application/json': ('zenodo.modules.records.serializers'
-                                 ':search_to_json_serializer'),
+            'application/json': (
+                'zenodo.modules.records.serializers:json_v1_search'),
+            'application/marcxml+xml': (
+                'zenodo.modules.records.serializers.marcxml_v1_search'),
         },
+        default_media_type='application/json',
     ),
 )
+# Default OpenAIRE API endpoints.
+RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
+
+RECORDS_REST_SORT_OPTIONS = dict(
+    records=dict(
+        best_match=dict(
+            fields=['_score:desc'],
+            title='Best match',
+            default_order='asc',
+            order=1,
+        ),
+        most_recent=dict(
+            fields=['creation_date:desc'],
+            title='Most recent',
+            default_order='asc',
+            order=2,
+        ),
+        publication_date=dict(
+            fields=['publication_date:asc'],
+            title='Publication date',
+            default_order='desc',
+            order=3,
+        ),
+        title=dict(
+            fields=['title:asc', ],
+            title='Title',
+            order=4,
+        ),
+        # conference_session=dict(
+        #     fields=['conference_part:asc', 'conference_contribution:desc'],
+        #     title='Conference session',
+        #     default_order='desc',
+        #     order=4,
+        # ),
+        journal=dict(
+            fields=[
+                'journal.year:asc',
+                'journal.volume:asc',
+                'journal.issue:asc',
+                'journal.pages:asc',
+            ],
+            title='Journal',
+            default_order='desc',
+            order=6,
+        ),
+    )
+)
+
 
 # Accounts
 # ========
 RECAPTCHA_PUBLIC_KEY = "CHANGE_ME"
-RECAPTCHA_SECRET_KEY = "CHANGE_ME"
+RECAPTCHA_PRIVATE_KEY = "CHANGE_ME"
 
 SECURITY_REGISTER_USER_TEMPLATE = \
     "zenodo_theme/security/register_user.html"
@@ -223,6 +283,13 @@ SECURITY_LOGIN_SALT = "CHANGE_ME"
 SECURITY_PASSWORD_SALT = "CHANGE_ME"
 SECURITY_REMEMBER_SALT = "CHANGE_ME"
 SECURITY_RESET_SALT = "CHANGE_ME"
+
+# Search
+# ======
+SEARCH_AUTOINDEX = []
+SEARCH_UI_SEARCH_API = "invenio_records_rest.recid_list"
+SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
+SEARCH_DOC_TYPE_DEFAULT = None
 
 # Theme
 # =====
@@ -238,13 +305,11 @@ BASE_TEMPLATE = "zenodo_theme/page.html"
 COVER_TEMPLATE = "zenodo_theme/page_cover.html"
 SETTINGS_TEMPLATE = "invenio_theme/page_settings.html"
 
-# Search
-# ======
-SEARCH_AUTOINDEX = []
-SEARCH_UI_SEARCH_API = "invenio_records_rest.recid_list"
-SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
-SEARCH_DOC_TYPE_DEFAULT = None
+REQUIREJS_CONFIG = "js/zenodo-build.js"
 
+# User profile
+# ============
+USERPROFILES_EXTEND_SECURITY_FORMS = True
 
 # Database
 # ========

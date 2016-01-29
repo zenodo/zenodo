@@ -24,7 +24,29 @@
 
 {%- extends config.ACCOUNTS_COVER_TEMPLATE %}
 
-{% from "invenio_accounts/_macros.html" import render_field, form_errors %}
+{% from "invenio_accounts/_macros.html" import render_field %}
+
+{% macro form_errors(form) %}
+  {%- if form.errors %}
+  <div class="alert alert-danger alert-dismissible text-left" role="alert">
+  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  {%- for field, errors in form.errors.items() %}
+    {%- if field == 'profile' %}
+      {%- for field, es in errors.items() %}
+        {%- for e in es %}
+          <p>{{e}}</p>
+        {%- endfor %}
+      {%- endfor %}
+    {%- else %}
+      {%- for error in errors %}
+        <p>{{error}}</p>
+      {%- endfor %}
+    {%- endif %}
+  {%- endfor %}
+  </div>
+  {%- endif %}
+{% endmacro %}
+
 
 {% block panel %}
 {%- with form = register_user_form %}
@@ -37,9 +59,11 @@
     <div class="col-sm-6 col-sm-push-6 sign-up">
       <form action="{{ url_for_security('register') }}" method="POST" name="register_user_form">
       {{form_errors(form)}}
-      {{ form.hidden_tag()}}
-      {{ render_field(form.email, icon="glyphicon glyphicon-user", autofocus=True, errormsg=False) }}
-      {{ render_field(form.password, icon="glyphicon glyphicon-lock", errormsg=False) }}
+      {{ form.csrf_token()}}
+      {{ form.profile.csrf_token()}}
+      {{ render_field(form.email, autofocus=True, errormsg=False) }}
+      {{ render_field(form.profile.username, errormsg=False) }}
+      {{ render_field(form.password, errormsg=False) }}
       {%- if form.password_confirm %}
         {{ render_field(form.password_confirm, icon="glyphicon glyphicon-lock", errormsg=False) }}
       {%- endif %}

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,47 +22,28 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""JS/CSS bundles for theme."""
+"""Base class for Marshmallow based serializers."""
 
 from __future__ import absolute_import, print_function
 
-from flask_assets import Bundle
-from invenio_assets import NpmBundle
+from .base import PreprocessorMixin
 
-css = NpmBundle(
-    'scss/styles.scss',
-    filters='scss, cleancss',
-    depends=('scss/*.scss', ),
-    output='gen/zenodo.%(version)s.css',
-    npm={
-        "almond": "~0.3.1",
-        "bootstrap-sass": "~3.3.5",
-        "font-awesome": "~4.4.0"
-    }
-)
-"""Default CSS bundle."""
 
-js = NpmBundle(
-    Bundle(
-        'node_modules/almond/almond.js',
-        'js/modernizr-custom.js',
-        filters='uglifyjs',
-    ),
-    Bundle(
-        'js/main.js',
-        filters='requirejs',
-    ),
-    depends=(
-        'js/*.js',
-        'js/zenodo/*.js',
-        'js/zenodo/filters/*.js',
-    ),
-    filters='jsmin',
-    output="gen/zenodo.%(version)s.js",
-    npm={
-        "almond": "~0.3.1",
-        "angular": "~1.4.9",
-        "angular-sanitize": "~1.4.9"
-    }
-)
-"""Default JavaScript bundle."""
+class MarshmallowSerializer(PreprocessorMixin):
+    """Base class for marshmallow serializers."""
+
+    def __init__(self, schema_class):
+        """Initialize record."""
+        self.schema_class = schema_class
+
+    def dump(self, obj):
+        """Serialize object with schema."""
+        return self.schema_class().dump(obj).data
+
+    def transform_record(self, pid, record):
+        """Transform record into an intermediate representation."""
+        return self.dump(self.preprocess_record(pid, record))
+
+    def transform_search_hit(self, pid, record_hit):
+        """Transform search result hit into an intermediate representation."""
+        return self.dump(self.preprocess_search_hit(pid, record_hit))

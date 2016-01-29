@@ -52,7 +52,7 @@ def setup_menu():
 @blueprint.route('/')
 def index():
     """Frontpage blueprint."""
-    query = Query("")
+    query = Query("communities:zenodo AND access_right:open")
     query.body["size"] = 10
     query.body["sort"] = [{"creation_date": "desc"}]
 

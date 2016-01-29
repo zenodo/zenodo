@@ -22,9 +22,30 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Record serializers."""
+"""Base class for dojson based serializers."""
 
 from __future__ import absolute_import, print_function
 
-from invenio_records_rest.serializers import record_to_json_serializer, \
-    search_to_json_serializer
+from dojson.contrib.marc21.utils import GroupableOrderedDict
+
+from .base import PreprocessorMixin
+
+
+class DoJSONSerializer(PreprocessorMixin):
+    """Base class for marshmallow serializers."""
+
+    def __init__(self, dojson_model):
+        """Initialize record."""
+        self.dojson_model = dojson_model
+
+    def dump(self, obj):
+        """Serialize object with schema."""
+        return GroupableOrderedDict(self.dojson_model.do(obj))
+
+    def transform_record(self, pid, record):
+        """Transform record into an intermediate representation."""
+        return self.dump(self.preprocess_record(pid, record))
+
+    def transform_search_hit(self, pid, record_hit):
+        """Transform search result hit into an intermediate representation."""
+        return self.dump(self.preprocess_search_hit(pid, record_hit))
