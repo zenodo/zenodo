@@ -1,0 +1,16 @@
+<ul class="pagination" ng-if="vm.invenioSearchResults.hits.total">
+  <li ng-class="paginationHelper.getPrevClass()">
+    <a href="#" ng-click="paginationHelper.changePage(paginationHelper.previous())" aria-label="Previous">
+      <span aria-hidden="true"><</span>
+    </a>
+  </li>
+  <li ng-class="paginationHelper.getPageClass(page.value)" ng-repeat="page in paginatePages">
+    <a href="#" ng-if="page.value != '..'" ng-click="paginationHelper.changePage(page.value)" alt="{{ page.title }}">{{ page.value }}</a>
+    <a href="#" ng-if="page.value == '..'" alt="{{ page.title }}">{{ page.value }}</a>
+  </li>
+  <li ng-class="paginationHelper.getNextClass()">
+    <a href="#" ng-click="paginationHelper.changePage(paginationHelper.next())" aria-label="Next">
+      <span aria-hidden="true">></span>
+    </a>
+  </li>
+</ul>

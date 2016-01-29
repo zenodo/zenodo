@@ -31,6 +31,7 @@ import shutil
 import tempfile
 
 import pytest
+from elasticsearch.exceptions import RequestError
 from flask_cli import ScriptInfo
 from invenio_db import db as db_
 from invenio_search import current_search
@@ -88,7 +89,11 @@ def database(app):
 @pytest.yield_fixture(scope='session')
 def es(app):
     """Provide elasticsearch access."""
-    list(current_search.create())
+    try:
+        list(current_search.create())
+    except RequestError:
+        list(current_search.delete())
+        list(current_search.create())
     yield current_search
     list(current_search.delete(ignore=[404]))
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,47 +22,19 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""JS/CSS bundles for theme."""
+"""MARCXML translation index."""
 
 from __future__ import absolute_import, print_function
 
-from flask_assets import Bundle
-from invenio_assets import NpmBundle
+from dateutil.parser import parse
+from marshmallow import Schema, fields
 
-css = NpmBundle(
-    'scss/styles.scss',
-    filters='scss, cleancss',
-    depends=('scss/*.scss', ),
-    output='gen/zenodo.%(version)s.css',
-    npm={
-        "almond": "~0.3.1",
-        "bootstrap-sass": "~3.3.5",
-        "font-awesome": "~4.4.0"
-    }
-)
-"""Default CSS bundle."""
 
-js = NpmBundle(
-    Bundle(
-        'node_modules/almond/almond.js',
-        'js/modernizr-custom.js',
-        filters='uglifyjs',
-    ),
-    Bundle(
-        'js/main.js',
-        filters='requirejs',
-    ),
-    depends=(
-        'js/*.js',
-        'js/zenodo/*.js',
-        'js/zenodo/filters/*.js',
-    ),
-    filters='jsmin',
-    output="gen/zenodo.%(version)s.js",
-    npm={
-        "almond": "~0.3.1",
-        "angular": "~1.4.9",
-        "angular-sanitize": "~1.4.9"
-    }
-)
-"""Default JavaScript bundle."""
+class RecordSchemaMARC(Schema):
+    """Schema for records in MARC."""
+
+    control_number = fields.Str(attribute='pid.pid_value')
+    date_and_time_of_latest_transaction = fields.Function(
+        lambda obj: parse(obj['updated']).strftime("%Y%m%d%H%M%S.0"))
+    # title_statement = fields.Function(
+    #     lambda obj: dict(title=obj['metadata']['title']))

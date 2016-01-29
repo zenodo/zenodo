@@ -75,6 +75,7 @@ setup_requires = [
 
 install_requires = [
     # 'invenio-search-ui',
+    'dojson>=1.0.0',
     'Flask-BabelEx>=0.9.2',
     'Flask-Debugtoolbar>=0.10.0',
     'idutils>=0.1.1',
@@ -89,6 +90,7 @@ install_requires = [
     'invenio-i18n',
     'invenio-logging',
     'invenio-mail',
+    'invenio-openaire',
     'invenio-pages',
     'invenio-pidstore',
     'invenio-records',
@@ -100,6 +102,7 @@ install_requires = [
     'invenio-userprofiles',
     'invenio>=3.0.0a1,<3.1.0',
     'jsonref>=0.1',
+    'marshmallow>=2.5.0',
     'zenodo-migrationkit>=1.0.0.dev20150000',
 ]
 
