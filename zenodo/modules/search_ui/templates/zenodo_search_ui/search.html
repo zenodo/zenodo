@@ -21,9 +21,15 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 #}
 
-{% extends "invenio_search_ui/search.html" %}
+{% extends config.SEARCH_UI_BASE_TEMPLATE %}
+
+{%- block css %}
+    {{ super() }}
+    {% assets "invenio_search_ui_search_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
+{%- endblock css %}
 
 {%- block page_body %}
+{%- set sort_options = config.RECORDS_REST_SORT_OPTIONS['records'] %}
   <div id="invenio-search">
     <!-- Searchbar -->
     <div class="invenio-search-bar">
@@ -38,6 +44,26 @@
                   </invenio-search-facets>
                 </div> <!-- /.col-md-3 -->
                 <div class="col-md-9">
+
+                  <!-- SORT -->
+                  <div class="pull-right">
+                    <invenio-search-select-box
+                     sort-key="sort"
+                     default-option="{{ sort_options|default_sortoption }}"
+                     available-options="{{ sort_options|format_sortoptions }}"
+                     template="{{ url_for('static', filename='templates/zenodo_search_ui/selectBox.html') }}"
+                    >
+                  </div>
+                  <!-- SORT ORDER -->
+                  <div class="pull-right">
+                    <invenio-search-sort-order
+                     sort-key="sort"
+                     template="{{ url_for('static', filename='templates/zenodo_search_ui/toggleButton.html') }}"
+                    >
+                    </invenio-search-sort-order>
+                  </div>
+
+                  </invenio-search-select-box>
                   <!-- SEARCHBAR -->
                   <invenio-search-bar
                    template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/searchBar.html') }}"
@@ -61,12 +87,12 @@
                   </center>
                   <!-- RESULTS -->
                   <invenio-search-results
-                   template="{{ url_for('static', filename='templates/zenodo_search_ui/default.html') }}">
+                   template="{{ url_for('static', filename='templates/zenodo_search_ui/results.html') }}">
                   </invenio-search-results>
                   <!-- PAGINATION -->
                   <center>
                     <invenio-search-pagination
-                     template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/pagination.html') }}">
+                     template="{{ url_for('static', filename='templates/zenodo_search_ui/pagination.html') }}">
                     </invenio-search-pagination>
                   </center>
                 </div> <!-- /.col-md-12 -->
@@ -78,78 +104,3 @@
     </div> <!-- ./searchbar -->
   </div> <!-- /#invenio-search -->
 {%- endblock page_body -%}
-
-
-{#- block page_body %}
-  {{ super() }}
-  <div id="invenio-search">
-    <div ng-controller="invenioSearchController as search">
-      <!-- Searchbar -->
-      <div class="invenio-search-bar">
-        <div class="container">
-          <div class="row">
-            <div class="col-md-12">
-              <div invenio-search-bar
-                invenio-search-query="search.invenioSearchQuery"
-                invenio-search-args="search.invenioSearchArgs"
-                invenio-search-do="search.invenioDoSearch(query)"
-                search-doctype=""
-                search-method="GET"
-                search-endpoint="/api/records/"
-                search-extra-params='{}'
-                search-page="1"
-                search-size="5"
-                search-bar-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchBar.html') }}"
-                search-bar-input-placeholder="{{ _('Type something') }}"
-              ></div>
-            </div> <!-- /.col-md-12 -->
-          </div> <!-- /.row -->
-        </div> <!-- /.container -->
-      </div>
-
-      <div class="container">
-        <div class="row">
-          <div class="col-md-12">
-
-            <!-- Count -->
-            <div class="invenio-search-count">
-              <div invenio-search-results-count
-                invenio-search-items="search.invenioResults"
-                search-count-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchResultsCount.html') }}"
-              ></div>
-            </div>
-            <!-- /Count -->
-
-            <!-- Loading -->
-            <div class="invenio-search-count">
-              <div invenio-search-results-loading
-                invenio-search-loading="search.invenioSearchLoading"
-                search-loading-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchLoading.html') }}"
-                search-loading-message="{{ _('Loading results') }}"
-              ></div>
-            </div>
-            <!-- /Loading -->
-
-            <!-- Search results-->
-            <div invenio-search-results
-              invenio-search-items="search.invenioResults.hits.hits"
-              search-results-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchResults.html') }}"
-              search-results-record-template="{{ url_for('static', filename='templates/zenodo_search_ui/default.html') }}"
-            ></div>
-            <!-- /Search results-->
-
-            <!-- Search pagination -->
-            <div invenio-search-results-pagination
-              invenio-search-items="search.invenioResults"
-              invenio-search-args="search.invenioSearchArgs"
-              invenio-search-do="search.invenioDoSearch(query)"
-              search-pagination-template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/invenioSearchResultsPagination.html') }}"
-            ></div>
-            <!-- /Search pagination -->
-          </div> <!-- /.col-md-12 -->
-        </div> <!-- /.row -->
-      </div> <!-- /.container -->
-    </div> <!-- /controller -->
-  </div> <!-- /#invenio-search -->
-{%- endblock page_body -#}
-

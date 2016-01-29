@@ -1,0 +1,25 @@
+<div class="row record-elem" ng-repeat="record in vm.invenioSearchResults.hits.hits track by $index">
+  <div class="col-xs-12">
+    <div class="pull-right view-record hidden-xs">
+      <a target="_self" ng-href="/record/{{record.id}}" class="btn btn-default">View</a>
+    </div>
+    <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ record.metadata.publication_date|date:'longDate' }}</span>
+    <span class="label label-default">{{ record.metadata.type }}</span>
+    <span class="label label-success">{{ record.metadata.access_right }}</span>
+
+    {{ objecttype_label(object_type, lang=current_i18n.language) }}
+    {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
+
+    <h4><a target="_self" ng-href="/record/{{record.id}}">{{record.metadata.title}}</a></h4>
+    <p>
+      <span ng-repeat='creator in record.metadata.creators'>
+      <a target="_self" ng-href="/record/{{record.id}}" class="text-muted">{{ creator.name }}</a>;
+      </span>
+    </p>
+    <p class="hidden-xs"><a target="_self" ng-href="/record/{{record.id}}"><span ng-bind-html="record.metadata.description|striptags|limitTo:300"></span></a></p>
+      <small class="text-muted hidden-xs">
+        Uploaded on {{ record.created|date:'longDate' }}
+      </small>
+    <hr />
+  </div>
+</div>
