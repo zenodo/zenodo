@@ -62,5 +62,6 @@ RUN chown -R zenodo:zenodo /code ${APP_INSTANCE_PATH}
 VOLUME ["/code"]
 
 USER zenodo
+RUN echo "export PATH=${PATH}:/usr/local/bin >> ~/.bashrc"
 
 CMD ["zenodo", "run", "-h", "0.0.0.0"]
