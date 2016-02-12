@@ -26,9 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, render_template, request
-from flask_babelex import gettext as _
-from flask_menu import current_menu, register_menu
+from flask import Blueprint, render_template
+from flask_menu import register_menu
 from invenio_search import Query, current_search_client
 
 blueprint = Blueprint(
@@ -37,16 +36,6 @@ blueprint = Blueprint(
     url_prefix='',
     template_folder='templates',
 )
-
-
-@blueprint.before_app_first_request
-def setup_menu():
-    """Setup menu."""
-    item = current_menu.submenu('main.search')
-    item.register(
-        'invenio_search_ui.search', _('Search'), order=1,
-        active_when=lambda: request.endpoint.startswith("invenio_search_ui")
-    )
 
 
 @blueprint.route('/')
