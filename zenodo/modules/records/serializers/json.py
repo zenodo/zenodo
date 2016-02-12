@@ -80,5 +80,5 @@ class JSONSerializer(MarshmallowSerializer):
                 total=search_result['hits']['total'],
             ),
             links=links or {},
-            aggregations=search_result['aggregations'],
+            aggregations=search_result.get('aggregations', {}),
         ), **self._format_args())
