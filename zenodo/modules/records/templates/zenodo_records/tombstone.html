@@ -22,4 +22,16 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{% extends "invenio_theme/header.html" %}
+{% extends config.THEME_ERROR_TEMPLATE %}
+
+{%- set title = _("Tombstone") + " | " + config.THEME_SITENAME -%}
+
+{% block message %}
+  <h1><i class="fa fa-flash"></i> {{_('Gone')}}</h1>
+  <p>
+  {% trans sitename=config.THEME_SITENAME %}
+    The record  you are trying to access was removed from {{sitename}}. The
+    metadata of the record is kept for archival purposes.
+  {% endtrans %}
+  </p>
+{% endblock message %}

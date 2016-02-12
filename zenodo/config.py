@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 import os
 
 from invenio_openaire.config import OPENAIRE_REST_ENDPOINTS
+from invenio_records_rest.facets import terms_filter
 
 
 def _(x):
@@ -187,7 +188,7 @@ RECORDS_UI_ENDPOINTS = dict(
         template='zenodo_records/record_export.html',
     ),
 )
-
+RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"
 
 RECORDS_REST_ENDPOINTS = dict(
     recid=dict(
@@ -223,25 +224,25 @@ RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
 RECORDS_REST_SORT_OPTIONS = dict(
     records=dict(
         best_match=dict(
-            fields=['_score:desc'],
+            fields=['-_score'],
             title='Best match',
             default_order='asc',
             order=1,
         ),
         most_recent=dict(
-            fields=['creation_date:desc'],
+            fields=['-creation_date'],
             title='Most recent',
             default_order='asc',
             order=2,
         ),
         publication_date=dict(
-            fields=['publication_date:asc'],
+            fields=['publication_date'],
             title='Publication date',
             default_order='desc',
             order=3,
         ),
         title=dict(
-            fields=['title:asc', ],
+            fields=['title', ],
             title='Title',
             order=4,
         ),
@@ -253,10 +254,10 @@ RECORDS_REST_SORT_OPTIONS = dict(
         # ),
         journal=dict(
             fields=[
-                'journal.year:asc',
-                'journal.volume:asc',
-                'journal.issue:asc',
-                'journal.pages:asc',
+                'journal.year',
+                'journal.volume',
+                'journal.issue',
+                'journal.pages',
             ],
             title='Journal',
             default_order='desc',
@@ -265,6 +266,31 @@ RECORDS_REST_SORT_OPTIONS = dict(
     )
 )
 
+RECORDS_REST_FACETS = dict(
+    records=dict(
+        aggs=dict(
+            type=dict(
+                terms=dict(field="upload_type.type"),
+                aggs=dict(
+                    subtype=dict(
+                        terms=dict(field="upload_type.subtype"),
+                    )
+                )
+            ),
+            access_right=dict(
+                terms=dict(field="access_right"),
+            ),
+        ),
+        filters=dict(
+            communities=terms_filter('communities'),
+        ),
+        post_filters=dict(
+            access_right=terms_filter('access_right'),
+            type=terms_filter('upload_type.type'),
+            subtype=terms_filter('upload_type.subtype'),
+        )
+    )
+)
 
 # Accounts
 # ========
@@ -288,9 +314,17 @@ SECURITY_RESET_SALT = "CHANGE_ME"
 # Search
 # ======
 SEARCH_AUTOINDEX = []
-SEARCH_UI_SEARCH_API = "invenio_records_rest.recid_list"
+SEARCH_UI_SEARCH_API = "/api/records/"
 SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
 SEARCH_DOC_TYPE_DEFAULT = None
+SEARCH_ALLOWED_KEYWORDS = [
+    'communities',
+    'title',
+    'authors.name',
+    'access_right',
+    'upload_type.type',
+    'upload_type.subtype',
+]
 
 # Theme
 # =====
@@ -305,6 +339,7 @@ THEME_GOOGLE_SITE_VERIFICATION = [
 BASE_TEMPLATE = "zenodo_theme/page.html"
 COVER_TEMPLATE = "zenodo_theme/page_cover.html"
 SETTINGS_TEMPLATE = "invenio_theme/page_settings.html"
+HEADER_TEMPLATE = "zenodo_theme/header.html"
 
 REQUIREJS_CONFIG = "js/zenodo-build.js"
 
