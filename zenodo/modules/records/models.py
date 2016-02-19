@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -134,3 +134,14 @@ class ObjectType(object):
                 loader=cls._jsonloader)
         except KeyError:
             return None
+
+    @classmethod
+    def get_by_dict(cls, value):
+        """Get object type dict with type and subtype key."""
+        if not value:
+            return None
+        if 'subtype' in value:
+            internal_id = "{0}-{1}".format(value['type'], value['subtype'])
+        else:
+            internal_id = value['type']
+        return cls.get(internal_id)

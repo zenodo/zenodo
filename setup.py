@@ -96,7 +96,7 @@ install_requires = [
     'invenio-records',
     'invenio-records-rest',
     'invenio-records-ui',
-    'invenio-rest',
+    'invenio-rest[cors]',
     'invenio-search',
     'invenio-theme',
     'invenio-userprofiles',

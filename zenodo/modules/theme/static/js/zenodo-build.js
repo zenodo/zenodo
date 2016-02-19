@@ -42,4 +42,4 @@
     mangle: true
   },
   mainConfigFile: ['./zenodo-settings.js']
-})
+});

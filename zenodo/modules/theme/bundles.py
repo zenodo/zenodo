@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -56,6 +56,7 @@ js = NpmBundle(
         'js/*.js',
         'js/zenodo/*.js',
         'js/zenodo/filters/*.js',
+        'node_modules/invenio-search-js/dist/*.js',
     ),
     filters='jsmin',
     output="gen/zenodo.%(version)s.js",

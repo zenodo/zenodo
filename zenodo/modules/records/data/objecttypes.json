@@ -106,6 +106,18 @@
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "lesson",
+  "id": "http://zenodo.org/objecttypes/lesson#",
+  "title": {
+    "en": "Lesson"
+  },
+  "title_plural": {
+    "en": "Lessons"
+  },
+  "schema.org": "http://schema.org/CreativeWork"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
   "internal_id": "publication-book",
   "id": "http://zenodo.org/objecttypes/publication/book#",
   "title": {
@@ -245,6 +257,45 @@
     "en": "Working papers"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-proposal",
+  "id": "http://zenodo.org/objecttypes/publication/proposal#",
+  "title": {
+    "en": "Proposal"
+  },
+  "title_plural": {
+    "en": "Proposals"
+  },
+  "schema.org": "http://schema.org/CreativeWork",
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-deliverable",
+  "id": "http://zenodo.org/objecttypes/publication/deliverable#",
+  "title": {
+    "en": "Project deliverable"
+  },
+  "title_plural": {
+    "en": "Project deliverable"
+  },
+  "schema.org": "http://schema.org/CreativeWork",
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-milestone",
+  "id": "http://zenodo.org/objecttypes/publication/milestone#",
+  "title": {
+    "en": "Project milestone"
+  },
+  "title_plural": {
+    "en": "Project milestone"
+  },
+  "schema.org": "http://schema.org/CreativeWork",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
