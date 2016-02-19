@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -30,18 +30,14 @@
   {%- if form.errors %}
   <div class="alert alert-danger alert-dismissible text-left" role="alert">
   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-  {%- for field, errors in form.errors.items() %}
-    {%- if field == 'profile' %}
-      {%- for field, es in errors.items() %}
-        {%- for e in es %}
-          <p>{{e}}</p>
-        {%- endfor %}
-      {%- endfor %}
-    {%- else %}
-      {%- for error in errors %}
-        <p>{{error}}</p>
-      {%- endfor %}
-    {%- endif %}
+  {%- for key,err_obj in form.errors.items() recursive %}
+      {%  if err_obj is mapping %}
+          {{  loop(err_obj.items()) }}
+      {% else %}
+          {% for single_message in err_obj %}
+            <p>{{ single_message }}</p>
+          {% endfor %}
+      {% endif %}
   {%- endfor %}
   </div>
   {%- endif %}
@@ -68,7 +64,7 @@
         {{ render_field(form.password_confirm, icon="glyphicon glyphicon-lock", errormsg=False) }}
       {%- endif %}
       {%- if form.recaptcha %}
-        <div class="form-group form-group-lg">{{ form.recaptcha() }}</div>
+        <div class="form-group form-group-lg"><div align="center">{{ form.recaptcha() }}</div></div>
       {%- endif %}
       <button type="submit" class="btn btn-warning btn-lg btn-block"><i class="fa fa-edit"></i> {{_('Sign Up')}}</button>
       </form>

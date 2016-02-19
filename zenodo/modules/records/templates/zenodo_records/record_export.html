@@ -22,6 +22,14 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
+{% extends config.THEME_ERROR_TEMPLATE %}
+
+{% block message %}
+  <h1><i class="fa fa-flash"></i> {{_('Coming soon...')}}</h1>
+{% endblock message %}
+
+
+{#
 {%- extends config.RECORDS_UI_BASE_TEMPLATE %}
 
 {%- from "zenodo_records/macros/accessright.html" import accessright_label -%}
@@ -34,7 +42,7 @@
 
 {%- block head %}
 {{super()}}
-{#- include "zenodo_records/meta.html" #}
+{%- include "zenodo_records/meta.html" %}
 {%- endblock head %}
 
 {%- block page_body %}
@@ -51,3 +59,4 @@
   </div>
 </div>
 {%- endblock %}
+#}

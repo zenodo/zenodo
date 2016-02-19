@@ -21,15 +21,10 @@
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 define([], function(){
-  function upperCaseFilter() {
-    return function(input, ellipsis) {
-      var out = input.toUpperCase();
-
-      if (ellipsis) {
-        out = out + ' ...';
-      }
-      return out;
+  function titleCaseFilter() {
+    return function(text) {
+      return text ? String(text).replace('_', ' ') : '';
     };
   }
-  return upperCaseFilter;
+  return titleCaseFilter;
 });

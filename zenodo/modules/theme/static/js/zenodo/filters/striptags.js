@@ -24,7 +24,7 @@ define([], function(){
   function stripTagsFilter() {
     return function(text) {
       return text ? String(text).replace(/<[^>]+>/gm, '') : '';
-    }
+    };
   }
   return stripTagsFilter;
 });

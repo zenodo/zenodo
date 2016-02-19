@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -216,6 +216,7 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.marcxml_v1_search'),
         },
         default_media_type='application/json',
+        query_factory_imp='invenio_records_rest.query.es_query_factory',
     ),
 )
 # Default OpenAIRE API endpoints.
@@ -223,13 +224,13 @@ RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
 
 RECORDS_REST_SORT_OPTIONS = dict(
     records=dict(
-        best_match=dict(
+        bestmatch=dict(
             fields=['-_score'],
             title='Best match',
             default_order='asc',
             order=1,
         ),
-        most_recent=dict(
+        mostrecent=dict(
             fields=['-creation_date'],
             title='Most recent',
             default_order='asc',
@@ -266,6 +267,10 @@ RECORDS_REST_SORT_OPTIONS = dict(
     )
 )
 
+RECORDS_REST_DEFAULT_SORT = dict(
+    records=dict(query='bestmatch', noquery='mostrecent'),
+)
+
 RECORDS_REST_FACETS = dict(
     records=dict(
         aggs=dict(
@@ -291,6 +296,10 @@ RECORDS_REST_FACETS = dict(
         )
     )
 )
+
+# REST
+# ====
+REST_ENABLE_CORS = True
 
 # Accounts
 # ========
@@ -324,10 +333,12 @@ SEARCH_ALLOWED_KEYWORDS = [
     'upload_type.type',
     'upload_type.subtype',
 ]
+SEARCH_ELASTIC_KEYWORD_MAPPING = {}
 
 # Theme
 # =====
 THEME_SITENAME = _("Zenodo")
+THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
 THEME_TWITTERHANDLE = "@zenodo_org"
 THEME_LOGO = "img/zenodo.svg"
 THEME_GOOGLE_SITE_VERIFICATION = [

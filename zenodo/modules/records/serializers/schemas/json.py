@@ -26,7 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
+from dateutil.parser import parse
 from marshmallow import Schema, fields
+
+from zenodo.modules.records.models import AccessRight, ObjectType
 
 
 class PersonSchemaV1(Schema):
@@ -86,6 +89,7 @@ class MetadataSchemaV1(Schema):
 
     type = fields.Str(attribute="upload_type.type")
     subtype = fields.Str(attribute="upload_type.subtype", missing=None)
+    type_title = fields.Method('get_type_title')
 
     publication_date = fields.Str()
     doi = fields.Str(attribute='doi')
@@ -99,7 +103,8 @@ class MetadataSchemaV1(Schema):
     notes = fields.Str()
     keywords = fields.List(fields.Str)
     license = fields.Str(attribute="license.identifier")
-    access_right = fields.Str()
+    access_right = fields.Method('get_access_right')
+    access_right_category = fields.Method('get_access_right_category')
     embargo_date = fields.Str()
     access_condition = fields.Str()
 
@@ -112,6 +117,27 @@ class MetadataSchemaV1(Schema):
     references = fields.List(fields.Str)
     journal = fields.Nested(JournalSchemaV1)
     conference = fields.Nested(ConferenceSchemaV1)
+
+    def get_type_title(self, obj):
+        """Get type title."""
+        try:
+            return ObjectType.get_by_dict(obj['upload_type'])['title']['en']
+        except Exception:
+            from flask import current_app
+            current_app.logger.exception("Failed object {}".format(obj['upload_type']))
+            raise
+
+    def get_access_right(self, obj):
+        """Get access right information."""
+        dt = obj.get('embargo_date')
+        return AccessRight.get(
+            obj['access_right'],
+            embargo_date=parse(dt).date() if dt else None
+        )
+
+    def get_access_right_category(self, obj):
+        """Get access right category."""
+        return AccessRight.as_category(self.get_access_right(obj))
 
 
 class RecordSchemaJSONV1(Schema):

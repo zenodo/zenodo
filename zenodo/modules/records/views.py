@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -78,13 +78,7 @@ def accessright_title(value, embargo_date=None):
 @blueprint.app_template_filter()
 def objecttype(value):
     """Get object type."""
-    if not value:
-        return None
-    if 'subtype' in value:
-        internal_id = "{0}-{1}".format(value['type'], value['subtype'])
-    else:
-        internal_id = value['type']
-    return ObjectType.get(internal_id)
+    return ObjectType.get_by_dict(value)
 
 
 #

@@ -1,0 +1,37 @@
+<div ng-init="tree=[];tree_more=[]" ng-repeat="(key, value) in vm.invenioSearchResults.aggregations track by $index">
+  <div ng-if="value.buckets.length > 0" class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title titlecase">{{ key|titlecase}}</h3>
+    </div>
+    <div class="panel-body">
+      <ul class="list-unstyled" ng-repeat="item in value.buckets">
+        <li class="titlecase">
+          <input type="checkbox" ng-checked="handler[key].indexOf(item.key) > -1" ng-click="handleClick(key, item.key)" /> {{ item.key|titlecase }} ({{ item.doc_count }})
+          <small>
+            <a
+              ng-init="tree_more[item.key]=false;tree[item.key]=(handler[key].indexOf(item.key) > -1) ? true : false"
+              ng-model="tree[item.key]"
+              ng-show="tree_more[item.key]"
+              ng-click="tree[item.key]=!tree[item.key]"
+            >
+              {{ (tree[item.key]) ? '-' : '+' }}
+            </a>
+          </small>
+          <div ng-show="tree[item.key]===true" ng-repeat="(subKey, subValue) in item">
+            <div ng-if="['doc_count', 'key'].indexOf(subKey) === -1">
+              <ul ng-init="tree_more[item.key]=true" ng-repeat="subFacets in subValue.buckets">
+                <li class="titlecase">
+                  <input
+                   ng-init="tree[item.key]=(handler[subKey].indexOf(subFacets.key) > -1 || tree[item.key])"
+                   type="checkbox"
+                   ng-checked="handler[subKey].indexOf(subFacets.key) > -1"
+                   ng-click="handleClick(subKey, subFacets.key)" /> {{ subFacets.key|titlecase }} ({{ subFacets.doc_count }})
+                </li>
+              </ul>
+            </div>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>

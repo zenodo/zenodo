@@ -22,10 +22,12 @@
 
 define([
   'js/zenodo/filters/striptags',
-  'js/zenodo/filters/safe'
-], function(striptagsFilter, safeFilter){
+  'js/zenodo/filters/safe',
+  'js/zenodo/filters/titlecase'
+], function(striptagsFilter, safeFilter, titlecaseFilter){
   var app = angular.module('zenodo.filters', ['ngSanitize'])
     .filter('striptags', striptagsFilter)
+    .filter('titlecase', titlecaseFilter)
     .filter('safe', ['$sce', safeFilter]);
   return app;
 });
