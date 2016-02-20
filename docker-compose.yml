@@ -22,8 +22,6 @@ web:
     - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
     - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
     - "APP_SECRET_KEY=CHANGE_ME"
-    - "APP_SESSION_TYPE=redis"
-    - "APP_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
   links:
@@ -44,8 +42,6 @@ worker:
     - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
     - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
     - "APP_SECRET_KEY=CHANGE_ME"
-    - "APP_SESSION_TYPE=redis"
-    - "APP_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
   links:

@@ -64,6 +64,7 @@ CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 CACHE_KEY_PREFIX = "cache::"
 CACHE_REDIS_URL = "redis://localhost:6379/0"
 CACHE_TYPE = "redis"
+ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 
 # Deposit
 # =======
@@ -345,6 +346,7 @@ THEME_GOOGLE_SITE_VERIFICATION = [
     "5fPGCLllnWrvFxH9QWI0l1TadV7byeEvfPcyK2VkS_s",
     "Rp5zp04IKW-s1IbpTOGB7Z6XY60oloZD5C3kTM-AiY4"
 ]
+THEME_PIWIK_ID = "CHANGE_ME"
 
 BASE_TEMPLATE = "zenodo_theme/page.html"
 COVER_TEMPLATE = "zenodo_theme/page_cover.html"

@@ -56,6 +56,12 @@ def index():
     )
 
 
+@blueprint.route('/ping', methods=['HEAD', 'GET'])
+def ping():
+    """Frontpage blueprint."""
+    return 'OK'
+
+
 @blueprint.route('/deposit/')
 @register_menu(blueprint, 'main.upload', 'Upload', order=2)
 def index2():

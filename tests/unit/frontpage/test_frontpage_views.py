@@ -35,6 +35,14 @@ def test_frontpage(app, db, es):
         assert 'Recent uploads' in res.get_data(as_text=True)
 
 
+def test_ping(app):
+    """Test frontpage."""
+    with app.test_client() as client:
+        res = client.get("/ping")
+        assert res.status_code == 200
+        assert res.get_data(as_text=True) == "OK"
+
+
 def test_temporary_views(app):
     """Test frontpage."""
     with app.test_client() as client:
