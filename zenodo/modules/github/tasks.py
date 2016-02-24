@@ -104,7 +104,7 @@ def handle_github_payload(event_state, verify_sender=True):
         metadata = extract_metadata(gh, e.payload)
 
         # Extract zip snapshot from github
-        files = extract_files(e.payload)
+        files = extract_files(e.payload, account.tokens[0].access_token)
 
         # Upload into Zenodo
         deposition = upload(access_token, metadata, files, publish=True)
@@ -189,7 +189,7 @@ def extract_metadata(gh, payload):
     return defaults
 
 
-def extract_files(payload):
+def extract_files(payload, access_token):
     """ Extract files to download from GitHub payload. """
     release = payload["release"]
     repository = payload["repository"]
@@ -201,6 +201,8 @@ def extract_files(payload):
     filename = "%(repo_name)s-%(tag_name)s.zip" % {
         "repo_name": repo_name, "tag_name": tag_name
     }
+
+    zipball_url + "?access_token={0}".format(access_token)
 
     r = requests.get(zipball_url, stream=True)
     if r.status_code != 200:

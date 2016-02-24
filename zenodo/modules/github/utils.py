@@ -131,7 +131,6 @@ def sync(gh, extra_data, sync_hooks=True):
     new_set = set()
 
     repos = gh.iter_repos(type='all', sort='full_name')
-    repos.headers['Accept'] = 'application/vnd.github.moondragon+json'
 
     for r in repos:
         # Next line to be replaced with "r.permissions['admin']" once
