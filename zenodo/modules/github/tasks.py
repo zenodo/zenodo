@@ -204,10 +204,11 @@ def extract_files(payload, access_token):
 
     zipball_url + "?access_token={0}".format(access_token)
 
-    r = requests.get(zipball_url, stream=True)
-    if r.status_code != 200:
+    # Check if zipball exists.
+    r = requests.head(zipball_url)
+    if r.status_code != 302:
         raise Exception(
             "Could not retrieve archive from GitHub: %s" % zipball_url
         )
 
-    return [(r.raw, filename)]
+    return [(zipball_url, filename)]

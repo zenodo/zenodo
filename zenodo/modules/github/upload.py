@@ -114,13 +114,19 @@ def upload(access_token, metadata, files, publish=False, request_factory=None):
     deposition_id = r.json()['id']
 
     # Upload a file
-    for fileobj, filename in files:
+    for (zipball_url, filename) in files:
+        githubres = requests.get(zipball_url, stream=True)
+        if githubres.status_code != 200:
+            raise Exception(
+                "Could not retrieve archive from GitHub: %s" % zipball_url
+            )
+
         r = client.post(
             'depositionfilelistresource',
             urlargs=dict(resource_id=deposition_id),
             is_json=False,
             data={'filename': filename},
-            files={'file': fileobj},
+            files={'file': githubres.raw},
         )
         if r.status_code != 201:
             raise ZenodoApiWarning("Could not add file", deposition_id,
