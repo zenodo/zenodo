@@ -57,7 +57,7 @@ def payload_debug(event_state):
 
         res['metadata'] = extract_metadata(gh, e.payload)
 
-        res['files'] = extract_files(e.payload)
+        res['files'] = extract_files(e.payload, account.tokens[0].access_token)
     finally:
         pass
     return res
