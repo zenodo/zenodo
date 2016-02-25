@@ -202,7 +202,7 @@ def extract_files(payload, access_token):
         "repo_name": repo_name, "tag_name": tag_name
     }
 
-    zipball_url + "?access_token={0}".format(access_token)
+    zipball_url = zipball_url + "?access_token={0}".format(access_token)
 
     # Check if zipball exists.
     r = requests.head(zipball_url)
