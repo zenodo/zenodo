@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -26,6 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
+import sys
+from os.path import join
+
 from .cli import fixtures
 
 
@@ -39,4 +42,12 @@ class ZenodoFixtures(object):
 
     def init_app(self, app):
         """Flask application initialization."""
+        self.init_config(app.config)
         app.cli.add_command(fixtures)
+
+    def init_config(self, config):
+        """Flask application initialization."""
+        config.setdefault(
+            'FIXTURES_FILES_LOCATION',
+            join(sys.prefix, 'var/data')
+        )

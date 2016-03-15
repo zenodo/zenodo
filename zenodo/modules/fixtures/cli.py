@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -27,11 +27,14 @@
 from __future__ import absolute_import, print_function
 
 import json
-from os.path import join
+from os import makedirs
+from os.path import exists, join
 
 import click
+from flask import current_app
 from flask_cli import with_appcontext
 from invenio_db import db
+from invenio_files_rest.models import Location
 from invenio_pages.models import Page
 from pkg_resources import resource_string
 
@@ -76,6 +79,23 @@ def loadpages(force):
             )
             db.session.add(p)
         db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+@fixtures.command()
+@with_appcontext
+def loadlocation():
+    """Load data store location."""
+    try:
+        uri = current_app.config['FIXTURES_FILES_LOCATION']
+        if not exists(uri):
+            makedirs(uri)
+        loc = Location(name='local', uri=uri, default=True, )
+        db.session.add(loc)
+        db.session.commit()
+        click.secho('Created location {0}'.format(loc.uri), fg='green')
     except Exception:
         db.session.rollback()
         raise
