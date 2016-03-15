@@ -1,6 +1,8 @@
 Installation
 ============
 
+Docker installation
+-------------------
 The easiest way to get started with Zenodo is using the provided docker image.
 First checkout the source code, build all docker images and boot them up
 using Docker Compose:
@@ -21,12 +23,14 @@ Next, create the database and indexes and an admin user:
     $ docker-compose run web zenodo index init
     $ docker-compose run web zenodo fixtures loadpages
     $ docker-compose run web zenodo users create info@zenodo.org -a
+    $ docker-compose run web zenodo access \
+    allow admin-access -e info@zenodo.org
 
 Now visit the following URL in your browser:
 
 .. code-block:: console
 
-    http://<docker ip>:5000
+    https://<docker ip>
 
 You can use the following web interface to inspect Elasticsearch and RabbitMQ:
 
@@ -35,6 +39,8 @@ You can use the following web interface to inspect Elasticsearch and RabbitMQ:
 
 Also the following ports are exposed on the Docker host:
 
+- ``80``: Nginx
+- ``443``: Nginx
 - ``5000``: Zenodo
 - ``5432``: PostgreSQL
 - ``5672``: RabbitMQ
@@ -46,3 +52,4 @@ Also the following ports are exposed on the Docker host:
 **Dependencies**
 
 Zenodo depends on PostgreSQL, Elasticsearch, Redis and RabbitMQ.
+

@@ -16,13 +16,13 @@ web:
   ports:
     - "5000:5000"
   environment:
+    - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
     - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
     - "APP_CACHE_TYPE=redis"
     - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
     - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
     - "APP_SECRET_KEY=CHANGE_ME"
-    - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
   links:
     - cache
@@ -36,13 +36,13 @@ worker:
   restart: "always"
   command: "celery worker -A zenodo.celery --loglevel=INFO"
   environment:
+    - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
     - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
     - "APP_CACHE_TYPE=redis"
     - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
     - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
     - "APP_SECRET_KEY=CHANGE_ME"
-    - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
   links:
     - cache
@@ -62,9 +62,9 @@ db:
   command: postgres
   restart: "always"
   environment:
-    - "POSTGRES_USER=zenodo"
-    - "POSTGRES_PASSWORD=zenodo"
     - "POSTGRES_DB=zenodo"
+    - "POSTGRES_PASSWORD=zenodo"
+    - "POSTGRES_USER=zenodo"
   ports:
     - "5432:5432"
   read_only: false

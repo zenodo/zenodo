@@ -6,7 +6,7 @@ License
    does not apply to the name Zenodo (TM) and the Zenodo logo which are trademarked
    by CERN. Thus if you instantiate the software you must change the branding to your own.
 
-Copyright (C) 2009-2015 CERN.
+Copyright (C) 2009-2016 CERN.
 
 Zenodo is free software; you can redistribute it and/or
 modify it under the terms of the GNU General Public License as
