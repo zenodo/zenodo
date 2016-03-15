@@ -26,7 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta
+
 from zenodo.modules.records.models import AccessRight, ObjectType
 
 
@@ -51,11 +52,13 @@ def test_access_right_embargo():
     assert AccessRight.get(AccessRight.OPEN) == 'open'
     assert AccessRight.get(AccessRight.EMBARGOED) == 'embargoed'
     # Embargo just lifted today.
+    today = datetime.utcnow().date()
+
     assert AccessRight.get(
-        AccessRight.EMBARGOED, embargo_date=date.today()) == 'open'
+        AccessRight.EMBARGOED, embargo_date=today) == 'open'
     # Future embargo date.
     assert AccessRight.get(
-        AccessRight.EMBARGOED, embargo_date=date.today()+timedelta(days=1)) \
+        AccessRight.EMBARGOED, embargo_date=today+timedelta(days=1)) \
         == 'embargoed'
 
 

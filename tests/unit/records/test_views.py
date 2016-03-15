@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 from flask import render_template_string
 
 
@@ -38,16 +38,17 @@ def test_is_valid_access_right(app):
 
 def test_is_embargoed(app):
     """Test template test."""
+    today = datetime.utcnow().date()
     assert render_template_string(
-        "{{ dt is embargoed }}", dt=date.today()) == "False"
+        "{{ dt is embargoed }}", dt=today) == "False"
     assert render_template_string(
-        "{{ dt is embargoed }}", dt=date.today()+timedelta(days=1)) == "True"
+        "{{ dt is embargoed }}", dt=today+timedelta(days=1)) == "True"
     assert render_template_string(
         "{{ dt is embargoed(accessright='open') }}",
-        dt=date.today()+timedelta(days=1)) == "False"
+        dt=today+timedelta(days=1)) == "False"
     assert render_template_string(
         "{{ dt is embargoed(accessright='embargoed') }}",
-        dt=date.today()+timedelta(days=1)) == "True"
+        dt=today+timedelta(days=1)) == "True"
     assert render_template_string(
         "{{ dt is embargoed(accessright='embargoed') }}",
         dt=None) == "False"
