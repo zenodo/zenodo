@@ -91,6 +91,7 @@ install_requires = [
     'invenio-i18n',
     'invenio-logging',
     'invenio-mail',
+    'invenio-marc21',
     'invenio-migrator',
     'invenio-oauth2server',
     'invenio-oauthclient',
