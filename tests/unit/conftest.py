@@ -34,9 +34,9 @@ import pytest
 from elasticsearch.exceptions import RequestError
 from flask_cli import ScriptInfo
 from invenio_db import db as db_
+from invenio_files_rest.models import Location
 from invenio_search import current_search
-from sqlalchemy_utils.functions import create_database, database_exists, \
-    drop_database
+from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
 
@@ -58,13 +58,10 @@ def app(request):
         TESTING=True,
     )
 
-    def teardown():
-        shutil.rmtree(instance_path)
-
-    request.addfinalizer(teardown)
-
     with app.app_context():
         yield app
+
+    shutil.rmtree(instance_path)
 
 
 @pytest.yield_fixture(scope='session')
@@ -73,17 +70,33 @@ def script_info(app):
     yield ScriptInfo(create_app=lambda info: app)
 
 
-@pytest.yield_fixture(scope='session')
-def database(app):
-    """Ensure that the database schema is created."""
+@pytest.yield_fixture()
+def db(app):
+    """Setup database."""
     if not database_exists(str(db_.engine.url)):
         create_database(str(db_.engine.url))
-    db_.drop_all()
     db_.create_all()
-
     yield db_
+    db_.session.remove()
+    db_.drop_all()
 
-    drop_database(str(db_.engine.url))
+
+@pytest.yield_fixture()
+def location(db):
+    """File system location."""
+    tmppath = tempfile.mkdtemp()
+
+    loc = Location(
+        name='testloc',
+        uri=tmppath,
+        default=True
+    )
+    db.session.add(loc)
+    db.session.commit()
+
+    yield loc
+
+    shutil.rmtree(tmppath)
 
 
 @pytest.yield_fixture(scope='session')
@@ -96,14 +109,3 @@ def es(app):
         list(current_search.create())
     yield current_search
     list(current_search.delete(ignore=[404]))
-
-
-@pytest.yield_fixture
-def db(database, monkeypatch):
-    """Provide database access and ensure changes do not persist."""
-    # Prevent database/session modifications
-    monkeypatch.setattr(database.session, 'commit', database.session.flush)
-    monkeypatch.setattr(database.session, 'remove', lambda: None)
-    yield database
-    database.session.rollback()
-    database.session.remove()

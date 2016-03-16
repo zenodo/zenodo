@@ -124,7 +124,8 @@ class MetadataSchemaV1(Schema):
             return ObjectType.get_by_dict(obj['upload_type'])['title']['en']
         except Exception:
             from flask import current_app
-            current_app.logger.exception("Failed object {}".format(obj['upload_type']))
+            current_app.logger.exception(
+                "Failed object {}".format(obj['upload_type']))
             raise
 
     def get_access_right(self, obj):

@@ -43,7 +43,8 @@ tests_require = [
     'pytest-flask>=0.10.0',
     'pytest-pep8>=1.0.6',
     'pytest>=2.8.0',
-    'selenium>=2.48.0',
+    # 2.53.0 introduced a Python 3 compatibility issue. Wait for it to be fixed
+    'selenium>=2.48.0,<2.53.0',
     'six>=1.10.0',
 ]
 

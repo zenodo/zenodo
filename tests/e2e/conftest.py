@@ -33,16 +33,16 @@ from __future__ import absolute_import, print_function
 import os
 
 import pytest
-from invenio_db import db
+from elasticsearch.exceptions import RequestError
+from invenio_db import db as db_
 from invenio_search import current_search
 from selenium import webdriver
-from sqlalchemy_utils.functions import create_database, database_exists, \
-    drop_database
+from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
 
 
-@pytest.fixture()
+@pytest.yield_fixture(scope='session', autouse=True)
 def app(request):
     """Flask application fixture."""
     app = create_app(
@@ -60,20 +60,23 @@ def app(request):
     )
 
     with app.app_context():
-        if not database_exists(str(db.engine.url)):
-            create_database(str(db.engine.url))
-        db.drop_all()
-        db.create_all()
-        list(current_search.create())
+        # Init
+        if not database_exists(str(db_.engine.url)):
+            create_database(str(db_.engine.url))
+        db_.create_all()
 
-    def teardown():
-        with app.app_context():
-            drop_database(str(db.engine.url))
-            list(current_search.delete(ignore=[404]))
+        try:
+            list(current_search.create())
+        except RequestError:
+            list(current_search.delete())
+            list(current_search.create())
 
-    request.addfinalizer(teardown)
+        yield app
 
-    return app
+        # Teardown
+        list(current_search.delete(ignore=[404]))
+        db_.session.remove()
+        db_.drop_all()
 
 
 def pytest_generate_tests(metafunc):
@@ -90,7 +93,7 @@ def pytest_generate_tests(metafunc):
         metafunc.parametrize('env_browser', browsers, indirect=True)
 
 
-@pytest.fixture()
+@pytest.yield_fixture()
 def env_browser(request):
     """Fixture for a webdriver instance of the browser."""
     if request.param is None:
@@ -98,6 +101,8 @@ def env_browser(request):
 
     # Create instance of webdriver.`request.param`()
     browser = getattr(webdriver, request.param)()
-    # Add finalizer to quit the webdriver instance
-    request.addfinalizer(lambda: browser.quit())
-    return browser
+
+    yield browser
+
+    # Quit the webdriver instance
+    browser.quit()
