@@ -36,38 +36,55 @@ def _(x):
     """Identity function for string extraction."""
     return x
 
+#: Email address for support.
 SUPPORT_EMAIL = "info@zenodo.org"
 
 # DataCite
 # ========
+#: DOI prefixes considered as local prefixes.
 ZENODO_LOCAL_DOI_PREFIXES = ["10.5072", "10.5281"]
+
+#: The instance's DOI prefix.
 DATACITE_DOI_PREFIX = "10.5072"
+
 
 # Debug
 # =====
+#: Do not allow DebugToolbar to redirects redirects.
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
 # Language
 # ========
+#: Default language.
 BABEL_DEFAULT_LANGUAGE = 'en'
+#: Default timezone.
 BABEL_DEFAULT_TIMEZONE = 'Europe/Zurich'
+#: Other supported languages.
 I18N_LANGUAGES = []
 
 # Celery
 # ======
+#: Default broker (RabbitMQ on locahost).
 BROKER_URL = "amqp://guest:guest@localhost:5672//"
+#: Default Celery result backend.
 CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
+#: Accepted content types for Celery.
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 
 # Cache
 # =========
+#: Cache key prefix
 CACHE_KEY_PREFIX = "cache::"
+#: URL of Redis db.
 CACHE_REDIS_URL = "redis://localhost:6379/0"
+#: Default cache type.
 CACHE_TYPE = "redis"
+#: Default cache URL for sessions.
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 
 # Deposit
 # =======
+#: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),
     dict(label='Data collector', marc='col', datacite='DataCollector'),
@@ -82,9 +99,10 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
 
 # Frontpage
 # =========
+#: Frontpage endpoint.
 FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
 
-# OAuthclient
+#: Defintion of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
     # github=dict(
     #     title='GitHub',
@@ -136,11 +154,13 @@ OAUTHCLIENT_REMOTE_APPS = dict(
     ),
 )
 
+#: Credentials for GitHub (must be changed to work).
 OAUTHCLIENT_GITHUB_CREDENTIALS = dict(
     consumer_key="CHANGE_ME",
     consumer_secret="CHANGE_ME",
 )
 
+#: Credentials for ORCID (must be changed to work).
 OAUTHCLIENT_ORCID_CREDENTIALS = dict(
     consumer_key="CHANGE_ME",
     consumer_secret="CHANGE_ME",
@@ -148,11 +168,14 @@ OAUTHCLIENT_ORCID_CREDENTIALS = dict(
 
 # OpenAIRE
 # ========
+#: Hostname for JSON Schemas.
 OPENAIRE_SCHEMAS_HOST = 'zenodo.org'
+#: Hostname for OpenAIRE's grant resolver.
 OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'zenodo.org'
 
 # Pages
 # =====
+#: Allowed configuration variables to use in page templates.
 PAGES_WHITELIST_CONFIG_KEYS = [
     'DATACITE_DOI_PREFIX',
     'DEPOSIT_CONTRIBUTOR_TYPES',
@@ -163,6 +186,7 @@ PAGES_WHITELIST_CONFIG_KEYS = [
 
 # Records
 # =======
+#: Mapping of old export formats to new content type.
 ZENODO_LEGACY_FORMATS = {
     'dcite': 'application/x-datacite+xml',
     'dcite3': 'application/x-datacite+xml',
@@ -176,6 +200,7 @@ ZENODO_LEGACY_FORMATS = {
     'json': 'application/json',
 }
 
+#: Endpoints for displaying records.
 RECORDS_UI_ENDPOINTS = dict(
     recid=dict(
         pid_type='recid',
@@ -189,8 +214,10 @@ RECORDS_UI_ENDPOINTS = dict(
         template='zenodo_records/record_export.html',
     ),
 )
+#: Default tombstone template.
 RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"
 
+#: Records REST API endpoints.
 RECORDS_REST_ENDPOINTS = dict(
     recid=dict(
         pid_type='recid',
@@ -223,6 +250,7 @@ RECORDS_REST_ENDPOINTS = dict(
 # Default OpenAIRE API endpoints.
 RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
 
+#: Sort options records REST API.
 RECORDS_REST_SORT_OPTIONS = dict(
     records=dict(
         bestmatch=dict(
@@ -268,10 +296,12 @@ RECORDS_REST_SORT_OPTIONS = dict(
     )
 )
 
+#: Default sort for records REST API.
 RECORDS_REST_DEFAULT_SORT = dict(
     records=dict(query='bestmatch', noquery='mostrecent'),
 )
 
+#: Defined facets for records REST API.
 RECORDS_REST_FACETS = dict(
     records=dict(
         aggs=dict(
@@ -300,15 +330,20 @@ RECORDS_REST_FACETS = dict(
 
 # REST
 # ====
+#: Enable CORS support.
 REST_ENABLE_CORS = True
 
 # Accounts
 # ========
+#: Recaptcha public key (must be changed).
 RECAPTCHA_PUBLIC_KEY = "CHANGE_ME"
+#: Recaptcha private key (must be changed).
 RECAPTCHA_PRIVATE_KEY = "CHANGE_ME"
 
+#: User registration template.
 SECURITY_REGISTER_USER_TEMPLATE = \
     "zenodo_theme/security/register_user.html"
+#: Login registration template.
 SECURITY_LOGIN_USER_TEMPLATE = \
     "zenodo_theme/security/login_user.html"
 
@@ -322,46 +357,54 @@ SECURITY_RESET_SALT = "CHANGE_ME"
 
 # Search
 # ======
-SEARCH_AUTOINDEX = []
+#: Default API endpoint for search UI.
 SEARCH_UI_SEARCH_API = "/api/records/"
+#: Default template for search UI.
 SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
+#: Default Elasticsearch document type.
 SEARCH_DOC_TYPE_DEFAULT = None
-SEARCH_ALLOWED_KEYWORDS = [
-    'communities',
-    'title',
-    'authors.name',
-    'access_right',
-    'upload_type.type',
-    'upload_type.subtype',
-]
+#: Do not map any keywords.
 SEARCH_ELASTIC_KEYWORD_MAPPING = {}
 
 # Theme
 # =====
+#: Default site name.
 THEME_SITENAME = _("Zenodo")
+#: Endpoint for breadcrumb root.
 THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
+#: Twitter handle.
 THEME_TWITTERHANDLE = "@zenodo_org"
+#: Path to logo file.
 THEME_LOGO = "img/zenodo.svg"
+#: Google Site Verification ids.
 THEME_GOOGLE_SITE_VERIFICATION = [
     "5fPGCLllnWrvFxH9QWI0l1TadV7byeEvfPcyK2VkS_s",
     "Rp5zp04IKW-s1IbpTOGB7Z6XY60oloZD5C3kTM-AiY4"
 ]
+#: Piwik site id.
 THEME_PIWIK_ID = "CHANGE_ME"
 
+#: Base template for entire site.
 BASE_TEMPLATE = "zenodo_theme/page.html"
+#: Cover template for entire site.
 COVER_TEMPLATE = "zenodo_theme/page_cover.html"
+#: Settings template for entire site.
 SETTINGS_TEMPLATE = "invenio_theme/page_settings.html"
+#: Header template for entire site.
 HEADER_TEMPLATE = "zenodo_theme/header.html"
-
+#: JavaScript file containing the require.js build configuration.
 REQUIREJS_CONFIG = "js/zenodo-build.js"
 
 # User profile
 # ============
+#: Extend account registration form with user profiles fields.
 USERPROFILES_EXTEND_SECURITY_FORMS = True
 
 # Database
 # ========
+#: Default database host.
 SQLALCHEMY_DATABASE_URI = os.environ.get(
     "SQLALCHEMY_DATABASE_URI",
     "postgresql+psycopg2://localhost/zenodo")
+#: Do not print SQL queries to console.
 SQLALCHEMY_ECHO = False

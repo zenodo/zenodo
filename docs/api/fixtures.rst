@@ -1,6 +1,6 @@
 ..
     This file is part of Zenodo.
-    Copyright (C) 2015 CERN.
+    Copyright (C) 2015, 2016 CERN.
 
     Zenodo is free software; you can redistribute it
     and/or modify it under the terms of the GNU General Public License as
@@ -22,9 +22,16 @@
     as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 
-Base Configuration
-------------------
+Fixtures
+--------
 
-.. automodule:: zenodo.config
+.. automodule:: zenodo.modules.fixtures
+   :members:
+   :undoc-members:
+
+CLI
+~~~
+
+.. automodule:: zenodo.modules.fixtures.cli
    :members:
    :undoc-members:

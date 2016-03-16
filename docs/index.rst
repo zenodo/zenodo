@@ -52,6 +52,7 @@ this part of the documentation is for you.
 
    api/applications
    api/config
+   api/fixtures
    api/records
    api/theme
 

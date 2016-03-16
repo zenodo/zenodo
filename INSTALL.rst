@@ -15,16 +15,20 @@ using Docker Compose:
     $ docker-compose up
 
 
-Next, create the database and indexes and an admin user:
+Next, create the database, indexes, fixtures and an admin user:
 
 .. code-block:: console
 
     $ docker-compose run web zenodo db create
     $ docker-compose run web zenodo index init
     $ docker-compose run web zenodo fixtures loadpages
+    $ docker-compose run web zenodo fixtures loadlocation
+    $ docker-compose run web zenodo fixtures loaddemorecords
     $ docker-compose run web zenodo users create info@zenodo.org -a
     $ docker-compose run web zenodo access \
     allow admin-access -e info@zenodo.org
+    $ docker-compose run web zenodo migration reindex recid
+    $ docker-compose run web zenodo index run -d
 
 Now visit the following URL in your browser:
 

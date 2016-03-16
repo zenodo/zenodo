@@ -22,7 +22,191 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo."""
+"""Zenodo usage documentation for developers.
+
+Running
+-------
+Starting a development server is as simple as (note, if you are using docker,
+simply run ``docker-compose up``):
+
+.. code-block:: console
+
+   $ zenodo --debug run
+
+Celery workers can be started using the command:
+
+.. code-block:: console
+
+   $ celery worker -A zenodo.celery -l INFO
+
+Configuration
+-------------
+Out-of-the-box Zenodo is configured to run in a local development environment
+with all services running on localhost. Some Zenodo features are dependent
+on external services, which by default are not configured - e.g. ORCID/GitHub
+sign-in. In order to make these features work, please follow the guide below
+for how to configure them.
+
+Instance configuration
+~~~~~~~~~~~~~~~~~~~~~~
+You can configure your specific instance by either environment variables
+and/or using the instance configuration file located at:
+
+.. code-block:: console
+
+    ${VIRTUAL_ENV}/var/instance/zenodo.cfg
+
+Recaptcha
+~~~~~~~~~
+To enable Recaptcha on the sign up page, you need to get a public and private
+key from https://www.google.com/recaptcha/ and add them to your configuration:
+
+.. code-block:: python
+
+   RECAPTCHA_PUBLIC_KEY = '...'
+   RECAPTCHA_PRIVATE_KEY = '...'
+
+ORCID Login
+~~~~~~~~~~~
+In order to enable ORCID login you must get an OAuth client id and client
+secret from ORCID and add them to:
+
+.. code-block:: python
+
+   ORCID_APP_CREDENTIALS = dict(
+       consumer_key='...',
+       consumer_secret='...',
+   )
+
+GitHub Login
+~~~~~~~~~~~~
+In order to enable GitHub login you must get an OAuth client id and client
+secret from GitHub and add them to:
+
+.. code-block:: python
+
+   GITHUB_APP_CREDENTIALS = dict(
+       consumer_key='...',
+       consumer_secret='...',
+   )
+
+
+For the GitHub integration to work with a self-signed SSL certificate you need
+to set:
+
+.. code-block:: python
+
+   GITHUB_INSECURE_SSL = True
+
+Also, for production instances, you should set the following shared secret
+(note, do not use your `SECRET_KEY` for this):
+
+.. code-block:: python
+
+   GITHUB_SHARED_SECRET = '...'
+
+
+DataCite DOI minting
+~~~~~~~~~~~~~~~~~~~~
+For DOI minting to work you must provide the DataCite prefix and credentials
+like this:
+
+.. code-block:: python
+
+   DATACITE_USERNAME = '...'
+   DATACITE_PASSWORD = '..'
+   DATACITE_DOI_PREFIX = '10.5072'
+
+
+Google Site Verification
+~~~~~~~~~~~~~~~~~~~~~~~~
+If you want to use Google Webmasters toolkit you can add the site verification
+id in to the templates by setting the following configuration:
+
+.. code-block:: python
+
+   GOOGLE_SITE_VERIFICATION = ['<id1>', '<id2>', ...]
+
+
+Elasticsearch
+~~~~~~~~~~~~~
+If you need to configure Elasticsearch to connect to an ES cluster with HTTPS
+proxy using HTTP Basic authentication it can be done like this:
+
+.. code-block:: python
+
+   SEARCH_ELASTIC_KWARGS = dict(
+       port=443,
+       http_auth=('myuser', 'mypassword'),
+       use_ssl=True,
+       verify_certs=False,
+   )
+   SEARCH_ELASTIC_HOSTS = [
+       dict(host='es1.example.org', **SEARCH_ELASTIC_KWARGS),
+       dict(host='es2.example.org', **SEARCH_ELASTIC_KWARGS),
+       dict(host='es2.example.org', **SEARCH_ELASTIC_KWARGS),
+   ]
+
+
+PostgreSQL, RabbitMQ, Redis
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+In case you want to use remote database, broker and cache you can change the
+defaults using the following configuration variables:
+
+.. code-block:: python
+
+   SQLALCHEMY_DATABASE_URI = 'postgresql+psycopg2://dbhost/db'
+   REDIS_URL = 'redis://redishost:6379'
+   BROKER_URL = 'amqp://rabbitmqhost:5672/myvhost"
+
+   ACCOUNTS_SESSION_REDIS_URL = '{0}/0'.format(REDIS_URL)
+   CACHE_REDIS_URL = '{0}/0'.format(REDIS_URL)
+   CELERY_RESULT_BACKEND = '{0}/1'.format(REDIS_URL)
+
+Sentry
+~~~~~~
+If you would like error logging to Sentry, set the configuration variable:
+
+.. code-block:: python
+
+   SENTRY_DSN = 'https://user:pw@sentry.example.org/'
+
+Theme
+~~~~~
+Piwik analytics can be configured with the configuration variable:
+
+.. code-block:: python
+
+   THEME_PIWIK_ID = 123
+
+You can add a message to all pages, in order to show that a certain instancen
+is not a production instance, e.g."
+
+.. code-block:: python
+
+   THEME_TAG = 'Sandbox'
+
+Assets
+~~~~~~
+For non-development installation be sure to set the static file collection to
+copy files instead of symlinking:
+
+.. code-block:: python
+
+   COLLECT_STORAGE = 'flask_collect.storage.file'
+
+
+Metrics
+~~~~~~~
+Zenodo uses the Invenio-Metrics module to compute metrics at given intervals
+and send it to the CERN monitoring infrastructure.
+
+.. code-block:: python
+
+   METRICS_XSLS_API_URL = "http://xsls-dev.cern.ch"
+   METRICS_XSLS_SERVICE_ID = "myid"
+
+"""
 
 from __future__ import absolute_import, print_function
 

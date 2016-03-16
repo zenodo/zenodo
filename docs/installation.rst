@@ -103,6 +103,17 @@ Next, create the database and Elasticsearch indexes and an admin user:
    (zenodo)$ zenodo users create info@zenodo.org -a
    (zenodo)$ zenodo access allow admin-access -e info@zenodo.org
 
-
 You must already have PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ for
 above to work.
+
+Demo records
+~~~~~~~~~~~~
+You can now load the demo records:
+
+.. code-block:: console
+
+   (zenodo)$ celery worker -A zenodo.celery -l INFO --purge
+   (zenodo)$ zenodo fixtures loaddemorecords
+   (zenodo)$ zenodo migration reindex recid
+   (zenodo)$ zenodo index run -d
+

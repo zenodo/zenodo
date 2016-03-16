@@ -171,7 +171,7 @@ setup(
             'zenodo = zenodo.cli:cli',
         ],
         'invenio_base.apps': [
-            'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
+            'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
         ],
@@ -220,7 +220,7 @@ setup(
         'Programming Language :: Python :: 3.3',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
-        'Development Status :: 1 - Planning',
+        'Development Status :: 3 - Alpha',
     ],
     cmdclass={'test': PyTest},
 )

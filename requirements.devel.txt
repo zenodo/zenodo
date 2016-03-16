@@ -24,6 +24,7 @@
 
 # Requirements for testing development version of important packages.
 -e git+https://github.com/inveniosoftware/dojson.git#egg=dojson
+-e git+https://github.com/inveniosoftware/flask-celeryext.git#egg=flask-celeryext
 -e git+https://github.com/inveniosoftware/invenio-access.git#egg=invenio-access
 -e git+https://github.com/inveniosoftware/invenio-accounts.git#egg=invenio-accounts
 -e git+https://github.com/inveniosoftware/invenio-admin.git#egg=invenio-admin
@@ -35,6 +36,7 @@
 -e git+https://github.com/inveniosoftware/invenio-files-rest.git#egg=invenio-files-rest
 -e git+https://github.com/inveniosoftware/invenio-formatter.git#egg=invenio-formatter
 -e git+https://github.com/inveniosoftware/invenio-i18n.git#egg=invenio-i18n
+-e git+https://github.com/inveniosoftware/invenio-indexer.git#egg=invenio-indexer
 -e git+https://github.com/inveniosoftware/invenio-jsonschemas.git#egg=invenio-jsonschemas
 -e git+https://github.com/inveniosoftware/invenio-logging.git#egg=invenio-logging
 -e git+https://github.com/inveniosoftware/invenio-mail.git#egg=invenio-mail

@@ -22,33 +22,33 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Jinja utilities for Invenio."""
+"""CLI for Zenodo fixtures."""
 
 from __future__ import absolute_import, print_function
 
 import json
 from os import makedirs
-from os.path import exists, join
+from os.path import dirname, exists, join
 
 import click
 from flask import current_app
 from flask_cli import with_appcontext
 from invenio_db import db
 from invenio_files_rest.models import Location
+from invenio_migrator.tasks.records import import_record
 from invenio_pages.models import Page
-from pkg_resources import resource_string
+from pkg_resources import resource_stream, resource_string
 
 
 def _read_json(path):
     """Retrieve JSON from package resource."""
-    return json.loads(_read_file(path))
+    return json.loads(
+        resource_string('zenodo.modules.fixtures', path).decode('utf8'))
 
 
-def _read_file(path):
+def _file_stream(path):
     """Retrieve JSON from package resource."""
-    return resource_string(
-        'zenodo.modules.fixtures',
-        path).decode('utf8')
+    return resource_stream('zenodo.modules.fixtures', path)
 
 
 @click.group()
@@ -74,7 +74,8 @@ def loadpages(force):
                 url=p['url'],
                 title=p['title'],
                 description=p['description'],
-                content=_read_file(join("data", p['file'])),
+                content=_file_stream(
+                    join('data', p['file'])).read().decode('utf8'),
                 template_name=p['template_name'],
             )
             db.session.add(p)
@@ -99,3 +100,23 @@ def loadlocation():
     except Exception:
         db.session.rollback()
         raise
+
+
+@fixtures.command()
+@with_appcontext
+def loaddemorecords():
+    """Load demo records."""
+    click.echo('Loading demo data...')
+    with open(join(dirname(__file__), 'data/records.json'), 'r') as fp:
+        data = json.load(fp)
+
+    click.echo('Sending tasks to queue...')
+    with click.progressbar(data) as records:
+        for item in records:
+            import_record.delay(item, source_type='json')
+
+    click.echo("1. Start Celery:")
+    click.echo("     celery worker -A zenodo.celery -l INFO")
+    click.echo("2. After tasks have been processed start reindexing:")
+    click.echo("     zenodo migration reindex recid")
+    click.echo("     zenodo index run -d -c 4")

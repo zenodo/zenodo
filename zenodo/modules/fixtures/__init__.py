@@ -23,3 +23,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Fixtures module."""
+
+from __future__ import absolute_import, print_function
+
+from .ext import ZenodoFixtures
+
+__all__ = ('ZenodoFixtures', )
