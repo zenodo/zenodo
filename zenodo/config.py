@@ -242,10 +242,10 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.json_v1_response'),
             'application/marcxml+xml': (
                 'zenodo.modules.records.serializers.marcxml_v1_response'),
-            # 'application/x-datacite+xml': (
-            #     'zenodo.modules.records.serializers.datacite_v1_response'),
             'application/x-bibtex': (
                 'zenodo.modules.records.serializers.bibtex_v1_response'),
+            'application/x-datacite+xml': (
+                'zenodo.modules.records.serializers.datacite_v31_response'),
         },
         search_serializers={
             'application/json': (
@@ -254,6 +254,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.marcxml_v1_search'),
             'application/x-bibtex': (
                 'zenodo.modules.records.serializers:bibtex_v1_search'),
+            'application/x-datacite+xml': (
+                'zenodo.modules.records.serializers.datacite_v31_search'),
         },
         default_media_type='application/json',
         query_factory_imp='invenio_records_rest.query.es_query_factory',
@@ -339,6 +341,51 @@ RECORDS_REST_FACETS = dict(
         )
     )
 )
+
+# OAI-PMH
+# =======
+#: Index to use for the OAI-PMH server.
+OAISERVER_RECORD_INDEX = 'records'
+#: OAI identifier prefix
+OAISERVER_ID_PREFIX = 'oai:localhost:recid/'
+#: Number of records to return per page in OAI-PMH results.
+OAISERVER_PAGE_SIZE = 25
+#: Support email for OAI-PMH.
+OAISERVER_ADMIN_EMAILS = [SUPPORT_EMAIL]
+#: Do not register signals to automatically update record on updates.
+OAISERVER_REGISTER_RECORD_SIGNALS = False
+#: Metadata formats for OAI-PMH server
+OAISERVER_METADATA_FORMATS = {
+    'marcxml': {
+        'namespace': 'http://www.loc.gov/MARC21/slim',
+        'schema': 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_marc21_v1',
+    },
+    'marc21': {
+        'namespace': 'http://www.loc.gov/MARC21/slim',
+        'schema': 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_marc21_v1',
+    },
+    'datacite3': {
+        'namespace': 'http://datacite.org/schema/kernel-3',
+        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v31',
+    },
+    'oai_datacite': {
+        'namespace': 'http://datacite.org/schema/kernel-3',
+        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
+    }
+    # },
+    # 'oai_dc': {
+    #     'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
+    #     'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
+    #     'serializer': (
+    #         'dojson.contrib.to_marc21.utils:dumps_etree',
+    #         {'xslt_filename': '/Users/lnielsen/src/invenio-oaiserver/invenio_oaiserver/static/xsl/oai2.v1.0.xsl'}
+    #     ),
+    # }
+}
 
 # REST
 # ====

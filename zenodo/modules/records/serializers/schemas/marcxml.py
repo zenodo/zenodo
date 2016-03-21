@@ -33,7 +33,7 @@ from marshmallow import Schema, fields
 class RecordSchemaMARC(Schema):
     """Schema for records in MARC."""
 
-    control_number = fields.Str(attribute='pid.pid_value')
+    control_number = fields.Str(attribute='metadata.recid')
     date_and_time_of_latest_transaction = fields.Function(
         lambda obj: parse(obj['updated']).strftime("%Y%m%d%H%M%S.0"))
     # title_statement = fields.Function(

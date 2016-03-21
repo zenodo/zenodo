@@ -4,28 +4,29 @@
   "type":"object",
   "required":[
     "authors",
-    "creation_date",
     "description",
-    "documents",
     "access_right",
-    "modification_date",
     "publication_date",
     "recid",
-    "restriction",
-    "title",
-    "version_history"
+    "title"
   ],
   "properties":{
     "notes":{
       "type":"string"
     },
-    "oai":{
+    "_oaiid":{
+      "type":"string"
+    },
+    "_oai":{
       "type":"object",
       "properties":{
-        "indicator":{
-          "type":"string"
+        "sets":{
+          "type":"array",
+          "items":{
+            "type":"string"
+          }
         },
-        "oai":{
+        "updated":{
           "type":"string"
         }
       }
