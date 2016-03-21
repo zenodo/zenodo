@@ -213,6 +213,16 @@ RECORDS_UI_ENDPOINTS = dict(
             list(ZENODO_LEGACY_FORMATS.keys()))),
         template='zenodo_records/record_export.html',
     ),
+    record_preview=dict(
+        pid_type='recid',
+        route='/record/<pid_value>/preview',
+        view_imp='invenio_previewer.views.preview',
+    ),
+    record_files=dict(
+        pid_type='recid',
+        route='/record/<pid_value>/files/<filename>',
+        view_imp='invenio_files_rest.views.file_download_ui',
+    ),
 )
 #: Default tombstone template.
 RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"

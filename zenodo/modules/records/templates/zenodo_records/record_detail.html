@@ -58,6 +58,7 @@
         {{ record.notes}}
       </div>
       {%- endif %}
+      {%-  include "zenodo_records/box/files.html" %}
     </div>
     <div class="col-sm-4 col-md-4">
       {%- if record.doi %}
