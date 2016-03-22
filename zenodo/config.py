@@ -680,4 +680,8 @@ STATSD_HOST = None
 #: Default StatsD port
 STATSD_port = 8125
 #: Default StatsD port
-STATSD_PREFIX = 'zenodo'
+STATSD_PREFIX = "zenodo"
+
+# Proxy configuration
+#: Number of proxies in front of application.
+WSGI_PROXIES = 0

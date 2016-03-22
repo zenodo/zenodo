@@ -237,6 +237,15 @@ Zenodo uses StatsD to measure request performance.
    STATSD_PORT = 8125
    STATSD_PREFIX = "zenodo"
 
+Proxy configuration
+~~~~~~~~~~~~~~~~~~~
+In order for Zenodo to correctly determine a client's IP address, you must set
+how many proxies are in-front of the application:
+
+.. code-block:: python
+
+   WSGI_PROXIES = 1
+
 Vocabularies
 ------------
 Zenodo relies on external vocabularies/authorities for linking records to

@@ -25,6 +25,7 @@ web:
     - "APP_SECRET_KEY=CHANGE_ME"
     - "APP_STATSD_HOST=statsd"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
+    - "APP_WSGI_PROXIES=1"
   links:
     - cache
     - es
@@ -47,6 +48,7 @@ worker:
     - "APP_SECRET_KEY=CHANGE_ME"
     - "APP_STATSD_HOST=statsd"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
+    - "APP_WSGI_PROXIES=1"
   links:
     - cache
     - es
@@ -111,4 +113,4 @@ static:
   volumes:
     - "/usr/local/var/instance/static"
     - "/usr/local/var/data"
-    - ".:/code"
+    - ".:/code/zenodo"

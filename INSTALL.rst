@@ -18,16 +18,14 @@ Next, create the database, indexes, fixtures and an admin user:
 
 .. code-block:: console
 
-    $ docker-compose run --rm statsd init-es.sh
-    $ docker-compose run --rm web zenodo db create
-    $ docker-compose run --rm web zenodo index init
-    $ docker-compose run --rm web zenodo fixtures init
+    $ docker-compose run --rm web bash /code/zenodo/scripts/init.sh
+    $ docker-compose run --rm statsd bash /init.sh
+
+Next, load demo records:
+
     $ docker-compose run --rm web zenodo fixtures loaddemorecords
-    $ docker-compose run --rm web zenodo users create info@zenodo.org -a
-    $ docker-compose run --rm web zenodo access \
-    allow admin-access -e info@zenodo.org
     $ docker-compose run --rm web zenodo migration recordsrun
-    $ docker-compose run --rm web zenodo migration reindex recid
+    $ docker-compose run --rm web zenodo index reindex --yes-i-know
     $ docker-compose run --rm web zenodo index run -d
 
 Now visit the following URL in your browser:
@@ -50,7 +48,7 @@ Also the following ports are exposed on the Docker host:
 - ``5601``: Kibana
 - ``5672``: RabbitMQ
 - ``6379``: Redis
-- ``8125``: StatsD
+- ``8125``: StatsD (UDP)
 - ``9200``: Elasticsearch
 - ``9300``: Elasticsearch
 - ``15672``: RabbitMQ management console

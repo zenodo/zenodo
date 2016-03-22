@@ -22,7 +22,9 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-zenodo fixtures loadfp6grants
-zenodo openaire loadfunders --source ~/src/invenio-openaire/invenio_openaire/data/fundref_registry.rdf
-zenodo openaire loadgrants --setspec=FP7Projects
-zenodo openaire loadgrants --setspec=H2020Projects
+zenodo db create
+zenodo index init
+zenodo fixtures init
+zenodo users create info@zenodo.org -a --password=123456
+zenodo access allow admin-access -e info@zenodo.org
+zenodo access allow deposit-admin-access -e info@zenodo.org
