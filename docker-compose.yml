@@ -88,4 +88,4 @@ static:
   user: zenodo
   volumes:
     - "/usr/local/var/zenodo-instance/static"
-    - ".:/code"
+    - ".:/code/zenodo"

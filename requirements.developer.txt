@@ -25,5 +25,3 @@
 # Pinned requirements which cannot be upgraded without breaking changes.
 -r requirements.txt
 -r requirements.devel.txt
-
--e .[all,postgresql]
