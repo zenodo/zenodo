@@ -29,6 +29,8 @@ from __future__ import absolute_import, print_function
 from datetime import datetime, timedelta
 from flask import render_template_string
 
+from zenodo.modules.records.views import zenodo_related_links
+
 
 def test_is_valid_access_right(app):
     """Test template test."""
@@ -98,6 +100,36 @@ def test_relation_title(app):
         "{{ 'isCitedBy'|relation_title }}") == "Cited by"
     assert render_template_string(
         "{{ 'isIdenticalTo'|relation_title }}") == "isIdenticalTo"
+
+
+def test_relation_logo():
+    """Test relation logo."""
+    no_relations = {}
+    assert zenodo_related_links(no_relations) == []
+
+    github_relation = {
+        'communities': [
+            'zenodo',
+        ],
+        'related_identifiers': [
+            {
+                'scheme': 'url',
+                'relation': 'isSupplementTo',
+                'identifier': 'https://github.com/'
+                              'TaghiAliyev/BBiCat/tree/v1.0.4-alpha',
+            }
+        ],
+    }
+    assert zenodo_related_links(github_relation) == [
+        {
+            'image': 'img/github.png',
+            'link': 'https://github.com/TaghiAliyev/BBiCat/tree/v1.0.4-alpha',
+            'prefix': 'https://github.com',
+            'relation': 'isSupplementTo',
+            'scheme': 'url',
+            'text': 'Available in'
+        }
+    ]
 
 
 def test_pid_url(app):

@@ -63,6 +63,7 @@
       {%- if record.doi %}
         {{ almetric_badge(record.doi, css_class='well') }}
       {%- endif %}
+      {%- include "zenodo_records/box/publishedin.html" %}
       <div class="well metadata">
         {%- include "zenodo_records/box/info.html" %}
       </div>

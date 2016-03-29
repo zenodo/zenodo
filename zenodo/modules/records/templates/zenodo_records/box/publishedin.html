@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -31,58 +31,3 @@
 <a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>{% endfor %}
 </div>
 {% endif %}
-
-
-
-RULES = {
-    'f1000research': [{
-        'prefix': '10.12688/f1000research',
-        'relation': 'isCitedBy',
-        'scheme': 'doi',
-        'text': 'Published in',
-        'image': 'img/f1000research.jpg',
-    }],
-    'inspire': [{
-        'prefix': 'http://inspirehep.net/record/',
-        'relation': 'isSupplementedBy',
-        'scheme': 'url',
-        'text': 'Available in',
-        'image': 'img/inspirehep.png',
-    }],
-    'zenodo': [{
-        'prefix': 'https://github.com',
-        'relation': 'isSupplementTo',
-        'scheme': 'url',
-        'text': 'Available in',
-        'image': 'img/github.png',
-    }]
-}
-
-
-@blueprint.app_template_filter('zenodo_related_links')
-def zenodo_related_links(record):
-    def apply_rule(item, rule):
-        r = copy.deepcopy(rule)
-        r['link'] = persistentid.to_url(item['identifier'], item['scheme'])
-        return r
-
-    def match_rules(item, communities):
-        rs = []
-        for c in set(communities):
-            if c in RULES:
-                rules = RULES[c]
-                for r in rules:
-                    if item['relation'] == r['relation'] and \
-                       item['scheme'] == r['scheme'] and \
-                       item['identifier'].startswith(r['prefix']):
-                        rs.append(r)
-        return rs
-
-    ret = []
-    communities = record.get('communities', []) + \
-        record.get('provisional_communities', [])
-    for item in record.get('related_identifiers', []):
-        for r in match_rules(item, communities):
-            ret.append(apply_rule(item, r))
-
-    return ret

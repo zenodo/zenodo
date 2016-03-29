@@ -31,6 +31,43 @@ from speaklater import make_lazy_gettext
 
 _ = make_lazy_gettext(lambda: gettext)
 
+ZENODO_RELATION_RULES = {
+    'f1000research': [{
+        'prefix': '10.12688/f1000research',
+        'relation': 'isCitedBy',
+        'scheme': 'doi',
+        'text': 'Published in',
+        'image': 'img/f1000research.jpg',
+        }],
+    'inspire': [{
+        'prefix': 'http://inspirehep.net/record/',
+        'relation': 'isSupplementedBy',
+        'scheme': 'url',
+        'text': 'Available in',
+        'image': 'img/inspirehep.png',
+        }],
+    'briefideas': [{
+        'prefix': 'http://beta.briefideas.org/',
+        'relation': 'isIdenticalTo',
+        'scheme': 'url',
+        'text': 'Published in',
+        'image': 'img/briefideas.png',
+        }],
+    'zenodo': [{
+        'prefix': 'https://github.com',
+        'relation': 'isSupplementTo',
+        'scheme': 'url',
+        'text': 'Available in',
+        'image': 'img/github.png',
+        }, {
+        'prefix': '10.1109/JBHI',
+        'relation': 'isCitedBy',
+        'scheme': 'doi',
+        'text': 'Published in',
+        'image': 'img/ieee.jpg',
+        }],
+}
+
 ZENODO_RELATION_TYPES = [
     ('isCitedBy', _('Cited by')),
     ('cites', _('Cites')),

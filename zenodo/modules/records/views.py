@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import copy
 import idutils
 from flask import Blueprint, current_app
 
@@ -70,6 +71,39 @@ def accessright_title(value, embargo_date=None):
     """Get category for access right."""
     return AccessRight.as_title(
         AccessRight.get(value, embargo_date=embargo_date))
+
+
+#
+# Related identifiers filters.
+#
+@blueprint.app_template_filter('zenodo_related_links')
+def zenodo_related_links(record):
+    """Get logos for related links."""
+    def apply_rule(item, rule):
+        r = copy.deepcopy(rule)
+        r['link'] = idutils.to_url(item['identifier'], item['scheme'])
+        return r
+
+    def match_rules(item, communities):
+        rs = []
+        for c in set(communities):
+            if c in current_app.config['ZENODO_RELATION_RULES']:
+                rules = current_app.config['ZENODO_RELATION_RULES'][c]
+                for r in rules:
+                    if item['relation'] == r['relation'] and \
+                       item['scheme'] == r['scheme'] and \
+                       item['identifier'].startswith(r['prefix']):
+                        rs.append(r)
+        return rs
+
+    ret = []
+    communities = record.get('communities', []) + \
+        record.get('provisional_communities', [])
+    for item in record.get('related_identifiers', []):
+        for r in match_rules(item, communities):
+            ret.append(apply_rule(item, r))
+
+    return ret
 
 
 #
