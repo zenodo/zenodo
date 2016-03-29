@@ -34,4 +34,3 @@ def test_celery():
     assert 'invenio_accounts.tasks.send_security_email' in celery.tasks
     assert 'invenio_mail.tasks.send_email' in celery.tasks
     assert 'invenio_records.tasks.api.create_record' in celery.tasks
-    assert 'zenodo_migrationkit.tasks.create_record' in celery.tasks

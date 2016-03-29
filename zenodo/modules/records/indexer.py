@@ -22,13 +22,23 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo search ui views."""
+"""Record modification prior to indexing."""
 
 
-def test_for_smoke(app, es):
-    """Test search view."""
-    with app.test_client() as client:
-        res = client.get('/search')
-        assert res.status_code == 200
-        res = client.get('/api/records/')
-        assert res.status_code == 200
+def indexer_receiver(sender, json=None, record=None):
+    """Connect to before_record_index signal to transform record for ES."""
+    # Inject timestamp into record.
+    json['_created'] = record.created
+    json['_updated'] = record.updated
+
+    if not json.get('$schema', '').startswith(
+            'https://zenodo.org/schemas/records/'):
+        return
+
+    # Remove files from index if record is not open access.
+    if json['access_right'] != 'open' and 'files' in json:
+        del json['files']
+
+    print
+    if '_internal' in json:
+        del json['_internal']

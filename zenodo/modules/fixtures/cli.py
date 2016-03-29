@@ -26,15 +26,18 @@
 
 from __future__ import absolute_import, print_function
 
+import hashlib
 import json
-from os import makedirs
+from os import makedirs, stat
 from os.path import dirname, exists, join
 
 import click
+from celery import chain
 from flask import current_app
 from flask_cli import with_appcontext
 from invenio_db import db
-from invenio_files_rest.models import Location
+from invenio_files_rest.models import FileInstance, Location, ObjectVersion
+from invenio_migrator.proxies import current_migrator
 from invenio_migrator.tasks.records import import_record
 from invenio_pages.models import Page
 from pkg_resources import resource_stream, resource_string
@@ -113,10 +116,39 @@ def loaddemorecords():
     click.echo('Sending tasks to queue...')
     with click.progressbar(data) as records:
         for item in records:
-            import_record.delay(item, source_type='json')
+            if current_migrator.records_post_task:
+                chain(
+                    import_record.s(item, source_type='json'),
+                    current_migrator.records_post_task.s()
+                )()
+            else:
+                import_record.delay(item, source_type='json')
 
     click.echo("1. Start Celery:")
     click.echo("     celery worker -A zenodo.celery -l INFO")
     click.echo("2. After tasks have been processed start reindexing:")
     click.echo("     zenodo migration reindex recid")
     click.echo("     zenodo index run -d -c 4")
+
+
+@fixtures.command()
+@click.argument('source', type=click.Path(exists=True, dir_okay=False,
+                resolve_path=True))
+@with_appcontext
+def loaddemofiles(source):
+    """Load demo files."""
+    s = stat(source)
+
+    with open(source, 'rb') as fp:
+        m = hashlib.md5()
+        m.update(fp.read())
+        checksum = "md5:{0}".format(m.hexdigest())
+
+    # Create a file instance
+    with db.session.begin_nested():
+        f = FileInstance.create()
+        f.set_uri(source, s.st_size, checksum)
+
+    # Replace all objects associated files.
+    ObjectVersion.query.update({ObjectVersion.file_id: str(f.id)})
+    db.session.commit()

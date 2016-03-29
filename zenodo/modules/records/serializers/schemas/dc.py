@@ -22,13 +22,19 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo search ui views."""
+"""Record serialization."""
+
+from __future__ import absolute_import, print_function
+
+from marshmallow import Schema, fields
 
 
-def test_for_smoke(app, es):
-    """Test search view."""
-    with app.test_client() as client:
-        res = client.get('/search')
-        assert res.status_code == 200
-        res = client.get('/api/records/')
-        assert res.status_code == 200
+class DublinCoreJSONV1(Schema):
+    """Schema for records v1 in JSON."""
+
+    identifiers = fields.Function(lambda o: [o['metadata'].get('doi', '')])
+    creators = fields.Method('get_creators')
+
+    def get_creators(self, obj):
+        """Get creators."""
+        return [c['name'] for c in obj['metadata'].get('authors', [])]

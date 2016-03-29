@@ -53,3 +53,4 @@ recursive-include zenodo *.png
 recursive-include zenodo *.scss
 recursive-include zenodo *.svg
 recursive-include zenodo *.xcf
+recursive-include zenodo *.xsl

@@ -20,22 +20,21 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-"""Marshmallow based BibTeX serializer for records."""
+"""BibTeX serializer for records."""
 
 from __future__ import absolute_import, print_function
 
-from flask import current_app
 import textwrap
 
-from dateutil.parser import parse as iso2dt
-
 import six
-
+from dateutil.parser import parse as iso2dt
+from flask import current_app
+from flask_babelex import gettext as _
 from slugify import slugify
 
 
 class BibTeXSerializer(object):
-    """Marshmallow based BibTeX serializer for records."""
+    """BibTeX serializer for records."""
 
     def serialize(self, pid, record, links_factory=None):
         """Serialize a single record and persistent identifier.
@@ -172,7 +171,6 @@ class Bibtex(object):
         """
         name = "book"
         req_fileds = ['author', 'title', 'publisher', 'year']
-        # TODO: author or editor
         opt_fileds = ['volume', 'series', 'address', 'edition',
                       'month', 'note', 'key']
         ign_fields = ['doi', 'url']
@@ -206,7 +204,6 @@ class Bibtex(object):
         """
         name = "conference"
         req_fileds = ['author', 'title', 'chapter', 'publisher', 'year']
-        # TODO author or editor, chapter or pages
         opt_fileds = ['volume', 'series', 'address', 'edition',
                       'month', 'note', 'key']
         ign_fields = ['doi', 'url']
@@ -326,7 +323,8 @@ class Bibtex(object):
             return self._format_entry(name, req_fileds,
                                       opt_fileds, ign_fields)
         except Exception:
-            return "This record cannot be exported to BibTEX."
+            current_app.logger.warning("", exc_info=True)
+            return _("This record cannot be exported to BibTeX.")
 
     def _fetch_fields(self, req_fileds, opt_fileds=[], ign_fields=[]):
         fields = {
@@ -375,7 +373,7 @@ class Bibtex(object):
         return out
 
     def _format_output_row(self, field, value):
-        out = ""  # FIXME handle all fields
+        out = ""
         if field == "author":
             if len(value) == 1:
                 out += u"  {0:<12} = {{{1}}},\n".format(field, value[0])
@@ -386,7 +384,7 @@ class Bibtex(object):
                     out += u" {0:<16} {1:<} and\n".format("", line)
                 out += u" {0:<16} {1:<}}},\n".format("", value[-1])
         elif len(value) >= 50:
-            if isinstance(value, basestring):
+            if isinstance(value, six.string_types):
                 value = value.strip()
             wrapped = textwrap.wrap(value, 50)
             out += u"  {0:<12} = {{{{{1} \n".format(field, wrapped[0])
@@ -413,22 +411,22 @@ class Bibtex(object):
 
     def _get_entry_type(self):
         """Return entry type."""
-        if 'upload_type' in self.record:
-            if 'type' in self.record['upload_type']:
-                return self.record['upload_type']['type']
+        if 'resource_type' in self.record:
+            if 'type' in self.record['resource_type']:
+                return self.record['resource_type']['type']
         return 'default'
 
     def _get_entry_subtype(self):
         """Return entry subtype."""
-        if 'upload_type' in self.record:
-            if 'subtype' in self.record['upload_type']:
-                return self.record['upload_type']['subtype']
+        if 'resource_type' in self.record:
+            if 'subtype' in self.record['resource_type']:
+                return self.record['resource_type']['subtype']
         return 'default'
 
     def _get_citation_key(self):
         """Return citation key."""
         if "recid" in self.record:
-            authors = self.record.get("authors", None)
+            authors = self.record.get("creators", None)
             if authors:
                 first_author = authors[0]
                 name = first_author.get(
@@ -460,8 +458,8 @@ class Bibtex(object):
     def _get_author(self):
         """Return list of name(s) of the author(s)."""
         result = []
-        if "authors" in self.record:
-            for author in self.record['authors']:
+        if "creators" in self.record:
+            for author in self.record['creators']:
                 result.append(author["name"])
             return result
         else:
@@ -618,14 +616,11 @@ class Bibtex(object):
                 "publisher" in self.record["part_of"]:
             return self.record["part_of"]["publisher"]
         else:
-            return current_app.config.get("CFG_SITE_NAME", "")
+            return current_app.config.get("THEME_SITENAME", "")
 
     def _get_school(self):
         """Return the school where the thesis was written."""
-        if "thesis_university" in self.record:
-            return self.record["thesis_university"]
-        else:
-            return ""
+        return self.record.get("thesis_university", "")
 
     def _get_series(self):
         """Return the series of books the book was published in.
@@ -643,16 +638,9 @@ class Bibtex(object):
 
     def _get_url(self):
         """Return the WWW address."""
-        if "doi" in self.record:
-            doi = self.record['doi']
-            return "http://dx.doi.org/%s" % doi
-        else:
-            return ""
+        return "http://dx.doi.org/%s" % self.record['doi'] \
+            if "doi" in self.record else ""
 
     def _get_volume(self):
         """Return the volume of a journal or multi-volume book."""
-        if "journal" in self.record and \
-                "volume" in self.record["journal"]:
-            return self.record["journal"]["volume"]
-        else:
-            return ""
+        return self.record.get("journal", {}).get("volume", "")

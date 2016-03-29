@@ -42,9 +42,9 @@
 
       {%- for r in records %}
         {%- set publication_date = r.publication_date|from_isodate -%}
-        {%- set creation_date = r.creation_date|from_isodatetime -%}
+        {%- set creation_date = r._created|from_isodatetime -%}
         {%- set embargo_date = r.get('embargo_date', None)|from_isodate -%}
-        {%- set object_type = r.upload_type|objecttype %}
+        {%- set object_type = r.resource_type|objecttype %}
         {%- set record_url = url_for('invenio_records_ui.recid', pid_value=r['recid']) %}
         <div class="row record-elem">
           <div class="col-xs-12">
@@ -68,7 +68,11 @@
             </small>
           </div>
         </div>
-        {%- if not loop.last %}<hr class="hidden-xs" />{% endif %}
+        {%- if not loop.last %}
+        <hr class="hidden-xs" />
+        {%- else%}
+        <p class="text-center"><a class="btn btn-default" href="{{url_for('invenio_search_ui.search')}}">More</a></p>
+        {%- endif %}
       {%- endfor %}
     </div>
     <div class="col-md-4">

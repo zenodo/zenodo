@@ -32,7 +32,7 @@ FIXME:
 
 {%- set meta_title = record.title|striptags -%}
 {%- set meta_description = record.description|striptags -%}
-{%- set meta_url = url_for(request.endpoint, pid_value=pid.pid_value, _external=True) -%}
+{%- set meta_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value, _external=True) -%}
 {%- set meta_authors = record.authors|map(attribute='familyname') -%}
 {%- set meta_publication_date = record.publication_date|from_isodate -%}
 

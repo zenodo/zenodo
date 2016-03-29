@@ -21,7 +21,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
-{%- if record.files -%}
+{% from "invenio_previewer/macros.html" import preview_file %}
+{%- if record.files and record.access_right == "open" -%}
 {%- set state = "default" %}
 {#
 {%- if record.access_right == 'closed' %}
@@ -39,7 +40,7 @@
     </a>
   </div>
   <div id="collapseOne" class="collapse in">
-      <iframe id="preview-iframe" width="100%" height="400" style="border: none;"></iframe>
+      {{- preview_file('invenio_records_ui.record_preview', pid=pid, filename=record.files[0].filename) }}
   </div>
 </div>
 <div class="panel panel-{{state}}" id="files">
@@ -88,11 +89,11 @@
   </thead>
   <tbody>
   {%- for file in record.files|sort(attribute='filename') -%}
-  {%- set file_url = url_for('invenio_records_ui.record_files', pid_value=record.recid, filename=file.filename) %}
+  {%- set file_url = url_for('invenio_records_ui.record_files', pid_value=pid.pid_value, filename=file.filename) %}
     <tr class="">
         <td><a class="forcewrap" href="{{file_url}}">{{ file.filename }}</a><br /><small class="text-muted">{{file.checksum}}</small></td>
         <td class="nowrap">{{ file.size|filesizeformat }}</td>
-        <td class="nowrap"><span class="pull-right"><button class="btn preview-link btn-xs btn-default" data-filename="{{file.filename}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> <a class="btn btn-xs btn-default" href="{{file.filename}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+        <td class="nowrap"><span class="pull-right"><button class="btn preview-link btn-xs btn-default" data-filename="{{file.filename}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> <a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
       </tr>
     {%- endfor -%}
     </tbody>

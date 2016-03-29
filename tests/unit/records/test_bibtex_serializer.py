@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -23,11 +23,11 @@
 """Unit tests BibTex formatter."""
 
 import pytest
+from invenio_records.api import Record
+from invenio_records.models import RecordMetadata
 
 from zenodo.modules.records.serializers.bibtex import Bibtex, \
-    MissingRequiredFieldError, BibTeXSerializer
-from invenio_records.models import RecordMetadata
-from invenio_records.api import Record
+    BibTeXSerializer, MissingRequiredFieldError
 
 
 def test_serializer(bibtex_records):
@@ -62,25 +62,22 @@ def test_serializer(bibtex_records):
 def test_get_entry_type(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
-    records = []
-    record_list = RecordMetadata.query.all()
-    for rec in record_list:
-        rec = Record.get_record(id=rec.id)
-        if rec:
-            records.append(rec)
 
-    for r in records:
-        b = Bibtex(r)
-        assert r['upload_type']['type'] == b._get_entry_type()
+    for rec, in RecordMetadata.query.values(RecordMetadata.id):
+        if rec != record_bad.record.id:
+            r = Record.get_record(id=rec)
+            b = Bibtex(r)
+            assert r['resource_type']['type'] == b._get_entry_type()
 
-    assert test_record['upload_type']['type'] == record_good._get_entry_type()
+    assert test_record['resource_type']['type'] == \
+        record_good._get_entry_type()
     assert 'default' == record_bad._get_entry_type()
 
 
 def test_get_entry_subtype(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert test_record['upload_type']['subtype'] == \
+    assert test_record['resource_type']['subtype'] == \
         record_good._get_entry_subtype()
     assert 'default' == record_bad._get_entry_subtype()
 
@@ -106,7 +103,7 @@ def test_get_author(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
     authors = []
-    for author in test_record['authors']:
+    for author in test_record['creators']:
         authors.append(author['name'])
 
     assert authors == record_good._get_author()
@@ -244,7 +241,7 @@ def test_get_publisher(app, bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
     with app.app_context():
-        global_cfg = app.config['CFG_SITE_NAME']
+        global_cfg = app.config['THEME_SITENAME']
     assert test_record['imprint']['publisher'] == record_good._get_publisher()
     assert global_cfg == record_empty._get_publisher()
 

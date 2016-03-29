@@ -28,9 +28,13 @@ from __future__ import absolute_import, print_function
 
 import copy
 import idutils
-from flask import Blueprint, current_app
+import six
+
+from flask import Blueprint, current_app, render_template, request
+from werkzeug.utils import import_string
 
 from .models import AccessRight, ObjectType
+from .serializers import datacite_v31, dc_v1, json_v1, marcxml_v1
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -143,3 +147,63 @@ def pid_url(identifier, scheme=None):
     if scheme and identifier:
         return idutils.to_url(identifier, scheme)
     return ""
+
+
+@blueprint.app_template_filter('tojsonv1')
+def tojson_v1(record, pid=None):
+    """Get category for access right."""
+    assert pid is not None
+    return json_v1.serialize(pid, record)
+
+
+@blueprint.app_template_filter('tomarcxml')
+def tomarcxml(record, pid=None):
+    """Get category for access right."""
+    assert pid is not None
+    return marcxml_v1.serialize(pid, record).decode('utf8')
+
+
+@blueprint.app_template_filter('todatacitev31')
+def todatacite31(record, pid=None):
+    """Get category for access right."""
+    assert pid is not None
+    return datacite_v31.serialize(pid, record)
+
+
+@blueprint.app_template_filter('todc')
+def todc(record, pid=None):
+    """Get category for access right."""
+    assert pid is not None
+    return dc_v1.serialize(pid, record)
+
+
+def records_ui_export(pid, record, template=None):
+    """Record serialization view.
+
+    Plug this method into your ``RECORDS_UI_ENDPOINTS`` configuration:
+
+    .. code-block:: python
+
+        RECORDS_UI_ENDPOINTS = dict(
+            recid=dict(
+                # ...
+                route='/records/<pid_value/files/<filename>',
+                view_imp='zenodo.modules.records.views.records_ui_export',
+            )
+        )
+    """
+    formats = current_app.config.get('ZENODO_LEGACY_FORMATS')
+    fmt = request.view_args.get('format')
+
+    if formats.get(fmt) is None:
+        return render_template(
+            'zenodo_records/records_export_unsupported.html'), 410
+    else:
+        serializer = import_string(formats[fmt]['serializer'])
+        data = serializer.serialize(pid, record)
+        if isinstance(data, six.binary_type):
+            data = data.decode('utf8')
+
+        return render_template(
+            template, pid=pid, record=record,
+            data=data, format_title=formats[fmt]['title'])

@@ -32,7 +32,7 @@ from marshmallow import Schema, fields
 class IdentifierSchema(Schema):
     """Identifier schema."""
 
-    identifier = fields.Str(attribute='doi')
+    identifier = fields.Str(attribute='doi', default='')
     identifierType = fields.Constant('DOI')
 
 

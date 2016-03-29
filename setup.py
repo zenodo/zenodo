@@ -75,7 +75,8 @@ setup_requires = [
 ]
 
 install_requires = [
-    # 'invenio-search-ui',
+    'datacite>=0.2.1',
+    'dcxml>=0.1.0',
     'dojson>=1.0.0',
     'Flask-BabelEx>=0.9.2',
     'Flask-Debugtoolbar>=0.10.0',

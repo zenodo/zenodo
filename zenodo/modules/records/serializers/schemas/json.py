@@ -87,12 +87,12 @@ class SubjectSchemaV1(Schema):
 class MetadataSchemaV1(Schema):
     """Schema for metadata."""
 
-    type = fields.Str(attribute="upload_type.type")
-    subtype = fields.Str(attribute="upload_type.subtype", missing=None)
+    type = fields.Str(attribute="resource_type.type")
+    subtype = fields.Str(attribute="resource_type.subtype", missing=None)
     type_title = fields.Method('get_type_title')
 
     publication_date = fields.Str()
-    doi = fields.Str(attribute='doi')
+    doi = fields.Str(attribute='doi', default='')
 
     creators = fields.List(fields.Nested(PersonSchemaV1), attribute='authors')
     contributors = fields.List(
@@ -121,11 +121,11 @@ class MetadataSchemaV1(Schema):
     def get_type_title(self, obj):
         """Get type title."""
         try:
-            return ObjectType.get_by_dict(obj['upload_type'])['title']['en']
+            return ObjectType.get_by_dict(obj['resource_type'])['title']['en']
         except Exception:
             from flask import current_app
             current_app.logger.exception(
-                "Failed object {}".format(obj['upload_type']))
+                "Failed object {}".format(obj.get('recid')))
             raise
 
     def get_access_right(self, obj):

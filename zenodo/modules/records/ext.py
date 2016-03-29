@@ -26,7 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_indexer.signals import before_record_index
+
 from . import config
+from .indexer import indexer_receiver
 from .views import blueprint
 
 
@@ -42,6 +45,7 @@ class ZenodoRecords(object):
         """Flask application initialization."""
         self.init_config(app)
         app.register_blueprint(blueprint)
+        before_record_index.connect(indexer_receiver, sender=app)
         app.extensions['zenodo-records'] = self
 
     @staticmethod

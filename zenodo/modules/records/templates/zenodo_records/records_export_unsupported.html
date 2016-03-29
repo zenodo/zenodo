@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-#
+{#
 # This file is part of Zenodo.
 # Copyright (C) 2016 CERN.
 #
@@ -21,14 +20,14 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
 
-"""Zenodo search ui views."""
+{%- extends config.THEME_ERROR_TEMPLATE %}
+
+{% block message %}
+<h1><i class="fa fa-flash"></i> {{_('Unsupported export format')}}</h1>
+<p>{{_('The export format you are trying to access has been deprecated.')}}</p>
+{% endblock message %}
 
 
-def test_for_smoke(app, es):
-    """Test search view."""
-    with app.test_client() as client:
-        res = client.get('/search')
-        assert res.status_code == 200
-        res = client.get('/api/records/')
-        assert res.status_code == 200
+

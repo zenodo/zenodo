@@ -43,7 +43,7 @@ def index():
     """Frontpage blueprint."""
     query = Query("communities:zenodo AND access_right:open")
     query.body["size"] = 10
-    query.body["sort"] = [{"creation_date": "desc"}]
+    query.body["sort"] = [{"_created": "desc"}]
 
     response = current_search_client.search(
         index='records',

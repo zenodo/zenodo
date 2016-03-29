@@ -30,10 +30,12 @@ from dojson.contrib.to_marc21 import to_marc21
 from invenio_marc21.serializers.marcxml import MARCXMLSerializer
 from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
     OAIDataCiteSerializer
+from invenio_records_rest.serializers.dc import DublinCoreSerializer
 from invenio_records_rest.serializers.json import JSONSerializer
 from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
+from .schemas.dc import DublinCoreJSONV1
 from .schemas.datacite import DataCiteSchemaJSONV1
 from .schemas.json import RecordSchemaJSONV1
 from .schemas.marcxml import RecordSchemaMARC
@@ -54,28 +56,34 @@ oai_datacite = OAIDataCiteSerializer(
     v31=datacite_v31,
     datacentre='CERN.ZENODO',
 )
+#: Dublin Core serializer
+dc_v1 = DublinCoreSerializer(DublinCoreJSONV1)
 
 # Records-REST serializers
 # ========================
 #: JSON record serializer for individual records.
 json_v1_response = record_responsify(json_v1, 'application/json')
 #: MARCXML record serializer for individual records.
-marcxml_v1_response = record_responsify(marcxml_v1, 'application/marc+xml')
+marcxml_v1_response = record_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX record serializer for individual records.
 bibtex_v1_response = record_responsify(bibtex_v1, 'application/x-bibtex')
 #: DataCite v3.1 record serializer for individual records.
 datacite_v31_response = record_responsify(
     datacite_v31, 'application/x-datacite+xml')
+#: DublinCore record serializer for individual records.
+dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 
 #: JSON record serializer for search results.
 json_v1_search = search_responsify(json_v1, 'application/json')
 #: MARCXML record serializer for search records.
-marcxml_v1_search = search_responsify(marcxml_v1, 'application/marc+xml')
+marcxml_v1_search = search_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX serializer for search records.
 bibtex_v1_search = search_responsify(bibtex_v1, 'application/x-bibtex')
 #: DataCite v3.1 record serializer for search records.
-datacite_v31_search = record_responsify(
+datacite_v31_search = search_responsify(
     datacite_v31, 'application/x-datacite+xml')
+#: DublinCore record serializer for search records.
+dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
 
 # OAI-PMH record serializers.
 # ===========================
@@ -85,3 +93,5 @@ oaipmh_marc21_v1 = marcxml_v1.serialize_oaipmh
 oaipmh_datacite_v31 = datacite_v31.serialize_oaipmh
 #: OAI-PMH OAI DataCite record serializer.
 oaipmh_oai_datacite = oai_datacite.serialize_oaipmh
+#: OAI-PMH OAI Dublin Core record serializer.
+oaipmh_oai_dc = dc_v1.serialize_oaipmh

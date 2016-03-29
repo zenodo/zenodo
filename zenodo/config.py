@@ -188,16 +188,43 @@ PAGES_WHITELIST_CONFIG_KEYS = [
 # =======
 #: Mapping of old export formats to new content type.
 ZENODO_LEGACY_FORMATS = {
-    'dcite': 'application/x-datacite+xml',
-    'dcite3': 'application/x-datacite+xml',
-    'hm': 'application/marcxml+xml',
-    'hx': 'application/x-bibtex',
-    'xd': 'application/xml',
+    'dcite': dict(
+        title='DataCite XML',
+        serializer='zenodo.modules.records.serializers.datacite_v31',
+    ),
+    'dcite3': dict(
+        title='DataCite XML',
+        serializer='zenodo.modules.records.serializers.datacite_v31',
+        order=3,
+    ),
+    'hm': dict(
+        title='MARC21 XML',
+        serializer='zenodo.modules.records.serializers.marcxml_v1',
+    ),
+    'hx': dict(
+        title='BibTeX',
+        serializer='zenodo.modules.records.serializers.bibtex_v1',
+        order=2,
+    ),
+    'xd': dict(
+        title='Dublin Core',
+        serializer='zenodo.modules.records.serializers.dc_v1',
+        order=4,
+    ),
+    'xm': dict(
+        title='MARC21 XML',
+        serializer='zenodo.modules.records.serializers.marcxml_v1',
+        order=5,
+    ),
+    'json': dict(
+        title='JSON',
+        serializer='zenodo.modules.records.serializers.json_v1',
+        order=1,
+    ),
+    # Unsupported formats.
     'xe': None,
-    'xm': 'application/marcxml+xml',
     'xn': None,
     'xw': None,
-    'json': 'application/json',
 }
 
 #: Endpoints for displaying records.
@@ -212,10 +239,11 @@ RECORDS_UI_ENDPOINTS = dict(
         route='/record/<pid_value>/export/<any({0}):format>'.format(", ".join(
             list(ZENODO_LEGACY_FORMATS.keys()))),
         template='zenodo_records/record_export.html',
+        view_imp='zenodo.modules.records.views.records_ui_export',
     ),
     record_preview=dict(
         pid_type='recid',
-        route='/record/<pid_value>/preview',
+        route='/record/<pid_value>/preview/<filename>',
         view_imp='invenio_previewer.views.preview',
     ),
     record_files=dict(
@@ -246,6 +274,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.bibtex_v1_response'),
             'application/x-datacite+xml': (
                 'zenodo.modules.records.serializers.datacite_v31_response'),
+            'application/x-dc+xml': (
+                'zenodo.modules.records.serializers.dc_v1_response'),
         },
         search_serializers={
             'application/json': (
@@ -256,6 +286,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers:bibtex_v1_search'),
             'application/x-datacite+xml': (
                 'zenodo.modules.records.serializers.datacite_v31_search'),
+            'application/x-dc+xml': (
+                'zenodo.modules.records.serializers.dc_v1_search'),
         },
         default_media_type='application/json',
         query_factory_imp='invenio_records_rest.query.es_query_factory',
@@ -274,7 +306,7 @@ RECORDS_REST_SORT_OPTIONS = dict(
             order=1,
         ),
         mostrecent=dict(
-            fields=['-creation_date'],
+            fields=['-_created'],
             title='Most recent',
             default_order='asc',
             order=2,
@@ -290,12 +322,12 @@ RECORDS_REST_SORT_OPTIONS = dict(
             title='Title',
             order=4,
         ),
-        # conference_session=dict(
-        #     fields=['conference_part:asc', 'conference_contribution:desc'],
-        #     title='Conference session',
-        #     default_order='desc',
-        #     order=4,
-        # ),
+        conference_session=dict(
+            fields=['meetings.session:asc', 'meetings.session_part:desc'],
+            title='Conference session',
+            default_order='desc',
+            order=4,
+        ),
         journal=dict(
             fields=[
                 'journal.year',
@@ -320,15 +352,18 @@ RECORDS_REST_FACETS = dict(
     records=dict(
         aggs=dict(
             type=dict(
-                terms=dict(field="upload_type.type"),
+                terms=dict(field="resource_type.type"),
                 aggs=dict(
                     subtype=dict(
-                        terms=dict(field="upload_type.subtype"),
+                        terms=dict(field="resource_type.subtype"),
                     )
                 )
             ),
             access_right=dict(
                 terms=dict(field="access_right"),
+            ),
+            file_type=dict(
+                terms=dict(field="files.type"),
             ),
         ),
         filters=dict(
@@ -336,8 +371,9 @@ RECORDS_REST_FACETS = dict(
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
-            type=terms_filter('upload_type.type'),
-            subtype=terms_filter('upload_type.subtype'),
+            type=terms_filter('resource_type.type'),
+            subtype=terms_filter('resource_type.subtype'),
+            file_type=terms_filter('files.type'),
         )
     )
 )
@@ -375,17 +411,17 @@ OAISERVER_METADATA_FORMATS = {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
+    },
+    'oai_dc': {
+        'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
+        'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_dc',
     }
-    # },
-    # 'oai_dc': {
-    #     'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
-    #     'schema': 'http://www.openarchives.org/OAI/2.0/oai_dc.xsd',
-    #     'serializer': (
-    #         'dojson.contrib.to_marc21.utils:dumps_etree',
-    #         {'xslt_filename': '/Users/lnielsen/src/invenio-oaiserver/invenio_oaiserver/static/xsl/oai2.v1.0.xsl'}
-    #     ),
-    # }
 }
+
+# Migrator
+# ========
+MIGRATOR_RECORDS_POST_TASK = 'zenodo_migrationkit.tasks.migrate_record'
 
 # REST
 # ====
@@ -394,10 +430,10 @@ REST_ENABLE_CORS = True
 
 # Accounts
 # ========
-#: Recaptcha public key (must be changed).
-RECAPTCHA_PUBLIC_KEY = "CHANGE_ME"
-#: Recaptcha private key (must be changed).
-RECAPTCHA_PRIVATE_KEY = "CHANGE_ME"
+#: Recaptcha public key (change to enable).
+RECAPTCHA_PUBLIC_KEY = None
+#: Recaptcha private key (change to enable).
+RECAPTCHA_PRIVATE_KEY = None
 
 #: User registration template.
 SECURITY_REGISTER_USER_TEMPLATE = \

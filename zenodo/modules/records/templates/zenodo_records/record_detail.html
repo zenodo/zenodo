@@ -32,7 +32,7 @@
 {%- set title = record.title + " | " + config.THEME_SITENAME -%}
 {%- set publication_date = record.publication_date|from_isodate -%}
 {%- set embargo_date = record.get('embargo_date', None)|from_isodate -%}
-{%- set object_type = record.upload_type|objecttype %}
+{%- set object_type = record.resource_type|objecttype %}
 
 {%- block head %}
 {{super()}}
@@ -43,6 +43,7 @@
 <div class="container">
   <div class="row" itemscope itemtype="{{object_type['schema.org']}}">
     <div class="col-sm-8 col-md-8">
+      {%- block record_body %}
       <p>
         <time itemprop="datePublished" datetime="{{ publication_date|dateformat(format='long') }}" data-toggle="tooltip" title="{{_("Publication date")}}">{{ publication_date|dateformat(format='long') }}</time>
         <span class="pull-right">
@@ -58,7 +59,10 @@
         {{ record.notes}}
       </div>
       {%- endif %}
+      {%- endblock record_body %}
+      {%- block record_body_extra %}
       {%-  include "zenodo_records/box/files.html" %}
+      {%- endblock record_body_extra %}
     </div>
     <div class="col-sm-4 col-md-4">
       {%- if record.doi %}
