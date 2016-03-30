@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import os
+
 from invenio_openaire.config import OPENAIRE_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
 
@@ -233,14 +234,16 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.marcxml_v1_response'),
             # 'application/x-datacite+xml': (
             #     'zenodo.modules.records.serializers.datacite_v1_response'),
-            # 'application/x-bibtex': (
-            #     'zenodo.modules.records.serializers.bibtex_v1_response'),
+            'application/x-bibtex': (
+                'zenodo.modules.records.serializers.bibtex_v1_response'),
         },
         search_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers:json_v1_search'),
             'application/marcxml+xml': (
                 'zenodo.modules.records.serializers.marcxml_v1_search'),
+            'application/x-bibtex': (
+                'zenodo.modules.records.serializers:bibtex_v1_search'),
         },
         default_media_type='application/json',
         query_factory_imp='invenio_records_rest.query.es_query_factory',

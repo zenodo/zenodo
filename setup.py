@@ -111,6 +111,7 @@ install_requires = [
     'jsonref>=0.1',
     'marshmallow>=2.5.0',
     'zenodo-migrationkit>=1.0.0.dev20150000',
+    'python-slugify>=1.2.0',
 ]
 
 packages = find_packages()

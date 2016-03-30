@@ -34,20 +34,21 @@ from invenio_records_rest.serializers.response import record_responsify, \
 
 from .schemas.json import RecordSchemaJSONV1
 from .schemas.marcxml import RecordSchemaMARC
+from .bibtex import BibTeXSerializer
 
 json_v1 = JSONSerializer(RecordSchemaJSONV1)
 marcxml_v1 = MARCXMLSerializer(to_marc21, schema_class=RecordSchemaMARC)
 # datacite_v1 = None
-# bibtex_v1 = None
+bibtex_v1 = BibTeXSerializer()
 
 json_v1_response = record_responsify(json_v1, 'application/json')
 marcxml_v1_response = record_responsify(marcxml_v1, 'application/marc+xml')
 # datacite_v1_response = record_responsify(
 #    datacite_v1, 'application/x-datacite+xml')
-# bibtex_v1_response = record_responsify(bibtex_v1, 'application/x-bibtex')
+bibtex_v1_response = record_responsify(bibtex_v1, 'application/x-bibtex')
 
 json_v1_search = search_responsify(json_v1, 'application/json')
 marcxml_v1_search = search_responsify(marcxml_v1, 'application/marc+xml')
 # datacite_v1_search = search_responsify(
 #     datacite_v1, 'application/x-datacite+xml')
-# bibtex_v1_search = search_responsify(bibtex_v1, 'application/x-bibtex')
+bibtex_v1_search = search_responsify(bibtex_v1, 'application/x-bibtex')
