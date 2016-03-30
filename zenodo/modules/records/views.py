@@ -27,14 +27,13 @@
 from __future__ import absolute_import, print_function
 
 import copy
+
 import idutils
 import six
-
 from flask import Blueprint, current_app, render_template, request
 from werkzeug.utils import import_string
 
 from .models import AccessRight, ObjectType
-from .serializers import datacite_v31, dc_v1, json_v1, marcxml_v1
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -149,34 +148,6 @@ def pid_url(identifier, scheme=None):
     return ""
 
 
-@blueprint.app_template_filter('tojsonv1')
-def tojson_v1(record, pid=None):
-    """Get category for access right."""
-    assert pid is not None
-    return json_v1.serialize(pid, record)
-
-
-@blueprint.app_template_filter('tomarcxml')
-def tomarcxml(record, pid=None):
-    """Get category for access right."""
-    assert pid is not None
-    return marcxml_v1.serialize(pid, record).decode('utf8')
-
-
-@blueprint.app_template_filter('todatacitev31')
-def todatacite31(record, pid=None):
-    """Get category for access right."""
-    assert pid is not None
-    return datacite_v31.serialize(pid, record)
-
-
-@blueprint.app_template_filter('todc')
-def todc(record, pid=None):
-    """Get category for access right."""
-    assert pid is not None
-    return dc_v1.serialize(pid, record)
-
-
 def records_ui_export(pid, record, template=None):
     """Record serialization view.
 
@@ -192,7 +163,7 @@ def records_ui_export(pid, record, template=None):
             )
         )
     """
-    formats = current_app.config.get('ZENODO_LEGACY_FORMATS')
+    formats = current_app.config.get('ZENODO_RECORDS_EXPORTFORMATS')
     fmt = request.view_args.get('format')
 
     if formats.get(fmt) is None:

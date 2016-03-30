@@ -27,7 +27,10 @@
 from __future__ import absolute_import, print_function
 
 from datetime import datetime, timedelta
-from flask import render_template_string
+
+from flask import render_template_string, url_for
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
+from invenio_records.api import Record
 
 from zenodo.modules.records.views import zenodo_related_links
 
@@ -141,3 +144,19 @@ def test_pid_url(app):
     assert render_template_string(
         "{{ 'arXiv:1512.01558'|pid_url(scheme='arxiv') }}") \
         == "http://arxiv.org/abs/arXiv:1512.01558"
+
+
+def test_records_ui_export(app, db, full_record):
+    """Test export pages."""
+    r = Record.create(full_record)
+    PersistentIdentifier.create(
+        'recid', '1', object_type='rec', object_uuid=r.id,
+        status=PIDStatus.REGISTERED)
+    db.session.commit()
+
+    formats = app.config['ZENODO_RECORDS_EXPORTFORMATS']
+    with app.test_client() as client:
+        for f, val in formats.items():
+            res = client.get(url_for(
+                'invenio_records_ui.record_export', pid_value='1', format=f))
+            assert res.status_code == 410 if val is None else 200

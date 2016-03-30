@@ -187,7 +187,7 @@ PAGES_WHITELIST_CONFIG_KEYS = [
 # Records
 # =======
 #: Mapping of old export formats to new content type.
-ZENODO_LEGACY_FORMATS = {
+ZENODO_RECORDS_EXPORTFORMATS = {
     'dcite': dict(
         title='DataCite XML',
         serializer='zenodo.modules.records.serializers.datacite_v31',
@@ -237,7 +237,7 @@ RECORDS_UI_ENDPOINTS = dict(
     record_export=dict(
         pid_type='recid',
         route='/record/<pid_value>/export/<any({0}):format>'.format(", ".join(
-            list(ZENODO_LEGACY_FORMATS.keys()))),
+            list(ZENODO_RECORDS_EXPORTFORMATS.keys()))),
         template='zenodo_records/record_export.html',
         view_imp='zenodo.modules.records.views.records_ui_export',
     ),
