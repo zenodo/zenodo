@@ -19,7 +19,8 @@
     "id",
     "title",
     "title_plural",
-    "schema.org"
+    "schema.org",
+    "datacite"
   ],
   "properties": {
     "internal_id": {
@@ -38,6 +39,23 @@
     "schema.org": {
       "type": "string",
       "format": "uri"
+    },
+    "datacite": {
+      "type": "object",
+      "properties": {
+        "general": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "required": [
+          "general"
+        ]
+      }
+    },
+    "eurepo": {
+      "type": "string"
     },
     "parent": {
       "type": "object"

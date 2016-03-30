@@ -28,13 +28,143 @@ from __future__ import absolute_import, print_function
 
 from marshmallow import Schema, fields
 
+from ...models import ObjectType
+
 
 class DublinCoreJSONV1(Schema):
     """Schema for records v1 in JSON."""
 
-    identifiers = fields.Function(lambda o: [o['metadata'].get('doi', '')])
+    identifiers = fields.Method('get_identifiers')
+    titles = fields.Function(lambda o: [o['metadata'].get('title', '')])
     creators = fields.Method('get_creators')
+    relations = fields.Method('get_relations')
+    rights = fields.Method('get_rights')
+    dates = fields.Method('get_dates')
+    subjects = fields.Method('get_subjects')
+    descriptions = fields.Method('get_descriptions')
+    publishers = fields.Method('get_publishers')
+    contributors = fields.Method('get_contributors')
+    types = fields.Method('get_types')
+    sources = fields.Method('get_sources')
+    languages = fields.Function(lambda o: [o['metadata'].get('language', '')])
+
+    def get_identifiers(self, obj):
+        """Get identifiers."""
+        items = [obj['metadata'].get('doi', '')]
+        items.append('https://zenodo.org/record/{0}'.format(
+            obj['metadata']['recid']))
+        oai = obj['metadata'].get('_oai', {}).get('id')
+        if oai:
+            items.append(oai)
+        return items
 
     def get_creators(self, obj):
         """Get creators."""
-        return [c['name'] for c in obj['metadata'].get('authors', [])]
+        return [c['name'] for c in obj['metadata'].get('creators', [])]
+
+    def get_relations(self, obj):
+        """Get creators."""
+        rels = []
+        # Grants
+        for g in obj['metadata'].get('grants', []):
+            eurepo_id = g.get('identifiers', {}).get('eurepo')
+            if eurepo_id:
+                rels.append(eurepo_id)
+
+        # Alternate identifiers
+        for a in obj['metadata'].get('alternate_identifiers', []):
+            rels.append(
+                'info:eu-repo/semantics/altIdentifier/{0}/{1}'.format(
+                    a['scheme'],
+                    a['identifier']))
+
+        # Related identifiers
+        for a in obj['metadata'].get('related_identifiers', []):
+            rels.append(
+                '{0}:{1}'.format(
+                    a['scheme'],
+                    a['identifier']))
+
+        return rels
+
+    def get_rights(self, obj):
+        """Get rights."""
+        rights = [
+            'info:eu-repo/semantics/{}Access'.format(
+                obj['metadata']['access_right'])]
+        license_url = obj['metadata'].get('license', {}).get('url')
+        if license_url:
+            rights.append(license_url)
+        return rights
+
+    def get_dates(self, obj):
+        """Get dates."""
+        dates = [obj['metadata']['publication_date']]
+        if obj['metadata']['access_right'] == 'embargoed':
+            dates.append(
+                'info:eu-repo/date/embargoEnd/{0}'.format(
+                    obj['metadata']['embargo_date']))
+
+        return dates
+
+    def get_descriptions(self, obj):
+        """Get descriptions."""
+        return [obj['metadata']['description']]
+
+    def get_subjects(self, obj):
+        """Get subjects."""
+        return obj['metadata'].get('keywords', [])
+
+    def get_publishers(self, obj):
+        """Get publishers."""
+        imprint = obj['metadata'].get('imprint', {}).get('publisher')
+        if imprint:
+            return [imprint]
+        part = obj['metadata'].get('part_of', {}).get('publisher')
+        if part:
+            return [part]
+        return []
+
+    def get_contributors(self, obj):
+        """Get contributors."""
+        return [c['name'] for c in obj['metadata'].get('contributors', [])]
+
+    def get_types(self, obj):
+        """Get types."""
+        return [
+            ObjectType.get_by_dict(obj['metadata']['resource_type'])['eurepo']]
+
+    def get_sources(self, obj):
+        """Get sources."""
+        items = []
+
+        # Journal
+        journal = obj['metadata'].get('journal')
+        if journal is not None:
+            vol = journal.get('volume')
+            issue = journal.get('issue')
+            if vol and issue:
+                vol = '{0}({1})'.format(vol, issue)
+            if vol is None:
+                vol = issue
+
+            y = journal.get('year')
+
+            parts = [
+                journal.get('title'),
+                vol,
+                journal.get('pages'),
+                '({0})'.format(y) if y else None,
+            ]
+            items.append(' '.join([x for x in parts if x]))
+
+        # Meetings
+        for m in obj['metadata'].get('meetings', []):
+            parts = [
+                m.get('acronym'),
+                m.get('title'),
+                m.get('place'),
+                m.get('dates'),
+            ]
+            items.append(', '.join([x for x in parts if x]))
+        return items

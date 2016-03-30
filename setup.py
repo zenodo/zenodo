@@ -111,8 +111,8 @@ install_requires = [
     'invenio>=3.0.0a1,<3.1.0',
     'jsonref>=0.1',
     'marshmallow>=2.5.0',
-    'zenodo-migrationkit>=1.0.0.dev20150000',
     'python-slugify>=1.2.0',
+    'zenodo-migrationkit>=1.0.0.dev20150000',
 ]
 
 packages = find_packages()

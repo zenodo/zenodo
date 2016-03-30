@@ -26,22 +26,54 @@
 
 from __future__ import absolute_import, print_function
 
+import json
+
+import arrow
 from marshmallow import Schema, fields
+
+from ...models import ObjectType
 
 
 class IdentifierSchema(Schema):
     """Identifier schema."""
 
-    identifier = fields.Str(attribute='doi', default='')
+    identifier = fields.Function(lambda o: o)
     identifierType = fields.Constant('DOI')
 
 
-class CreatorSchema(Schema):
+class PersonSchema(Schema):
+    """Creator/contributor common schema."""
+
+    affiliation = fields.Str()
+    nameIdentifier = fields.Method('get_nameidentifier')
+
+    def get_nameidentifier(self, obj):
+        """Get name identifier."""
+        if obj.get('orcid'):
+            return {
+                "nameIdentifier": obj.get('orcid'),
+                "nameIdentifierScheme": "ORCID",
+                "schemeURI": "http://orcid.org/"
+            }
+        if obj.get('gnd'):
+            return {
+                "nameIdentifier": obj.get('gnd'),
+                "nameIdentifierScheme": "GND",
+            }
+        return {}
+
+
+class CreatorSchema(PersonSchema):
     """Creator schema."""
 
     creatorName = fields.Str(attribute='name')
-    affiliation = fields.Str()
-    # TODO Support for ORCID/GND
+
+
+class ContributorSchema(PersonSchema):
+    """Contributor schema."""
+
+    contributorName = fields.Str(attribute='name')
+    contributorType = fields.Str(attribute='type')
 
 
 class TitleSchema(Schema):
@@ -57,28 +89,155 @@ class DateSchema(Schema):
     dateType = fields.Str(attribute='type')
 
 
+class AlternateIdentifierSchema(Schema):
+    """Alternate identifiers schema."""
+
+    alternateIdentifier = fields.Str(attribute='identifier')
+    alternateIdentifierType = fields.Str(attribute='scheme')
+
+
+class RelatedIdentifierSchema(Schema):
+    """Alternate identifiers schema."""
+
+    relatedIdentifier = fields.Str(attribute='identifier')
+    relatedIdentifierType = fields.Method('get_type')
+    relationType = fields.Function(
+        lambda o: o['relation'][0].upper() + o['relation'][1:])
+
+    def get_type(self, obj):
+        """Get type."""
+        if obj['scheme'] == 'handle':
+            return 'Handle'
+        elif obj['scheme'] == 'ads':
+            return 'bibcode'
+        elif obj['scheme'] == 'arxiv':
+            return 'arXiv'
+        else:
+            return obj['scheme'].upper()
+
+
 class DataCiteSchemaJSONV1(Schema):
     """Schema for records v1 in JSON."""
 
-    identifier = fields.Nested(IdentifierSchema, attribute='metadata')
+    identifier = fields.Nested(IdentifierSchema, attribute='metadata.doi')
     creators = fields.List(
         fields.Nested(CreatorSchema),
-        attribute='metadata.authors')
+        attribute='metadata.creators')
     titles = fields.List(
         fields.Nested(TitleSchema),
         attribute='metadata.title')
     publisher = fields.Constant('Zenodo')
-    # TODO: Fix date -> year only
-    publicationYear = fields.Str(attribute='metadata.publication_date')
-    # TODO: Subjects from both keywords and subjects
+    publicationYear = fields.Function(
+        lambda o: str(arrow.get(o['metadata']['publication_date']).year))
+    subjects = fields.Method('get_subjects')
+    contributors = fields.Method('get_contributors')
     # TOOD: Contributors
     dates = fields.Method('get_dates')
+    language = fields.Str(attribute='metadata.language')
+    resourceType = fields.Method('get_type')
+    alternateIdentifiers = fields.List(
+        fields.Nested(AlternateIdentifierSchema),
+        attribute='metadata.alternate_identifiers',
+    )
+    relatedIdentifiers = fields.Method('get_related_identifiers')
+    rightsList = fields.Method('get_rights')
+    descriptions = fields.Method('get_descriptions')
+
+    def get_descriptions(self, obj):
+        """."""
+        items = []
+        desc = obj['metadata']['description']
+        if desc:
+            items.append({
+                'description': desc,
+                'descriptionType': 'Abstract'
+
+            })
+        notes = obj['metadata'].get('notes')
+        if notes:
+            items.append({
+                'description': notes,
+                'descriptionType': 'Other'
+
+            })
+        refs = obj['metadata'].get('references')
+        if refs:
+            items.append({
+                'description': json.dumps({
+                    'references': [
+                        r['raw_reference'] for r in refs
+                        if 'raw_reference' in r]
+                }),
+                'descriptionType': 'Other'
+
+            })
+        return items
+
+    def get_rights(self, obj):
+        """Get rights."""
+        # eu-repo
+        eurepo = 'info:eu-repo/semantics/{}Access'.format(
+            obj['metadata']['access_right'])
+
+        items = [
+            {'rightsURI': eurepo,
+             'rights': '{0} access'.format(
+                obj['metadata']['access_right']).title()}
+        ]
+
+        # license
+        license_url = obj['metadata'].get('license', {}).get('url')
+        license_text = obj['metadata'].get('license', {}).get('license')
+        if license_url and license_text:
+            items.append({
+                'rightsURI': license_url,
+                'rights': license_text,
+            })
+        return items
+
+    def get_type(self, obj):
+        """Resource type."""
+        t = ObjectType.get_by_dict(obj['metadata']['resource_type'])
+        return {
+            'resourceTypeGeneral': t['datacite']['general'],
+            'resourceType': t['datacite'].get('type', None),
+        }
+
+    def get_related_identifiers(self, obj):
+        """Resource type."""
+        accepted_types = [
+            'doi', 'ark', 'ean13', 'eissn', 'handle', 'isbn', 'issn', 'istc',
+            'lissn', 'lsid', 'purl', 'upc', 'url', 'urn', 'ads', 'arxiv',
+            'bibcode',
+        ]
+        s = RelatedIdentifierSchema()
+
+        items = []
+        for r in obj['metadata'].get('related_identifiers', []):
+            if r['scheme'] in accepted_types:
+                items.append(s.dump(r).data)
+        return items
+
+    def get_subjects(self, obj):
+        """Get subjects."""
+        items = []
+        for s in obj['metadata'].get('keywords', []):
+            items.append({'subject': s})
+
+        for s in obj['metadata'].get('subjects', []):
+            items.append({
+                'subject': s['identifier'],
+                'subjectScheme': s['scheme'],
+            })
+
+        return items
 
     def get_dates(self, obj):
         """Get dates."""
         s = DateSchema()
 
-        if obj.get('embargo_date'):
+        if obj['metadata']['access_right'] == 'embargoed' and \
+                obj['metadata'].get('embargo_date'):
             return [
                 s.dump(dict(
                     date=obj['metadata']['embargo_date'],
@@ -91,3 +250,38 @@ class DataCiteSchemaJSONV1(Schema):
             return [s.dump(dict(
                 date=obj['metadata']['publication_date'],
                 type='Issued')).data, ]
+
+    def get_contributors(self, obj):
+        """Get contributors."""
+        def inject_type(c):
+            c['type'] = 'Supervisor'
+            return c
+
+        # Contributors and supervisors
+        s = ContributorSchema()
+        contributors = obj['metadata'].get('contributors', [])
+        contributors.extend([
+            inject_type(c) for c in
+            obj['metadata'].get('thesis_supervisors', [])
+        ])
+
+        items = []
+        for c in contributors:
+            items.append(s.dump(c).data)
+
+        # Grants
+        s = ContributorSchema()
+        for g in obj['metadata'].get('grants', []):
+            funder = g.get('funder', {}).get('name')
+            eurepo = g.get('identifiers', {}).get('eurepo')
+            if funder and eurepo:
+                items.append({
+                    'contributorName': funder,
+                    'contributorType': 'Funder',
+                    'nameIdentifier': {
+                        'nameIdentifier': eurepo,
+                        'nameIdentifierScheme': 'info',
+                    },
+                })
+
+        return items

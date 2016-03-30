@@ -9,6 +9,8 @@
     "en": "Publications"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text"},
+  "eurepo": "info:eu-repo/semantics/other",
   "children": [
     {"$ref": "http://zenodo.org/objecttypes/publication/book"},
     {"$ref": "http://zenodo.org/objecttypes/publication/section"},
@@ -34,6 +36,8 @@
   "title_plural": {
     "en": "Posters"
   },
+  "datacite": {"general": "Text", "type": "Poster"},
+  "eurepo": "info:eu-repo/semantics/conferencePoster",
   "schema.org": "http://schema.org/CreativeWork"
 },
 {
@@ -46,6 +50,8 @@
   "title_plural": {
     "en": "Presentations"
   },
+  "datacite": {"general": "Text", "type": "Presentation"},
+  "eurepo": "info:eu-repo/semantics/lecture",
   "schema.org": "http://schema.org/CreativeWork"
 },
 {
@@ -58,6 +64,8 @@
   "title_plural": {
     "en": "Datasets"
   },
+  "datacite": {"general": "Dataset"},
+  "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "http://schema.org/Dataset"
 },
 {
@@ -71,6 +79,8 @@
     "en": "Images"
   },
   "schema.org": "http://schema.org/ImageObject",
+  "datacite": {"general": "Image"},
+  "eurepo": "info:eu-repo/semantics/other",
   "children": [
     {"$ref": "http://zenodo.org/objecttypes/image/figure"},
     {"$ref": "http://zenodo.org/objecttypes/image/plot"},
@@ -90,6 +100,8 @@
   "title_plural": {
     "en": "Videos/Audio"
   },
+  "datacite": {"general": "Audiovisual"},
+  "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "http://schema.org/VideoObject"
 },
 {
@@ -102,6 +114,8 @@
   "title_plural": {
     "en": "Software"
   },
+  "datacite": {"general": "Software"},
+  "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "http://schema.org/Code"
 },
 {
@@ -114,6 +128,8 @@
   "title_plural": {
     "en": "Lessons"
   },
+  "datacite": {"general": "InteractiveResource"},
+  "eurepo": "info:eu-repo/semantics/lecture",
   "schema.org": "http://schema.org/CreativeWork"
 },
 {
@@ -127,6 +143,8 @@
     "en": "Books"
   },
   "schema.org": "http://schema.org/Book",
+  "datacite": {"general": "Text", "type": "Book"},
+  "eurepo": "info:eu-repo/semantics/book",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -140,6 +158,8 @@
     "en": "Book sections"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Book section"},
+  "eurepo": "info:eu-repo/semantics/bookPart",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -153,6 +173,8 @@
     "en": "Conference papers"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Conference paper"},
+  "eurepo": "info:eu-repo/semantics/conferencePaper",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -166,6 +188,8 @@
     "en": "Journal articles"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Journal article"},
+  "eurepo": "info:eu-repo/semantics/article",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -178,6 +202,8 @@
   "title_plural": {
     "en": "Patents"
   },
+  "datacite": {"general": "Text", "type": "Patent"},
+  "eurepo": "info:eu-repo/semantics/patent",
   "schema.org": "http://schema.org/CreativeWork",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
@@ -192,6 +218,8 @@
     "en": "Preprints"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Preprint"},
+  "eurepo": "info:eu-repo/semantics/preprint",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -205,6 +233,8 @@
     "en": "Reports"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Report"},
+  "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -218,6 +248,8 @@
     "en": "Software documentation"
   },
   "schema.org": "http://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Software documentation"},
+  "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -231,6 +263,8 @@
     "en": "Theses"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Thesis"},
+  "eurepo": "info:eu-repo/semantics/doctoralThesis",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -244,6 +278,8 @@
     "en": "Technical notes"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Technical note"},
+  "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -257,6 +293,8 @@
     "en": "Working papers"
   },
   "schema.org": "http://schema.org/ScholarlyArticle",
+  "datacite": {"general": "Text", "type": "Working paper"},
+  "eurepo": "info:eu-repo/semantics/workingPaper",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -270,6 +308,8 @@
     "en": "Proposals"
   },
   "schema.org": "http://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Proposal"},
+  "eurepo": "info:eu-repo/semantics/researchProposal",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -283,6 +323,8 @@
     "en": "Project deliverable"
   },
   "schema.org": "http://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Project deliverable"},
+  "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -296,6 +338,8 @@
     "en": "Project milestone"
   },
   "schema.org": "http://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Project milestone"},
+  "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -309,6 +353,8 @@
     "en": "Other"
   },
   "schema.org": "http://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Other"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
 },
 {
@@ -322,6 +368,8 @@
     "en": "Figures"
   },
   "schema.org": "http://schema.org/Webpage",
+  "datacite": {"general": "Image", "type": "Figure"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/image#"}
 },
 {
@@ -335,6 +383,8 @@
     "en": "Plots"
   },
   "schema.org": "http://schema.org/Webpage",
+  "datacite": {"general": "Image", "type": "Plot"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
 },
 {
@@ -348,6 +398,8 @@
     "en": "Drawings"
   },
   "schema.org": "http://schema.org/Webpage",
+  "datacite": {"general": "Image", "type": "Drawing"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
 },
 {
@@ -361,6 +413,8 @@
     "en": "Diagrams"
   },
   "schema.org": "http://schema.org/Webpage",
+  "datacite": {"general": "Image", "type": "Diagram"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
 },
 {
@@ -374,6 +428,8 @@
     "en": "Photos"
   },
   "schema.org": "http://schema.org/Webpage",
+  "datacite": {"general": "Image", "type": "Photo"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
 },
 {
@@ -387,5 +443,7 @@
     "en": "Other"
   },
   "schema.org": "http://schema.org/Webpage",
+  "datacite": {"general": "Image", "type": "Other"},
+  "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
 }]

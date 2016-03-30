@@ -30,13 +30,14 @@ import os
 import shutil
 import tempfile
 from datetime import date
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from elasticsearch.exceptions import RequestError
 from flask_cli import ScriptInfo
 from invenio_db import db as db_
 from invenio_files_rest.models import Location
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_search import current_search
 from sqlalchemy_utils.functions import create_database, database_exists
@@ -131,6 +132,14 @@ def minimal_record():
         "description": "My description",
         "access_right": "open",
     }
+
+
+@pytest.fixture()
+def recid_pid():
+    """PID for minimal record."""
+    return PersistentIdentifier(
+        pid_type='recid', pid_value='123', status='R', object_type='rec',
+        object_uuid=uuid4())
 
 
 @pytest.fixture()
