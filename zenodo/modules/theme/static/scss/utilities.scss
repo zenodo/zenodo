@@ -49,3 +49,18 @@
         text-align: center;
     }
 }
+
+.hide-on-collapsed {
+	display: block;
+}
+.show-on-collapsed {
+	display: none;
+}
+.panel-toggle.collapsed {
+	.hide-on-collapsed {
+		display: none;
+	}
+	.show-on-collapsed {
+		display: block;
+	}
+}
