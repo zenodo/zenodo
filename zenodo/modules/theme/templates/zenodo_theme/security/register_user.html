@@ -61,7 +61,7 @@
       {{ render_field(form.profile.username, errormsg=False) }}
       {{ render_field(form.password, errormsg=False) }}
       {%- if form.password_confirm %}
-        {{ render_field(form.password_confirm, icon="glyphicon glyphicon-lock", errormsg=False) }}
+        {{ render_field(form.password_confirm, icon="fa fa-lock", errormsg=False) }}
       {%- endif %}
       {%- if form.recaptcha %}
         <div class="form-group form-group-lg"><div align="center">{{ form.recaptcha() }}</div></div>

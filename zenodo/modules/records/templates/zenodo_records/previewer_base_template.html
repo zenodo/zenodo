@@ -22,21 +22,16 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{%- from "invenio_previewer/macros.html" import preview_file %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{_('Preview')}}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-{%- if record.files -%}
-  {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
-  {%- set initial_preview_filename = record.files[0].filename %}
-  <div class="panel panel-{{state}}" id="preview">
-    <div class="panel-heading">
-      <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
-        {{_('Preview')}}
-        <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
-        <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
-      </a>
-    </div>
-    <div id="collapseOne" class="collapse in">
-        {{- preview_file('invenio_records_ui.record_preview', pid=pid, filename=initial_preview_filename) }}
-    </div>
-  </div>
-{%- endif %}
+    {% assets "zenodo_theme_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
+    {% block head %} {% endblock %}
+  </head>
+  <body>
+    {% block page_body %} {% endblock %}
+  </body>
+</html>

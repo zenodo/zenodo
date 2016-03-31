@@ -383,6 +383,11 @@ RECORDS_REST_FACETS = dict(
     )
 )
 
+# Previewer
+# =======
+#: Default base template for previewer extensions.
+PREVIEWER_BASE_TEMPLATE = 'zenodo_records/previewer_base_template.html'
+
 # OAI-PMH
 # =======
 #: Index to use for the OAI-PMH server.
