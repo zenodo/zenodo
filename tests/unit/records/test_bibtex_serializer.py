@@ -203,3 +203,301 @@ def test_get_volume(bibtex_records):
     (record_good, record_bad, record_empty, test_record) = bibtex_records
     assert test_record['journal']['volume'] == record_good._get_volume()
     assert "" == record_empty._get_volume()
+
+
+def test_format_article(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'article'
+    bibtex = ("""@article{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  journal      = {Bam},\n"""
+              """  year         = 2014,\n"""
+              """  volume       = 20,\n"""
+              """  number       = 2,\n"""
+              """  pages        = 20,\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_book(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'book'
+    bibtex = ("""@book{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  publisher    = {Jol},\n"""
+              """  year         = 2014,\n"""
+              """  volume       = 20,\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_booklet(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'book'
+    del full_record['publication_date']
+    bibtex = ("""@booklet{doe_12345,\n"""
+              """  title        = {Test title},\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_inbook(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'section'
+    bibtex = ("""@misc{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_inproceedings(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'conferencepaper'
+    bibtex = ("""@inproceedings{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  booktitle    = {Bum},\n"""
+              """  year         = 2014,\n"""
+              """  pages        = 20,\n"""
+              """  publisher    = {Jol},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+    del full_record['journal']
+    full_record['part_of']['pages'] = "30"
+    bibtex = ("""@inproceedings{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  booktitle    = {Bum},\n"""
+              """  year         = 2014,\n"""
+              """  pages        = 30,\n"""
+              """  publisher    = {Jol},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+    del full_record['imprint']
+    full_record['part_of']['publisher'] = "hello"
+    bibtex = ("""@inproceedings{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  booktitle    = {Bum},\n"""
+              """  year         = 2014,\n"""
+              """  pages        = 30,\n"""
+              """  publisher    = {hello},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_proceedings(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'conferencepaper'
+    del full_record['part_of']
+    bibtex = ("""@proceedings{doe_2014_12345,\n"""
+              """  title        = {Test title},\n"""
+              """  year         = 2014,\n"""
+              """  publisher    = {Jol},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_manual(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'technicalnote'
+    bibtex = ("""@manual{doe_2014_12345,\n"""
+              """  title        = {Test title},\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+    full_record['creators'].append({'name': 'Bar, Fuu', 'affiliation': 'CERN',
+                                    'orcid': '', 'familyname': 'Bar',
+                                    'givennames': 'Fuu'})
+    bibtex = ("""@manual{doe_2014_12345,\n"""
+              """  title        = {Test title},\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John and\n"""
+              """                  Bar, Fuu},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+    authors = ""
+    for i in range(0, 50):
+        full_record['creators'].append({
+            'name': 'Bar, Fuu{0}'.format(i), 'affiliation': 'CERN',
+            'orcid': '', 'familyname': 'Bar',
+            'givennames': 'Fuu{0}'.format(i)})
+        authors += "                  Bar, Fuu{0}".format(i)
+        if i != 49:
+            authors += " and\n"
+
+    bibtex = ("@manual{doe_2014_12345,\n"
+              "  title        = {Test title},\n"
+              "  author       = {Doe, John and\n"
+              "                  Smith, John and\n"
+              "                  Bar, Fuu and\n" +
+              authors + "},\n"
+              "  address      = {Staszkowka},\n"
+              "  month        = feb,\n"
+              "  year         = 2014,\n"
+              "  note         = {notes},\n"
+              "  doi          = {10.1234/foo.bar},\n"
+              "  url          = {http://dx.doi.org/10.1234/foo.bar}\n"
+              "}")
+    assert bibtex == Bibtex(full_record).format()
+
+    full_record['creators'] = full_record['creators'][:1]
+    bibtex = ("""@manual{doe_2014_12345,\n"""
+              """  title        = {Test title},\n"""
+              """  author       = {Doe, John},\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_thesis(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'thesis'
+    bibtex = ("""@phdthesis{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  school       = {I guess important},\n"""
+              """  year         = 2014,\n"""
+              """  address      = {Staszkowka},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+    del full_record['imprint']
+    bibtex = ("""@phdthesis{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  school       = {I guess important},\n"""
+              """  year         = 2014,\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_unpublished(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'preprint'
+    bibtex = ("""@unpublished{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  note         = {notes},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+    full_record['resource_type']['subtype'] = 'workingpaper'
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_default_type(full_record):
+    """Test."""
+    full_record['resource_type']['type'] = 'undefined_type'
+    bibtex = ("""@misc{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_publication_default(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'undefined_subtype'
+    full_record['resource_type']['type'] = 'publication'
+    bibtex = ("""@misc{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Smith, John},\n"""
+              """  title        = {Test title},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()

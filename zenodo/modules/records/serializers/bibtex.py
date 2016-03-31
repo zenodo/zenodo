@@ -29,7 +29,6 @@ import textwrap
 import six
 from dateutil.parser import parse as iso2dt
 from flask import current_app
-from flask_babelex import gettext as _
 from slugify import slugify
 
 
@@ -136,14 +135,11 @@ class Bibtex(object):
             return formats['default']()
 
     def _format_entry(self, name, req, opt, ign):
-        try:
-            out = "@" + name + "{"
-            out += self._get_citation_key() + ",\n"
-            out += self._fetch_fields(req, opt, ign)
-            out += "}"
-            return out
-        except MissingRequiredFieldError as e:
-            raise e
+        out = "@" + name + "{"
+        out += self._get_citation_key() + ",\n"
+        out += self._fetch_fields(req, opt, ign)
+        out += "}"
+        return out
 
     def _format_article(self):
         """Format article entry type.
@@ -154,11 +150,8 @@ class Bibtex(object):
         req_fileds = ['author', 'title', 'journal', 'year']
         opt_fileds = ['volume', 'number', 'pages', 'month', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_book(self):
         """Format book entry type.
@@ -169,11 +162,8 @@ class Bibtex(object):
         req_fileds = ['author', 'title', 'publisher', 'year']
         opt_fileds = ['volume', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_booklet(self):
         """Format article entry type.
@@ -185,11 +175,8 @@ class Bibtex(object):
         req_fileds = ['title']
         opt_fileds = ['author', 'address', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_proceedings(self):
         """Format article entry type.
@@ -200,11 +187,8 @@ class Bibtex(object):
         req_fileds = ['title', 'year']
         opt_fileds = ['publisher', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_inproceedings(self):
         """Format article entry type.
@@ -215,11 +199,8 @@ class Bibtex(object):
         req_fileds = ['author', 'title', 'booktitle', 'year']
         opt_fileds = ['pages', 'publisher', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_unpublished(self):
         """Format article entry type.
@@ -231,11 +212,8 @@ class Bibtex(object):
         opt_fileds = ['month', 'year']
         ign_fields = ['doi', 'url']
 
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_manual(self):
         """Format article entry type.
@@ -246,11 +224,8 @@ class Bibtex(object):
         req_fileds = ['title']
         opt_fileds = ['author', 'address', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_thesis(self):
         """Format article entry type.
@@ -261,11 +236,8 @@ class Bibtex(object):
         req_fileds = ['author', 'title', 'school', 'year']
         opt_fileds = ['address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _format_misc(self):
         """Format misc entry type.
@@ -276,12 +248,8 @@ class Bibtex(object):
         req_fileds = []
         opt_fileds = ['author', 'title', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except Exception:
-            current_app.logger.warning("", exc_info=True)
-            return _("This record cannot be exported to BibTeX.")
+        return self._format_entry(name, req_fileds,
+                                  opt_fileds, ign_fields)
 
     def _fetch_fields(self, req_fileds, opt_fileds=[], ign_fields=[]):
         fields = {

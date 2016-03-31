@@ -49,6 +49,7 @@ Credits
   * Jiri Kuncar
   * João Gonçalves
   * Krzysztof Nowak
+  * Leonardo Rossi
   * Odd Magnus Trondrud
   * Sami Hiltunen
   * Samuele Kaplun
