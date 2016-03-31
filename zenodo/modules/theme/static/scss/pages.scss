@@ -1,0 +1,27 @@
+.features-page{
+  h1, h2{
+    font-weight: 100;
+  }
+  h4{
+    font-weight: 700;
+  }
+  .jumbotron{
+    background-color: transparent;
+    padding-bottom: 0px;
+  }
+  .introducing p {
+    line-height: 28px;
+  }
+  .marketing-bg {
+    background-color: $color6;
+    padding-bottom: 75px;
+    padding-top: 75px;
+  }
+  .jumbotron h1 {
+    font-size: 70px;
+    line-height: 90px;
+  }
+  .row{
+    margin-bottom: 50px;
+  }
+}

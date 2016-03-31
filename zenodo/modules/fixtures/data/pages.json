@@ -60,6 +60,6 @@
     "title": "Features",
     "description": "",
     "file": "pages/features.html",
-    "template_name": "invenio_pages/dynamic.html"
+    "template_name": "zenodo_theme/full_page.html"
   }
 ]

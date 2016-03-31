@@ -183,6 +183,11 @@ PAGES_WHITELIST_CONFIG_KEYS = [
     'SUPPORT_EMAIL',
     'THEME_SITENAME',
 ]
+PAGES_TEMPLATES = [
+    ('invenio_pages/default.html', 'Default'),
+    ('invenio_pages/dynamic.html', 'Default dynamic'),
+    ('zenodo_theme/full_page.html', 'Default full page'),
+]
 
 # Records
 # =======
