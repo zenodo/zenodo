@@ -60,7 +60,7 @@ python:
   - "3.4"
 
 before_install:
-  - "travis_retry pip install --upgrade pip setuptools py"
+  - "travis_retry pip install --upgrade pip setuptools==20.4 py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-base-requirements.txt"
