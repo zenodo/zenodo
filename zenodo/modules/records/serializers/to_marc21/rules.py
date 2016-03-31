@@ -22,25 +22,29 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""MARCXML translation index."""
+"""MARC21 rules."""
 
 from __future__ import absolute_import, print_function
 
-from dateutil.parser import parse
-from marshmallow import Schema, fields
+from dojson import utils
+from dojson.contrib.to_marc21.model import to_marc21
 
 
-class RecordSchemaMARC(Schema):
-    """Schema for records in MARC."""
-
-    control_number = fields.Str(attribute='metadata.recid')
-    date_and_time_of_latest_transaction = fields.Function(
-        lambda obj: parse(obj['updated']).strftime("%Y%m%d%H%M%S.0"))
-
-    information_relating_to_copyright_status = fields.Function(
-        lambda o: dict(copyright_status=o['metadata']['access_right']))
-
-    # Custom
-    # ======
-    resource_type = fields.Raw(attribute='metadata.resource_type')
-    communities = fields.Raw(attribute='metadata.communities')
+@to_marc21.over('980', '^(resource_type|communities)$')
+@utils.for_each_value
+@utils.filter_values
+def reverse_resource_type(self, key, value):
+    """Reverse - Resource Type."""
+    if key == 'resource_type':
+        return {
+            'a': value.get('type'),
+            'b': value.get('subtype'),
+            '$ind1': '_',
+            '$ind2': '_',
+        }
+    elif key == 'communities':
+        return {
+            'a': 'user-{0}'.format(value),
+            '$ind1': '_',
+            '$ind2': '_',
+        }

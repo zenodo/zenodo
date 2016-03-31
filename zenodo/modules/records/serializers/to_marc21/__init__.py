@@ -22,25 +22,6 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""MARCXML translation index."""
+"""MARC21 rules."""
 
 from __future__ import absolute_import, print_function
-
-from dateutil.parser import parse
-from marshmallow import Schema, fields
-
-
-class RecordSchemaMARC(Schema):
-    """Schema for records in MARC."""
-
-    control_number = fields.Str(attribute='metadata.recid')
-    date_and_time_of_latest_transaction = fields.Function(
-        lambda obj: parse(obj['updated']).strftime("%Y%m%d%H%M%S.0"))
-
-    information_relating_to_copyright_status = fields.Function(
-        lambda o: dict(copyright_status=o['metadata']['access_right']))
-
-    # Custom
-    # ======
-    resource_type = fields.Raw(attribute='metadata.resource_type')
-    communities = fields.Raw(attribute='metadata.communities')

@@ -39,6 +39,5 @@ def indexer_receiver(sender, json=None, record=None):
     if json['access_right'] != 'open' and 'files' in json:
         del json['files']
 
-    print
     if '_internal' in json:
         del json['_internal']

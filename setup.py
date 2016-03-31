@@ -202,7 +202,10 @@ setup(
         ],
         'invenio_search.mappings': [
             'records = zenodo.modules.records.mappings',
-        ]
+        ],
+        'dojson.contrib.to_marc21': [
+            'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
+        ],
     },
     extras_require=extras_require,
     install_requires=install_requires,
