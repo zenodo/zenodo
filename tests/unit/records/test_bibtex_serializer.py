@@ -146,60 +146,11 @@ def test_get_address(bibtex_records):
     assert "" == record_empty._get_note()
 
 
-def test_get_annote(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_annote()
-    assert "" == record_empty._get_annote()
-
-
 def test_get_booktitle(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
     assert test_record["part_of"]["title"] == record_good._get_booktitle()
     assert "" == record_empty._get_booktitle()
-
-
-def test_get_chapter(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_chapter()
-    assert "" == record_empty._get_chapter()
-
-
-def test_get_edition(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_edition()
-    assert "" == record_empty._get_edition()
-
-
-def test_get_editor(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_editor()
-    assert "" == record_empty._get_editor()
-
-
-def test_get_crossref(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_crossref()
-    assert "" == record_empty._get_crossref()
-
-
-def test_get_howpublished(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_howpublished()
-    assert "" == record_empty._get_howpublished()
-
-
-def test_get_institution(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_institution()
-    assert "" == record_empty._get_institution()
 
 
 def test_get_journal(bibtex_records):
@@ -209,25 +160,11 @@ def test_get_journal(bibtex_records):
     assert "" == record_empty._get_journal()
 
 
-def test_get_key(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_key()
-    assert "" == record_empty._get_key()
-
-
 def test_get_number(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
     assert test_record['journal']['issue'] == record_good._get_number()
     assert "" == record_empty._get_number()
-
-
-def test_get_organization(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_organization()
-    assert "" == record_empty._get_organization()
 
 
 def test_get_pages(bibtex_records):
@@ -251,20 +188,6 @@ def test_get_school(bibtex_records):
     (record_good, record_bad, record_empty, test_record) = bibtex_records
     assert test_record['thesis_university'] == record_good._get_school()
     assert "" == record_empty._get_school()
-
-
-def test_get_series(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_series()
-    assert "" == record_empty._get_series()
-
-
-def test_get_type(bibtex_records):
-    """Test."""
-    (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert "" == record_good._get_type()
-    assert "" == record_empty._get_type()
 
 
 def test_get_url(bibtex_records):

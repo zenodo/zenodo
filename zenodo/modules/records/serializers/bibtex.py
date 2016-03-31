@@ -104,8 +104,7 @@ class Bibtex(object):
             'book': [self._format_book,
                      self._format_booklet,
                      self._format_misc],
-            'section': [self._format_inbook,
-                        self._format_misc],
+            'section': [self._format_misc],
             'conferencepaper': [self._format_inproceedings,
                                 self._format_proceedings,
                                 self._format_misc],
@@ -114,12 +113,10 @@ class Bibtex(object):
             'patent': self._format_misc,
             'preprint': [self._format_unpublished,
                          self._format_misc],
-            'report': [self._format_techreport,
-                       self._format_misc],
+            'report': [self._format_misc],
             'thesis': [self._format_thesis,
                        self._format_misc],
-            'technicalnote': [self._format_techreport,
-                              self._format_manual,
+            'technicalnote': [self._format_manual,
                               self._format_misc],
             'workingpaper': [self._format_unpublished,
                              self._format_misc],
@@ -155,8 +152,7 @@ class Bibtex(object):
         """
         name = "article"
         req_fileds = ['author', 'title', 'journal', 'year']
-        opt_fileds = ['volume', 'number', 'pages',
-                      'month', 'note', 'key']
+        opt_fileds = ['volume', 'number', 'pages', 'month', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -171,8 +167,7 @@ class Bibtex(object):
         """
         name = "book"
         req_fileds = ['author', 'title', 'publisher', 'year']
-        opt_fileds = ['volume', 'series', 'address', 'edition',
-                      'month', 'note', 'key']
+        opt_fileds = ['volume', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -188,24 +183,7 @@ class Bibtex(object):
         """
         name = "booklet"
         req_fileds = ['title']
-        opt_fileds = ['author', 'howpublished', 'address',
-                      'month', 'year', 'note', 'key']
-        ign_fields = ['doi', 'url']
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
-
-    def _format_inbook(self):
-        """Format article entry type.
-
-        A part of a book, which may be a chapter and/or a range of pages.
-        """
-        name = "conference"
-        req_fileds = ['author', 'title', 'chapter', 'publisher', 'year']
-        opt_fileds = ['volume', 'series', 'address', 'edition',
-                      'month', 'note', 'key']
+        opt_fileds = ['author', 'address', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -220,8 +198,7 @@ class Bibtex(object):
         """
         name = "proceedings"
         req_fileds = ['title', 'year']
-        opt_fileds = ['editor', 'publisher', 'organization',
-                      'address', 'month', 'note', 'key']
+        opt_fileds = ['publisher', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -236,8 +213,7 @@ class Bibtex(object):
         """
         name = "inproceedings"
         req_fileds = ['author', 'title', 'booktitle', 'year']
-        opt_fileds = ['editor', 'pages', 'organization', 'publisher',
-                      'address', 'month', 'note', 'key']
+        opt_fileds = ['pages', 'publisher', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -252,26 +228,9 @@ class Bibtex(object):
         """
         name = "unpublished"
         req_fileds = ['author', 'title', 'note']
-        opt_fileds = ['month', 'year', 'key']
+        opt_fileds = ['month', 'year']
         ign_fields = ['doi', 'url']
 
-        try:
-            return self._format_entry(name, req_fileds,
-                                      opt_fileds, ign_fields)
-        except MissingRequiredFieldError as e:
-            raise e
-
-    def _format_techreport(self):
-        """Format article entry type.
-
-        A report published by a school or other institution, usually numbered
-        within a series.
-        """
-        name = "techreport"
-        req_fileds = ['author', 'title', 'institution', 'year']
-        opt_fileds = ['type', 'number', 'address',
-                      'month', 'note', 'key']
-        ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
                                       opt_fileds, ign_fields)
@@ -285,8 +244,7 @@ class Bibtex(object):
         """
         name = "manual"
         req_fileds = ['title']
-        opt_fileds = ['author', 'organization', 'address', 'edition',
-                      'month', 'year', 'note', 'key']
+        opt_fileds = ['author', 'address', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -301,7 +259,7 @@ class Bibtex(object):
         """
         name = "phdthesis"
         req_fileds = ['author', 'title', 'school', 'year']
-        opt_fileds = ['address', 'month', 'note', 'key']
+        opt_fileds = ['address', 'month', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -316,8 +274,7 @@ class Bibtex(object):
         """
         name = "misc"
         req_fileds = []
-        opt_fileds = ['author', 'title', 'month',
-                      'year', 'note', 'howpublished', 'key']
+        opt_fileds = ['author', 'title', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
         try:
             return self._format_entry(name, req_fileds,
@@ -329,27 +286,16 @@ class Bibtex(object):
     def _fetch_fields(self, req_fileds, opt_fileds=[], ign_fields=[]):
         fields = {
             'address': self._get_address,
-            'annote': self._get_annote,
             'author': self._get_author,
             'booktitle': self._get_booktitle,
-            'chapter': self._get_chapter,
-            'crossref': self._get_crossref,
-            'edition': self._get_edition,
-            'editor': self._get_editor,
-            'howpublished': self._get_howpublished,
-            'institution': self._get_institution,
             'journal': self._get_journal,
-            'key': self._get_key,
             'month': self._get_month,
             'note': self._get_note,
             'number': self._get_number,
-            'organization': self._get_organization,
             'pages': self._get_pages,
             'publisher': self._get_publisher,
             'school': self._get_school,
-            'series': self._get_series,
             'title': self._get_title,
-            'type': self._get_type,
             'url': self._get_url,
             'volume': self._get_volume,
             'year': self._get_year,
@@ -503,13 +449,6 @@ class Bibtex(object):
         else:
             return ""
 
-    def _get_annote(self):
-        """Return an annotation for annotated bibliography styles.
-
-        NOTE: unsupported
-        """
-        return ""
-
     def _get_booktitle(self):
         """Return the title of the book, part of which is being cited."""
         if "part_of" in self.record and\
@@ -517,48 +456,6 @@ class Bibtex(object):
             return self.record["part_of"]["title"]
         else:
             return ""
-
-    def _get_chapter(self):
-        """Return the chapter number.
-
-        NOTE: unsupported
-        """
-        return ""
-
-    def _get_crossref(self):
-        """Return the key of the cross-referenced entry.
-
-        NOTE: unsupported
-        """
-        return ""
-
-    def _get_edition(self):
-        """Return the edition of a book, long form.
-
-        NOTE: unsupported
-        """
-        return ""
-
-    def _get_editor(self):
-        """Return the name(s) of the editor(s).
-
-        NOTE: unsupported
-        """
-        return ""
-
-    def _get_howpublished(self):
-        """Return information on how the record was published.
-
-        NOTE: unsupported
-        """
-        return ""
-
-    def _get_institution(self):
-        """Return the institution that was involved in the publishing.
-
-        NOTE: unsupported
-        """
-        return ""
 
     def _get_journal(self):
         """Return the journal or magazine the work was published in."""
@@ -568,19 +465,6 @@ class Bibtex(object):
         else:
             return ""
 
-    def _get_key(self):
-        """Return record's hidden field.
-
-        Used for specifying or overriding
-        the alphabetical order of entries (when the "author" and "editor"
-        fields are missing). Note that this is very different from the key
-        (mentioned just after this list) that is used to cite or
-        cross-reference the entry.
-
-        NOTE: unsupported
-        """
-        return ""
-
     def _get_number(self):
         """Return the (issue) number of a journal, magazine, or tech-report."""
         if "journal" in self.record and\
@@ -588,13 +472,6 @@ class Bibtex(object):
             return self.record["journal"]["issue"]
         else:
             return ""
-
-    def _get_organization(self):
-        """Return the conference sponsor.
-
-        NOTE: unsupported
-        """
-        return ""
 
     def _get_pages(self):
         """Return page numbers, separated by commas or double-hyphens."""
@@ -621,20 +498,6 @@ class Bibtex(object):
     def _get_school(self):
         """Return the school where the thesis was written."""
         return self.record.get("thesis_university", "")
-
-    def _get_series(self):
-        """Return the series of books the book was published in.
-
-        NOTE: unsupported
-        """
-        return ""
-
-    def _get_type(self):
-        """Return the field overriding the default type of publication.
-
-        NOTE: unsupported
-        """
-        return ""
 
     def _get_url(self):
         """Return the WWW address."""
