@@ -63,10 +63,10 @@ def is_embargoed(embargo_date, accessright=None):
 
 
 @blueprint.app_template_filter()
-def accessright_category(value, embargo_date=None):
+def accessright_category(value, embargo_date=None, **kwargs):
     """Get category for access right."""
     return AccessRight.as_category(
-        AccessRight.get(value, embargo_date=embargo_date))
+        AccessRight.get(value, embargo_date=embargo_date), **kwargs)
 
 
 @blueprint.app_template_filter()

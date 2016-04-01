@@ -21,53 +21,34 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
-{% from "invenio_previewer/macros.html" import preview_file %}
+
 {%- if record.files and record.access_right == "open" -%}
-{%- set state = "default" %}
-{#
-{%- if record.access_right == 'closed' %}
-  {%- set state = "danger" %}
-{%- elif record|is_embargoed %}
-  {%- set state = "warning" %}
-{%- endif -%}
-#}
-<div class="panel panel-{{state}}" id="preview">
-  <div class="panel-heading">
-    <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
-      Preview
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
-    </a>
-  </div>
-  <div id="collapseOne" class="collapse in">
-      {{- preview_file('invenio_records_ui.record_preview', pid=pid, filename=record.files[0].filename) }}
-  </div>
-</div>
-<div class="panel panel-{{state}}" id="files">
-  <div class="panel-heading">
-    <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
-      {{ _("Files") }}
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
-    </a>
-  </div>
-  <div class="collapse in" id="collapseTwo">
-  {#
-  {% if record|is_restricted %}
-    <div class="panel-body">
-      <h5><i class="fa fa-ban" style="color: red;"></i> Restricted access</h5>
-      <p><small class="text-muted">
-      {% if file_token %}
-      The owner has granted you access to the files in this record, subject to the conditions below:
-      {% else %}
-      You have access to the files in this upload because you are the owner. Other users may request access to the files in this upload, provided that they fulfil the conditions below:
-      {% endif %}
-      </small></p>
-      <hr />
-      {{record.get('access_conditions')|safe}}
-      <hr />
+  {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
+  <div class="panel panel-{{state}}" id="files">
+    <div class="panel-heading">
+      <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
+        {{ _("Files") }}
+        <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+        <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      </a>
     </div>
-  {% elif record|is_embargoed %}
+    <div class="collapse in" id="collapseTwo">
+    {#
+    {% if record|is_restricted %}
+      <div class="panel-body">
+        <h5><i class="fa fa-ban" style="color: red;"></i> Restricted access</h5>
+        <p><small class="text-muted">
+        {% if file_token %}
+        The owner has granted you access to the files in this record, subject to the conditions below:
+        {% else %}
+        You have access to the files in this upload because you are the owner. Other users may request access to the files in this upload, provided that they fulfil the conditions below:
+        {% endif %}
+        </small></p>
+        <hr />
+        {{record.get('access_conditions')|safe}}
+        <hr />
+      </div>
+    {% elif record|is_embargoed %}
      <div class="panel-body">
       <h5><i class="fa fa-warning"></i> Embargoed access</h5>
       <p><small class="text-muted">Files are currently under embargo but will be publicly available after {{ record['embargo_date'] }}. {% if file_token %}You have access to the files in this upload because the owner shared a secret link with you.{% else %}You have access to the files in this upload because you are the owner.{% endif %}

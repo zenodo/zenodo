@@ -61,7 +61,9 @@
       {%- endif %}
       {%- endblock record_body %}
       {%- block record_body_extra %}
+      {%-  include "zenodo_records/box/preview.html" %}
       {%-  include "zenodo_records/box/files.html" %}
+      {# TODO: include references #}
       {%- endblock record_body_extra %}
     </div>
     <div class="col-sm-4 col-md-4">

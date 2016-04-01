@@ -87,9 +87,10 @@ class AccessRight(object):
         return dict(cls._all)[value]
 
     @classmethod
-    def as_category(cls, value):
+    def as_category(cls, value, **kwargs):
         """Get title for a specific status."""
-        return cls._category[value]
+        cat = cls._category[value]
+        return kwargs[cat] if cat in kwargs else cat
 
     @classmethod
     def as_options(cls):
