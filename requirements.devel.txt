@@ -31,6 +31,7 @@
 -e git+https://github.com/inveniosoftware/invenio-assets.git#egg=invenio-assets
 -e git+https://github.com/inveniosoftware/invenio-base.git#egg=invenio-base
 -e git+https://github.com/inveniosoftware/invenio-celery.git#egg=invenio-celery
+-e git+https://github.com/inveniosoftware/invenio-communities.git#egg=invenio-communities
 -e git+https://github.com/inveniosoftware/invenio-config.git#egg=invenio-config
 -e git+https://github.com/inveniosoftware/invenio-db.git#egg=invenio-db
 -e git+https://github.com/inveniosoftware/invenio-files-rest.git#egg=invenio-files-rest
