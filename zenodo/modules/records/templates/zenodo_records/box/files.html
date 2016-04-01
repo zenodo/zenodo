@@ -35,8 +35,8 @@
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
       Preview
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
     </a>
   </div>
   <div id="collapseOne" class="collapse in">
@@ -47,8 +47,8 @@
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
       {{ _("Files") }}
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
     </a>
   </div>
   <div class="collapse in" id="collapseTwo">
@@ -93,7 +93,7 @@
     <tr class="">
         <td><a class="forcewrap" href="{{file_url}}">{{ file.filename }}</a><br /><small class="text-muted">{{file.checksum}}</small></td>
         <td class="nowrap">{{ file.size|filesizeformat }}</td>
-        <td class="nowrap"><span class="pull-right"><button class="btn preview-link btn-xs btn-default" data-filename="{{file.filename}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> <a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+        <td class="nowrap"><span class="pull-right">{% if file is previewable %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.filename}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button>{% endif %}<a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
       </tr>
     {%- endfor -%}
     </tbody>
@@ -107,8 +107,8 @@
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
       Files
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
     </a>
   </div>
   <div class="collapse in" id="collapseTwo">
@@ -130,8 +130,8 @@
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
       {{ _("Files") }}
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
     </a>
   </div>
   <div class="collapse in" id="collapseTwo">
@@ -146,8 +146,8 @@
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
       {{ _("Files") }}
-      <span class="pull-right show-on-collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
-      <span class="pull-right hide-on-collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+      <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
     </a>
   </div>
   <div class="collapse in" id="collapseTwo">
