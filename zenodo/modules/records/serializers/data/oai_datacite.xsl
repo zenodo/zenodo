@@ -2,7 +2,7 @@
 <!-- $Id$
 
      This file is part of Invenio.
-     Copyright (C) 2007, 2008, 2010, 2011 CERN.
+     Copyright (C) 2007, 2008, 2010, 2011, 2016 CERN.
 
      Invenio is free software; you can redistribute it and/or
      modify it under the terms of the GNU General Public License as
@@ -31,7 +31,7 @@ xmlns:marc="http://www.loc.gov/MARC21/slim"
 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 xmlns:dc="http://purl.org/dc/elements/1.1/"
 xmlns:fn="http://cdsweb.cern.ch/bibformat/fn"
-xmlns:invenio="http://invenio-software.org/elements/1.0"
+xmlns:invenio="http://inveniosoftware.org/elements/1.0"
 xmlns:contributors="marc.contributors"
 exclude-result-prefixes="marc fn dc invenio contributors">
     <xsl:output method="xml"  indent="yes" encoding="UTF-8" omit-xml-declaration="yes"/>

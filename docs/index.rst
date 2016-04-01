@@ -26,8 +26,8 @@
    :end-before: Powered by Invenio
 
 **Powered by Invenio**: Zenodo is a small layer on top of
-`Invenio <http://invenio-software.org>`_, a free software suite enabling you
-to run your own ​digital repository on the web.
+`Invenio <http://inveniosoftware.org>`_, a free software suite enabling you
+to run your own digital repository on the web.
 
 Developers's Guide
 ------------------
@@ -91,6 +91,6 @@ OpenAIRE2020.
    you must change the branding to your own.
 
    Please consider creating your own overlay to
-   `Invenio <http://invenio-software.org>`_ and look to Zenodo for inspiration.
+   `Invenio <http://inveniosoftware.org>`_ and look to Zenodo for inspiration.
    We will be happy to help you get started, just contact us on
    info@zenodo.org.
