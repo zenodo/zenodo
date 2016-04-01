@@ -28,7 +28,45 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime, timedelta
 
+from pytest_mock import mocker
+
+from invenio_db import db
+from invenio_records import Record
+
 from zenodo.modules.records.models import AccessRight, ObjectType
+from zenodo.modules.records.tasks import update_embargoed_records
+
+def test_update_embargoed_records(app, mocker):
+    with app.app_context():
+        records = [
+            Record.create({
+                'title': 'record1',
+                'access_right': 'embargoed',
+                'embargo_date': '2016-01-01'
+            }),
+            Record.create({
+                'title': 'record2',
+                'access_right': 'embargoed',
+                'embargo_date': '2016-01-03'
+            }),
+            Record.create({
+                'title': 'record3',
+                'access_right': 'open',
+                'embargo_date': '2015-01-01',
+            })
+        ]
+        db.session.commit()
+        record_ids = [record.id for record in records]
+
+    mock_search_client = mocker.patch("elasticsearch.Elasticsearch")
+    mock_search_client.search.return_value = [records[0]]
+    mock_search_client.remove.assert_called(
+        index='records',
+        body='blala'
+    )
+
+    with app.app_context():
+        update_embargoed_records()
 
 
 def test_access_right():

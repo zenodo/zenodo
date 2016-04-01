@@ -6043,7 +6043,8 @@
       {
         "json": {
           "modification_date": "2015-11-19T14:27:29",
-          "access_right": "open",
+          "access_right": "embargoed",
+          "embargo_date": "2016-04-01T01:01:01",
           "upload_type": {
             "type": "software"
           },
@@ -6206,7 +6207,8 @@
               "name": "Belleman, J\u00e9r\u00f4me"
             }
           ],
-          "access_right": "open"
+          "access_right": "embargoed",
+          "embargo_date": "2016-03-01T01:02:03"
         },
         "modification_datetime": "2014-03-10T17:38:58+00:00",
         "marcxml": ""

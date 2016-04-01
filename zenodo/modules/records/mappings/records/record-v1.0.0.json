@@ -223,6 +223,14 @@
         },
         "journal": {
           "type": "object",
+        "doi": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "embargo_date": {
+          "type": "date"
+        },
+        "files_to_upload": {
           "properties": {
             "issue": {
               "type": "string"
