@@ -373,6 +373,7 @@ RECORDS_REST_FACETS = dict(
         ),
         filters=dict(
             communities=terms_filter('communities'),
+            provisional_communities=terms_filter('provisional_communities'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
