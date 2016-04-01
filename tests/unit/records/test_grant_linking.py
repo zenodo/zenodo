@@ -22,24 +22,19 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Record modification prior to indexing."""
+"""Grant linking tests."""
 
 from __future__ import absolute_import, print_function
 
+from invenio_records.api import Record
+from flask import current_app
 
-def indexer_receiver(sender, json=None, record=None):
-    """Connect to before_record_index signal to transform record for ES."""
-    # Inject timestamp into record.
-    json['_created'] = record.created
-    json['_updated'] = record.updated
 
-    if not json.get('$schema', '').startswith(
-            'https://zenodo.org/schemas/records/'):
-        return
-
-    # Remove files from index if record is not open access.
-    if json['access_right'] != 'open' and 'files' in json:
-        del json['files']
-
-    if '_internal' in json:
-        del json['_internal']
+def test_grant_linking(app, db, minimal_record, grant_record):
+    """Test grant linking."""
+    minimal_record['grants'] = [{
+        '$ref': 'http://dx.zenodo.org/grants/10.13039/501100000780::282896'}]
+    record = current_app.extensions['invenio-records'].replace_refs(
+        Record.create(minimal_record))
+    assert record['grants'][0]['funder']['name'] == 'European Commission'
+    record.validate()

@@ -171,7 +171,7 @@ OAUTHCLIENT_ORCID_CREDENTIALS = dict(
 #: Hostname for JSON Schemas.
 OPENAIRE_SCHEMAS_HOST = 'zenodo.org'
 #: Hostname for OpenAIRE's grant resolver.
-OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'zenodo.org'
+OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
 
 # Pages
 # =====

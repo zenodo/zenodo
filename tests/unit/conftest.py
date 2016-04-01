@@ -229,3 +229,39 @@ def bibtex_records(app, db, full_record):
     record_empty = Bibtex({})
 
     yield (record_good, record_bad, record_empty, r_good)
+
+
+@pytest.fixture()
+def funder_record(db):
+    """Create a funder record."""
+    funder = Record.create(dict(
+        doi='10.13039/501100000780',
+        name='European Commission',
+        acronyms=['EC'],
+    ))
+    PersistentIdentifier.create(
+        pid_type='frdoi', pid_value=funder['doi'], object_type='rec',
+        object_uuid=funder.id, status='R')
+    db.session.commit()
+    return funder
+
+
+@pytest.fixture()
+def grant_record(db, funder_record):
+    """Create a funder record."""
+    grant = Record.create(dict(
+        internal_id='10.13039/501100000780::282896',
+        funder={'$ref': 'http://dx.doi.org/10.13039/501100000780'},
+        identifiers=dict(
+            eurepo='info:eu-repo/grantAgreement/EC/FP7/282896',
+        ),
+        code='282896',
+        title='Open Access Research Infrastructure in Europe',
+        acronym='OpenAIREplus',
+        program='FP7',
+    ))
+    PersistentIdentifier.create(
+        pid_type='grant', pid_value=grant['internal_id'], object_type='rec',
+        object_uuid=grant.id, status='R')
+    db.session.commit()
+    return grant
