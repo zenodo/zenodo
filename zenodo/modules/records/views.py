@@ -31,6 +31,7 @@ import copy
 import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
+from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from .models import AccessRight, ObjectType
@@ -116,6 +117,22 @@ def zenodo_related_links(record):
 def objecttype(value):
     """Get object type."""
     return ObjectType.get_by_dict(value)
+
+
+#
+# Files related template filters.
+#
+@blueprint.app_template_filter()
+def select_preview_file(files):
+    """Get list of files and select one for preview."""
+    selected = None
+    for f in files:
+        if f.get('type') in current_previewer.previewable_extensions:
+            if selected is None:
+                selected = f
+        elif f.get('default'):
+            selected = f
+    return selected
 
 
 #

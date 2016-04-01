@@ -22,7 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{%- if record.files and record.access_right == "open" -%}
+{%- if files and record.access_right == "open" -%}
   {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
@@ -41,10 +41,10 @@
       </tr>
     </thead>
     <tbody>
-    {%- for file in record.files|sort(attribute='filename') -%}
+    {%- for file in files|sort(attribute='filename') -%}
     {%- set file_url = url_for('invenio_records_ui.record_files', pid_value=pid.pid_value, filename=file.filename) %}
       <tr class="">
-          <td><a class="forcewrap" href="{{file_url}}">{{ file.filename }}</a><br /><small class="text-muted">{{file.checksum}}</small></td>
+          <td><a class="forcewrap" href="{{file_url}}">{{ file.filename }}</a><br /><small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{_('This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity.')}}">{{file.checksum}}</small></td>
           <td class="nowrap">{{ file.size|filesizeformat }}</td>
           <td class="nowrap"><span class="pull-right">{% if file.type is previewable %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.filename}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> {% endif %}<a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
         </tr>

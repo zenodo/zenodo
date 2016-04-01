@@ -61,6 +61,7 @@
       {%- endif %}
       {%- endblock record_body %}
       {%- block record_body_extra %}
+      {%- set files = record.files %}
       {%-  include "zenodo_records/box/preview.html" %}
       {%-  include "zenodo_records/box/files.html" %}
       {# TODO: include references #}
@@ -94,13 +95,6 @@
       var filename = encodeURIComponent($(event.target).data('filename'));
       $('#preview-iframe').attr("src","{{ url_for('invenio_records_ui.record_preview', pid_value=record.recid, filename='') }}" + filename);
     });
-
-    var previewbutton = $('.preview-link:first');
-    if (previewbutton.html()) {
-      previewbutton.click();
-    } else {
-      $('#preview').hide();
-    }
   });
 </script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>

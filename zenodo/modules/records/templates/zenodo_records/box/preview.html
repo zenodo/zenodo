@@ -24,9 +24,10 @@
 
 {%- from "invenio_previewer/macros.html" import preview_file %}
 
-{%- if record.files -%}
+{% set selected_file = files|select_preview_file %}
+
+{%- if selected_file -%}
   {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
-  {%- set initial_preview_filename = record.files[0].filename %}
   <div class="panel panel-{{state}}" id="preview">
     <div class="panel-heading">
       <a class="panel-toggle" data-toggle="collapse" href="#collapseOne">
@@ -36,7 +37,7 @@
       </a>
     </div>
     <div id="collapseOne" class="collapse in">
-        {{- preview_file('invenio_records_ui.record_preview', pid=pid, filename=initial_preview_filename) }}
+        {{- preview_file('invenio_records_ui.record_preview', pid=pid, filename=selected_file.filename) }}
     </div>
   </div>
 {%- endif %}

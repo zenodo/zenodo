@@ -384,9 +384,14 @@ RECORDS_REST_FACETS = dict(
 )
 
 # Previewer
-# =======
-#: Default base template for previewer extensions.
-PREVIEWER_BASE_TEMPLATE = 'zenodo_records/previewer_base_template.html'
+# =========
+#: Base CSS bundle to include in all previewers
+PREVIEWER_BASE_CSS_BUNDLES = ['zenodo_theme_css']
+"""Basic bundle which includes Font-Awesome/Bootstrap."""
+#: Base JS bundle to include in all previewers
+PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
+"""Basic bundle which includes Bootstrap/jQuery."""
+
 
 # OAI-PMH
 # =======
