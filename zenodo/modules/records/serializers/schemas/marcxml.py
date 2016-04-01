@@ -34,13 +34,112 @@ class RecordSchemaMARC(Schema):
     """Schema for records in MARC."""
 
     control_number = fields.Str(attribute='metadata.recid')
+
     date_and_time_of_latest_transaction = fields.Function(
         lambda obj: parse(obj['updated']).strftime("%Y%m%d%H%M%S.0"))
 
     information_relating_to_copyright_status = fields.Function(
         lambda o: dict(copyright_status=o['metadata']['access_right']))
 
+    index_term_uncontrolled = fields.Function(
+        lambda o: dict(uncontrolled_term=o['metadata'].get('keywords'))
+    )
+
+    subject_added_entry_topical_term = fields.Function(
+        lambda o: dict(
+            topical_term_or_geographic_name_entry_element=o[
+                'metadata'].get('license', {}).get('identifier'),
+            source_of_heading_or_term=o[
+                'metadata'].get('license', {}).get('source')
+        ))
+
+    terms_governing_use_and_reproduction_note = fields.Function(
+        lambda o: dict(
+            uniform_resource_identifier=o[
+                'metadata'].get('license', {}).get('url'),
+            terms_governing_use_and_reproduction=o[
+                'metadata'].get('license', {}).get('license')
+        ))
+
+    title_statement = fields.Function(
+        lambda o: dict(title=o['metadata'].get('title')))
+
+    general_note = fields.Function(
+        lambda o: dict(general_note=o['metadata'].get('notes')))
+
+    information_relating_to_copyright_status = fields.Function(
+        lambda o: dict(copyright_status=o['metadata'].get('access_right')))
+
+    publication_distribution_imprint = fields.Function(
+        lambda o: dict(
+            date_of_publication_distribution=o['metadata'].get(
+                'publication_date')))
+
+    funding_information_note = fields.Function(
+        lambda o: [dict(
+            text_of_note=v.get('title'),
+            grant_number=v.get('identifier')
+        ) for v in o['metadata'].get('grants', [])])
+
+    other_standard_identifier = fields.Function(
+        lambda o: [dict(
+            standard_number_or_code=v.get('identifier'),
+            source_of_number_or_code=v.get('scheme'),
+        ) for v in o['metadata'].get('alternate_identifiers', [])])
+
+    added_entry_meeting_name = fields.Function(
+        lambda o: [dict(
+            meeting_name_or_jurisdiction_name_as_entry_element=v.get('title'),
+            location_of_meeting=v.get('place'),
+            date_of_meeting=v.get('dates'),
+            miscellaneous_information=v.get('acronym'),
+            number_of_part_section_meeting=v.get('session'),
+            name_of_part_section_of_a_work=v.get('session_part'),
+        ) for v in o['metadata'].get('meetings', [])])
+
+    main_entry_personal_name = fields.Function(
+        lambda o: [dict(
+            personal_name=v.get('name'),
+            affiliation=v.get('affiliation'),
+            authority_record_control_number_or_standard_number=[
+                "({0}){1}".format(scheme, identifier)
+                for (scheme, identifier) in v.items()
+                if scheme not in (
+                    'name', 'affiliation', 'familyname', 'givennames')
+            ],
+        ) for v in o['metadata'].get('creators', [])]
+    )
+
+    added_entry_personal_name = fields.Function(
+        lambda o: [dict(
+            personal_name=v.get('name'),
+            affiliation=v.get('affiliation'),
+            relator_code=[
+                "({0}){1}".format(scheme, identifier)
+                for (scheme, identifier) in v.items()
+                if scheme not in ('name', 'affiliation', 'type')
+            ],
+        ) for v in o['metadata'].get('contributors', [])]
+    )
+
+    summary = fields.Function(
+        lambda o: dict(summary=o['metadata'].get('description')))
+
+    host_item_entry = fields.Function(
+        lambda o: [dict(
+            relationship_information=v.get('relation'),
+            note=v.get('scheme'),
+        ) for v in o['metadata'].get('related_identifiers', [])])
+
     # Custom
     # ======
+
     resource_type = fields.Raw(attribute='metadata.resource_type')
+
     communities = fields.Raw(attribute='metadata.communities')
+
+    references = fields.Raw(attribute='metadata.references')
+
+    embargo_date = fields.Raw(attribute='metadata.embargo_date')
+
+    _oai = fields.Raw(attribute='metadata._oai')

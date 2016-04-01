@@ -48,3 +48,38 @@ def reverse_resource_type(self, key, value):
             '$ind1': '_',
             '$ind2': '_',
         }
+
+
+@to_marc21.over('999', '^references$')
+@utils.reverse_for_each_value
+@utils.filter_values
+def reverse_references(self, key, value):
+    """Reverse - References - raw reference."""
+    return {
+        'x': value.get('raw_reference'),
+        '$ind1': 'C',
+        '$ind2': '5',
+    }
+
+
+@to_marc21.over('942', '^embargo_date$')
+@utils.filter_values
+def reverse_embargo_date(self, key, value):
+    """Reverse - embargo date."""
+    return {
+        'a': value,
+        '$ind1': '_',
+        '$ind2': '_',
+    }
+
+
+@to_marc21.over('909', '^oai$')
+@utils.filter_values
+def reverse_oai(self, key, value):
+    """Reverse - OAI."""
+    return {
+        'o': value.get('id'),
+        'p': utils.reverse_force_list(value.get('sets')),
+        '$ind1': 'C',
+        '$ind2': 'O',
+    }
