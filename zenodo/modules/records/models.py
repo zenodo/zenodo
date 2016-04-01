@@ -30,7 +30,9 @@ import json
 from datetime import datetime
 from os.path import dirname, join
 
+from flask import current_app
 from flask_babelex import gettext
+from invenio_search import Query, current_search_client
 from jsonref import JsonRef
 from speaklater import make_lazy_gettext
 
@@ -96,6 +98,30 @@ class AccessRight(object):
     def as_options(cls):
         """Return list of access rights as options."""
         return cls._all
+
+    @classmethod
+    def get_expired_embargos(cls):
+        """Get records for which the embargo period have expired."""
+        query_str = 'access_right:{0} AND embargo_date:{{* TO {1}}}'.format(
+            cls.EMBARGOED,
+            datetime.utcnow().isoformat()
+        )
+
+        query = Query()
+        query.body['query'] = {
+            'query_string': {
+                'query': query_str,
+                'allow_leading_wildcard': False,
+            }
+        }
+
+        endpoints = current_app.config['RECORDS_REST_ENDPOINTS']
+        index = endpoints['recid']['search_index']
+
+        response = current_search_client.search(
+            index=index, body=query.body
+        )
+        return [hit['_id'] for hit in response['hits']['hits']]
 
 
 class ObjectType(object):

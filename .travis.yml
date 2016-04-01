@@ -42,25 +42,27 @@ cache:
 
 services:
   - postgresql
-  - elasticsearch
   - redis
   - rabbitmq
 
 env:
   #- REQUIREMENTS=base SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
   #- REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
-  - REQUIREMENTS=devel E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  - REQUIREMENTS=devel E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_VERSION=2.2.0
   #- REQUIREMENTS=base SQLALCHEMY_DATABASE_URI="sqlite:///tmp/zenodo.db"
   #- REQUIREMENTS=release SQLALCHEMY_DATABASE_URI="sqlite:///tmp/zenodo.db"
-  - REQUIREMENTS=devel E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db"
-  - REQUIREMENTS=devel E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  - REQUIREMENTS=devel E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db" ES_VERSION=2.2.0
+  - REQUIREMENTS=devel E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_VERSION=2.2.0
 
 python:
   - "2.7"
   - "3.4"
 
 before_install:
-  - "travis_retry pip install --upgrade pip setuptools==20.4 py"
+  - "mkdir /tmp/elasticsearch"
+  - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
+  - "/tmp/elasticsearch/bin/elasticsearch &"
+  - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install twine wheel coveralls requirements-builder"
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-base-requirements.txt"

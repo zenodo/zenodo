@@ -22,13 +22,27 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo search ui views."""
+"""Celery background tasks."""
+
+from __future__ import absolute_import, print_function
+
+from celery import shared_task
+from invenio_db import db
+from invenio_indexer.api import RecordIndexer
+from invenio_records import Record
+
+from zenodo.modules.records.models import AccessRight
 
 
-def test_for_smoke(app, db, es):
-    """Test search view."""
-    with app.test_client() as client:
-        res = client.get('/search')
-        assert res.status_code == 200
-        res = client.get('/api/records/')
-        assert res.status_code == 200
+@shared_task(ignore_result=True)
+def update_expired_embargos():
+    """Release expired embargoes every midnight."""
+    record_ids = AccessRight.get_expired_embargos()
+    for record in Record.get_records(record_ids):
+        record['access_right'] = AccessRight.OPEN
+        record.commit()
+    db.session.commit()
+
+    indexer = RecordIndexer()
+    indexer.bulk_index(record_ids)
+    indexer.process_bulk_queue()

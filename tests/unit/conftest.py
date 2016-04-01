@@ -39,7 +39,7 @@ from invenio_db import db as db_
 from invenio_files_rest.models import Location
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
-from invenio_search import current_search
+from invenio_search import current_search, current_search_client
 from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
@@ -47,7 +47,7 @@ from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
 @pytest.yield_fixture(scope='session', autouse=True)
-def app(request):
+def app():
     """Flask application fixture."""
     instance_path = tempfile.mkdtemp()
 
@@ -58,6 +58,7 @@ def app(request):
 
     app = create_app(
         DEBUG_TB_ENABLED=False,
+        DEBUG=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
         TESTING=True,
@@ -105,7 +106,7 @@ def location(db):
     shutil.rmtree(tmppath)
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.yield_fixture()
 def es(app):
     """Provide elasticsearch access."""
     try:
@@ -113,7 +114,8 @@ def es(app):
     except RequestError:
         list(current_search.delete())
         list(current_search.create())
-    yield current_search
+    current_search_client.indices.refresh()
+    yield current_search_client
     list(current_search.delete(ignore=[404]))
 
 
