@@ -27,14 +27,13 @@
 from __future__ import absolute_import, print_function
 
 
-def indexer_receiver(sender, json=None, record=None):
+def indexer_receiver(sender, json=None, record=None, index=None, **kwargs):
     """Connect to before_record_index signal to transform record for ES."""
     # Inject timestamp into record.
     json['_created'] = record.created
     json['_updated'] = record.updated
 
-    if not json.get('$schema', '').startswith(
-            'https://zenodo.org/schemas/records/'):
+    if not index.startswith('records-'):
         return
 
     # Remove files from index if record is not open access.
