@@ -24,6 +24,8 @@
 
 """Zenodo usage documentation for developers.
 
+.. _running:
+
 Running
 -------
 Starting a development server is as simple as (note, if you are using docker,
@@ -205,6 +207,58 @@ and send it to the CERN monitoring infrastructure.
 
    METRICS_XSLS_API_URL = "http://xsls-dev.cern.ch"
    METRICS_XSLS_SERVICE_ID = "myid"
+
+
+Vocabularies
+------------
+Zenodo relies on external vocabularies/authorities for linking records to
+funders/grants and licenses. Since some of the vocabularies can be rather big,
+the actual important is done using the task queue. Hence, before executing any
+of the commands below, please first start Celery (see :ref:`running`).
+
+Licenses
+~~~~~~~~
+Licenses are imported from `opendefinition.org
+<http://licenses.opendefinition.org>`_:
+
+.. code-block:: console
+
+   (zenodo)$ zenodo opendefinition loadlicenses
+
+
+Funders and grants
+~~~~~~~~~~~~~~~~~~
+Funders are imported from `FundRef <http://www.crossref.org/fundingdata/>`_.
+Currently the dataset contains more than 10.000 funders:
+
+.. code-block:: console
+
+   (zenodo)$ zenodo openaire loadfunders
+
+
+Grants are imported from `OpenAIRE <http://api.openaire.eu/#cha_oai_pmh>`_.
+Currently the full dataset contains more than 600.000 grants spread over a
+handful of funders. You can harvest grants selectively from the funders you
+need:
+
+.. code-block:: console
+
+   (zenodo)$ zenodo openaire loadgrants --setspec=FP7Projects
+
+
+The ``--setspec`` option should be one of the following:
+
+* Australian Research Council: ``ARCProjects``
+* European Commission FP7: ``FP7Projects``
+* European Commission Horizon 2020: ``H2020Projects``
+* European Commission: ``ECProjects`` (contains both FP7Projects and
+  ``H2020Projects``)
+* Fundação para a Ciência e a Tecnologia, I.P.: ``FCTProjects``
+* National Health and Medical Research Council: ``NHMRCProjects``
+* National Science Foundation: ``NSFProjects``
+* Wellcome Trust: ``WTProjects``
+
+
 
 """
 
