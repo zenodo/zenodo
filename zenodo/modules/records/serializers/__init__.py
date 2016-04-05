@@ -44,20 +44,21 @@ from .bibtex import BibTeXSerializer
 # Serializers
 # ===========
 #: Zenodo JSON serializer version 1.0.0
-json_v1 = JSONSerializer(RecordSchemaJSONV1)
+json_v1 = JSONSerializer(RecordSchemaJSONV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
-marcxml_v1 = MARCXMLSerializer(to_marc21, schema_class=RecordSchemaMARC)
+marcxml_v1 = MARCXMLSerializer(
+    to_marc21, schema_class=RecordSchemaMARC, replace_refs=True)
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializer
-datacite_v31 = DataCite31Serializer(DataCiteSchemaJSONV1)
+datacite_v31 = DataCite31Serializer(DataCiteSchemaJSONV1, replace_refs=True)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     v31=datacite_v31,
     datacentre='CERN.ZENODO',
 )
 #: Dublin Core serializer
-dc_v1 = DublinCoreSerializer(DublinCoreJSONV1)
+dc_v1 = DublinCoreSerializer(DublinCoreJSONV1, replace_refs=True)
 
 # Records-REST serializers
 # ========================

@@ -407,7 +407,7 @@ PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
 #: Index to use for the OAI-PMH server.
 OAISERVER_RECORD_INDEX = 'records'
 #: OAI identifier prefix
-OAISERVER_ID_PREFIX = 'oai:localhost:recid/'
+OAISERVER_ID_PREFIX = 'oai:zenodo.org:recid/'
 #: Number of records to return per page in OAI-PMH results.
 OAISERVER_PAGE_SIZE = 25
 #: Support email for OAI-PMH.

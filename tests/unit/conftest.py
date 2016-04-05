@@ -174,8 +174,10 @@ def full_record():
         communities=['zenodo'],
         provisional_communities=['ecfunded'],
         grants=[
-            {'title': 'Grant Title', 'identifier': '1234', },
-            {'title': 'Title Grant', 'identifier': '4321', },
+            {'title': 'Grant Title', 'code': '1234', 'identifiers': {},
+             'funder': {'name': 'EC'}},
+            {'title': 'Title Grant', 'code': '4321', 'identifiers': {},
+             'funder': {'name': 'EC'}},
         ],
         # Test all schemes
         related_identifiers=[

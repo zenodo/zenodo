@@ -105,11 +105,18 @@
   {%- endwith %}
   {%- endif %}
 
-  {%- if record.grants %}
+  {%- if resolved_record.grants %}
     <dt>{{_('Grants')}}:</dt>
     <dd>
-      {%- for grant in record.grants %}
-        {{grant.title}}{% if not loop.last %}<br />{% endif %}
+      {%- for group in resolved_record.grants|groupby('funder.name') %}
+        <u>{{group.grouper}}:</u><br />
+        <ul>
+        {%- for grant in group.list %}
+          <li>{% if grant.url or grant.identifiers.purl %}<a href="{{grant.url or grant.identifiers.purl}}">{% endif %}
+          {% if grant.acronym %}{{grant.acronym}} - {% endif %}{{grant.title}}{% if grant.code %} ({{grant.code}}){% endif %} {% if not loop.last %}<br />{% endif %}
+          {% if grant.url or grant.identifiers.purl %}</a>{% endif %}</li>
+        {%- endfor %}
+        </ul>
       {%- endfor %}
     </dd>
   {%- endif %}

@@ -26,9 +26,12 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.records.serializers import marcxml_v1
+from datetime import date
+
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records import Record
+
+from zenodo.modules.records.serializers import marcxml_v1
 
 
 def test_full_record(app, full_record):
@@ -267,7 +270,7 @@ def test_minimal_record(app, minimal_record):
     marcxml_v1.serialize(pid=pid, record=Record(minimal_record))
     expected = {
         u'publication_distribution_imprint': {
-            'date_of_publication_distribution': '2016-04-11'
+            'date_of_publication_distribution': date.today().isoformat()
         },
         u'control_number': '123',
         u'information_relating_to_copyright_status': {

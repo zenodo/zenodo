@@ -79,7 +79,7 @@ class RecordSchemaMARC(Schema):
     funding_information_note = fields.Function(
         lambda o: [dict(
             text_of_note=v.get('title'),
-            grant_number=v.get('identifier')
+            grant_number=v.get('code')
         ) for v in o['metadata'].get('grants', [])])
 
     other_standard_identifier = fields.Function(

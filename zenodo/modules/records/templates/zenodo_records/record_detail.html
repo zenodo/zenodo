@@ -73,6 +73,7 @@
       {%- endif %}
       {%- include "zenodo_records/box/publishedin.html" %}
       <div class="well metadata">
+        {%- set resolved_record = record.replace_refs() %}
         {%- include "zenodo_records/box/info.html" %}
       </div>
       <div class="well">
