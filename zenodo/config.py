@@ -28,7 +28,9 @@ from __future__ import absolute_import, print_function
 
 import os
 
-from invenio_openaire.config import OPENAIRE_REST_ENDPOINTS
+from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
+    OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
+    OPENAIRE_REST_SORT_OPTIONS
 from invenio_records_rest.facets import terms_filter
 
 
@@ -350,11 +352,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
         ),
     )
 )
+RECORDS_REST_SORT_OPTIONS.update(OPENAIRE_REST_SORT_OPTIONS)
 
 #: Default sort for records REST API.
 RECORDS_REST_DEFAULT_SORT = dict(
     records=dict(query='bestmatch', noquery='mostrecent'),
 )
+RECORDS_REST_DEFAULT_SORT.update(OPENAIRE_REST_DEFAULT_SORT)
 
 #: Defined facets for records REST API.
 RECORDS_REST_FACETS = dict(
@@ -391,6 +395,7 @@ RECORDS_REST_FACETS = dict(
         )
     )
 )
+RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 
 # Previewer
 # =========
