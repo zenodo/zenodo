@@ -1,0 +1,20 @@
+[
+  {
+    "$schema": "http://zenodo.org/schemas/grants/grant-v1.0.0.json",
+    "acronym": "POLYMOD",
+    "code": "502084",
+    "enddate": "2008-08-31",
+    "funder": {
+      "$ref": "http://dx.doi.org/10.13039/501100000780"
+    },
+    "identifiers": {
+      "eurepo": "info:eu-repo/grantAgreement/EC/FP6/502084/"
+    },
+    "internal_id": "10.13039/501100000780::502084",
+    "program": "FP6",
+    "remote_modified": "2016-03-22T19:35:59Z",
+    "startdate": "2004-09-01",
+    "title": "Improving Public Health Policy in Europe through Modelling and Economic Evaluation of Interventions for the Control of Infectious Diseases",
+    "url": "http://cordis.europa.eu/search/index.cfm?fuseaction=proj.document&PJ_RCN=8373729"
+  }
+]

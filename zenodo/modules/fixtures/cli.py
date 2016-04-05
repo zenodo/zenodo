@@ -39,7 +39,10 @@ from invenio_db import db
 from invenio_files_rest.models import FileInstance, Location, ObjectVersion
 from invenio_migrator.proxies import current_migrator
 from invenio_migrator.tasks.records import import_record
+from invenio_oaiserver.models import OAISet
+from invenio_openaire.minters import grant_minter
 from invenio_pages.models import Page
+from invenio_records.api import Record
 from pkg_resources import resource_stream, resource_string
 
 
@@ -100,6 +103,41 @@ def loadlocation():
         db.session.add(loc)
         db.session.commit()
         click.secho('Created location {0}'.format(loc.uri), fg='green')
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+@fixtures.command()
+@with_appcontext
+def loadoaisets():
+    """Load OAI-PMH sets."""
+    sets = [
+        ('openaire', 'OpenAIRE', None),
+        ('openaire_data', 'OpenAIRE data sets', None),
+        ('user-zenodo', 'Zenodo', None),
+    ]
+    try:
+        for setid, name, pattern in sets:
+            oset = OAISet(spec=setid, name=name, search_pattern=pattern)
+            db.session.add(oset)
+        db.session.commit()
+        click.secho('Created {0} OAI-PMH sets'.format(len(sets)), fg='green')
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+@fixtures.command()
+@with_appcontext
+def loadoneoffs():
+    """Load one-off grants."""
+    data = _read_json('data/grants.json')
+    try:
+        for g in data:
+            r = Record.create(g)
+            grant_minter(r.id, r)
+        db.session.commit()
     except Exception:
         db.session.rollback()
         raise
