@@ -27,13 +27,14 @@
 from __future__ import absolute_import, print_function
 
 from dateutil.parser import parse
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, post_dump
 
 
 class RecordSchemaMARC(Schema):
     """Schema for records in MARC."""
 
-    control_number = fields.Str(attribute='metadata.recid')
+    control_number = fields.Function(
+        lambda o: str(o['metadata'].get('recid')))
 
     date_and_time_of_latest_transaction = fields.Function(
         lambda obj: parse(obj['updated']).strftime("%Y%m%d%H%M%S.0"))
@@ -143,3 +144,25 @@ class RecordSchemaMARC(Schema):
     embargo_date = fields.Raw(attribute='metadata.embargo_date')
 
     _oai = fields.Raw(attribute='metadata._oai')
+
+    @post_dump(pass_many=True)
+    def remove_empty_fields(self, data, many):
+        """Dump + Remove empty fields."""
+        _filter_empty(data)
+        return data
+
+
+def _filter_empty(record):
+    """Filter empty fields."""
+    if isinstance(record, dict):
+        for k in list(record.keys()):
+            if not record[k]:
+                del record[k]
+            else:
+                _filter_empty(record[k])
+    elif isinstance(record, list) or isinstance(record, tuple):
+        for (k, v) in list(enumerate(record)):
+            if not v:
+                del record[k]
+            else:
+                _filter_empty(record[k])

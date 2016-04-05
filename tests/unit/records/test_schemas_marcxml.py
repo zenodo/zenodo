@@ -26,10 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-import json
-
-from invenio_records_rest.serializers.json import JSONSerializer
-from zenodo.modules.records.serializers.schemas.marcxml import RecordSchemaMARC
+from zenodo.modules.records.serializers import marcxml_v1
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records import Record
 
@@ -118,8 +115,12 @@ def test_full_record(app, full_record):
         "sets": ["user-zenodo", "user-ecfunded"]
     }
     assert Record(full_record).validate() is None
-    serializer = JSONSerializer(RecordSchemaMARC)
-    data = serializer.serialize(
+    record = Record(full_record)
+    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    data = marcxml_v1.schema_class().dump(marcxml_v1.preprocess_record(
+        pid=pid,
+        record=record)).data
+    marcxml_v1.serialize(
         pid=PersistentIdentifier(pid_type='recid', pid_value='2'),
         record=Record(full_record))
     expected = {
@@ -218,7 +219,6 @@ def test_full_record(app, full_record):
                 u'personal_name': u'Smith, Other'
             },
             {
-                u'affiliation': u'',
                 u'relator_code': [u'(orcid)', u'(gnd)'],
                 u'personal_name': u'Hansen, Viggo'
             }, {
@@ -257,8 +257,15 @@ def test_full_record(app, full_record):
             u'id': u'oai:zenodo.org:1'
         }
     }
-    transformed = json.loads(data)
-    check_dict(expected, transformed)
+    check_dict(expected, data)
+
+
+def test_minimal_record(app, minimal_record):
+    """Test minimal record."""
+    assert Record(minimal_record).validate() is None
+    marcxml_v1.serialize(
+        pid=PersistentIdentifier(pid_type='recid', pid_value='2'),
+        record=Record(minimal_record))
 
 
 def check_array(a1, a2):
