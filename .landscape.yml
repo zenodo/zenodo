@@ -22,19 +22,18 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""PID Fetchers."""
-
-from collections import namedtuple
-
-from invenio_pidstore.providers.recordid import RecordIdProvider
-
-FetchedPID = namedtuple('FetchedPID', ['provider', 'pid_type', 'pid_value'])
-
-
-def zenodo_record_fetcher(dummy_record_uuid, data):
-    """Fetch a record's identifiers."""
-    return FetchedPID(
-        provider=RecordIdProvider,
-        pid_type=RecordIdProvider.pid_type,
-        pid_value=str(data['recid']),
-    )
+doc-warnings: yes
+test-warnings: no
+strictness: medium
+max-line-length: 79
+uses:
+    - celery
+    - flask
+autodetect: yes
+requirements:
+    - requirements.devel.txt
+ignore-paths:
+    - docs
+python-targets:
+    - 2
+    - 3

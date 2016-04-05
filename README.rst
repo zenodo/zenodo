@@ -26,13 +26,17 @@
 ============================
 
 .. image:: https://img.shields.io/travis/zenodo/zenodo.svg
-        :target: https://travis-ci.org/zenodo/zenodo
+   :target: https://travis-ci.org/zenodo/zenodo
 
 .. image:: https://img.shields.io/coveralls/zenodo/zenodo.svg
-        :target: https://coveralls.io/r/zenodo/zenodo
+   :target: https://coveralls.io/r/zenodo/zenodo
+
+.. image:: https://landscape.io/github/zenodo/zenodo/master/landscape.svg?style=flat
+   :target: https://landscape.io/github/zenodo/zenodo/master
+   :alt: Code Health
 
 .. image:: https://img.shields.io/github/license/zenodo/zenodo.svg
-        :target: https://github.com/zenodo/zenodo/blob/master/LICENSE
+   :target: https://github.com/zenodo/zenodo/blob/master/LICENSE
 
 
 Zenodo, a CERN service, is an open dependable home for the long-tail of

@@ -145,7 +145,7 @@ class ObjectType(object):
                 cls.index_id[objtype['id'][:-1]] = objtype
 
     @classmethod
-    def _jsonloader(cls, uri, **kwargs):
+    def _jsonloader(cls, uri, **dummy_kwargs):
         """Local JSON loader for JsonRef."""
         cls._load_data()
         return cls.index_id[uri]

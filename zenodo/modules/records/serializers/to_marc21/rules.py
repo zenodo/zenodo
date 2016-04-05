@@ -33,7 +33,7 @@ from dojson.contrib.to_marc21.model import to_marc21
 @to_marc21.over('980', '^(resource_type|communities)$')
 @utils.for_each_value
 @utils.filter_values
-def reverse_resource_type(self, key, value):
+def reverse_resource_type(dummy_self, key, value):
     """Reverse - Resource Type."""
     if key == 'resource_type':
         return {
@@ -53,7 +53,7 @@ def reverse_resource_type(self, key, value):
 @to_marc21.over('999', '^references$')
 @utils.reverse_for_each_value
 @utils.filter_values
-def reverse_references(self, key, value):
+def reverse_references(dummy_self, dummy_key, value):
     """Reverse - References - raw reference."""
     return {
         'x': value.get('raw_reference'),
@@ -64,7 +64,7 @@ def reverse_references(self, key, value):
 
 @to_marc21.over('942', '^embargo_date$')
 @utils.filter_values
-def reverse_embargo_date(self, key, value):
+def reverse_embargo_date(dummy_self, dummy_key, value):
     """Reverse - embargo date."""
     return {
         'a': value,
@@ -75,7 +75,7 @@ def reverse_embargo_date(self, key, value):
 
 @to_marc21.over('909', '^oai$')
 @utils.filter_values
-def reverse_oai(self, key, value):
+def reverse_oai(dummy_self, dummy_key, value):
     """Reverse - OAI."""
     return {
         'o': value.get('id'),

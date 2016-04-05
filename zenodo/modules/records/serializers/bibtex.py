@@ -35,6 +35,7 @@ from slugify import slugify
 class BibTeXSerializer(object):
     """BibTeX serializer for records."""
 
+    # pylint: disable=W0613
     def serialize(self, pid, record, links_factory=None):
         """Serialize a single record and persistent identifier.
 
@@ -44,6 +45,7 @@ class BibTeXSerializer(object):
         """
         return Bibtex(record=record).format()
 
+    # pylint: disable=W0613
     def serialize_search(self, pid_fetcher, search_result, links=None,
                          item_links_factory=None):
         """Serialize a search result.
@@ -92,9 +94,9 @@ class Bibtex(object):
             'video': self._format_misc,
             'default': self._format_misc,
         }
-        type = self._get_entry_type()
-        if type in formats:
-            return formats[type]()
+        t = self._get_entry_type()
+        if t in formats:
+            return formats[t]()
         else:
             return formats['default']()
 
@@ -124,9 +126,9 @@ class Bibtex(object):
         }
         subtype = self._get_entry_subtype()
         if subtype in formats:
-            for format in formats[subtype]:
+            for f in formats[subtype]:
                 try:
-                    out = format()
+                    out = f()
                 except MissingRequiredFieldError:
                     continue
                 else:
@@ -147,11 +149,11 @@ class Bibtex(object):
         An article from a journal or magazine.
         """
         name = "article"
-        req_fileds = ['author', 'title', 'journal', 'year']
-        opt_fileds = ['volume', 'number', 'pages', 'month', 'note']
+        req_fields = ['author', 'title', 'journal', 'year']
+        opt_fields = ['volume', 'number', 'pages', 'month', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_book(self):
         """Format book entry type.
@@ -159,11 +161,11 @@ class Bibtex(object):
         A book with an explicit publisher.
         """
         name = "book"
-        req_fileds = ['author', 'title', 'publisher', 'year']
-        opt_fileds = ['volume', 'address', 'month', 'note']
+        req_fields = ['author', 'title', 'publisher', 'year']
+        opt_fields = ['volume', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_booklet(self):
         """Format article entry type.
@@ -172,11 +174,11 @@ class Bibtex(object):
         or sponsoring institution.
         """
         name = "booklet"
-        req_fileds = ['title']
-        opt_fileds = ['author', 'address', 'month', 'year', 'note']
+        req_fields = ['title']
+        opt_fields = ['author', 'address', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_proceedings(self):
         """Format article entry type.
@@ -184,11 +186,11 @@ class Bibtex(object):
         The proceedings of a conference.
         """
         name = "proceedings"
-        req_fileds = ['title', 'year']
-        opt_fileds = ['publisher', 'address', 'month', 'note']
+        req_fields = ['title', 'year']
+        opt_fields = ['publisher', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_inproceedings(self):
         """Format article entry type.
@@ -196,11 +198,11 @@ class Bibtex(object):
         An article in the proceedings of a conference.
         """
         name = "inproceedings"
-        req_fileds = ['author', 'title', 'booktitle', 'year']
-        opt_fileds = ['pages', 'publisher', 'address', 'month', 'note']
+        req_fields = ['author', 'title', 'booktitle', 'year']
+        opt_fields = ['pages', 'publisher', 'address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_unpublished(self):
         """Format article entry type.
@@ -208,12 +210,12 @@ class Bibtex(object):
         A document with an author and title, but not formally published.
         """
         name = "unpublished"
-        req_fileds = ['author', 'title', 'note']
-        opt_fileds = ['month', 'year']
+        req_fields = ['author', 'title', 'note']
+        opt_fields = ['month', 'year']
         ign_fields = ['doi', 'url']
 
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_manual(self):
         """Format article entry type.
@@ -221,11 +223,11 @@ class Bibtex(object):
         Technical documentation.
         """
         name = "manual"
-        req_fileds = ['title']
-        opt_fileds = ['author', 'address', 'month', 'year', 'note']
+        req_fields = ['title']
+        opt_fields = ['author', 'address', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_thesis(self):
         """Format article entry type.
@@ -233,11 +235,11 @@ class Bibtex(object):
         An article from a journal or magazine.
         """
         name = "phdthesis"
-        req_fileds = ['author', 'title', 'school', 'year']
-        opt_fileds = ['address', 'month', 'note']
+        req_fields = ['author', 'title', 'school', 'year']
+        opt_fields = ['address', 'month', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
     def _format_misc(self):
         """Format misc entry type.
@@ -245,13 +247,15 @@ class Bibtex(object):
         For use when nothing else fits.
         """
         name = "misc"
-        req_fileds = []
-        opt_fileds = ['author', 'title', 'month', 'year', 'note']
+        req_fields = []
+        opt_fields = ['author', 'title', 'month', 'year', 'note']
         ign_fields = ['doi', 'url']
-        return self._format_entry(name, req_fileds,
-                                  opt_fileds, ign_fields)
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
 
-    def _fetch_fields(self, req_fileds, opt_fileds=[], ign_fields=[]):
+    def _fetch_fields(self, req_fields, opt_fields=None, ign_fields=None):
+        opt_fields = opt_fields or []
+        ign_fields = ign_fields or []
         fields = {
             'address': self._get_address,
             'author': self._get_author,
@@ -270,13 +274,13 @@ class Bibtex(object):
             'doi': self._get_doi
         }
         out = ""
-        for field in req_fileds:
+        for field in req_fields:
             value = fields[field]()
             if value:
                 out += self._format_output_row(field, value)
             else:
                 raise MissingRequiredFieldError(field)
-        for field in opt_fileds:
+        for field in opt_fields:
             value = fields[field]()
             if value:
                 out += self._format_output_row(field, value)
