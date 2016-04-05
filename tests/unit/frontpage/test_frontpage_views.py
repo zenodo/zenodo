@@ -49,7 +49,3 @@ def test_temporary_views(app):
         res = client.get("/deposit/")
         assert res.status_code == 200
         assert 'Coming soon' in res.get_data(as_text=True)
-
-        res = client.get("/communities/")
-        assert res.status_code == 200
-        assert 'Coming soon' in res.get_data(as_text=True)
