@@ -473,7 +473,7 @@ class Bibtex(object):
 
     def _get_url(self):
         """Return the WWW address."""
-        return "http://dx.doi.org/%s" % self.record['doi'] \
+        return "https://doi.org/%s" % self.record['doi'] \
             if "doi" in self.record else ""
 
     def _get_volume(self):

@@ -45,7 +45,7 @@ def test_serializer(bibtex_records):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == serializer.serialize(record=test_record, pid=1)
     results = {
@@ -193,7 +193,7 @@ def test_get_school(bibtex_records):
 def test_get_url(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
-    url = "http://dx.doi.org/" + test_record['doi']
+    url = "https://doi.org/" + test_record['doi']
     assert url == record_good._get_url()
     assert "" == record_empty._get_url()
 
@@ -220,7 +220,7 @@ def test_format_article(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -239,7 +239,7 @@ def test_format_book(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -255,7 +255,7 @@ def test_format_booklet(full_record):
               """  address      = {Staszkowka},\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -271,7 +271,7 @@ def test_format_inbook(full_record):
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -291,7 +291,7 @@ def test_format_inproceedings(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -309,7 +309,7 @@ def test_format_inproceedings(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -326,7 +326,7 @@ def test_format_inproceedings(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -343,7 +343,7 @@ def test_format_proceedings(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -360,7 +360,7 @@ def test_format_manual(full_record):
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -377,7 +377,7 @@ def test_format_manual(full_record):
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -402,7 +402,7 @@ def test_format_manual(full_record):
               "  year         = 2014,\n"
               "  note         = {notes},\n"
               "  doi          = {10.1234/foo.bar},\n"
-              "  url          = {http://dx.doi.org/10.1234/foo.bar}\n"
+              "  url          = {https://doi.org/10.1234/foo.bar}\n"
               "}")
     assert bibtex == Bibtex(full_record).format()
 
@@ -415,7 +415,7 @@ def test_format_manual(full_record):
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -433,7 +433,7 @@ def test_format_thesis(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -447,7 +447,7 @@ def test_format_thesis(full_record):
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -463,7 +463,7 @@ def test_format_unpublished(full_record):
               """  month        = feb,\n"""
               """  year         = 2014,\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
     full_record['resource_type']['subtype'] = 'workingpaper'
@@ -481,7 +481,7 @@ def test_format_default_type(full_record):
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
 
@@ -498,6 +498,6 @@ def test_format_publication_default(full_record):
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
-              """  url          = {http://dx.doi.org/10.1234/foo.bar}\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
