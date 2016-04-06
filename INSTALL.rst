@@ -21,8 +21,7 @@ Next, create the database, indexes, fixtures and an admin user:
 
     $ docker-compose run web zenodo db create
     $ docker-compose run web zenodo index init
-    $ docker-compose run web zenodo fixtures loadpages
-    $ docker-compose run web zenodo fixtures loadlocation
+    $ docker-compose run web zenodo fixtures init
     $ docker-compose run web zenodo fixtures loaddemorecords
     $ docker-compose run web zenodo users create info@zenodo.org -a
     $ docker-compose run web zenodo access \

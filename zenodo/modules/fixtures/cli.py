@@ -26,35 +26,18 @@
 
 from __future__ import absolute_import, print_function
 
-import hashlib
 import json
-from os import makedirs, stat
-from os.path import dirname, exists, join
+from os.path import dirname, join
 
 import click
-from celery import chain
-from flask import current_app
 from flask_cli import with_appcontext
-from invenio_db import db
-from invenio_files_rest.models import FileInstance, Location, ObjectVersion
-from invenio_migrator.proxies import current_migrator
-from invenio_migrator.tasks.records import import_record
-from invenio_oaiserver.models import OAISet
-from invenio_openaire.minters import grant_minter
-from invenio_pages.models import Page
-from invenio_records.api import Record
-from pkg_resources import resource_stream, resource_string
+from invenio_communities.utils import initialize_communities_bucket
 
-
-def _read_json(path):
-    """Retrieve JSON from package resource."""
-    return json.loads(
-        resource_string('zenodo.modules.fixtures', path).decode('utf8'))
-
-
-def _file_stream(path):
-    """Retrieve JSON from package resource."""
-    return resource_stream('zenodo.modules.fixtures', path)
+from .files import loaddemofiles, loadlocation
+from .grants import loadfp6grants
+from .oai import loadoaisets
+from .pages import loadpages
+from .records import loaddemorecords
 
 
 @click.group()
@@ -63,89 +46,50 @@ def fixtures():
 
 
 @fixtures.command()
+@with_appcontext
+def init():
+    """Load basic data."""
+    loadpages()
+    loadlocation()
+    loadoaisets()
+    initialize_communities_bucket()
+
+
+@fixtures.command('loadpages')
 @click.option('--force', '-f', is_flag=True, default=False)
 @with_appcontext
-def loadpages(force):
+def loadpages_cli(force):
     """Load pages."""
-    data = _read_json('data/pages.json')
-
-    try:
-        if force:
-            Page.query.delete()
-        for p in data:
-            if len(p['description']) >= 200:
-                raise ValueError(  # pragma: nocover
-                    "Description too long for {0}".format(p['url']))
-            p = Page(
-                url=p['url'],
-                title=p['title'],
-                description=p['description'],
-                content=_file_stream(
-                    join('data', p['file'])).read().decode('utf8'),
-                template_name=p['template_name'],
-            )
-            db.session.add(p)
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
+    loadpages(force=force)
+    click.secho('Created pages', fg='green')
 
 
-@fixtures.command()
+@fixtures.command('loadlocation')
 @with_appcontext
-def loadlocation():
+def loadlocation_cli():
     """Load data store location."""
-    try:
-        uri = current_app.config['FIXTURES_FILES_LOCATION']
-        if not exists(uri):
-            makedirs(uri)
-        loc = Location(name='local', uri=uri, default=True, )
-        db.session.add(loc)
-        db.session.commit()
-        click.secho('Created location {0}'.format(loc.uri), fg='green')
-    except Exception:
-        db.session.rollback()
-        raise
+    loc = loadlocation()
+    click.secho('Created location {0}'.format(loc.uri), fg='green')
 
 
-@fixtures.command()
+@fixtures.command('loadoaisets')
 @with_appcontext
-def loadoaisets():
+def loadoaisets_cli():
     """Load OAI-PMH sets."""
-    sets = [
-        ('openaire', 'OpenAIRE', None),
-        ('openaire_data', 'OpenAIRE data sets', None),
-        ('user-zenodo', 'Zenodo', None),
-    ]
-    try:
-        for setid, name, pattern in sets:
-            oset = OAISet(spec=setid, name=name, search_pattern=pattern)
-            db.session.add(oset)
-        db.session.commit()
-        click.secho('Created {0} OAI-PMH sets'.format(len(sets)), fg='green')
-    except Exception:
-        db.session.rollback()
-        raise
+    sets_count = loadoaisets()
+    click.secho('Created {0} OAI-PMH sets'.format(len(sets_count)), fg='green')
 
 
-@fixtures.command()
+@fixtures.command('loadfp6grants')
 @with_appcontext
-def loadoneoffs():
+def loadfp6grants_cli():
     """Load one-off grants."""
-    data = _read_json('data/grants.json')
-    try:
-        for g in data:
-            r = Record.create(g)
-            grant_minter(r.id, r)
-        db.session.commit()
-    except Exception:
-        db.session.rollback()
-        raise
+    loadfp6grants()
 
 
-@fixtures.command()
+@fixtures.command('loaddemorecords')
 @with_appcontext
-def loaddemorecords():
+def loaddemorecords_cli():
     """Load demo records."""
     click.echo('Loading demo data...')
     with open(join(dirname(__file__), 'data/records.json'), 'r') as fp:
@@ -153,14 +97,7 @@ def loaddemorecords():
 
     click.echo('Sending tasks to queue...')
     with click.progressbar(data) as records:
-        for item in records:
-            if current_migrator.records_post_task:
-                chain(
-                    import_record.s(item, source_type='json'),
-                    current_migrator.records_post_task.s()
-                )()
-            else:
-                import_record.delay(item, source_type='json')
+        loaddemorecords(records)
 
     click.echo("1. Start Celery:")
     click.echo("     celery worker -A zenodo.celery -l INFO")
@@ -169,24 +106,10 @@ def loaddemorecords():
     click.echo("     zenodo index run -d -c 4")
 
 
-@fixtures.command()
+@fixtures.command('loaddemofiles')
 @click.argument('source', type=click.Path(exists=True, dir_okay=False,
-                resolve_path=True))
+                                          resolve_path=True))
 @with_appcontext
-def loaddemofiles(source):
+def loaddemofiles_cli(source):
     """Load demo files."""
-    s = stat(source)
-
-    with open(source, 'rb') as fp:
-        m = hashlib.md5()
-        m.update(fp.read())
-        checksum = "md5:{0}".format(m.hexdigest())
-
-    # Create a file instance
-    with db.session.begin_nested():
-        f = FileInstance.create()
-        f.set_uri(source, s.st_size, checksum)
-
-    # Replace all objects associated files.
-    ObjectVersion.query.update({ObjectVersion.file_id: str(f.id)})
-    db.session.commit()
+    loaddemofiles(source)

@@ -98,8 +98,7 @@ Next, create the database and Elasticsearch indexes and an admin user:
    (zenodo)$ zenodo db init
    (zenodo)$ zenodo db create
    (zenodo)$ zenodo index init
-   (zenodo)$ zenodo fixtures loadpages
-   (zenodo)$ zenodo fixtures loadlocation
+   (zenodo)$ zenodo fixtures init
    (zenodo)$ zenodo users create info@zenodo.org -a
    (zenodo)$ zenodo access allow admin-access -e info@zenodo.org
 
@@ -116,4 +115,3 @@ You can now load the demo records:
    (zenodo)$ zenodo fixtures loaddemorecords
    (zenodo)$ zenodo migration reindex recid
    (zenodo)$ zenodo index run -d
-

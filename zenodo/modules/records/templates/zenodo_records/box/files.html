@@ -22,7 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{%- if files and record.access_right == "open" -%}
+{%- if files -%}
   {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
