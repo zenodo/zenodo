@@ -86,7 +86,8 @@
     <dt>{{_('Keyword(s)')}}:</dt>
     <dd>
     {%- for keyword in record.keywords %}
-      <a href="#FIXME">
+      {% set q = {"keywords": keyword}|make_query %}
+      <a href="{{url_for('invenio_search_ui.search', q=q)}}">
         <span class="label label-default" itemprop="keywords">{{keyword}}</span>
       </a>
     {%- endfor %}

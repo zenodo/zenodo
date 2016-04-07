@@ -374,6 +374,9 @@ RECORDS_REST_FACETS = dict(
             file_type=dict(
                 terms=dict(field="files.type"),
             ),
+            keywords=dict(
+                terms=dict(field="keywords"),
+            ),
         ),
         filters=dict(
             communities=terms_filter('communities'),
@@ -384,6 +387,7 @@ RECORDS_REST_FACETS = dict(
             type=terms_filter('resource_type.type'),
             subtype=terms_filter('resource_type.subtype'),
             file_type=terms_filter('files.type'),
+            keywords=terms_filter('keywords'),
         )
     )
 )
@@ -476,10 +480,20 @@ SECURITY_RESET_SALT = "CHANGE_ME"
 SEARCH_UI_SEARCH_API = "/api/records/"
 #: Default template for search UI.
 SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
+#: Angular template for rendering search results.
+SEARCH_UI_JSTEMPLATE_RESULTS = "templates/zenodo_search_ui/results.html"
+#: Angular template for rendering search facets.
+SEARCH_UI_JSTEMPLATE_FACETS = "templates/zenodo_search_ui/facets.html"
 #: Default Elasticsearch document type.
 SEARCH_DOC_TYPE_DEFAULT = None
 #: Do not map any keywords.
 SEARCH_ELASTIC_KEYWORD_MAPPING = {}
+
+# Communities
+# ===========
+#: Angular template for rendering search results for curation.
+COMMUNITIES_JSTEMPLATE_RESULTS_CURATE = \
+    "templates/zenodo_search_ui/results_curate.html"
 
 # Theme
 # =====
@@ -497,7 +511,7 @@ THEME_GOOGLE_SITE_VERIFICATION = [
     "Rp5zp04IKW-s1IbpTOGB7Z6XY60oloZD5C3kTM-AiY4"
 ]
 #: Piwik site id.
-THEME_PIWIK_ID = "CHANGE_ME"
+THEME_PIWIK_ID = None
 
 #: Base template for entire site.
 BASE_TEMPLATE = "zenodo_theme/page.html"

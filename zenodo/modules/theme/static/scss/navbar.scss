@@ -26,6 +26,10 @@
     $end-color: $color1-gradient);
 }
 
+@mixin navbar-shadow() {
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 .navbar-static-top {
   border-width: 0 0 0;
 }
@@ -43,7 +47,7 @@
 
 .navbar-default {
   @include navbar-gradient();
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  @include navbar-shadow();
 
   // Header background image
   // .container {

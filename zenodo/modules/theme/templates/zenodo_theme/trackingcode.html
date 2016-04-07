@@ -21,6 +21,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+{%- if config.THEME_PIWIK_ID %}
 <script type="text/javascript">
 var _paq = _paq || [];
 _paq.push(["setDomains", ["*.zenodo.org","*.zenodo.cern.ch","*.zenodo.eu","*.zenodo.net"]]);
@@ -35,3 +36,4 @@ _paq.push(["enableLinkTracking"]);
   g.defer=true; g.async=true; g.src=u+"piwik.js"; s.parentNode.insertBefore(g,s);
 })();
 </script>
+{%- endif %}

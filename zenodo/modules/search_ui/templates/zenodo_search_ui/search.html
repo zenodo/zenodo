@@ -26,18 +26,3 @@
 {%- block javascript %}
 {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 {%- endblock javascript %}
-
-
-{%- block search_results %}
-<invenio-search-results
- template="{{ url_for('static', filename='templates/zenodo_search_ui/results.html') }}">
-</invenio-search-results>
-{%- endblock search_results %}
-
-{%- block search_facets %}
-<div class="col-md-3 col-md-pull-9 col-xs-12">
-  <invenio-search-facets
-   template="{{ url_for('static', filename='templates/zenodo_search_ui/facets.html') }}">
-  </invenio-search-facets>
-</div>
-{%- endblock search_facets %}

@@ -38,8 +38,12 @@ def indexer_receiver(sender, json=None, record=None, index=None,
         return
 
     # Remove files from index if record is not open access.
-    if json['access_right'] != 'open' and 'files' in json:
-        del json['files']
+    try:
+        if json['access_right'] != 'open' and 'files' in json:
+            del json['files']
+    except Exception:
+        print(json)
+        raise
 
     if '_internal' in json:
         del json['_internal']

@@ -1,5 +1,5 @@
 // This file is part of Zenodo.
-// Copyright (C) 2015 CERN.
+// Copyright (C) 2016 CERN.
 //
 // Zenodo is free software; you can redistribute it
 // and/or modify it under the terms of the GNU General Public License as
@@ -20,25 +20,25 @@
 // waive the privileges and immunities granted to it by virtue of its status
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-@import "variables";
+$communities-header-background: #f6f6f6;
+$communities-header-padding: 5px;
 
-// Setting the path to fonts files.
-$icon-font-path: "/static/node_modules/bootstrap-sass/assets/fonts/";
-$fa-font-path: "/static/node_modules/font-awesome/fonts";
+.communities {
+  .header {
+    background-color: $communities-header-background;
+    margin-top: -$navbar-margin-bottom;
+    margin-bottom: $navbar-margin-bottom;
+    padding: $communities-header-padding 0;
+  }
 
-@import "../node_modules/bootstrap-sass/assets/stylesheets/_bootstrap";
-@import "../node_modules/font-awesome/scss/font-awesome";
+  h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+  }
 
-@import "type";
-@import "utilities";
-@import "navbar";
-@import "body";
-@import "footer";
-@import "frontpage";
-@import "input-icon";
-@import "sidebarnav";
-@import "cover";
-@import "record";
-@import "search";
-@import "pages";
-@import "communities";
+  h1 {
+    a {
+      color: $text-color;
+    }
+  }
+}

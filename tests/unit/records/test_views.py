@@ -138,7 +138,7 @@ def test_relation_logo():
 def test_pid_url(app):
     """Test pid_url."""
     assert render_template_string(
-        "{{ '10.123/foo'|pid_url }}") == "http://dx.doi.org/10.123/foo"
+        "{{ '10.123/foo'|pid_url }}") == "https://doi.org/10.123/foo"
     assert render_template_string(
         "{{ 'asfasdf'|pid_url }}") == ""
     assert render_template_string(

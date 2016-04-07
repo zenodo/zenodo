@@ -71,6 +71,15 @@ def accessright_category(value, embargo_date=None, **kwargs):
 
 
 @blueprint.app_template_filter()
+def make_query(values):
+    """Get category for access right."""
+    parts = []
+    for k, v in values.items():
+        parts.append('{0}:"{1}"'.format(k, v))
+    return' '.join(parts)
+
+
+@blueprint.app_template_filter()
 def accessright_title(value, embargo_date=None):
     """Get category for access right."""
     return AccessRight.as_title(
@@ -130,8 +139,8 @@ def select_preview_file(files):
         if f.get('type') in current_previewer.previewable_extensions:
             if selected is None:
                 selected = f
-        elif f.get('default'):
-            selected = f
+            elif f.get('default'):
+                selected = f
     return selected
 
 
