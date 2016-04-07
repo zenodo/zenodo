@@ -154,6 +154,9 @@ setup(
         'invenio_i18n.translations': [
             'messages = zenodo',
         ],
+        'invenio_celery.tasks': [
+            'zenodo_records = zenodo.modules.records.tasks',
+        ],
         'invenio_pidstore.minters': [
             'zenodo_record_minter '
             '= zenodo.modules.records.minters:zenodo_record_minter',

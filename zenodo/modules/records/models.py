@@ -108,11 +108,13 @@ class AccessRight(object):
         )
 
         query = Query()
+        query.body['from'] = 0
+        query.body['size'] = 1000
         query.body['query'] = {
             'query_string': {
                 'query': query_str,
                 'allow_leading_wildcard': False,
-            }
+            },
         }
 
         endpoints = current_app.config['RECORDS_REST_ENDPOINTS']
