@@ -9,7 +9,7 @@
           "index": "not_analyzed"
         },
         "recid": {
-          "type": "integer"
+          "type": "long"
         },
         "doi": {
           "type": "string",
@@ -267,21 +267,6 @@
           },
           "type": "object"
         },
-        "imprint": {
-          "properties": {
-            "publisher": {
-              "type": "string"
-            },
-            "place": {
-              "type": "string"
-            },
-            "year": {
-              "type": "string",
-              "index": "not_analyzed"
-            }
-          },
-          "type": "object"
-        },
         "part_of": {
           "properties": {
             "publisher": {
@@ -289,6 +274,19 @@
             },
             "title": {
               "type": "string"
+            },
+            "isbn": {
+              "type": "string"
+            },
+            "place": {
+              "type": "string"
+            },
+            "pages": {
+              "type": "string"
+            },
+            "year": {
+              "type": "string",
+              "index": "not_analyzed"
             }
           },
           "type": "object"
@@ -337,7 +335,7 @@
               "index": "not_analyzed"
             },
             "size": {
-              "type": "integer"
+              "type": "long"
             },
             "checksum": {
               "type": "string",

@@ -121,7 +121,8 @@
         "url",
         "urn",
         "orcid",
-        "gnd"
+        "gnd",
+        "ads"
       ]
     },
     "relation": {
@@ -425,22 +426,6 @@
         }
       }
     },
-    "imprint": {
-      "description": "Imprint in of book or report.",
-      "type": "object",
-      "additionalProperties": false,
-      "properties": {
-        "publisher": {
-          "type": "string"
-        },
-        "place": {
-          "type": "string"
-        },
-        "year": {
-          "type": "string"
-        }
-      }
-    },
     "part_of": {
       "description": "For parts of books and reports.",
       "type": "object",
@@ -450,6 +435,30 @@
           "type": "string"
         },
         "title": {
+          "type": "string"
+        },
+        "isbn": {
+          "type": "string"
+        },
+        "place": {
+          "type": "string"
+        },
+        "pages": {
+          "type": "string"
+        },
+        "year": {
+          "type": "string"
+        }
+      }
+    },
+    "imprint": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "publisher": {
+          "type": "string"
+        },
+        "place": {
           "type": "string"
         }
       }
