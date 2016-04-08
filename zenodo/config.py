@@ -97,6 +97,15 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Other', marc='oth', datacite='Other'),
 ]
 
+# Formatter
+# =========
+#: List of allowed titles in badges.
+FORMATTER_BADGES_ALLOWED_TITLES = ['DOI', 'doi']
+
+#: Mapping of titles.
+FORMATTER_BADGES_TITLE_MAPPING = {'doi': 'DOI'}
+
+
 # Frontpage
 # =========
 #: Frontpage endpoint.
