@@ -252,7 +252,7 @@ def grant_record(db, funder_record):
     """Create a funder record."""
     grant = Record.create(dict(
         internal_id='10.13039/501100000780::282896',
-        funder={'$ref': 'http://dx.doi.org/10.13039/501100000780'},
+        funder={'$ref': 'https://doi.org/10.13039/501100000780'},
         identifiers=dict(
             eurepo='info:eu-repo/grantAgreement/EC/FP7/282896',
         ),

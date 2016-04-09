@@ -5,7 +5,7 @@
     "code": "502084",
     "enddate": "2008-08-31",
     "funder": {
-      "$ref": "http://dx.doi.org/10.13039/501100000780"
+      "$ref": "https://doi.org/10.13039/501100000780"
     },
     "identifiers": {
       "eurepo": "info:eu-repo/grantAgreement/EC/FP6/502084/"
