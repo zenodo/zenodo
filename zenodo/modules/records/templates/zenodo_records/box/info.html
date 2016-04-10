@@ -36,45 +36,25 @@
 
   {%- if record.doi %}
     <dt>{{_('DOI')}}:</dt>
-    {%- if record.doi is local_doi %}
-    {# FIXME record.doi #}
-    <dd itemprop="doi">{{ record.doi }}</dd>
-    {%- else %}
-    <dd itemprop="doi"><a href="{{record.doi|pid_url(scheme='doi')}}">{{ record.doi }}</a></dd>
-    {%- endif %}
-    {# FIXME record.doi|badge_doi
-    {%- from "github/helpers.html" import doi_badge with context %}
-    {% if record.doi|is_local_doi %}{{doi_badge(record.doi)}}{% else %}{{ record.doi|doi_link }}{% endif %}</dd>
-      {% endif%}
-    <span class="get-badge" data-toggle="tooltip" data-placement="bottom" title="Get the DOI badge!">
-          <img data-toggle="modal" data-target="[data-modal='10.5281-zenodo.32481']" src="https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg" alt="10.5281/zenodo.32481">
-        </span>
-        <div class="modal fade badge-modal" data-modal="10.5281-zenodo.32481">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-body">
-                <h4>Zenodo DOI Badge</h4>
-
-                <h4><small>Markdown</small></h4><h4>
-                <pre>[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg)](http://dx.doi.org/10.5281/zenodo.32481)</pre>
-
-                </h4><h4><small>reStructedText</small></h4><h4>
-                <pre>.. image:: https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg
-     :target: http://dx.doi.org/10.5281/zenodo.32481</pre>
-
-                </h4><h4><small>HTML</small></h4><h4>
-                <pre>&lt;a href="http://dx.doi.org/10.5281/zenodo.32481"&gt;&lt;img src="https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg" alt="10.5281/zenodo.32481"&gt;&lt;/a&gt;</pre>
-
-                </h4><h4><small>Image URL</small></h4><h4>
-                <pre>https://zenodo.org/badge/doi/10.5281/zenodo.32481.svg</pre>
-
-                </h4><h4><small>DOI URL</small></h4><h4>
-                <pre>http://dx.doi.org/10.5281/zenodo.32481</pre>
-              </h4></div>
+    <dd itemprop="doi">
+      <span class="get-badge" data-toggle="tooltip" data-placement="bottom"
+            title="Get the DOI badge!">
+        <img data-toggle="modal" data-target="[data-modal='{{ record.doi }}']"
+             src="{{ url_for('invenio_formatter.badge_svg', title='DOI', value=record.doi) }}" alt="{{ record.doi }}">
+        </img>
+      </span>
+      <div class="modal fade badge-modal" data-modal="{{ record.doi }}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <h4>Zenodo DOI Badge</h4>
+              {% from "invenio_formatter/macros/meta.html" import badges_formats_list %}
+              {{ badges_formats_list(url_for('invenio_formatter.badge_svg', title='DOI', value=record.doi, _external=True, _scheme='https'), record.doi|pid_url(scheme='doi')) }}
             </div>
           </div>
         </div>
-        #}
+      </div>
+    </dd>
   {%- endif %}
 
   {%- if record.isbn %}
