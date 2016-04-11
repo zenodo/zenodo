@@ -194,19 +194,16 @@ def test_full_record(app, full_record):
             {
                 u'affiliation': u'CERN', u'personal_name': u'Doe, Jane',
                 u'authority_record_control_number_or_standard_number': [
-                    u'(gnd)', u'(orcid)0000-0002-1825-0097'
+                    u'(orcid)0000-0002-1825-0097'
                 ]
             },
             {
                 u'affiliation': u'CERN', u'personal_name': u'Smith, John',
-                u'authority_record_control_number_or_standard_number': [
-                    u'(gnd)', u'(orcid)'
-                ]
             },
             {
                 u'affiliation': u'CERN', u'personal_name': u'Nowak, Jack',
                 u'authority_record_control_number_or_standard_number': [
-                    u'(gnd)170118215', u'(orcid)'
+                    u'(gnd)170118215'
                 ]
             }
         ],
@@ -214,17 +211,17 @@ def test_full_record(app, full_record):
             {
                 u'affiliation': u'CERN',
                 u'relator_code': [
-                    u'(orcid)0000-0002-1825-0097', u'(gnd)'
+                    u'(orcid)0000-0002-1825-0097'
                 ],
                 u'personal_name': u'Smith, Other'
             },
             {
-                u'relator_code': [u'(orcid)', u'(gnd)'],
                 u'personal_name': u'Hansen, Viggo'
-            }, {
+            },
+            {
                 u'affiliation': u'CERN',
                 u'relator_code': [
-                    u'(gnd)170118215', u'(orcid)'
+                    u'(gnd)170118215'
                 ],
                 u'personal_name': u'Kowalski, Manager'
             }
@@ -263,9 +260,35 @@ def test_full_record(app, full_record):
 def test_minimal_record(app, minimal_record):
     """Test minimal record."""
     assert Record(minimal_record).validate() is None
-    marcxml_v1.serialize(
-        pid=PersistentIdentifier(pid_type='recid', pid_value='2'),
-        record=Record(minimal_record))
+    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    data = marcxml_v1.schema_class().dump(marcxml_v1.preprocess_record(
+        pid=pid,
+        record=Record(minimal_record))).data
+    marcxml_v1.serialize(pid=pid, record=Record(minimal_record))
+    expected = {
+        u'publication_distribution_imprint': {
+            'date_of_publication_distribution': '2016-04-11'
+        },
+        u'control_number': '123',
+        u'information_relating_to_copyright_status': {
+            'copyright_status': 'open'
+        },
+        u'summary': {
+            'summary': 'My description'
+        },
+        u'main_entry_personal_name': [
+            {
+                'personal_name': 'Test'
+            }
+        ],
+        u'resource_type': {
+            'type': 'software'
+        },
+        u'title_statement': {
+            'title': 'Test'
+        }
+    }
+    check_dict(expected, data)
 
 
 def check_array(a1, a2):

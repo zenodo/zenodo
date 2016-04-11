@@ -105,7 +105,7 @@ class RecordSchemaMARC(Schema):
             authority_record_control_number_or_standard_number=[
                 "({0}){1}".format(scheme, identifier)
                 for (scheme, identifier) in v.items()
-                if scheme not in (
+                if identifier and scheme not in (
                     'name', 'affiliation', 'familyname', 'givennames')
             ],
         ) for v in o['metadata'].get('creators', [])]
@@ -118,7 +118,7 @@ class RecordSchemaMARC(Schema):
             relator_code=[
                 "({0}){1}".format(scheme, identifier)
                 for (scheme, identifier) in v.items()
-                if scheme not in ('name', 'affiliation', 'type')
+                if identifier and scheme not in ('name', 'affiliation', 'type')
             ],
         ) for v in o['metadata'].get('contributors', [])]
     )
@@ -156,13 +156,13 @@ def _filter_empty(record):
     """Filter empty fields."""
     if isinstance(record, dict):
         for k in list(record.keys()):
+            if record[k]:
+                _filter_empty(record[k])
             if not record[k]:
                 del record[k]
-            else:
-                _filter_empty(record[k])
     elif isinstance(record, list) or isinstance(record, tuple):
         for (k, v) in list(enumerate(record)):
+            if v:
+                _filter_empty(record[k])
             if not v:
                 del record[k]
-            else:
-                _filter_empty(record[k])
