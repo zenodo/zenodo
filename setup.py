@@ -75,6 +75,7 @@ setup_requires = [
 ]
 
 install_requires = [
+    'CairoSVG>=1.0.20',
     'datacite>=0.2.1',
     'dcxml>=0.1.0',
     'dojson>=1.0.0',
@@ -98,6 +99,7 @@ install_requires = [
     'invenio-oauth2server',
     'invenio-oauthclient',
     'invenio-openaire',
+    'invenio-opendefinition',
     'invenio-pages',
     'invenio-pidstore',
     'invenio-previewer',
@@ -110,6 +112,7 @@ install_requires = [
     'invenio-userprofiles',
     'jsonref>=0.1',
     'marshmallow>=2.5.0',
+    'Pillow>=3.2.0',
     'python-slugify>=1.2.0',
     'zenodo-migrationkit>=1.0.0.dev20150000',
 ]

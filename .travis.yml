@@ -27,6 +27,7 @@ addons:
   apt:
     packages:
       - nodejs
+      - libfreetype6-dev
 
 notifications:
   email: false
