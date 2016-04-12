@@ -66,7 +66,7 @@ def ping():
 @register_menu(blueprint, 'main.upload', 'Upload', order=2)
 def index2():
     """Frontpage blueprint."""
-    return render_template('zenodo_frontpage/coming_soon.html')
+    return render_template('invenio_deposit/index.html')
 
 
 @blueprint.route('/communities/')
