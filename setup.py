@@ -114,6 +114,7 @@ install_requires = [
     'marshmallow>=2.5.0',
     'Pillow>=3.2.0',
     'python-slugify>=1.2.0',
+    'raven<=5.1.0',
     'zenodo-migrationkit>=1.0.0.dev20150000',
 ]
 

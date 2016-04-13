@@ -113,6 +113,13 @@ FORMATTER_BADGES_TITLE_MAPPING = {'doi': 'DOI'}
 #: Frontpage endpoint.
 FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
 
+
+# Logging
+# =======
+#: Overwrite default Sentry extension class to support Sentry 6.
+LOGGING_SENTRY_CLASS = 'invenio_logging.sentry6:Sentry6'
+
+
 #: Defintion of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
     # github=dict(
