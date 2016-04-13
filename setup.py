@@ -89,6 +89,7 @@ install_requires = [
     'invenio-base',
     'invenio-celery',
     'invenio-config',
+    'invenio-deposit',
     'invenio-files-rest',
     'invenio-formatter',
     'invenio-i18n',
