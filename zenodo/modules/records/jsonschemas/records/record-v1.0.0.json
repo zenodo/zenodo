@@ -397,32 +397,28 @@
     },
     "meetings": {
       "description": "Associated meetings.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "properties": {
-          "acronym": {
-            "type": "string"
-          },
-          "title": {
-            "type": "string"
-          },
-          "place": {
-            "type": "string"
-          },
-          "dates": {
-            "type": "string"
-          },
-          "session": {
-            "type": "string"
-          },
-          "session_part": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
-          }
+      "type": "object",
+      "properties": {
+        "acronym": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "place": {
+          "type": "string"
+        },
+        "dates": {
+          "type": "string"
+        },
+        "session": {
+          "type": "string"
+        },
+        "session_part": {
+          "type": "string"
+        },
+        "url": {
+          "type": "string"
         }
       }
     },

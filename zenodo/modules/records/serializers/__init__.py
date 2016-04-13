@@ -38,32 +38,44 @@ from invenio_records_rest.serializers.response import record_responsify, \
 from .schemas.dc import DublinCoreJSONV1
 from .schemas.datacite import DataCiteSchemaJSONV1
 from .schemas.json import RecordSchemaJSONV1
+from .schemas.zenodo import ZenodoRecordSchemaV1
 from .schemas.marcxml import RecordSchemaMARC
+from .serializers.zenodo_deposition import ZenodoDepositionSerializer
 from .bibtex import BibTeXSerializer
+from .loaders import json_marshmallow_translator_loader
+from .translators.legacy_to_zenodo import translate as \
+    translate_legacy_to_zenodo
+from .translators.zenodo_to_legacy import translate as \
+    translate_zenodo_to_legacy
 
 # Serializers
 # ===========
 #: Zenodo JSON serializer version 1.0.0
 json_v1 = JSONSerializer(RecordSchemaJSONV1, replace_refs=True)
+#: Zenodo JSON serialzier legacy version 1.0.0
+json_v1_legacy = ZenodoDepositionSerializer(translate_zenodo_to_legacy,
+                                            replace_refs=True)
 #: MARCXML serializer version 1.0.0
 marcxml_v1 = MARCXMLSerializer(
-    to_marc21, schema_class=RecordSchemaMARC, replace_refs=True)
+    to_marc21, schema_class=RecordSchemaMARC)
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializer
-datacite_v31 = DataCite31Serializer(DataCiteSchemaJSONV1, replace_refs=True)
+datacite_v31 = DataCite31Serializer(DataCiteSchemaJSONV1)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     v31=datacite_v31,
     datacentre='CERN.ZENODO',
 )
 #: Dublin Core serializer
-dc_v1 = DublinCoreSerializer(DublinCoreJSONV1, replace_refs=True)
+dc_v1 = DublinCoreSerializer(DublinCoreJSONV1)
 
 # Records-REST serializers
 # ========================
 #: JSON record serializer for individual records.
 json_v1_response = record_responsify(json_v1, 'application/json')
+#: JSON record legacy serializer for individual records.
+json_v1_legacy_response = record_responsify(json_v1_legacy, 'application/json')
 #: MARCXML record serializer for individual records.
 marcxml_v1_response = record_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX record serializer for individual records.
@@ -76,6 +88,8 @@ dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 
 #: JSON record serializer for search results.
 json_v1_search = search_responsify(json_v1, 'application/json')
+#: JSON record legacy serializer for search results.
+json_v1_legacy_search = search_responsify(json_v1_legacy, 'application/json')
 #: MARCXML record serializer for search records.
 marcxml_v1_search = search_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX serializer for search records.
@@ -85,6 +99,10 @@ datacite_v31_search = search_responsify(
     datacite_v31, 'application/x-datacite+xml')
 #: DublinCore record serializer for search records.
 dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
+
+#: JSON record legacy serializer for individual records.
+json_v1_legacy_loader = json_marshmallow_translator_loader(
+        ZenodoRecordSchemaV1, translate_legacy_to_zenodo)
 
 # OAI-PMH record serializers.
 # ===========================
