@@ -89,9 +89,11 @@ install_requires = [
     'invenio-base',
     'invenio-celery',
     'invenio-config',
+    'invenio-deposit',
     'invenio-files-rest',
     'invenio-formatter',
     'invenio-i18n',
+    'invenio-jsonschemas',
     'invenio-logging',
     'invenio-mail',
     'invenio-marc21',
@@ -148,6 +150,9 @@ setup(
             'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
+        ],
+        'invenio_base.api_apps': [
+            'invenio_records = invenio_records:InvenioRecords',
         ],
         'invenio_base.blueprints': [
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',

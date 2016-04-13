@@ -42,7 +42,7 @@ from invenio_records.api import Record
 from invenio_search import current_search, current_search_client
 from sqlalchemy_utils.functions import create_database, database_exists
 
-from zenodo.factory import create_app
+from zenodo.factory import create_app, create_api
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
@@ -66,6 +66,32 @@ def app():
 
     with app.app_context():
         yield app
+
+    shutil.rmtree(instance_path)
+
+
+@pytest.yield_fixture(scope='session', autouse=True)
+def api():
+    """Flask application fixture."""
+    instance_path = tempfile.mkdtemp()
+
+    os.environ.update(
+        APP_INSTANCE_PATH=os.environ.get(
+            'INSTANCE_PATH', instance_path),
+    )
+
+    api = create_api(
+        DEBUG_TB_ENABLED=False,
+        SQLALCHEMY_DATABASE_URI=os.environ.get(
+            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+        TESTING=True,
+        CFG_SITE_NAME="testserver",
+        # No permission checking
+        RECORDS_REST_DEFAULT_CREATE_PERMISSION_FACTORY=None,
+    )
+
+    with api.app_context():
+        yield api
 
     shutil.rmtree(instance_path)
 
