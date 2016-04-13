@@ -551,3 +551,5 @@ SQLALCHEMY_DATABASE_URI = os.environ.get(
     "postgresql+psycopg2://localhost/zenodo")
 #: Do not print SQL queries to console.
 SQLALCHEMY_ECHO = False
+#: Track modifications to objects.
+SQLALCHEMY_TRACK_MODIFICATIONS = True
