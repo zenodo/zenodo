@@ -26,8 +26,12 @@
 
 from __future__ import absolute_import, print_function
 
+import copy
 import os
 
+from flask import request
+from invenio_deposit.config import \
+    DEPOSIT_REST_ENDPOINTS as INVENIO_DEPOSIT_REST_ENDPOINTS
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
@@ -108,6 +112,32 @@ DEPOSIT_DEFAULT_JSONSCHEMA = 'zenodo_deposit/deposit-v1.0.0.json'
 #: Angular Schema Form for deposit
 DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
 
+#: Endpoints for deposit.
+DEPOSIT_REST_ENDPOINTS = copy.deepcopy(INVENIO_DEPOSIT_REST_ENDPOINTS)
+DEPOSIT_REST_ENDPOINTS['dep'].update(
+    dict(
+        record_loaders={
+            'application/json': (
+                'zenodo.modules.deposit.loaders:legacyjson_loader'),
+            'application/vnd.zenodo.v1+json': lambda: request.get_json(),
+        },
+        record_serializers={
+            'application/json': (
+                'zenodo.modules.records.serializers:legacyjson_v1_response'),
+            'application/vnd.zenodo.v1+json': (
+                'invenio_records_rest.serializers:json_v1_response'),
+        },
+        search_serializers={
+            'application/json': (
+                'zenodo.modules.records.serializers:legacyjson_v1_search'),
+            'application/vnd.zenodo.v1+json': (
+                'invenio_records_rest.serializers:json_v1_search'),
+        },
+        list_route='/deposit/depositions/',
+        item_route='/deposit/depositions/<pid_value>',
+    ),
+)
+
 # Formatter
 # =========
 #: List of allowed titles in badges.
@@ -115,7 +145,6 @@ FORMATTER_BADGES_ALLOWED_TITLES = ['DOI', 'doi']
 
 #: Mapping of titles.
 FORMATTER_BADGES_TITLE_MAPPING = {'doi': 'DOI'}
-
 
 # Frontpage
 # =========
@@ -200,7 +229,15 @@ OPENAIRE_SCHEMAS_HOST = 'zenodo.org'
 #: Hostname for OpenAIRE's grant resolver.
 OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
 
+# OpenDefinition
+# ==============
+#: Hostname for JSON Schemas in OpenAIRE.
+OPENDEFINITION_SCHEMAS_HOST = 'zenodo.org'
+#: Hostname for OpenAIRE's grant resolver.
+OPENDEFINITION_JSONRESOLVER_HOST = 'dx.zenodo.org'
+
 # JSON Schemas
+# ============
 #: Hostname for JSON Schemas.
 JSONSCHEMAS_HOST = 'zenodo.org'
 

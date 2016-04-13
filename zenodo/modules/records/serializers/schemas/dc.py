@@ -159,7 +159,8 @@ class DublinCoreJSONV1(Schema):
             items.append(' '.join([x for x in parts if x]))
 
         # Meetings
-        for m in obj['metadata'].get('meetings', []):
+        m = obj['metadata'].get('meetings', {})
+        if m:
             parts = [
                 m.get('acronym'),
                 m.get('title'),
@@ -167,4 +168,5 @@ class DublinCoreJSONV1(Schema):
                 m.get('dates'),
             ]
             items.append(', '.join([x for x in parts if x]))
+
         return items

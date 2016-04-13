@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 import os
 import shutil
 import tempfile
-from datetime import date
+from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
@@ -39,6 +39,7 @@ from invenio_db import db as db_
 from invenio_files_rest.models import Location
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
+from invenio_records.models import RecordMetadata
 from invenio_search import current_search, current_search_client
 from sqlalchemy_utils.functions import create_database, database_exists
 
@@ -46,7 +47,7 @@ from zenodo.factory import create_app
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
-@pytest.yield_fixture(scope='session', autouse=True)
+@pytest.yield_fixture(scope='session')
 def app():
     """Flask application fixture."""
     instance_path = tempfile.mkdtemp()
@@ -59,7 +60,8 @@ def app():
     app = create_app(
         DEBUG_TB_ENABLED=False,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+            'SQLALCHEMY_DATABASE_URI',
+            'sqlite:///test.db'),
         TESTING=True,
         CFG_SITE_NAME="testserver",
     )
@@ -68,6 +70,12 @@ def app():
         yield app
 
     shutil.rmtree(instance_path)
+
+
+@pytest.yield_fixture(scope='session')
+def api(app):
+    """Flask application fixture."""
+    yield app.wsgi_app.mounts['/api']
 
 
 @pytest.yield_fixture(scope='session')
@@ -136,10 +144,28 @@ def minimal_record():
 
 
 @pytest.fixture()
+def minimal_record_model(minimal_record):
+    """Minimal record."""
+    model = RecordMetadata()
+    model.created = datetime.utcnow() - timedelta(days=1)
+    model.updated = model.created + timedelta(days=1)
+    model.version_id = 0
+    return Record(minimal_record, model=model)
+
+
+@pytest.fixture()
 def recid_pid():
     """PID for minimal record."""
     return PersistentIdentifier(
         pid_type='recid', pid_value='123', status='R', object_type='rec',
+        object_uuid=uuid4())
+
+
+@pytest.fixture()
+def depid_pid():
+    """PID for minimal record."""
+    return PersistentIdentifier(
+        pid_type='depid', pid_value='321', status='R', object_type='rec',
         object_uuid=uuid4())
 
 
@@ -188,14 +214,14 @@ def full_record():
             {'identifier': '1234.4321', 'scheme':
                 'arxiv', 'relation': 'cites'},
         ],
-        meetings=[{
+        meetings={
             'title': 'The 13th Biennial HITRAN Conference',
             'place': 'Harvard-Smithsonian Center for Astrophysics',
             'dates': '23-25 June, 2014',
             'acronym': 'HITRAN13',
             'session': 'VI',
             'session_part': '1',
-        }],
+        },
         altmetric_id='9876',
         references=[
             {'raw_reference': 'Doe, John et al (2012). Some title. ZENODO. '
@@ -253,7 +279,7 @@ def funder_record(db):
 
 @pytest.fixture()
 def grant_record(db, funder_record):
-    """Create a funder record."""
+    """Create a grant record."""
     grant = Record.create(dict(
         internal_id='10.13039/501100000780::282896',
         funder={'$ref': 'http://dx.doi.org/10.13039/501100000780'},
@@ -270,3 +296,27 @@ def grant_record(db, funder_record):
         object_uuid=grant.id, status='R')
     db.session.commit()
     return grant
+
+
+@pytest.fixture()
+def license_record(db):
+    """Create a license record."""
+    license = Record.create({
+        "$schema": "http://zenodo.org/schemas/licenses/license-v1.0.0.json",
+        "domain_content": True,
+        "domain_data": True,
+        "domain_software": True,
+        "family": "",
+        "id": "CC0-1.0",
+        "maintainer": "Creative Commons",
+        "od_conformance": "approved",
+        "osd_conformance": "not reviewed",
+        "status": "active",
+        "title": "CC0 1.0",
+        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+    })
+    PersistentIdentifier.create(
+        pid_type='od_lic', pid_value=license['id'], object_type='rec',
+        object_uuid=license.id, status='R')
+    db.session.commit()
+    return license

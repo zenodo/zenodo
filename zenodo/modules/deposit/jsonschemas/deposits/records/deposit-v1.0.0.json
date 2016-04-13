@@ -1,8 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "http://zenodo.org/schemas/records/record-v1.0.0.json",
-  "title": "Zenodo Record Schema v1.0.0",
-  "additionalProperties": false,
+  "title": "Zenodo Deposit Schema v1.0.0",
   "definitions": {
     "person_or_org": {
       "type": "object",
@@ -158,19 +157,7 @@
     }
   },
   "type": "object",
-  "required": [
-    "recid",
-    "resource_type",
-    "publication_date",
-    "title",
-    "creators",
-    "description",
-    "access_right"
-  ],
   "properties": {
-    "$schema": {
-      "type": "string"
-    },
     "recid": {
       "description": "Invenio record identifier (integer).",
       "type": "number"

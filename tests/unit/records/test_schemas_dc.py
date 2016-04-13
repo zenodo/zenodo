@@ -174,13 +174,13 @@ def test_sources(minimal_record, recid_pid):
 
 def test_sources_meetings(minimal_record, recid_pid):
     """"Test contributors."""
-    minimal_record['meetings'] = [{
+    minimal_record['meetings'] = {
         'acronym': 'CAP',
         'title': 'Communicating',
         'place': 'Cape Town',
         'dates': 'March, 2010',
         'session': 'I',
         'session_part': '1',
-    }]
+    }
     obj = dc_v1.transform_record(recid_pid, Record(minimal_record))
     assert obj['sources'] == ['CAP, Communicating, Cape Town, March, 2010']

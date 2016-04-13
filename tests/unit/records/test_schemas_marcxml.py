@@ -52,14 +52,14 @@ def test_full_record(app, full_record):
         },
     ]
     assert Record(full_record).validate() is None
-    full_record['meetings'] = [{
+    full_record['meetings'] = {
         'title': 'The 13th Biennial HITRAN Conference',
         'place': 'Harvard-Smithsonian Center for Astrophysics',
         'dates': '23-25 June, 2014',
         'acronym': 'HITRAN13',
         'session': 'VI',
         'session_part': '1',
-    }]
+    }
     assert Record(full_record).validate() is None
     full_record['creators'] = [
         {'name': 'Doe, John', 'affiliation': 'CERN',
@@ -71,11 +71,11 @@ def test_full_record(app, full_record):
          'familyname': 'Doe', 'givennames': 'Jane',
          },
         {'name': 'Smith, John', 'affiliation': 'CERN',
-         'gnd': '',  'orcid': '',
+         'gnd': '', 'orcid': '',
          'familyname': 'Smith', 'givennames': 'John',
          },
         {'name': 'Nowak, Jack', 'affiliation': 'CERN',
-         'gnd': '170118215',  'orcid': '',
+         'gnd': '170118215', 'orcid': '',
          'familyname': 'Nowak', 'givennames': 'Jack',
          },
     ]

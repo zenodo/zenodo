@@ -35,16 +35,19 @@ from invenio_records_rest.serializers.json import JSONSerializer
 from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
-from .schemas.dc import DublinCoreJSONV1
-from .schemas.datacite import DataCiteSchemaJSONV1
-from .schemas.json import RecordSchemaJSONV1
-from .schemas.marcxml import RecordSchemaMARC
 from .bibtex import BibTeXSerializer
+from .schemas.datacite import DataCiteSchemaJSONV1
+from .schemas.dc import DublinCoreJSONV1
+from .schemas.json import RecordSchemaJSONV1
+from .schemas.legacyjson import LegacyJSONSchemaV1
+from .schemas.marcxml import RecordSchemaMARC
 
 # Serializers
 # ===========
 #: Zenodo JSON serializer version 1.0.0
 json_v1 = JSONSerializer(RecordSchemaJSONV1, replace_refs=True)
+#: Zenodo legacy deposit JSON serialzier version 1.0.0
+legacyjson_v1 = JSONSerializer(LegacyJSONSchemaV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
 marcxml_v1 = MARCXMLSerializer(
     to_marc21, schema_class=RecordSchemaMARC, replace_refs=True)
@@ -64,6 +67,8 @@ dc_v1 = DublinCoreSerializer(DublinCoreJSONV1, replace_refs=True)
 # ========================
 #: JSON record serializer for individual records.
 json_v1_response = record_responsify(json_v1, 'application/json')
+#: JSON record legacy serializer for individual records.
+legacyjson_v1_response = record_responsify(legacyjson_v1, 'application/json')
 #: MARCXML record serializer for individual records.
 marcxml_v1_response = record_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX record serializer for individual records.
@@ -76,6 +81,8 @@ dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 
 #: JSON record serializer for search results.
 json_v1_search = search_responsify(json_v1, 'application/json')
+#: JSON record legacy serializer for search results.
+legacyjson_v1_search = search_responsify(legacyjson_v1, 'application/json')
 #: MARCXML record serializer for search records.
 marcxml_v1_search = search_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX serializer for search records.

@@ -88,15 +88,7 @@ class RecordSchemaMARC(Schema):
             source_of_number_or_code=v.get('scheme'),
         ) for v in o['metadata'].get('alternate_identifiers', [])])
 
-    added_entry_meeting_name = fields.Function(
-        lambda o: [dict(
-            meeting_name_or_jurisdiction_name_as_entry_element=v.get('title'),
-            location_of_meeting=v.get('place'),
-            date_of_meeting=v.get('dates'),
-            miscellaneous_information=v.get('acronym'),
-            number_of_part_section_meeting=v.get('session'),
-            name_of_part_section_of_a_work=v.get('session_part'),
-        ) for v in o['metadata'].get('meetings', [])])
+    added_entry_meeting_name = fields.Method('get_added_entry_meeting_name')
 
     main_entry_personal_name = fields.Function(
         lambda o: [dict(
@@ -144,6 +136,18 @@ class RecordSchemaMARC(Schema):
     embargo_date = fields.Raw(attribute='metadata.embargo_date')
 
     _oai = fields.Raw(attribute='metadata._oai')
+
+    def get_added_entry_meeting_name(self, o):
+        """Get added_entry_meeting_name."""
+        v = o['metadata'].get('meetings', {})
+        return [dict(
+            meeting_name_or_jurisdiction_name_as_entry_element=v.get('title'),
+            location_of_meeting=v.get('place'),
+            date_of_meeting=v.get('dates'),
+            miscellaneous_information=v.get('acronym'),
+            number_of_part_section_meeting=v.get('session'),
+            name_of_part_section_of_a_work=v.get('session_part'),
+        )]
 
     @post_dump(pass_many=True)
     def remove_empty_fields(self, data, many):
