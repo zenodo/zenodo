@@ -545,6 +545,10 @@ THEME_GOOGLE_SITE_VERIFICATION = [
 #: Piwik site id.
 THEME_PIWIK_ID = None
 
+THEME_MATHJAX_CDN = \
+    '//cdn.mathjax.org/mathjax/latest/MathJax.js' \
+    '?config=TeX-AMS-MML_HTMLorMML'
+
 #: Base template for entire site.
 BASE_TEMPLATE = "zenodo_theme/page.html"
 #: Cover template for entire site.
