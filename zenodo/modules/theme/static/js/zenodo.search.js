@@ -20,21 +20,9 @@
 // waive the privileges and immunities granted to it by virtue of its status
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 require([
-    "jquery",
-    "bootstrap",
-    "node_modules/angular/angular",
-    "node_modules/angular-sanitize/angular-sanitize",
-    "js/zenodo/module",
-    "node_modules/invenio-search-js/dist/invenio-search-js",
-    ], function() {
-    // loading all the jQuery modules for the not require.js ready scripts
-    // everywhere.
-
-    // On document ready bootstrap angular
-    angular.element(document).ready(function() {
-      angular.bootstrap(
-
-        document.getElementById("invenio-search"), ['invenioSearch', 'zenodo']
-      );
-    });
-});
+  "node_modules/invenio-search-js/dist/invenio-search-js",
+  "js/invenio_communities/module",
+  ], function() {
+  // On document ready bootstrap angular
+  }
+);

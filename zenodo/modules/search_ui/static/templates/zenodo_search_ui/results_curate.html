@@ -4,7 +4,7 @@
       <span class="pull-right" id="curate_{{ record.id }}">
         <span class="ajaxmsg text-muted" style="display: none;"></span>
         <a class="btn 10 btn-default" ng-class="pressedClassSucc" ng-click="handleClick('accept', record.id);isPressed=true;pressedClassSucc='btn-success'" ng-disabled="isPressed"><i class="fa fa-check"></i>Accept</a>
-        <a class="btn 10 btn-default" ng-class="pressedClassWarn" ng-click="handleClick('accept', record.id);isPressed=true;pressedClassWarn='btn-danger'" ng-disabled="isPressed"><i class="fa fa-check"></i>Reject</a>
+        <a class="btn 10 btn-default" ng-class="pressedClassWarn" ng-click="handleClick('reject', record.id);isPressed=true;pressedClassWarn='btn-danger'" ng-disabled="isPressed"><i class="fa fa-check"></i>Reject</a>
       </span>
     </div>
     <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ record.metadata.
@@ -28,7 +28,7 @@
       <a target="_self" ng-href="/record/{{record.id}}" class="text-muted">{{ creator.name }}</a>;
       </span>
     </p>
-    <p class="hidden-xs"><a target="_self" ng-href="/record/{{record.id}}"><span ng-bind-html="record.metadata.description"></span></a></p>
+    <p class="hidden-xs"><a target="_self" ng-href="/record/{{record.id}}"><span ng-bind-html="record.metadata.description|striptags|limitTo:300"></span></a></p>
       <small class="text-muted hidden-xs">
         Uploaded on {{ record.created|date:'longDate' }}
       </small>

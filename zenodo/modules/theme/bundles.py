@@ -49,14 +49,13 @@ js = NpmBundle(
         filters='uglifyjs',
     ),
     Bundle(
-        'js/main.js',
+        'js/zenodo.js',
         filters='requirejs',
     ),
     depends=(
-        'js/*.js',
+        'js/zenodo.js',
         'js/zenodo/*.js',
         'js/zenodo/filters/*.js',
-        'node_modules/invenio-search-js/dist/*.js',
     ),
     filters='jsmin',
     output="gen/zenodo.%(version)s.js",
@@ -67,3 +66,20 @@ js = NpmBundle(
     }
 )
 """Default JavaScript bundle."""
+
+search_js = NpmBundle(
+    Bundle(
+        'js/zenodo.search.js',
+        filters='requirejs',
+    ),
+    depends=(
+        'node_modules/invenio-search-js/dist/*.js',
+        'js/invenio_communities/*.js',
+        'js/invenio_communities/directives/*.js',
+    ),
+    filters='jsmin',
+    output="gen/zenodo.search.%(version)s.js",
+    npm={
+    }
+)
+"""Search JavaScript bundle (with communities support)."""

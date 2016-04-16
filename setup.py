@@ -172,6 +172,7 @@ setup(
         'invenio_assets.bundles': [
             'zenodo_theme_css = zenodo.modules.theme.bundles:css',
             'zenodo_theme_js = zenodo.modules.theme.bundles:js',
+            'zenodo_search_js = zenodo.modules.theme.bundles:search_js',
         ],
         'invenio_jsonschemas.schemas': [
             'zenodo_records = zenodo.modules.records.jsonschemas',

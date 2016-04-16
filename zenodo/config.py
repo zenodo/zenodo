@@ -512,14 +512,25 @@ SEARCH_ELASTIC_KEYWORD_MAPPING = {}
 
 # Communities
 # ===========
+#: Override templates to use custom search-js
+COMMUNITIES_COMMUNITY_TEMPLATE = "zenodo_theme/communities/base.html"
+#: Override templates to use custom search-js
+COMMUNITIES_CURATE_TEMPLATE = "zenodo_theme/communities/curate.html"
+#: Override templates to use custom search-js
+COMMUNITIES_SEARCH_TEMPLATE = "zenodo_theme/communities/search.html"
+
 #: Angular template for rendering search results for curation.
 COMMUNITIES_JSTEMPLATE_RESULTS_CURATE = \
     "templates/zenodo_search_ui/results_curate.html"
+#: Email sender for communities emails.
+COMMUNITIES_REQUEST_EMAIL_SENDER = SUPPORT_EMAIL
 
 # Theme
 # =====
 #: Default site name.
 THEME_SITENAME = _("Zenodo")
+#: Default site URL (used only when not in a context - e.g. like celery tasks).
+THEME_SITEURL = "https://zenodo.org"
 #: Endpoint for breadcrumb root.
 THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
 #: Twitter handle.
