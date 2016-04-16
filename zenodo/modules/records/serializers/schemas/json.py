@@ -50,7 +50,7 @@ class ContributorSchemaV1(PersonSchemaV1):
 class RelatedIdentifierSchemav1(Schema):
     """Schema for a related identifier."""
 
-    id = fields.Str()
+    identifier = fields.Str()
     relation = fields.Str()
     scheme = fields.Str()
 
