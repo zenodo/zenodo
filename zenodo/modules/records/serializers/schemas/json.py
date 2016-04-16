@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from dateutil.parser import parse
+from flask import url_for
 from marshmallow import Schema, fields
 
 from zenodo.modules.records.models import AccessRight, ObjectType
@@ -84,6 +85,40 @@ class SubjectSchemaV1(Schema):
     scheme = fields.Str()
 
 
+class FunderSchemaV1(Schema):
+    """Schema for a funder."""
+
+    funder_url = fields.Method('get_funder_url')
+    doi = fields.Str()
+    name = fields.Str()
+    acronyms = fields.List(fields.Str())
+
+    def get_funder_url(self, obj):
+        """Get grant url."""
+        return url_for(
+            'invenio_records_rest.frdoi_item', pid_value=obj['doi'],
+            _external=True
+        )
+
+
+class GrantSchemaV1(Schema):
+    """Schema for a grant."""
+
+    grant_url = fields.Method('get_grant_url')
+    title = fields.Str()
+    code = fields.Str()
+    program = fields.Str()
+    acronym = fields.Str()
+    funder = fields.Nested(FunderSchemaV1)
+
+    def get_grant_url(self, obj):
+        """Get grant url."""
+        return url_for(
+            'invenio_records_rest.grant_item', pid_value=obj['internal_id'],
+            _external=True
+        )
+
+
 class MetadataSchemaV1(Schema):
     """Schema for metadata."""
 
@@ -97,7 +132,6 @@ class MetadataSchemaV1(Schema):
     creators = fields.List(fields.Nested(PersonSchemaV1), attribute='authors')
     contributors = fields.List(
         fields.Nested(ContributorSchemaV1), attribute='contributors')
-
     title = fields.Str()
     description = fields.Str()
     notes = fields.Str()
@@ -110,7 +144,7 @@ class MetadataSchemaV1(Schema):
 
     related_identifiers = fields.List(fields.Nested(RelatedIdentifierSchemav1))
     subjects = fields.List(fields.Nested(SubjectSchemaV1))
-    grants = fields.List(fields.Str)
+    grants = fields.List(fields.Nested(GrantSchemaV1))
 
     communities = fields.List(fields.Str)
 
