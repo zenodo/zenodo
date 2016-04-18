@@ -113,5 +113,6 @@ You can now load the demo records:
 
    (zenodo)$ celery worker -A zenodo.celery -l INFO --purge
    (zenodo)$ zenodo fixtures loaddemorecords
+   (zenodo)$ zenodo migration recordsrun
    (zenodo)$ zenodo migration reindex recid
    (zenodo)$ zenodo index run -d

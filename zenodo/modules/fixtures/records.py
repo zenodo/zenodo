@@ -26,18 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_db import db
-from invenio_oaiserver.models import OAISet
+from invenio_migrator.tasks.records import import_record
 
 
 def loaddemorecords(records):
     """Load demo records."""
     for item in records:
-        if current_migrator.records_post_task:
-            chain(
-                import_record.s(item, source_type='json'),
-                current_migrator.records_post_task.s()
-            )()
-        else:
-            import_record.delay(item, source_type='json')
-
+        import_record.delay(item, source_type='json'),
