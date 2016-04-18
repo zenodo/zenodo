@@ -175,9 +175,11 @@ def full_record():
         provisional_communities=['ecfunded'],
         grants=[
             {'title': 'Grant Title', 'code': '1234', 'identifiers': {},
-             'funder': {'name': 'EC'}},
+             'internal_id': '10.1234/foo::1234',
+             'funder': {'name': 'EC', 'doi': '10.1234/foo'}},
             {'title': 'Title Grant', 'code': '4321', 'identifiers': {},
-             'funder': {'name': 'EC'}},
+             'internal_id': '10.1234/foo::4321',
+             'funder': {'name': 'EC', 'doi': '10.1234/foo'}},
         ],
         # Test all schemes
         related_identifiers=[

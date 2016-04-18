@@ -32,7 +32,7 @@ from os.path import dirname, join
 
 from flask import current_app
 from flask_babelex import gettext
-from invenio_search import Query, current_search_client
+from invenio_search.api import RecordsSearch
 from jsonref import JsonRef
 from speaklater import make_lazy_gettext
 
@@ -102,28 +102,20 @@ class AccessRight(object):
     @classmethod
     def get_expired_embargos(cls):
         """Get records for which the embargo period have expired."""
-        query_str = 'access_right:{0} AND embargo_date:{{* TO {1}}}'.format(
-            cls.EMBARGOED,
-            datetime.utcnow().isoformat()
-        )
+        endpoint = current_app.config['RECORDS_REST_ENDPOINTS']['recid']
 
-        query = Query()
-        query.body['from'] = 0
-        query.body['size'] = 1000
-        query.body['query'] = {
-            'query_string': {
-                'query': query_str,
-                'allow_leading_wildcard': False,
-            },
-        }
+        s = RecordsSearch(
+            index=endpoint['search_index']
+        ).query(
+            'query_string',
+            query='access_right:{0} AND embargo_date:{{* TO {1}}}'.format(
+                cls.EMBARGOED,
+                datetime.utcnow().isoformat()
+            ),
+            allow_leading_wildcard=False
+        ).fields([])
 
-        endpoints = current_app.config['RECORDS_REST_ENDPOINTS']
-        index = endpoints['recid']['search_index']
-
-        response = current_search_client.search(
-            index=index, body=query.body
-        )
-        return [hit['_id'] for hit in response['hits']['hits']]
+        return [hit.meta.id for hit in s.scan()]
 
 
 class ObjectType(object):

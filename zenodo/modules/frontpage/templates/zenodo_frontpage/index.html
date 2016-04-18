@@ -43,7 +43,7 @@
       {%- for r in records %}
         {%- set publication_date = r.publication_date|from_isodate -%}
         {%- set creation_date = r._created|from_isodatetime -%}
-        {%- set embargo_date = r.get('embargo_date', None)|from_isodate -%}
+        {%- set embargo_date = r.embargo_date|from_isodate -%}
         {%- set object_type = r.resource_type|objecttype %}
         {%- set record_url = url_for('invenio_records_ui.recid', pid_value=r['recid']) %}
         <div class="row record-elem">
@@ -51,12 +51,12 @@
             <div class="pull-right view-record hidden-xs">
               <a href="{{ record_url }}" class="btn btn-default">{{_('View')}}</a>
             </div>
-            {%- if r.get('doi') %}
+            {%- if r.doi %}
               <span class="pull-right hidden-xs">
                   <br><div class="altmetric-embed altmetric-hidden" data-badge-type="donut" data-badge-popover="left" data-hide-no-mentions="true" data-doi="{{r.doi}}"></div>
               </span>
             {% endif %}
-            <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{publication_date|dateformat(format='long')}}</span>
+            <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}</span>
             {{ objecttype_label(object_type, lang=current_i18n.language) }}
             {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
             <br />

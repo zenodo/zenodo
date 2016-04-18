@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 from dateutil.parser import parse
 from flask import url_for
 from marshmallow import Schema, fields
+from werkzeug.routing import BuildError
 
 from zenodo.modules.records.models import AccessRight, ObjectType
 
@@ -95,10 +96,14 @@ class FunderSchemaV1(Schema):
 
     def get_funder_url(self, obj):
         """Get grant url."""
-        return url_for(
-            'invenio_records_rest.frdoi_item', pid_value=obj['doi'],
-            _external=True
-        )
+        try:
+            return url_for(
+                'invenio_records_rest.frdoi_item',
+                pid_value=obj['doi'],
+                _external=True
+            )
+        except BuildError:
+            return None
 
 
 class GrantSchemaV1(Schema):
@@ -113,10 +118,14 @@ class GrantSchemaV1(Schema):
 
     def get_grant_url(self, obj):
         """Get grant url."""
-        return url_for(
-            'invenio_records_rest.grant_item', pid_value=obj['internal_id'],
-            _external=True
-        )
+        try:
+            return url_for(
+                'invenio_records_rest.grant_item',
+                pid_value=obj['internal_id'],
+                _external=True
+            )
+        except BuildError:
+            return None
 
 
 class MetadataSchemaV1(Schema):

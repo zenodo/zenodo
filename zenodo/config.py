@@ -291,7 +291,8 @@ RECORDS_REST_ENDPOINTS = dict(
         list_route='/records/',
         item_route='/records/<pid_value>',
         search_index='records',
-        search_type=None,
+        search_type=['record-v1.0.0'],
+        search_factory_imp='invenio_records_rest.query.es_query_factory',
         record_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers.json_v1_response'),
@@ -317,7 +318,6 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.dc_v1_search'),
         },
         default_media_type='application/json',
-        query_factory_imp='invenio_records_rest.query.es_query_factory',
     ),
 )
 # Default OpenAIRE API endpoints.

@@ -28,7 +28,8 @@ from __future__ import absolute_import, print_function
 
 from flask import Blueprint, render_template
 from flask_menu import register_menu
-from invenio_search import Query, current_search_client
+
+from .api import FrontpageRecordsSearch
 
 blueprint = Blueprint(
     'zenodo_frontpage',
@@ -41,24 +42,15 @@ blueprint = Blueprint(
 @blueprint.route('/')
 def index():
     """Frontpage blueprint."""
-    query = Query("communities:zenodo AND access_right:open")
-    query.body["size"] = 10
-    query.body["sort"] = [{"_created": "desc"}]
-
-    response = current_search_client.search(
-        index='records',
-        body=query.body,
-    )
-
     return render_template(
         'zenodo_frontpage/index.html',
-        records=(h['_source'] for h in response['hits']['hits'])
+        records=FrontpageRecordsSearch()[:10].sort('-_created').execute(),
     )
 
 
 @blueprint.route('/ping', methods=['HEAD', 'GET'])
 def ping():
-    """Frontpage blueprint."""
+    """Load balancer ping view."""
     return 'OK'
 
 
