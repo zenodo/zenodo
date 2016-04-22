@@ -99,6 +99,42 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Other', marc='oth', datacite='Other'),
 ]
 
+#: Endpoints for deposit.
+DEPOSIT_REST_ENDPOINTS = dict(
+    dep=dict(
+        pid_type='dep',
+        pid_minter='deposit',
+        pid_fetcher='deposit',
+        search_index='deposits',
+        search_type=None,
+        record_class='invenio_deposit.api:Deposit',
+        record_loaders={
+            'application/json': ('zenodo.modules.records.serializers'
+                                 ':json_v1_legacy_loader'),
+        },
+        record_serializers={
+            'application/json': ('zenodo.modules.records.serializers'
+                                 ':json_v1_legacy_response'),
+        },
+        search_serializers={
+            'application/json': ('zenodo.modules.records.serializers'
+                                 ':json_v1_legacy_search'),
+        },
+        list_route='/deposit/depositions/',
+        item_route='/deposit/depositions/<pid_value>',
+        default_media_type='application/json',
+        max_result_window=10000,
+    ),
+)
+
+DEPOSIT_RECORDS_UI_ENDPOINTS = dict(
+    dep=dict(
+        pid_type='deposit_deposition',
+        route='/deposit/<pid_value>',
+        template='invenio_deposit/edit.html',
+    ),
+)
+
 # Formatter
 # =========
 #: List of allowed titles in badges.
@@ -106,7 +142,6 @@ FORMATTER_BADGES_ALLOWED_TITLES = ['DOI', 'doi']
 
 #: Mapping of titles.
 FORMATTER_BADGES_TITLE_MAPPING = {'doi': 'DOI'}
-
 
 # Frontpage
 # =========
@@ -277,6 +312,11 @@ RECORDS_UI_ENDPOINTS = dict(
         pid_type='recid',
         route='/record/<pid_value>/files/<filename>',
         view_imp='invenio_files_rest.views.file_download_ui',
+    ),
+    deposit=dict(
+        pid_type='recid',
+        route='/deposit/<pid_value>',
+        template='invenio_deposit/edit.html',
     ),
 )
 #: Default tombstone template.
