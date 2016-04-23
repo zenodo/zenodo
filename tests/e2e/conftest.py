@@ -35,7 +35,7 @@ import os
 import pytest
 from elasticsearch.exceptions import RequestError
 from invenio_db import db as db_
-from invenio_search import current_search
+from invenio_search import current_search, current_search_client
 from selenium import webdriver
 from sqlalchemy_utils.functions import create_database, database_exists
 
@@ -43,7 +43,7 @@ from zenodo.factory import create_app
 
 
 @pytest.yield_fixture(scope='session', autouse=True)
-def app(request):
+def base_app(request):
     """Flask application fixture."""
     app = create_app(
         CELERY_ALWAYS_EAGER=True,
@@ -60,23 +60,37 @@ def app(request):
     )
 
     with app.app_context():
-        # Init
-        if not database_exists(str(db_.engine.url)):
-            create_database(str(db_.engine.url))
-        db_.create_all()
-
-        try:
-            list(current_search.create())
-        except RequestError:
-            list(current_search.delete())
-            list(current_search.create())
-
         yield app
 
-        # Teardown
-        list(current_search.delete(ignore=[404]))
-        db_.session.remove()
-        db_.drop_all()
+
+@pytest.yield_fixture(scope='session')
+def es(base_app):
+    """Provide elasticsearch access."""
+    try:
+        list(current_search.create())
+    except RequestError:
+        list(current_search.delete())
+        list(current_search.create())
+    current_search_client.indices.refresh()
+    yield current_search_client
+    list(current_search.delete(ignore=[404]))
+
+
+@pytest.yield_fixture(scope='session')
+def db(base_app):
+    """Setup database."""
+    if not database_exists(str(db_.engine.url)):
+        create_database(str(db_.engine.url))
+    db_.create_all()
+    yield db_
+    db_.session.remove()
+    db_.drop_all()
+
+
+@pytest.yield_fixture(scope='session', autouse=True)
+def app(base_app, es, db):
+    """Application with ES and DB."""
+    yield base_app
 
 
 def pytest_generate_tests(metafunc):

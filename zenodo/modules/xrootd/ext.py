@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -43,7 +43,7 @@ class ZenodoXRootD(object):
             # Import XRootDPyFS if available so opener gets registered on
             # PyFilesystem.
             get_distribution('xrootdpyfs')
-            import xrootdpyfs
+            import xrootdpyfs  # noqa
             app.config['XROOTD_ENABLED'] = True
         except DistributionNotFound:
             app.config['XROOTD_ENABLED'] = False

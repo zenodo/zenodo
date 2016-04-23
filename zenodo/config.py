@@ -31,6 +31,7 @@ import os
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
+from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
 
 
@@ -292,7 +293,7 @@ RECORDS_REST_ENDPOINTS = dict(
         item_route='/records/<pid_value>',
         search_index='records',
         search_type=['record-v1.0.0'],
-        search_factory_imp='invenio_records_rest.query.es_query_factory',
+        search_factory_imp='invenio_records_rest.query.es_search_factory',
         record_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers.json_v1_response'),
@@ -322,6 +323,7 @@ RECORDS_REST_ENDPOINTS = dict(
 )
 # Default OpenAIRE API endpoints.
 RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
+RECORDS_REST_ENDPOINTS.update(OPENDEFINITION_REST_ENDPOINTS)
 
 #: Sort options records REST API.
 RECORDS_REST_SORT_OPTIONS = dict(

@@ -26,13 +26,11 @@
 
 from __future__ import absolute_import, print_function
 
-import uuid
 from datetime import datetime, timedelta
-from time import sleep
 
 from invenio_indexer.api import RecordIndexer
 from invenio_records.api import Record
-from mock import MagicMock, patch
+from invenio_search import current_search
 
 from zenodo.modules.records.models import AccessRight, ObjectType
 from zenodo.modules.records.tasks import update_expired_embargos
@@ -40,22 +38,6 @@ from zenodo.modules.records.tasks import update_expired_embargos
 
 def _today_offset(val):
     return (datetime.utcnow().date() + timedelta(days=val)).isoformat()
-
-
-def test_get_expired_embargos(app):
-    """Test get expired records."""
-    c = MagicMock()
-    id1 = str(uuid.uuid4())
-    id2 = str(uuid.uuid4())
-    with patch('zenodo.modules.records.models.current_search_client', c):
-        c.search.return_value = dict(
-            hits=dict(hits=[
-                {'_id': id1},
-                {'_id': id2},
-            ])
-        )
-        assert c.search.called_with(index='records')
-        assert AccessRight.get_expired_embargos() == [id1, id2]
 
 
 def test_update_embargoed_records(app, db, es):
@@ -79,14 +61,15 @@ def test_update_embargoed_records(app, db, es):
         Record.create({
             'title': 'already open',
             'access_right': 'open',
-            'embargo_date': _today_offset(1)
+            'embargo_date': _today_offset(-1)
         })
     ]
     db.session.commit()
     for r in records:
         RecordIndexer().index(r)
 
-    es.indices.refresh(index='records-record-v1.0.0')
+    current_search.flush_and_refresh('records-record-v1.0.0')
+
     res = AccessRight.get_expired_embargos()
     assert len(res) == 2
     assert str(records[0].id) in res

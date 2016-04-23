@@ -71,8 +71,8 @@ before_install:
   - "requirements-builder --level=dev --req requirements.devel.txt setup.py > .travis-devel-requirements.txt"
 
 install:
-  - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
-  - "travis_retry pip install -e .[all,postgresql]"
+  - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt --pre"
+  - "travis_retry pip install -e .[all,postgresql] --pre"
   - "./scripts/setup-assets.sh"
 
 before_script:

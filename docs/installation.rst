@@ -73,11 +73,7 @@ done like this:
 
 .. code-block:: console
 
-   (zenodo)$ zenodo npm
-   (zenodo)$ cd ${VIRTUAL_ENV}/var/instance/static
-   (zenodo)$ npm install
-   (zenodo)$ zenodo collect -v
-   (zenodo)$ zenodo assets build
+   (zenodo)$ source scripts/setup-assets.sh
 
 .. note::
 
@@ -86,7 +82,7 @@ done like this:
 
    .. code-block:: console
 
-      npm install -g node-sass clean-css uglify-js requirejs
+      (zenodo)$ source scripts/setup-npm.sh
 
 
 Initialization

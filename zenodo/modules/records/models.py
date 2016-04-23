@@ -32,6 +32,7 @@ from os.path import dirname, join
 
 from flask import current_app
 from flask_babelex import gettext
+from invenio_search import current_search_client
 from invenio_search.api import RecordsSearch
 from jsonref import JsonRef
 from speaklater import make_lazy_gettext
@@ -105,11 +106,13 @@ class AccessRight(object):
         endpoint = current_app.config['RECORDS_REST_ENDPOINTS']['recid']
 
         s = RecordsSearch(
+            using=current_search_client,
             index=endpoint['search_index']
         ).query(
             'query_string',
             query='access_right:{0} AND embargo_date:{{* TO {1}}}'.format(
                 cls.EMBARGOED,
+                # Uses timestamp instead of date on purpose.
                 datetime.utcnow().isoformat()
             ),
             allow_leading_wildcard=False
@@ -129,7 +132,7 @@ class ObjectType(object):
         """Load object types for JSON data."""
         if cls.index_id is None:
             with open(join(dirname(__file__), "data", "objecttypes.json")) \
-                 as fp:
+                    as fp:
                 data = json.load(fp)
 
             cls.index_internal_id = {}
