@@ -57,7 +57,7 @@ env:
 
 python:
   - "2.7"
-  - "3.4"
+  - "3.5"
 
 before_install:
   - "mkdir /tmp/elasticsearch"
