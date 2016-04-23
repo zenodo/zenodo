@@ -39,9 +39,9 @@ def loadlocation(force=False):
     """Load default file store location."""
     try:
         uri = current_app.config['FIXTURES_FILES_LOCATION']
-        if not exists(uri):
+        if uri.startswith('/') and not exists(uri):
             makedirs(uri)
-        loc = Location(name='local', uri=uri, default=True, )
+        loc = Location(name='default', uri=uri, default=True, )
         db.session.add(loc)
         db.session.commit()
         return loc

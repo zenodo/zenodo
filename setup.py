@@ -69,6 +69,11 @@ for name, reqs in extras_require.items():
         continue
     extras_require['all'].extend(reqs)
 
+# Do not include in all requirement
+extras_require['xrootd'] = [
+    'xrootdpyfs>=0.1.1',
+]
+
 setup_requires = [
     'Babel>=1.3',
     'pytest-runner>=2.7.0',
@@ -147,7 +152,11 @@ setup(
         'invenio_base.apps': [
             'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
+            'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
+        ],
+        'invenio_base.api_apps': [
+            'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
         ],
         'invenio_base.blueprints': [
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
