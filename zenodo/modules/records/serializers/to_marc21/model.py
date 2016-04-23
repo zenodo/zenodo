@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,6 +22,21 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-# Pinned requirements which cannot be upgraded without breaking changes.
--r requirements.txt
--r requirements.devel.txt
+"""MARC21 model."""
+
+from __future__ import absolute_import, print_function
+
+from dojson.contrib.to_marc21.model import Underdo
+from dojson.overdo import Index
+
+
+class ZenodoUnderdo(Underdo):
+    """Temporary fix for dojson branch size problem."""
+
+    def build(self):
+        """."""
+        self._collect_entry_points()
+        self.index = Index(self.rules, branch_size=98)
+
+
+to_marc21 = ZenodoUnderdo(entry_point_group='dojson.contrib.to_marc21')

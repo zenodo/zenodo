@@ -27,7 +27,8 @@
 from __future__ import absolute_import, print_function
 
 from dojson import utils
-from dojson.contrib.to_marc21.model import to_marc21
+
+from .model import to_marc21
 
 
 @to_marc21.over('980', '^(resource_type|communities)$')
