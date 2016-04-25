@@ -112,3 +112,9 @@ You can now load the demo records:
    (zenodo)$ zenodo migration recordsrun
    (zenodo)$ zenodo migration reindex recid
    (zenodo)$ zenodo index run -d
+
+Badges
+~~~~~~
+In order for the DOI badges to work you must have the Cairo SVG library and the
+DejaVu Sans font installed on your system . Please see `Invenio-Formatter
+<http://pythonhosted.org/invenio-formatter/installation.html>`_ for details.

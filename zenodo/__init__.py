@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-u"""Zenodo usage documentation for developers.
+r"""Zenodo usage documentation for developers.
 
 .. _running:
 
@@ -94,7 +94,7 @@ secret from GitHub and add them to:
 
 
 For the GitHub integration to work with a self-signed SSL certificate you need
-to set:
+to set (only use this during development):
 
 .. code-block:: python
 
@@ -152,7 +152,7 @@ proxy using HTTP Basic authentication it can be done like this:
 
 PostgreSQL, RabbitMQ, Redis
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~
-In case you want to use remote database, broker and cache you can change the
+In case you want to use a remote database, broker and cache you can change the
 defaults using the following configuration variables:
 
 .. code-block:: python
@@ -164,6 +164,25 @@ defaults using the following configuration variables:
    ACCOUNTS_SESSION_REDIS_URL = '{0}/0'.format(REDIS_URL)
    CACHE_REDIS_URL = '{0}/0'.format(REDIS_URL)
    CELERY_RESULT_BACKEND = '{0}/1'.format(REDIS_URL)
+
+
+Storage
+~~~~~~~
+You can configure the default storage location using the configuration
+variable:
+
+.. code-block:: python
+
+   FIXTURES_DEFAULT_LOCATION = \
+    'root://eospublic.cern.ch//eos/zenodo/prod/data/'
+
+In case you need XRootD support, please ensure that
+`XRootDPyFS <http://pythonhosted.org/xrootdpyfs/>`_ have been installed by e.g.
+installing Zenodo with the ``xrootd`` extras:
+
+.. code-block:: console
+
+   $ pip install -e .[postgresql,xrootd]
 
 Sentry
 ~~~~~~
@@ -253,12 +272,10 @@ The ``--setspec`` option should be one of the following:
 * European Commission Horizon 2020: ``H2020Projects``
 * European Commission: ``ECProjects`` (contains both FP7Projects and
   ``H2020Projects``)
-* Fundação para a Ciência e a Tecnologia, I.P.: ``FCTProjects``
+* Foundation for Science and Technology, Portugal: ``FCTProjects``
 * National Health and Medical Research Council: ``NHMRCProjects``
 * National Science Foundation: ``NSFProjects``
 * Wellcome Trust: ``WTProjects``
-
-
 
 """
 
