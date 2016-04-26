@@ -1,0 +1,345 @@
+{
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "id": "http://zenodo.org/schemas/zenodo_deposit/deposit-v1.0.0.json",
+    "title": "Zenodo Deposit Schema v1.0.0",
+    "additionalProperties": false,
+    "definitions": {
+
+    },
+    "type": "object",
+    "required": [
+        "type_of_file",
+        "publication_date",
+        "title",
+        "authors",
+        "description",
+        "license"
+    ],
+    "properties": {
+        "type_of_file": {
+            "type": "string",
+            "title": "Type of file(s)",
+            "enum": [
+                "publication",
+                "poster",
+                "presentation",
+                "dataset",
+                "image",
+                "video/audio",
+                "software",
+                "lesson"
+            ]
+        },
+        "publication_type": {
+            "type": "string",
+            "default": "book",
+            "title": "Publication Type",
+            "enum": [
+                "book",
+                "book_section",
+                "conference_paper",
+                "journal_article",
+                "patent",
+                "preprint",
+                "project_deliverable",
+                "project_milestone",
+                "proposal",
+                "report",
+                "software_documentation",
+                "thesis",
+                "technical_note",
+                "working_paper",
+                "other"
+            ]
+        },
+        "image_type": {
+            "type": "string",
+            "default": "figure",
+            "title": "Image Type",
+            "enum": [
+                "figure",
+                "plot",
+                "drawing",
+                "diagram",
+                "photo",
+                "other"
+            ]
+        },
+        "doi": {
+            "title": "Digital Object Identifier",
+            "description": "Digital Object Identifier (DOI).",
+            "type": "string"
+        },
+        "publication_date": {
+            "title": "Publication Date",
+            "description": "Deposit publication date. YYYY-MM-DD formatted.",
+            "type": "string",
+            "format": "date"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Deposit title.",
+            "type": "string"
+        },
+        "authors": {
+            "title": "Authors",
+            "type": "array",
+            "items": {
+                "title": "Author",
+                "type": "object",
+                "properties":{
+                    "name": {
+                        "title": "Name",
+                        "type": "string"
+                    },
+                    "affliation": {
+                        "title": "Affliation",
+                        "type": "string"
+                    }
+                }
+            },
+            "minItems": 1
+        },
+        "description": {
+            "title": "Description",
+            "type": "string",
+            "minLength": 1
+        },
+        "keywords": {
+            "title": "Keywords",
+            "type": "array",
+            "items": {
+                "title": "Keyword",
+                "type": "string"
+            }
+        },
+        "additional_notes": {
+            "title": "Additional Notes",
+            "type": "string"
+        },
+        "access_right": {
+            "title": "Access Right",
+            "type": "string",
+            "default": "open",
+            "enum": [
+                "open",
+                "embargoed",
+                "restricted",
+                "closed"
+            ]
+        },
+        "embargo_date": {
+            "title": "Embargo Date",
+            "type": "string"
+        },
+        "license": {
+            "title": "License",
+            "type": "string"
+        },
+        "conditions": {
+            "title": "Conditions",
+            "type": "string"
+        },
+        "communities": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "title": "Community"
+            }
+        },
+        "funding": {
+            "type": "array",
+            "items": {
+                "type": "string",
+                "title": "Funding"
+            }
+        },
+        "related_identifiers": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "identifier": {
+                       "type": "string"
+                    },
+                    "relation_type": {
+                        "type": "string",
+                        "default": "isCitedBy",
+                        "enum": [
+                            "isCitedBy",
+                            "cites",
+                            "isSupplementTo",
+                            "isSupplementedBy",
+                            "isNewVersionOf",
+                            "isPreviousVersionOf",
+                            "isPartOf",
+                            "hasPart",
+                            "isCompiledBy",
+                            "compiles",
+                            "isIdenticalTo",
+                            "isAlternativeIdentifier"
+                        ]
+                    }
+                }
+            },
+            "required": [
+                "identifier",
+                "relation_type"
+            ]
+        },
+        "contributors": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": "string"
+                    },
+                    "affiliation": {
+                        "type": "string"
+                    },
+                   "type": {
+                        "type": "string",
+                        "default": "ContactPerson",
+                        "enum": [
+                            "ContactPerson",
+                            "DataCollector",
+                            "DataCurator",
+                            "DataManager",
+                            "Editor",
+                            "Researcher",
+                            "RightsHolder",
+                            "Sponsor",
+                            "Other"
+                        ]
+                   }
+                }
+            }
+        },
+        "references": {
+            "type": "string",
+            "title": "References",
+            "description": "Optional. Format: One reference per line."
+        },
+        "journal": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "title": "Journal title",
+                    "type": "string"
+                },
+                "volume": {
+                    "title": "Volume",
+                    "type": "string"
+                },
+                "issue": {
+                    "title": "Issue",
+                    "type": "string"
+                },
+                "pages": {
+                    "title": "Pages",
+                    "type": "string"
+                }
+            }
+        },
+        "conference": {
+            "type": "object",
+            "properties": {
+                "title": {
+                    "title": "Conference title",
+                    "type": "string"
+                },
+                "acronym": {
+                    "title": "Acronym",
+                    "type": "string"
+                },
+                "dates": {
+                    "title": "Dates",
+                    "type": "string"
+                },
+                "place": {
+                    "title": "Place",
+                    "type": "string"
+                },
+                "website": {
+                    "title": "Website",
+                    "type": "string"
+                },
+                "session": {
+                    "title": "Session",
+                    "type": "string"
+                },
+                "part": {
+                    "title": "Part",
+                    "type": "string"
+                }
+            }
+        },
+        "book_report_chapter": {
+            "type": "object",
+            "properties": {
+                "publisher": {
+                    "type": "string",
+                    "title": "Publisher"
+                },
+                "place": {
+                    "type": "string",
+                    "title": "Place"
+                },
+                "isbn": {
+                    "type": "string",
+                    "title": "ISBN"
+                },
+                "book_title": {
+                    "type": "string",
+                    "title": "Book title"
+                },
+                "pages": {
+                    "type": "string",
+                    "title": "Pages"
+                }
+            }
+        },
+        "thesis": {
+            "type": "object",
+            "properties": {
+                "awarding_university": {
+                    "title": "Awarding University",
+                    "type": "string"
+                },
+                "supervisors": {
+                    "title": "Supervisors",
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "affiliation": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "subjects": {
+            "type": "array",
+            "title": "Subjects",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "term": {
+                        "title": "Term",
+                        "type": "string"
+                    },
+                    "identifier": {
+                        "title": "Identifier",
+                        "type": "string"
+                    }
+                }
+            }
+        }
+    }
+}

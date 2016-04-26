@@ -102,6 +102,12 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Other', marc='oth', datacite='Other'),
 ]
 
+#: Default JSON Schema for deposit
+DEPOSIT_DEFAULT_JSONSCHEMA = 'zenodo_deposit/deposit-v1.0.0.json'
+
+#: Angular Schema Form for deposit
+DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
+
 # Formatter
 # =========
 #: List of allowed titles in badges.

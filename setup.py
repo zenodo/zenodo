@@ -193,6 +193,7 @@ setup(
         ],
         'invenio_jsonschemas.schemas': [
             'zenodo_records = zenodo.modules.records.jsonschemas',
+            'zenodo_deposit = zenodo.modules.deposit.jsonschemas',
         ],
         'invenio_search.mappings': [
             'records = zenodo.modules.records.mappings',
