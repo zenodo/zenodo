@@ -1,0 +1,68 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2016 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends "invenio_deposit/index.html" %}
+
+{%- block css %}
+    {% assets "zenodo_theme_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
+{%- endblock css %}
+
+{%- block javascript %}
+  {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  <script type="text/javascript">
+  require([
+    "node_modules/angular/angular",
+    "node_modules/invenio-search-js/dist/invenio-search-js",
+    "js/zenodo/module"
+    ], function() {
+      angular.element(document).ready(function() {
+        angular.bootstrap(document.getElementById("invenio-search"), [
+            'invenioSearch',
+            'zenodo'
+          ]
+        );
+      });
+    }
+  );
+  </script>
+{%- endblock javascript %}
+
+
+{%- block search_results %}
+<invenio-search-results
+  class="list-group"
+  template="{{ url_for('static', filename='templates/zenodo_deposit/results.html') }}">
+</invenio-search-results>
+{% endblock %}
+
+
+{%- block search_loading %}
+<div class="col-md-4">
+  <invenio-search-loading
+    template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/loading.html') }}"
+    message="{{ _('Loading...') }}">
+  </invenio-search-loading>
+</div>
+{%- endblock search_loading %}

@@ -87,6 +87,8 @@ ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 
 # Deposit
 # =======
+#: Template for deposit list view.
+DEPOSIT_UI_INDEX_TEMPLATE = "zenodo_deposit/index.html"
 #: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),

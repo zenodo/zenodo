@@ -22,22 +22,6 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo frontpage view."""
+"""Zenodo deposit additions."""
 
 from __future__ import absolute_import, print_function
-
-
-def test_frontpage(app, db, es):
-    """Test frontpage."""
-    with app.test_client() as client:
-        res = client.get("/")
-        assert res.status_code == 200
-        assert 'Recent uploads' in res.get_data(as_text=True)
-
-
-def test_ping(app):
-    """Test frontpage."""
-    with app.test_client() as client:
-        res = client.get("/ping")
-        assert res.status_code == 200
-        assert res.get_data(as_text=True) == "OK"

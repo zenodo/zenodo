@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,51 +22,34 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo frontpage blueprint."""
+"""Redirects for legacy URLs."""
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, render_template
-from flask_babelex import lazy_gettext as _
-from flask_menu import current_menu
-
-from .api import FrontpageRecordsSearch
+from flask import Blueprint, redirect, request, url_for
+from invenio_communities.models import Community
 
 blueprint = Blueprint(
-    'zenodo_frontpage',
+    'zenodo_deposit',
     __name__,
     url_prefix='',
     template_folder='templates',
+    static_folder='static',
 )
 
 
-@blueprint.before_app_first_request
-def init_menu():
-    """Initialize menu before first request."""
-    item = current_menu.submenu('main.deposit')
-    item.register(
-        'invenio_deposit_ui.index',
-        _('Uploads'),
-        order=2,
-    )
-    item = current_menu.submenu('main.communities')
-    item.register(
-        'invenio_communities.index',
-        _('Communities'),
-        order=2,
-    )
+@blueprint.route('/upload/')
+@blueprint.route('/deposit/')
+def legacy_index():
+    """Legacy deposit."""
+    c_id = request.args.get('c', type=str)
+    if c_id:
+        c = Community.get(c_id)
+        return redirect('/communities/{0}/upload'.format(c.id))
+    return redirect(url_for('invenio_deposit_ui.new'))
 
 
-@blueprint.route('/')
-def index():
-    """Frontpage blueprint."""
-    return render_template(
-        'zenodo_frontpage/index.html',
-        records=FrontpageRecordsSearch()[:10].sort('-_created').execute(),
-    )
-
-
-@blueprint.route('/ping', methods=['HEAD', 'GET'])
-def ping():
-    """Load balancer ping view."""
-    return 'OK'
+# @blueprint.route('/deposit/<int:deposit_id>/')
+# def deposit_index():
+#     """Legacy deposit."""
+#     return redirect(url_for('invenio_deposit_ui.new', deposit_id=deposit_id))
