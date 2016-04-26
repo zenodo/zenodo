@@ -28,6 +28,16 @@ from __future__ import absolute_import, print_function
 
 from pkg_resources import DistributionNotFound, get_distribution
 
+try:
+    # Import XRootDPyFS if available so opener gets registered on
+    # PyFilesystem.
+    get_distribution('xrootdpyfs')
+    import xrootdpyfs  # noqa
+    XROOTD_ENABLED = True
+except DistributionNotFound:
+    XROOTD_ENABLED = False
+    xrootdpyfs = None
+
 
 class ZenodoXRootD(object):
     """Zenodo xrootd extension."""
@@ -39,13 +49,5 @@ class ZenodoXRootD(object):
 
     def init_app(self, app):
         """Flask application initialization."""
-        try:
-            # Import XRootDPyFS if available so opener gets registered on
-            # PyFilesystem.
-            get_distribution('xrootdpyfs')
-            import xrootdpyfs  # noqa
-            app.config['XROOTD_ENABLED'] = True
-        except DistributionNotFound:
-            app.config['XROOTD_ENABLED'] = False
-
+        app.config['XROOTD_ENABLED'] = XROOTD_ENABLED
         app.extensions['zenodo-xrootd'] = self
