@@ -75,8 +75,8 @@ def make_query(values):
     """Get category for access right."""
     parts = []
     for k, v in values.items():
-        parts.append('{0}:"{1}"'.format(k, v))
-    return' '.join(parts)
+        parts.append(u'{0}:"{1}"'.format(k, v))
+    return u' '.join(parts)
 
 
 @blueprint.app_template_filter()
