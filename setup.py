@@ -113,12 +113,12 @@ install_requires = [
     'invenio-pages>=1.0.0a2',
     'invenio-pidstore>=1.0.0a7',
     'invenio-previewer>=1.0.0a2',
-    'invenio-records>=1.0.0a15',
     'invenio-records-rest>=1.0.0a10',
     'invenio-records-ui>=1.0.0a6',
+    'invenio-records>=1.0.0a15',
     'invenio-rest[cors]>=1.0.0a7',
-    'invenio-search>=1.0.0a7',
     'invenio-search-ui>=1.0.0a4',
+    'invenio-search>=1.0.0a7',
     'invenio-theme>=1.0.0a10',
     'invenio-userprofiles>=1.0.0a5',
     'jsonref>=0.1',
@@ -126,6 +126,7 @@ install_requires = [
     'marshmallow>=2.5.0',
     'Pillow>=3.2.0',
     'python-slugify>=1.2.0',
+    'raven<=5.1.0',
     'zenodo-migrationkit>=1.0.0.dev20150000',
 ]
 

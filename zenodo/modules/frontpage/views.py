@@ -46,14 +46,14 @@ def init_menu():
     item = current_menu.submenu('main.deposit')
     item.register(
         'invenio_deposit_ui.index',
-        _('Uploads'),
+        _('Upload'),
         order=2,
     )
     item = current_menu.submenu('main.communities')
     item.register(
         'invenio_communities.index',
         _('Communities'),
-        order=2,
+        order=3,
     )
 
 
