@@ -176,10 +176,12 @@
       "type": "number"
     },
     "doi": {
+      "title": "Digital Object Identifier",
       "description": "Digital Object Identifier (DOI).",
       "type": "string"
     },
     "isbn": {
+      "title": "International Standard Book Number",
       "description": "International Standard Book Number (ISBN).",
       "type": "string"
     },
@@ -189,6 +191,7 @@
     },
     "resource_type": {
       "description": "Record resource type.",
+      "default": "publication",
       "type": "object",
       "additionalProperties": false,
       "properties": {
@@ -206,7 +209,7 @@
       ]
     },
     "publication_date": {
-      "description": "Record publication date (IS8601-formatted). EDTF support to be added for field.",
+      "description": "Record publication date (ISO 8601-formatted). EDTF support to be added for field.",
       "type": "string"
     },
     "title": {
@@ -225,9 +228,11 @@
       "type": "string"
     },
     "keywords": {
+      "title": "Keywords",
       "description": "Free text keywords.",
       "type": "array",
       "items": {
+        "title": "Keyword",
         "type": "string"
       }
     },
@@ -254,6 +259,7 @@
       }
     },
     "notes": {
+      "title": "Additional notes",
       "description": "Additional notes for record.",
       "type": "string"
     },
@@ -264,6 +270,7 @@
     "access_right": {
       "description": "Access right for record.",
       "type": "string",
+      "default": "open",
       "enum": [
         "open",
         "embargoed",
@@ -272,14 +279,17 @@
       ]
     },
     "embargo_date": {
-      "description": "Embargo date of record (ISO8601 formatted date).",
+      "title": "Embargo Date",
+      "description": "Embargo date of record (ISO 8601 formatted date).",
       "type": "string"
     },
     "access_conditions": {
+      "title": "Access conditions",
       "description": "Conditions under which access is given if record is restricted.",
       "type": "string"
     },
     "license": {
+      "title": "License",
       "description": "License for embargoed/open access content.",
       "type": "object"
     },
@@ -287,6 +297,7 @@
       "description": "List of community identifiers.",
       "type": "array",
       "items": {
+        "title": "Community",
         "type": "string"
       }
     },
@@ -301,6 +312,7 @@
       "description": "Source of grants/awards which have funded all or part of this particular record.",
       "type": "array",
       "items": {
+        "title": "Grant",
         "type": "object"
       }
     },
@@ -308,6 +320,7 @@
       "description": "Related research outputs.",
       "type": "array",
       "items": {
+        "type": "object",
         "properties": {
           "identifier": {
             "description": "Identifier of research output.",
@@ -349,6 +362,7 @@
       }
     },
     "contributors": {
+      "title": "Contributors",
       "description": "Contributors in order of importance.",
       "type": "array",
       "items": {
@@ -374,22 +388,27 @@
       "additionalProperties": false,
       "properties": {
         "issue": {
+          "title": "Journal issue",
           "description": "Journal issue.",
           "type": "string"
         },
         "pages": {
+          "title": "Journal page(s)",
           "description": "Journal page(s).",
           "type": "string"
         },
         "volume": {
+          "title": "Journal volume",
           "description": "Journal volume.",
           "type": "string"
         },
         "title": {
+          "title": "Journal title",
           "description": "Journal title.",
           "type": "string"
         },
         "year": {
+          "title": "Journal year",
           "description": "Journal year.",
           "type": "string"
         }
@@ -403,24 +422,31 @@
         "additionalProperties": false,
         "properties": {
           "acronym": {
+            "title": "Acronym",
             "type": "string"
           },
           "title": {
+            "title": "Title",
             "type": "string"
           },
           "place": {
+            "title": "Place",
             "type": "string"
           },
           "dates": {
+            "title": "Dates",
             "type": "string"
           },
           "session": {
+            "title": "Session",
             "type": "string"
           },
           "session_part": {
+            "title": "Part of session",
             "type": "string"
           },
           "url": {
+            "title": "URL",
             "type": "string"
           }
         }
@@ -432,21 +458,27 @@
       "additionalProperties": false,
       "properties": {
         "publisher": {
+          "title": "Publisher",
           "type": "string"
         },
         "title": {
+          "title": "Title",
           "type": "string"
         },
         "isbn": {
+          "title": "ISBN",
           "type": "string"
         },
         "place": {
+          "title": "Place",
           "type": "string"
         },
         "pages": {
+          "title": "Pages",
           "type": "string"
         },
         "year": {
+          "title": "Year",
           "type": "string"
         }
       }
@@ -463,15 +495,24 @@
         }
       }
     },
-    "thesis_university": {
-      "description": "Awarding university in case of a thesis.",
-      "type": "string"
-    },
-    "thesis_supervisors": {
-      "description": "Supervisors of thesis in order of importance.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/person_or_org"
+    "thesis": {
+      "title": "Thesis",
+      "description": "Extra information in case of a thesis.",
+      "type": "object",
+      "properties": {
+        "university": {
+          "title": "Awarding university",
+          "description": "University awarding the title.",
+          "type": "string"
+        },
+        "supervisors": {
+          "title": "Supervisors",
+          "description": "Supervisors of the thesis in order of importance.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/person_or_org"
+          }
+        }
       }
     },
     "files": {
