@@ -92,7 +92,7 @@ install_requires = [
     'invenio-accounts>=1.0.0a10',
     'invenio-admin>=1.0.0a3',
     'invenio-assets>=1.0.0a4',
-    'invenio-base>=1.0.0a7',
+    'invenio-base>=1.0.0a8',
     'invenio-celery>=1.0.0a4',
     'invenio-communities>=1.0.0a3',
     'invenio-config>=1.0.0a1',
@@ -114,7 +114,7 @@ install_requires = [
     'invenio-pages>=1.0.0a2',
     'invenio-pidstore>=1.0.0a7',
     'invenio-previewer>=1.0.0a2',
-    'invenio-records-rest>=1.0.0a11',
+    'invenio-records-rest>=1.0.0a12',
     'invenio-records-ui>=1.0.0a6',
     'invenio-records>=1.0.0a15',
     'invenio-rest[cors]>=1.0.0a7',
@@ -173,6 +173,9 @@ setup(
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
         ],
+        'invenio_base.api_converters': [
+            'file_key = zenodo.modules.deposit.utils:FileKeyConverter',
+        ],
         'invenio_i18n.translations': [
             'messages = zenodo',
         ],
@@ -198,6 +201,7 @@ setup(
         ],
         'invenio_search.mappings': [
             'records = zenodo.modules.records.mappings',
+            'deposits = zenodo.modules.deposit.mappings',
         ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
