@@ -81,6 +81,7 @@ create_app = create_app_factory(
     config_loader=conf_loader,
     extension_entry_points=['invenio_base.apps'],
     blueprint_entry_points=['invenio_base.blueprints'],
+    converter_entry_points=['invenio_base.converters'],
     wsgi_factory=create_wsgi_factory({'/api': create_api}),
     instance_path=instance_path,
     static_folder=static_folder,

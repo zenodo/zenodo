@@ -36,12 +36,15 @@ import pytest
 from elasticsearch.exceptions import RequestError
 from flask_cli import ScriptInfo
 from invenio_db import db as db_
+from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Location
+from invenio_indexer import InvenioIndexer
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 from invenio_search import current_search, current_search_client
 from sqlalchemy_utils.functions import create_database, database_exists
+from invenio_oauth2server.models import Client, Token
 
 from zenodo.factory import create_app
 from zenodo.modules.records.serializers.bibtex import Bibtex
@@ -58,12 +61,15 @@ def app():
     )
 
     app = create_app(
+        CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
+        LOGIN_DISABLED=False,
+        OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI',
             'sqlite:///test.db'),
         TESTING=True,
-        CFG_SITE_NAME="testserver",
+        WTF_CSRF_ENABLED=False,
     )
 
     with app.app_context():
@@ -119,11 +125,64 @@ def es(app):
     try:
         list(current_search.create())
     except RequestError:
-        list(current_search.delete())
+        list(current_search.delete(ignore=[400, 404]))
         list(current_search.create())
     current_search_client.indices.refresh()
     yield current_search_client
     list(current_search.delete(ignore=[404]))
+
+
+@pytest.fixture()
+def users(app):
+    """Create users."""
+    with db_.session.begin_nested():
+        datastore = app.extensions['security'].datastore
+        user1 = datastore.create_user(email='info@zenodo.org',
+                                      password='tester', active=True)
+        user2 = datastore.create_user(email='test@zenodo.org',
+                                      password='tester2', active=True)
+    db_.session.commit()
+    return [{'email': user1.email, 'id': user1.id},
+            {'email': user2.email, 'id': user1.id}]
+
+
+@pytest.fixture()
+def client(app, users):
+    """Create client."""
+    with db_.session.begin_nested():
+        # create resource_owner -> client_1
+        client_ = Client(
+            client_id='client_test_u1c1',
+            client_secret='client_test_u1c1',
+            name='client_test_u1c1',
+            description='',
+            is_confidential=False,
+            user_id=users[0]['id'],
+            _redirect_uris='',
+            _default_scopes='',
+        )
+        db_.session.add(client_)
+    db_.session.commit()
+    return client_.client_id
+
+
+@pytest.fixture()
+def write_token(app, client, users):
+    """Create token."""
+    with db_.session.begin_nested():
+        token_ = Token(
+            client_id=client,
+            user_id=users[0]['id'],
+            access_token='dev_access_2',
+            refresh_token='dev_refresh_2',
+            expires=datetime.now() + timedelta(hours=10),
+            is_personal=False,
+            is_internal=True,
+            _scopes=write_scope.id,
+        )
+        db_.session.add(token_)
+    db_.session.commit()
+    return token_.access_token
 
 
 @pytest.fixture()
