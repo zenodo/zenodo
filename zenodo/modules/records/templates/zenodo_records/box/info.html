@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -121,6 +121,21 @@
     {%- endfor %}
     </dd>
   {%- endfor %}
+
+  {%- if record.alternate_identifiers %}
+    <dt>{{ _('Alternate identifiers') }}:</dt>
+    <dd>
+    {%- for alt_id in record.alternate_identifiers %}
+      {%- set alt_url = alt_id.identifier|pid_url(scheme=alt_id.scheme) %}
+      {%- if alt_url %}
+        <a href="{{alt_url}}">{{alt_id.identifier}}</a>
+      {%- else %}
+        <i>{{alt_id.identifier}}</i> ({{alt_id.scheme|upper}})
+      {%- endif %}
+      {%- if not loop.last %}, {% endif %}
+    {%- endfor %}
+    </dd>
+  {%- endif %}
 
   {#- FIXME: Communities -#}
 

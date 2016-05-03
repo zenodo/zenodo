@@ -1,5 +1,5 @@
 // This file is part of Zenodo.
-// Copyright (C) 2015 CERN.
+// Copyright (C) 2015, 2016 CERN.
 //
 // Zenodo is free software; you can redistribute it
 // and/or modify it under the terms of the GNU General Public License as
@@ -29,6 +29,14 @@
   dd {
     padding-left: 10px;
     margin-bottom: 4px;
+
+    .label {
+      display: inline-block;
+      margin-top: 2px;
+      line-height: inherit;
+      text-align: left;
+      white-space: normal;
+    }
   }
 }
 
