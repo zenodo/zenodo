@@ -97,6 +97,7 @@ Next, create the database and Elasticsearch indexes and an admin user:
    (zenodo)$ zenodo fixtures init
    (zenodo)$ zenodo users create info@zenodo.org -a
    (zenodo)$ zenodo access allow admin-access -e info@zenodo.org
+   (zenodo)$ zenodo access allow deposit-admin-access -e info@zenodo.org
 
 You must already have PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ for
 above to work.
