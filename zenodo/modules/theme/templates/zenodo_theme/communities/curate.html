@@ -30,6 +30,7 @@
   <script type="text/javascript">
   require([
     "node_modules/angular/angular",
+    "node_modules/angular-loading-bar/build/loading-bar",
     "node_modules/invenio-search-js/dist/invenio-search-js",
     "js/invenio_communities/module",
     "js/zenodo/module"
@@ -38,7 +39,8 @@
         angular.bootstrap(document.getElementById("invenio-communities-search"), [
             'invenioCommunities',
             'invenioSearch',
-            'zenodo'
+            'zenodo',
+            'angular-loading-bar',
           ]
         );
       });

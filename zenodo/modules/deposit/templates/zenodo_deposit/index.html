@@ -34,13 +34,15 @@
   <script type="text/javascript">
   require([
     "node_modules/angular/angular",
+    "node_modules/angular-loading-bar/build/loading-bar",
     "node_modules/invenio-search-js/dist/invenio-search-js",
     "js/zenodo/module"
     ], function() {
       angular.element(document).ready(function() {
         angular.bootstrap(document.getElementById("invenio-search"), [
             'invenioSearch',
-            'zenodo'
+            'zenodo',
+            'angular-loading-bar',
           ]
         );
       });
@@ -57,12 +59,4 @@
 </invenio-search-results>
 {% endblock %}
 
-
-{%- block search_loading %}
-<div class="col-md-4">
-  <invenio-search-loading
-    template="{{ url_for('static', filename='node_modules/invenio-search-js/dist/templates/loading.html') }}"
-    message="{{ _('Loading...') }}">
-  </invenio-search-loading>
-</div>
-{%- endblock search_loading %}
+{%- block search_loading %}{%- endblock search_loading %}

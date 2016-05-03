@@ -30,14 +30,20 @@ from flask_assets import Bundle
 from invenio_assets import NpmBundle
 
 css = NpmBundle(
-    'scss/styles.scss',
-    filters='scss, cleancss',
+    Bundle(
+        'scss/styles.scss',
+        filters='scss, cleancss',
+    ),
+    Bundle(
+        'node_modules/angular-loading-bar/build/loading-bar.css',
+        filters='cleancss',
+    ),
     depends=('scss/*.scss', ),
     output='gen/zenodo.%(version)s.css',
     npm={
-        "almond": "~0.3.1",
-        "bootstrap-sass": "~3.3.5",
-        "font-awesome": "~4.4.0"
+        'almond': '~0.3.1',
+        'bootstrap-sass': '~3.3.5',
+        'font-awesome': '~4.4.0',
     }
 )
 """Default CSS bundle."""
@@ -56,13 +62,15 @@ js = NpmBundle(
         'js/zenodo.js',
         'js/zenodo/*.js',
         'js/zenodo/filters/*.js',
+        'node_modules/angular-loading-bar/build/*.js',
     ),
     filters='jsmin',
     output="gen/zenodo.%(version)s.js",
     npm={
-        "almond": "~0.3.1",
-        "angular": "~1.4.9",
-        "angular-sanitize": "~1.4.9"
+        'almond': '~0.3.1',
+        'angular': '~1.4.9',
+        'angular-sanitize': '~1.4.9',
+        'angular-loading-bar': '~0.9.0',
     }
 )
 """Default JavaScript bundle."""
