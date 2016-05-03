@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from dateutil.parser import parse
+from flask import current_app
 from marshmallow import Schema, fields, post_dump
 
 
@@ -90,30 +91,9 @@ class RecordSchemaMARC(Schema):
 
     added_entry_meeting_name = fields.Method('get_added_entry_meeting_name')
 
-    main_entry_personal_name = fields.Function(
-        lambda o: [dict(
-            personal_name=v.get('name'),
-            affiliation=v.get('affiliation'),
-            authority_record_control_number_or_standard_number=[
-                "({0}){1}".format(scheme, identifier)
-                for (scheme, identifier) in v.items()
-                if identifier and scheme not in (
-                    'name', 'affiliation', 'familyname', 'givennames')
-            ],
-        ) for v in o['metadata'].get('creators', [])]
-    )
+    main_entry_personal_name = fields.Method('get_main_entry_personal_name')
 
-    added_entry_personal_name = fields.Function(
-        lambda o: [dict(
-            personal_name=v.get('name'),
-            affiliation=v.get('affiliation'),
-            relator_code=[
-                "({0}){1}".format(scheme, identifier)
-                for (scheme, identifier) in v.items()
-                if identifier and scheme not in ('name', 'affiliation', 'type')
-            ],
-        ) for v in o['metadata'].get('contributors', [])]
-    )
+    added_entry_personal_name = fields.Method('get_added_entry_personal_name')
 
     summary = fields.Function(
         lambda o: dict(summary=o['metadata'].get('description')))
@@ -136,6 +116,51 @@ class RecordSchemaMARC(Schema):
     embargo_date = fields.Raw(attribute='metadata.embargo_date')
 
     _oai = fields.Raw(attribute='metadata._oai')
+
+    def _get_personal_name(self, v, relator_code=None):
+        ids = []
+        for scheme in ['gnd', 'orcid', ]:
+            if v.get(scheme):
+                ids.append((scheme, v[scheme]))
+
+        return dict(
+            personal_name=v.get('name'),
+            affiliation=v.get('affiliation'),
+            authority_record_control_number_or_standard_number=[
+                "({0}){1}".format(scheme, identifier)
+                for (scheme, identifier) in ids
+            ],
+            relator_code=[relator_code] if relator_code else []
+        )
+
+    def get_main_entry_personal_name(self, o):
+        """Get main_entry_personal_name."""
+        creators = o['metadata'].get('creators', [])
+        if len(creators) > 0:
+            v = creators[0]
+            return self._get_personal_name(v)
+
+    def get_added_entry_personal_name(self, o):
+        """Get added_entry_personal_name."""
+        items = []
+        creators = o['metadata'].get('creators', [])
+        if len(creators) > 1:
+            for c in creators[1:]:
+                items.append(self._get_personal_name(c))
+
+        contributors = o['metadata'].get('contributors', [])
+        for c in contributors:
+            items.append(self._get_personal_name(
+                c, relator_code=self._map_contributortype(c.get('type'))))
+
+        supervisors = o['metadata'].get('thesis_supervisors', [])
+        for s in supervisors:
+            items.append(self._get_personal_name(s, relator_code='ths'))
+
+        return items
+
+    def _map_contributortype(self, type_):
+        return current_app.config['DEPOSIT_CONTRIBUTOR_DATACITE2MARC'][type_]
 
     def get_added_entry_meeting_name(self, o):
         """Get added_entry_meeting_name."""

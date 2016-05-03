@@ -105,6 +105,12 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Sponsor', marc='spn', datacite='Sponsor'),
     dict(label='Other', marc='oth', datacite='Other'),
 ]
+DEPOSIT_CONTRIBUTOR_MARC2DATACITE = {
+    x['marc']: x['datacite'] for x in DEPOSIT_CONTRIBUTOR_TYPES
+}
+DEPOSIT_CONTRIBUTOR_DATACITE2MARC = {
+    x['datacite']: x['marc'] for x in DEPOSIT_CONTRIBUTOR_TYPES
+}
 
 #: Default JSON Schema for deposit
 DEPOSIT_DEFAULT_JSONSCHEMA = 'zenodo_deposit/deposit-v1.0.0.json'

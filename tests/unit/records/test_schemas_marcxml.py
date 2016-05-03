@@ -86,7 +86,10 @@ def test_full_record(app, full_record):
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
          'gnd': '', 'orcid': ''},
         {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
-         'type': 'DataManager', 'gnd': '170118215', 'orcid': ''},
+         'type': 'DataManager'},
+    ]
+    full_record['thesis_supervisors'] = [
+        {'name': 'Smith, Professor'},
     ]
     assert Record(full_record).validate() is None
     full_record['description'] = 'Test Description'
@@ -187,47 +190,53 @@ def test_full_record(app, full_record):
             u'location_of_meeting':
             u'Harvard-Smithsonian Center for Astrophysics'
         }],
-        'main_entry_personal_name': [
-            {
-                u'affiliation': u'CERN', u'personal_name': u'Doe, John',
-                u'authority_record_control_number_or_standard_number': [
-                    u'(gnd)170118215', u'(orcid)0000-0002-1694-233X'
-                ]
-            },
-            {
-                u'affiliation': u'CERN', u'personal_name': u'Doe, Jane',
-                u'authority_record_control_number_or_standard_number': [
-                    u'(orcid)0000-0002-1825-0097'
-                ]
-            },
-            {
-                u'affiliation': u'CERN', u'personal_name': u'Smith, John',
-            },
-            {
-                u'affiliation': u'CERN', u'personal_name': u'Nowak, Jack',
-                u'authority_record_control_number_or_standard_number': [
-                    u'(gnd)170118215'
-                ]
-            }
-        ],
+        'main_entry_personal_name': {
+            u'affiliation': u'CERN',
+            u'personal_name': u'Doe, John',
+            u'authority_record_control_number_or_standard_number': [
+                u'(gnd)170118215', u'(orcid)0000-0002-1694-233X'
+            ]
+        },
         u'added_entry_personal_name': [
             {
                 u'affiliation': u'CERN',
-                u'relator_code': [
+                u'personal_name': u'Doe, Jane',
+                u'authority_record_control_number_or_standard_number': [
                     u'(orcid)0000-0002-1825-0097'
-                ],
-                u'personal_name': u'Smith, Other'
-            },
-            {
-                u'personal_name': u'Hansen, Viggo'
+                ]
             },
             {
                 u'affiliation': u'CERN',
-                u'relator_code': [
+                u'personal_name': u'Smith, John',
+            },
+            {
+                u'affiliation': u'CERN',
+                u'personal_name': u'Nowak, Jack',
+                u'authority_record_control_number_or_standard_number': [
                     u'(gnd)170118215'
-                ],
+                ]
+            },
+            {
+                u'affiliation': u'CERN',
+                u'relator_code': [u'oth'],
+                u'personal_name': u'Smith, Other',
+                u'authority_record_control_number_or_standard_number': [
+                    u'(orcid)0000-0002-1825-0097'
+                ]
+            },
+            {
+                u'personal_name': u'Hansen, Viggo',
+                u'relator_code': [u'oth'],
+            },
+            {
+                u'affiliation': u'CERN',
+                u'relator_code': [u'dtm'],
                 u'personal_name': u'Kowalski, Manager'
-            }
+            },
+            {
+                u'relator_code': [u'ths'],
+                u'personal_name': u'Smith, Professor'
+            },
         ],
         u'summary': {
             u'summary': u'Test Description'
@@ -279,11 +288,9 @@ def test_minimal_record(app, minimal_record):
         u'summary': {
             'summary': 'My description'
         },
-        u'main_entry_personal_name': [
-            {
-                'personal_name': 'Test'
-            }
-        ],
+        u'main_entry_personal_name': {
+            'personal_name': 'Test'
+        },
         u'resource_type': {
             'type': 'software'
         },
