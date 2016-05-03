@@ -60,6 +60,7 @@ create_celery = create_app_factory(
     config_loader=conf_loader,
     extension_entry_points=['invenio_base.apps'],
     blueprint_entry_points=['invenio_base.blueprints'],
+    converter_entry_points=['invenio_base.converters'],
     instance_path=instance_path,
     static_folder=static_folder,
 )
@@ -70,6 +71,7 @@ create_api = create_app_factory(
     config_loader=conf_loader,
     extension_entry_points=['invenio_base.api_apps'],
     blueprint_entry_points=['invenio_base.api_blueprints'],
+    converter_entry_points=['invenio_base.api_converters'],
     instance_path=instance_path,
 )
 """Create Flask API application."""
