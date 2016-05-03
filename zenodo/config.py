@@ -100,37 +100,11 @@ _PID = 'pid(dep,record_class="invenio_deposit.api:Deposit")'
 
 DEPOSIT_REST_ENDPOINTS = dict(
     dep=dict(
-        pid_type='dep',
-        pid_minter='deposit',
-        pid_fetcher='deposit',
-        record_class='invenio_deposit.api:Deposit',
-        files_serializers={
-            'application/json': ('invenio_deposit.serializers'
-                                 ':json_v1_files_response'),
-        },
-        record_serializers={
-            'application/json': ('invenio_records_rest.serializers'
-                                 ':json_v1_response'),
-        },
-        search_class='invenio_deposit.search:DepositSearch',
-        search_serializers={
-            'application/json': ('invenio_records_rest.serializers'
-                                 ':json_v1_search'),
-        },
-        list_route='/deposits/',
-        item_route='/deposits/<{0}:pid_value>'.format(_PID),
-        file_list_route='/deposits/<{0}:pid_value>/files/'.format(_PID),
-        file_item_route='/deposits/<{0}:pid_value>/files/<file_key:key>'.format(
-            _PID),
-        default_media_type='application/json',
-        links_factory_imp='invenio_deposit.links:deposit_links_factory',
-        create_permission_factory_imp=check_oauth2_scope_write,
-        read_permission_factory_imp=check_elasticsearch,
-        update_permission_factory_imp=check_elasticsearch,
-        delete_permission_factory_imp=check_elasticsearch,
-        max_result_window=10000,
+
     ),
 )
+#: Template for deposit list view.
+DEPOSIT_SEARCH_API = '/api/deposit/depositions/'
 #: Template for deposit list view.
 DEPOSIT_UI_INDEX_TEMPLATE = "zenodo_deposit/index.html"
 #: Allow list of contributor types.
@@ -159,9 +133,12 @@ DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'
 DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
 
 #: Endpoints for deposit.
-DEPOSIT_REST_ENDPOINTS = copy.deepcopy(INVENIO_DEPOSIT_REST_ENDPOINTS)
-DEPOSIT_REST_ENDPOINTS['dep'].update(
-    dict(
+DEPOSIT_REST_ENDPOINTS = dict(
+    dep=dict(
+        pid_type='dep',
+        pid_minter='deposit',
+        pid_fetcher='deposit',
+        record_class='invenio_deposit.api:Deposit',
         record_loaders={
             'application/json': (
                 'zenodo.modules.deposit.loaders:legacyjson_loader'),
@@ -173,14 +150,31 @@ DEPOSIT_REST_ENDPOINTS['dep'].update(
             'application/vnd.zenodo.v1+json': (
                 'invenio_records_rest.serializers:json_v1_response'),
         },
+        search_class='invenio_deposit.search:DepositSearch',
         search_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers:legacyjson_v1_search'),
             'application/vnd.zenodo.v1+json': (
                 'invenio_records_rest.serializers:json_v1_search'),
         },
+        files_serializers={
+            'application/json': ('invenio_deposit.serializers'
+                                 ':json_v1_files_response'),
+        },
         list_route='/deposit/depositions/',
-        item_route='/deposit/depositions/<pid_value>',
+        item_route='/deposit/depositions/<{0}:pid_value>'.format(_PID),
+        file_list_route=(
+            '/deposit/depositions/<{0}:pid_value>/files/'.format(_PID)),
+        file_item_route=(
+            '/deposit/depositions/<{0}:pid_value>/files/<file_key:key>'.format(
+                _PID)),
+        default_media_type='application/json',
+        links_factory_imp='invenio_deposit.links:deposit_links_factory',
+        create_permission_factory_imp=check_oauth2_scope_write,
+        read_permission_factory_imp=check_elasticsearch,
+        update_permission_factory_imp=check_elasticsearch,
+        delete_permission_factory_imp=check_elasticsearch,
+        max_result_window=10000,
     ),
 )
 
