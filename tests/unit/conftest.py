@@ -36,11 +36,12 @@ import pytest
 from elasticsearch.exceptions import RequestError
 from flask_cli import ScriptInfo
 from invenio_db import db as db_
-from invenio_files_rest.models import Location
+from invenio_files_rest.models import Bucket, Location, ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 from invenio_search import current_search, current_search_client
+from six import b, BytesIO
 from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
@@ -159,6 +160,45 @@ def recid_pid():
     return PersistentIdentifier(
         pid_type='recid', pid_value='123', status='R', object_type='rec',
         object_uuid=uuid4())
+
+
+@pytest.yield_fixture()
+def dummy_location(db):
+    """File system location."""
+    tmppath = tempfile.mkdtemp()
+
+    loc = Location(
+        name='testloc',
+        uri=tmppath,
+        default=True
+    )
+    db.session.add(loc)
+    db.session.commit()
+
+    yield loc
+
+    shutil.rmtree(tmppath)
+
+
+@pytest.fixture()
+def bucket(db, dummy_location):
+    """File system location."""
+    b1 = Bucket.create()
+    db.session.commit()
+    return b1
+
+
+@pytest.yield_fixture()
+def test_object(db, bucket):
+    """File system location."""
+    data_bytes = b('test object')
+    obj = ObjectVersion.create(
+        bucket, 'test.txt', stream=BytesIO(data_bytes),
+        size=len(data_bytes)
+    )
+    db.session.commit()
+
+    yield obj
 
 
 @pytest.fixture()
