@@ -1,0 +1,21 @@
+{
+    "_all": {
+        "enable": true
+    }, 
+    "properties": {
+        "_deposit": {
+            "type": "object", 
+            "properties": {
+                "id": {
+                    "type": "string"
+                }, 
+                "created_by": {
+                    "type": "integer"
+                }, 
+                "editors": {
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
