@@ -186,10 +186,14 @@ setup(
         'invenio_pidstore.minters': [
             'zenodo_record_minter '
             '= zenodo.modules.records.minters:zenodo_record_minter',
+            'zenodo_deposit_minter '
+            '= zenodo.modules.deposit.minters:zenodo_deposit_minter',
         ],
         'invenio_pidstore.fetchers': [
             'zenodo_record_fetcher '
             '= zenodo.modules.records.fetchers:zenodo_record_fetcher',
+            'zenodo_deposit_fetcher '
+            '= zenodo.modules.deposit.fetchers:zenodo_deposit_fetcher'
         ],
         'invenio_assets.bundles': [
             'zenodo_theme_css = zenodo.modules.theme.bundles:css',

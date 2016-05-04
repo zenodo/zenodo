@@ -136,8 +136,8 @@ DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
 DEPOSIT_REST_ENDPOINTS = dict(
     dep=dict(
         pid_type='dep',
-        pid_minter='deposit',
-        pid_fetcher='deposit',
+        pid_minter='zenodo_deposit_minter',
+        pid_fetcher='zenodo_deposit_fetcher',
         record_class='invenio_deposit.api:Deposit',
         record_loaders={
             'application/json': (
