@@ -51,37 +51,68 @@ from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
 @pytest.yield_fixture(scope='session')
-def app():
-    """Flask application fixture."""
-    instance_path = tempfile.mkdtemp()
+def instance_path():
+    """Default instance path."""
+    path = tempfile.mkdtemp()
 
+    yield path
+
+    shutil.rmtree(path)
+
+
+@pytest.fixture(scope='session')
+def env_config(instance_path):
+    """Default instance path."""
     os.environ.update(
         APP_INSTANCE_PATH=os.environ.get(
             'INSTANCE_PATH', instance_path),
     )
 
-    app = create_app(
+    return os.environ
+
+
+@pytest.fixture(scope='session')
+def config():
+    """Default configuration."""
+    return dict(
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
         LOGIN_DISABLED=False,
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI',
-            'sqlite:///test.db'),
+            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
         TESTING=True,
         WTF_CSRF_ENABLED=False,
     )
 
+
+@pytest.yield_fixture(scope='session')
+def app(env_config, config):
+    """Flask application fixture."""
+    app = create_app(**config)
+
     with app.app_context():
         yield app
-
-    shutil.rmtree(instance_path)
 
 
 @pytest.yield_fixture(scope='session')
 def api(app):
     """Flask application fixture."""
     yield app.wsgi_app.mounts['/api']
+
+
+@pytest.yield_fixture()
+def app_client(app):
+    """Flask test client for UI app."""
+    with app.test_client() as client:
+        yield client
+
+
+@pytest.yield_fixture()
+def api_client(api):
+    """Flask test client for API app."""
+    with api.test_client() as client:
+        yield client
 
 
 @pytest.yield_fixture(scope='session')
@@ -133,23 +164,23 @@ def es(app):
 
 
 @pytest.fixture()
-def users(app):
+def users(app, db):
     """Create users."""
-    with db_.session.begin_nested():
+    with db.session.begin_nested():
         datastore = app.extensions['security'].datastore
         user1 = datastore.create_user(email='info@zenodo.org',
                                       password='tester', active=True)
         user2 = datastore.create_user(email='test@zenodo.org',
                                       password='tester2', active=True)
-    db_.session.commit()
+    db.session.commit()
     return [{'email': user1.email, 'id': user1.id},
             {'email': user2.email, 'id': user1.id}]
 
 
 @pytest.fixture()
-def client(app, users):
+def oauth2_client(app, db, users):
     """Create client."""
-    with db_.session.begin_nested():
+    with db.session.begin_nested():
         # create resource_owner -> client_1
         client_ = Client(
             client_id='client_test_u1c1',
@@ -161,17 +192,17 @@ def client(app, users):
             _redirect_uris='',
             _default_scopes='',
         )
-        db_.session.add(client_)
-    db_.session.commit()
+        db.session.add(client_)
+    db.session.commit()
     return client_.client_id
 
 
 @pytest.fixture()
-def write_token(app, client, users):
+def write_token(app, db, oauth2_client, users):
     """Create token."""
-    with db_.session.begin_nested():
+    with db.session.begin_nested():
         token_ = Token(
-            client_id=client,
+            client_id=oauth2_client,
             user_id=users[0]['id'],
             access_token='dev_access_2',
             refresh_token='dev_refresh_2',
@@ -180,9 +211,14 @@ def write_token(app, client, users):
             is_internal=True,
             _scopes=write_scope.id,
         )
-        db_.session.add(token_)
-    db_.session.commit()
-    return token_.access_token
+        db.session.add(token_)
+    db.session.commit()
+    return dict(
+        token=token_,
+        auth_header=[
+            ('Authorization', 'Bearer {0}'.format(token_.access_token)),
+        ]
+    )
 
 
 @pytest.fixture()

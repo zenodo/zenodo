@@ -171,6 +171,14 @@
     "$schema": {
       "type": "string"
     },
+    "_deposit": {
+      "description": "Deposit information",
+      "type": "object"
+    },
+    "_files": {
+      "description": "Deposit information",
+      "type": "array"
+    },
     "recid": {
       "description": "Invenio record identifier (integer).",
       "type": "number"

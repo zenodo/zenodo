@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -33,7 +33,7 @@ def file_id_to_key(value):
     """Convert file UUID to value if in request context."""
     from invenio_files_rest.models import ObjectVersion
 
-    _, record = request.view_args['pid_value']
+    _, record = request.view_args['pid_value'].data
     if value in record.files:
         return value
 

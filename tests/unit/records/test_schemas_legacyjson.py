@@ -37,7 +37,7 @@ legacyjson_v1.replace_refs = False
 def test_id(minimal_record_model, depid_pid):
     """Test created."""
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
-    assert obj['id'] == int(depid_pid.pid_value)
+    assert obj['id'] == depid_pid.pid_value
 
 
 def test_created_modified(minimal_record_model, depid_pid):
@@ -64,7 +64,7 @@ def test_owners(minimal_record_model, depid_pid):
 
 def test_owners_deposit(minimal_record_model, depid_pid):
     """Test owners."""
-    minimal_record_model['_deposit'] = dict(editors=[3, 2, 1])
+    minimal_record_model['_deposit'] = dict(owners=[3, 2, 1])
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
     assert obj['owner'] == 3
 

@@ -23,23 +23,31 @@ from __future__ import absolute_import, print_function
 
 import hashlib
 import json
-from time import sleep
 
 from flask import url_for
+from invenio_deposit.api import Deposit
+from invenio_search import current_search
 from six import BytesIO
 
-from invenio_deposit.api import Deposit
+
+def get_json(response, code=None):
+    """Decode JSON from response."""
+    if code is not None:
+        assert response.status_code == code
+    return json.loads(response.get_data(as_text=True))
 
 
-def make_pdf_fixture(filename, text=None):
+def make_file_fixture(filename, text=None):
     """Generate a PDF fixture."""
-    content = text or b''
+    content = text or filename.encode('utf8')
     digest = 'md5:{0}'.format(hashlib.md5(content).hexdigest())
     return (BytesIO(content), filename)
 
 
-def test_simple_rest_flow(app, db, es, location, users, write_token):
+def test_simple_rest_flow(api, api_client, db, es, location, users,
+                          write_token):
     """Test simple flow using REST API."""
+    client = api_client
     test_data = dict(
         metadata=dict(
             upload_type='presentation',
@@ -50,106 +58,106 @@ def test_simple_rest_flow(app, db, es, location, users, write_token):
             ],
             description='Test Description',
             publication_date='2013-05-08',
+            access_right='open'
         )
     )
-    auth = [
-        ('Authorization', 'Bearer {0}'.format(write_token)),
+
+    # Prepare headers
+    auth = write_token['auth_header']
+    headers = [
+        ('Content-Type', 'application/json'),
+        ('Accept', 'application/json')
     ]
-    headers = [('Content-Type', 'application/json'),
-               ('Accept', 'application/json')]
     auth_headers = headers + auth
-    deposit_url = '/api/deposits/'
 
-    with app.test_client() as client:
-        # try create deposit as anonymous user (failing)
-        response = client.post(deposit_url, data=json.dumps(test_data),
-                               headers=headers)
-        assert response.status_code == 401
+    # Get deposit URL
+    with api.test_request_context():
+        deposit_url = url_for('invenio_deposit_rest.dep_list')
 
-        # Create deposition
-        response = client.post(deposit_url, data=json.dumps(test_data),
-                               headers=auth_headers)
-        assert response.status_code == 201
+    # Try to create deposit as anonymous user (failing)
+    response = client.post(
+        deposit_url, data=json.dumps(test_data), headers=headers)
+    assert response.status_code == 401
 
-        data = json.loads(response.data.decode('utf-8'))
-        deposit = data['metadata']
-        links = data['links']
+    # Create deposit
+    response = client.post(
+        deposit_url, data=json.dumps(test_data), headers=auth_headers)
+    links = get_json(response, code=201)['links']
 
-        sleep(5)
+    # Get deposition
+    current_search.flush_and_refresh(index='deposits')
+    response = client.get(links['self'], headers=auth)
+    assert response.status_code == 200
 
-        # Get deposition
-        response = client.get(links['self'], headers=auth)
-        assert response.status_code == 200
-
-        # Upload 3 files
-        for i in range(3):
-            response = client.post(
-                links['files'],
-                data={
-                    'file': make_pdf_fixture('test{0}.pdf'.format(i)),
-                    'name': 'test-{0}.pdf'.format(i),
-                },
-                headers=auth,
-            )
-            assert response.status_code == 201, i
-
-        # Publish deposition
-        response = client.post(links['publish'], headers=auth_headers)
-        assert response.status_code == 202
-
-        #
-        # Test for workflow status
-        #
-        # TODO check that record exists
-
-        # Second request will return forbidden since it's already published
-        response = client.post(links['publish'])
-        assert response.status_code == 403  # FIXME should be 400
-
-        # Not allowed to edit drafts
-        response = client.put(links['self'], data=json.dumps(test_data),
-                              headers=auth_headers)
-        assert response.status_code == 403
-
-        # Not allowed to delete
-        response = client.delete(links['self'], data=json.dumps(test_data),
-                                 headers=auth)
-        assert response.status_code == 403
-
-        # Not allowed to sort files
-        response = client.get(links['files'], headers=auth_headers)
-        assert response.status_code == 200
-
-        files_list = map(lambda x: {'id': x['id']}, response.json)
-        files_list.reverse()
-        response = client.put(links['files'], data=json.dumps(files_list),
-                              headers=auth)
-        assert response.status_code == 403
-
-        # Not allowed to add files
-        i = 5
+    # Upload 3 files
+    for i in range(3):
         response = client.post(
             links['files'],
             data={
-                'file': make_pdf_fixture('test{0}.pdf'.format(i)),
-                'name': 'test-{0}.pdf'.format(i),
+                'file': make_file_fixture('test{0}.txt'.format(i)),
+                'name': 'test-{0}.txt'.format(i),
             },
             headers=auth,
         )
-        assert response.status_code == 403
+        assert response.status_code == 201, i
 
-        # Not allowed to delete file
-        assert links['files'][-1] == '/'
-        response = client.delete(links['files'] + files_list[0]['id'],
-                                 headers=auth)
-        assert response.status_code == 403
+    # Publish deposition
+    response = client.post(links['publish'], headers=auth_headers)
+    record_id = get_json(response, code=202)['record_id']
 
-        # Not allowed to rename file
-        response = client.put(
-            links['files'] + files_list[0]['id'],
-            data=json.dumps(dict(filename='another_test.pdf')),
-            headers=auth_headers,
-        )
-        assert response.status_code == 403
+    # Does record exists?
+    current_search.flush_and_refresh(index='records')
+    response = client.get(
+        url_for('invenio_records_rest.recid_item', pid_value=record_id))
 
-        # check submitted record
+    # Second request will return forbidden since it's already published
+    response = client.post(links['publish'], headers=auth_headers)
+    assert response.status_code == 403  # FIXME should be 400
+
+    # Not allowed to edit drafts
+    response = client.put(
+        links['self'], data=json.dumps(test_data), headers=auth_headers)
+    assert response.status_code == 403
+
+    # Not allowed to delete
+    response = client.delete(
+        links['self'], data=json.dumps(test_data), headers=auth)
+    assert response.status_code == 403
+
+    # Not allowed to sort files
+    response = client.get(links['files'], headers=auth_headers)
+    data = get_json(response, code=200)
+
+    files_list = list(map(lambda x: {'id': x['id']}, data))
+    files_list.reverse()
+    response = client.put(
+        links['files'], data=json.dumps(files_list), headers=auth)
+    assert response.status_code == 403
+
+    # Not allowed to add files
+    i = 5
+    response = client.post(
+        links['files'],
+        data={
+            'file': make_file_fixture('test{0}.txt'.format(i)),
+            'name': 'test-{0}.txt'.format(i),
+        },
+        headers=auth,
+    )
+    assert response.status_code == 403
+
+    # Not allowed to delete file
+    assert links['files'][-1] == '/'
+    response = client.delete(
+        links['files'] + files_list[0]['id'], headers=auth)
+    assert response.status_code == 403
+
+    # Not allowed to rename file
+    response = client.put(
+        links['files'] + files_list[0]['id'],
+        data=json.dumps(dict(filename='another_test.pdf')),
+        headers=auth_headers,
+    )
+    assert response.status_code == 403
+
+    # check submitted record

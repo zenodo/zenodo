@@ -25,6 +25,7 @@
 """Zenodo legacy JSON schema."""
 
 import idutils
+from flask import url_for
 from marshmallow import Schema, fields, post_dump
 
 
@@ -209,9 +210,12 @@ class MetadataSchemaV1(Schema):
         """Clean empty values."""
         data = self.clean_imprint_partof(data)
         empty_keys = [
-            'publication_type',
+            'communities',
+            'grants',
             'image_type',
-            'communities'
+            'publication_type',
+            'related_identifiers',
+
         ]
         return clean_empty(data, empty_keys)
 
@@ -223,7 +227,8 @@ class LegacyJSONSchemaV1(Schema):
     doi = fields.Str(attribute='metadata.doi')
     doi_url = DOILink(attribute='metadata.doi')
     files = fields.List(fields.Nested(FileSchemaV1))
-    id = fields.Integer(attribute='pid.pid_value')
+    # Make into integer
+    id = fields.String(attribute='pid.pid_value')
     metadata = fields.Nested(MetadataSchemaV1, attribute='metadata')
     modified = fields.Str(attribute='updated')
     owner = fields.Method('get_owners')
@@ -232,12 +237,13 @@ class LegacyJSONSchemaV1(Schema):
     state = fields.String()
     submitted = fields.Boolean()
     title = fields.String(attribute='metadata.title')
+    links = fields.Raw()
 
     def get_owners(self, obj):
         """Get owners."""
         if '_deposit' in obj['metadata']:
             try:
-                return obj['metadata']['_deposit'].get('editors', [])[0]
+                return obj['metadata']['_deposit'].get('owners', [])[0]
             except IndexError:
                 return None
         elif 'owners' in obj['metadata']:
