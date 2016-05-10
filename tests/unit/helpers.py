@@ -22,27 +22,15 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Persistent identifier minters."""
+"""Helpers."""
 
-from __future__ import absolute_import
-
-import uuid
-from datetime import datetime
-
-from invenio_pidstore.models import RecordIdentifier
-
-from .providers import ZenodoDepositProvider
+from copy import deepcopy
 
 
-def zenodo_deposit_minter(record_uuid, data):
-    """Mint a deposit identifier."""
-    provider = ZenodoDepositProvider.create(
-        object_type='rec',
-        object_uuid=record_uuid,
-        pid_value=RecordIdentifier.next(),
+def fill_oauth2_headers(json_headers, token):
+    """Create authentication headers (with a valid oauth2 token)."""
+    headers = deepcopy(json_headers)
+    headers.append(
+        ('Authorization', 'Bearer {0}'.format(token['token'].access_token))
     )
-    data['_deposit'] = {
-        'id': provider.pid.pid_value,
-        'status': 'draft',
-    }
-    return provider.pid
+    return headers

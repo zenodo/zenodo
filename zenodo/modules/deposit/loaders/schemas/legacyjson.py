@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function
 
 import idutils
 from marshmallow import Schema, fields, missing, post_dump
+from datetime import datetime
 
 from zenodo.modules.records.serializers import fields as zfields
 
@@ -162,7 +163,9 @@ class LegacyRecordSchemaV1(Schema):
 
     doi = zfields.DOI(attribute='metadata.doi')
     resource_type = fields.Nested(ResourceTypeSchema, attribute='metadata')
-    publication_date = fields.String(attribute='metadata.publication_date')
+    publication_date = fields.String(
+        attribute='metadata.publication_date',
+        default=datetime.utcnow().date().isoformat())
     title = fields.String(attribute='metadata.title')
     creators = fields.List(
         fields.Nested(PersonSchema),
@@ -173,7 +176,8 @@ class LegacyRecordSchemaV1(Schema):
         fields.Nested(SubjectSchema),
         attribute='metadata.subjects')
     notes = fields.String(attribute='metadata.notes')
-    access_right = fields.String(attribute='metadata.access_right')
+    access_right = fields.String(attribute='metadata.access_right',
+                                 default='open')
     embargo_date = fields.String(attribute='metadata.embargo_date')
     access_conditions = fields.String(attribute='metadata.access_conditions')
     license = fields.Method('get_license')

@@ -29,9 +29,8 @@ import uuid
 import pytest
 from flask import url_for
 from flask_principal import ActionNeed
-
-from invenio_accounts.models import User
 from invenio_access.models import ActionUsers
+from invenio_accounts.models import User
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records import Record
 from invenio_records_files.models import RecordsBuckets

@@ -31,10 +31,9 @@ import copy
 import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
+from invenio_formatter.filters.datetime import from_isodate
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
-
-from invenio_formatter.filters.datetime import from_isodate
 
 from .models import AccessRight, ObjectType
 from .permissions import has_access

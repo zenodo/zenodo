@@ -26,8 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_records.api import Record
 from flask import current_app
+from invenio_records.api import Record
 
 
 def test_grant_linking(app, db, minimal_record, grant_record):

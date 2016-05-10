@@ -35,7 +35,13 @@ from uuid import UUID, uuid4
 import pytest
 from elasticsearch.exceptions import RequestError
 from flask_cli import ScriptInfo
+from flask_security import login_user
+from helpers import fill_oauth2_headers
+from invenio_access.models import ActionUsers
+from invenio_accounts.testutils import create_test_user
 from invenio_db import db as db_
+from invenio_deposit.api import Deposit
+from invenio_deposit.permissions import action_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
 from invenio_oauth2server.models import Client, Token
@@ -166,15 +172,19 @@ def es(app):
 @pytest.fixture()
 def users(app, db):
     """Create users."""
+    user1 = create_test_user(email='info@zenodo.org', password='tester')
+    user2 = create_test_user(email='test@zenodo.org', password='tester2')
+    user_admin = create_test_user(email='admin@zenodo.org',
+                                  password='admin')
     with db.session.begin_nested():
-        datastore = app.extensions['security'].datastore
-        user1 = datastore.create_user(email='info@zenodo.org',
-                                      password='tester', active=True)
-        user2 = datastore.create_user(email='test@zenodo.org',
-                                      password='tester2', active=True)
+        # set admin permissions
+        db.session.add(ActionUsers(action=action_admin_access.value,
+                                   user=user_admin))
+
     db.session.commit()
     return [{'email': user1.email, 'id': user1.id},
-            {'email': user2.email, 'id': user1.id}]
+            {'email': user2.email, 'id': user2.id},
+            {'email': user_admin.email, 'id': user_admin.id}]
 
 
 @pytest.fixture()
@@ -456,3 +466,45 @@ def license_record(db):
         object_uuid=license.id, status='R')
     db.session.commit()
     return license
+
+
+@pytest.fixture()
+def deposit(app, es, users, location):
+    """New deposit with files."""
+    record = dict(
+        metadata=dict(
+            upload_type='presentation',
+            title='Test title',
+            creators=[
+                dict(name='Doe, John', affiliation='Atlantis'),
+                dict(name='Smith, Jane', affiliation='Atlantis')
+            ],
+            description='Test Description',
+            publication_date='2013-05-08',
+            access_right='open'
+        )
+    )
+    with app.test_request_context():
+        datastore = app.extensions['security'].datastore
+        login_user(datastore.get_user(users[0]['email']))
+        deposit = Deposit.create(record)
+        deposit.commit()
+        db_.session.commit()
+    current_search.flush_and_refresh(index='deposits')
+    return deposit
+
+
+@pytest.fixture()
+def json_headers(app):
+    """JSON headers."""
+    return [('Content-Type', 'application/json'),
+            ('Accept', 'application/json')]
+
+
+@pytest.fixture()
+def oauth2_headers_user_1(app, json_headers, write_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return fill_oauth2_headers(json_headers, write_token)

@@ -23,7 +23,9 @@ from __future__ import absolute_import, print_function
 
 import json
 
+import pytest
 from flask import url_for
+from invenio_accounts.testutils import login_user_via_view
 from invenio_search import current_search
 from six import BytesIO
 
@@ -156,3 +158,121 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
         headers=auth_headers,
     )
     assert response.status_code == 403
+
+
+@pytest.mark.parametrize('user_info,status', [
+    # anonymous user
+    (None, 401),
+    # owner
+    (dict(email='info@zenodo.org', password='tester'), 200),
+    # not owner
+    (dict(email='test@zenodo.org', password='tester2'), 403),
+    # admin user
+    (dict(email='admin@zenodo.org', password='admin'), 200),
+])
+def test_read_deposit_users(api, api_client, db, users, deposit, json_headers,
+                            user_info, status):
+    """Test read deposit by users."""
+    deposit_id = deposit['_deposit']['id']
+    with api.test_request_context():
+        with api.test_client() as client:
+            if user_info:
+                # Login as user
+                login_user_via_view(client, user_info['email'],
+                                    user_info['password'])
+
+            res = client.get(
+                url_for('invenio_deposit_rest.dep_item',
+                        pid_value=deposit_id),
+                headers=json_headers
+            )
+            assert res.status_code == status
+
+
+@pytest.mark.parametrize('user_info,status,count_deposit', [
+    # anonymous user
+    (None, 401, 0),
+    # owner
+    (dict(email='info@zenodo.org', password='tester'), 200, 1),
+    # not owner
+    (dict(email='test@zenodo.org', password='tester2'), 200, 0),
+    # admin user
+    (dict(email='admin@zenodo.org', password='admin'), 200, 1),
+])
+def test_read_deposits_users(api, api_client, db, users, deposit, json_headers,
+                             user_info, status, count_deposit):
+    """Test read deposit by users."""
+    with api.test_request_context():
+        with api.test_client() as client:
+            if user_info:
+                # Login as user
+                login_user_via_view(client, user_info['email'],
+                                    user_info['password'])
+
+            res = client.get(
+                url_for('invenio_deposit_rest.dep_list'),
+                headers=json_headers
+            )
+            assert res.status_code == status
+            if user_info:
+                data = json.loads(res.data.decode('utf-8'))
+                assert len(data) == count_deposit
+
+
+@pytest.mark.parametrize('user_info,status', [
+    # anonymous user
+    (None, 401),
+    # owner
+    (dict(email='info@zenodo.org', password='tester'), 200),
+    # not owner
+    (dict(email='test@zenodo.org', password='tester2'), 403),
+    # admin user
+    (dict(email='admin@zenodo.org', password='admin'), 200),
+])
+def test_update_deposits_users(api, api_client, db, users, deposit,
+                               json_headers, user_info, status):
+    """Test read deposit by users."""
+    deposit_id = deposit['_deposit']['id']
+    with api.test_request_context():
+        with api.test_client() as client:
+            if user_info:
+                # Login as user
+                login_user_via_view(client, user_info['email'],
+                                    user_info['password'])
+
+            res = client.put(
+                url_for('invenio_deposit_rest.dep_item',
+                        pid_value=deposit_id),
+                data=json.dumps({}),
+                headers=json_headers
+            )
+            assert res.status_code == status
+
+
+@pytest.mark.parametrize('user_info,status', [
+    # anonymous user
+    (None, 401),
+    # owner
+    (dict(email='info@zenodo.org', password='tester'), 204),
+    # not owner
+    (dict(email='test@zenodo.org', password='tester2'), 403),
+    # admin user
+    (dict(email='admin@zenodo.org', password='admin'), 204),
+])
+def test_delete_deposits_users(api, api_client, db, users, deposit,
+                               json_headers, user_info, status):
+    """Test read deposit by users."""
+    deposit_id = deposit['_deposit']['id']
+    with api.test_request_context():
+        with api.test_client() as client:
+            if user_info:
+                # Login as user
+                login_user_via_view(client, user_info['email'],
+                                    user_info['password'])
+
+            res = client.delete(
+                url_for('invenio_deposit_rest.dep_item',
+                        pid_value=deposit_id),
+                headers=json_headers
+            )
+            assert res.status_code == status

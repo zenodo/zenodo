@@ -25,16 +25,16 @@
 """Zenodo license fixture loading."""
 
 from __future__ import absolute_import, print_function
+
 import json
 from collections import OrderedDict
 
 from invenio_db import db
-from invenio_pidstore.errors import PIDDoesNotExistError
-from invenio_records.api import Record
-
 from invenio_opendefinition.minters import license_minter
 from invenio_opendefinition.resolvers import license_resolver
 from invenio_opendefinition.validators import license_validator
+from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_records.api import Record
 
 from .utils import read_json
 

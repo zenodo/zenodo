@@ -24,7 +24,10 @@
 
 from __future__ import absolute_import, print_function
 
+from datetime import datetime
+
 from invenio_deposit.api import Deposit
+
 from zenodo.modules.deposit.loaders import legacyjson_v1_translator
 
 
@@ -37,7 +40,10 @@ def defaults(**kwargs):
     """Simple helper to translate small part of legacy JSON."""
     d = {
         '$schema': (
-            'https://zenodo.org/schemas/deposits/records/record-v1.0.0.json')}
+            'https://zenodo.org/schemas/deposits/records/record-v1.0.0.json'),
+        'access_right': 'open',
+        'publication_date': datetime.utcnow().date().isoformat()
+    }
     d.update(kwargs)
     return d
 

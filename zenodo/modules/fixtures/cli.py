@@ -35,10 +35,10 @@ from invenio_communities.utils import initialize_communities_bucket
 
 from .files import loaddemofiles, loadlocation
 from .grants import loadfp6grants
+from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .pages import loadpages
 from .records import loaddemorecords
-from .licenses import loadlicenses, matchlicenses
 
 
 @click.group()
