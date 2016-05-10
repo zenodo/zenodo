@@ -38,6 +38,7 @@ from .grants import loadfp6grants
 from .oai import loadoaisets
 from .pages import loadpages
 from .records import loaddemorecords
+from .licenses import loadlicenses, matchlicenses
 
 
 @click.group()
@@ -113,3 +114,21 @@ def loaddemorecords_cli():
 def loaddemofiles_cli(source):
     """Load demo files."""
     loaddemofiles(source)
+
+
+@fixtures.command('loadlicenses')
+@with_appcontext
+def loadlicenses_cli():
+    """Load Zenodo licenses."""
+    loadlicenses()
+
+
+@fixtures.command('matchlicenses')
+@click.argument('legacy_source', type=click.Path(exists=True, dir_okay=False,
+                                                 resolve_path=True))
+@click.argument('od_source', type=click.Path(exists=True, dir_okay=False,
+                                             resolve_path=True))
+@click.argument('destination', type=click.Path(exists=False, dir_okay=False))
+def matchlicenses_cli(legacy_source, od_source, destination):
+    """Match legacy Zenodo licenses with OpenDefinition.org licenses."""
+    matchlicenses(legacy_source, od_source, destination)
