@@ -34,6 +34,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from elasticsearch.exceptions import RequestError
+from flask import url_for
 from flask_cli import ScriptInfo
 from flask_security import login_user
 from helpers import fill_oauth2_headers
@@ -47,6 +48,7 @@ from invenio_oauth2server.models import Client, Token
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
+from invenio_records_files.api import Record as RecordFile, RecordsBuckets
 from invenio_search import current_search, current_search_client
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
@@ -387,6 +389,32 @@ def full_record():
     )
     record['$schema'] = 'http://zenodo.org/schemas/records/record-v1.0.0.json'
     return record
+
+
+@pytest.fixture()
+def record_with_bucket(full_record, bucket, db):
+    """Create a bucket."""
+    record = RecordFile.create(full_record)
+    RecordsBuckets.create(bucket=bucket, record=record.model)
+    pid = PersistentIdentifier.create(
+        pid_type='recid', pid_value=1, object_type='rec',
+        object_uuid=record.id, status='R')
+    db.session.commit()
+    return pid, record
+
+
+@pytest.fixture()
+def record_with_files_creation(db, record_with_bucket):
+    """Creation of a full record with files in database."""
+    pid, record = record_with_bucket
+    filename = 'Test.pdf'
+    record.files[filename] = BytesIO(b'v1')
+    record.files[filename]['type'] = 'pdf'
+    record.commit()
+
+    record_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value)
+
+    return pid, record, record_url
 
 
 @pytest.yield_fixture()
