@@ -182,7 +182,7 @@ class DataCiteSchemaJSONV1(Schema):
         items = [
             {'rightsURI': eurepo,
              'rights': '{0} access'.format(
-                obj['metadata']['access_right']).title()}
+                 obj['metadata']['access_right']).title()}
         ]
 
         # license

@@ -52,7 +52,7 @@ def test_full_record(app, full_record):
         },
     ]
     assert Record(full_record).validate() is None
-    full_record['meetings'] = {
+    full_record['meeting'] = {
         'title': 'The 13th Biennial HITRAN Conference',
         'place': 'Harvard-Smithsonian Center for Astrophysics',
         'dates': '23-25 June, 2014',
@@ -88,7 +88,7 @@ def test_full_record(app, full_record):
         {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
          'type': 'DataManager'},
     ]
-    full_record['thesis_supervisors'] = [
+    full_record['thesis']['supervisors'] = [
         {'name': 'Smith, Professor'},
     ]
     assert Record(full_record).validate() is None

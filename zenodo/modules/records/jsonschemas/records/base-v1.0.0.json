@@ -1,7 +1,7 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
-  "id": "http://zenodo.org/schemas/records/record-v1.0.0.json",
-  "title": "Zenodo Deposit Schema v1.0.0",
+  "id": "http://zenodo.org/schemas/records/base-v1.0.0.json",
+  "title": "Zenodo Base Record Schema v1.0.0",
   "definitions": {
     "person_or_org": {
       "type": "object",
@@ -158,20 +158,15 @@
   },
   "type": "object",
   "properties": {
+    "$schema": {
+      "type": "string"
+    },
     "recid": {
       "description": "Invenio record identifier (integer).",
       "type": "number"
     },
     "doi": {
       "description": "Digital Object Identifier (DOI).",
-      "type": "string"
-    },
-    "isbn": {
-      "description": "International Standard Book Number (ISBN).",
-      "type": "string"
-    },
-    "altmetric_id": {
-      "description": "Almetric.com identifier.",
       "type": "string"
     },
     "resource_type": {
@@ -277,13 +272,6 @@
         "type": "string"
       }
     },
-    "provisional_communities": {
-      "description": "List of provisional community identifiers. To be removed.",
-      "type": "array",
-      "items": {
-        "type": "string"
-      }
-    },
     "grants": {
       "description": "Source of grants/awards which have funded all or part of this particular record.",
       "type": "array",
@@ -382,8 +370,8 @@
         }
       }
     },
-    "meetings": {
-      "description": "Associated meetings.",
+    "meeting": {
+      "description": "Associated meeting.",
       "type": "object",
       "properties": {
         "acronym": {
@@ -414,22 +402,10 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "publisher": {
-          "type": "string"
-        },
         "title": {
           "type": "string"
         },
-        "isbn": {
-          "type": "string"
-        },
-        "place": {
-          "type": "string"
-        },
         "pages": {
-          "type": "string"
-        },
-        "year": {
           "type": "string"
         }
       }
@@ -443,18 +419,27 @@
         },
         "place": {
           "type": "string"
+        },
+        "isbn": {
+          "type": "string"
         }
       }
     },
-    "thesis_university": {
-      "description": "Awarding university in case of a thesis.",
-      "type": "string"
-    },
-    "thesis_supervisors": {
-      "description": "Supervisors of thesis in order of importance.",
-      "type": "array",
-      "items": {
-        "$ref": "#/definitions/person_or_org"
+    "thesis": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "university": {
+          "description": "Awarding university in case of a thesis.",
+          "type": "string"
+        },
+        "supervisors": {
+          "description": "Supervisors of thesis in order of importance.",
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/person_or_org"
+          }
+        }
       }
     },
     "files": {
@@ -536,13 +521,6 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "state": {
-          "type": "string",
-          "enum": [
-            "draft",
-            "published"
-          ]
-        },
         "comments": {
           "description": "Comments for internal purposes.",
           "type": "array",

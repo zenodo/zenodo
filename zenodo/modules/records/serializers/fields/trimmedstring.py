@@ -22,29 +22,17 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Deposit loaders."""
+"""Trimmed string field."""
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.records.serializers.schemas.json import RecordSchemaJSONV1
+from marshmallow import fields
 
-from ..validators import legacyjson_validator
-from .base import json_loader, marshmallow_dumper, marshmallow_loader
-from .schemas.legacyjson import LegacyRecordSchemaV1
 
-# Translators
-# ===========
-#: Legacy deposit dictionary translator.
-legacyjson_v1_translator = marshmallow_dumper(LegacyRecordSchemaV1)
-#: JSON v1 deposit translator.
-json_v1_translator = marshmallow_loader(RecordSchemaJSONV1)
+class TrimmedString(fields.String):
+    """String field which strips whitespace the ends of the string."""
 
-# Loaders
-# =======
-#: Legacy deposit JSON record loader.
-legacyjson_v1 = json_loader(
-    pre_validator=legacyjson_validator,
-    translator=legacyjson_v1_translator,
-)
-#: JSON deposit record loader.
-json_v1 = json_loader(translator=json_v1_translator)
+    def _deserialize(self, value, attr, data):
+        """Deserialize DOI value."""
+        value = super(TrimmedString, self)._deserialize(value, attr, data)
+        return value.strip()

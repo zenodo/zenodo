@@ -153,7 +153,7 @@ class RecordSchemaMARC(Schema):
             items.append(self._get_personal_name(
                 c, relator_code=self._map_contributortype(c.get('type'))))
 
-        supervisors = o['metadata'].get('thesis_supervisors', [])
+        supervisors = o['metadata'].get('thesis', {}).get('supervisors', [])
         for s in supervisors:
             items.append(self._get_personal_name(s, relator_code='ths'))
 
@@ -164,7 +164,7 @@ class RecordSchemaMARC(Schema):
 
     def get_added_entry_meeting_name(self, o):
         """Get added_entry_meeting_name."""
-        v = o['metadata'].get('meetings', {})
+        v = o['metadata'].get('meeting', {})
         return [dict(
             meeting_name_or_jurisdiction_name_as_entry_element=v.get('title'),
             location_of_meeting=v.get('place'),

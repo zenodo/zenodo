@@ -21,11 +21,9 @@
 
 from __future__ import absolute_import, print_function
 
-import hashlib
 import json
 
 from flask import url_for
-from invenio_deposit.api import Deposit
 from invenio_search import current_search
 from six import BytesIO
 
@@ -40,7 +38,6 @@ def get_json(response, code=None):
 def make_file_fixture(filename, text=None):
     """Generate a PDF fixture."""
     content = text or filename.encode('utf8')
-    digest = 'md5:{0}'.format(hashlib.md5(content).hexdigest())
     return (BytesIO(content), filename)
 
 
@@ -147,17 +144,15 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
     assert response.status_code == 403
 
     # Not allowed to delete file
-    assert links['files'][-1] == '/'
+    file_url = '{0}/{1}'.format(links['files'], files_list[0]['id'])
     response = client.delete(
-        links['files'] + files_list[0]['id'], headers=auth)
+        file_url, headers=auth)
     assert response.status_code == 403
 
     # Not allowed to rename file
     response = client.put(
-        links['files'] + files_list[0]['id'],
+        file_url,
         data=json.dumps(dict(filename='another_test.pdf')),
         headers=auth_headers,
     )
     assert response.status_code == 403
-
-    # check submitted record

@@ -186,7 +186,7 @@ def test_get_publisher(app, bibtex_records):
 def test_get_school(bibtex_records):
     """Test."""
     (record_good, record_bad, record_empty, test_record) = bibtex_records
-    assert test_record['thesis_university'] == record_good._get_school()
+    assert test_record['thesis']['university'] == record_good._get_school()
     assert "" == record_empty._get_school()
 
 

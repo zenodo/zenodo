@@ -45,8 +45,16 @@ def json_loader(pre_validator=None, post_validator=None, translator=None):
     return loader
 
 
-def marshmallow_translator(schema_class, mapper=None):
-    """Basic marshmallow translator generator."""
+def marshmallow_dumper(schema_class):
+    """Basic marshmallow dumper generator."""
     def translator(obj):
         return schema_class().dump(obj).data
+    return translator
+
+
+def marshmallow_loader(schema_class):
+    """Basic marshmallow loader generator."""
+    def translator(obj):
+        data, errrors = schema_class().load(obj).data
+        return data
     return translator

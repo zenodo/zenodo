@@ -348,7 +348,7 @@ def full_record():
             {'identifier': '1234.4321', 'scheme':
                 'arxiv', 'relation': 'cites'},
         ],
-        meetings={
+        meeting={
             'title': 'The 13th Biennial HITRAN Conference',
             'place': 'Harvard-Smithsonian Center for Astrophysics',
             'dates': '23-25 June, 2014',
@@ -356,7 +356,6 @@ def full_record():
             'session': 'VI',
             'session_part': '1',
         },
-        altmetric_id='9876',
         references=[
             {'raw_reference': 'Doe, John et al (2012). Some title. ZENODO. '
              '10.5281/zenodo.12'},
@@ -364,7 +363,8 @@ def full_record():
              '10.5281/zenodo.34'},
         ],
         part_of={
-            'title': 'Bum'
+            'title': 'Bum',
+            'pages': '1-2',
         },
         journal={
             'title': 'Bam',
@@ -372,7 +372,9 @@ def full_record():
             'pages': '20',
             'volume': '20'
         },
-        thesis_university='I guess important',
+        thesis={
+            'university': 'I guess important',
+        }
     )
     record['$schema'] = 'http://zenodo.org/schemas/records/record-v1.0.0.json'
     return record

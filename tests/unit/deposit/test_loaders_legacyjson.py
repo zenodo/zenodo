@@ -25,12 +25,12 @@
 from __future__ import absolute_import, print_function
 
 from invenio_deposit.api import Deposit
-from zenodo.modules.deposit.loaders import legacyjson_translator
+from zenodo.modules.deposit.loaders import legacyjson_v1_translator
 
 
 def t(**kwargs):
     """Simple helper to translate small part of legacy JSON."""
-    return legacyjson_translator(dict(metadata=kwargs))
+    return legacyjson_v1_translator(dict(metadata=kwargs))
 
 
 def defaults(**kwargs):
@@ -46,7 +46,7 @@ def test_direct_mapping():
     """Test fields that maps directly."""
     fields = [
         'publication_date', 'title', 'description', 'notes', 'embargo_date',
-        'access_right', 'thesis_university', 'doi', 'access_conditions']
+        'access_right', 'doi', 'access_conditions']
 
     for f in fields:
         assert t(**{f: 'TEST'}) == defaults(**{f: 'TEST'})
@@ -69,18 +69,38 @@ def test_resource_type():
         defaults(resource_type=dict(type='invalid'))
 
 
-def test_creators_supervisors():
+def test_creators():
     """Test creators and thesis supervisors."""
-    for k in ['creators', 'thesis_supervisors']:
-        assert t(**{k: [
+    assert t(**{'creators': [
+        dict(name="Doe, John", affiliation="Atlantis",
+             orcid="0000-0002-1825-0097", gnd="170118215"),
+        dict(name="Smith, Jane", affiliation="Atlantis")
+    ]}) == defaults(**{'creators': [
+        dict(name="Doe, John", affiliation="Atlantis",
+             orcid="0000-0002-1825-0097", gnd="170118215"),
+        dict(name="Smith, Jane", affiliation="Atlantis")
+    ]})
+
+
+def test_thesis():
+    """Test creators and thesis supervisors."""
+    assert t(**{
+        'thesis_supervisors': [
             dict(name="Doe, John", affiliation="Atlantis",
                  orcid="0000-0002-1825-0097", gnd="170118215"),
             dict(name="Smith, Jane", affiliation="Atlantis")
-        ]}) == defaults(**{k: [
-            dict(name="Doe, John", affiliation="Atlantis",
-                 orcid="0000-0002-1825-0097", gnd="170118215"),
-            dict(name="Smith, Jane", affiliation="Atlantis")
-        ]})
+        ],
+        'thesis_university': 'Important'
+    }) == defaults(**{
+        'thesis': {
+            'supervisors': [
+                dict(name="Doe, John", affiliation="Atlantis",
+                     orcid="0000-0002-1825-0097", gnd="170118215"),
+                dict(name="Smith, Jane", affiliation="Atlantis")
+            ],
+            'university': 'Important',
+        }
+    })
 
 
 def test_contributors():
@@ -190,7 +210,7 @@ def test_meetings():
         conference_url='http://someurl.com',
         conference_session='VI',
         conference_session_part='1',
-    ) == defaults(meetings=dict(
+    ) == defaults(meeting=dict(
         acronym='Some acronym',
         dates='Some dates',
         place='Some place',
@@ -218,7 +238,6 @@ def test_imprint():
         imprint_publisher="Some publisher",
     ) == defaults(
         imprint=dict(
-            year="2016",
             place="Some place",
             publisher="Some publisher"
         ),
@@ -244,12 +263,13 @@ def test_partof():
         imprint_isbn="Some isbn",
     ) == defaults(
         part_of=dict(
-            year="2016",
+            pages="Some pages",
+            title="Some title",
+        ),
+        imprint=dict(
             place="Some place",
             publisher="Some publisher",
             isbn="Some isbn",
-            pages="Some pages",
-            title="Some title",
         ),
         publication_date="2016-01-01"
     )
@@ -368,4 +388,4 @@ def test_legacyjson_to_record_translation(app, db, es, grant_record,
             upload_type="publication",
         )
     )
-    Deposit.create(legacyjson_translator(test_data)).validate()
+    Deposit.create(legacyjson_v1_translator(test_data)).validate()

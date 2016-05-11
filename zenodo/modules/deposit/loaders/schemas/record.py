@@ -22,29 +22,6 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Deposit loaders."""
+"""Marshmallow schemas for Zenodo record validation."""
 
 from __future__ import absolute_import, print_function
-
-from zenodo.modules.records.serializers.schemas.json import RecordSchemaJSONV1
-
-from ..validators import legacyjson_validator
-from .base import json_loader, marshmallow_dumper, marshmallow_loader
-from .schemas.legacyjson import LegacyRecordSchemaV1
-
-# Translators
-# ===========
-#: Legacy deposit dictionary translator.
-legacyjson_v1_translator = marshmallow_dumper(LegacyRecordSchemaV1)
-#: JSON v1 deposit translator.
-json_v1_translator = marshmallow_loader(RecordSchemaJSONV1)
-
-# Loaders
-# =======
-#: Legacy deposit JSON record loader.
-legacyjson_v1 = json_loader(
-    pre_validator=legacyjson_validator,
-    translator=legacyjson_v1_translator,
-)
-#: JSON deposit record loader.
-json_v1 = json_loader(translator=json_v1_translator)

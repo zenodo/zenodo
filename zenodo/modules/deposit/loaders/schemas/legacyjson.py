@@ -27,7 +27,9 @@
 from __future__ import absolute_import, print_function
 
 import idutils
-from marshmallow import Schema, fields, post_dump
+from marshmallow import Schema, fields, missing, post_dump
+
+from zenodo.modules.records.serializers import fields as zfields
 
 
 class PersonSchema(Schema):
@@ -104,7 +106,7 @@ class LicenseSchema(Schema):
 
 
 class ReferenceSchema(Schema):
-    """Schema for Zenodo references."""
+    """Schema for references."""
 
     raw_reference = fields.Function(lambda x: x)
 
@@ -122,6 +124,14 @@ class ImprintSchema(Schema):
     isbn = fields.String(attribute='imprint_isbn')
     place = fields.String(attribute='imprint_place')
     publisher = fields.String(attribute='imprint_publisher')
+
+
+class ThesisSchema(Schema):
+    """Schema for thesis."""
+
+    university = fields.String(attribute='thesis_university')
+    supervisors = fields.Nested(
+        PersonSchema, attribute='thesis_supervisors', many=True)
 
 
 class ActionSchema(Schema):
@@ -144,20 +154,13 @@ class ResourceTypeSchema(Schema):
         elif type_ == 'image':
             return obj.get('image_type')
         else:
-            return None
-
-    @post_dump(pass_many=False)
-    def clean(self, data):
-        """Cleanup."""
-        if not data['subtype']:
-            del data['subtype']
-        return data
+            return missing
 
 
-class ZenodoRecordSchemaV1(Schema):
+class LegacyRecordSchemaV1(Schema):
     """Marshmallow schema for legacy JSON to Zenodo record."""
 
-    doi = fields.String(attribute='metadata.doi')
+    doi = zfields.DOI(attribute='metadata.doi')
     resource_type = fields.Nested(ResourceTypeSchema, attribute='metadata')
     publication_date = fields.String(attribute='metadata.publication_date')
     title = fields.String(attribute='metadata.title')
@@ -188,13 +191,10 @@ class ZenodoRecordSchemaV1(Schema):
         fields.Nested(ReferenceSchema),
         attribute='metadata.references')
     journal = fields.Nested(JournalSchema, attribute='metadata')
-    meetings = fields.Nested(MeetingSchema, attribute='metadata')
+    meeting = fields.Nested(MeetingSchema, attribute='metadata')
     part_of = fields.Nested(PartOfSchema, attribute='metadata')
     imprint = fields.Nested(ImprintSchema, attribute='metadata')
-    thesis_university = fields.String(attribute='metadata.thesis_university')
-    thesis_supervisors = fields.List(
-        fields.Nested(PersonSchema),
-        attribute='metadata.thesis_supervisors')
+    thesis = fields.Nested(ThesisSchema, attribute='metadata')
     _deposit_actions = fields.Nested(ActionSchema, attribute='metadata')
 
     def get_grants(self, obj):
@@ -213,7 +213,7 @@ class ZenodoRecordSchemaV1(Schema):
                 res.append({
                     '$ref': 'https://dx.zenodo.org/grants/{0}'.format(grant_id)
                 })
-        return res
+        return res if res else missing
 
     def get_license(self, obj):
         """Get license."""
@@ -222,18 +222,18 @@ class ZenodoRecordSchemaV1(Schema):
             return {
                 '$ref': 'https://dx.zenodo.org/licenses/{0}'.format(l_id)
             }
-        return None
+        return missing
 
     def split_related_identifers(self, obj, schema_class, test):
         """Split into related/alternate identifiers."""
         res = []
-        for r in obj['metadata'].get('related_identifiers', []):
+        for r in obj.get('metadata', {}).get('related_identifiers', []):
             # Problem that API accepted one relation while documentation
             # presented a different relation.
             if test(r.get('relation'), [
                     'isAlternativeIdentifier', 'isAlternateIdentifier']):
                 res.append(schema_class().dump(r).data)
-        return res
+        return res if res else missing
 
     def get_related_identifiers(self, obj):
         """Get related identifiers."""
@@ -263,7 +263,7 @@ class ZenodoRecordSchemaV1(Schema):
     @post_dump(pass_many=False)
     def clean(self, data):
         """Clean empty values."""
-        data = self.clean_imprint_partof(data)
+        # data = self.clean_imprint_partof(data)
 
         empty_keys = [
             '_deposit_actions',
@@ -273,11 +273,12 @@ class ZenodoRecordSchemaV1(Schema):
             'imprint',
             'journal',
             'license',
-            'meetings',
+            'meeting',
             'part_of',
             'provisional_communities',
             'related_identifiers',
             'resource_type',
+            'thesis',
         ]
 
         for k in empty_keys:

@@ -165,7 +165,10 @@ class ObjectType(object):
         if not value:
             return None
         if 'subtype' in value:
-            internal_id = "{0}-{1}".format(value['type'], value['subtype'])
+            internal_id = "{0}-{1}".format(
+                value.get('type', ''),
+                value.get('subtype', '')
+            )
         else:
             internal_id = value['type']
         return cls.get(internal_id)

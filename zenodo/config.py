@@ -141,7 +141,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
         record_class='invenio_deposit.api:Deposit',
         record_loaders={
             'application/json': (
-                'zenodo.modules.deposit.loaders:legacyjson_loader'),
+                'zenodo.modules.deposit.loaders:legacyjson_v1'),
             'application/vnd.zenodo.v1+json': lambda: request.get_json(),
         },
         record_serializers={
@@ -161,10 +161,10 @@ DEPOSIT_REST_ENDPOINTS = dict(
             'application/json': ('invenio_deposit.serializers'
                                  ':json_v1_files_response'),
         },
-        list_route='/deposit/depositions/',
+        list_route='/deposit/depositions',
         item_route='/deposit/depositions/<{0}:pid_value>'.format(_PID),
         file_list_route=(
-            '/deposit/depositions/<{0}:pid_value>/files/'.format(_PID)),
+            '/deposit/depositions/<{0}:pid_value>/files'.format(_PID)),
         file_item_route=(
             '/deposit/depositions/<{0}:pid_value>/files/<file_key:key>'.format(
                 _PID)),

@@ -469,7 +469,7 @@ class Bibtex(object):
 
     def _get_school(self):
         """Return the school where the thesis was written."""
-        return self.record.get("thesis_university", "")
+        return self.record.get("thesis", {}).get("university", "")
 
     def _get_url(self):
         """Return the WWW address."""
