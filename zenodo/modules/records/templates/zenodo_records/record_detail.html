@@ -52,7 +52,7 @@
         </span>
       </p>
       <h1 itemprop="name">{{ record.title }}</h1>
-      <p>{{ authors(record.authors) }}</p>
+      <p>{{ authors(record.creators) }}</p>
       <p itemprop="description">{{ record.description|safe }}</p>
       {%- if record.notes %}
       <div class="alert alert-warning">
@@ -94,7 +94,7 @@
     $('.preview-link').on('click', function(event) {
       $('#preview').show();
       var filename = encodeURIComponent($(event.target).data('filename'));
-      $('#preview-iframe').attr("src","{{ url_for('invenio_records_ui.record_preview', pid_value=record.recid, filename='') }}" + filename);
+      $('#preview-iframe').attr("src","{{ url_for('invenio_records_ui.recid_preview', pid_value=record.recid, filename='') }}" + filename);
     });
   });
 </script>

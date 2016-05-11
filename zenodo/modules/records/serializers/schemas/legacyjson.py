@@ -25,7 +25,6 @@
 """Zenodo legacy JSON schema."""
 
 import idutils
-from flask import url_for
 from marshmallow import Schema, fields, post_dump
 
 

@@ -64,7 +64,7 @@ before_install:
   - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/elasticsearch &"
   - "travis_retry pip install --upgrade pip setuptools py"
-  - "travis_retry pip install twine wheel coveralls requirements-builder"
+  - "travis_retry pip install wheel coveralls requirements-builder"
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-base-requirements.txt"
   - "requirements-builder --level=pypi setup.py > .travis-release-requirements.txt"

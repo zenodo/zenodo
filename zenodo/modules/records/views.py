@@ -170,11 +170,14 @@ def select_preview_file(files):
     """Get list of files and select one for preview."""
     selected = None
     for f in files:
-        if f.get('type') in current_previewer.previewable_extensions:
-            if selected is None:
-                selected = f
-            elif f.get('default'):
-                selected = f
+        try:
+            if f['type'] in current_previewer.previewable_extensions:
+                if selected is None:
+                    selected = f
+                elif f['default']:
+                    selected = f
+        except KeyError:
+            pass
     return selected
 
 

@@ -22,44 +22,27 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Persistent identifier field."""
+"""DOI field."""
 
 from __future__ import absolute_import, print_function
 
-import idutils
-from flask_babelex import lazy_gettext as _
+import arrow
+from arrow.parser import ParserError
 from marshmallow import fields, missing
 
 
-class PersistentId(fields.String):
-    """Special DOI field."""
-
-    default_error_messages = {
-        'invalid_scheme': _('Not a valid {scheme} identifier.'),
-        'invalid_pid': _('Not a valid persistent identifier.'),
-    }
-
-    def __init__(self, scheme=None, normalize=True, *args, **kwargs):
-        """Initialize field."""
-        super(PersistentId, self).__init__(*args, **kwargs)
-        self.scheme = scheme
-        self.normalize = normalize
+class DateString(fields.Date):
+    """ISO8601-formatted date string."""
 
     def _serialize(self, value, attr, obj):
-        """Serialize persistent identifier value."""
-        if not value:
+        """Serialize an ISO8601-formatted date."""
+        try:
+            return super(DateString, self)._serialize(
+                arrow.get(value).date(), attr, obj)
+        except ParserError:
             return missing
-        return value
 
     def _deserialize(self, value, attr, data):
-        """Deserialize persistent identifier value."""
-        value = super(PersistentId, self)._deserialize(value, attr, data)
-        value = value.strip()
-
-        schemes = idutils.detect_identifier_schemes(value)
-        if self.scheme and self.scheme.lower() not in schemes:
-            self.fail('invalid_scheme', scheme=self.scheme)
-        if not schemes:
-            self.fail('invalid_pid')
-        return idutils.normalize_pid(value, schemes[0]) \
-            if self.normalize else value
+        """Deserialize an ISO8601-formatted date."""
+        return super(DateString, self)._deserialize(
+            value, attr, data).isoformat()

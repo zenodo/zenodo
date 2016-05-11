@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+from .datetime import DateString
 from .doi import DOI
 from .persistentid import PersistentId
 from .trimmedstring import TrimmedString

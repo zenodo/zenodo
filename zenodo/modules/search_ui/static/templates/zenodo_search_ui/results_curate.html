@@ -9,7 +9,7 @@
     </div>
     <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ record.metadata.
     publication_date|date:'longDate' }}</span>
-    <span class="label label-default">{{ record.metadata.type_title }}</span>
+    <span class="label label-default">{{ record.metadata.resource_type.title }}</span>
     <span ng-switch on="record.metadata.access_right">
       <span ng-switch-when="embargoed">
           <span class="label label-{{record.metadata.access_right_category}} titlecase" data-toggle="tooltip" data-placement="top" title="Available as Open Access after {{ record.metadata.embargo_date|date:'longDate' }}">{{ record.metadata.access_right }} Access</span>

@@ -158,5 +158,5 @@ def test_records_ui_export(app, db, full_record):
     with app.test_client() as client:
         for f, val in formats.items():
             res = client.get(url_for(
-                'invenio_records_ui.record_export', pid_value='1', format=f))
+                'invenio_records_ui.recid_export', pid_value='1', format=f))
             assert res.status_code == 410 if val is None else 200

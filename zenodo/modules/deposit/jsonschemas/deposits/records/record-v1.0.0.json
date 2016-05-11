@@ -8,6 +8,9 @@
     },
     {
       "$ref": "https://zenodo.org/schemas/records/base-v1.0.0.json"
+    },
+    {
+      "$ref": "https://zenodo.org/schemas/records/file-v1.0.0.json"
     }
   ]
 }

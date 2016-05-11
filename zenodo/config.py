@@ -104,7 +104,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
     ),
 )
 #: Template for deposit list view.
-DEPOSIT_SEARCH_API = '/api/deposit/depositions/'
+DEPOSIT_SEARCH_API = '/api/deposit/depositions'
 #: Template for deposit list view.
 DEPOSIT_UI_INDEX_TEMPLATE = "zenodo_deposit/index.html"
 #: Allow list of contributor types.
@@ -346,23 +346,27 @@ RECORDS_UI_ENDPOINTS = dict(
         pid_type='recid',
         route='/record/<pid_value>',
         template='zenodo_records/record_detail.html',
+        record_class='invenio_records_files.api:Record',
     ),
-    record_export=dict(
+    recid_export=dict(
         pid_type='recid',
         route='/record/<pid_value>/export/<any({0}):format>'.format(", ".join(
             list(ZENODO_RECORDS_EXPORTFORMATS.keys()))),
         template='zenodo_records/record_export.html',
         view_imp='zenodo.modules.records.views.records_ui_export',
+        record_class='invenio_records_files.api:Record',
     ),
-    record_preview=dict(
+    recid_preview=dict(
         pid_type='recid',
         route='/record/<pid_value>/preview/<filename>',
         view_imp='invenio_previewer.views.preview',
+        record_class='invenio_records_files.api:Record',
     ),
-    record_files=dict(
+    recid_files=dict(
         pid_type='recid',
         route='/record/<pid_value>/files/<filename>',
         view_imp='invenio_files_rest.views.file_download_ui',
+        record_class='invenio_records_files.api:Record',
     ),
 )
 #: Default tombstone template.
@@ -381,6 +385,7 @@ RECORDS_REST_ENDPOINTS = dict(
         list_route='/records/',
         item_route='/records/<pid(recid):pid_value>',
         search_index='records',
+        record_class='invenio_records_files.api:Record',
         search_type=['record-v1.0.0'],
         search_factory_imp='invenio_records_rest.query.es_search_factory',
         record_serializers={
@@ -495,10 +500,10 @@ RECORDS_REST_FACETS = dict(
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
-            type=terms_filter('resource_type.type'),
-            subtype=terms_filter('resource_type.subtype'),
             file_type=terms_filter('files.type'),
             keywords=terms_filter('keywords'),
+            subtype=terms_filter('resource_type.subtype'),
+            type=terms_filter('resource_type.type'),
         )
     )
 )

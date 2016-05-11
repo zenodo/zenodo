@@ -105,6 +105,7 @@
         "arxiv",
         "doi",
         "bibcode",
+        "ean8",
         "ean13",
         "eissn",
         "handle",
@@ -438,51 +439,6 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/person_or_org"
-          }
-        }
-      }
-    },
-    "files": {
-      "description": "Files for this record.",
-      "type": "array",
-      "items": {
-        "type": "object",
-        "additionalProperties": false,
-        "require": [
-          "bucket",
-          "filename",
-          "version_id",
-          "size",
-          "checksum"
-        ],
-        "properties": {
-          "bucket": {
-            "description": "Bucket identifier for file.",
-            "type": "string"
-          },
-          "filename": {
-            "description": "Filename.",
-            "type": "string"
-          },
-          "version_id": {
-            "description": "Filename.",
-            "type": "string"
-          },
-          "size": {
-            "description": "File size in bytes.",
-            "type": "number"
-          },
-          "checksum": {
-            "description": "Checksums of file.",
-            "type": "string"
-          },
-          "previewer": {
-            "description": "Identifier for previewer needed to preview this file.",
-            "type": "string"
-          },
-          "type": {
-            "description": "File type extension.",
-            "type": "string"
           }
         }
       }

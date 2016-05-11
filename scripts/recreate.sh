@@ -23,7 +23,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-zenodo db drop --yes-i-know
+zenodo db destroy --yes-i-know
+zenodo db init
 zenodo db create
 zenodo index destroy --force --yes-i-know
 zenodo index init

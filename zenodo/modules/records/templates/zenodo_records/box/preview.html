@@ -26,7 +26,7 @@
 
 {% set selected_file = files|select_preview_file %}
 
-{%- if selected_file and record.access_right == "open" -%}
+{%- if files -%}
   {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
   <div class="panel panel-{{state}}" id="preview">
     <div class="panel-heading">
@@ -37,7 +37,7 @@
       </a>
     </div>
     <div id="collapseOne" class="collapse in">
-        {{- preview_file('invenio_records_ui.record_preview', pid=pid, filename=selected_file.filename) }}
+        {{- preview_file('invenio_records_ui.recid_preview', pid=pid, filename=selected_file.key) }}
     </div>
   </div>
 {%- endif %}

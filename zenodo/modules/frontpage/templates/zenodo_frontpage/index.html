@@ -61,7 +61,7 @@
             {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
             <br />
             <h4><a href="{{ record_url }}">{{r.title}}</a></h4>
-            <p>{{ authors(r.authors) }}</p>
+            <p>{{ authors(r.creators) }}</p>
             <p class="hidden-xs"><a href="{{record_url}}">{{ r.description|striptags|truncate(300) }}</a></p>
             <small class="text-muted hidden-xs">
               {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}.{% endtrans %}

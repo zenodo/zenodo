@@ -33,11 +33,10 @@ from os.path import dirname, join
 import arrow
 from elasticsearch_dsl.utils import AttrDict
 from flask import current_app
-from flask_babelex import gettext
+from flask_babelex import format_date, gettext
 from invenio_search import current_search_client
 from invenio_search.api import RecordsSearch
 from jsonref import JsonRef
-from six import string_types
 from speaklater import make_lazy_gettext
 
 _ = make_lazy_gettext(lambda: gettext)
@@ -118,7 +117,8 @@ class AccessRight(object):
     @classmethod
     def as_description(cls, value, embargo_date=None):
         """Get description for a specific status."""
-        return cls._description[value].format(date=embargo_date)
+        return cls._description[value].format(
+            date=format_date(embargo_date, 'long'))
 
     @classmethod
     def as_category(cls, value, **kwargs):

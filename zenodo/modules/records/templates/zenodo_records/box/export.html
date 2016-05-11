@@ -23,9 +23,9 @@
 -#}
 <h4>{{_('Export')}}</h4>
 <ul class="list-inline">
-  <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='hx') }}">BibTeX</a></li>
-  <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='json') }}">JSON</a></li>
-  <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='dcite3') }}">DataCite</a></li>
-  <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='xd') }}">Dublin Core</a></li>
-  <li><a href="{{ url_for('invenio_records_ui.record_export', pid_value=pid.pid_value, format='xm') }}">MARCXML</a></li>
+  <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='hx') }}">BibTeX</a></li>
+  <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='json') }}">JSON</a></li>
+  <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='dcite3') }}">DataCite</a></li>
+  <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='xd') }}">Dublin Core</a></li>
+  <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='xm') }}">MARCXML</a></li>
 </ul>

@@ -74,13 +74,13 @@ def test_file_permissions(app, db, test_object,  # fixtures
         object_uuid=rec_uuid,
         status=PIDStatus.REGISTERED
     )
-    r = Record.create({
+    Record.create({
         'recid': 1,
         'owners': [2],
         'access_right': access_right,
-        'files': [
+        '_files': [
             {
-                'filename': test_object.key,
+                'key': test_object.key,
                 'bucket': str(test_object.bucket_id),
                 'checksum': 'invalid'
             },
@@ -91,7 +91,7 @@ def test_file_permissions(app, db, test_object,  # fixtures
     )
 
     file_url = url_for(
-        'invenio_records_ui.record_files',
+        'invenio_records_ui.recid_files',
         pid_value='1',
         filename=test_object.key
     )

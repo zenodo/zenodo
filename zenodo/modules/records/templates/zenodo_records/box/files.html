@@ -21,8 +21,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
-
 {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
+{%- if record._files -%}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
@@ -35,7 +35,7 @@
   {% if record.access_right|accessright_get(record.embargo_date) != 'open' %}
     {% set title = record.access_right|accessright_title(record.embargo_date) %}
     {% set icon = record.access_right|accessright_icon(record.embargo_date) %}
-    {% set description = record.access_right|accessright_description(record.embargo_date) %} 
+    {% set description = record.access_right|accessright_description(record.embargo_date) %}
     <div class="panel-body">
       <h5><i class="fa {{ icon -}}"></i> {{ title -}}</h5>
       <p><small class="text-muted">{{- description -}}</small></p>
@@ -50,12 +50,12 @@
       </tr>
     </thead>
     <tbody>
-    {%- for file in files|sort(attribute='filename') -%}
-    {%- set file_url = url_for('invenio_records_ui.record_files', pid_value=pid.pid_value, filename=file.filename) %}
+    {%- for file in files|sort(attribute='key') -%}
+    {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key) %}
       <tr class="">
-          <td><a class="forcewrap" href="{{file_url}}">{{ file.filename }}</a><br /><small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{_('This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity.')}}">{{file.checksum}}</small></td>
+          <td><a class="forcewrap" href="{{file_url}}">{{ file.key }}</a><br /><small class="text-muted" data-toggle="tooltip" data-placement="top" title="{{_('This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity.')}}">{{file.checksum}}</small></td>
           <td class="nowrap">{{ file.size|filesizeformat }}</td>
-          <td class="nowrap"><span class="pull-right">{% if file.type is previewable %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.filename}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> {% endif %}<a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
+          <td class="nowrap"><span class="pull-right">{% if file.type is previewable %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.key}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> {% endif %}<a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
         </tr>
       {%- endfor -%}
       </tbody>
@@ -63,3 +63,4 @@
   {%- endif %}
   </div>
 </div>
+{%- endif %}

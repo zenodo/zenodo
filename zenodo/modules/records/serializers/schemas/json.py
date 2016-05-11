@@ -201,7 +201,7 @@ class MetadataSchemaV1(Schema):
 
     doi = zfields.DOI()
     resource_type = fields.Nested(ResourceTypeSchema)
-    publication_date = fields.Date(
+    publication_date = zfields.DateString(
         default=datetime.utcnow().date()
     )
     title = zfields.TrimmedString(
@@ -218,7 +218,7 @@ class MetadataSchemaV1(Schema):
     access_right = fields.Str()
     access_right_category = fields.Method(
         'get_access_right_category', dump_only=True)
-    embargo_date = fields.Date()
+    embargo_date = zfields.DateString()
     access_conditions = fields.Str()
     # TODO
     license = fields.Str(attribute="license.identifier")
