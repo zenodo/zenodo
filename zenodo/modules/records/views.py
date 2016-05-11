@@ -34,7 +34,10 @@ from flask import Blueprint, current_app, render_template, request
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
+from invenio_formatter.filters.datetime import from_isodate
+
 from .models import AccessRight, ObjectType
+from .permissions import has_access
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -64,6 +67,16 @@ def is_embargoed(embargo_date, accessright=None):
 
 
 @blueprint.app_template_filter()
+def accessright_get(value, embargo_date=None):
+    """Get access right.
+
+    Better than comparing record.access_right directly as access_right
+    may have not yet been updated after the embargo_date has passed.
+    """
+    return AccessRight.get(value, embargo_date)
+
+
+@blueprint.app_template_filter()
 def accessright_category(value, embargo_date=None, **kwargs):
     """Get category for access right."""
     return AccessRight.as_category(
@@ -84,6 +97,27 @@ def accessright_title(value, embargo_date=None):
     """Get category for access right."""
     return AccessRight.as_title(
         AccessRight.get(value, embargo_date=embargo_date))
+
+
+@blueprint.app_template_filter()
+def accessright_icon(value, embargo_date=None):
+    """Get icon for access right."""
+    return AccessRight.as_icon(AccessRight.get(value, embargo_date))
+
+
+@blueprint.app_template_filter()
+def accessright_description(value, embargo_date=None):
+    """Get a description for access right."""
+    return AccessRight.as_description(
+        AccessRight.get(value, embargo_date),
+        from_isodate(embargo_date)
+    )
+
+
+@blueprint.app_template_filter()
+def has_access_to(user, record):
+    """Check whether the user has access to the record."""
+    return has_access(user, record)
 
 
 #

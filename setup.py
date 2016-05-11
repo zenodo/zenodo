@@ -80,6 +80,7 @@ setup_requires = [
 ]
 
 install_requires = [
+    'arrow>=0.7.0',
     'CairoSVG>=1.0.20',
     'cerberus>=0.9.2',
     'datacite>=0.2.1',

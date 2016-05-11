@@ -111,6 +111,13 @@ def test_access_right_embargo():
         AccessRight.EMBARGOED, embargo_date=today+timedelta(days=1)) \
         == 'embargoed'
 
+    # Should work with strings as well
+    assert AccessRight.get(
+        AccessRight.EMBARGOED, embargo_date='1253-01-01') == AccessRight.OPEN
+    assert AccessRight.get(
+        AccessRight.EMBARGOED,
+        embargo_date=str(today+timedelta(days=1))) == AccessRight.EMBARGOED
+
 
 def test_object_type():
     """Test object type."""

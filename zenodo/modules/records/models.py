@@ -30,11 +30,14 @@ import json
 from datetime import datetime
 from os.path import dirname, join
 
+import arrow
+from elasticsearch_dsl.utils import AttrDict
 from flask import current_app
 from flask_babelex import gettext
 from invenio_search import current_search_client
 from invenio_search.api import RecordsSearch
 from jsonref import JsonRef
+from six import string_types
 from speaklater import make_lazy_gettext
 
 _ = make_lazy_gettext(lambda: gettext)
@@ -58,6 +61,24 @@ class AccessRight(object):
         (CLOSED, _('Closed Access')),
     )
 
+    _icon = {
+        OPEN: 'fa-unlock',
+        EMBARGOED: 'fa-warning',
+        RESTRICTED: 'fa-ban',
+        CLOSED: 'fa-lock',
+    }
+
+    _description = {
+        OPEN: _('Files are publicly accessible.'),
+        EMBARGOED: _('Files are currently under embargo but will be publicly '
+                     'accessible after {date}.'),
+        RESTRICTED: _('You may request access to the files in this upload, '
+                      'provided that you fulfil the conditions below. The '
+                      'decision whether to grant/deny access is solely under '
+                      'the responsibility of the record owner.'),
+        CLOSED: _('Files are not publicly accessible.'),
+    }
+
     _category = {
         OPEN: 'success',
         EMBARGOED: 'warning',
@@ -68,7 +89,7 @@ class AccessRight(object):
     @staticmethod
     def is_embargoed(embargo_date):
         """Test if date is still under embargo."""
-        return embargo_date > datetime.utcnow().date()
+        return arrow.get(embargo_date).date() > datetime.utcnow().date()
 
     @classmethod
     def is_valid(cls, value):
@@ -85,9 +106,19 @@ class AccessRight(object):
         return value
 
     @classmethod
+    def as_icon(cls, value):
+        """Get icon for a specific status."""
+        return cls._icon[value]
+
+    @classmethod
     def as_title(cls, value):
         """Get title for a specific status."""
         return dict(cls._all)[value]
+
+    @classmethod
+    def as_description(cls, value, embargo_date=None):
+        """Get description for a specific status."""
+        return cls._description[value].format(date=embargo_date)
 
     @classmethod
     def as_category(cls, value, **kwargs):
@@ -165,6 +196,8 @@ class ObjectType(object):
         if not value:
             return None
         if 'subtype' in value:
+            if isinstance(value, AttrDict):
+                value = value.to_dict()
             internal_id = "{0}-{1}".format(
                 value.get('type', ''),
                 value.get('subtype', '')

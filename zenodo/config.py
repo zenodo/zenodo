@@ -370,7 +370,7 @@ RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"
 
 #: Files REST permission factory
 FILES_REST_PERMISSION_FACTORY = \
-    'zenodo.modules.records.permissions:FilePermission'
+    'zenodo.modules.records.permissions:RESTFilePermissionFactory'
 
 #: Records REST API endpoints.
 RECORDS_REST_ENDPOINTS = dict(

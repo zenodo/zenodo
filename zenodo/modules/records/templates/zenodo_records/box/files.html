@@ -22,8 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{%- if files -%}
-  {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
+{%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
@@ -33,11 +32,21 @@
     </a>
   </div>
   <div class="collapse in" id="collapseTwo">
+  {% if record.access_right|accessright_get(record.embargo_date) != 'open' %}
+    {% set title = record.access_right|accessright_title(record.embargo_date) %}
+    {% set icon = record.access_right|accessright_icon(record.embargo_date) %}
+    {% set description = record.access_right|accessright_description(record.embargo_date) %} 
+    <div class="panel-body">
+      <h5><i class="fa {{ icon -}}"></i> {{ title -}}</h5>
+      <p><small class="text-muted">{{- description -}}</small></p>
+    </div>
+  {% endif %}
+  {%- if files -%}
     <table class="table table-striped" >
     <thead>
       <tr class="">
-        <th>Name</th>
-        <th>Size</th>
+        <th>{{_('Name')}}</th>
+        <th>{{_('Size')}}</th>
       </tr>
     </thead>
     <tbody>
@@ -51,6 +60,6 @@
       {%- endfor -%}
       </tbody>
     </table>
+  {%- endif %}
   </div>
 </div>
-{%- endif %}

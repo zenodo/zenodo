@@ -95,7 +95,7 @@
               "name": "Fernandez Alvarez, Luis"
             }
           ],
-          "access_right": "open"
+          "access_right": "closed"
         },
         "modification_datetime": "2014-10-13T08:27:47+00:00",
         "marcxml": ""
@@ -199,7 +199,7 @@
               "name": "Moreira, Belmiro"
             }
           ],
-          "access_right": "open"
+          "access_right": "restricted"
         },
         "modification_datetime": "2014-10-13T08:27:47+00:00",
         "marcxml": ""
@@ -6044,7 +6044,7 @@
         "json": {
           "modification_date": "2015-11-19T14:27:29",
           "access_right": "embargoed",
-          "embargo_date": "2016-04-01T01:01:01",
+          "embargo_date": "2024-04-01T01:01:01",
           "upload_type": {
             "type": "software"
           },

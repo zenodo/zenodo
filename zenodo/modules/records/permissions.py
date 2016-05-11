@@ -34,8 +34,8 @@ from invenio_records_files.models import RecordsBuckets
 from zenodo.modules.records.models import AccessRight
 
 
-class FilePermission(object):
-    """Permission factory for files on Zenodo."""
+class RESTFilePermissionFactory(object):
+    """Invenio-Files-Rest permission factory."""
 
     def __init__(self, bucket, action='objects-read'):
         """Initialize a file permission object."""
@@ -45,18 +45,28 @@ class FilePermission(object):
     def can(self):
         """Check if the current user has permission to access file."""
         rb = RecordsBuckets.query.filter_by(bucket_id=self.bucket.id).one()
+        return has_access(current_user, rb.record.json)
 
-        # Open records are available to everyone
-        if rb.record.json['access_right'] == AccessRight.OPEN:
-            return True
 
-        # Users can access their own files
-        if current_user.is_authenticated and \
-                int(current_user.get_id()) in rb.record.json.get('owners', []):
-            return True
+def has_access(user=None, record=None):
+    """Check whether the user has access to the record.
 
-        # Admins can access every file
-        if DynamicPermission(ActionNeed('admin-access')).can():
-            return True
+    The rules followed are:
+        1. Open Access records can be viewed by everyone.
+        2. Embargoed, Restricted and Closed records can be viewed by
+           the record owners.
+        3. Administrators can view every record.
+    """
+    if AccessRight.get(record['access_right'], record.get('embargo_date')) \
+            == AccessRight.OPEN:
+        return True
 
-        return False
+    user_id = int(user.get_id()) if user.is_authenticated else None
+
+    if user_id in record.get('owners', []):
+        return True
+
+    if DynamicPermission(ActionNeed('admin-access')):
+        return True
+
+    return False

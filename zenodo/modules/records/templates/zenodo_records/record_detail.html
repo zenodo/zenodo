@@ -61,7 +61,7 @@
       {%- endif %}
       {%- endblock record_body %}
       {%- block record_body_extra %}
-      {%- set files = record.files if record.access_right == "open" else [] %}
+      {%- set files = record.files if current_user|has_access_to(record) else [] %}
       {%-  include "zenodo_records/box/preview.html" %}
       {%-  include "zenodo_records/box/files.html" %}
       {# TODO: include references #}
