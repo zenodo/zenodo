@@ -450,7 +450,7 @@
         "additionalProperties": false,
         "require": [
           "bucket",
-          "filename",
+          "key",
           "version_id",
           "size",
           "checksum"
@@ -460,12 +460,12 @@
             "description": "Bucket identifier for file.",
             "type": "string"
           },
-          "filename": {
-            "description": "Filename.",
+          "key": {
+            "description": "File key.",
             "type": "string"
           },
           "version_id": {
-            "description": "Filename.",
+            "description": "Version ID.",
             "type": "string"
           },
           "size": {
