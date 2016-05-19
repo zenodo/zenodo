@@ -35,7 +35,7 @@ class DublinCoreJSONV1(Schema):
     """Schema for records v1 in JSON."""
 
     identifiers = fields.Method('get_identifiers')
-    titles = fields.Function(lambda o: [o['metadata'].get('title', '')])
+    titles = fields.Function(lambda o: [o['metadata'].get('title', u'')])
     creators = fields.Method('get_creators')
     relations = fields.Method('get_relations')
     rights = fields.Method('get_rights')
@@ -46,12 +46,12 @@ class DublinCoreJSONV1(Schema):
     contributors = fields.Method('get_contributors')
     types = fields.Method('get_types')
     sources = fields.Method('get_sources')
-    languages = fields.Function(lambda o: [o['metadata'].get('language', '')])
+    languages = fields.Function(lambda o: [o['metadata'].get('language', u'')])
 
     def get_identifiers(self, obj):
         """Get identifiers."""
-        items = [obj['metadata'].get('doi', '')]
-        items.append('https://zenodo.org/record/{0}'.format(
+        items = [obj['metadata'].get('doi', u'')]
+        items.append(u'https://zenodo.org/record/{0}'.format(
             obj['metadata']['recid']))
         oai = obj['metadata'].get('_oai', {}).get('id')
         if oai:
@@ -74,14 +74,14 @@ class DublinCoreJSONV1(Schema):
         # Alternate identifiers
         for a in obj['metadata'].get('alternate_identifiers', []):
             rels.append(
-                'info:eu-repo/semantics/altIdentifier/{0}/{1}'.format(
+                u'info:eu-repo/semantics/altIdentifier/{0}/{1}'.format(
                     a['scheme'],
                     a['identifier']))
 
         # Related identifiers
         for a in obj['metadata'].get('related_identifiers', []):
             rels.append(
-                '{0}:{1}'.format(
+                u'{0}:{1}'.format(
                     a['scheme'],
                     a['identifier']))
 
@@ -90,7 +90,7 @@ class DublinCoreJSONV1(Schema):
     def get_rights(self, obj):
         """Get rights."""
         rights = [
-            'info:eu-repo/semantics/{}Access'.format(
+            u'info:eu-repo/semantics/{}Access'.format(
                 obj['metadata']['access_right'])]
         license_url = obj['metadata'].get('license', {}).get('url')
         if license_url:
@@ -100,9 +100,9 @@ class DublinCoreJSONV1(Schema):
     def get_dates(self, obj):
         """Get dates."""
         dates = [obj['metadata']['publication_date']]
-        if obj['metadata']['access_right'] == 'embargoed':
+        if obj['metadata']['access_right'] == u'embargoed':
             dates.append(
-                'info:eu-repo/date/embargoEnd/{0}'.format(
+                u'info:eu-repo/date/embargoEnd/{0}'.format(
                     obj['metadata']['embargo_date']))
 
         return dates
@@ -144,7 +144,7 @@ class DublinCoreJSONV1(Schema):
             vol = journal.get('volume')
             issue = journal.get('issue')
             if vol and issue:
-                vol = '{0}({1})'.format(vol, issue)
+                vol = u'{0}({1})'.format(vol, issue)
             if vol is None:
                 vol = issue
 
@@ -154,9 +154,9 @@ class DublinCoreJSONV1(Schema):
                 journal.get('title'),
                 vol,
                 journal.get('pages'),
-                '({0})'.format(y) if y else None,
+                u'({0})'.format(y) if y else None,
             ]
-            items.append(' '.join([x for x in parts if x]))
+            items.append(u' '.join([x for x in parts if x]))
 
         # Meetings
         m = obj['metadata'].get('meetings', {})
