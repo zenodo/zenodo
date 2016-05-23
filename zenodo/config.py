@@ -26,12 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-import copy
 import os
 
 from flask import request
-from invenio_deposit.config import \
-    DEPOSIT_REST_ENDPOINTS as INVENIO_DEPOSIT_REST_ENDPOINTS
 from invenio_deposit.utils import check_oauth2_scope_write
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
@@ -96,7 +93,7 @@ ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 #: PID minter used during record creation.
 DEPOSIT_PID_MINTER = 'zenodo_record_minter'
 #: REST API configuration.
-_PID = 'pid(dep,record_class="invenio_deposit.api:Deposit")'
+_PID = 'pid(depid,record_class="invenio_deposit.api:Deposit")'
 
 DEPOSIT_REST_ENDPOINTS = dict(
     dep=dict(
@@ -134,8 +131,8 @@ DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
 
 #: Endpoints for deposit.
 DEPOSIT_REST_ENDPOINTS = dict(
-    dep=dict(
-        pid_type='dep',
+    depid=dict(
+        pid_type='depid',
         pid_minter='zenodo_deposit_minter',
         pid_fetcher='zenodo_deposit_fetcher',
         record_class='invenio_deposit.api:Deposit',

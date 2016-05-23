@@ -69,7 +69,7 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
 
     # Get deposit URL
     with api.test_request_context():
-        deposit_url = url_for('invenio_deposit_rest.dep_list')
+        deposit_url = url_for('invenio_deposit_rest.depid_list')
 
     # Try to create deposit as anonymous user (failing)
     response = client.post(
