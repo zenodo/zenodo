@@ -71,7 +71,7 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
 
     # Get deposit URL
     with api.test_request_context():
-        deposit_url = url_for('invenio_deposit_rest.dep_list')
+        deposit_url = url_for('invenio_deposit_rest.depid_list')
 
     # Try to create deposit as anonymous user (failing)
     response = client.post(
@@ -182,7 +182,7 @@ def test_read_deposit_users(api, api_client, db, users, deposit, json_headers,
                                     user_info['password'])
 
             res = client.get(
-                url_for('invenio_deposit_rest.dep_item',
+                url_for('invenio_deposit_rest.depid_item',
                         pid_value=deposit_id),
                 headers=json_headers
             )
@@ -210,7 +210,7 @@ def test_read_deposits_users(api, api_client, db, users, deposit, json_headers,
                                     user_info['password'])
 
             res = client.get(
-                url_for('invenio_deposit_rest.dep_list'),
+                url_for('invenio_deposit_rest.depid_list'),
                 headers=json_headers
             )
             assert res.status_code == status
@@ -241,7 +241,7 @@ def test_update_deposits_users(api, api_client, db, users, deposit,
                                     user_info['password'])
 
             res = client.put(
-                url_for('invenio_deposit_rest.dep_item',
+                url_for('invenio_deposit_rest.depid_item',
                         pid_value=deposit_id),
                 data=json.dumps({}),
                 headers=json_headers
@@ -271,7 +271,7 @@ def test_delete_deposits_users(api, api_client, db, users, deposit,
                                     user_info['password'])
 
             res = client.delete(
-                url_for('invenio_deposit_rest.dep_item',
+                url_for('invenio_deposit_rest.depid_item',
                         pid_value=deposit_id),
                 headers=json_headers
             )

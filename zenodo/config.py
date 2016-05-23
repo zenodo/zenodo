@@ -94,7 +94,7 @@ ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 #: PID minter used during record creation.
 DEPOSIT_PID_MINTER = 'zenodo_record_minter'
 #: REST API configuration.
-_PID = 'pid(dep,record_class="invenio_deposit.api:Deposit")'
+_PID = 'pid(depid,record_class="invenio_deposit.api:Deposit")'
 
 DEPOSIT_REST_ENDPOINTS = dict(
     dep=dict(
@@ -134,8 +134,8 @@ DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
 
 #: Endpoints for deposit.
 DEPOSIT_REST_ENDPOINTS = dict(
-    dep=dict(
-        pid_type='dep',
+    depid=dict(
+        pid_type='depid',
         pid_minter='zenodo_deposit_minter',
         pid_fetcher='zenodo_deposit_fetcher',
         record_class='invenio_deposit.api:Deposit',

@@ -37,13 +37,13 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
         with api.test_client() as client:
             # try get deposits as anonymous user
             res = client.get(
-                url_for('invenio_deposit_rest.dep_list')
+                url_for('invenio_deposit_rest.depid_list')
             )
             assert res.status_code == 401
 
             # try get deposits as logged-in user
             res = client.get(
-                url_for('invenio_deposit_rest.dep_list'),
+                url_for('invenio_deposit_rest.depid_list'),
                 headers=oauth2_headers_user_1
             )
             assert res.status_code == 200
@@ -55,7 +55,7 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
             }
 
             res = client.post(
-                url_for('invenio_deposit_rest.dep_list'),
+                url_for('invenio_deposit_rest.depid_list'),
                 headers=oauth2_headers_user_1,
                 data=json.dumps(deposit)
             )
@@ -107,7 +107,7 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
                 }
             }
             res = client.put(
-                url_for('invenio_deposit_rest.dep_item',
+                url_for('invenio_deposit_rest.depid_item',
                         pid_value=deposit_id),
                 headers=oauth2_headers_user_1,
                 data=json.dumps(deposit)
@@ -116,7 +116,7 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
 
             # publish deposit
             res = client.post(
-                url_for('invenio_deposit_rest.dep_actions',
+                url_for('invenio_deposit_rest.depid_actions',
                         pid_value=deposit_id, action='publish'),
                 headers=oauth2_headers_user_1,
             )
