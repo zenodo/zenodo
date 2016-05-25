@@ -103,8 +103,10 @@ DEPOSIT_REST_ENDPOINTS = dict(
 )
 #: Template for deposit list view.
 DEPOSIT_SEARCH_API = '/api/deposit/depositions'
+#: Mimetype for deposit search.
+DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
 #: Template for deposit list view.
-DEPOSIT_UI_INDEX_TEMPLATE = "zenodo_deposit/index.html"
+DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
 #: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),

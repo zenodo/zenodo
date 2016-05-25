@@ -250,6 +250,31 @@ class MetadataSchemaV1(Schema):
                 data[f] = data[f].isoformat()
 
 
+class FilesSchema(Schema):
+    """Files metadata schema."""
+
+    type = fields.String()
+    checksum = fields.String()
+    size = fields.Integer()
+    bucket = fields.String()
+    key = fields.String()
+    links = fields.Method('get_links')
+
+    def get_links(self, obj):
+        """Get links."""
+        try:
+            return {
+                'self': url_for(
+                    'invenio_files_rest.object_api',
+                    bucket_id=obj['bucket'],
+                    key=obj['key'],
+                    _external=True
+                )
+            }
+        except (BuildError, KeyError):
+            return missing
+
+
 class RecordSchemaJSONV1(Schema):
     """Schema for records v1 in JSON."""
 
@@ -258,6 +283,8 @@ class RecordSchemaJSONV1(Schema):
         fields.Integer, attribute='metadata.owners', dump_only=True)
     metadata = fields.Nested(MetadataSchemaV1)
     links = fields.Raw(dump_only=True)
+    files = fields.Nested(
+        FilesSchema, many=True, dump_only=True, attribute='metadata._files')
     created = fields.Str(dump_only=True)
     updated = fields.Str(dump_only=True)
     revision = fields.Integer(dump_only=True)
