@@ -219,6 +219,15 @@ class MetadataSchemaV1(Schema):
         return clean_empty(data, empty_keys)
 
 
+def legacy_state(o):
+    """Dinamically build legacy state."""
+    if o['metadata'].get('_deposit', {}).get('status', 'draft') == 'draft':
+        if o['metadata'].get('_deposit', {}).get('pid', {}):
+            return 'inprogress'
+        else:
+            return 'unsubmitted'
+    return 'done'
+
 class LegacyJSONSchemaV1(Schema):
     """Legacy JSON schema (used by deposit)."""
 
@@ -233,8 +242,11 @@ class LegacyJSONSchemaV1(Schema):
     owner = fields.Method('get_owners')
     record_id = fields.Integer(attribute='metadata.recid')
     record_url = fields.String()
-    state = fields.String()
-    submitted = fields.Boolean()
+    state = fields.Function(legacy_state)
+    submitted = fields.Function(
+        lambda o: o['metadata'].get(
+            '_deposit', {}).get('status', 'draft') == 'published'
+    )
     title = fields.String(attribute='metadata.title')
     links = fields.Raw()
 

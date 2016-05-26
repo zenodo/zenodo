@@ -69,8 +69,7 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
             assert 'modified' in data
             assert 'id' in data
             assert 'metadata' in data
-            # FIXME
-            #  assert data['state'] == 'unsubmitted'
+            assert data['state'] == 'unsubmitted'
             assert data['owner'] == write_token['token'].user_id
 
             current_search.flush_and_refresh(index='deposits')

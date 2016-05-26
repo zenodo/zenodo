@@ -30,9 +30,6 @@ from zenodo.modules.records.serializers import legacyjson_v1
 
 legacyjson_v1.replace_refs = False
 
-# TODO:state
-# TODO:submitted
-
 
 def test_id(minimal_record_model, depid_pid):
     """Test created."""
@@ -379,3 +376,66 @@ def test_partof(minimal_record_model, depid_pid):
     assert 'partof_title' in obj
     assert 'imprint_year' not in obj
     assert 'partof_year' not in obj
+
+
+def test_state(minimal_record_model, depid_pid):
+    """Test state."""
+    minimal_record_model.update(dict(
+        _deposit=dict(status='draft')
+    ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['state'] == 'unsubmitted'
+
+    minimal_record_model.update(dict(
+        _deposit=dict(
+            status='draft',
+            pid={u'revision_id': 0, u'type': u'recid', u'value': u'1'}
+        )
+    ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['state'] == 'inprogress'
+
+    minimal_record_model.update(dict(
+        _deposit=dict(status='published')
+    ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['state'] == 'done'
+
+    del minimal_record_model['_deposit']['status']
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['state'] == 'unsubmitted'
+
+    minimal_record_model.update(dict(
+        _deposit=dict(
+            pid={u'revision_id': 0, u'type': u'recid', u'value': u'1'}
+        )
+    ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['state'] == 'inprogress'
+
+
+def test_submitted(minimal_record_model, depid_pid):
+    """Test state."""
+    minimal_record_model.update(dict(
+        _deposit=dict(status='draft')
+    ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['submitted'] is False
+
+    minimal_record_model.update(dict(
+        _deposit=dict(status='published')
+    ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['submitted'] is True
+
+    del minimal_record_model['_deposit']['status']
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['submitted'] is False
