@@ -27,3 +27,4 @@
 -e git+https://github.com/inveniosoftware/invenio-migrator.git#egg=invenio-migrator
 -e git+https://github.com/inveniosoftware/invenio-oauth2server.git#egg=invenio-oauth2server
 -e git+https://github.com/zenodo/zenodo-migrationkit.git#egg=zenodo-migrationkit
+-e git+https://github.com/zenodo/zenodo.git#egg=zenodo

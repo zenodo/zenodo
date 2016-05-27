@@ -164,6 +164,7 @@ setup(
         'invenio_base.apps': [
             'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
+            'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
             'zenodo_jsonschemas = '
             'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',

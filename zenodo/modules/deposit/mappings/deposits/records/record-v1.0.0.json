@@ -1,7 +1,25 @@
 {
   "mappings": {
-    "record-v1.0.0": {
+    "deposits-record-v1.0.0": {
       "properties": {
+        "title": {
+          "type": "string"
+        },
+        "resource_type": {
+          "type" : "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "index": "not_analyzed",
+              "copy_to": "type"
+            },
+            "subtype": {
+              "type": "string",
+              "index": "not_analyzed",
+              "copy_to": "type"
+            }
+          }
+        },
         "_deposit": {
           "type": "object",
           "properties": {
@@ -11,10 +29,86 @@
             "created_by": {
               "type": "integer"
             },
-            "editors": {
+            "owners": {
               "type": "integer"
             }
           }
+        },
+        "type": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "publication_date": {
+          "type": "date",
+          "copy_to": "publicationdate"
+        },
+        "publicationdate": {
+          "type": "date"
+        },
+        "creators": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "affiliation": {
+              "type": "string"
+            },
+            "familyname": {
+              "type": "string"
+            },
+            "givennames": {
+              "type": "string"
+            },
+            "gnd": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "orcid": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "description": {
+          "type": "string"
+        },
+        "keywords": {
+          "type": "string"
+        },
+        "access_right": {
+          "type": "string",
+          "index": "not_analyzed",
+          "copy_to": "accessrights"
+        },
+        "accessrights": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "embargo_date": {
+          "type": "date",
+          "copy_to": "embargodate"
+        },
+        "embargodate": {
+          "type": "date"
+        },
+        "owners": {
+          "type": "integer",
+          "index": "not_analyzed"
+        },
+        "_created": {
+          "type": "date",
+          "copy_to": "created"
+        },
+        "_updated": {
+          "type": "date",
+          "copy_to": "updated"
+        },
+        "created": {
+          "type": "date"
+        },
+        "updated": {
+          "type": "date"
         }
       }
     }

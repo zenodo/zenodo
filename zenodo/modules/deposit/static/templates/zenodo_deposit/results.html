@@ -14,12 +14,21 @@
         </h5>
         <p class="list-group-item-text text-muted">
           <small>
-            Created {{ record.created|date:'medium' }}
+            Created {{ record.created|date:'medium' }}, modified {{ record.updated|date:'medium' }}
           </small>
         </p>
       </div>
       <small class="pull-right label label-default">
         #{{ record.id }}
+      </small>
+      <small class="pull-right label label-default">
+        {{ record.metadata._deposit.status }}
+      </small>
+      <small class="pull-right label label-default">
+        {{ record.metadata.access_right }}
+      </small>
+      <small class="pull-right label label-default">
+        {{ record.metadata.doi }}
       </small>
       <div class="clearfix"></div>
     </a>

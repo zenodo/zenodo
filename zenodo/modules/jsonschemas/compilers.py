@@ -26,8 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from .utils import merge_dicts, remove_keys, resolve_schema_url, \
-    resolve_schema_path, replace_schema_refs
+from .utils import merge_dicts, remove_keys, replace_schema_refs, \
+    resolve_schema_path, resolve_schema_url
 
 
 def _iter_all_of(schema):

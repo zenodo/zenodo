@@ -27,7 +27,7 @@ from __future__ import absolute_import, print_function
 from zenodo.modules.jsonschemas.utils import merge_dicts
 
 
-def test_merge_dicts(app):
+def test_merge_dicts():
     """Test jsonschema merging util."""
     a1 = {
         'd': {
