@@ -29,6 +29,8 @@ from __future__ import absolute_import, print_function
 import os
 
 from flask import request
+from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
+    DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.utils import check_oauth2_scope_write, \
     check_oauth2_scope_write_elasticsearch
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
@@ -466,12 +468,14 @@ RECORDS_REST_SORT_OPTIONS = dict(
     )
 )
 RECORDS_REST_SORT_OPTIONS.update(OPENAIRE_REST_SORT_OPTIONS)
+RECORDS_REST_SORT_OPTIONS.update(DEPOSIT_REST_SORT_OPTIONS)
 
 #: Default sort for records REST API.
 RECORDS_REST_DEFAULT_SORT = dict(
     records=dict(query='bestmatch', noquery='mostrecent'),
 )
 RECORDS_REST_DEFAULT_SORT.update(OPENAIRE_REST_DEFAULT_SORT)
+RECORDS_REST_DEFAULT_SORT.update(DEPOSIT_REST_DEFAULT_SORT)
 
 #: Defined facets for records REST API.
 RECORDS_REST_FACETS = dict(
@@ -509,6 +513,7 @@ RECORDS_REST_FACETS = dict(
     )
 )
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
+RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
 # Previewer
 # =========

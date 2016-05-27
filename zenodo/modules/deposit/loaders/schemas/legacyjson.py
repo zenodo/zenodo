@@ -26,10 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
-import idutils
-from marshmallow import Schema, fields, missing, post_dump
 from datetime import datetime
 
+import idutils
+from marshmallow import Schema, fields, missing, post_dump
+
+from zenodo.modules.deposit.loaders.schemas.utils import filter_empty_list, \
+    filter_thesis, none_if_empty
 from zenodo.modules.records.serializers import fields as zfields
 
 
@@ -79,8 +82,10 @@ class AlternateIdentifierSchema(Schema):
         """Get scheme."""
         scheme = obj.get('scheme')
         if not scheme and obj.get('identifier'):
-            scheme = idutils.detect_identifier_schemes(obj['identifier'])[0]
-        return scheme or ""
+            scheme = idutils.detect_identifier_schemes(obj['identifier'])
+            if scheme:
+                scheme = scheme[0]
+        return scheme if scheme else ""
 
 
 class RelatedIdentifierSchema(AlternateIdentifierSchema):
@@ -138,7 +143,13 @@ class ThesisSchema(Schema):
 class ActionSchema(Schema):
     """Schema for PartOf."""
 
-    prereserve_doi = fields.Boolean(attribute='prereserve_doi')
+    prereserve_doi = fields.Method('get_prereserve_doi')
+
+    @staticmethod
+    def get_prereserve_doi(obj):
+        """Get pre-reserve DOI."""
+        # TODO: Review after the Pre-Reserve DOI has been implemented
+        return obj.get('prereserve_doi') is not None
 
 
 class ResourceTypeSchema(Schema):
@@ -200,7 +211,6 @@ class LegacyRecordSchemaV1(Schema):
     imprint = fields.Nested(ImprintSchema, attribute='metadata')
     thesis = fields.Nested(ThesisSchema, attribute='metadata')
     # _deposit_actions = fields.Nested(ActionSchema, attribute='metadata')
-    # TODO: Disabled until pre-reserved DOIs are being handled
 
     def get_grants(self, obj):
         """Get grant."""
@@ -270,25 +280,38 @@ class LegacyRecordSchemaV1(Schema):
         """Clean empty values."""
         # data = self.clean_imprint_partof(data)
 
-        empty_keys = [
-            '_deposit_actions',
-            'alternate_identifiers',
-            'communities',
-            'grants',
-            'imprint',
-            'journal',
-            'license',
-            'meeting',
-            'part_of',
-            'provisional_communities',
-            'related_identifiers',
-            'resource_type',
-            'thesis',
-        ]
+        empty_keys = {
+            '_deposit_actions': None,
+            'access_conditions': None,
+            'alternate_identifiers': filter_empty_list(keys=['identifier', ],
+                                                       remove_empty_keys=True),
+            'resource_type': None,
+            'communities': None,
+            'contributors': filter_empty_list(keys=['name', 'affiliation', ]),
+            'creators': filter_empty_list(keys=['name', 'affiliation', ]),
+            'description': None,
+            'grants': None,
+            'imprint': none_if_empty(),
+            'journal': none_if_empty(keys=['title']),
+            'keywords': filter_empty_list(),
+            'license': None,
+            'meeting': none_if_empty(),
+            'notes': None,
+            'part_of': none_if_empty(),
+            'provisional_communities': None,
+            'references': None,
+            'related_identifiers': filter_empty_list(keys=['identifier', ],
+                                                     remove_empty_keys=True),
+            'subjects': filter_empty_list(keys=['term', ]),
+            'thesis': filter_thesis(),
+        }
 
-        for k in empty_keys:
-            if k in data and not data[k]:
-                del data[k]
+        for k, fun in empty_keys.items():
+            if k in data:
+                if fun is not None:  # Apply the function if provided
+                    data[k] = fun(data[k])
+                if not data[k]:  # Remove empty items
+                    del data[k]
 
         data['$schema'] = \
             'https://zenodo.org/schemas/deposits/records/record-v1.0.0.json'

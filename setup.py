@@ -131,7 +131,6 @@ install_requires = [
     'Pillow>=3.2.0',
     'python-slugify>=1.2.0',
     'raven<=5.1.0',
-    'zenodo-migrationkit>=1.0.0.dev20150000',
 ]
 
 packages = find_packages()
@@ -164,6 +163,7 @@ setup(
         'invenio_base.apps': [
             'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
+            'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
             'zenodo_jsonschemas = '
             'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',

@@ -24,8 +24,8 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.jsonschemas.compilers import compile_record_jsonschema, \
-    compile_deposit_jsonschema, compile_file_jsonschema
+from zenodo.modules.jsonschemas.compilers import compile_deposit_jsonschema, \
+    compile_file_jsonschema, compile_record_jsonschema
 from zenodo.modules.jsonschemas.utils import resolve_schema_path
 
 
