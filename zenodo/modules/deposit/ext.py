@@ -22,16 +22,17 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""JSON schemas compiler for Zenodo."""
+"""ZenodoDeposit module."""
 
 from __future__ import absolute_import, print_function
 
-from . import config
-from .cli import jsonschemas
+from invenio_indexer.signals import before_record_index
+
+from .indexer import indexer_receiver
 
 
-class ZenodoJSONSchemas(object):
-    """Zenodo records extension."""
+class ZenodoDeposit(object):
+    """Zenodo deposit extension."""
 
     def __init__(self, app=None):
         """Extension initialization."""
@@ -40,13 +41,5 @@ class ZenodoJSONSchemas(object):
 
     def init_app(self, app):
         """Flask application initialization."""
-        self.init_config(app)
-        app.extensions['zenodo-jsonschemas'] = self
-        app.cli.add_command(jsonschemas)
-
-    @staticmethod
-    def init_config(app):
-        """Initialize configuration."""
-        for k in dir(config):
-            if k.startswith('ZENODO_JSONSCHEMAS_'):
-                app.config.setdefault(k, getattr(config, k))
+        before_record_index.connect(indexer_receiver, sender=app)
+        app.extensions['zenodo-deposit'] = self

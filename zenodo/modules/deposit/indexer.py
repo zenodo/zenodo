@@ -29,15 +29,26 @@ from __future__ import absolute_import, print_function
 
 def indexer_receiver(sender, json=None, record=None, index=None,
                      **dummy_kwargs):
-    """Connect to before_record_index signal to transform record for ES."""
-    if not index.startswith('records-'):
-        return
-    # Remove files from index if record is not open access.
-    try:
-        if json['access_right'] != 'open' and '_files' in json:
-            del json['_files']
-    except Exception:
-        raise
+    """Connect to before_record_index signal to transform record for ES.
 
-    if '_internal' in json:
-        del json['_internal']
+    :param sender: Sender of the signal.
+    :param json: JSON to be passed for the elastic search.
+    :type json: `invenio_records.api.Deposit`
+    :param record: Indexed deposit record.
+    :type record: `invenio_records.api.Deposit`
+    :param index: Elasticsearch index name.
+    :type index: str
+    """
+    if not index.startswith('deposits-records-'):
+        return
+    if record['_deposit']['status'] == 'published':
+        pub_pid, pub_rec = record.fetch_published()
+        schema = json['$schema']
+        json['_deposit']['status'] = 'draft'  # Cannot call `clear` otherwise
+        json.clear()
+        json.update(pub_rec)
+        json['_updated'] = pub_rec.updated
+        json['$schema'] = schema
+    else:
+        json['_updated'] = record.updated
+    json['_created'] = record.created
