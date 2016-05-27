@@ -25,11 +25,13 @@
 """ZenodoJSONSchemas utilities functions."""
 
 from __future__ import absolute_import, print_function
+
 import json
 from copy import deepcopy
 
 from flask import current_app
 from werkzeug.local import LocalProxy
+
 current_jsonschemas = LocalProxy(
     lambda: current_app.extensions['invenio-jsonschemas']
 )

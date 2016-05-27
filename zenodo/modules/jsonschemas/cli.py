@@ -29,11 +29,12 @@ from __future__ import absolute_import, print_function
 import json
 
 import click
-from flask_cli import with_appcontext
 from flask import current_app
-from .compilers import compile_deposit_jsonschema, compile_record_jsonschema, \
-    compile_file_jsonschema
-from .utils import save_jsonschema, get_abs_schema_path
+from flask_cli import with_appcontext
+
+from .compilers import compile_deposit_jsonschema, compile_file_jsonschema, \
+    compile_record_jsonschema
+from .utils import get_abs_schema_path, save_jsonschema
 
 
 @click.group()
