@@ -342,7 +342,6 @@ def full_record():
             'publisher': 'Jol'
         },
         communities=['zenodo'],
-        provisional_communities=['ecfunded'],
         grants=[
             {'title': 'Grant Title', 'code': '1234', 'identifiers': {},
              'internal_id': '10.1234/foo::1234',
@@ -472,17 +471,14 @@ def license_record(db):
 def deposit(app, es, users, location):
     """New deposit with files."""
     record = dict(
-        metadata=dict(
-            upload_type='presentation',
-            title='Test title',
-            creators=[
-                dict(name='Doe, John', affiliation='Atlantis'),
-                dict(name='Smith, Jane', affiliation='Atlantis')
-            ],
-            description='Test Description',
-            publication_date='2013-05-08',
-            access_right='open'
-        )
+        title='Test title',
+        creators=[
+            dict(name='Doe, John', affiliation='Atlantis'),
+            dict(name='Smith, Jane', affiliation='Atlantis')
+        ],
+        description='Test Description',
+        publication_date='2013-05-08',
+        access_right='open'
     )
     with app.test_request_context():
         datastore = app.extensions['security'].datastore

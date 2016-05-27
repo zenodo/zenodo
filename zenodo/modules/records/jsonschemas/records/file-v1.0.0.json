@@ -1,31 +1,40 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "http://zenodo.org/schemas/records/file-v1.0.0.json",
-  "title": "Zenodo Files Schema v1.0.0",
-  "type": "object",
   "properties": {
     "_files": {
-      "type": "array",
       "items": {
-        "allOf": [
-          {
-            "$ref": "../records-files/records-files-v1.0.0.json"
+        "description": "Describe information needed for files in records.",
+        "properties": {
+          "bucket": {
+            "type": "string"
           },
-          {
-            "type": "object",
-            "properties": {
-              "previewer": {
-                "description": "Identifier for previewer needed to preview this file.",
-                "type": "string"
-              },
-              "type": {
-                "description": "File type extension.",
-                "type": "string"
-              }
-            }
+          "checksum": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "previewer": {
+            "description": "Identifier for previewer needed to preview this file.",
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "type": {
+            "description": "File type extension.",
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
           }
-        ]
-      }
+        },
+        "type": "object"
+      },
+      "type": "array"
     }
-  }
+  },
+  "title": "Zenodo Files Schema v1.0.0",
+  "type": "object"
 }

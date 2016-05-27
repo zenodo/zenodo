@@ -199,7 +199,8 @@ class LegacyRecordSchemaV1(Schema):
     part_of = fields.Nested(PartOfSchema, attribute='metadata')
     imprint = fields.Nested(ImprintSchema, attribute='metadata')
     thesis = fields.Nested(ThesisSchema, attribute='metadata')
-    _deposit_actions = fields.Nested(ActionSchema, attribute='metadata')
+    # _deposit_actions = fields.Nested(ActionSchema, attribute='metadata')
+    # TODO: Disabled until pre-reserved DOIs are being handled
 
     def get_grants(self, obj):
         """Get grant."""

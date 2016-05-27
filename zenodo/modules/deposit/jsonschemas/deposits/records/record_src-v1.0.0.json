@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://zenodo.org/schemas/deposits/records/record-v1.0.0.json",
+  "title": "Zenodo Deposit Schema v1.0.0",
+  "additionalProperties": false,
+  "allOf": [
+    {
+      "$ref": "https://zenodo.org/schemas/deposits/deposit-v1.0.0.json"
+    },
+    {
+      "$ref": "https://zenodo.org/schemas/records/base-v1.0.0.json"
+    },
+    {
+      "$ref": "https://zenodo.org/schemas/records/file-v1.0.0.json"
+    }
+  ]
+}

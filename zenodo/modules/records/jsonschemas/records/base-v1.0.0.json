@@ -177,6 +177,7 @@
       "properties": {
         "type": {
           "description": "General resource type.",
+          "default": "publication",
           "type": "string"
         },
         "subtype": {
@@ -208,9 +209,11 @@
       "type": "string"
     },
     "keywords": {
+      "title": "Keywords",
       "description": "Free text keywords.",
       "type": "array",
       "items": {
+        "title": "Keyword",
         "type": "string"
       }
     },
@@ -237,6 +240,7 @@
       }
     },
     "notes": {
+      "title": "Additional notes",
       "description": "Additional notes for record.",
       "type": "string"
     },
@@ -247,6 +251,7 @@
     "access_right": {
       "description": "Access right for record.",
       "type": "string",
+      "default": "open",
       "enum": [
         "open",
         "embargoed",
@@ -255,14 +260,17 @@
       ]
     },
     "embargo_date": {
+      "title": "Embargo Date",
       "description": "Embargo date of record (ISO8601 formatted date).",
       "type": "string"
     },
     "access_conditions": {
+      "title": "Access conditions",
       "description": "Conditions under which access is given if record is restricted.",
       "type": "string"
     },
     "license": {
+      "title": "License",
       "description": "License for embargoed/open access content.",
       "type": "object"
     },
@@ -277,6 +285,7 @@
       "description": "Source of grants/awards which have funded all or part of this particular record.",
       "type": "array",
       "items": {
+        "title": "Grant",
         "type": "object"
       }
     },
@@ -284,6 +293,7 @@
       "description": "Related research outputs.",
       "type": "array",
       "items": {
+        "type": "object",
         "properties": {
           "identifier": {
             "description": "Identifier of research output.",
@@ -325,6 +335,7 @@
       }
     },
     "contributors": {
+      "title": "Contributors",
       "description": "Contributors in order of importance.",
       "type": "array",
       "items": {
@@ -335,6 +346,7 @@
       "description": "Raw textual references when identifier is not known.",
       "type": "array",
       "items": {
+        "title": "Reference",
         "type": "object",
         "additionalProperties": false,
         "properties": {
@@ -350,22 +362,27 @@
       "additionalProperties": false,
       "properties": {
         "issue": {
+          "title": "Journal issue",
           "description": "Journal issue.",
           "type": "string"
         },
         "pages": {
+          "title": "Journal page(s)",
           "description": "Journal page(s).",
           "type": "string"
         },
         "volume": {
+          "title": "Journal volume",
           "description": "Journal volume.",
           "type": "string"
         },
         "title": {
+          "title": "Journal title",
           "description": "Journal title.",
           "type": "string"
         },
         "year": {
+          "title": "Journal year",
           "description": "Journal year.",
           "type": "string"
         }
@@ -376,24 +393,31 @@
       "type": "object",
       "properties": {
         "acronym": {
+          "title": "Acronym",
           "type": "string"
         },
         "title": {
+          "title": "Title",
           "type": "string"
         },
         "place": {
+          "title": "Place",
           "type": "string"
         },
         "dates": {
+          "title": "Dates",
           "type": "string"
         },
         "session": {
+          "title": "Session",
           "type": "string"
         },
         "session_part": {
+          "title": "Part of session",
           "type": "string"
         },
         "url": {
+          "title": "URL",
           "type": "string"
         }
       }
@@ -404,9 +428,11 @@
       "additionalProperties": false,
       "properties": {
         "title": {
+          "title": "Title",
           "type": "string"
         },
         "pages": {
+          "title": "Pages",
           "type": "string"
         }
       }

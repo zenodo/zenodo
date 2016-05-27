@@ -165,6 +165,8 @@ setup(
             'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
+            'zenodo_jsonschemas = '
+            'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
         ],
         'invenio_base.api_apps': [
