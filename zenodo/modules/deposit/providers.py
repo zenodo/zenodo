@@ -32,6 +32,8 @@ from invenio_deposit.providers import DepositProvider
 class ZenodoDepositProvider(DepositProvider):
     """Deposit identifier provider."""
 
+    pid_type = 'dep'
+
     @classmethod
     def create(cls, object_type=None, object_uuid=None, **kwargs):
         """Create a new deposit identifier."""
