@@ -26,6 +26,8 @@
 
 from copy import deepcopy
 
+from flask import current_app
+
 
 def fill_oauth2_headers(json_headers, token):
     """Create authentication headers (with a valid oauth2 token)."""
@@ -34,3 +36,12 @@ def fill_oauth2_headers(json_headers, token):
         ('Authorization', 'Bearer {0}'.format(token['token'].access_token))
     )
     return headers
+
+
+def login_user_via_session(client, user=None, email=None):
+    """Login a user via the session."""
+    if not user:
+        user = current_app.extensions['security'].datastore.find_user(
+            email=email)
+    with client.session_transaction() as sess:
+        sess['user_id'] = user.get_id()

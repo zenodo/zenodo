@@ -10,14 +10,16 @@
       </div>
       <div class="pull-left">
         <h5 class="list-group-item-heading">
-          {{ record.metadata.title_statement.title }}
+          {{ record.metadata.title }}
         </h5>
-        <p class="list-group-item-text">
-          Created {{ record.metadata._deposit.created[0] }}
+        <p class="list-group-item-text text-muted">
+          <small>
+            Created {{ record.created|date:'medium' }}
+          </small>
         </p>
       </div>
       <small class="pull-right label label-default">
-        #{{ record.metadata._deposit.id }}
+        #{{ record.id }}
       </small>
       <div class="clearfix"></div>
     </a>

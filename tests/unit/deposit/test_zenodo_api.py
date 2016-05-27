@@ -25,7 +25,7 @@ import json
 
 import pytest
 from flask import url_for
-from invenio_accounts.testutils import login_user_via_view
+from helpers import login_user_via_session
 from invenio_search import current_search
 from six import BytesIO
 
@@ -178,8 +178,7 @@ def test_read_deposit_users(api, api_client, db, users, deposit, json_headers,
         with api.test_client() as client:
             if user_info:
                 # Login as user
-                login_user_via_view(client, user_info['email'],
-                                    user_info['password'])
+                login_user_via_session(client, email=user_info['email'])
 
             res = client.get(
                 url_for('invenio_deposit_rest.depid_item',
@@ -206,8 +205,7 @@ def test_read_deposits_users(api, api_client, db, users, deposit, json_headers,
         with api.test_client() as client:
             if user_info:
                 # Login as user
-                login_user_via_view(client, user_info['email'],
-                                    user_info['password'])
+                login_user_via_session(client, email=user_info['email'])
 
             res = client.get(
                 url_for('invenio_deposit_rest.depid_list'),
@@ -237,8 +235,7 @@ def test_update_deposits_users(api, api_client, db, users, deposit,
         with api.test_client() as client:
             if user_info:
                 # Login as user
-                login_user_via_view(client, user_info['email'],
-                                    user_info['password'])
+                login_user_via_session(client, email=user_info['email'])
 
             res = client.put(
                 url_for('invenio_deposit_rest.depid_item',
@@ -267,8 +264,7 @@ def test_delete_deposits_users(api, api_client, db, users, deposit,
         with api.test_client() as client:
             if user_info:
                 # Login as user
-                login_user_via_view(client, user_info['email'],
-                                    user_info['password'])
+                login_user_via_session(client, email=user_info['email'])
 
             res = client.delete(
                 url_for('invenio_deposit_rest.depid_item',
