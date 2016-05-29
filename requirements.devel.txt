@@ -24,6 +24,4 @@
 
 # Requirements for testing development version of important packages.
 -e git+https://github.com/inveniosoftware/invenio-deposit.git#egg=invenio-deposit
--e git+https://github.com/inveniosoftware/invenio-migrator.git#egg=invenio-migrator
--e git+https://github.com/inveniosoftware/invenio-oauth2server.git#egg=invenio-oauth2server
 -e git+https://github.com/zenodo/zenodo-migrationkit.git#egg=zenodo-migrationkit

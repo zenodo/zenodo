@@ -35,10 +35,11 @@ First check out the source code:
 .. code-block:: console
 
     $ cd ~/src/
-    $ git clone https://github.com/zenodo/zenodo.git -b master
+    $ git clone https://github.com/zenodo/zenodo.git
     $ cd zenodo
 
-Next, create a virtual environment (using virtualenvwrapper):
+Next, create a virtual environment (using
+`virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/>`_):
 
 .. code-block:: console
 
@@ -57,8 +58,8 @@ Next, install Invenio extensions and Zenodo itself:
     --src ~/src/ --pre --exists-action i
     (zenodo)$ pip install -e .[all,postgresql]
 
-Above command will checkout the required Invenio extensions into ``~/src/`` as
-well as install Zenodo with PostgreSQL support.
+Above command will checkout development versions of certain Invenio extensions
+into ``~/src/`` as well as install Zenodo with PostgreSQL support.
 
 .. note::
 
@@ -73,7 +74,7 @@ done like this:
 
 .. code-block:: console
 
-   (zenodo)$ source scripts/setup-assets.sh
+   (zenodo)$ ./scripts/setup-assets.sh
 
 .. note::
 
@@ -82,7 +83,9 @@ done like this:
 
    .. code-block:: console
 
-      (zenodo)$ source scripts/setup-npm.sh
+      (zenodo)$ ./scripts/setup-npm.sh
+
+    Feel free to take a peek in the scripts to see the commands being run
 
 
 Initialization
@@ -113,6 +116,7 @@ You can now load the demo records:
    (zenodo)$ zenodo migration recordsrun
    (zenodo)$ zenodo migration reindex recid
    (zenodo)$ zenodo index run -d
+
 
 Badges
 ~~~~~~

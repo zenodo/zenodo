@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -29,16 +29,16 @@ from __future__ import print_function
 import os
 
 import sphinx.environment
-from docutils.utils import get_source_line
+
+_warn_node_old = sphinx.environment.BuildEnvironment.warn_node
 
 
-def _warn_node(self, msg, node, *args, **kwargs):
+def _warn_node(self, msg, *args, **kwargs):
     """Do not warn on external images."""
     if not msg.startswith('nonlocal image URI found:'):
-        self._warnfunc(msg, '{0}:{1}'.format(*get_source_line(node)))
+        _warn_node_old(self, msg, *args, **kwargs)
 
 sphinx.environment.BuildEnvironment.warn_node = _warn_node
-
 
 # -- General configuration ------------------------------------------------
 

@@ -672,3 +672,12 @@ SQLALCHEMY_DATABASE_URI = os.environ.get(
 SQLALCHEMY_ECHO = False
 #: Track modifications to objects.
 SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+# StatsD
+# ======
+#: Default StatsD host (i.e. no request timing)
+STATSD_HOST = None
+#: Default StatsD port
+STATSD_port = 8125
+#: Default StatsD port
+STATSD_PREFIX = 'zenodo'

@@ -49,7 +49,7 @@ tests_require = [
 
 extras_require = {
     'docs': [
-        'Sphinx>=1.3',
+        'Sphinx>=1.4',
     ],
     'postgresql': [
         'invenio-db[postgresql,versioning]>=1.0.0a9',
@@ -107,7 +107,7 @@ install_requires = [
     'invenio-logging>=1.0.0a2',
     'invenio-mail>=1.0.0a3',
     'invenio-marc21>=1.0.0a2',
-    'invenio-migrator>=1.0.0a4',
+    'invenio-migrator>=1.0.0a5',
     'invenio-oaiserver>=1.0.0a5',
     'invenio-oauth2server>=1.0.0a5',
     'invenio-oauthclient>=1.0.0a2',
@@ -132,6 +132,7 @@ install_requires = [
     'Pillow>=3.2.0',
     'python-slugify>=1.2.0',
     'raven<=5.1.0',
+    'wsgi-statsd>=0.3.1',
     'zenodo-migrationkit>=1.0.0.dev20150000',
 ]
 

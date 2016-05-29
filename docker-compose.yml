@@ -23,12 +23,14 @@ web:
     - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
     - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
     - "APP_SECRET_KEY=CHANGE_ME"
+    - "APP_STATSD_HOST=statsd"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
   links:
     - cache
     - es
     - mq
     - db
+    - statsd
   volumes_from:
     - static
 worker:
@@ -43,14 +45,34 @@ worker:
     - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
     - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
     - "APP_SECRET_KEY=CHANGE_ME"
+    - "APP_STATSD_HOST=statsd"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
   links:
     - cache
     - es
     - mq
     - db
+    - statsd
   volumes_from:
     - static
+kibana:
+  image: kibana
+  ports:
+    - "5601:5601"
+  environment:
+    - "ELASTICSEARCH_URL=http://es:9200"
+  links:
+    - es
+statsd:
+  build: ./docker/statsd/
+  restart: "always"
+  ports:
+    - "8125/udp:8125/udp"
+  environment:
+    - "ES_HOST=es"
+    - "ES_PORT=9200"
+  links:
+    - es
 cache:
   image: redis
   restart: "always"
@@ -87,5 +109,6 @@ static:
   command: /bin/true
   user: zenodo
   volumes:
-    - "/usr/local/var/zenodo-instance/static"
+    - "/usr/local/var/instance/static"
+    - "/usr/local/var/data"
     - ".:/code"

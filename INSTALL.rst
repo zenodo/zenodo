@@ -14,20 +14,21 @@ using Docker Compose:
     $ docker-compose build
     $ docker-compose up
 
-
 Next, create the database, indexes, fixtures and an admin user:
 
 .. code-block:: console
 
-    $ docker-compose run web zenodo db create
-    $ docker-compose run web zenodo index init
-    $ docker-compose run web zenodo fixtures init
-    $ docker-compose run web zenodo fixtures loaddemorecords
-    $ docker-compose run web zenodo users create info@zenodo.org -a
-    $ docker-compose run web zenodo access \
+    $ docker-compose run --rm statsd init-es.sh
+    $ docker-compose run --rm web zenodo db create
+    $ docker-compose run --rm web zenodo index init
+    $ docker-compose run --rm web zenodo fixtures init
+    $ docker-compose run --rm web zenodo fixtures loaddemorecords
+    $ docker-compose run --rm web zenodo users create info@zenodo.org -a
+    $ docker-compose run --rm web zenodo access \
     allow admin-access -e info@zenodo.org
-    $ docker-compose run web zenodo migration reindex recid
-    $ docker-compose run web zenodo index run -d
+    $ docker-compose run --rm web zenodo migration recordsrun
+    $ docker-compose run --rm web zenodo migration reindex recid
+    $ docker-compose run --rm web zenodo index run -d
 
 Now visit the following URL in your browser:
 
@@ -46,8 +47,10 @@ Also the following ports are exposed on the Docker host:
 - ``443``: Nginx
 - ``5000``: Zenodo
 - ``5432``: PostgreSQL
+- ``5601``: Kibana
 - ``5672``: RabbitMQ
 - ``6379``: Redis
+- ``8125``: StatsD
 - ``9200``: Elasticsearch
 - ``9300``: Elasticsearch
 - ``15672``: RabbitMQ management console
@@ -55,4 +58,3 @@ Also the following ports are exposed on the Docker host:
 **Dependencies**
 
 Zenodo depends on PostgreSQL, Elasticsearch, Redis and RabbitMQ.
-

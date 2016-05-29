@@ -219,14 +219,23 @@ copy files instead of symlinking:
 
 Metrics
 ~~~~~~~
-Zenodo uses the Invenio-Metrics module to compute metrics at given intervals
-and send it to the CERN monitoring infrastructure.
+Zenodo uses the Invenio-Metrics module to compute application KPIs at given
+intervals and send it to the CERN monitoring infrastructure.
 
 .. code-block:: python
 
    METRICS_XSLS_API_URL = "http://xsls-dev.cern.ch"
    METRICS_XSLS_SERVICE_ID = "myid"
 
+StatsD
+~~~~~~
+Zenodo uses StatsD to measure request performance.
+
+.. code-block:: python
+
+   STATSD_HOST = "localhost"
+   STATSD_PORT = 8125
+   STATSD_PREFIX = "zenodo"
 
 Vocabularies
 ------------

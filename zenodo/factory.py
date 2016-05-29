@@ -32,6 +32,8 @@ import sys
 from invenio_base.app import create_app_factory
 from invenio_base.wsgi import create_wsgi_factory
 from invenio_config import create_conf_loader
+from statsd import StatsClient
+from wsgi_statsd import StatsdTimingMiddleware
 
 from . import config
 
@@ -54,6 +56,25 @@ static_folder = os.getenv(env_prefix + '_STATIC_FOLDER') or \
 Defaults to ``<virtualenv>/var/instance/static/``. Can be overwritten
 using the environment variable ``APP_STATIC_FOLDER``
 """
+
+
+def create_wsgi_statsd_factory(mounts_factories):
+    """Create WSGI statsd factory."""
+    wsgi_factory = create_wsgi_factory(mounts_factories)
+
+    def create_wsgi(app, **kwargs):
+        application = wsgi_factory(app, **kwargs)
+
+        host = app.config.get('STATSD_HOST')
+        port = app.config.get('STATSD_PORT', 8125)
+        prefix = app.config.get('STATSD_PREFIX')
+
+        if host and port and prefix:
+            client = StatsClient(prefix=prefix, host=host, port=port)
+            return StatsdTimingMiddleware(application, client)
+        return application
+    return create_wsgi
+
 
 create_celery = create_app_factory(
     'zenodo',
@@ -82,7 +103,7 @@ create_app = create_app_factory(
     extension_entry_points=['invenio_base.apps'],
     blueprint_entry_points=['invenio_base.blueprints'],
     converter_entry_points=['invenio_base.converters'],
-    wsgi_factory=create_wsgi_factory({'/api': create_api}),
+    wsgi_factory=create_wsgi_statsd_factory({'/api': create_api}),
     instance_path=instance_path,
     static_folder=static_folder,
 )
