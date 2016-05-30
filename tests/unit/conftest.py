@@ -40,7 +40,6 @@ from helpers import fill_oauth2_headers
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
 from invenio_db import db as db_
-from invenio_deposit.api import Deposit
 from invenio_deposit.permissions import action_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
@@ -54,6 +53,7 @@ from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
 from zenodo.modules.records.serializers.bibtex import Bibtex
+from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 
 
 @pytest.yield_fixture(scope='session')

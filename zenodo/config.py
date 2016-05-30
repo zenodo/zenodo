@@ -138,7 +138,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
         pid_type='depid',
         pid_minter='zenodo_deposit_minter',
         pid_fetcher='zenodo_deposit_fetcher',
-        record_class='invenio_deposit.api:Deposit',
+        record_class='zenodo.modules.deposit.api:ZenodoDeposit',
         record_loaders={
             'application/json': (
                 'zenodo.modules.deposit.loaders:legacyjson_v1'),

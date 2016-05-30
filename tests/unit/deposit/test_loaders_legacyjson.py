@@ -26,9 +26,9 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime
 
-from invenio_deposit.api import Deposit
 
 from zenodo.modules.deposit.loaders import legacyjson_v1_translator
+from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 
 
 def t(**kwargs):
