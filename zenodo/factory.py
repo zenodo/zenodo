@@ -30,7 +30,7 @@ import os
 import sys
 
 from invenio_base.app import create_app_factory
-from invenio_base.wsgi import create_wsgi_factory
+from invenio_base.wsgi import create_wsgi_factory, wsgi_proxyfix
 from invenio_config import create_conf_loader
 from statsd import StatsClient
 from wsgi_statsd import StatsdTimingMiddleware
@@ -103,7 +103,8 @@ create_app = create_app_factory(
     extension_entry_points=['invenio_base.apps'],
     blueprint_entry_points=['invenio_base.blueprints'],
     converter_entry_points=['invenio_base.converters'],
-    wsgi_factory=create_wsgi_statsd_factory({'/api': create_api}),
+    wsgi_factory=wsgi_proxyfix(
+        create_wsgi_statsd_factory({'/api': create_api})),
     instance_path=instance_path,
     static_folder=static_folder,
 )
