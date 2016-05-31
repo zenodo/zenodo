@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -20,13 +20,7 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
-
-FIXME:
-  - List of authors should be injected into the template.
-  - PDF URLS in highwire
-  - <link rel="alternate" type="application/pdf" href="https://zenodo.org/record/19169/files/WDS_Strategic_Plan_2014-2018.pdf">
-
--#}
+#}
 
 {%- from "invenio_formatter/macros/meta.html" import meta_twittercard, meta_opengraph, meta_highwire -%}
 
@@ -35,6 +29,13 @@ FIXME:
 {%- set meta_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value, _external=True) -%}
 {%- set meta_authors = record.creators|map(attribute='familyname') -%}
 {%- set meta_publication_date = record.publication_date|from_isodate -%}
+{%- set files = record.files if current_user|has_access_to(record) else [] %}
+
+{% if files | selectattr("type", "equalto", "pdf") | list | length is equalto 0 %}
+  {% set pdf_url_meta_highwire = "" %}
+{% else %}
+  {% set pdf_url_meta_highwire = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=files | selectattr("type", "equalto", "pdf") | first | attr("key")) %}
+{% endif %}
 
 {{ meta_highwire(
   meta_title,
@@ -44,15 +45,15 @@ FIXME:
   doi=record.doi,
   keywords=record.keywords,
   publication_date=publication_date,
+  pdf_url=pdf_url_meta_highwire
 ) }}
 {{ meta_opengraph(meta_title, meta_description, url=meta_url) }}
 {{ meta_twittercard(meta_title, meta_description) }}
     <link rel="canonical" href="{{ meta_url }}">
-{# FIXME
-{%- if zenodo_files -%}
-{%- for file in zenodo_files|sort(attribute='comment') -%}
-<link rel="alternate" type="{{file.mime}}" href="{{file.get_url().decode('utf8')}}">
-{%- if file.get_superformat() == '.pdf' -%}<meta content="{{file.get_url().decode('utf8')}}" name="citation_pdf_url" />{%- endif -%}
+
+<bla>{{ files | selectattr("type", "equalto", "pdf") | first }}</bla>
+
+{%- for file in files or [] -%}
+  {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key) %}
+  <link rel="alternate" type="{{file.mimetype}}" href="{{ file_url }}">
 {%- endfor -%}
-{%- endif -%}
-#}
