@@ -1,9 +1,18 @@
-frontend:
-  build: ./docker/nginx/
+lb:
+  build: ./docker/haproxy/
   restart: "always"
   ports:
     - "80:80"
     - "443:443"
+    - "8080:8080"
+  links:
+    - frontend
+frontend:
+  build: ./docker/nginx/
+  restart: "always"
+  ports:
+    - "81:80"
+    - "444:443"
   links:
     - web
   volumes_from:
@@ -25,7 +34,7 @@ web:
     - "APP_SECRET_KEY=CHANGE_ME"
     - "APP_STATSD_HOST=statsd"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-    - "APP_WSGI_PROXIES=1"
+    - "APP_WSGI_PROXIES=2"
   links:
     - cache
     - es
@@ -48,7 +57,7 @@ worker:
     - "APP_SECRET_KEY=CHANGE_ME"
     - "APP_STATSD_HOST=statsd"
     - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-    - "APP_WSGI_PROXIES=1"
+    - "APP_WSGI_PROXIES=2"
   links:
     - cache
     - es

@@ -33,6 +33,7 @@ include Dockerfile
 include LICENSE
 include pytest.ini
 include zenodo/modules/theme/static/img/LICENSE
+include zenodo/modules/theme/static/ping
 recursive-include .tx *
 recursive-include benchmarks *.py
 recursive-include docker *
