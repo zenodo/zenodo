@@ -24,47 +24,39 @@ from __future__ import absolute_import, print_function
 import json
 
 from flask import url_for
-from invenio_pidstore.models import PersistentIdentifier
-from invenio_records.models import RecordMetadata
 from invenio_search import current_search
 from six import BytesIO
 
 
-def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
-                                    write_token, oauth2_headers_user_1):
+def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
+                                    oauth2_headers_user_1):
     """Test zenodo quickstart workflow."""
     with api.test_request_context():
         with api.test_client() as client:
-            # try get deposits as anonymous user
-            res = client.get(
-                url_for('invenio_deposit_rest.depid_list')
-            )
+            # Try get deposits as anonymous user
+            res = client.get(url_for('invenio_deposit_rest.depid_list'))
             assert res.status_code == 401
 
-            # try get deposits as logged-in user
+            # Try get deposits as logged-in user
             res = client.get(
                 url_for('invenio_deposit_rest.depid_list'),
                 headers=oauth2_headers_user_1
             )
             assert res.status_code == 200
-            data = json.loads(res.data.decode('utf-8'))
+            data = json.loads(res.get_data(as_text=True))
             assert data == []
 
-            # create a new deposit
-            deposit = {
-            }
-
+            # Create a new deposit
             res = client.post(
                 url_for('invenio_deposit_rest.depid_list'),
                 headers=oauth2_headers_user_1,
-                data=json.dumps(deposit)
+                data=json.dumps({})
             )
             assert res.status_code == 201
-            data = json.loads(res.data.decode('utf-8'))
+            data = json.loads(res.get_data(as_text=True))
             deposit_id = data['id']
-            # FIXME
-            #  assert data['files'] == []
-            #  assert data['title'] == ''
+            assert data['files'] == []
+            assert data['title'] == ''
             assert 'created' in data
             assert 'modified' in data
             assert 'id' in data
@@ -74,10 +66,9 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
 
             current_search.flush_and_refresh(index='deposits')
 
-            # upload a file
+            # Upload a file
             files = {'file': (BytesIO(b'1, 2, 3'), "myfirstfile.csv"),
                      'name': 'myfirstfile.csv'}
-
             res = client.post(
                 data['links']['files'],
                 headers=oauth2_headers_user_1,
@@ -85,7 +76,7 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
                 content_type='multipart/form-data',
             )
             assert res.status_code == 201
-            data = json.loads(res.data.decode('utf-8'))
+            data = json.loads(res.get_data(as_text=True))
             assert data['checksum'] == 'md5:66ce05ea43c73b8e33c74c12d0371bc9'
             assert data['filename'] == 'myfirstfile.csv'
             assert data['filesize'] == 7
@@ -106,22 +97,22 @@ def test_zenodo_quickstart_workflow(api, api_client, db, es, location,
                 }
             }
             res = client.put(
-                url_for('invenio_deposit_rest.depid_item',
-                        pid_value=deposit_id),
+                url_for(
+                    'invenio_deposit_rest.depid_item', pid_value=deposit_id),
                 headers=oauth2_headers_user_1,
                 data=json.dumps(deposit)
             )
             assert res.status_code == 200
 
-            # publish deposit
+            # Publish deposit
             res = client.post(
                 url_for('invenio_deposit_rest.depid_actions',
                         pid_value=deposit_id, action='publish'),
                 headers=oauth2_headers_user_1,
             )
             assert res.status_code == 202
-            #  Deposit.get_record()
-            data = json.loads(res.data.decode('utf-8'))
-            pid = PersistentIdentifier.query.filter_by(
-                pid_value=data['id']).one()
-            RecordMetadata.query.filter_by(id=pid.object_uuid).one()
+
+            # Check that record exists.
+            recid = json.loads(res.get_data(as_text=True))['record_id']
+            res = client.get(url_for(
+                'invenio_records_rest.recid_item', pid_value=recid))

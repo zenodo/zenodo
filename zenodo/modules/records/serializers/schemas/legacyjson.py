@@ -219,36 +219,36 @@ class MetadataSchemaV1(Schema):
         return clean_empty(data, empty_keys)
 
 
-def legacy_state(o):
-    """Dinamically build legacy state."""
-    if o['metadata'].get('_deposit', {}).get('status', 'draft') == 'draft':
-        if o['metadata'].get('_deposit', {}).get('pid', {}):
-            return 'inprogress'
-        else:
-            return 'unsubmitted'
-    return 'done'
-
 class LegacyJSONSchemaV1(Schema):
     """Legacy JSON schema (used by deposit)."""
 
     created = fields.Str()
     doi = fields.Str(attribute='metadata.doi')
     doi_url = DOILink(attribute='metadata.doi')
-    files = fields.List(fields.Nested(FileSchemaV1))
+    files = fields.List(fields.Nested(FileSchemaV1), default=[])
     # Make into integer
-    id = fields.String(attribute='pid.pid_value')
+    id = fields.Integer(attribute='pid.pid_value')
     metadata = fields.Nested(MetadataSchemaV1, attribute='metadata')
     modified = fields.Str(attribute='updated')
     owner = fields.Method('get_owners')
     record_id = fields.Integer(attribute='metadata.recid')
     record_url = fields.String()
-    state = fields.Function(legacy_state)
+    state = fields.Method('get_state')
     submitted = fields.Function(
         lambda o: o['metadata'].get(
             '_deposit', {}).get('status', 'draft') == 'published'
     )
-    title = fields.String(attribute='metadata.title')
+    title = fields.String(attribute='metadata.title', default='')
     links = fields.Raw()
+
+    def get_state(self, o):
+        """Get state of deposit."""
+        if o['metadata'].get('_deposit', {}).get('status', 'draft') == 'draft':
+            if o['metadata'].get('_deposit', {}).get('pid', {}):
+                return 'inprogress'
+            else:
+                return 'unsubmitted'
+        return 'done'
 
     def get_owners(self, obj):
         """Get owners."""

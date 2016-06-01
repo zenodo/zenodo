@@ -88,6 +88,7 @@ search_js = NpmBundle(
     filters='jsmin',
     output="gen/zenodo.search.%(version)s.js",
     npm={
+        'invenio-search-js': '~0.2.0',
     }
 )
 """Search JavaScript bundle (with communities support)."""

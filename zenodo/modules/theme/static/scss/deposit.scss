@@ -2,4 +2,11 @@
     .jumbotron {
         background-color: transparent;
     }
+
+    .active {
+        font-weight: bold;
+        .glyphicon {
+            color: $brand-success;
+        }
+    }
 }

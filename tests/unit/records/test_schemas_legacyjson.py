@@ -34,7 +34,7 @@ legacyjson_v1.replace_refs = False
 def test_id(minimal_record_model, depid_pid):
     """Test created."""
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
-    assert obj['id'] == depid_pid.pid_value
+    assert obj['id'] == int(depid_pid.pid_value)
 
 
 def test_created_modified(minimal_record_model, depid_pid):

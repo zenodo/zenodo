@@ -275,10 +275,20 @@ class FilesSchema(Schema):
             return missing
 
 
+class OwnerSchema(Schema):
+    """Schema for owners.
+
+    Allows us to later introduce more properties for an owner.
+    """
+
+    id = fields.Function(lambda x: x)
+
+
 class RecordSchemaJSONV1(Schema):
     """Schema for records v1 in JSON."""
 
     id = fields.Integer(attribute='pid.pid_value', dump_only=True)
+    doi = fields.Str(attribute='metadata.doi', dump_only=True)
     owners = fields.List(
         fields.Integer, attribute='metadata.owners', dump_only=True)
     metadata = fields.Nested(MetadataSchemaV1)
@@ -303,3 +313,15 @@ class RecordSchemaJSONV1(Schema):
             'https://zenodo.org/schemas/deposits/records/record-v1.0.0.json'
 
         return data
+
+
+class DepositSchemaJSONV1(RecordSchemaJSONV1):
+    """Deposit schema.
+
+    Same as the Record schema except for some few extra additions.
+    """
+
+    owners = fields.Nested(
+        OwnerSchema, dump_only=True, attribute='metadata._deposit.owners',
+        many=True)
+    status = fields.Str(dump_only=True, attribute='metadata._deposit.status')

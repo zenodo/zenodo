@@ -24,17 +24,15 @@
 
 """PID Fetchers."""
 
-from collections import namedtuple
+from __future__ import absolute_import, print_function
 
-from invenio_pidstore.providers.recordid import RecordIdProvider
-
-FetchedPID = namedtuple('FetchedPID', ['provider', 'pid_type', 'pid_value'])
+from invenio_pidstore.fetchers import FetchedPID
 
 
 def zenodo_record_fetcher(dummy_record_uuid, data):
     """Fetch a record's identifiers."""
     return FetchedPID(
-        provider=RecordIdProvider,
-        pid_type=RecordIdProvider.pid_type,
+        provider=None,
+        pid_type='recid',
         pid_value=str(data['recid']),
     )

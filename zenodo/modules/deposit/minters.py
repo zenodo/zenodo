@@ -26,23 +26,30 @@
 
 from __future__ import absolute_import
 
-import uuid
-from datetime import datetime
-
-from invenio_pidstore.models import RecordIdentifier
-
-from .providers import ZenodoDepositProvider
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus, \
+    RecordIdentifier
 
 
 def zenodo_deposit_minter(record_uuid, data):
-    """Mint a deposit identifier."""
-    provider = ZenodoDepositProvider.create(
+    """Mint deposit identifier."""
+    id_ = RecordIdentifier.next()
+    depid = PersistentIdentifier.create(
+        'depid',
+        str(id_),
         object_type='rec',
         object_uuid=record_uuid,
-        pid_value=RecordIdentifier.next(),
+        status=PIDStatus.REGISTERED,
     )
-    data['_deposit'] = {
-        'id': provider.pid.pid_value,
-        'status': 'draft',
-    }
-    return provider.pid
+    # Reserve recid with same number.
+    PersistentIdentifier.create(
+        'recid', depid.pid_value,
+        status=PIDStatus.RESERVED
+    )
+    data.update({
+        '_deposit': {
+            'id': depid.pid_value,
+            'status': 'draft',
+        },
+        'recid': id_,
+    })
+    return depid

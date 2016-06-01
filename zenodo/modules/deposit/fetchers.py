@@ -24,17 +24,15 @@
 
 """Persistent identifier fetchers."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 from invenio_pidstore.fetchers import FetchedPID
-
-from .providers import ZenodoDepositProvider
 
 
 def zenodo_deposit_fetcher(record_uuid, data):
     """Fetch a deposit identifier."""
     return FetchedPID(
-        provider=ZenodoDepositProvider,
-        pid_type=ZenodoDepositProvider.pid_type,
+        provider=None,
+        pid_type='depid',
         pid_value=data['_deposit']['id'],
     )

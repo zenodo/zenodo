@@ -81,7 +81,10 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
     # Create deposit
     response = client.post(
         deposit_url, data=json.dumps(test_data), headers=auth_headers)
-    links = get_json(response, code=201)['links']
+    data = get_json(response, code=201)
+
+    deposit_id = data['id']
+    links = data['links']
 
     # Get deposition
     current_search.flush_and_refresh(index='deposits')
@@ -103,6 +106,9 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
     # Publish deposition
     response = client.post(links['publish'], headers=auth_headers)
     record_id = get_json(response, code=202)['record_id']
+
+    # Check that same id is being used for both deposit and record.
+    assert deposit_id == record_id
 
     # Does record exists?
     current_search.flush_and_refresh(index='records')

@@ -38,7 +38,7 @@ from invenio_records_rest.serializers.response import record_responsify, \
 from .bibtex import BibTeXSerializer
 from .schemas.datacite import DataCiteSchemaJSONV1
 from .schemas.dc import DublinCoreJSONV1
-from .schemas.json import RecordSchemaJSONV1
+from .schemas.json import RecordSchemaJSONV1, DepositSchemaJSONV1
 from .schemas.legacyjson import LegacyJSONSchemaV1
 from .schemas.marcxml import RecordSchemaMARC
 from .legacyjson import LegacyJSONSerializer
@@ -48,6 +48,8 @@ from .legacyjson import LegacyJSONSerializer
 # ===========
 #: Zenodo JSON serializer version 1.0.0
 json_v1 = JSONSerializer(RecordSchemaJSONV1, replace_refs=True)
+#: Zenodo Deposit JSON serializer version 1.0.0
+deposit_json_v1 = JSONSerializer(DepositSchemaJSONV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 legacyjson_v1 = LegacyJSONSerializer(LegacyJSONSchemaV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
@@ -69,6 +71,9 @@ dc_v1 = DublinCoreSerializer(DublinCoreJSONV1, replace_refs=True)
 # ========================
 #: JSON record serializer for individual records.
 json_v1_response = record_responsify(json_v1, 'application/json')
+#: JSON record serializer for individual records.
+deposit_json_v1_response = record_responsify(
+    deposit_json_v1, 'application/vnd.zenodo.v1+json')
 #: JSON record legacy serializer for individual records.
 legacyjson_v1_response = record_responsify(legacyjson_v1, 'application/json')
 #: MARCXML record serializer for individual records.
@@ -83,6 +88,9 @@ dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 
 #: JSON record serializer for search results.
 json_v1_search = search_responsify(json_v1, 'application/json')
+#: JSON record serializer for search results.
+deposit_json_v1_search = search_responsify(
+    deposit_json_v1, 'application/vnd.zenodo.v1+json')
 #: JSON record legacy serializer for search results.
 legacyjson_v1_search = search_responsify(legacyjson_v1, 'application/json')
 #: MARCXML record serializer for search records.

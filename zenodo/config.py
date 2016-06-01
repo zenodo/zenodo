@@ -150,7 +150,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
             'application/json': (
                 'zenodo.modules.records.serializers:legacyjson_v1_response'),
             'application/vnd.zenodo.v1+json': (
-                'invenio_records_rest.serializers:json_v1_response'),
+                'zenodo.modules.records.serializers:deposit_json_v1_response'),
         },
         search_class='invenio_deposit.search:DepositSearch',
         search_factory_imp='zenodo.modules.deposit.query.search_factory',
@@ -158,7 +158,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
             'application/json': (
                 'zenodo.modules.records.serializers:legacyjson_v1_search'),
             'application/vnd.zenodo.v1+json': (
-                'invenio_records_rest.serializers:json_v1_search'),
+                'zenodo.modules.records.serializers:deposit_json_v1_search'),
         },
         files_serializers={
             'application/json': ('invenio_deposit.serializers'
