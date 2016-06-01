@@ -1,6 +1,6 @@
 {
   "mappings": {
-    "deposits-record-v1.0.0": {
+    "deposit-record-v1.0.0": {
       "properties": {
         "title": {
           "type": "string"
