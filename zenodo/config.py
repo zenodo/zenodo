@@ -32,6 +32,8 @@ from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.utils import check_oauth2_scope_write, \
     check_oauth2_scope_write_elasticsearch
+from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
@@ -213,6 +215,10 @@ FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
 #: Overwrite default Sentry extension class to support Sentry 6.
 LOGGING_SENTRY_CLASS = 'invenio_logging.sentry6:Sentry6'
 
+GITHUB_REMOTE_APP.update(dict(
+    description='Software collaboration platform, with one-click '
+                'software preservation in Zenodo.',
+))
 
 #: Defintion of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
@@ -240,40 +246,18 @@ OAUTHCLIENT_REMOTE_APPS = dict(
     #         app_key="OAUTHCLIENT_GITHUB_CREDENTIALS",
     #     )
     # ),
-    orcid=dict(
-        title='ORCID',
-        description='Connecting Research and Researchers.',
-        icon='',
-        authorized_handler="invenio_oauthclient.handlers"
-                           ":authorized_signup_handler",
-        disconnect_handler="invenio_oauthclient.handlers"
-                           ":disconnect_handler",
-        signup_handler=dict(
-            info="invenio_oauthclient.contrib.orcid:account_info",
-            setup="invenio_oauthclient.contrib.orcid:account_setup",
-            view="invenio_oauthclient.handlers:signup_handler",
-        ),
-        params=dict(
-            request_token_params={'scope': '/authenticate'},
-            base_url='https://pub.orcid.org/',
-            request_token_url=None,
-            access_token_url="https://pub.orcid.org/oauth/token",
-            access_token_method='POST',
-            authorize_url="https://orcid.org/oauth/authorize?show_login=true",
-            app_key="OAUTHCLIENT_ORCID_CREDENTIALS",
-            content_type="application/json",
-        )
-    ),
+    github=GITHUB_REMOTE_APP,
+    orcid=ORCID_REMOTE_APP,
 )
 
 #: Credentials for GitHub (must be changed to work).
-OAUTHCLIENT_GITHUB_CREDENTIALS = dict(
+GITHUB_APP_CREDENTIALS = dict(
     consumer_key="CHANGE_ME",
     consumer_secret="CHANGE_ME",
 )
 
 #: Credentials for ORCID (must be changed to work).
-OAUTHCLIENT_ORCID_CREDENTIALS = dict(
+ORCID_APP_CREDENTIALS = dict(
     consumer_key="CHANGE_ME",
     consumer_secret="CHANGE_ME",
 )
