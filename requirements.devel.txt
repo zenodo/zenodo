@@ -29,5 +29,4 @@
 -e git+https://github.com/inveniosoftware/invenio-oauthclient.git#egg=invenio-oauthclient
 -e git+https://github.com/inveniosoftware/invenio-records.git#egg=invenio-records
 -e git+https://github.com/inveniosoftware/invenio-sipstore.git#egg=invenio-sipstore
--e git+https://github.com/inveniosoftware/invenio-webhooks.git#egg=invenio-webhooks
 -e git+https://github.com/zenodo/zenodo-migrationkit.git#egg=zenodo-migrationkit

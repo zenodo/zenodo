@@ -26,12 +26,14 @@
 
 from __future__ import absolute_import
 
-from invenio_pidstore.models import PersistentIdentifier
+import idutils
+from flask import current_app
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
 
 
 def zenodo_record_minter(record_uuid, data):
-    """Mint record identifier."""
+    """Mint record identifier (and DOI)."""
     if 'recid' in data:
         recid = PersistentIdentifier.get('recid', data['recid'])
         recid.assign('rec', record_uuid)
@@ -41,4 +43,37 @@ def zenodo_record_minter(record_uuid, data):
             object_type='rec', object_uuid=record_uuid).pid
         data['recid'] = int(recid.pid_value)
 
+    zenodo_doi_minter(record_uuid, data)
+
     return recid
+
+
+def zenodo_doi_minter(record_uuid, data):
+    """Mint DOI."""
+    doi = data.get('doi')
+    status = PIDStatus.RESERVED
+    provider = None
+    prefix = current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']
+
+    # Create a DOI if no DOI was found.
+    if not doi:
+        assert 'recid' in data
+        doi = '{prefix}/zenodo.{recid}'.format(
+            prefix=prefix,
+            recid=data['recid'],
+        )
+        data['doi'] = doi
+
+    assert idutils.is_doi(doi)
+
+    if doi.startswith('{0}/'.format(prefix)):
+        provider = 'datacite'
+
+    return PersistentIdentifier.create(
+        'doi',
+        doi,
+        pid_provider=provider,
+        object_type='rec',
+        object_uuid=record_uuid,
+        status=status,
+    )

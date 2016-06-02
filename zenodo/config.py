@@ -54,7 +54,7 @@ SUPPORT_EMAIL = "info@zenodo.org"
 ZENODO_LOCAL_DOI_PREFIXES = ["10.5072", "10.5281"]
 
 #: The instance's DOI prefix.
-DATACITE_DOI_PREFIX = "10.5072"
+PIDSTORE_DATACITE_DOI_PREFIX = "10.5072"
 
 
 # Debug
@@ -288,7 +288,7 @@ JSONSCHEMAS_HOST = 'zenodo.org'
 # =====
 #: Allowed configuration variables to use in page templates.
 PAGES_WHITELIST_CONFIG_KEYS = [
-    'DATACITE_DOI_PREFIX',
+    'PIDSTORE_DATACITE_DOI_PREFIX',
     'DEPOSIT_CONTRIBUTOR_TYPES',
     'FRONTPAGE_ENDPOINT',
     'SUPPORT_EMAIL',

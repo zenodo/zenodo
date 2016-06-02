@@ -66,6 +66,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
             assert 'modified' in data
             assert 'id' in data
             assert 'metadata' in data
+            assert 'doi' not in data
             assert data['state'] == 'unsubmitted'
             assert data['owner'] == write_token['token'].user_id
 
@@ -116,8 +117,14 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
                 headers=oauth2_headers_user_1,
             )
             assert res.status_code == 202
+            recid = json.loads(res.get_data(as_text=True))['record_id']
 
             # Check that record exists.
-            recid = json.loads(res.get_data(as_text=True))['record_id']
+            current_search.flush_and_refresh(index='records')
             res = client.get(url_for(
                 'invenio_records_rest.recid_item', pid_value=recid))
+            assert res.status_code == 200
+            data = json.loads(res.get_data(as_text=True))
+
+            # Assert that a DOI has been assigned.
+            assert data['doi'] == '10.5072/zenodo.{0}'.format(recid)

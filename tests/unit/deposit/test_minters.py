@@ -26,6 +26,7 @@ from __future__ import absolute_import, print_function
 
 from uuid import uuid4
 
+import pytest
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
@@ -40,6 +41,7 @@ def test_double_minting_depid_recid(db):
     # Assert values added to data
     assert data['_deposit']['id'] == '1'
     assert data['recid'] == 1
+    assert 'doi' not in data
     # Assert pid values
     assert pid.pid_type == 'depid'
     assert pid.pid_value == '1'
@@ -57,3 +59,34 @@ def test_double_minting_depid_recid(db):
     assert pid.pid_value == '1'
     assert pid.status == PIDStatus.REGISTERED
     assert pid.object_uuid == rec_uuid
+    assert data['doi'] == '10.5072/zenodo.1'
+
+
+@pytest.mark.parametrize('doi_in, doi_out', [
+    ('10.1234/foo', '10.1234/foo'),
+    ('10.5072/foo', '10.5072/foo'),
+    (None, '10.5072/zenodo.1'),
+])
+def test_doi_minting(db, doi_in, doi_out):
+    """Test using same integer for dep/rec ids."""
+    dep_uuid, rec_uuid = uuid4(), uuid4()
+    data = dict(doi=doi_in)
+    zenodo_deposit_minter(dep_uuid, data)
+    zenodo_record_minter(rec_uuid, data)
+    db.session.commit()
+
+    pid = PersistentIdentifier.get('doi', doi_out)
+    assert pid.object_uuid == rec_uuid
+    assert pid.status == PIDStatus.RESERVED
+
+
+@pytest.mark.parametrize('doi', [
+    '1234/foo',
+    'a',
+])
+def test_invalid_doi(db, doi):
+    """Test using same integer for dep/rec ids."""
+    dep_uuid, rec_uuid = uuid4(), uuid4()
+    data = dict(doi=doi)
+    zenodo_deposit_minter(dep_uuid, data)
+    pytest.raises(AssertionError, zenodo_record_minter, rec_uuid, data)
