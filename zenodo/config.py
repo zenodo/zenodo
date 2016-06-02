@@ -96,7 +96,7 @@ ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 #: PID minter used during record creation.
 DEPOSIT_PID_MINTER = 'zenodo_record_minter'
 #: REST API configuration.
-_PID = 'pid(depid,record_class="invenio_deposit.api:Deposit")'
+_PID = 'pid(depid,record_class="zenodo.modules.deposit.api:ZenodoDeposit")'
 
 DEPOSIT_REST_ENDPOINTS = dict(
     dep=dict(
@@ -394,6 +394,8 @@ RECORDS_REST_ENDPOINTS = dict(
         record_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers.json_v1_response'),
+            'application/vnd.zenodo.v1+json': (
+                'zenodo.modules.records.serializers.json_v1_response'),
             'application/marcxml+xml': (
                 'zenodo.modules.records.serializers.marcxml_v1_response'),
             'application/x-bibtex': (
@@ -405,6 +407,8 @@ RECORDS_REST_ENDPOINTS = dict(
         },
         search_serializers={
             'application/json': (
+                'zenodo.modules.records.serializers:json_v1_search'),
+            'application/vnd.zenodo.v1+json': (
                 'zenodo.modules.records.serializers:json_v1_search'),
             'application/marcxml+xml': (
                 'zenodo.modules.records.serializers.marcxml_v1_search'),

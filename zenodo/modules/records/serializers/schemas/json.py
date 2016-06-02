@@ -28,10 +28,11 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime
 
-from flask import url_for
+from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
 from marshmallow import Schema, ValidationError, fields, missing, post_load, \
     validate, validates_schema
+from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
 
 from .. import fields as zfields
@@ -243,8 +244,6 @@ class MetadataSchemaV1(Schema):
     @post_load(pass_many=False)
     def format_dates(self, data):
         """Convert dates back to to ISO-format."""
-        print(data)
-        print('Stop it')
         for f in ['publication_date', 'embargo_date']:
             if f in data:
                 data[f] = data[f].isoformat()
@@ -292,7 +291,7 @@ class RecordSchemaJSONV1(Schema):
     owners = fields.List(
         fields.Integer, attribute='metadata.owners', dump_only=True)
     metadata = fields.Nested(MetadataSchemaV1)
-    links = fields.Raw(dump_only=True)
+    links = fields.Method('get_links', dump_only=True)
     files = fields.Nested(
         FilesSchema, many=True, dump_only=True, attribute='metadata._files')
     created = fields.Str(dump_only=True)
@@ -300,6 +299,19 @@ class RecordSchemaJSONV1(Schema):
     revision = fields.Integer(dump_only=True)
     _deposit_actions = fields.Nested(
         ActionSchemaV1, load_from='actions', dump_to='actions')
+
+    def get_links(self, obj):
+        """."""
+        links = obj.get('links', {})
+
+        doi = obj.get('metadata', {}).get('doi')
+        if doi:
+            links['doi_badge'] = "{base}/badge/DOI/{value}.svg".format(
+                base=current_app.config.get('THEME_SITEURL'),
+                value=quote(doi),
+            )
+
+        return links
 
     @post_load(pass_many=False)
     def remove_envelope(self, data):

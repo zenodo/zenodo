@@ -26,12 +26,31 @@
 
 from __future__ import absolute_import
 
-from invenio_deposit.api import Deposit
+from os.path import splitext
+
 from invenio_communities.models import Community, InclusionRequest
+from invenio_deposit.api import Deposit
+from invenio_records_files.api import FileObject
+
+
+class ZenodoFileObject(FileObject):
+    """Zenodo file object."""
+
+    def dumps(self):
+        """Create a dump."""
+        super(ZenodoFileObject, self).dumps()
+        self.data.update({
+            # Remove dot from extension.
+            'type': splitext(self.data['key'])[1][1:].lower()
+        })
+
+        return self.data
 
 
 class ZenodoDeposit(Deposit):
     """Define API for changing deposit state."""
+
+    file_cls = ZenodoFileObject
 
     @staticmethod
     def _create_inclusion_requests(comm_ids, record):
@@ -97,9 +116,10 @@ class ZenodoDeposit(Deposit):
             record = super(ZenodoDeposit, self)._publish_new(id_=id_)
             self['communities'] = communities
             self._create_inclusion_requests(communities, record)
-            return record
         else:
-            return super(ZenodoDeposit, self)._publish_new(id_=id_)
+            record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+
+        return record
 
     def _publish_edited(self):
         """Publish the edited deposit with communities merging."""
