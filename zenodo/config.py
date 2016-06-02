@@ -39,6 +39,7 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import check_elasticsearch
+from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
 
 
 def _(x):
@@ -200,33 +201,14 @@ FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
 #: Overwrite default Sentry extension class to support Sentry 6.
 LOGGING_SENTRY_CLASS = 'invenio_logging.sentry6:Sentry6'
 
+GITHUB_REMOTE_APP.update(dict(
+    description='Software collaboration platform, with one-click '
+                'software preservation in Zenodo.',
+))
 
 #: Defintion of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
-    # github=dict(
-    #     title='GitHub',
-    #     description='Software collaboration platform, with one-click '
-    #                 'software preservation in Zenodo.',
-    #     icon='fa fa-github',
-    #     authorized_handler="zenodo.modules.github.views.handlers:authorized",
-    #     disconnect_handler="zenodo.modules.github.views.handlers:disconnect",
-    #     signup_handler=dict(
-    #         info="zenodo.modules.github.views.handlers:account_info",
-    #         setup="zenodo.modules.github.views.handlers:account_setup",
-    #         view="invenio.modules.oauthclient.handlers:signup_handler",
-    #     ),
-    #     params=dict(
-    #         request_token_params={
-    #             'scope': 'user:email,admin:repo_hook,read:org'
-    #         },
-    #         base_url='https://api.github.com/',
-    #         request_token_url=None,
-    #         access_token_url="https://github.com/login/oauth/access_token",
-    #         access_token_method='POST',
-    #         authorize_url="https://github.com/login/oauth/authorize",
-    #         app_key="OAUTHCLIENT_GITHUB_CREDENTIALS",
-    #     )
-    # ),
+    github=GITHUB_REMOTE_APP,
     orcid=dict(
         title='ORCID',
         description='Connecting Research and Researchers.',
@@ -254,7 +236,7 @@ OAUTHCLIENT_REMOTE_APPS = dict(
 )
 
 #: Credentials for GitHub (must be changed to work).
-OAUTHCLIENT_GITHUB_CREDENTIALS = dict(
+GITHUB_APP_CREDENTIALS = dict(
     consumer_key="CHANGE_ME",
     consumer_secret="CHANGE_ME",
 )
