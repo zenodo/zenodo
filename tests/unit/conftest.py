@@ -44,6 +44,7 @@ from invenio_db import db as db_
 from invenio_deposit.permissions import action_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
+from invenio_communities.models import Community
 from invenio_oauth2server.models import Client, Token
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
@@ -187,6 +188,21 @@ def users(app, db):
     return [{'email': user1.email, 'id': user1.id},
             {'email': user2.email, 'id': user2.id},
             {'email': user_admin.email, 'id': user_admin.id}]
+
+
+@pytest.fixture()
+def communities(db, users):
+    """Create communities."""
+    comm_data = [
+        {'id': 'c1', 'user_id': users[0]['id']},
+        {'id': 'c2', 'user_id': users[1]['id']},
+        {'id': 'c3', 'user_id': users[1]['id']},
+        {'id': 'c4', 'user_id': users[1]['id']},
+    ]
+    for c in comm_data:
+        Community.create(c['id'], user_id=c['user_id'])
+    db.session.commit()
+    return comm_data
 
 
 @pytest.fixture()
@@ -505,6 +521,7 @@ def deposit(app, es, users, location):
             dict(name='Smith, Jane', affiliation='Atlantis')
         ],
         description='Test Description',
+        resource_type=dict(type='publication'),
         publication_date='2013-05-08',
         access_right='open'
     )
