@@ -22,22 +22,39 @@
 
 from __future__ import absolute_import
 
-
-from flask import url_for, redirect, current_app
+import requests
+from flask import current_app, redirect, url_for
 from flask.ext.login import current_user
-from invenio.modules.oauthclient.models import RemoteToken
+
+from invenio.modules.accounts.models import UserEXT
+from invenio.modules.oauthclient.errors import OAuthResponseError
 from invenio.modules.oauthclient.handlers import authorized_signup_handler, \
     oauth_error_handler
-from invenio.modules.oauthclient.errors import OAuthResponseError
+from invenio.modules.oauthclient.models import RemoteToken
 
-from ..utils import init_account, init_api
 from ..tasks import disconnect_github
+from ..utils import init_account, init_api
 
 
 def account_info(remote, resp):
-    gh = init_api(resp['access_token'])
+    t = resp['access_token']
+    gh = init_api(t)
     ghuser = gh.user()
-    return dict(email=ghuser.email, nickname=ghuser.login)
+
+    email = None
+    r = requests.get('https://api.github.com/user/emails?access_token=%s' % t)
+    if r.status_code == 200:
+        emails = r.json()
+        for e in emails:
+            if e.get('primary', False) and e.get('verified', False):
+                email = e['email']
+
+    return dict(
+        email=email,
+        nickname=ghuser.login,
+        external_id=str(ghuser.id),
+        external_method="github",
+    )
 
 
 def account_setup(remote, token):
@@ -80,6 +97,11 @@ def disconnect(remote):
             remote.name, token.access_token, token.remote_account.extra_data
         )
         token.remote_account.delete()
+        # Delete account link.
+        UserEXT.query.filter_by(
+            id_user=current_user.get_id(),
+            method='github'
+        ).delete()
 
     return redirect(url_for('oauthclient_settings.index'))
 

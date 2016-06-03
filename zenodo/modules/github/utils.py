@@ -18,21 +18,21 @@
 ## 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
 
 import copy
-import github3
 import json
+from datetime import datetime
+from operator import itemgetter
+
+import dateutil.parser
+import github3
 import pytz
 import requests
-from operator import itemgetter
 from flask import current_app
 
-from datetime import datetime
-import dateutil.parser
-
-from invenio.ext.sqlalchemy import db
 from invenio.base.globals import cfg
-from invenio.modules.webhooks.models import CeleryReceiver
+from invenio.ext.sqlalchemy import db
 from invenio.modules.oauth2server.models import Token as ProviderToken
-
+from invenio.modules.oauthclient.utils import oauth_link_external_id
+from invenio.modules.webhooks.models import CeleryReceiver
 
 utcnow = lambda: datetime.now(tz=pytz.utc)
 """
@@ -91,6 +91,10 @@ def init_account(remote_token):
     gh = init_api(remote_token.access_token)
     ghuser = gh.user()
 
+    # Create user <-> external id link.
+    user = remote_token.remote_account.user
+    oauth_link_external_id(user, dict(id=ghuser.id, method="github"))
+
     # Setup local access tokens
     hook_token, internal_token = init_provider_tokens(
         remote_token.remote_account.user_id
@@ -98,6 +102,7 @@ def init_account(remote_token):
 
     # Initial structure of extra data
     extra_data = dict(
+        user_id=ghuser.id,
         login=ghuser.login,
         name=ghuser.name,
         tokens=dict(
