@@ -181,6 +181,17 @@ DEPOSIT_REST_ENDPOINTS = dict(
     ),
 )
 
+# SIPStore
+# ========
+#: Default JSON schema for the SIP agent
+SIPSTORE_DEFAULT_AGENT_JSONSCHEMA = 'sipstore/agent-webclient-v1.0.0.json'
+
+#: Enable the agent JSON schema
+SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
+
+#: Max length of SIPFile.filepath
+SIPSTORE_FILEPATH_MAX_LEN = 1000
+
 # Formatter
 # =========
 #: List of allowed titles in badges.

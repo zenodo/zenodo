@@ -32,6 +32,7 @@ from flask import current_app
 from invenio_deposit.api import Deposit as _Deposit
 from invenio_communities.models import Community, InclusionRequest
 from invenio_records_files.api import FileObject
+from zenodo.modules.sipstore.api import ZenodoSIP
 
 
 class ZenodoFileObject(FileObject):
@@ -213,3 +214,10 @@ class ZenodoDeposit(_Deposit):
         if not record['communities']:
             del record['communities']
         return record
+
+    def publish(self, pid=None, id_=None):
+        """Publish the Zenodo deposit."""
+        deposit = super(ZenodoDeposit, self).publish(pid, id_)
+        pid, record = deposit.fetch_published()
+        ZenodoSIP.create(pid, record)
+        return deposit

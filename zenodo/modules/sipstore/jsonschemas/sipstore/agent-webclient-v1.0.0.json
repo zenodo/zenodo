@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "Zenodo SIPStore Agent Web Client Schema v1.0.0.",
+  "description": "User agent information making the SIP.",
+  "id": "http://zenodo.org/schemas/sipstore/agent-webclient-v1.0.0.json",
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "ip_address": {
+      "type": "string"
+    }
+  }
+}
