@@ -194,10 +194,10 @@ def users(app, db):
 def communities(db, users):
     """Create communities."""
     comm_data = [
-        {'id': 'c1', 'user_id': users[0]['id']},
+        {'id': 'c1', 'user_id': users[1]['id']},
         {'id': 'c2', 'user_id': users[1]['id']},
-        {'id': 'c3', 'user_id': users[1]['id']},
-        {'id': 'c4', 'user_id': users[1]['id']},
+        {'id': 'c3', 'user_id': users[0]['id']},
+        {'id': 'c4', 'user_id': users[0]['id']},
     ]
     for c in comm_data:
         Community.create(c['id'], user_id=c['user_id'])

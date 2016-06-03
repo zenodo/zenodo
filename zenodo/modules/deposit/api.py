@@ -27,9 +27,10 @@
 from __future__ import absolute_import
 
 from os.path import splitext
+from flask import current_app
 
+from invenio_deposit.api import Deposit as _Deposit
 from invenio_communities.models import Community, InclusionRequest
-from invenio_deposit.api import Deposit
 from invenio_records_files.api import FileObject
 
 
@@ -47,58 +48,64 @@ class ZenodoFileObject(FileObject):
         return self.data
 
 
-class ZenodoDeposit(Deposit):
+class ZenodoDeposit(_Deposit):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject
 
     @staticmethod
-    def _create_inclusion_requests(comm_ids, record):
+    def _create_inclusion_requests(comms, record):
         """Create inclusion requests for communities.
 
-        :param comm_ids: Community IDs for which the inclusion requests might
-                         should be created (if they don't exist already).
-        :type comm_ids: list of str
+        :param comms: Community IDs for which the inclusion requests might
+                      should be created (if they don't exist already).
+        :type comms: list of str
         :param record: Record corresponding to this deposit.
         :type record: `invenio_records.api.Record`
         """
-        for comm_id in comm_ids:
+        for comm_id in comms:
             comm = Community.get(comm_id)
             if not InclusionRequest.get(comm_id, record.id):
                 InclusionRequest.create(comm, record)
 
     @staticmethod
-    def _remove_accepted_communities(comm_ids, record):
+    def _remove_accepted_communities(comms, record):
         """Remove accepted communities.
 
-        :param comm_ids: Already accepted community IDs which no longer
-                         should have this record.
-        :type comm_ids: list of str
+        :param comms: Already accepted community IDs which no longer
+                      should have this record.
+        :type comms: list of str
         :param record: Record corresponding to this deposit.
         :type record: `invenio_records.api.Record`
+        :returns: modified 'record' argument
+        :rtype: `invenio_records.api.Record`
         """
-        for comm_id in comm_ids:
+        for comm_id in comms:
             comm = Community.get(comm_id)
             if comm.has_record(record):
-                comm.remove_record(record)
+                comm.remove_record(record)  # Handles oai-sets internally
         return record
 
     @staticmethod
-    def _remove_obsolete_irs(comm_ids, record):
+    def _remove_obsolete_irs(comms, record):
         """Remove obsolete inclusion requests.
 
-        :param comm_ids: Community IDs as declared in deposit. Used to retire
-                         obsolete inclusion requests.
-        :type comm_ids: list of str
+        :param comms: Community IDs as declared in deposit. Used to remove
+                      obsolete inclusion requests.
+        :type comms: list of str
         :param record: Record corresponding to this deposit.
         :type record: `invenio_records.api.Record`
         """
         InclusionRequest.get_by_record(record.id).filter(
-            InclusionRequest.id_community.notin_(comm_ids)).delete(
+            InclusionRequest.id_community.notin_(comms)).delete(
                 synchronize_session='fetch')
 
     def _prepare_edit(self, record):
-        """Prepare deposit for editing."""
+        """Prepare deposit for editing.
+
+        Extend the deposit's communities metadata by the pending inclusion
+        requests.
+        """
         data = super(ZenodoDeposit, self)._prepare_edit(record)
         data.setdefault('communities', []).extend(
             [c.id_community for c in
@@ -108,32 +115,101 @@ class ZenodoDeposit(Deposit):
             del data['communities']
         return data
 
+    @staticmethod
+    def _update_oaiset(comms, record):
+        """Update the communities OAISets with newly added record.
+
+        :param comms: Community IDs for which the OAISets are to be updated.
+        :type comms: list of str
+        :param record: Record corresponding to this deposit.
+        :type record: `invenio_records.api.Record`
+        """
+        if current_app.config["COMMUNITIES_OAI_ENABLED"]:
+            from invenio_oaiserver.models import OAISet
+            for c in comms:
+                comm = Community.get(c)
+                oaiset = OAISet.query.filter_by(spec=comm.oaiset_spec).one()
+                oaiset.add_record(record)
+
+    @staticmethod
+    def _autoadd_communities(comms, record):
+        """Add record to all communities ommiting the inclusion request.
+
+        :param comms: Community IDs, to which the record should be added.
+        :type comms: list of str
+        :param record: Record corresponding to this deposit.
+        :type record: `invenio_records.api.Record`
+        """
+        for comm_id in comms:
+            comm = Community.get(comm_id)
+            comm.add_record(record)  # Handles oai-sets internally
+
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
         if 'communities' in self:
-            # pop the 'communities' entry for record creation
-            communities = self.pop('communities')
+            # pop the 'communities' entry so they aren't added to the Record
+            dep_comms = self.pop('communities')
+
+            # Communities for automatic acceptance
+            owned_comms = self._filter_by_owned_communities(dep_comms)
+
+            # Communities for which the InclusionRequest should be made
+            requested_comms = set(dep_comms) - set(owned_comms)
+
+            # Add the owned communities to the record
+            self['communities'] = sorted(list(owned_comms))
             record = super(ZenodoDeposit, self)._publish_new(id_=id_)
-            self['communities'] = communities
-            self._create_inclusion_requests(communities, record)
+
+            # Push the communities back so they appear in deposit
+            self['communities'] = dep_comms
+            self._create_inclusion_requests(requested_comms, record)
+            self._update_oaiset(owned_comms, record)
+            return record
         else:
             record = super(ZenodoDeposit, self)._publish_new(id_=id_)
 
         return record
+
+    def _filter_by_owned_communities(self, comms):
+        """Filter the list of communities for auto accept.
+
+        :param comms: Community IDs to be filtered by the deposit owners.
+        :type comms: list of str
+        :returns: Community IDs, which are owned by one of the deposit owners.
+        :rtype: list
+        """
+        return [c for c in comms if Community.get(c).id_user in
+                self['_deposit']['owners']]
 
     def _publish_edited(self):
         """Publish the edited deposit with communities merging."""
         pid, record = self.fetch_published()
         dep_comms = self.get('communities', [])
         rec_comms = record.get('communities', [])
+
+        # Already accepted communities which should be removed
         removals = set(rec_comms) - set(dep_comms)
+
+        # New communities by user
+        new_comms = set(dep_comms) - set(rec_comms)
+
+        # New communities, which should be added automatically
+        new_owned_comms = set(self._filter_by_owned_communities(new_comms))
+
+        # New communities, for which the InclusionRequests should be made
+        new_ir_comms = set(new_comms) - new_owned_comms
+
         self._remove_accepted_communities(removals, record)
-        additions = set(dep_comms) - set(rec_comms)
-        self._create_inclusion_requests(additions, record)
+        self._autoadd_communities(new_owned_comms, record)
+        self._create_inclusion_requests(new_ir_comms, record)
+
+        # Remove obsolete InclusionRequests
         self._remove_obsolete_irs(dep_comms, record)
-        new_rec_comms = sorted(list(set(dep_comms) & set(rec_comms)))
+
+        # Communities, which should be in record after publishing:
+        new_rec_comms = (set(dep_comms) & set(rec_comms)) | new_owned_comms
         record = super(ZenodoDeposit, self)._publish_edited()
-        record['communities'] = new_rec_comms
+        record['communities'] = sorted(list(new_rec_comms))
         if not record['communities']:
             del record['communities']
         return record

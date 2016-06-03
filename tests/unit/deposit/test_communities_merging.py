@@ -22,11 +22,25 @@
 from __future__ import absolute_import, print_function
 
 from invenio_communities.models import Community, InclusionRequest
+from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
+
+
+def _publish_and_expunge(db, deposit):
+    """Publish the deposit and expunge the session.
+
+    Use this if you want to be safe that session is synced with the DB after
+    the deposit publishing."""
+    deposit.publish()
+    dep_uuid = deposit.id
+    db.session.commit()
+    db.session.expunge_all()
+    deposit = Deposit.get_record(dep_uuid)
+    return deposit
 
 
 def test_basic_community_workflow(app, db, communities, deposit):
     """Test simple (without concurrent events) deposit publishing workflow."""
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     assert InclusionRequest.query.count() == 0
     pid, record = deposit.fetch_published()
     assert not record.get('communities', [])
@@ -34,7 +48,7 @@ def test_basic_community_workflow(app, db, communities, deposit):
     # Open record for edit, request a community and publish
     deposit = deposit.edit()
     deposit['communities'] = ['c1', ]
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
 
     # Should contain just an InclusionRequest
@@ -56,7 +70,7 @@ def test_basic_community_workflow(app, db, communities, deposit):
     deposit = deposit.edit()
     assert deposit['communities'] == ['c1', ]
     deposit['communities'] = ['c1', 'c2', ]  # New request for community 'c2'
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     deposit['communities'] = ['c1', 'c2', ]
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c1', ]
@@ -79,7 +93,7 @@ def test_basic_community_workflow(app, db, communities, deposit):
 
     # Request for removal from a previously accepted community 'c1'
     deposit['communities'] = []
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert not deposit.get('communities', [])
     assert not record.get('communities', [])
@@ -93,7 +107,7 @@ def test_accept_while_edit(app, db, communities, deposit):
     """
 
     deposit['communities'] = ['c1', 'c2']
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     assert InclusionRequest.query.count() == 2
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
@@ -113,7 +127,7 @@ def test_accept_while_edit(app, db, communities, deposit):
     db.session.commit()
 
     # Publish and make sure nothing is missing
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert record['communities'] == ['c1', ]
@@ -131,7 +145,7 @@ def test_reject_while_edit(app, db, communities, deposit):
 
     # Request for community 'c1'
     deposit['communities'] = ['c1', ]
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     assert deposit['communities'] == ['c1', ]
     pid, record = deposit.fetch_published()
     assert not record.get('communities', [])
@@ -150,7 +164,7 @@ def test_reject_while_edit(app, db, communities, deposit):
     db.session.commit()
 
     # Publish the deposit
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     # NOTE: 'c1' is requested again!
     assert InclusionRequest.query.count() == 2
@@ -167,9 +181,8 @@ def test_record_modified_while_edit(app, db, communities, deposit):
 
     Modify a record, while deposit in open edit and then published.
     """
-
     deposit['communities'] = ['c1', ]
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     assert InclusionRequest.query.count() == 1
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', ]
@@ -188,7 +201,7 @@ def test_record_modified_while_edit(app, db, communities, deposit):
     db.session.commit()
 
     # Publish and make sure nothing is missing
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', ]
     assert not record.get('communities', [])
@@ -203,7 +216,7 @@ def test_remove_obsolete_irs(app, db, communities, deposit):
 
     # Request for 'c1'
     deposit['communities'] = ['c1', ]
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert InclusionRequest.query.count() == 1
     assert deposit['communities'] == ['c1', ]
@@ -212,7 +225,7 @@ def test_remove_obsolete_irs(app, db, communities, deposit):
     # Open for edit and remove the request to community 'c1'
     deposit = deposit.edit()
     deposit['communities'] = []
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert InclusionRequest.query.count() == 0
     assert not deposit.get('communities', [])
@@ -228,7 +241,7 @@ def test_remove_community_by_key_del(app, db, communities, deposit):
     # If 'communities' key was not in deposit metadata,
     # it shouldn't be automatically added
     assert 'communities' not in deposit
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert 'communities' not in deposit
     assert 'communities' not in record
@@ -236,7 +249,7 @@ def test_remove_community_by_key_del(app, db, communities, deposit):
     # Request for 'c1' and 'c2'
     deposit = deposit.edit()
     deposit['communities'] = ['c1', 'c2', ]
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     # No reason to have 'communities' in record since nothing was accepted
     assert 'communities' not in record
@@ -254,8 +267,44 @@ def test_remove_community_by_key_del(app, db, communities, deposit):
     # Remove the key from deposit and publish
     deposit = deposit.edit()
     del deposit['communities']
-    deposit = deposit.publish()
+    deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert 'communities' not in deposit
     assert 'communities' not in record
     assert InclusionRequest.query.count() == 0
+
+
+def test_autoaccept_owned_communities(app, db, users, communities, deposit):
+    """Automatically accept records requested by community owners."""
+
+    # 'c3' is owned by the user, but not 'c1'
+    dep_uuid = deposit.id
+    deposit['communities'] = ['c1', 'c3', ]
+    deposit = _publish_and_expunge(db, deposit)
+    db.session.commit()
+    db.session.expunge_all()
+    deposit = Deposit.get_record(dep_uuid)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['c1', 'c3', ]
+    assert record['communities'] == ['c3', ]
+    assert InclusionRequest.query.count() == 1
+    ir = InclusionRequest.query.one()
+    assert ir.id_community == 'c1'
+    assert ir.id_record == record.id
+
+    # Edit the deposit, and add more communities
+    # 'c4' should be added automatically, but not 'c2'
+    deposit = deposit.edit()
+    deposit['communities'] = ['c1', 'c2', 'c3', 'c4', ]
+    deposit = _publish_and_expunge(db, deposit)
+    db.session.commit()
+    db.session.expunge_all()
+    deposit = Deposit.get_record(dep_uuid)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['c1', 'c2', 'c3', 'c4', ]
+    assert record['communities'] == ['c3', 'c4', ]
+    assert InclusionRequest.query.count() == 2
+    ir1 = InclusionRequest.query.filter_by(id_community='c1').one()
+    ir2 = InclusionRequest.query.filter_by(id_community='c2').one()
+    assert ir1.id_record == record.id
+    assert ir2.id_record == record.id
