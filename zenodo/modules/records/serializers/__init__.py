@@ -36,13 +36,12 @@ from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
 from .bibtex import BibTeXSerializer
+from .legacyjson import LegacyJSONSerializer
 from .schemas.datacite import DataCiteSchemaJSONV1
 from .schemas.dc import DublinCoreJSONV1
-from .schemas.json import RecordSchemaJSONV1, DepositSchemaJSONV1
+from .schemas.json import DepositSchemaJSONV1, RecordSchemaJSONV1
 from .schemas.legacyjson import LegacyJSONSchemaV1
 from .schemas.marcxml import RecordSchemaMARC
-from .legacyjson import LegacyJSONSerializer
-
 
 # Serializers
 # ===========
@@ -51,7 +50,8 @@ json_v1 = JSONSerializer(RecordSchemaJSONV1, replace_refs=True)
 #: Zenodo Deposit JSON serializer version 1.0.0
 deposit_json_v1 = JSONSerializer(DepositSchemaJSONV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
-legacyjson_v1 = LegacyJSONSerializer(LegacyJSONSchemaV1, replace_refs=True)
+legacyjson_v1 = LegacyJSONSerializer(
+    LegacyJSONSchemaV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
 marcxml_v1 = MARCXMLSerializer(
     to_marc21, schema_class=RecordSchemaMARC, replace_refs=True)

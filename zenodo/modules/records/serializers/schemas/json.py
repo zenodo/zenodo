@@ -317,7 +317,6 @@ class RecordSchemaJSONV1(Schema):
     def remove_envelope(self, data):
         """Post process data."""
         # Remove envelope
-        data['metadata']['_deposit_actions'] = data['_deposit_actions']
         data = data['metadata']
 
         # Record schema.
