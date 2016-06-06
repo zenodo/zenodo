@@ -22,9 +22,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
   <dl>
-  {%- if publication_date %}
+  {%- if record.publication_date %}
     <dt>{{_('Publication date')}}:</dt>
-    <dd>{{ publication_date|dateformat(format='long') }}</dd>
+    <dd>{{ record.publication_date|from_isodate|dateformat(format='long') }}</dd>
   {%- endif %}
 
   {%- if embargo_date is embargoed(record.accessright) %}
