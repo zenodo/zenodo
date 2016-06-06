@@ -44,7 +44,7 @@ def test_basic_workflow(app, db, users, deposit):
         assert sip.sip_files[1].sip_id == sip.id
 
 
-def test_programmatic_publish(app, db, deposit):
+def test_programmatic_publish(app, db, deposit, deposit_file):
     """Test publishing by without request.
 
     Might never happen, but at least shouldn't crash the system."""

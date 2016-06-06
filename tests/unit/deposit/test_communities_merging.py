@@ -38,7 +38,7 @@ def _publish_and_expunge(db, deposit):
     return deposit
 
 
-def test_basic_community_workflow(app, db, communities, deposit):
+def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     """Test simple (without concurrent events) deposit publishing workflow."""
     deposit = _publish_and_expunge(db, deposit)
     assert InclusionRequest.query.count() == 0
@@ -100,7 +100,7 @@ def test_basic_community_workflow(app, db, communities, deposit):
     assert InclusionRequest.query.count() == 0
 
 
-def test_accept_while_edit(app, db, communities, deposit):
+def test_accept_while_edit(app, db, communities, deposit, deposit_file):
     """Test deposit publishing with concurrent events.
 
     Accept a record, while deposit in open edit and then published.
@@ -136,7 +136,7 @@ def test_accept_while_edit(app, db, communities, deposit):
     assert ir.id_record == record.id
 
 
-def test_reject_while_edit(app, db, communities, deposit):
+def test_reject_while_edit(app, db, communities, deposit, deposit_file):
     """Test deposit publishing with concurrent events.
 
     Reject a record, while deposit in open edit and published.
@@ -174,7 +174,8 @@ def test_reject_while_edit(app, db, communities, deposit):
     assert not record.get('communities', [])
 
 
-def test_record_modified_while_edit(app, db, communities, deposit):
+def test_record_modified_while_edit(app, db, communities, deposit,
+                                    deposit_file):
     """Test deposit publishing with concurrent events.
 
     Modify a record, while deposit in open edit and then published.
@@ -209,7 +210,7 @@ def test_record_modified_while_edit(app, db, communities, deposit):
     assert ir.id_record == record.id
 
 
-def test_remove_obsolete_irs(app, db, communities, deposit):
+def test_remove_obsolete_irs(app, db, communities, deposit, deposit_file):
     """Test removal of obsolete IRs in-between deposit edits."""
     # Request for 'c1'
     deposit['communities'] = ['c1', ]
@@ -229,7 +230,8 @@ def test_remove_obsolete_irs(app, db, communities, deposit):
     assert not record.get('communities', [])
 
 
-def test_remove_community_by_key_del(app, db, communities, deposit):
+def test_remove_community_by_key_del(app, db, communities, deposit,
+                                     deposit_file):
     """Test removal of communities by key deletion.
 
     Communities can be removed by not providing or deleting the communities
@@ -271,7 +273,8 @@ def test_remove_community_by_key_del(app, db, communities, deposit):
     assert InclusionRequest.query.count() == 0
 
 
-def test_autoaccept_owned_communities(app, db, users, communities, deposit):
+def test_autoaccept_owned_communities(app, db, users, communities, deposit,
+                                      deposit_file):
     """Automatically accept records requested by community owners."""
     # 'c3' is owned by the user, but not 'c1'
     dep_uuid = deposit.id

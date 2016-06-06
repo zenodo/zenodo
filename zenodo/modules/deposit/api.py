@@ -27,12 +27,15 @@
 from __future__ import absolute_import
 
 from os.path import splitext
-from flask import current_app
 
-from invenio_deposit.api import Deposit as _Deposit
+from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
+from invenio_deposit.api import Deposit as _Deposit
 from invenio_records_files.api import FileObject
+
 from zenodo.modules.sipstore.api import ZenodoSIP
+
+from .errors import MissingFilesError
 
 
 class ZenodoFileObject(FileObject):
@@ -215,8 +218,15 @@ class ZenodoDeposit(_Deposit):
             del record['communities']
         return record
 
+    def validate_publish(self):
+        """Validate deposit."""
+        super(ZenodoDeposit, self).validate()
+        if len(self.files) == 0:
+            raise MissingFilesError()
+
     def publish(self, pid=None, id_=None):
         """Publish the Zenodo deposit."""
+        self.validate_publish()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         pid, record = deposit.fetch_published()
         ZenodoSIP.create(pid, record)

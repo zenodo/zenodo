@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 import os
 import shutil
 import tempfile
@@ -40,23 +41,24 @@ from flask_security import login_user
 from helpers import fill_oauth2_headers
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
+from invenio_communities.models import Community
 from invenio_db import db as db_
 from invenio_deposit.permissions import action_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
-from invenio_communities.models import Community
 from invenio_oauth2server.models import Client, Token
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
-from invenio_records_files.api import Record as RecordFile, RecordsBuckets
+from invenio_records_files.api import Record as RecordFile
+from invenio_records_files.api import RecordsBuckets
 from invenio_search import current_search, current_search_client
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
-from zenodo.modules.records.serializers.bibtex import Bibtex
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
+from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
 @pytest.yield_fixture(scope='session')
@@ -536,6 +538,21 @@ def deposit(app, es, users, location):
 
 
 @pytest.fixture()
+def deposit_file(deposit, db):
+    """Deposit files."""
+    deposit.files['test.txt'] = BytesIO(b'test')
+    db.session.commit()
+    return deposit.files
+
+
+@pytest.fixture()
+def deposit_url(api):
+    """Deposit API URL."""
+    with api.test_request_context():
+        return url_for('invenio_deposit_rest.depid_list')
+
+
+@pytest.fixture()
 def json_headers(app):
     """JSON headers."""
     return [('Content-Type', 'application/json'),
@@ -549,3 +566,14 @@ def oauth2_headers_user_1(app, json_headers, write_token):
     It uses the token associated with the first user.
     """
     return fill_oauth2_headers(json_headers, write_token)
+
+
+@pytest.fixture()
+def get_json():
+    """Function for extracting json from response."""
+    def inner(response, code=None):
+        """Decode JSON from response."""
+        if code is not None:
+            assert response.status_code == code
+        return json.loads(response.get_data(as_text=True))
+    return inner
