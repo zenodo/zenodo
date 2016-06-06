@@ -30,7 +30,6 @@ from zenodo.modules.deposit.loaders.schemas.utils import is_valid, \
 
 def test_is_nonempty():
     """Test legacy JSON cleaning functions."""
-
     is_valid_f1 = is_valid(keys=['name', 'affiliation'])
 
     assert is_valid_f1({'name': 'Doe, John', 'affiliation': 'CERN'})

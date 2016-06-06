@@ -34,27 +34,27 @@ def test_deposit_index(db, es):
     """Test update embargoed records."""
     deposit_index_name = 'deposits-records-record-v1.0.0'
     rec1 = Record.create({
-            'title': 'One',
-            '_deposit': {
-                'status': 'published',
-                'pid': {
-                    'type': 'recid',
-                    'value': '1'
-                }
+        'title': 'One',
+        '_deposit': {
+            'status': 'published',
+            'pid': {
+                'type': 'recid',
+                'value': '1'
             }
-        })
+        }
+    })
     PersistentIdentifier.create(pid_type='recid', pid_value='1',
                                 status=PIDStatus.REGISTERED,
                                 object_uuid=rec1.id, object_type='rec')
     Deposit.create({
-            '_deposit': {
-                'status': 'published',
-                'pid': {
-                    'type': 'recid',
-                    'value': '1'
-                }
+        '_deposit': {
+            'status': 'published',
+            'pid': {
+                'type': 'recid',
+                'value': '1'
             }
-        })
+        }
+    })
     db.session.commit()
     current_search.flush_and_refresh(deposit_index_name)
     res = current_search.client.search(index=deposit_index_name)

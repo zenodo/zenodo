@@ -62,6 +62,7 @@ def test_programmatic_publish(app, db, deposit):
 
 
 def test_anonymous_request(app, db, deposit):
+    """Test sip creation during an anonymous request."""
     with app.test_request_context(environ_base={'REMOTE_ADDR': '127.0.0.1'}):
         deposit.files['one.txt'] = BytesIO(b'Test')
         deposit.files['two.txt'] = BytesIO(b'Test2')

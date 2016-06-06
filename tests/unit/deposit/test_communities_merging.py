@@ -105,7 +105,6 @@ def test_accept_while_edit(app, db, communities, deposit):
 
     Accept a record, while deposit in open edit and then published.
     """
-
     deposit['communities'] = ['c1', 'c2']
     deposit = _publish_and_expunge(db, deposit)
     assert InclusionRequest.query.count() == 2
@@ -142,7 +141,6 @@ def test_reject_while_edit(app, db, communities, deposit):
 
     Reject a record, while deposit in open edit and published.
     """
-
     # Request for community 'c1'
     deposit['communities'] = ['c1', ]
     deposit = _publish_and_expunge(db, deposit)
@@ -213,7 +211,6 @@ def test_record_modified_while_edit(app, db, communities, deposit):
 
 def test_remove_obsolete_irs(app, db, communities, deposit):
     """Test removal of obsolete IRs in-between deposit edits."""
-
     # Request for 'c1'
     deposit['communities'] = ['c1', ]
     deposit = _publish_and_expunge(db, deposit)
@@ -276,7 +273,6 @@ def test_remove_community_by_key_del(app, db, communities, deposit):
 
 def test_autoaccept_owned_communities(app, db, users, communities, deposit):
     """Automatically accept records requested by community owners."""
-
     # 'c3' is owned by the user, but not 'c1'
     dep_uuid = deposit.id
     deposit['communities'] = ['c1', 'c3', ]
