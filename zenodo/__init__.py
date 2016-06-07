@@ -115,9 +115,9 @@ like this:
 
 .. code-block:: python
 
-   DATACITE_USERNAME = '...'
-   DATACITE_PASSWORD = '..'
-   DATACITE_DOI_PREFIX = '10.5072'
+   PIDSTORE_DATACITE_USERNAME = '...'
+   PIDSTORE_DATACITE_PASSWORD = '...'
+   PIDSTORE_DATACITE_DOI_PREFIX = '10.5072'
 
 
 Google Site Verification
@@ -240,11 +240,12 @@ Zenodo uses StatsD to measure request performance.
 Proxy configuration
 ~~~~~~~~~~~~~~~~~~~
 In order for Zenodo to correctly determine a client's IP address, you must set
-how many proxies are in-front of the application:
+how many proxies are in-front of the application (Zenodo production has e.g.
+two proxies in front - HAproxy and Nginx):
 
 .. code-block:: python
 
-   WSGI_PROXIES = 1
+   WSGI_PROXIES = 2
 
 Vocabularies
 ------------

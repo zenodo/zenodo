@@ -35,3 +35,95 @@ Models
 .. automodule:: zenodo.modules.records.models
    :members:
    :undoc-members:
+
+Serializers
+~~~~~~~~~~~
+
+.. automodule:: zenodo.modules.records.serializers
+   :members:
+   :undoc-members:
+
+Fetchers and minters
+~~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: zenodo.modules.records.minters
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.fetchers
+   :members:
+   :undoc-members:
+
+Indexing
+~~~~~~~~
+
+.. automodule:: zenodo.modules.records.indexer
+   :members:
+   :undoc-members:
+
+Permissions
+~~~~~~~~~~~
+
+.. automodule:: zenodo.modules.records.permissions
+   :members:
+   :undoc-members:
+
+
+Tasks
+~~~~~
+
+.. automodule:: zenodo.modules.records.tasks
+   :members:
+   :undoc-members:
+
+
+Views
+~~~~~
+
+.. automodule:: zenodo.modules.records.views
+   :members:
+   :undoc-members:
+
+
+Marshmallow schemas
+~~~~~~~~~~~~~~~~~~~
+
+.. automodule:: zenodo.modules.records.serializers.schemas.datacite
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.serializers.schemas.dc
+   :members:
+   :undoc-members:
+
+
+.. automodule:: zenodo.modules.records.serializers.schemas.json
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.serializers.schemas.legacyjson
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.serializers.schemas.marcxml
+   :members:
+   :undoc-members:
+
+Marshmallow fields
+~~~~~~~~~~~~~~~~~~
+
+.. automodule:: zenodo.modules.records.serializers.fields.datetime
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.serializers.fields.doi
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.serializers.fields.persistentid
+   :members:
+   :undoc-members:
+
+.. automodule:: zenodo.modules.records.serializers.fields.trimmedstring
+   :members:
+   :undoc-members:

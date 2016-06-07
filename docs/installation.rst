@@ -85,7 +85,7 @@ done like this:
 
       (zenodo)$ ./scripts/setup-npm.sh
 
-    Feel free to take a peek in the scripts to see the commands being run
+   Feel free to take a peek in the scripts to see the commands being run
 
 
 Initialization
@@ -94,13 +94,7 @@ Next, create the database and Elasticsearch indexes and an admin user:
 
 .. code-block:: console
 
-   (zenodo)$ zenodo db init
-   (zenodo)$ zenodo db create
-   (zenodo)$ zenodo index init
-   (zenodo)$ zenodo fixtures init
-   (zenodo)$ zenodo users create info@zenodo.org -a
-   (zenodo)$ zenodo access allow admin-access -e info@zenodo.org
-   (zenodo)$ zenodo access allow deposit-admin-access -e info@zenodo.org
+   (zenodo)$ ./scripts/init.sh
 
 You must already have PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ for
 above to work.
