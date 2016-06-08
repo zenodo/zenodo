@@ -24,6 +24,8 @@
 
 from __future__ import absolute_import, print_function
 
+from datetime import timedelta
+
 import arrow
 
 from zenodo.modules.records.serializers import legacyjson_v1
@@ -111,27 +113,32 @@ def test_upload_type(minimal_record_model, depid_pid):
 
 def test_publication_date(minimal_record_model, depid_pid):
     """Test publication date."""
-    obj = legacyjson_v1.transform_record(
-        depid_pid, minimal_record_model)['metadata']
-    assert arrow.get(obj['publication_date']).date() <= arrow.utcnow().date()
+    for k in ['publication_date', 'embargo_date']:
+        minimal_record_model[k] = arrow.utcnow().date() - timedelta(days=1)
+        obj = legacyjson_v1.transform_record(
+            depid_pid, minimal_record_model)['metadata']
+        assert arrow.get(obj[k]).date() <= arrow.utcnow().date()
 
 
 def test_creators(minimal_record_model, depid_pid):
     """Test creators."""
-    for k in ['creators', 'thesis_supervisors']:
-        minimal_record_model[k] = [
-            {'name': 'Doe, John', 'affiliation': '', 'orcid': '',
-             'familyname': 'Doe', 'givennames': 'John'},
-            {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '1234',
-             'familyname': 'Smith', 'givennames': 'John', 'gnd': '4321'},
-        ]
-        obj = legacyjson_v1.transform_record(
-            depid_pid, minimal_record_model)['metadata']
-        assert obj[k] == [
-            {'name': 'Doe, John'},
-            {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '1234',
-             'gnd': '4321', },
-        ]
+    minimal_record_model['creators'] = [
+        {'name': 'Doe, John', 'affiliation': '', 'orcid': '',
+         'familyname': 'Doe', 'givennames': 'John'},
+        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '1234',
+         'familyname': 'Smith', 'givennames': 'John', 'gnd': '4321'},
+    ]
+    minimal_record_model['thesis'] = dict(
+        supervisors=minimal_record_model['creators']
+    )
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)['metadata']
+    assert obj['creators'] == [
+        {'name': 'Doe, John'},
+        {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '1234',
+         'gnd': '4321', },
+    ]
+    assert obj['thesis_supervisors'] == obj['creators']
 
 
 def test_contributors(minimal_record_model, depid_pid):
@@ -155,14 +162,22 @@ def test_contributors(minimal_record_model, depid_pid):
 def test_direct_mappings(minimal_record_model, depid_pid):
     """Test direct mappings."""
     fields = [
-        'publication_date', 'title', 'description', 'notes', 'embargo_date',
-        'access_right', 'thesis_university', 'access_conditions']
+        'title', 'description', 'notes', 'access_right', 'access_conditions'
+    ]
 
     for f in fields:
         minimal_record_model[f] = 'TEST'
         obj = legacyjson_v1.transform_record(
             depid_pid, minimal_record_model)['metadata']
-        obj[f] == 'TEST'
+        assert obj[f] == 'TEST'
+
+
+def test_thesis_university(minimal_record_model, depid_pid):
+    """Test direct mappings."""
+    minimal_record_model['thesis'] = dict(university='TEST')
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)['metadata']
+    assert obj['thesis_university'] == 'TEST'
 
 
 def test_prereserve(minimal_record_model, depid_pid):
@@ -170,7 +185,10 @@ def test_prereserve(minimal_record_model, depid_pid):
     minimal_record_model['_deposit_actions'] = dict(prereserve_doi=True)
     obj = legacyjson_v1.transform_record(
         depid_pid, minimal_record_model)['metadata']
-    assert obj['prereserve_doi'] is True
+    assert obj['prereserve_doi'] == {
+        'recid': 123,
+        'doi': '10.5072/zenodo.123'
+    }
 
 
 def test_keywords(minimal_record_model, depid_pid):
@@ -219,7 +237,7 @@ def test_journal(minimal_record_model, depid_pid):
 
 def test_conference(minimal_record_model, depid_pid):
     """Test conferences."""
-    minimal_record_model['meetings'] = {
+    minimal_record_model['meeting'] = {
         'title': '20th International Conference on Computing in High Energy '
                  'and Nuclear Physics',
         'acronym': 'CHEP\'13',
@@ -256,7 +274,7 @@ def test_related_identifiers(minimal_record_model, depid_pid):
     assert obj['related_identifiers'] == [
         dict(identifier='10.1234/f', scheme='doi', relation='cites'),
         dict(identifier='10.1234/f', scheme='doi',
-             relation='isAlternativeIdentifier'),
+             relation='isAlternateIdentifier'),
     ]
 
 
@@ -327,7 +345,7 @@ def test_subjects(minimal_record_model, depid_pid):
     assert obj['subjects'] == [
         dict(
             term="Astronomy",
-            identifier="http://id.loc.gov/authorities/subjects/sh85009003",
+            id="http://id.loc.gov/authorities/subjects/sh85009003",
             scheme="url"
         ),
     ]
@@ -337,7 +355,6 @@ def test_imprint(minimal_record_model, depid_pid):
     """Test imprint."""
     minimal_record_model.update(dict(
         imprint=dict(
-            year='2016',
             place='Some place',
             publisher='Some publisher',
             isbn='978-3-16-148410-0',
@@ -356,11 +373,12 @@ def test_imprint(minimal_record_model, depid_pid):
 def test_partof(minimal_record_model, depid_pid):
     """Test imprint."""
     minimal_record_model.update(dict(
+        imprint=dict(
+            place='Some place',
+            publisher='Some publisher',
+            isbn='Some isbn',
+        ),
         part_of=dict(
-            year="2016",
-            place="Some place",
-            publisher="Some publisher",
-            isbn="Some isbn",
             pages="Some pages",
             title="Some title",
         ),

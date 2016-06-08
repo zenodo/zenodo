@@ -85,3 +85,12 @@ class DOI(fields.String):
                     'test_prefix' if prefix == '10.5072' else 'banned_prefix',
                     prefix=prefix
                 )
+
+
+class DOILink(fields.Field):
+    """DOI link field."""
+
+    def _serialize(self, value, attr, obj):
+        if value is None:
+            return None
+        return idutils.to_url(value, 'doi')

@@ -50,7 +50,7 @@ def get_data(**kwargs):
     return test_data
 
 
-def test_missing_files(api, api_client, deposit, oauth2_headers_user_1,
+def test_missing_files(api_client, deposit, oauth2_headers_user_1,
                        deposit_url, get_json):
     """Test data validation."""
     client = api_client
@@ -65,5 +65,21 @@ def test_missing_files(api, api_client, deposit, oauth2_headers_user_1,
     # Publish - not possible (file is missing)
     res = client.post(links['publish'], headers=headers)
     data = get_json(res, code=400)
-    print(data)
     assert len(data['errors']) == 1
+
+
+# def test_access_right(api_client, deposit, oauth2_headers_user_1,
+#                       deposit_url, get_json):
+#     """Test data validation."""
+#     client = api_client
+#     headers = oauth2_headers_user_1
+
+#     # Create
+#     res = client.post(
+#         deposit_url,
+#         data=json.dumps(get_data(access_right='invalid')),
+#         headers=headers)
+
+#     data = get_json(res, code=400)
+#     print(data)
+#     assert len(data['errors']) == 1

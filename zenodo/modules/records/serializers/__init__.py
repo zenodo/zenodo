@@ -37,35 +37,35 @@ from invenio_records_rest.serializers.response import record_responsify, \
 
 from .bibtex import BibTeXSerializer
 from .legacyjson import LegacyJSONSerializer
-from .schemas.datacite import DataCiteSchemaJSONV1
-from .schemas.dc import DublinCoreJSONV1
-from .schemas.json import DepositSchemaJSONV1, RecordSchemaJSONV1
-from .schemas.legacyjson import LegacyJSONSchemaV1
+from .schemas.datacite import DataCiteSchemaV1
+from .schemas.dc import DublinCoreV1
+from .schemas.json import DepositSchemaV1, RecordSchemaV1
+from .schemas.legacyjson import LegacyRecordSchemaV1
 from .schemas.marcxml import RecordSchemaMARC
 
 # Serializers
 # ===========
 #: Zenodo JSON serializer version 1.0.0
-json_v1 = JSONSerializer(RecordSchemaJSONV1, replace_refs=True)
+json_v1 = JSONSerializer(RecordSchemaV1, replace_refs=True)
 #: Zenodo Deposit JSON serializer version 1.0.0
-deposit_json_v1 = JSONSerializer(DepositSchemaJSONV1, replace_refs=True)
+deposit_json_v1 = JSONSerializer(DepositSchemaV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 legacyjson_v1 = LegacyJSONSerializer(
-    LegacyJSONSchemaV1, replace_refs=True)
+    LegacyRecordSchemaV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
 marcxml_v1 = MARCXMLSerializer(
     to_marc21, schema_class=RecordSchemaMARC, replace_refs=True)
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializer
-datacite_v31 = DataCite31Serializer(DataCiteSchemaJSONV1, replace_refs=True)
+datacite_v31 = DataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     v31=datacite_v31,
     datacentre='CERN.ZENODO',
 )
 #: Dublin Core serializer
-dc_v1 = DublinCoreSerializer(DublinCoreJSONV1, replace_refs=True)
+dc_v1 = DublinCoreSerializer(DublinCoreV1, replace_refs=True)
 
 # Records-REST serializers
 # ========================

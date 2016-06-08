@@ -157,6 +157,8 @@ class ObjectType(object):
 
     index_id = None
     index_internal_id = None
+    types = None
+    subtypes = None
 
     @classmethod
     def _load_data(cls):
@@ -168,9 +170,19 @@ class ObjectType(object):
 
             cls.index_internal_id = {}
             cls.index_id = {}
+            cls.types = set()
+            cls.subtypes = {}
             for objtype in data:
                 cls.index_internal_id[objtype['internal_id']] = objtype
                 cls.index_id[objtype['id'][:-1]] = objtype
+                if '-' in objtype['internal_id']:
+                    type_, subtype = objtype['internal_id'].split('-')
+                    cls.types.add(type_)
+                    if type_ not in cls.subtypes:
+                        cls.subtypes[type_] = set()
+                    cls.subtypes[type_].add(subtype)
+                else:
+                    cls.types.add(objtype['internal_id'])
 
     @classmethod
     def _jsonloader(cls, uri, **dummy_kwargs):
@@ -189,6 +201,18 @@ class ObjectType(object):
                 loader=cls._jsonloader)
         except KeyError:
             return None
+
+    @classmethod
+    def get_types(cls):
+        """Get object type value."""
+        cls._load_data()
+        return cls.types
+
+    @classmethod
+    def get_subtypes(cls, type_):
+        """Get object type value."""
+        cls._load_data()
+        return cls.subtypes[type_]
 
     @classmethod
     def get_by_dict(cls, value):

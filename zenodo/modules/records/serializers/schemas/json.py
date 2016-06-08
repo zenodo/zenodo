@@ -26,20 +26,28 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import datetime
-
-from flask import current_app, url_for
+from flask import url_for
 from flask_babelex import lazy_gettext as _
-from marshmallow import Schema, ValidationError, fields, missing, post_load, \
-    validate, validates_schema
-from six.moves.urllib.parse import quote
+from marshmallow import Schema, ValidationError, fields, missing, \
+    validates_schema
 from werkzeug.routing import BuildError
 
-from .. import fields as zfields
 from ...models import AccessRight, ObjectType
+from . import common
 
 
-class ResourceTypeSchema(Schema):
+class StrictKeysSchema(Schema):
+    """Ensure only valid keys exists."""
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """Check for unknown keys."""
+        for key in original_data:
+            if key not in self.fields:
+                raise ValidationError('Unknown field name {}'.format(key))
+
+
+class ResourceTypeSchema(StrictKeysSchema):
     """Resource type schema."""
 
     type = fields.Str(
@@ -64,45 +72,7 @@ class ResourceTypeSchema(Schema):
             raise ValidationError(_('Invalid resource type.'))
 
 
-class IdentifierSchemaV1(Schema):
-    """Schema for a identifiers."""
-
-    identifier = zfields.PersistentId()
-    scheme = fields.Str()
-
-
-class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
-    """Schema for a related identifier."""
-
-    relation = fields.Str()
-
-
-class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
-    """Schema for a related identifier."""
-
-
-class SubjectSchemaV1(IdentifierSchemaV1):
-    """Schema for a subject."""
-
-    term = fields.Str()
-
-
-class PersonSchemaV1(Schema):
-    """Schema for a person."""
-
-    name = fields.Str()
-    affiliation = fields.Str()
-    gnd = zfields.PersistentId(scheme='GND')
-    orcid = zfields.PersistentId(scheme='ORCID')
-
-
-class ContributorSchemaV1(PersonSchemaV1):
-    """Schema for a contributor."""
-
-    type = fields.Str()
-
-
-class JournalSchemaV1(Schema):
+class JournalSchemaV1(StrictKeysSchema):
     """Schema for a journal."""
 
     issue = fields.Str()
@@ -112,7 +82,7 @@ class JournalSchemaV1(Schema):
     year = fields.Str()
 
 
-class MeetingSchemaV1(Schema):
+class MeetingSchemaV1(StrictKeysSchema):
     """Schema for a meeting."""
 
     title = fields.Str()
@@ -124,14 +94,14 @@ class MeetingSchemaV1(Schema):
     session_part = fields.Str()
 
 
-class ImprintSchemaV1(Schema):
+class ImprintSchemaV1(StrictKeysSchema):
     """Schema for imprint."""
 
     publisher = fields.Str()
     place = fields.Str()
 
 
-class PartOfSchemaV1(Schema):
+class PartOfSchemaV1(StrictKeysSchema):
     """Schema for imprint."""
 
     pages = fields.Str()
@@ -142,14 +112,14 @@ class PartOfSchemaV1(Schema):
     isbn = fields.Str()
 
 
-class ThesisSchemaV1(Schema):
+class ThesisSchemaV1(StrictKeysSchema):
     """Schema for thesis."""
 
     university = fields.Str()
-    supervisors = fields.Nested(PersonSchemaV1, many=True)
+    supervisors = fields.Nested(common.PersonSchemaV1, many=True)
 
 
-class FunderSchemaV1(Schema):
+class FunderSchemaV1(StrictKeysSchema):
     """Schema for a funder."""
 
     doi = fields.Str()
@@ -169,7 +139,7 @@ class FunderSchemaV1(Schema):
             return missing
 
 
-class GrantSchemaV1(Schema):
+class GrantSchemaV1(StrictKeysSchema):
     """Schema for a grant."""
 
     title = fields.Str(dump_only=True)
@@ -191,62 +161,16 @@ class GrantSchemaV1(Schema):
             return missing
 
 
-class ActionSchemaV1(Schema):
+class CommunitiesSchemaV1(StrictKeysSchema):
+    """Schema for communities."""
+
+    id = fields.Function(lambda x: x)
+
+
+class ActionSchemaV1(StrictKeysSchema):
     """Schema for a actions."""
 
     prereserve_doi = fields.Str(load_only=True)
-
-
-class MetadataSchemaV1(Schema):
-    """Schema for a record."""
-
-    doi = zfields.DOI()
-    resource_type = fields.Nested(ResourceTypeSchema)
-    publication_date = zfields.DateString(
-        default=datetime.utcnow().date()
-    )
-    title = zfields.TrimmedString(
-        required=True,
-        validate=validate.Length(min=3),
-    )
-    creators = fields.Nested(PersonSchemaV1, many=True)
-    description = zfields.TrimmedString(
-        validate=validate.Length(min=3),
-    )
-    keywords = fields.List(zfields.TrimmedString)
-    subjects = fields.Nested(SubjectSchemaV1, many=True)
-    notes = zfields.TrimmedString()
-    access_right = fields.Str()
-    access_right_category = fields.Method(
-        'get_access_right_category', dump_only=True)
-    embargo_date = zfields.DateString()
-    access_conditions = fields.Str()
-    # TODO
-    license = fields.Str(attribute="license.identifier")
-    # TODO
-    communities = fields.List(fields.Str)
-    grants = fields.Nested(GrantSchemaV1, many=True)
-    related_identifiers = fields.Nested(RelatedIdentifierSchemaV1, many=True)
-    alternate_identifiers = fields.Nested(
-        AlternateIdentifierSchemaV1, many=True)
-    contributors = fields.Nested(ContributorSchemaV1, many=True)
-    references = fields.List(fields.Str, attribute='references.raw_reference')
-    journal = fields.Nested(JournalSchemaV1)
-    meeting = fields.Nested(MeetingSchemaV1)
-    part_of = fields.Nested(PartOfSchemaV1)
-    imprint = fields.Nested(ImprintSchemaV1)
-    thesis = fields.Nested(ThesisSchemaV1)
-
-    def get_access_right_category(self, obj):
-        """Get access right category."""
-        return AccessRight.as_category(obj.get('access_right'))
-
-    @post_load(pass_many=False)
-    def format_dates(self, data):
-        """Convert dates back to to ISO-format."""
-        for f in ['publication_date', 'embargo_date']:
-            if f in data:
-                data[f] = data[f].isoformat()
 
 
 class FilesSchema(Schema):
@@ -274,7 +198,7 @@ class FilesSchema(Schema):
             return missing
 
 
-class OwnerSchema(Schema):
+class OwnerSchema(StrictKeysSchema):
     """Schema for owners.
 
     Allows us to later introduce more properties for an owner.
@@ -283,50 +207,48 @@ class OwnerSchema(Schema):
     id = fields.Function(lambda x: x)
 
 
-class RecordSchemaJSONV1(Schema):
+class LicenseSchemaV1(StrictKeysSchema):
+    """Schema for license.
+
+    Allows us to later introduce more properties for an owner.
+    """
+
+    id = fields.Str(attribute='id')
+
+
+class MetadataSchemaV1(common.CommonMetadataSchemaV1):
+    """Schema for a record."""
+
+    resource_type = fields.Nested(ResourceTypeSchema)
+    access_right_category = fields.Method(
+        'dump_access_right_category', dump_only=True)
+    license = fields.Nested(LicenseSchemaV1)
+    communities = fields.Nested(CommunitiesSchemaV1, many=True)
+    grants = fields.Nested(GrantSchemaV1, many=True)
+    journal = fields.Nested(JournalSchemaV1)
+    meeting = fields.Nested(MeetingSchemaV1)
+    imprint = fields.Nested(ImprintSchemaV1)
+    part_of = fields.Nested(PartOfSchemaV1)
+    thesis = fields.Nested(ThesisSchemaV1)
+
+    def dump_access_right_category(self, obj):
+        """Get access right category."""
+        return AccessRight.as_category(obj.get('access_right'))
+
+
+class RecordSchemaV1(common.CommonRecordSchemaV1):
     """Schema for records v1 in JSON."""
 
-    id = fields.Integer(attribute='pid.pid_value', dump_only=True)
-    doi = fields.Str(attribute='metadata.doi', dump_only=True)
-    owners = fields.List(
-        fields.Integer, attribute='metadata.owners', dump_only=True)
-    metadata = fields.Nested(MetadataSchemaV1)
-    links = fields.Method('get_links', dump_only=True)
     files = fields.Nested(
         FilesSchema, many=True, dump_only=True, attribute='metadata._files')
-    created = fields.Str(dump_only=True)
-    updated = fields.Str(dump_only=True)
+    metadata = fields.Nested(MetadataSchemaV1)
+    owners = fields.List(
+        fields.Integer, attribute='metadata.owners', dump_only=True)
     revision = fields.Integer(dump_only=True)
-    _deposit_actions = fields.Nested(
-        ActionSchemaV1, load_from='actions', dump_to='actions')
-
-    def get_links(self, obj):
-        """."""
-        links = obj.get('links', {})
-
-        doi = obj.get('metadata', {}).get('doi')
-        if doi:
-            links['doi_badge'] = "{base}/badge/DOI/{value}.svg".format(
-                base=current_app.config.get('THEME_SITEURL'),
-                value=quote(doi),
-            )
-
-        return links
-
-    @post_load(pass_many=False)
-    def remove_envelope(self, data):
-        """Post process data."""
-        # Remove envelope
-        data = data['metadata']
-
-        # Record schema.
-        data['$schema'] = \
-            'https://zenodo.org/schemas/deposits/records/record-v1.0.0.json'
-
-        return data
+    updated = fields.Str(dump_only=True)
 
 
-class DepositSchemaJSONV1(RecordSchemaJSONV1):
+class DepositSchemaV1(RecordSchemaV1):
     """Deposit schema.
 
     Same as the Record schema except for some few extra additions.

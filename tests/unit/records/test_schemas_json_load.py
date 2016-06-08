@@ -77,6 +77,7 @@ def test_valid_resource_type(val, expected):
     dict(subtype='photo'),
     dict(type='invalid'),
     dict(title='Dataset'),
+    dict(),
 ])
 def test_invalid_resource_type(val):
     """Test resource type."""

@@ -116,7 +116,7 @@ class RelatedIdentifierSchema(Schema):
             return obj['scheme'].upper()
 
 
-class DataCiteSchemaJSONV1(Schema):
+class DataCiteSchemaV1(Schema):
     """Schema for records v1 in JSON."""
 
     identifier = fields.Nested(IdentifierSchema, attribute='metadata.doi')

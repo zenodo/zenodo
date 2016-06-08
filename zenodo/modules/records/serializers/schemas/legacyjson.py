@@ -24,155 +24,122 @@
 
 """Zenodo legacy JSON schema."""
 
-import idutils
-from marshmallow import Schema, fields, post_dump
+import six
+from flask import current_app
+from flask_babelex import lazy_gettext as _
+from marshmallow import Schema, ValidationError, fields, missing, post_load, \
+    pre_dump, pre_load, validate, validates, validates_schema
 
+from zenodo.modules.records.models import ObjectType
 
-def clean_empty(data, keys):
-    """Clean empty values."""
-    for k in keys:
-            if k in data and not data[k]:
-                del data[k]
-    return data
-
-
-class DOILink(fields.Field):
-    """DOI link field."""
-
-    def _serialize(self, value, attr, obj):
-        if value is None:
-            return None
-        return idutils.to_url(value, 'doi')
-
-
-class PersonSchemaV1(Schema):
-    """Schema for a person."""
-
-    name = fields.String()
-    affiliation = fields.String()
-    gnd = fields.String()
-    orcid = fields.String()
-
-    @post_dump(pass_many=False)
-    def clean(self, data):
-        """Clean empty values."""
-        return clean_empty(data, ['orcid', 'gnd', 'affiliation'])
-
-
-class ContributorSchemaV1(PersonSchemaV1):
-    """Schema for contributors."""
-
-    type = fields.String()
-
-
-class BaseIdentifierSchemeV1(Schema):
-    """Base for identifiers."""
-
-    identifier = fields.String()
-    scheme = fields.String()
-
-
-class RelatedIdentifierSchemaV1(BaseIdentifierSchemeV1):
-    """Schema for a related identifier."""
-
-    relation = fields.String()
-
-
-class SubjectSchemaV1(BaseIdentifierSchemeV1):
-    """Schema for a subject."""
-
-    term = fields.String()
+from . import common
+from ...minters import doi_generator
+from ..fields import DOILink, PersistentId, TrimmedString
 
 
 class FileSchemaV1(Schema):
     """Schema for files depositions."""
 
-    id = fields.String()
-    filename = fields.String(attribute='key')
-    filesize = fields.Integer(attribute='size')
-    checksum = fields.String()
+    id = fields.String(dump_only=True)
+    filename = fields.String(attribute='key', dump_only=True)
+    filesize = fields.Integer(attribute='size', dump_only=True)
+    checksum = fields.Method('dump_checksum', dump_only=True)
+
+    def dump_checksum(self, obj):
+        """Dump checksum."""
+        if 'checksum' not in obj:
+            return missing
+        algo, hashval = obj['checksum'].split(':')
+        if algo != 'md5':
+            return missing
+        return hashval
 
 
-class MetadataSchemaV1(Schema):
+class SubjectSchemaV1(common.SubjectSchemaV1):
+    """Allow reading identifier from 'id' and 'identifier'."""
+
+    identifier = PersistentId(required=True, dump_to='id', load_from='id')
+
+
+class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
     """Legacy JSON metadata."""
 
-    upload_type = fields.String(attribute='resource_type.type')
-    publication_type = fields.Method('get_publication_type')
-    image_type = fields.Method('get_image_type')
-    publication_date = fields.String()
-    title = fields.String()
-    creators = fields.List(fields.Nested(PersonSchemaV1))
-    description = fields.String()
-    access_right = fields.String()
-    license = fields.String(attribute='license.id')
-    embargo_date = fields.String()
-    access_conditions = fields.String()
-    doi = fields.String()
-    prereserve_doi = fields.Bool(attribute='_deposit_actions.prereserve_doi')
-    keywords = fields.List(fields.String)
-    notes = fields.String()
-    related_identifiers = fields.Method('get_related_identifiers')
-    contributors = fields.List(fields.Nested(ContributorSchemaV1))
-    references = fields.List(fields.String(attribute='raw_reference'))
-    communities = fields.Function(
-        lambda o: [dict(identifier=x) for x in o.get('communities', [])])
-    grants = fields.Method('get_grants')
+    upload_type = fields.String(
+        attribute='resource_type.type',
+        required=True,
+        validate=validate.OneOf(choices=ObjectType.get_types()),
+    )
+    publication_type = fields.Method(
+        'dump_publication_type',
+        attribute='resource_type.subtype',
+        validate=validate.OneOf(
+            choices=ObjectType.get_subtypes('publication')),
+    )
+    image_type = fields.Method(
+        'dump_image_type',
+        attribute='resource_type.subtype',
+        validate=validate.OneOf(choices=ObjectType.get_subtypes('image')),
+    )
 
-    journal_title = fields.String(attribute='journal.title')
-    journal_volume = fields.String(attribute='journal.volume')
-    journal_issue = fields.String(attribute='journal.issue')
-    journal_pages = fields.String(attribute='journal.pages')
+    # Overwrite subjects from common schema.
+    subjects = fields.Nested(SubjectSchemaV1, many=True)
 
-    conference_title = fields.String(attribute='meetings.title')
-    conference_acronym = fields.String(attribute='meetings.acronym')
-    conference_dates = fields.String(attribute='meetings.dates')
-    conference_place = fields.String(attribute='meetings.place')
-    conference_url = fields.String(attribute='meetings.url')
-    conference_session = fields.String(attribute='meetings.session')
-    conference_session_part = fields.String(
-        attribute='meetings.session_part')
+    license = fields.Method('dump_license', 'load_license')
+    communities = fields.Method('dump_communities', 'load_communities')
+    grants = fields.Method('dump_grants', 'load_grants')
 
-    imprint_isbn = fields.String(attribute='imprint.isbn')
-    imprint_place = fields.String(attribute='imprint.place')
-    imprint_publisher = fields.String(attribute='imprint.publisher')
+    prereserve_doi = fields.Method('dump_prereservedoi', 'load_prereservedoi')
 
-    partof_isbn = fields.String(attribute='part_of.isbn')
-    partof_pages = fields.String(attribute='part_of.pages')
-    partof_place = fields.String(attribute='part_of.place')
-    partof_publisher = fields.String(attribute='part_of.publisher')
-    partof_title = fields.String(attribute='part_of.title')
+    journal_title = TrimmedString(attribute='journal.title')
+    journal_volume = TrimmedString(attribute='journal.volume')
+    journal_issue = TrimmedString(attribute='journal.issue')
+    journal_pages = TrimmedString(attribute='journal.pages')
 
-    thesis_university = fields.String()
-    thesis_supervisors = fields.List(fields.Nested(PersonSchemaV1))
+    conference_title = TrimmedString(attribute='meeting.title')
+    conference_acronym = TrimmedString(attribute='meeting.acronym')
+    conference_dates = TrimmedString(attribute='meeting.dates')
+    conference_place = TrimmedString(attribute='meeting.place')
+    conference_url = fields.Url(attribute='meeting.url')
+    conference_session = TrimmedString(attribute='meeting.session')
+    conference_session_part = TrimmedString(
+        attribute='meeting.session_part')
 
-    subjects = fields.List(fields.Nested(SubjectSchemaV1))
+    imprint_isbn = TrimmedString(attribute='imprint.isbn')
+    imprint_place = TrimmedString(attribute='imprint.place')
+    imprint_publisher = TrimmedString(attribute='imprint.publisher')
 
-    def get_subtype(self, obj, type_):
+    partof_pages = TrimmedString(attribute='part_of.pages')
+    partof_title = TrimmedString(attribute='part_of.title')
+
+    thesis_university = TrimmedString(attribute='thesis.university')
+    thesis_supervisors = fields.Nested(
+        common.PersonSchemaV1, many=True, attribute='thesis.supervisors')
+
+    def _dump_subtype(self, obj, type_):
         """Get subtype."""
         if obj.get('resource_type', {}).get('type') == type_:
-            return obj.get('resource_type', {}).get('subtype')
+            return obj.get('resource_type', {}).get('subtype', missing)
+        return missing
 
-    def get_publication_type(self, obj):
+    def dump_publication_type(self, obj):
         """Get publication type."""
-        return self.get_subtype(obj, 'publication')
+        return self._dump_subtype(obj, 'publication')
 
-    def get_image_type(self, obj):
+    def dump_image_type(self, obj):
         """Get publication type."""
-        return self.get_subtype(obj, 'image')
+        return self._dump_subtype(obj, 'image')
 
-    def get_related_identifiers(self, obj):
-        """Get related identifiers."""
-        s = RelatedIdentifierSchemaV1()
-        res = []
-        for i in obj.get('related_identifiers', []):
-            res.append(s.dump(i).data)
-        for i in obj.get('alternate_identifiers', []):
-            v = {'relation': 'isAlternativeIdentifier'}
-            v.update(i)
-            res.append(s.dump(v).data)
-        return res
+    def dump_license(self, obj):
+        """Dump license."""
+        return obj.get('license', {}).get('id', missing)
 
-    def get_grants(self, obj):
+    def load_license(self, data):
+        """Load license."""
+        if not isinstance(data, six.string_types):
+            raise ValidationError(_('Not a string.'))
+        return {'$ref': 'https://dx.zenodo.org/licenses/{0}'.format(data)}
+
+    def dump_grants(self, obj):
         """Get grants."""
         res = []
         for g in obj.get('grants', []):
@@ -181,67 +148,176 @@ class MetadataSchemaV1(Schema):
                 res.append(dict(id=g['code']))
             else:
                 res.append(dict(id=g['internal_id']))
-        return res
+        return res or missing
 
-    def clean_imprint_partof(self, data):
-        """Clean imprint and partof."""
-        keys = ['isbn', 'place', 'publisher']
+    def load_grants(self, data):
+        """Load grants."""
+        if not isinstance(data, list):
+            raise ValidationError(_('Not a list.'))
+        res = []
+        for g in data:
+            if not isinstance(g, dict):
+                raise ValidationError(_('Element not an object.'))
+            g = g.get('id')
+            if not g:
+                continue
+            # FP7 project grant
+            if not g.startswith('10.13039/'):
+                g = '10.13039/501100000780::{0}'.format(g)
+            res.append({'$ref': 'https://dx.zenodo.org/grants/{0}'.format(g)})
+        return res or missing
 
-        if data.get('partof_title', '').strip():
-            for k in keys:
-                pk = 'partof_{0}'.format(k)
-                ik = 'imprint_{0}'.format(k)
-                if pk in data:
-                    data[ik] = data[pk]
-                elif ik in data:
-                    del data[ik]
+    def dump_communities(self, obj):
+        """Dump communities type."""
+        return [dict(identifier=x) for x in obj.get('communities', [])] \
+            or missing
 
-        # Make sure keys are removed even if partof_title is empty
-        for k in keys:
-            pk = 'partof_{0}'.format(k)
-            if pk in data:
-                del data[pk]
+    def load_communities(self, data):
+        """Load communities type."""
+        if not isinstance(data, list):
+            raise ValidationError(_('Not a list.'))
+        return list(sorted([
+            x['identifier'] for x in data if x.get('identifier')
+        ])) or missing
+
+    def dump_prereservedoi(self, obj):
+        """Dump pre-reserved DOI."""
+        recid = obj.get('recid')
+        if recid:
+            prefix = None
+            if not current_app:
+                prefix = '10.5072'  # Test prefix
+
+            return dict(
+                recid=recid,
+                doi=doi_generator(recid, prefix=prefix),
+            )
+        return missing
+
+    def load_prereservedoi(self, obj):
+        """Load pre-reserved DOI.
+
+        The value is not important as we do not store it. Since the deposit and
+        record id are now the same
+        """
+        return missing
+
+    @pre_dump()
+    def predump_related_identifiers(self, data):
+        """Split related/alternate identifiers.
+
+        This ensures that we can just use the base schemas definitions of
+        related/alternate identifies.
+        """
+        relids = data.pop('related_identifiers', [])
+        alids = data.pop('alternate_identifiers', [])
+
+        for a in alids:
+            a['relation'] = 'isAlternateIdentifier'
+
+        if relids or alids:
+            data['related_identifiers'] = relids + alids
 
         return data
 
-    @post_dump(pass_many=False)
-    def clean(self, data):
-        """Clean empty values."""
-        data = self.clean_imprint_partof(data)
-        empty_keys = [
-            'communities',
-            'grants',
-            'image_type',
-            'publication_type',
-            'related_identifiers',
+    @pre_load()
+    def preload_related_identifiers(self, data):
+        """Split related/alternate identifiers.
 
+        This ensures that we can just use the base schemas definitions of
+        related/alternate identifies for loading.
+        """
+        # Legacy API does not accept alternate_identifiers, so force delete it.
+        data.pop('alternate_identifiers', None)
+
+        for r in data.pop('related_identifiers', []):
+            # Problem that API accepted one relation while documentation
+            # presented a different relation.
+            if r.get('relation') in [
+                    'isAlternativeIdentifier', 'isAlternateIdentifier']:
+                k = 'alternate_identifiers'
+            else:
+                k = 'related_identifiers'
+
+            data.setdefault(k, [])
+            data[k].append(r)
+
+    @pre_load()
+    def preload_resource_type(self, data):
+        """Prepare data for easier deserialization."""
+        if data.get('upload_type') == 'publication':
+            data.pop('image_type', None)
+        elif data.get('upload_type') == 'image':
+            data.pop('publication_type', None)
+
+    @post_load()
+    def merge_keys(self, data):
+        """Merge dot keys."""
+        prefixes = [
+            'resource_type',
+            'journal',
+            'meeting',
+            'imprint',
+            'part_of',
+            'thesis',
         ]
-        return clean_empty(data, empty_keys)
+
+        for p in prefixes:
+            for k in list(data.keys()):
+                if k.startswith('{0}.'.format(p)):
+                    key, subkey = k.split('.')
+                    if key not in data:
+                        data[key] = dict()
+                    data[key][subkey] = data.pop(k)
+
+        # Pre-reserve DOI is implemented differently now.
+        data.pop('prereserve_doi', None)
+
+    @validates('communities')
+    def validate_communities(self, values):
+        """Validate communities."""
+        for v in values:
+            if not isinstance(v, six.string_types):
+                raise ValidationError(_('Invalid community identifier.'))
+
+    @validates_schema
+    def validate_data(self, obj):
+        """Validate resource type."""
+        type_ = obj.get('resource_type.type')
+        if type_ in ['publication', 'image']:
+            type_dict = {
+                'type': type_,
+                'subtype': obj.get('resource_type.subtype'),
+            }
+        else:
+            type_dict = {'type': type_}
+
+        if ObjectType.get_by_dict(type_dict) is None:
+            raise ValidationError(
+                _('Invalid upload, publication or image type.'))
 
 
-class LegacyJSONSchemaV1(Schema):
+class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
     """Legacy JSON schema (used by deposit)."""
 
-    created = fields.Str()
-    doi = fields.Str(attribute='metadata.doi')
-    doi_url = DOILink(attribute='metadata.doi')
-    files = fields.List(fields.Nested(FileSchemaV1), default=[])
-    # Make into integer
-    id = fields.Integer(attribute='pid.pid_value')
-    metadata = fields.Nested(MetadataSchemaV1, attribute='metadata')
-    modified = fields.Str(attribute='updated')
-    owner = fields.Method('get_owners')
-    record_id = fields.Integer(attribute='metadata.recid')
-    record_url = fields.String()
-    state = fields.Method('get_state')
+    doi_url = DOILink(attribute='metadata.doi', dump_only=True)
+    files = fields.List(
+        fields.Nested(FileSchemaV1), default=[], dump_only=True)
+    metadata = fields.Nested(LegacyMetadataSchemaV1)
+    modified = fields.Str(attribute='updated', dump_only=True)
+    owner = fields.Method('dump_owners', dump_only=True)
+    record_id = fields.Integer(attribute='metadata.recid', dump_only=True)
+    record_url = fields.String(dump_only=True)
+    state = fields.Method('dump_state', dump_only=True)
     submitted = fields.Function(
         lambda o: o['metadata'].get(
-            '_deposit', {}).get('status', 'draft') == 'published'
+            '_deposit', {}).get('status', 'draft') == 'published',
+        dump_only=True
     )
-    title = fields.String(attribute='metadata.title', default='')
-    links = fields.Raw()
+    title = fields.String(
+        attribute='metadata.title', default='', dump_only=True)
 
-    def get_state(self, o):
+    def dump_state(self, o):
         """Get state of deposit."""
         if o['metadata'].get('_deposit', {}).get('status', 'draft') == 'draft':
             if o['metadata'].get('_deposit', {}).get('pid', {}):
@@ -250,7 +326,7 @@ class LegacyJSONSchemaV1(Schema):
                 return 'unsubmitted'
         return 'done'
 
-    def get_owners(self, obj):
+    def dump_owners(self, obj):
         """Get owners."""
         if '_deposit' in obj['metadata']:
             try:

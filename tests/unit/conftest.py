@@ -260,7 +260,7 @@ def minimal_record():
         "resource_type": {
             "type": "software",
         },
-        "publication_date": date.today().isoformat(),
+        "publication_date": datetime.utcnow().date().isoformat(),
         "title": "Test",
         "creators": [{"name": "Test"}],
         "description": "My description",
@@ -573,7 +573,8 @@ def get_json():
     """Function for extracting json from response."""
     def inner(response, code=None):
         """Decode JSON from response."""
+        data = response.get_data(as_text=True)
         if code is not None:
-            assert response.status_code == code
-        return json.loads(response.get_data(as_text=True))
+            assert response.status_code == code, data
+        return json.loads(data)
     return inner

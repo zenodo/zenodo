@@ -81,6 +81,7 @@ setup_requires = [
 
 install_requires = [
     'arrow>=0.7.0',
+    'bleach>=1.4.3',
     'CairoSVG>=1.0.20',
     'datacite>=0.2.1',
     'dcxml>=0.1.0',

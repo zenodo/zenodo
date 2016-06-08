@@ -26,25 +26,24 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.records.serializers.schemas.json import RecordSchemaJSONV1
+from zenodo.modules.records.serializers.schemas.json import RecordSchemaV1
+from zenodo.modules.records.serializers.schemas.legacyjson import \
+    LegacyRecordSchemaV1
 
-from .base import json_loader, marshmallow_dumper, marshmallow_loader
-from .schemas.legacyjson import LegacyRecordSchemaV1
+from .base import json_loader, marshmallow_loader
 
 # Translators
 # ===========
 #: JSON v1 deposit translator.
-json_v1_translator = marshmallow_loader(RecordSchemaJSONV1)
+json_v1_translator = marshmallow_loader(RecordSchemaV1)
 #: Legacy deposit dictionary translator.
-legacyjson_v1_translator = marshmallow_dumper(
-    LegacyRecordSchemaV1)
-
+legacyjson_v1_translator = marshmallow_loader(LegacyRecordSchemaV1)
 
 # Loaders
 # =======
 #: JSON deposit record loader.
 json_v1 = json_loader(
-    translator=json_v1_translator
+    translator=json_v1_translator,
 )
 #: Legacy deposit JSON record loader.
 legacyjson_v1 = json_loader(

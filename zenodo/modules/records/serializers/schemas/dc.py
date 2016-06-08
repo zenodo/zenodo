@@ -31,7 +31,7 @@ from marshmallow import Schema, fields
 from ...models import ObjectType
 
 
-class DublinCoreJSONV1(Schema):
+class DublinCoreV1(Schema):
     """Schema for records v1 in JSON."""
 
     identifiers = fields.Method('get_identifiers')

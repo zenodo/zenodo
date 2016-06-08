@@ -25,12 +25,11 @@
 """Zenodo SIPStore API."""
 
 from __future__ import absolute_import
-from flask_login import current_user
-from flask import request
 
 import json
-from flask import has_request_context
 
+from flask import has_request_context, request
+from flask_login import current_user
 from invenio_db import db
 from invenio_sipstore.models import SIP, RecordSIP, SIPFile
 

@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+import json
+
 from flask_babelex import gettext as _
 from invenio_rest.errors import FieldError, RESTValidationError
 
@@ -36,3 +38,34 @@ class MissingFilesError(RESTValidationError):
     errors = [
         FieldError(None, _('Minimum one file must be provided.'), code=10)
     ]
+
+
+class MarshmallowErrors(RESTValidationError):
+    """Marshmallow validation errors."""
+
+    def __init__(self, errors):
+        """Store marshmallow errors."""
+        self.errors = errors
+        super(MarshmallowErrors, self).__init__()
+
+    @staticmethod
+    def iter_errors(errors):
+        """Iterator over marshmallow errors."""
+        for field, error in errors.items():
+            if isinstance(error, list):
+                yield dict(field=field, message=' '.join(error))
+            elif isinstance(error, dict):
+                if '_schema' in error:
+                    yield dict(field=field, message=error['_schema'][0])
+
+    def get_body(self, environ=None):
+        """Get the request body."""
+        body = dict(
+            status=self.code,
+            message=self.get_description(environ),
+        )
+
+        if self.errors:
+            body['errors'] = list(self.iter_errors(self.errors))
+
+        return json.dumps(body)

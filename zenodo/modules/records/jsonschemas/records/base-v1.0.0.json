@@ -536,7 +536,14 @@
           "additionalProperties": false,
           "properties": {
             "legacy_deposit_id": {
-              "anyOf" : [{"type": "string"}, {"type": "null"}]
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
             },
             "agents": {
               "type": "array",
@@ -560,7 +567,14 @@
                     "type": "string"
                   },
                   "user_id": {
-                    "anyOf" : [{"type": "string"}, {"type": "null"}]
+                    "anyOf": [
+                      {
+                        "type": "string"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   }
                 }
               }

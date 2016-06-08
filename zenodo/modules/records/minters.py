@@ -32,6 +32,14 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
 
 
+def doi_generator(recid, prefix=None):
+    """Generate a DOI."""
+    return '{prefix}/zenodo.{recid}'.format(
+        prefix=prefix or current_app.config['PIDSTORE_DATACITE_DOI_PREFIX'],
+        recid=recid
+    )
+
+
 def zenodo_record_minter(record_uuid, data):
     """Mint record identifier (and DOI)."""
     if 'recid' in data:
@@ -58,10 +66,7 @@ def zenodo_doi_minter(record_uuid, data):
     # Create a DOI if no DOI was found.
     if not doi:
         assert 'recid' in data
-        doi = '{prefix}/zenodo.{recid}'.format(
-            prefix=prefix,
-            recid=data['recid'],
-        )
+        doi = doi_generator(data['recid'])
         data['doi'] = doi
 
     assert idutils.is_doi(doi)

@@ -430,7 +430,7 @@ RECORDS_REST_ENDPOINTS = dict(
             'application/x-dc+xml': (
                 'zenodo.modules.records.serializers.dc_v1_search'),
         },
-        default_media_type='application/json',
+        default_media_type='application/vnd.zenodo.v1+json',
     ),
 )
 # Default OpenAIRE API endpoints.

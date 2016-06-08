@@ -28,11 +28,13 @@ from __future__ import absolute_import, print_function
 
 from flask import request
 
+from ..errors import MarshmallowErrors
+
 
 def json_loader(pre_validator=None, post_validator=None, translator=None):
     """Basic JSON loader with translation and pre/post validation support."""
-    def loader():
-        data = request.json
+    def loader(data=None):
+        data = data or request.json
 
         if pre_validator:
             pre_validator(data)
@@ -45,17 +47,12 @@ def json_loader(pre_validator=None, post_validator=None, translator=None):
     return loader
 
 
-def marshmallow_dumper(schema_class, loader=None):
-    """Basic marshmallow dumper generator."""
-    def translator(obj):
-        data = schema_class().dump(obj).data
-        return data if loader is None else loader(data)
-    return translator
-
-
 def marshmallow_loader(schema_class):
     """Basic marshmallow loader generator."""
     def translator(data):
         result = schema_class().load(data)
+        if result.errors:
+            print(result.errors)
+            raise MarshmallowErrors(result.errors)
         return result.data
     return translator

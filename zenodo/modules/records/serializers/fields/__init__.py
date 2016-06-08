@@ -27,12 +27,16 @@
 from __future__ import absolute_import, print_function
 
 from .datetime import DateString
-from .doi import DOI
+from .doi import DOI, DOILink
+from .html import SanitizedHTML
 from .persistentid import PersistentId
 from .trimmedstring import TrimmedString
 
 __all__ = (
+    'DateString',
     'DOI',
+    'DOILink',
     'PersistentId',
+    'SanitizedHTML',
     'TrimmedString',
 )
