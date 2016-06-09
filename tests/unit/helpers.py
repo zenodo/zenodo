@@ -29,9 +29,9 @@ from copy import deepcopy
 from flask import current_app
 
 
-def fill_oauth2_headers(json_headers, token):
+def bearer_auth(headers, token):
     """Create authentication headers (with a valid oauth2 token)."""
-    headers = deepcopy(json_headers)
+    headers = deepcopy(headers)
     headers.append(
         ('Authorization', 'Bearer {0}'.format(token['token'].access_token))
     )

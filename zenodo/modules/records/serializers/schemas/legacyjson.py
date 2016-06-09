@@ -55,12 +55,6 @@ class FileSchemaV1(Schema):
         return hashval
 
 
-class SubjectSchemaV1(common.SubjectSchemaV1):
-    """Allow reading identifier from 'id' and 'identifier'."""
-
-    identifier = PersistentId(required=True, dump_to='id', load_from='id')
-
-
 class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
     """Legacy JSON metadata."""
 
@@ -80,9 +74,6 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         attribute='resource_type.subtype',
         validate=validate.OneOf(choices=ObjectType.get_subtypes('image')),
     )
-
-    # Overwrite subjects from common schema.
-    subjects = fields.Nested(SubjectSchemaV1, many=True)
 
     license = fields.Method('dump_license', 'load_license')
     communities = fields.Method('dump_communities', 'load_communities')

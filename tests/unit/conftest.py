@@ -38,7 +38,7 @@ from elasticsearch.exceptions import RequestError
 from flask import url_for
 from flask_cli import ScriptInfo
 from flask_security import login_user
-from helpers import fill_oauth2_headers
+from helpers import bearer_auth
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
 from invenio_communities.models import Community
@@ -553,19 +553,28 @@ def deposit_url(api):
 
 
 @pytest.fixture()
-def json_headers(app):
+def json_headers():
     """JSON headers."""
     return [('Content-Type', 'application/json'),
             ('Accept', 'application/json')]
 
 
 @pytest.fixture()
-def oauth2_headers_user_1(app, json_headers, write_token):
+def json_auth_headers(json_headers, write_token):
     """Authentication headers (with a valid oauth2 token).
 
     It uses the token associated with the first user.
     """
-    return fill_oauth2_headers(json_headers, write_token)
+    return bearer_auth(json_headers, write_token)
+
+
+@pytest.fixture()
+def auth_headers(write_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth([], write_token)
 
 
 @pytest.fixture()

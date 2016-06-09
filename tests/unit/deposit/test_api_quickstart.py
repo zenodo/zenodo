@@ -34,7 +34,7 @@ from six import BytesIO
 
 
 def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
-                                    oauth2_headers_user_1):
+                                    json_auth_headers):
     """Test zenodo quickstart workflow."""
     with api.test_request_context():
         with api.test_client() as client:
@@ -45,7 +45,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
             # Try get deposits as logged-in user
             res = client.get(
                 url_for('invenio_deposit_rest.depid_list'),
-                headers=oauth2_headers_user_1
+                headers=json_auth_headers
             )
             assert res.status_code == 200
             data = json.loads(res.get_data(as_text=True))
@@ -54,7 +54,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
             # Create a new deposit
             res = client.post(
                 url_for('invenio_deposit_rest.depid_list'),
-                headers=oauth2_headers_user_1,
+                headers=json_auth_headers,
                 data=json.dumps({})
             )
             assert res.status_code == 201
@@ -77,7 +77,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
                      'name': 'myfirstfile.csv'}
             res = client.post(
                 data['links']['files'],
-                headers=oauth2_headers_user_1,
+                headers=json_auth_headers,
                 data=files,
                 content_type='multipart/form-data',
             )
@@ -105,7 +105,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
             res = client.put(
                 url_for(
                     'invenio_deposit_rest.depid_item', pid_value=deposit_id),
-                headers=oauth2_headers_user_1,
+                headers=json_auth_headers,
                 data=json.dumps(deposit)
             )
             assert res.status_code == 200
@@ -114,7 +114,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
             res = client.post(
                 url_for('invenio_deposit_rest.depid_actions',
                         pid_value=deposit_id, action='publish'),
-                headers=oauth2_headers_user_1,
+                headers=json_auth_headers,
             )
             assert res.status_code == 202
             recid = json.loads(res.get_data(as_text=True))['record_id']

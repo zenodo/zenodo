@@ -24,7 +24,9 @@
 
 """Utilities for Zenodo deposit."""
 
-from flask import request
+import uuid
+
+from flask import abort, request
 from werkzeug.local import LocalProxy
 from werkzeug.routing import PathConverter
 
@@ -36,6 +38,11 @@ def file_id_to_key(value):
     _, record = request.view_args['pid_value'].data
     if value in record.files:
         return value
+
+    try:
+        value = uuid.UUID(value)
+    except ValueError:
+        abort(404)
 
     object_version = ObjectVersion.query.filter_by(
         bucket_id=record.files.bucket.id, file_id=value

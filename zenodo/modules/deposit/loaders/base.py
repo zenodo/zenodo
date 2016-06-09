@@ -52,7 +52,6 @@ def marshmallow_loader(schema_class):
     def translator(data):
         result = schema_class().load(data)
         if result.errors:
-            print(result.errors)
             raise MarshmallowErrors(result.errors)
         return result.data
     return translator
