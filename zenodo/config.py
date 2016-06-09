@@ -115,6 +115,21 @@ CACHE_TYPE = "redis"
 #: Default cache URL for sessions.
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 
+# CSL Citation Formatter
+# ======================
+#: Records Endpoint for CSL
+CSL_RECORDS_API_ENDPOINT = '/api/records/'
+#: Template dirrectory for CSL
+CSL_JSTEMPLATE_DIR = 'node_modules/invenio-csl-js/dist/templates/'
+#: Template for CSL citation result
+CSL_JSTEMPLATE_CITEPROC = os.path.join(CSL_JSTEMPLATE_DIR, 'citeproc.html')
+#: Template for CSL error
+CSL_JSTEMPLATE_ERROR = os.path.join(CSL_JSTEMPLATE_DIR, 'error.html')
+#: Template for CSL loading
+CSL_JSTEMPLATE_LOADING = os.path.join(CSL_JSTEMPLATE_DIR, 'loading.html')
+#: Template for CSL typeahead
+CSL_JSTEMPLATE_TYPEAHEAD = os.path.join(CSL_JSTEMPLATE_DIR, 'typeahead.html')
+
 # Deposit
 # =======
 #: PID minter used during record creation.
@@ -362,6 +377,16 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         serializer='zenodo.modules.records.serializers.json_v1',
         order=1,
     ),
+    'csl': dict(
+        title='CSL',
+        serializer='zenodo.modules.records.serializers.csl_v1',
+        order=6,
+    ),
+    'cp': dict(
+        title='CiteProc',
+        serializer='zenodo.modules.records.serializers.citeproc_v1',
+        order=7,
+    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
@@ -433,6 +458,10 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.datacite_v31_response'),
             'application/x-dc+xml': (
                 'zenodo.modules.records.serializers.dc_v1_response'),
+            'application/vnd.citationstyles.csl+json': (
+                'zenodo.modules.records.serializers.csl_v1_response'),
+            'text/x-bibliography': (
+                'zenodo.modules.records.serializers.citeproc_v1_response'),
         },
         search_serializers={
             'application/json': (

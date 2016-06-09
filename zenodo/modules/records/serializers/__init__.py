@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function
 
 from dojson.contrib.to_marc21 import to_marc21
 from invenio_marc21.serializers.marcxml import MARCXMLSerializer
+from invenio_records_rest.serializers.citeproc import CiteprocSerializer
 from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
     OAIDataCiteSerializer
 from invenio_records_rest.serializers.dc import DublinCoreSerializer
@@ -37,6 +38,7 @@ from invenio_records_rest.serializers.response import record_responsify, \
 from .bibtex import BibTeXSerializer
 from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import LegacyJSONSerializer
+from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
@@ -66,6 +68,11 @@ oai_datacite = OAIDataCiteSerializer(
 )
 #: Dublin Core serializer
 dc_v1 = DublinCoreSerializer(DublinCoreV1, replace_refs=True)
+#: CSL-JSON serializer
+csl_v1 = JSONSerializer(RecordSchemaCSLJSON, replace_refs=True)
+#: CSL Citation Formatter serializer
+citeproc_v1 = CiteprocSerializer(csl_v1)
+
 
 # Records-REST serializers
 # ========================
@@ -85,6 +92,12 @@ datacite_v31_response = record_responsify(
     datacite_v31, 'application/x-datacite+xml')
 #: DublinCore record serializer for individual records.
 dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
+#: CSL-JSON record serializer for individual records.
+csl_v1_response = record_responsify(
+    csl_v1, 'application/vnd.citationstyles.csl+json')
+#: CSL Citation Formatter serializer for individual records.
+citeproc_v1_response = record_responsify(citeproc_v1, 'text/x-bibliography')
+
 
 #: JSON record serializer for search results.
 json_v1_search = search_responsify(json_v1, 'application/json')
