@@ -102,6 +102,7 @@ install_requires = [
     'invenio-celery>=1.0.0a4',
     'invenio-communities>=1.0.0a9',
     'invenio-config>=1.0.0a1',
+    'invenio-csl-rest>=1.0.0a1',
     'invenio-deposit>=1.0.0a1',
     'invenio-files-rest>=1.0.0a3',
     'invenio-formatter>=1.0.0a2',

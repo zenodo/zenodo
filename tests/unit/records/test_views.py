@@ -26,11 +26,15 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 from datetime import datetime, timedelta
 
 from flask import render_template_string, url_for
+from helpers import login_user_via_session
+from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
+from invenio_search import current_search
 
 from zenodo.modules.records.views import zenodo_related_links
 
@@ -160,3 +164,41 @@ def test_records_ui_export(app, db, full_record):
             res = client.get(url_for(
                 'invenio_records_ui.recid_export', pid_value='1', format=f))
             assert res.status_code == 410 if val is None else 200
+
+
+def test_citation_formatter_styles_get(api, api_client, db):
+    """Test get CSL styles."""
+    with api.test_request_context():
+        style_url = url_for('invenio_csl_rest.styles')
+    res = api_client.get(style_url)
+    styles = json.loads(res.get_data(as_text=True))
+    assert res.status_code == 200
+    assert 'apa' in styles
+    assert 'American Psychological Association' in styles['apa']
+
+
+def test_citation_formatter_citeproc_get(api, api_client, es, db, full_record,
+                                         users):
+    """Test records REST citeproc get."""
+    r = Record.create(full_record)
+    pid = PersistentIdentifier.create(
+        'recid', '1', object_type='rec', object_uuid=r.id,
+        status=PIDStatus.REGISTERED)
+    db.session.commit()
+    db.session.refresh(pid)
+
+    RecordIndexer().index_by_id(r.id)
+    current_search.flush_and_refresh(index='records')
+    login_user_via_session(api_client, email=users[2]['email'])
+
+    with api.test_request_context():
+        records_url = url_for('invenio_records_rest.recid_item',
+                              pid_value=pid.pid_value)
+
+    res = api_client.get(records_url,
+                         query_string={'style': 'apa'},
+                         headers={'Accept': 'text/x-bibliography'})
+    assert res.status_code == 200
+    assert 'Doe, J.' in res.get_data(as_text=True)
+    assert 'Test title.' in res.get_data(as_text=True)
+    assert '(2014).' in res.get_data(as_text=True)
