@@ -24,7 +24,8 @@
     {"$ref": "http://zenodo.org/objecttypes/publication/technicalnote"},
     {"$ref": "http://zenodo.org/objecttypes/publication/workingpaper"},
     {"$ref": "http://zenodo.org/objecttypes/publication/other"}
-  ]
+  ],
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -38,7 +39,8 @@
   },
   "datacite": {"general": "Text", "type": "Poster"},
   "eurepo": "info:eu-repo/semantics/conferencePoster",
-  "schema.org": "http://schema.org/CreativeWork"
+  "schema.org": "http://schema.org/CreativeWork",
+  "csl": "graphic"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -52,7 +54,8 @@
   },
   "datacite": {"general": "Text", "type": "Presentation"},
   "eurepo": "info:eu-repo/semantics/lecture",
-  "schema.org": "http://schema.org/CreativeWork"
+  "schema.org": "http://schema.org/CreativeWork",
+  "csl": "speech"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -66,7 +69,8 @@
   },
   "datacite": {"general": "Dataset"},
   "eurepo": "info:eu-repo/semantics/other",
-  "schema.org": "http://schema.org/Dataset"
+  "schema.org": "http://schema.org/Dataset",
+  "csl": "dataset"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -88,7 +92,8 @@
     {"$ref": "http://zenodo.org/objecttypes/image/diagram"},
     {"$ref": "http://zenodo.org/objecttypes/image/photo"},
     {"$ref": "http://zenodo.org/objecttypes/image/other"}
-  ]
+  ],
+  "csl": "graphic"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -102,7 +107,8 @@
   },
   "datacite": {"general": "Audiovisual"},
   "eurepo": "info:eu-repo/semantics/other",
-  "schema.org": "http://schema.org/VideoObject"
+  "schema.org": "http://schema.org/VideoObject",
+  "csl": "motion_picture"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -116,7 +122,8 @@
   },
   "datacite": {"general": "Software"},
   "eurepo": "info:eu-repo/semantics/other",
-  "schema.org": "http://schema.org/Code"
+  "schema.org": "http://schema.org/Code",
+  "csl": "dataset"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -130,7 +137,8 @@
   },
   "datacite": {"general": "InteractiveResource"},
   "eurepo": "info:eu-repo/semantics/lecture",
-  "schema.org": "http://schema.org/CreativeWork"
+  "schema.org": "http://schema.org/CreativeWork",
+  "csl": "speech"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -145,7 +153,8 @@
   "schema.org": "http://schema.org/Book",
   "datacite": {"general": "Text", "type": "Book"},
   "eurepo": "info:eu-repo/semantics/book",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "book"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -160,7 +169,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Book section"},
   "eurepo": "info:eu-repo/semantics/bookPart",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "chapter"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -175,7 +185,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Conference paper"},
   "eurepo": "info:eu-repo/semantics/conferencePaper",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "paper-conference"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -190,7 +201,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Journal article"},
   "eurepo": "info:eu-repo/semantics/article",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article-journal"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -205,7 +217,8 @@
   "datacite": {"general": "Text", "type": "Patent"},
   "eurepo": "info:eu-repo/semantics/patent",
   "schema.org": "http://schema.org/CreativeWork",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "patent"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -220,7 +233,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Preprint"},
   "eurepo": "info:eu-repo/semantics/preprint",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -235,7 +249,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Report"},
   "eurepo": "info:eu-repo/semantics/report",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "report"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -250,7 +265,8 @@
   "schema.org": "http://schema.org/CreativeWork",
   "datacite": {"general": "Text", "type": "Software documentation"},
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -265,7 +281,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Thesis"},
   "eurepo": "info:eu-repo/semantics/doctoralThesis",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "thesis"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -280,7 +297,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Technical note"},
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -295,7 +313,8 @@
   "schema.org": "http://schema.org/ScholarlyArticle",
   "datacite": {"general": "Text", "type": "Working paper"},
   "eurepo": "info:eu-repo/semantics/workingPaper",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -310,7 +329,8 @@
   "schema.org": "http://schema.org/CreativeWork",
   "datacite": {"general": "Text", "type": "Proposal"},
   "eurepo": "info:eu-repo/semantics/researchProposal",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -325,7 +345,8 @@
   "schema.org": "http://schema.org/CreativeWork",
   "datacite": {"general": "Text", "type": "Project deliverable"},
   "eurepo": "info:eu-repo/semantics/report",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "report"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -340,7 +361,8 @@
   "schema.org": "http://schema.org/CreativeWork",
   "datacite": {"general": "Text", "type": "Project milestone"},
   "eurepo": "info:eu-repo/semantics/report",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "report"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -355,7 +377,8 @@
   "schema.org": "http://schema.org/CreativeWork",
   "datacite": {"general": "Text", "type": "Other"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -370,7 +393,8 @@
   "schema.org": "http://schema.org/Webpage",
   "datacite": {"general": "Image", "type": "Figure"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/image#"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/image#"},
+  "csl": "figure"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -385,7 +409,8 @@
   "schema.org": "http://schema.org/Webpage",
   "datacite": {"general": "Image", "type": "Plot"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/image"},
+  "csl": "figure"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -400,7 +425,8 @@
   "schema.org": "http://schema.org/Webpage",
   "datacite": {"general": "Image", "type": "Drawing"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/image"},
+  "csl": "graphic"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -415,7 +441,8 @@
   "schema.org": "http://schema.org/Webpage",
   "datacite": {"general": "Image", "type": "Diagram"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/image"},
+  "csl": "figure"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -430,7 +457,8 @@
   "schema.org": "http://schema.org/Webpage",
   "datacite": {"general": "Image", "type": "Photo"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/image"},
+  "csl": "graphic"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -445,5 +473,6 @@
   "schema.org": "http://schema.org/Webpage",
   "datacite": {"general": "Image", "type": "Other"},
   "eurepo": "info:eu-repo/semantics/other",
-  "parent": {"$ref": "http://zenodo.org/objecttypes/image"}
+  "parent": {"$ref": "http://zenodo.org/objecttypes/image"},
+  "csl": "graphic"
 }]
