@@ -117,12 +117,14 @@ ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 
 # CSL Citation Formatter
 # ======================
+#: Styles Endpoint for CSL
+CSL_STYLES_API_ENDPOINT = '/api/csl/styles'
 #: Records Endpoint for CSL
 CSL_RECORDS_API_ENDPOINT = '/api/records/'
 #: Template dirrectory for CSL
 CSL_JSTEMPLATE_DIR = 'node_modules/invenio-csl-js/dist/templates/'
 #: Template for CSL citation result
-CSL_JSTEMPLATE_CITEPROC = os.path.join(CSL_JSTEMPLATE_DIR, 'citeproc.html')
+CSL_JSTEMPLATE_CITEPROC = "templates/invenio_csl/citeproc.html"
 #: Template for CSL error
 CSL_JSTEMPLATE_ERROR = os.path.join(CSL_JSTEMPLATE_DIR, 'error.html')
 #: Template for CSL loading

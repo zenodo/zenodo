@@ -71,7 +71,6 @@ class RecordSchemaCSLJSON(Schema):
 
     container_title = fields.Str(attribute='metadata.part_of.title')
     page = fields.Str(attribute='metadata.part_of.pages')
-    # FIXME: Use these?
     volume = fields.Str(attribute='metadata.journal.volume')
     issue = fields.Str(attribute='metadata.journal.issue')
 

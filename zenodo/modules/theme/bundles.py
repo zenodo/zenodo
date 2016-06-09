@@ -36,6 +36,7 @@ css = NpmBundle(
     ),
     Bundle(
         'node_modules/angular-loading-bar/build/loading-bar.css',
+        'node_modules/typeahead.js-bootstrap-css/typeaheadjs.css',
         filters='cleancss',
     ),
     depends=('scss/*.scss', ),
@@ -44,6 +45,7 @@ css = NpmBundle(
         'almond': '~0.3.1',
         'bootstrap-sass': '~3.3.5',
         'font-awesome': '~4.4.0',
+        'typeahead.js-bootstrap-css': '~1.2.1'
     }
 )
 """Default CSS bundle."""
@@ -63,6 +65,8 @@ js = NpmBundle(
         'js/zenodo/*.js',
         'js/zenodo/filters/*.js',
         'node_modules/angular-loading-bar/build/*.js',
+        'node_modules/typeahead.js/dist/*.js',
+        'node_modules/invenio-csl-js/dist/*.js',
     ),
     filters='jsmin',
     output="gen/zenodo.%(version)s.js",
@@ -71,6 +75,8 @@ js = NpmBundle(
         'angular': '~1.4.9',
         'angular-sanitize': '~1.4.9',
         'angular-loading-bar': '~0.9.0',
+        'invenio-csl-js': '~0.1.2',
+        'typeahead.js': '~0.11.1',
     }
 )
 """Default JavaScript bundle."""

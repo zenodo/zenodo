@@ -77,3 +77,20 @@
 .get-badge {
     cursor: pointer;
 }
+
+#invenio-csl {
+  .twitter-typeahead .tt-menu {
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+
+  .twitter-typeahead .tt-suggestion {
+    white-space: normal;
+  }
+
+  .empty-results {
+    padding-left: 10px;
+    margin-bottom: 0px;
+  }
+}
