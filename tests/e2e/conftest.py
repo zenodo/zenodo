@@ -46,10 +46,10 @@ from zenodo.factory import create_app
 def base_app(request):
     """Flask application fixture."""
     app = create_app(
-        CELERY_ALWAYS_EAGER=True,
-        CELERY_CACHE_BACKEND="memory",
-        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
-        CELERY_RESULT_BACKEND="cache",
+        # CELERY_ALWAYS_EAGER=True,
+        # CELERY_CACHE_BACKEND="memory",
+        # CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+        # CELERY_RESULT_BACKEND="cache",
         DEBUG_TB_ENABLED=False,
         SECRET_KEY="CHANGE_ME",
         SECURITY_PASSWORD_SALT="CHANGE_ME",

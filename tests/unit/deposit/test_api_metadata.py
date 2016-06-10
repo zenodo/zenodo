@@ -27,14 +27,37 @@
 from __future__ import absolute_import, print_function
 
 import json
-
 from datetime import datetime, timedelta
+
+from flask import url_for
 from invenio_search import current_search
+from six import BytesIO
 
 
-def test_input_output(api_client, deposit, json_auth_headers,
-                      deposit_url, get_json, license_record, grant_record):
-    """Test data validation."""
+def test_invalid_create(api_client, es, json_auth_headers, deposit_url,
+                        get_json):
+    """Test invalid deposit creation."""
+    client = api_client
+    headers = json_auth_headers
+
+    # Invalid deposits.
+    cases = [
+        dict(unknownkey='data', metadata={}),
+        dict(metadat={}),
+    ]
+
+    for case in cases:
+        res = client.post(deposit_url, data=json.dumps(case), headers=headers)
+        assert res.status_code == 400, case
+
+    # No deposits were created
+    assert 0 == len(
+        get_json(client.get(deposit_url, headers=headers), code=200))
+
+
+def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
+                      license_record, grant_record):
+    """Rough validation of input against output data."""
     client = api_client
     headers = json_auth_headers
 
@@ -120,8 +143,132 @@ def test_input_output(api_client, deposit, json_auth_headers,
 
     # Get serialization.
     data = get_json(client.get(links['self'], headers=headers), code=200)
-    # Fix known differences.
+    # - fix known differences.
     test_data['metadata'].update({
         'prereserve_doi': {'doi': '10.5072/zenodo.1', 'recid': 1}
     })
     assert data['metadata'] == test_data['metadata']
+
+
+def test_unicode(api_client, es, location, json_auth_headers, deposit_url,
+                 get_json, license_record, grant_record, auth_headers,
+                 communities):
+    """Rough validation of input against output data."""
+    client = api_client
+    headers = json_auth_headers
+
+    test_data = dict(
+        metadata=dict(
+            access_right='open',
+            access_conditions='Αυτή είναι μια δοκιμή',
+            communities=[{'identifier': 'c1'}],
+            conference_acronym='Αυτή είναι μια δοκιμή',
+            conference_dates='هذا هو اختبار',
+            conference_place='Սա փորձություն',
+            conference_title='Гэта тэст',
+            conference_url='http://someurl.com',
+            conference_session='5',
+            conference_session_part='a',
+            creators=[
+                dict(name="Doe, John", affiliation="Това е тест"),
+                dict(name="Smith, Jane", affiliation="Tio ĉi estas testo")
+            ],
+            description="这是一个测试",
+            doi="10.1234/foo.bar",
+            embargo_date="2010-12-09",
+            grants=[dict(id="282896"), ],
+            imprint_isbn="Some isbn",
+            imprint_place="這是一個測試",
+            imprint_publisher="ეს არის გამოცდა",
+            journal_issue="આ એક કસોટી છે",
+            journal_pages="זהו מבחן",
+            journal_title="यह एक परीक्षण है",
+            journal_volume="Þetta er prófun",
+            keywords=["これはテストです", "ಇದು ಪರೀಕ್ಷೆ"],
+            subjects=[
+                dict(scheme="gnd", identifier="1234567899", term="これはです"),
+                dict(scheme="gnd", identifier="1234567898", term="ಇ"),
+            ],
+            license="CC0-1.0",
+            notes="이것은 테스트입니다",
+            partof_pages="ນີ້ແມ່ນການທົດສອບ",
+            partof_title="ही चाचणी आहे",
+            prereserve_doi=True,
+            publication_date="2013-09-12",
+            publication_type="book",
+            related_identifiers=[
+                dict(
+                    identifier='2011ApJS..192...18K',
+                    relation='isAlternativeIdentifier'),
+                dict(identifier='10.1234/foo.bar2', relation='isCitedBy'),
+                dict(identifier='10.1234/foo.bar3', relation='cites'),
+            ],
+            thesis_supervisors=[
+                dict(name="Doe Sr., این یک تست است", affiliation="Atlantis"),
+                dict(name="Это Sr., Jane", affiliation="Atlantis")
+            ],
+            thesis_university="இந்த ஒரு சோதனை",
+            contributors=[
+                dict(name="Doe Sr.,  ن یک تست", affiliation="Atlantis",
+                     type="Other"),
+                dict(name="SmЭтith Sr., Marco", affiliation="Atlantis",
+                     type="DataCurator")
+            ],
+            title="Đây là một thử nghiệm",
+            upload_type="publication",
+        )
+    )
+
+    # Create
+    res = client.post(deposit_url, data=json.dumps(test_data), headers=headers)
+    links = get_json(res, code=201)['links']
+    current_search.flush_and_refresh(index='deposits')
+
+    # Upload  file
+    assert client.post(
+        links['files'],
+        data=dict(file=(BytesIO(b'test'), 'test.txt'), name='test.txt'),
+        headers=auth_headers,
+    ).status_code == 201
+
+    # Publish deposition
+    response = client.post(links['publish'], headers=auth_headers)
+    record_id = get_json(response, code=202)['record_id']
+
+    # Get record.
+    current_search.flush_and_refresh(index='records')
+    response = client.get(
+        url_for('invenio_records_rest.recid_item', pid_value=record_id))
+
+
+def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
+                    license_record, grant_record, auth_headers):
+    """Test validation."""
+    client = api_client
+    headers = json_auth_headers
+
+    test_data = dict(metadata=dict(
+        access_right='notvalid',
+        conference_url='not_a_url',
+        doi='not a doi',
+        publication_date='not a date',
+        title='',
+        upload_type='notvalid'
+    ))
+
+    data = get_json(
+        client.post(deposit_url, data=json.dumps(test_data), headers=headers),
+        code=400)
+
+    field_errors = {e['field'] for e in data['errors']}
+    expected_field_errors = set([
+        'metadata.access_right',
+        'metadata.conference_url',
+        'metadata.doi',
+        'metadata.publication_date',
+        'metadata.title',
+        'metadata.upload_type',
+    ])
+
+    for e in expected_field_errors:
+        assert e in field_errors

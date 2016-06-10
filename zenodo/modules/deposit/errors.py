@@ -48,15 +48,21 @@ class MarshmallowErrors(RESTValidationError):
         self.errors = errors
         super(MarshmallowErrors, self).__init__()
 
-    @staticmethod
-    def iter_errors(errors):
+    def iter_errors(self, errors, prefix=''):
         """Iterator over marshmallow errors."""
+        res = []
         for field, error in errors.items():
             if isinstance(error, list):
-                yield dict(field=field, message=' '.join(error))
+                res.append(dict(
+                    field='{0}{1}'.format(prefix, field),
+                    message=' '.join([str(x) for x in error])
+                ))
             elif isinstance(error, dict):
-                if '_schema' in error:
-                    yield dict(field=field, message=error['_schema'][0])
+                res.extend(self.iter_errors(
+                    error,
+                    prefix='{0}{1}.'.format(prefix, field)
+                ))
+        return res
 
     def get_body(self, environ=None):
         """Get the request body."""
@@ -66,6 +72,6 @@ class MarshmallowErrors(RESTValidationError):
         )
 
         if self.errors:
-            body['errors'] = list(self.iter_errors(self.errors))
+            body['errors'] = self.iter_errors(self.errors)
 
         return json.dumps(body)

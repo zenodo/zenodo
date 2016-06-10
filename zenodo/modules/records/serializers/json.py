@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,10 +22,27 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-# Requirements for testing development version of important packages.
--e git+https://github.com/inveniosoftware/invenio-communities.git#egg=invenio-communities
--e git+https://github.com/inveniosoftware/invenio-deposit.git#egg=invenio-deposit
--e git+https://github.com/inveniosoftware/invenio-files-rest.git#egg=invenio-files-rest
--e git+https://github.com/inveniosoftware/invenio-oauthclient.git#egg=invenio-oauthclient
--e git+https://github.com/inveniosoftware/invenio-sipstore.git#egg=invenio-sipstore
--e git+https://github.com/zenodo/zenodo-migrationkit.git#egg=zenodo-migrationkit
+"""Zenodo Serializers."""
+
+from __future__ import absolute_import, print_function
+
+from flask import has_request_context
+from flask_security import current_user
+from invenio_records_files.api import Record
+from invenio_records_rest.serializers.json import JSONSerializer
+
+from ..permissions import has_access
+
+
+class ZenodoJSONSerializer(JSONSerializer):
+    """Legacy JSON Serializer."""
+
+    def preprocess_record(self, pid, record, links_factory=None):
+        """Include files for single record retrievals."""
+        result = super(JSONSerializer, self).preprocess_record(
+            pid, record, links_factory=links_factory
+        )
+        if isinstance(record, Record) and '_files' in record:
+            if not has_request_context() or has_access(current_user, record):
+                result['files'] = record['_files']
+        return result

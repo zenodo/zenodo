@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import date
+from datetime import datetime
 
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records import Record
@@ -279,7 +279,8 @@ def test_minimal_record(app, minimal_record):
     marcxml_v1.serialize(pid=pid, record=Record(minimal_record))
     expected = {
         u'publication_distribution_imprint': {
-            'date_of_publication_distribution': date.today().isoformat()
+            'date_of_publication_distribution': (
+                datetime.utcnow().date().isoformat())
         },
         u'control_number': '123',
         u'information_relating_to_copyright_status': {

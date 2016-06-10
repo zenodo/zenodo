@@ -28,14 +28,26 @@ from __future__ import absolute_import
 
 from os.path import splitext
 
-from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_deposit.api import Deposit as _Deposit
+from invenio_deposit.api import preserve
 from invenio_records_files.api import FileObject
 
+from zenodo.modules.records.minters import is_local_doi
 from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingFilesError
+
+
+PRESERVE_FIELDS = (
+    '_deposit',
+    '_files',
+    '_internal',
+    '_oai',
+    'owners',
+    'recid',
+)
+"""Fields which will not be overwritten on edit."""
 
 
 class ZenodoFileObject(FileObject):
@@ -56,6 +68,14 @@ class ZenodoDeposit(_Deposit):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject
+
+    def is_published(self):
+        """Check if deposit is published."""
+        return self['_deposit'].get('pid') is not None
+
+    def has_minted_doi(self):
+        """Check if deposit has a minted DOI."""
+        return is_local_doi(self['doi']) if self.is_published() else False
 
     @staticmethod
     def _create_inclusion_requests(comms, record):
@@ -120,22 +140,6 @@ class ZenodoDeposit(_Deposit):
         return data
 
     @staticmethod
-    def _update_oaiset(comms, record):
-        """Update the communities OAISets with newly added record.
-
-        :param comms: Community IDs for which the OAISets are to be updated.
-        :type comms: list of str
-        :param record: Record corresponding to this deposit.
-        :type record: `invenio_records.api.Record`
-        """
-        if current_app.config["COMMUNITIES_OAI_ENABLED"]:
-            from invenio_oaiserver.models import OAISet
-            for c in comms:
-                comm = Community.get(c)
-                oaiset = OAISet.query.filter_by(spec=comm.oaiset_spec).one()
-                oaiset.add_record(record)
-
-    @staticmethod
     def _autoadd_communities(comms, record):
         """Add record to all communities ommiting the inclusion request.
 
@@ -147,6 +151,17 @@ class ZenodoDeposit(_Deposit):
         for comm_id in comms:
             comm = Community.get(comm_id)
             comm.add_record(record)  # Handles oai-sets internally
+
+    def _filter_by_owned_communities(self, comms):
+        """Filter the list of communities for auto accept.
+
+        :param comms: Community IDs to be filtered by the deposit owners.
+        :type comms: list of str
+        :returns: Community IDs, which are owned by one of the deposit owners.
+        :rtype: list
+        """
+        return [c for c in comms if Community.get(c).id_user in
+                self['_deposit']['owners']]
 
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
@@ -161,29 +176,18 @@ class ZenodoDeposit(_Deposit):
             requested_comms = set(dep_comms) - set(owned_comms)
 
             # Add the owned communities to the record
-            self['communities'] = sorted(list(owned_comms))
+            self._autoadd_communities(owned_comms, self)
+
             record = super(ZenodoDeposit, self)._publish_new(id_=id_)
 
             # Push the communities back so they appear in deposit
             self['communities'] = dep_comms
             self._create_inclusion_requests(requested_comms, record)
-            self._update_oaiset(owned_comms, record)
             return record
         else:
             record = super(ZenodoDeposit, self)._publish_new(id_=id_)
 
         return record
-
-    def _filter_by_owned_communities(self, comms):
-        """Filter the list of communities for auto accept.
-
-        :param comms: Community IDs to be filtered by the deposit owners.
-        :type comms: list of str
-        :returns: Community IDs, which are owned by one of the deposit owners.
-        :rtype: list
-        """
-        return [c for c in comms if Community.get(c).id_user in
-                self['_deposit']['owners']]
 
     def _publish_edited(self):
         """Publish the edited deposit with communities merging."""
@@ -228,6 +232,20 @@ class ZenodoDeposit(_Deposit):
         """Publish the Zenodo deposit."""
         self.validate_publish()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
-        pid, record = deposit.fetch_published()
-        ZenodoSIP.create(pid, record)
+        ZenodoSIP.create(*deposit.fetch_published())
         return deposit
+
+    @preserve(result=False, fields=PRESERVE_FIELDS)
+    def clear(self, *args, **kwargs):
+        """Clear only drafts."""
+        super(ZenodoDeposit, self).clear(*args, **kwargs)
+
+    @preserve(result=False, fields=PRESERVE_FIELDS)
+    def update(self, *args, **kwargs):
+        """Update only drafts."""
+        super(ZenodoDeposit, self).update(*args, **kwargs)
+
+    @preserve(fields=PRESERVE_FIELDS)
+    def patch(self, *args, **kwargs):
+        """Patch only drafts."""
+        return super(ZenodoDeposit, self).patch(*args, **kwargs)

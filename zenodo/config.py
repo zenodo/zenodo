@@ -28,7 +28,6 @@ from __future__ import absolute_import, print_function
 
 import os
 
-from flask import request
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.utils import check_oauth2_scope_write, \
@@ -38,7 +37,7 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
-from invenio_records_rest.utils import check_elasticsearch
+from invenio_records_rest.utils import allow_all, check_elasticsearch
 
 
 def _(x):
@@ -144,7 +143,8 @@ DEPOSIT_REST_ENDPOINTS = dict(
         record_loaders={
             'application/json': (
                 'zenodo.modules.deposit.loaders:legacyjson_v1'),
-            'application/vnd.zenodo.v1+json': lambda: request.get_json(),
+            'application/vnd.zenodo.v1+json': (
+                'zenodo.modules.deposit.loaders:deposit_json_v1'),
         },
         record_serializers={
             'application/json': (
@@ -397,14 +397,16 @@ RECORDS_REST_ENDPOINTS = dict(
         pid_minter='zenodo_record_minter',
         pid_fetcher='zenodo_record_fetcher',
         list_route='/records/',
-        item_route='/records/<pid(recid):pid_value>',
+        item_route='/records/<{0}:pid_value>'.format(
+            'pid(recid,record_class="invenio_records_files.api:Record")'
+        ),
         search_index='records',
         record_class='invenio_records_files.api:Record',
         search_type=['record-v1.0.0'],
         search_factory_imp='invenio_records_rest.query.es_search_factory',
         record_serializers={
             'application/json': (
-                'zenodo.modules.records.serializers.json_v1_response'),
+                'zenodo.modules.records.serializers.legacyjson_v1_response'),
             'application/vnd.zenodo.v1+json': (
                 'zenodo.modules.records.serializers.json_v1_response'),
             'application/marcxml+xml': (
@@ -418,7 +420,7 @@ RECORDS_REST_ENDPOINTS = dict(
         },
         search_serializers={
             'application/json': (
-                'zenodo.modules.records.serializers:json_v1_search'),
+                'zenodo.modules.records.serializers:legacyjson_v1_search'),
             'application/vnd.zenodo.v1+json': (
                 'zenodo.modules.records.serializers:json_v1_search'),
             'application/marcxml+xml': (
@@ -431,6 +433,7 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.dc_v1_search'),
         },
         default_media_type='application/vnd.zenodo.v1+json',
+        read_permission_factory_imp=allow_all,
     ),
 )
 # Default OpenAIRE API endpoints.

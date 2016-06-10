@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function
 
 import json
 
+from invenio_files_rest.models import Bucket, ObjectVersion
 from invenio_search import current_search
 from six import BytesIO
 
@@ -51,7 +52,7 @@ def get_data(**kwargs):
 
 
 def test_missing_files(api_client, deposit, json_auth_headers,
-                       deposit_url, get_json):
+                       deposit_url, get_json, license_record):
     """Test data validation."""
     client = api_client
     headers = json_auth_headers
@@ -142,3 +143,31 @@ def test_file_ops(api_client, deposit, json_auth_headers, auth_headers,
 
     data = get_json(client.get(file_url, headers=headers), code=200)
     assert data['filename'] == 'rename.txt'
+
+
+def test_deletion(api_client, deposit, json_auth_headers, deposit_url,
+                  get_json, license_record, auth_headers):
+    """Test data validation."""
+    client = api_client
+    headers = json_auth_headers
+    auth = auth_headers
+
+    # Create
+    res = client.post(
+        deposit_url, data=json.dumps(get_data()), headers=headers)
+    links = get_json(res, code=201)['links']
+    current_search.flush_and_refresh(index='deposits')
+
+    # Upload file
+    client.post(
+        links['files'],
+        data=dict(file=(BytesIO(b'test'), 'test.txt'), name='test.txt'),
+        headers=auth
+    )
+    assert Bucket.query.count() == 1
+
+    # Delete upload
+    res = client.delete(links['self'], headers=auth)
+    assert res.status_code == 204
+
+    # TODO - check if files cannot be downloaded.

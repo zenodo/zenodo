@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import date
+from datetime import datetime
 
 import pytest
 from invenio_records.api import Record
@@ -57,7 +57,7 @@ def test_resource_type(app, db, minimal_record):
 def test_publication_date(app, db, minimal_record):
     """Test recid property."""
     # String instead of number
-    minimal_record['publication_date'] = date.today().isoformat()
+    minimal_record['publication_date'] = datetime.utcnow().date().isoformat()
     Record.create(minimal_record)
 
 

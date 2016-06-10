@@ -25,16 +25,17 @@
 """Zenodo legacy JSON schema."""
 
 import six
-from flask import current_app
+from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
 from marshmallow import Schema, ValidationError, fields, missing, post_load, \
     pre_dump, pre_load, validate, validates, validates_schema
+from werkzeug.routing import BuildError
 
-from zenodo.modules.records.models import ObjectType
+from zenodo.modules.records.models import AccessRight, ObjectType
 
 from . import common
 from ...minters import doi_generator
-from ..fields import DOILink, PersistentId, TrimmedString
+from ..fields import DOILink, TrimmedString
 
 
 class FileSchemaV1(Schema):
@@ -44,6 +45,7 @@ class FileSchemaV1(Schema):
     filename = fields.String(attribute='key', dump_only=True)
     filesize = fields.Integer(attribute='size', dump_only=True)
     checksum = fields.Method('dump_checksum', dump_only=True)
+    links = fields.Method('dump_links', dump_only=True)
 
     def dump_checksum(self, obj):
         """Dump checksum."""
@@ -53,6 +55,20 @@ class FileSchemaV1(Schema):
         if algo != 'md5':
             return missing
         return hashval
+
+    def dump_links(self, obj):
+        """Dump links."""
+        try:
+            return dict(
+                download=url_for(
+                    'invenio_files_rest.object_api',
+                    bucket_id=obj['bucket'],
+                    key=obj['key'],
+                    _external=True,
+                )
+            )
+        except BuildError:
+            return missing
 
 
 class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
@@ -227,6 +243,7 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             if r.get('relation') in [
                     'isAlternativeIdentifier', 'isAlternateIdentifier']:
                 k = 'alternate_identifiers'
+                r.pop('relation')
             else:
                 k = 'related_identifiers'
 
@@ -240,6 +257,17 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             data.pop('image_type', None)
         elif data.get('upload_type') == 'image':
             data.pop('publication_type', None)
+
+    @pre_load()
+    def preload_license(self, data):
+        """Default license."""
+        acc = data.get('access_right', AccessRight.OPEN)
+        if acc in [AccessRight.OPEN, AccessRight.EMBARGOED]:
+            if 'license' not in data:
+                if data.get('upload_type') == 'dataset':
+                    data['license'] = 'CC0-1.0'
+                else:
+                    data['license'] = 'CC-BY-4.0'
 
     @post_load()
     def merge_keys(self, data):
@@ -269,7 +297,10 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Validate communities."""
         for v in values:
             if not isinstance(v, six.string_types):
-                raise ValidationError(_('Invalid community identifier.'))
+                raise ValidationError(
+                    _('Invalid community identifier.'),
+                    field_names=['communities']
+                )
 
     @validates_schema
     def validate_data(self, obj):
@@ -280,12 +311,16 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
                 'type': type_,
                 'subtype': obj.get('resource_type.subtype'),
             }
+            field_names = ['{0}_type'.format(type_)]
         else:
             type_dict = {'type': type_}
+            field_names = ['upload_type']
 
         if ObjectType.get_by_dict(type_dict) is None:
             raise ValidationError(
-                _('Invalid upload, publication or image type.'))
+                _('Invalid upload, publication or image type.'),
+                field_names=field_names,
+            )
 
 
 class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):

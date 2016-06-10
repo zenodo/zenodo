@@ -41,13 +41,16 @@ from flask_security import login_user
 from helpers import bearer_auth
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
+from invenio_admin.permissions import action_admin_access
 from invenio_communities.models import Community
 from invenio_db import db as db_
-from invenio_deposit.permissions import action_admin_access
+from invenio_deposit.permissions import \
+    action_admin_access as deposit_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
 from invenio_oauth2server.models import Client, Token
 from invenio_pidstore.models import PersistentIdentifier
+from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 from invenio_records_files.api import Record as RecordFile
@@ -58,6 +61,7 @@ from sqlalchemy_utils.functions import create_database, database_exists
 
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
+from zenodo.modules.deposit.minters import zenodo_deposit_minter
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
@@ -181,15 +185,20 @@ def users(app, db):
     user2 = create_test_user(email='test@zenodo.org', password='tester2')
     user_admin = create_test_user(email='admin@zenodo.org',
                                   password='admin')
+
     with db.session.begin_nested():
         # set admin permissions
         db.session.add(ActionUsers(action=action_admin_access.value,
                                    user=user_admin))
-
+        db.session.add(ActionUsers(action=deposit_admin_access.value,
+                                   user=user_admin))
     db.session.commit()
-    return [{'email': user1.email, 'id': user1.id},
-            {'email': user2.email, 'id': user2.id},
-            {'email': user_admin.email, 'id': user_admin.id}]
+
+    return [
+        {'email': user1.email, 'id': user1.id},
+        {'email': user2.email, 'id': user2.id},
+        {'email': user_admin.email, 'id': user_admin.id}
+    ]
 
 
 @pytest.fixture()
@@ -236,7 +245,7 @@ def write_token(app, db, oauth2_client, users):
             user_id=users[0]['id'],
             access_token='dev_access_2',
             refresh_token='dev_refresh_2',
-            expires=datetime.now() + timedelta(hours=10),
+            expires=datetime.utcnow() + timedelta(hours=10),
             is_personal=False,
             is_internal=True,
             _scopes=write_scope.id,
@@ -493,7 +502,24 @@ def grant_record(db, funder_record):
 def license_record(db):
     """Create a license record."""
     license = Record.create({
-        "$schema": "http://zenodo.org/schemas/licenses/license-v1.0.0.json",
+        "$schema": "https://zenodo.org/schemas/licenses/license-v1.0.0.json",
+        "domain_content": True,
+        "domain_data": True,
+        "domain_software": True,
+        "family": "",
+        "id": "CC-BY-4.0",
+        "maintainer": "Creative Commons",
+        "od_conformance": "approved",
+        "osd_conformance": "not reviewed",
+        "status": "active",
+        "title": "Creative Commons Attribution International 4.0",
+        "url": "https://creativecommons.org/licenses/by/4.0/"
+    })
+    PersistentIdentifier.create(
+        pid_type='od_lic', pid_value=license['id'], object_type='rec',
+        object_uuid=license.id, status='R')
+    license = Record.create({
+        "$schema": "https://zenodo.org/schemas/licenses/license-v1.0.0.json",
         "domain_content": True,
         "domain_data": True,
         "domain_software": True,
@@ -516,7 +542,7 @@ def license_record(db):
 @pytest.fixture()
 def deposit(app, es, users, location):
     """New deposit with files."""
-    record = dict(
+    data = dict(
         title='Test title',
         creators=[
             dict(name='Doe, John', affiliation='Atlantis'),
@@ -530,8 +556,9 @@ def deposit(app, es, users, location):
     with app.test_request_context():
         datastore = app.extensions['security'].datastore
         login_user(datastore.get_user(users[0]['email']))
-        deposit = Deposit.create(record)
-        deposit.commit()
+        id_ = uuid4()
+        zenodo_deposit_minter(id_, data)
+        deposit = Deposit.create(data, id_=id_)
         db_.session.commit()
     current_search.flush_and_refresh(index='deposits')
     return deposit
@@ -587,3 +614,19 @@ def get_json():
             assert response.status_code == code, data
         return json.loads(data)
     return inner
+
+
+@pytest.yield_fixture()
+def legacyjson_v1():
+    """Function for extracting json from response."""
+    from zenodo.modules.records.serializers import legacyjson_v1 as serializer
+    serializer.replace_refs = False
+    yield serializer
+    serializer.replace_refs = True
+
+
+@pytest.fixture()
+def resolver():
+    """Get a record resolver."""
+    return Resolver(
+        pid_type='recid', object_type='rec', getter=Record.get_record)

@@ -34,7 +34,7 @@ from six import BytesIO
 
 
 def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
-                                    json_auth_headers):
+                                    json_auth_headers, license_record):
     """Test zenodo quickstart workflow."""
     with api.test_request_context():
         with api.test_client() as client:

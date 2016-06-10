@@ -26,35 +26,52 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime
 
+import idutils
 import pytest
 
 from zenodo.modules.records.serializers.schemas.json import MetadataSchemaV1
 
 
-@pytest.mark.parametrize('input_val', [
-    '10.1234/foo.bar',
-    'http://dx.doi.org/10.1234/foo.bar',
-    'https://doi.org/10.1234/foo.bar',
-    ' doi:10.1234/foo.bar ',
-    ' 10.1234/foo.bar ',
+@pytest.mark.parametrize('input_val, ctx', [
+    ('10.1234/foo.bar', dict()),
+    ('http://dx.doi.org/10.1234/foo.bar', dict()),
+    ('https://doi.org/10.1234/foo.bar', dict()),
+    (' doi:10.1234/foo.bar ', dict()),
+    (' 10.1234/foo.bar ', dict()),
+    ('10.5281/allow', dict(
+        allowed_dois=['10.5281/allow'],
+        managed_prefixes=['10.5281']
+    )),
+    ('10.5281/required', dict(
+        required_doi='10.5281/required',
+        allowed_dois=['10.5281/allow'],
+        managed_prefixes=['10.5281'])),
 ])
-def test_valid_doi(input_val):
+def test_valid_doi(input_val, ctx):
     """Test DOI."""
-    data, errors = MetadataSchemaV1(partial=['doi']).load(
-        dict(doi=input_val))
-    assert data['doi'] == '10.1234/foo.bar'
+    data, errors = MetadataSchemaV1(
+        partial=['doi'], context=ctx).load(dict(doi=input_val))
+    assert data['doi'] == idutils.normalize_doi(input_val.strip())
 
 
 @pytest.mark.parametrize(('input_val', 'ctx'), [
     ('10.5072/test.prefix', dict()),
     ('not a doi', dict()),
-    ('10.5281/banned_prefix', dict(banned_prefixes=['10.5281'])),
-    ('10.5281/invalid_prefix', dict(allowed_prefixes=['10.5072'])),
+    ('10.5281/banned_prefix', dict(managed_prefixes=['10.5281'])),
+    ('10.5281/allow', dict(
+        required_doi='10.5281/required',
+        allowed_dois=['10.5281/allow'],
+        managed_prefixes=['10.5281'])),
+    ('10.5281/invalid', dict(
+        allowed_dois=['10.5281/allow'],
+        managed_prefixes=['10.5281'])),
+    ('10.5281/invalid_prefix', dict(banned_prefixes=['10.5281', '10.5072'])),
+    ('10.5072/invalid_prefix', dict(banned_prefixes=['10.5281', '10.5072'])),
 ])
 def test_invalid_doi(input_val, ctx):
     """Test DOI."""
-    data, errors = MetadataSchemaV1(partial=['doi'], context=ctx).load(
-        dict(doi=input_val))
+    data, errors = MetadataSchemaV1(
+        partial=['doi'], context=ctx).load(dict(doi=input_val))
     assert 'doi' in errors
     assert 'doi' not in data
 

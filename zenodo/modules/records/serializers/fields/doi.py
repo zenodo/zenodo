@@ -38,29 +38,37 @@ class DOI(fields.String):
         'invalid_doi': _(
             'The provided DOI is invalid - it should look similar '
             ' to \'10.1234/foo.bar\'.'),
-        'invalid_prefix': _(
+        'managed_prefix': _(
             'The prefix {prefix} is administrated locally.'),
         'banned_prefix': _(
             'The prefix {prefix} is invalid.'
         ),
         'test_prefix': _(
-            'The prefix {prefix} is invalid. The '
+            'The prefix 10.5072 is invalid. The '
             'prefix is only used for testing purposes, and no DOIs with '
             'this prefix are attached to any meaningful content.'
         ),
+        'required_doi': _(
+            'The DOI cannot be changed.'
+        ),
     }
 
-    def __init__(self, allowed_prefixes=None, banned_prefixes=None,
-                 *args, **kwargs):
+    def __init__(self, required_doi=None, allowed_dois=None,
+                 managed_prefixes=None, banned_prefixes=None, *args, **kwargs):
         """Initialize field."""
         super(DOI, self).__init__(*args, **kwargs)
-        self.allowed_prefixes = allowed_prefixes or []
+        self.required_doi = required_doi
+        self.allowed_dois = allowed_dois
+        self.managed_prefixes = managed_prefixes or []
         self.banned_prefixes = banned_prefixes or ['10.5072']
 
     def _deserialize(self, value, attr, data):
         """Deserialize DOI value."""
         value = super(DOI, self)._deserialize(value, attr, data)
         value = value.strip()
+        if value == '' and not (
+                self.required or self.context.get('doi_required')):
+            return value
         if not idutils.is_doi(value):
             self.fail('invalid_doi')
         return idutils.normalize_doi(value)
@@ -69,22 +77,35 @@ class DOI(fields.String):
         """Validate DOI value."""
         super(DOI, self)._validate(value)
 
-        allowed_prefixes = self.context.get(
-            'allowed_prefixes', self.allowed_prefixes)
+        required_doi = self.context.get(
+            'required_doi', self.required_doi)
+        allowed_dois = self.context.get(
+            'allowed_dois', self.allowed_dois)
+        managed_prefixes = self.context.get(
+            'managed_prefixes', self.managed_prefixes)
         banned_prefixes = self.context.get(
             'banned_prefixes', self.banned_prefixes)
 
-        prefix = value.split('/')[0]
+        # First check for required DOI.
+        if required_doi:
+            if value == required_doi:
+                return
+            self.fail('required_doi')
+        # Check if DOI is in allowed list.
+        if allowed_dois:
+            if value in allowed_dois:
+                return
 
-        if allowed_prefixes:
-            if prefix not in allowed_prefixes:
-                self.fail('invalid_prefix', prefix=prefix)
-        elif banned_prefixes:
-            if prefix in banned_prefixes:
-                self.fail(
-                    'test_prefix' if prefix == '10.5072' else 'banned_prefix',
-                    prefix=prefix
-                )
+        prefix = value.split('/')[0]
+        # Check for managed prefix
+        if managed_prefixes and prefix in managed_prefixes:
+            self.fail('managed_prefix')
+        # Check for banned prefixes
+        if banned_prefixes and prefix in banned_prefixes:
+            self.fail(
+                'test_prefix' if prefix == '10.5072' else 'banned_prefix',
+                prefix=prefix
+            )
 
 
 class DOILink(fields.Field):

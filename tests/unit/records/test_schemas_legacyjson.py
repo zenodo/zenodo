@@ -28,25 +28,21 @@ from datetime import timedelta
 
 import arrow
 
-from zenodo.modules.records.serializers import legacyjson_v1
 
-legacyjson_v1.replace_refs = False
-
-
-def test_id(minimal_record_model, depid_pid):
+def test_id(minimal_record_model, depid_pid, legacyjson_v1):
     """Test created."""
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
     assert obj['id'] == int(depid_pid.pid_value)
 
 
-def test_created_modified(minimal_record_model, depid_pid):
+def test_created_modified(minimal_record_model, depid_pid, legacyjson_v1):
     """Test created."""
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
     assert arrow.get(obj['created']) <= arrow.utcnow()
     assert arrow.get(obj['modified']) <= arrow.utcnow()
 
 
-def test_doi(minimal_record_model, depid_pid):
+def test_doi(minimal_record_model, depid_pid, legacyjson_v1):
     """Test created."""
     minimal_record_model['doi'] = '10.1234/foo'
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
@@ -54,21 +50,21 @@ def test_doi(minimal_record_model, depid_pid):
     assert obj['doi_url'] == 'https://doi.org/10.1234/foo'
 
 
-def test_owners(minimal_record_model, depid_pid):
+def test_owners(minimal_record_model, depid_pid, legacyjson_v1):
     """Test created."""
     minimal_record_model['owners'] = [1, 2, 3]
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
     assert obj['owner'] == 1
 
 
-def test_owners_deposit(minimal_record_model, depid_pid):
+def test_owners_deposit(minimal_record_model, depid_pid, legacyjson_v1):
     """Test owners."""
     minimal_record_model['_deposit'] = dict(owners=[3, 2, 1])
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
     assert obj['owner'] == 3
 
 
-def test_recid(minimal_record_model, depid_pid):
+def test_recid(minimal_record_model, depid_pid, legacyjson_v1):
     """Test recid."""
     # TODO: Record URL.
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
@@ -78,7 +74,7 @@ def test_recid(minimal_record_model, depid_pid):
     assert 'record_id' not in obj
 
 
-def test_title(minimal_record_model, depid_pid):
+def test_title(minimal_record_model, depid_pid, legacyjson_v1):
     """Test title."""
     minimal_record_model['title'] = 'TEST'
     obj = legacyjson_v1.transform_record(depid_pid, minimal_record_model)
@@ -86,7 +82,7 @@ def test_title(minimal_record_model, depid_pid):
     assert obj['metadata']['title'] == 'TEST'
 
 
-def test_upload_type(minimal_record_model, depid_pid):
+def test_upload_type(minimal_record_model, depid_pid, legacyjson_v1):
     """Test upload/publication/image type."""
     obj = legacyjson_v1.transform_record(
         depid_pid, minimal_record_model)['metadata']
@@ -111,7 +107,7 @@ def test_upload_type(minimal_record_model, depid_pid):
     assert 'publication_type' not in obj
 
 
-def test_publication_date(minimal_record_model, depid_pid):
+def test_publication_date(minimal_record_model, depid_pid, legacyjson_v1):
     """Test publication date."""
     for k in ['publication_date', 'embargo_date']:
         minimal_record_model[k] = arrow.utcnow().date() - timedelta(days=1)
@@ -120,7 +116,7 @@ def test_publication_date(minimal_record_model, depid_pid):
         assert arrow.get(obj[k]).date() <= arrow.utcnow().date()
 
 
-def test_creators(minimal_record_model, depid_pid):
+def test_creators(minimal_record_model, depid_pid, legacyjson_v1):
     """Test creators."""
     minimal_record_model['creators'] = [
         {'name': 'Doe, John', 'affiliation': '', 'orcid': '',
@@ -141,7 +137,7 @@ def test_creators(minimal_record_model, depid_pid):
     assert obj['thesis_supervisors'] == obj['creators']
 
 
-def test_contributors(minimal_record_model, depid_pid):
+def test_contributors(minimal_record_model, depid_pid, legacyjson_v1):
     """Test contributors."""
     minimal_record_model['contributors'] = [
         {'name': 'Doe, John', 'affiliation': '', 'orcid': '',
@@ -159,7 +155,7 @@ def test_contributors(minimal_record_model, depid_pid):
     ]
 
 
-def test_direct_mappings(minimal_record_model, depid_pid):
+def test_direct_mappings(minimal_record_model, depid_pid, legacyjson_v1):
     """Test direct mappings."""
     fields = [
         'title', 'description', 'notes', 'access_right', 'access_conditions'
@@ -172,7 +168,7 @@ def test_direct_mappings(minimal_record_model, depid_pid):
         assert obj[f] == 'TEST'
 
 
-def test_thesis_university(minimal_record_model, depid_pid):
+def test_thesis_university(minimal_record_model, depid_pid, legacyjson_v1):
     """Test direct mappings."""
     minimal_record_model['thesis'] = dict(university='TEST')
     obj = legacyjson_v1.transform_record(
@@ -180,7 +176,7 @@ def test_thesis_university(minimal_record_model, depid_pid):
     assert obj['thesis_university'] == 'TEST'
 
 
-def test_prereserve(minimal_record_model, depid_pid):
+def test_prereserve(minimal_record_model, depid_pid, legacyjson_v1):
     """Test prereserve DOI."""
     minimal_record_model['_deposit_actions'] = dict(prereserve_doi=True)
     obj = legacyjson_v1.transform_record(
@@ -191,7 +187,7 @@ def test_prereserve(minimal_record_model, depid_pid):
     }
 
 
-def test_keywords(minimal_record_model, depid_pid):
+def test_keywords(minimal_record_model, depid_pid, legacyjson_v1):
     """Test keywords."""
     kws = ['kw1', 'kw2']
     minimal_record_model['keywords'] = kws
@@ -200,7 +196,7 @@ def test_keywords(minimal_record_model, depid_pid):
     assert obj['keywords'] == kws
 
 
-def test_references(minimal_record_model, depid_pid):
+def test_references(minimal_record_model, depid_pid, legacyjson_v1):
     """Test references."""
     refs = [{'raw_reference': 'ref1'}, {'raw_reference': 'ref2'}]
     minimal_record_model['references'] = refs
@@ -209,7 +205,7 @@ def test_references(minimal_record_model, depid_pid):
     assert obj['references'] == ['ref1', 'ref2']
 
 
-def test_communities(minimal_record_model, depid_pid):
+def test_communities(minimal_record_model, depid_pid, legacyjson_v1):
     """Test communities."""
     minimal_record_model['communities'] = ['zenodo']
     obj = legacyjson_v1.transform_record(
@@ -217,7 +213,7 @@ def test_communities(minimal_record_model, depid_pid):
     assert obj['communities'] == [{'identifier': 'zenodo'}]
 
 
-def test_journal(minimal_record_model, depid_pid):
+def test_journal(minimal_record_model, depid_pid, legacyjson_v1):
     """Test journal."""
     minimal_record_model['journal'] = {
         'title': 'Mathematical Combinations',
@@ -235,7 +231,7 @@ def test_journal(minimal_record_model, depid_pid):
     assert 'journal_year' not in obj
 
 
-def test_conference(minimal_record_model, depid_pid):
+def test_conference(minimal_record_model, depid_pid, legacyjson_v1):
     """Test conferences."""
     minimal_record_model['meeting'] = {
         'title': '20th International Conference on Computing in High Energy '
@@ -258,7 +254,7 @@ def test_conference(minimal_record_model, depid_pid):
     assert obj['conference_session_part']
 
 
-def test_related_identifiers(minimal_record_model, depid_pid):
+def test_related_identifiers(minimal_record_model, depid_pid, legacyjson_v1):
     """Test related identifiers."""
     minimal_record_model.update(dict(
         related_identifiers=[
@@ -278,7 +274,7 @@ def test_related_identifiers(minimal_record_model, depid_pid):
     ]
 
 
-def test_grants(minimal_record_model, depid_pid):
+def test_grants(minimal_record_model, depid_pid, legacyjson_v1):
     """Test grants."""
     minimal_record_model.update(dict(grants=[
         dict(
@@ -321,7 +317,7 @@ def test_grants(minimal_record_model, depid_pid):
     ]
 
 
-def test_license(minimal_record_model, depid_pid):
+def test_license(minimal_record_model, depid_pid, legacyjson_v1):
     """Test license."""
     minimal_record_model.update(dict(license=dict(id='CC0-1.0')))
 
@@ -330,7 +326,7 @@ def test_license(minimal_record_model, depid_pid):
     assert obj['license'] == 'CC0-1.0'
 
 
-def test_subjects(minimal_record_model, depid_pid):
+def test_subjects(minimal_record_model, depid_pid, legacyjson_v1):
     """Test subjects."""
     minimal_record_model.update(dict(subjects=[
         dict(
@@ -345,13 +341,13 @@ def test_subjects(minimal_record_model, depid_pid):
     assert obj['subjects'] == [
         dict(
             term="Astronomy",
-            id="http://id.loc.gov/authorities/subjects/sh85009003",
+            identifier="http://id.loc.gov/authorities/subjects/sh85009003",
             scheme="url"
         ),
     ]
 
 
-def test_imprint(minimal_record_model, depid_pid):
+def test_imprint(minimal_record_model, depid_pid, legacyjson_v1):
     """Test imprint."""
     minimal_record_model.update(dict(
         imprint=dict(
@@ -370,7 +366,7 @@ def test_imprint(minimal_record_model, depid_pid):
     assert 'imprint_year' not in obj
 
 
-def test_partof(minimal_record_model, depid_pid):
+def test_partof(minimal_record_model, depid_pid, legacyjson_v1):
     """Test imprint."""
     minimal_record_model.update(dict(
         imprint=dict(
@@ -396,7 +392,7 @@ def test_partof(minimal_record_model, depid_pid):
     assert 'partof_year' not in obj
 
 
-def test_state(minimal_record_model, depid_pid):
+def test_state(minimal_record_model, depid_pid, legacyjson_v1):
     """Test state."""
     minimal_record_model.update(dict(
         _deposit=dict(status='draft')
@@ -437,7 +433,7 @@ def test_state(minimal_record_model, depid_pid):
     assert obj['state'] == 'inprogress'
 
 
-def test_submitted(minimal_record_model, depid_pid):
+def test_submitted(minimal_record_model, depid_pid, legacyjson_v1):
     """Test state."""
     minimal_record_model.update(dict(
         _deposit=dict(status='draft')

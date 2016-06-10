@@ -35,15 +35,15 @@ from .base import json_loader, marshmallow_loader
 # Translators
 # ===========
 #: JSON v1 deposit translator.
-json_v1_translator = marshmallow_loader(RecordSchemaV1)
+deposit_json_v1_translator = marshmallow_loader(RecordSchemaV1)
 #: Legacy deposit dictionary translator.
 legacyjson_v1_translator = marshmallow_loader(LegacyRecordSchemaV1)
 
 # Loaders
 # =======
 #: JSON deposit record loader.
-json_v1 = json_loader(
-    translator=json_v1_translator,
+deposit_json_v1 = json_loader(
+    translator=deposit_json_v1_translator,
 )
 #: Legacy deposit JSON record loader.
 legacyjson_v1 = json_loader(

@@ -27,11 +27,16 @@
 from __future__ import absolute_import, print_function
 
 import json
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
 from invenio_records.api import Record
 
 from zenodo.modules.records.serializers import datacite_v31
+
+
+def today():
+    """Get todays UTC date."""
+    return datetime.utcnow().date()
 
 
 def test_minimal(minimal_record, recid_pid):
@@ -43,8 +48,8 @@ def test_minimal(minimal_record, recid_pid):
         'creators': [{'creatorName': 'Test', 'nameIdentifier': {}}],
         'titles': [{'title': 'Test'}],
         'publisher': 'Zenodo',
-        'publicationYear': str(date.today().year),
-        'dates': [{'dateType': 'Issued', 'date': date.today().isoformat()}],
+        'publicationYear': str(today().year),
+        'dates': [{'dateType': 'Issued', 'date': today().isoformat()}],
         'subjects': [],
         'contributors': [],
         'resourceType': {
@@ -85,7 +90,7 @@ def test_creators(minimal_record, recid_pid):
 
 def test_embargo_date(minimal_record, recid_pid):
     """Test embargo date."""
-    dt = (date.today() + timedelta(days=1)).isoformat()
+    dt = (today() + timedelta(days=1)).isoformat()
     minimal_record.update({
         'embargo_date': dt,
         'access_right': 'embargoed',
@@ -93,7 +98,7 @@ def test_embargo_date(minimal_record, recid_pid):
     obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
     assert obj['dates'] == [
         {'dateType': 'Available', 'date': dt},
-        {'dateType': 'Accepted', 'date': date.today().isoformat()},
+        {'dateType': 'Accepted', 'date': today().isoformat()},
     ]
 
 
@@ -118,19 +123,20 @@ def test_contributors(minimal_record, recid_pid):
             'affiliation': 'AA',
             'gnd': '1234',
             'type': 'Researcher'
-            }, ],
+        }, ],
         'thesis_supervisors': [{
             'name': 'B',
             'affiliation': 'BA',
             'type': 'Supervisor'
-            }, ],
+        }, ],
         'grants': [{
             'funder': {
                 'name': 'European Commission',
             },
             'identifiers': {
                 'eurepo': 'info:eu-repo/grantAgreement/EC/FP7/244909'
-            }, }],
+            },
+        }],
     })
     obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
     assert obj['contributors'] == [

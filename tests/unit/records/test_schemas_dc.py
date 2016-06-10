@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import date, timedelta
+from datetime import datetime, timedelta
 
 from invenio_records.api import Record
 
@@ -42,7 +42,7 @@ def test_minimal(minimal_record, recid_pid):
         'identifiers': ['', 'https://zenodo.org/record/123'],
         'subjects': [],
         'languages': [''],
-        'dates': [date.today().isoformat()],
+        'dates': [datetime.utcnow().date().isoformat()],
         'titles': ['Test'],
         'creators': ['Test'],
         'rights': ['info:eu-repo/semantics/openAccess'],
@@ -107,7 +107,7 @@ def test_rights(minimal_record, recid_pid):
 
 def test_embargo_date(minimal_record, recid_pid):
     """"Test embargo date."""
-    dt = (date.today() + timedelta(days=1)).isoformat()
+    dt = (datetime.utcnow().date() + timedelta(days=1)).isoformat()
     minimal_record.update({
         'embargo_date': dt,
         'access_right': 'embargoed',

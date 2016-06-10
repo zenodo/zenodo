@@ -28,10 +28,10 @@ from __future__ import absolute_import, print_function
 
 import json
 
-from invenio_records_rest.serializers.json import JSONSerializer
+from .json import ZenodoJSONSerializer
 
 
-class LegacyJSONSerializer(JSONSerializer):
+class LegacyJSONSerializer(ZenodoJSONSerializer):
     """Legacy JSON Serializer."""
 
     def serialize_search(self, pid_fetcher, search_result, links=None,

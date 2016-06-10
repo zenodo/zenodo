@@ -49,7 +49,7 @@ def make_file_fixture(filename, text=None):
 
 
 def test_simple_rest_flow(api, api_client, db, es, location, users,
-                          write_token):
+                          write_token, license_record):
     """Test simple flow using REST API."""
     client = api_client
     test_data = dict(
@@ -169,6 +169,31 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
         headers=auth_headers,
     )
     assert response.status_code == 403
+
+
+def test_simple_delete(api_client, db, es, location, json_auth_headers,
+                       auth_headers, deposit_url):
+    """Deletion."""
+    client = api_client
+    headers = json_auth_headers
+
+    # Create
+    links = get_json(client.post(
+        deposit_url, data=json.dumps({}), headers=headers), code=201)['links']
+    current_search.flush_and_refresh(index='deposits')
+    # Check list
+    assert 1 == len(
+        get_json(client.get(deposit_url, headers=headers), code=200))
+    # Delete
+    assert client.delete(
+        links['self'], headers=auth_headers).status_code == 204
+    current_search.flush_and_refresh(index='deposits')
+    # Check list
+    assert 0 == len(
+        get_json(client.get(deposit_url, headers=headers), code=200))
+    # Delete again
+    assert client.delete(
+        links['self'], headers=auth_headers).status_code == 410
 
 
 @pytest.mark.parametrize('user_info,status', [

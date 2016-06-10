@@ -28,8 +28,12 @@ from __future__ import absolute_import, print_function
 
 import arrow
 import idutils
-from flask import current_app
+import jsonref
+from flask import current_app, has_request_context
 from flask_babelex import lazy_gettext as _
+from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_pidstore.models import PersistentIdentifier
+from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, post_dump, \
     post_load, pre_load, validate, validates, validates_schema
 from six.moves.urllib.parse import quote
@@ -49,7 +53,48 @@ def clean_empty(data, keys):
     return data
 
 
-class PersonSchemaV1(Schema):
+class StrictKeysMixin(object):
+    """Ensure only defined keys exists in data."""
+
+    @validates_schema(pass_original=True)
+    def check_unknown_fields(self, data, original_data):
+        """Check for unknown keys."""
+        if not isinstance(original_data, list):
+            items = [original_data]
+        else:
+            items = original_data
+        for original_data in items:
+            for key in original_data:
+                if key not in self.fields:
+                    raise ValidationError(
+                        'Unknown field name.'.format(key),
+                        field_names=[key],
+                    )
+
+
+class RefResolverMixin(object):
+    """Mixin for helping to validate if a JSONRef resolves."""
+
+    def validate_jsonref(self, value):
+        """Validate that a JSONRef resolves.
+
+        Test is skipped if not explicitly requested and you are in an
+        application context.
+        """
+        if not self.context.get('replace_refs') or not current_app:
+            return True
+
+        if not(isinstance(value, dict) and '$ref' in value):
+            return True
+
+        try:
+            Record(value).replace_refs().dumps()
+            return True
+        except jsonref.JsonRefError:
+            return False
+
+
+class PersonSchemaV1(Schema, StrictKeysMixin):
     """Schema for a person."""
 
     name = TrimmedString(required=True)
@@ -74,7 +119,10 @@ class PersonSchemaV1(Schema):
         """Validate schema."""
         name = data.get('name')
         if not name:
-            raise ValidationError(_('Name is required.'))
+            raise ValidationError(
+                _('Name is required.'),
+                field_names=['name']
+            )
 
 
 class ContributorSchemaV1(PersonSchemaV1):
@@ -87,10 +135,13 @@ class ContributorSchemaV1(PersonSchemaV1):
         """Validate the type."""
         if value not in \
                 current_app.config['DEPOSIT_CONTRIBUTOR_DATACITE2MARC']:
-            raise ValidationError(_('Invalid contributor type.'))
+            raise ValidationError(
+                _('Invalid contributor type.'),
+                field_names=['type']
+            )
 
 
-class IdentifierSchemaV1(Schema):
+class IdentifierSchemaV1(Schema, StrictKeysMixin):
     """Schema for a identifiers.
 
     During deserialization the schema takes care of detecting the identifier
@@ -104,7 +155,7 @@ class IdentifierSchemaV1(Schema):
     @pre_load()
     def detect_scheme(self, data):
         """Load scheme."""
-        id_ = data.get('identifier', data.get('id'))
+        id_ = data.get('identifier')
         scheme = data.get('scheme')
         if not scheme and id_:
             scheme = idutils.detect_identifier_schemes(id_)
@@ -124,13 +175,26 @@ class IdentifierSchemaV1(Schema):
         id_ = data.get('identifier')
         scheme = data.get('scheme')
         if not id_:
-            raise ValidationError('Identifier is required.')
+            raise ValidationError(
+                'Identifier is required.',
+                field_names=['identifier']
+            )
 
         schemes = idutils.detect_identifier_schemes(id_)
         if not schemes:
-            raise ValidationError('Not a valid identifier.')
+            raise ValidationError(
+                'Not a valid persistent identifier.',
+                field_names=['identifier']
+            )
         if scheme not in schemes:
-            raise ValidationError('Not a valid {0} identifier.'.format(scheme))
+            raise ValidationError(
+                'Not a valid {0} identifier.'.format(scheme),
+                field_names=['identifier']
+            )
+
+
+class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
+    """Schema for a related identifier."""
 
 
 class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
@@ -144,17 +208,13 @@ class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
     )
 
 
-class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
-    """Schema for a related identifier."""
-
-
 class SubjectSchemaV1(IdentifierSchemaV1):
     """Schema for a subject."""
 
     term = TrimmedString()
 
 
-class CommonMetadataSchemaV1(Schema):
+class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     """Common metadata schema."""
 
     doi = DOIField()
@@ -187,7 +247,65 @@ class CommonMetadataSchemaV1(Schema):
     def validate_embargo_date(self, value):
         """Validate that embargo date is in the future."""
         if arrow.get(value).date() <= arrow.utcnow().date():
-            raise ValidationError(_('Embargo date must be in the future.'))
+            raise ValidationError(
+                _('Embargo date must be in the future.'),
+                field_names=['embargo_date']
+            )
+
+    @validates('license')
+    def validate_license_ref(self, value):
+        """Validate if license resolves."""
+        if not self.validate_jsonref(value):
+            raise ValidationError(
+                _('Invalid choice.'),
+                field_names=['license'],
+            )
+
+    @validates('grants')
+    def validate_grants_ref(self, values):
+        """Validate if license resolves."""
+        for v in values:
+            if not self.validate_jsonref(v):
+                raise ValidationError(
+                    _('Invalid grant.'),
+                    field_names=['grants'],
+                )
+
+    @validates('doi')
+    def validate_doi(self, value):
+        """Validate if doi exists."""
+        if value and has_request_context():
+            required_doi = self.context.get('required_doi')
+            if value == required_doi:
+                return
+            try:
+                PersistentIdentifier.get('doi', value)
+                raise ValidationError(
+                    _('DOI already exists in Zenodo.'),
+                    field_names=['doi'])
+            except PIDDoesNotExistError:
+                pass
+
+    @validates_schema()
+    def validate_license(self, data):
+        """Validate license."""
+        acc = data.get('access_right')
+        if acc in [AccessRight.OPEN, AccessRight.EMBARGOED] and \
+                'license' not in data:
+            raise ValidationError(
+                _('Required when access right is open or embargoed.'),
+                field_names=['license']
+            )
+        if acc == AccessRight.EMBARGOED and 'embargo_date' not in data:
+            raise ValidationError(
+                _('Required when access right is embargoed.'),
+                field_names=['embargo_date']
+            )
+        if acc == AccessRight.RESTRICTED and 'access_conditions' not in data:
+            raise ValidationError(
+                _('Required when access right is restricted.'),
+                field_names=['access_conditions']
+            )
 
     @pre_load()
     def preload_accessrights(self, data):
@@ -196,6 +314,7 @@ class CommonMetadataSchemaV1(Schema):
         if 'access_right' not in data:
             data['access_right'] = AccessRight.OPEN
 
+        # Pop values which should not be set for a given access right.
         if data.get('access_right') not in [
                 AccessRight.OPEN, AccessRight.EMBARGOED]:
             data.pop('license', None)
@@ -228,15 +347,15 @@ class CommonMetadataSchemaV1(Schema):
             ]
 
 
-class CommonRecordSchemaV1(Schema):
+class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     """Common record schema."""
 
     id = fields.Integer(attribute='pid.pid_value', dump_only=True)
     doi = fields.Str(attribute='metadata.doi', dump_only=True)
-    links = fields.Method('get_links', dump_only=True)
+    links = fields.Method('dump_links', dump_only=True)
     created = fields.Str(dump_only=True)
 
-    def get_links(self, obj):
+    def dump_links(self, obj):
         """."""
         links = obj.get('links', {})
 

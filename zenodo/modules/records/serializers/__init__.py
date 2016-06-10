@@ -31,11 +31,11 @@ from invenio_marc21.serializers.marcxml import MARCXMLSerializer
 from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
     OAIDataCiteSerializer
 from invenio_records_rest.serializers.dc import DublinCoreSerializer
-from invenio_records_rest.serializers.json import JSONSerializer
 from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
 from .bibtex import BibTeXSerializer
+from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import LegacyJSONSerializer
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1

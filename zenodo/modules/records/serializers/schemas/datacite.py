@@ -200,7 +200,7 @@ class DataCiteSchemaV1(Schema):
         t = ObjectType.get_by_dict(obj['metadata']['resource_type'])
         return {
             'resourceTypeGeneral': t['datacite']['general'],
-            'resourceType': t['datacite'].get('type', None),
+            'resourceType': t['datacite'].get('type'),
         }
 
     def get_related_identifiers(self, obj):

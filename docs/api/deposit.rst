@@ -45,9 +45,15 @@ Loaders
    :undoc-members:
 
 
-.. automodule:: zenodo.modules.deposit.loaders.schemas.legacyjson
+.. automodule:: zenodo.modules.deposit.loaders.base
    :members:
    :undoc-members:
+
+
+.. automodule:: zenodo.modules.deposit.loaders.utils
+   :members:
+   :undoc-members:
+
 
 Minters and fetchers
 ~~~~~~~~~~~~~~~~~~~~

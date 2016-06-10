@@ -26,7 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import request
+from flask import current_app, has_request_context, request
+
+from zenodo.modules.records.minters import doi_generator
 
 from ..errors import MarshmallowErrors
 
@@ -47,10 +49,34 @@ def json_loader(pre_validator=None, post_validator=None, translator=None):
     return loader
 
 
-def marshmallow_loader(schema_class):
+def marshmallow_loader(schema_class, **kwargs):
     """Basic marshmallow loader generator."""
     def translator(data):
-        result = schema_class().load(data)
+        # Replace refs when we are in request context.
+        context = dict(replace_refs=has_request_context())
+
+        # DOI validation context
+        if request and request.view_args.get('pid_value'):
+            managed_prefix = current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']
+
+            _, record = request.view_args.get('pid_value').data
+            if record.has_minted_doi():
+                context['required_doi'] = record['doi']
+            elif not record.is_published():
+                context['allowed_dois'] = [doi_generator(record['recid'])]
+            else:
+                # Ensure we cannot change to e.g. empty string.
+                context['doi_required'] = True
+
+            context['managed_prefixes'] = [managed_prefix]
+            context['banned_prefixes'] = \
+                ['10.5072'] if managed_prefix != '10.5072' else []
+
+        # Extra context
+        context.update(kwargs)
+
+        # Load data
+        result = schema_class(context=context).load(data)
         if result.errors:
             raise MarshmallowErrors(result.errors)
         return result.data

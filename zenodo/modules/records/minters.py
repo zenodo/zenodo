@@ -40,6 +40,12 @@ def doi_generator(recid, prefix=None):
     )
 
 
+def is_local_doi(doi):
+    """Check if DOI is a locally managed DOI."""
+    return doi.startswith('{0}/'.format(
+        current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']))
+
+
 def zenodo_record_minter(record_uuid, data):
     """Mint record identifier (and DOI)."""
     if 'recid' in data:
@@ -61,17 +67,21 @@ def zenodo_doi_minter(record_uuid, data):
     doi = data.get('doi')
     status = PIDStatus.RESERVED
     provider = None
-    prefix = current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']
 
     # Create a DOI if no DOI was found.
     if not doi:
         assert 'recid' in data
         doi = doi_generator(data['recid'])
         data['doi'] = doi
+    else:
+        assert 'recid' in data
+
+    if doi != doi_generator(data['recid']):
+        return
 
     assert idutils.is_doi(doi)
 
-    if doi.startswith('{0}/'.format(prefix)):
+    if is_local_doi(doi):
         provider = 'datacite'
 
     return PersistentIdentifier.create(

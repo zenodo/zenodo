@@ -423,7 +423,7 @@ def test_subjects():
     s = LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(subjects=[{
         "term": "Astronomy",
-        "id": "http://id.loc.gov/authorities/subjects/sh85009003",
+        "identifier": "http://id.loc.gov/authorities/subjects/sh85009003",
         "scheme": "url"
     }])).data['subjects'] == [{
         "term": "Astronomy",
@@ -432,7 +432,6 @@ def test_subjects():
     }]
     assert s.load(d(subjects=[{
         "term": "Astronomy",
-        # We allow to use both 'id' and 'identifier'
         "identifier": "http://id.loc.gov/authorities/subjects/sh85009003",
     }])).data['subjects'] == [{
         "term": "Astronomy",
@@ -624,6 +623,29 @@ def test_license():
     }
 
 
+def test_license_refresolver(app, db, license_record):
+    """Test license."""
+    s = LegacyMetadataSchemaV1(strict=True, context=dict(replace_refs=True))
+    assert s.load(d(
+        access_right='open', license='CC0-1.0'
+    )).data['license'] == {
+        '$ref': 'https://dx.zenodo.org/licenses/CC0-1.0'
+    }
+    pytest.raises(
+        ValidationError,
+        s.load,
+        d(access_right='open', license='invalid')
+    )
+
+    # Without ref resolving
+    s = LegacyMetadataSchemaV1(strict=True)
+    assert s.load(d(
+        access_right='open', license='invalid'
+    )).data['license'] == {
+        '$ref': 'https://dx.zenodo.org/licenses/invalid'
+    }
+
+
 def test_grants():
     """Test grants."""
     s = LegacyMetadataSchemaV1(strict=True)
@@ -637,6 +659,28 @@ def test_grants():
             'https://dx.zenodo.org/grants/10.13039/501100000780::643410'
         )},
     ]
+
+
+def test_grants_refresolver(app, db, grant_record, license_record):
+    """Test license."""
+    s = LegacyMetadataSchemaV1(strict=True, context=dict(replace_refs=True))
+    assert s.load(d(
+        grants=[dict(id='282896'), dict(id='10.13039/501100000780::282896')],
+        license='CC0-1.0'
+    ))
+    # Invalid grant raises
+    pytest.raises(ValidationError, s.load, d(
+        grants=[dict(id='invalid')],
+        license='CC0-1.0'
+    ))
+
+    # Without ref resolving
+    s = LegacyMetadataSchemaV1(strict=True)
+    assert s.load(
+        d(grants=[dict(id='invalid')], license='CC0-1.0')
+    ).data['grants'] == [{
+        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::invalid'
+    }]
 
 
 def test_communities():
