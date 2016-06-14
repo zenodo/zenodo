@@ -607,6 +607,11 @@ SECURITY_LOGIN_SALT = "CHANGE_ME"
 SECURITY_PASSWORD_SALT = "CHANGE_ME"
 SECURITY_REMEMBER_SALT = "CHANGE_ME"
 SECURITY_RESET_SALT = "CHANGE_ME"
+SECURITY_PASSWORD_HASH = "pbkdf2_sha512"
+SECURITY_PASSWORD_SCHEMES = [
+    'pbkdf2_sha512', 'sha512_crypt', 'invenio_aes_encrypted_email']
+SECURITY_DEPRECATED_PASSWORD_SCHEMES = [
+    'sha512_crypt', 'invenio_aes_encrypted_email']
 
 # Search
 # ======
