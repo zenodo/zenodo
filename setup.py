@@ -139,6 +139,7 @@ install_requires = [
     'python-slugify>=1.2.0',
     'raven<=5.1.0',
     'wsgi-statsd>=0.3.1',
+    'zenodo-accessrequests>=1.0.0.dev20150000',
 ]
 
 packages = find_packages()

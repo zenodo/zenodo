@@ -37,6 +37,7 @@
     {% set title = record.access_right|accessright_title(record.embargo_date) %}
     {% set icon = record.access_right|accessright_icon(record.embargo_date) %}
     {% set description = record.access_right|accessright_description(record.embargo_date) %}
+    {% set access_request_url = url_for('invenio_records_ui.recid_access_request', pid_value=record.recid) %}
     <div class="panel-body">
       <h5><i class="fa {{ icon -}}"></i> {{ title -}}</h5>
       <p><small class="text-muted">{{- description -}}</small></p>
@@ -61,6 +62,18 @@
       {%- endfor -%}
       </tbody>
     </table>
+  {%- endif %}
+  {%- if not current_user|has_access_to(record) and record.access_right in ['restricted'] %}
+    {%- if record.access_conditions %}
+    <div class="panel-body">
+    <hr/>
+    {{record.access_conditions|safe}}
+    <hr/>
+    </div>
+    {%- endif %}
+    <div class="panel-body" align="center">
+      <a class="btn btn-primary" href="{{access_request_url}}"><i class="fa fa-edit"></i> Request access...</a>
+    </div>
   {%- endif %}
   </div>
 </div>

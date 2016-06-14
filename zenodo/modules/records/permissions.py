@@ -26,11 +26,14 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import session
 from flask_login import current_user
 from flask_principal import ActionNeed
 from invenio_access import DynamicPermission
 from invenio_records_files.models import RecordsBuckets
+from zenodo_accessrequests.models import SecretLink
 
+from zenodo.modules.records.fetchers import zenodo_record_fetcher
 from zenodo.modules.records.models import AccessRight
 
 
@@ -71,5 +74,15 @@ def has_access(user=None, record=None):
 
     if DynamicPermission(ActionNeed('admin-access')):
         return True
+
+    try:
+        token = session['accessrequests-secret-token']
+        recid = record['recid']
+        if SecretLink.validate_token(token, dict(recid=int(recid))):
+            return True
+        else:
+            del session['accessrequests-secret-token']
+    except KeyError:
+        pass
 
     return False
