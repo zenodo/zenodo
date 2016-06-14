@@ -20,11 +20,12 @@
 """Test Zenodo deposit workflow."""
 
 from __future__ import absolute_import, print_function
-from flask_security import login_user
-import json
-from six import BytesIO
 
+import json
+
+from flask_security import login_user
 from invenio_sipstore.models import SIP
+from six import BytesIO
 
 
 def test_basic_workflow(app, db, users, deposit):

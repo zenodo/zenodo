@@ -87,12 +87,17 @@ def env_config(instance_path):
 
 
 @pytest.fixture(scope='session')
-def config():
+def default_config():
     """Default configuration."""
     return dict(
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
+        CELERY_ALWAYS_EAGER=True,
+        CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+        COMMUNITIES_MAIL_ENABLED=False,
+        MAIL_SUPPRESS_SEND=True,
         LOGIN_DISABLED=False,
+        DEPOSIT_DATACITE_MINTING_ENABLED=False,
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
@@ -102,9 +107,9 @@ def config():
 
 
 @pytest.yield_fixture(scope='session')
-def app(env_config, config):
+def app(env_config, default_config):
     """Flask application fixture."""
-    app = create_app(**config)
+    app = create_app(**default_config)
 
     with app.app_context():
         yield app

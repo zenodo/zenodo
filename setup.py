@@ -123,7 +123,7 @@ install_requires = [
     'invenio-rest[cors]>=1.0.0a9',
     'invenio-search-ui>=1.0.0a4',
     'invenio-search>=1.0.0a7',
-    'invenio-sipstore>=1.0.0a1',
+    'invenio-sipstore>=1.0.0a2',
     'invenio-theme>=1.0.0a10',
     'invenio-userprofiles>=1.0.0a5',
     'invenio-webhooks>=1.0.0a2',
@@ -173,6 +173,8 @@ setup(
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
         ],
         'invenio_base.api_apps': [
+            'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
+            'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
         ],
         'invenio_base.blueprints': [

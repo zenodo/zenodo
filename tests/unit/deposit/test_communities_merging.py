@@ -22,6 +22,7 @@
 from __future__ import absolute_import, print_function
 
 from invenio_communities.models import Community, InclusionRequest
+
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 
 
@@ -277,12 +278,8 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
                                       deposit_file):
     """Automatically accept records requested by community owners."""
     # 'c3' is owned by the user, but not 'c1'
-    dep_uuid = deposit.id
     deposit['communities'] = ['c1', 'c3', ]
     deposit = _publish_and_expunge(db, deposit)
-    db.session.commit()
-    db.session.expunge_all()
-    deposit = Deposit.get_record(dep_uuid)
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c3', ]
     assert record['communities'] == ['c3', ]
@@ -296,9 +293,6 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
     deposit = deposit.edit()
     deposit['communities'] = ['c1', 'c2', 'c3', 'c4', ]
     deposit = _publish_and_expunge(db, deposit)
-    db.session.commit()
-    db.session.expunge_all()
-    deposit = Deposit.get_record(dep_uuid)
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2', 'c3', 'c4', ]
     assert record['communities'] == ['c3', 'c4', ]

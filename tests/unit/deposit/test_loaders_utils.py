@@ -24,8 +24,8 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.deposit.loaders.utils import is_valid, \
-    filter_empty_list, none_if_empty, filter_thesis
+from zenodo.modules.deposit.loaders.utils import filter_empty_list, \
+    filter_thesis, is_valid, none_if_empty
 
 
 def test_is_nonempty():

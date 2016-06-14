@@ -180,6 +180,8 @@ DEPOSIT_REST_ENDPOINTS = dict(
         max_result_window=10000,
     ),
 )
+#: Enable the DataCite minding of DOIs after Deposit publishing
+DEPOSIT_DATACITE_MINTING_ENABLED = True
 
 # SIPStore
 # ========
@@ -385,6 +387,8 @@ RECORDS_UI_ENDPOINTS = dict(
 )
 #: Default tombstone template.
 RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"
+
+ZENODO_RECORDS_UI_LINKS_FORMAT = "https://zenodo.org/record/{recid}"
 
 #: Files REST permission factory
 FILES_REST_PERMISSION_FACTORY = \

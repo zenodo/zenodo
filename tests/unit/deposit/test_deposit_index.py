@@ -25,8 +25,8 @@
 from __future__ import absolute_import, print_function
 
 from invenio_deposit.api import Deposit
-from invenio_records.api import Record
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
+from invenio_records.api import Record
 from invenio_search import current_search
 
 

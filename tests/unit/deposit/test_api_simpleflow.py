@@ -32,6 +32,7 @@ import pytest
 from flask import url_for
 from helpers import login_user_via_session
 from invenio_search import current_search
+from mock import patch
 from six import BytesIO
 
 
@@ -48,9 +49,11 @@ def make_file_fixture(filename, text=None):
     return (BytesIO(content), filename)
 
 
-def test_simple_rest_flow(api, api_client, db, es, location, users,
-                          write_token, license_record):
+@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
+def test_simple_rest_flow(datacite_mock, api, api_client, db, es,
+                          location, users, write_token, license_record):
     """Test simple flow using REST API."""
+    # Setting var this way doesn't work
     client = api_client
     test_data = dict(
         metadata=dict(
@@ -109,8 +112,16 @@ def test_simple_rest_flow(api, api_client, db, es, location, users,
         assert response.status_code == 201, i
 
     # Publish deposition
+    # Enable datacite minting
+    api.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = True
     response = client.post(links['publish'], headers=auth_headers)
     record_id = get_json(response, code=202)['record_id']
+    api.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = False
+
+    # Check if the datacite DOI has been minted
+    assert datacite_mock().metadata_post.call_count == 1
+    datacite_mock().doi_post.assert_called_once_with(
+        '10.5072/zenodo.1', 'https://zenodo.org/record/1')
 
     # Check that same id is being used for both deposit and record.
     assert deposit_id == record_id
