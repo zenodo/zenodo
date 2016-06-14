@@ -30,5 +30,11 @@ submit itself to any jurisdiction.
 Documentation
 -------------
 The Zenodo source code documentation as displayed on
-http://zenodo.readthedocs.org/ is licensed under `Creative Commons Attribution
+http://zenodo.readthedocs.io/ is licensed under `Creative Commons Attribution
 4.0 International (CC-BY) <https://creativecommons.org/licenses/by/4.0/>`_
+
+Logos
+-----
+Logos in the directory ``zenodo/modules/theme/static/img/`` is property of
+their respective owners. If you want to use any of them, please seek explicit
+permissions from the owner.

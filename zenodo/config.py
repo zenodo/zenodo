@@ -250,6 +250,9 @@ OAUTHCLIENT_REMOTE_APPS = dict(
     orcid=ORCID_REMOTE_APP,
 )
 
+#: Change default template for oauth sign up.
+OAUTHCLIENT_SIGNUP_TEMPLATE = 'zenodo_theme/security/oauth_register_user.html'
+
 #: Credentials for GitHub (must be changed to work).
 GITHUB_APP_CREDENTIALS = dict(
     consumer_key="CHANGE_ME",

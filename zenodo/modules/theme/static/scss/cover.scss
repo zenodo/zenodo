@@ -45,6 +45,13 @@ body.cover-page {
     color: $text-white;
     margin: $cover-panel-padding*2 0;
   }
+
+  .brand-plus {
+    line-height: 95px;
+    margin-right: 20px;
+    margin-left: 20px;
+  }
+
   .panel {
     color: #000;
     border-radius: $border-radius-large*2;
@@ -87,6 +94,14 @@ body.cover-page {
 
     a, a:hover, a:active {
       color: $text-white;
+    }
+
+    .alert {
+      margin-top: $cover-signup-margin;
+      font-size: $font-size-base;
+    }
+    .alert p {
+      font-size: $font-size-base;
     }
   }
   .sign-up-benefits {

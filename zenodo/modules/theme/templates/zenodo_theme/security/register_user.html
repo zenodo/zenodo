@@ -45,31 +45,36 @@
 
 
 {% block panel %}
-{%- with form = register_user_form %}
+{%- set form = form or register_user_form %}
 <div class="col-xs-12 col-md-10 col-md-offset-1">
   {%- block signup_slogan %}
-  <h1>{{_('Research. Shared! Sign up for free today.')}}</h1>
+  <h1>{{_('Research. Shared! Sign up today.')}}</h1>
   {%- endblock signup_slogan %}
   <hr />
   <div class="row">
     <div class="col-sm-6 col-sm-push-6 sign-up">
-      <form action="{{ url_for_security('register') }}" method="POST" name="register_user_form">
+      {%- block signup_form_header %}{% endblock %}
+      <form action="{%- block signup_form_endpoint %}{{ url_for_security('register') }}{% endblock %}" method="POST" name="register_user_form">
       {{form_errors(form)}}
       {{ form.csrf_token()}}
       {{ form.profile.csrf_token()}}
       {{ render_field(form.email, autofocus=True, errormsg=False) }}
       {{ render_field(form.profile.username, errormsg=False) }}
-      {{ render_field(form.password, errormsg=False) }}
+      {%- if form.password %}
+        {{ render_field(form.password, errormsg=False) }}
+      {%- endif %}
       {%- if form.password_confirm %}
         {{ render_field(form.password_confirm, icon="fa fa-lock", errormsg=False) }}
       {%- endif %}
       {%- if form.recaptcha %}
         <div class="form-group form-group-lg"><div align="center">{{ form.recaptcha() }}</div></div>
       {%- endif %}
-      <button type="submit" class="btn btn-warning btn-lg btn-block"><i class="fa fa-edit"></i> {{_('Sign Up')}}</button>
+      <button type="submit" class="btn btn-warning btn-lg btn-block"><i class="fa fa-edit"></i> {% block signup_button_text %}{{_('Sign Up')}}{% endblock %}</button>
       </form>
+      {%- block signup_form_footer %}
       <p align="center">
       {{_('Already have an account?')}} <a href="{{url_for_security('login')}}">{{_('Log In')}}</a>
+      {%- endblock %}
       </p>
     </div>
     <div class="col-sm-6 col-sm-pull-6 sign-up sign-up-benefits">
@@ -77,14 +82,13 @@
       <h4>{{_('Citeable. Discoverable.')}}</h4>
       <p>{{_('Uploads gets a Digital Object Identifier (DOI) to make them easily and uniquely citeable.')}}</p>
       <h4>{{_('Communities')}}</h4>
-      <p>{{_('Accept or reject uploads to your own community collections (e.g workshops, EU projects or you')}}</p>
+      <p>{{_('Accept or reject uploads to your own community (e.g workshops, EU projects, institutions or entire disciplines).')}}</p>
       {%- endblock signup_benefits %}
       <h4>{{_('Trusted Research Data Management')}}</h4>
       <p>{{_('Built on top of CERN\'s expertise in managing 100s of petabytes of research data from the Large Hadron Collider.')}}</p>
     </div>
   </div>
 </div>
-{%- endwith %}
 {% endblock panel %}
 
 {% block page_footer %}
