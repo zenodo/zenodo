@@ -33,7 +33,7 @@
     </a>
   </div>
 </div>
-<div ng-if="vm.invenioSearchResults.hits.total == 0 && vm.invenioSearchArgs.q != ''">
+<div ng-if="vm.invenioSearchResults.hits.total == 0 && vm.invenioSearchArgs.q">
   <div class="list-group">
     <div class="list-group-item">
       <div class="jumbotron" align="center" class="hidden-sm hidden-xs">
@@ -47,7 +47,7 @@
     </div>
   </div>
 </div>
-<div ng-if="vm.invenioSearchResults.hits.total == 0 && vm.invenioSearchArgs.q == ''">
+<div ng-if="vm.invenioSearchResults.hits.total == 0 && !vm.invenioSearchArgs.q">
   <div class="list-group">
     <div class="list-group-item">
       <div class="jumbotron" align="center" class="hidden-sm hidden-xs">
