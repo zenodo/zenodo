@@ -252,6 +252,8 @@ OAUTHCLIENT_REMOTE_APPS = dict(
 
 #: Change default template for oauth sign up.
 OAUTHCLIENT_SIGNUP_TEMPLATE = 'zenodo_theme/security/oauth_register_user.html'
+#: Stop oauthclient from taking over template.
+OAUTHCLIENT_TEMPLATE_KEY = None
 
 #: Credentials for GitHub (must be changed to work).
 GITHUB_APP_CREDENTIALS = dict(

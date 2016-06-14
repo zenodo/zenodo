@@ -20,6 +20,8 @@
 // waive the privileges and immunities granted to it by virtue of its status
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+$masthead-margin-left: 40px;
+
 html.cover-page,
 body.cover-page {
   position: relative;
@@ -43,7 +45,26 @@ body.cover-page {
     font-weight: $brand-font-weight;
     font-size: $brand-font-size;
     color: $text-white;
-    margin: $cover-panel-padding*2 0;
+    padding-top: $cover-panel-padding*1.3;
+    padding-bottom: $cover-panel-padding*1.5;
+
+    img {
+      vertical-align: baseline;
+    }
+
+    h1 {
+      display: inline;
+      margin-left: $masthead-margin-left;
+    }
+
+    h1.plus {
+      vertical-align: 60% !important;
+    }
+
+    img.orcid {
+      margin-left: $masthead-margin-left;
+      vertical-align: text-bottom;
+    }
   }
 
   .brand-plus {
@@ -82,6 +103,11 @@ body.cover-page {
 
     h1, h2, h3, h4, h5, form {
       margin-top: $cover-signup-margin;
+      color: transparentize($text-white, 0.1);
+    }
+
+    .social-signup {
+      margin-top: $cover-signup-margin;
     }
 
     form {
@@ -94,6 +120,10 @@ body.cover-page {
 
     a, a:hover, a:active {
       color: $text-white;
+    }
+
+    .btn.btn-default {
+      color: $input-color;
     }
 
     .alert {

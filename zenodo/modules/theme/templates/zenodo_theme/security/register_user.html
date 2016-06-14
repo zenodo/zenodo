@@ -53,7 +53,13 @@
   <hr />
   <div class="row">
     <div class="col-sm-6 col-sm-push-6 sign-up">
-      {%- block signup_form_header %}{% endblock %}
+      {%- block signup_form_header %}
+      <div class="social-signup">
+        <a href="{{url_for('invenio_oauthclient.login', remote_app='github')}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> {{_('Sign up with GitHub')}}</a>
+        <a href="{{url_for('invenio_oauthclient.login', remote_app='orcid')}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.svg')}}" height="18px"> {{_('Sign up with ORCID')}}</a>
+        <h3 align="center">— OR —</h3>
+      </div>
+      {% endblock %}
       <form action="{%- block signup_form_endpoint %}{{ url_for_security('register') }}{% endblock %}" method="POST" name="register_user_form">
       {{form_errors(form)}}
       {{ form.csrf_token()}}

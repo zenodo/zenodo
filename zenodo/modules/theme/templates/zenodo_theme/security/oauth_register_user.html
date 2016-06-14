@@ -24,15 +24,15 @@
 
 {%- extends "zenodo_theme/security/register_user.html" %}
 
-{% block brand %}{{ super() }}
-{%- if app_title=='ORCID' %}
-<span class="text-center masthead-brand brand-plus"></span>
-<img class="text-center masthead-brand" height="95px" src="{{ url_for('static', filename='img/orcid.svg')}}"
+{%- block brand %}{{super()}}
+{%- if app_title == 'ORCID' %}
+<h1 class="plus"><i class="fa fa-plus"></i></h1>
+<img class="orcid" height="95px" src="{{ url_for('static', filename='img/orcid.svg')}}" />
 {%- elif app_icon %}
-<span class="text-center masthead-brand brand-plus">+</span>
-<span class="text-center masthead-brand"><i class="fa-3x {{app_icon}}"></i> </span>
+<h1 class="plus"><i class="fa fa-plus"></i></h1>
+<h1><i class="fa-3x {{app_icon}}"></i></h1>
 {%- endif %}
-{% endblock %}
+{%- endblock %}
 
 {%- block signup_slogan %}
   <h1>{{_('Sign up with %(app_title)s', app_title=app_title)}} - {{_('Almost there...')}}</h1>

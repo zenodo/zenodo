@@ -37,8 +37,10 @@
   {% block page_header %}
   <div class="container">
     <div class="row">
-      <div class="col-md-6 col-md-offset-3">
-        {% block brand %}<a href="/"><img class="text-center masthead-brand" src="{{ url_for('static', filename='img/zenodo.svg')}}" onerror="this.src={{ url_for('static', filename='img/zenodo.png')}}; this.src=null;" alt="{{_(config.THEME_SITENAME)}}" width="250px"/></a>{% endblock %}
+      <div class="col-md-6 col-md-offset-3 masthead-brand">
+        {%- block brand %}
+        <a href="/"><img src="{{ url_for('static', filename='img/zenodo.svg')}}" onerror="this.src={{ url_for('static', filename='img/zenodo.png')}}; this.src=null;" alt="{{_(config.THEME_SITENAME)}}" width="250px"/></a>
+        {%- endblock %}
       </div>
     </div>
   </div>
