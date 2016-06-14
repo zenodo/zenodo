@@ -87,6 +87,7 @@ install_requires = [
     'dcxml>=0.1.0',
     'dojson>=1.2.1',
     'Flask==0.10.1',
+    'Flask-Admin==1.4.0',
     'Flask-BabelEx>=0.9.2',
     'Flask-Debugtoolbar>=0.10.0',
     'idutils>=0.2.0',

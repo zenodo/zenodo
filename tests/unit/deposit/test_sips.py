@@ -24,7 +24,7 @@ from __future__ import absolute_import, print_function
 import json
 
 from flask_security import login_user
-from invenio_sipstore.models import SIP
+from invenio_sipstore.models import SIP, RecordSIP, SIPFile
 from six import BytesIO
 
 
@@ -35,7 +35,11 @@ def test_basic_workflow(app, db, users, deposit):
         login_user(datastore.get_user(users[0]['email']))
         deposit.files['one.txt'] = BytesIO(b'Test')
         deposit.files['two.txt'] = BytesIO(b'Test2')
-        deposit.publish()
+        deposit = deposit.publish()
+        # Should create one SIP, one RecordSIP and two SIPFiles
+        assert SIP.query.count() == 1
+        assert RecordSIP.query.count() == 1
+        assert SIPFile.query.count() == 2
         sip = SIP.query.one()
         assert sip.user_id == users[0]['id']
         assert sip.agent['email'] == users[0]['email']
@@ -43,6 +47,22 @@ def test_basic_workflow(app, db, users, deposit):
         assert len(sip.sip_files) == 2
         assert sip.sip_files[0].sip_id == sip.id
         assert sip.sip_files[1].sip_id == sip.id
+
+        # Publishing the second time shuld create a new SIP and new RecordSIP
+        # but no new SIPFiles. This is under assumption that users cannot
+        # upload new files to the already published deposit.
+        deposit = deposit.edit()
+        deposit['title'] = 'New Title'
+        deposit = deposit.publish()
+
+        assert SIP.query.count() == 2
+        assert RecordSIP.query.count() == 2
+        assert SIPFile.query.count() == 2
+
+        # Fetch the last RecordSIP and make sure, that
+        # the corresponding SIP doesn't have any files
+        recsip = RecordSIP.query.order_by(RecordSIP.created.desc()).first()
+        assert not recsip.sip.sip_files
 
 
 def test_programmatic_publish(app, db, deposit, deposit_file):

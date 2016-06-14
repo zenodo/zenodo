@@ -52,7 +52,7 @@ class ZenodoSIP(object):
         return agent
 
     @classmethod
-    def create(cls, pid, record):
+    def create(cls, pid, record, create_sip_files=True):
         """Create a Zenodo SIP, from the PID and the Record.
 
         Apart from the SIP itself, it also creates ``RecordSIP`` for the
@@ -60,7 +60,12 @@ class ZenodoSIP(object):
         the files in the record.
         Those objects are not returned by this function but can be fetched by
         the corresponding SIP relationships 'record_sips' and 'sip_files'.
-
+        :param pid: PID of the published record ('recid').
+        :type pid: `invenio_pidstore.models.PersistentIdentifier`
+        :param record: Record for which the SIP should be created.
+        :type record: `invenio_records.api.Record`
+        :param create_sip_files: If True the SIPFiles will be created.
+        :type create_sip_files: bool
         :returns: A Zenodo-specifi SIP object.
         :rtype: ``invenio_sipstore.models.SIP``
         """
@@ -71,9 +76,9 @@ class ZenodoSIP(object):
                              user_id=user_id, agent=agent)
             recsip = RecordSIP(sip_id=sip.id, pid_id=pid.id)
             db.session.add(recsip)
-            if record.files:
+            if record.files and create_sip_files:
                 for f in record.files:
-                    sf = SIPFile(sip_id=sip.id, filepath=f.obj.file.uri,
+                    sf = SIPFile(sip_id=sip.id, filepath=f.key,
                                  file_id=f.file_id)
                     db.session.add(sf)
         return sip
