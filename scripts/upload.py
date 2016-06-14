@@ -87,6 +87,8 @@ def upload_test(token, publish=True):
         "title": "My first upload",
         "upload_type": "poster",
         "description": "This is my first upload",
+        'access_right': 'restricted',
+        'access_conditions': 'fuuu',
         "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]
     }
     files = [('test.txt', BytesIO(b'My first test upload.'))]

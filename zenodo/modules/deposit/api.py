@@ -230,8 +230,9 @@ class ZenodoDeposit(_Deposit):
 
     def publish(self, pid=None, id_=None):
         """Publish the Zenodo deposit."""
+        self['owners'] = self['_deposit']['owners']
         self.validate_publish()
-        is_first_publishing = self['_deposit'].get('pid') is None
+        is_first_publishing = not self.is_published()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         pid, record = deposit.fetch_published()
         ZenodoSIP.create(pid, record, create_sip_files=is_first_publishing)
