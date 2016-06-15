@@ -120,6 +120,8 @@ DEPOSIT_SEARCH_API = '/api/deposit/depositions'
 DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
 #: Template for deposit list view.
 DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
+#: Template to use for UI.
+DEPOSIT_UI_NEW_TEMPLATE = "zenodo_deposit/edit.html"
 #: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),
@@ -192,7 +194,6 @@ DEPOSIT_REST_ENDPOINTS = dict(
         max_result_window=10000,
     ),
 )
-
 
 # SIPStore
 # ========
