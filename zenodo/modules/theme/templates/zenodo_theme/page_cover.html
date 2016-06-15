@@ -34,6 +34,12 @@
 <![endif]-->
 {%- endblock browserupgrade %}
 <div class="site-wrapper">
+  <header>
+    {%- block flashmessages %}
+      {%- from "invenio_theme/macros/messages.html" import flashed_messages with context -%}
+      {{ flashed_messages() }}
+    {%- endblock %}
+  </header>
   {% block page_header %}
   <div class="container">
     <div class="row">

@@ -34,6 +34,14 @@ body.cover-page {
     $end-color: $color1-gradient);
 }
 
+body.cover-page {
+  header {
+    .alert {
+      margin-top: 0px;
+    }
+  }
+}
+
 /* Extra markup and styles for table-esque vertical and horizontal centering */
 .site-wrapper {
   width: 100%;
