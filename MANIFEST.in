@@ -43,6 +43,7 @@ recursive-include docs *.rst
 recursive-include docs Makefile
 recursive-include misc *.py
 recursive-include misc *.rst
+recursive-include scripts *.py
 recursive-include scripts *.sh
 recursive-include tests *.py
 recursive-include zenodo *.html
