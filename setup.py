@@ -186,6 +186,7 @@ setup(
         'invenio_base.blueprints': [
             'zenodo_deposit = zenodo.modules.deposit.views:blueprint',
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
+            'zenodo_redirector = zenodo.modules.redirector.views:blueprint',
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
         ],
