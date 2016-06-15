@@ -54,9 +54,19 @@ SUPPORT_EMAIL = "info@zenodo.org"
 #: DOI prefixes considered as local prefixes.
 ZENODO_LOCAL_DOI_PREFIXES = ["10.5072", "10.5281"]
 
-#: The instance's DOI prefix.
+#: DataCite API - URL endpoint.
+PIDSTORE_DATACITE_URL = "https://mds.datacite.org"
+#: DataCite API - Disable test mode (we however use the test prefix).
+PIDSTORE_DATACITE_TESTMODE = False
+#: DataCite API - Prefix for minting DOIs in (10.5072 is a test prefix).
 PIDSTORE_DATACITE_DOI_PREFIX = "10.5072"
+#: DataCite MDS username.
+PIDSTORE_DATACITE_USERNAME = "CERN.ZENODO"
+#: DataCite MDS password.
+PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
 
+#: Enable the DataCite minding of DOIs after Deposit publishing
+DEPOSIT_DATACITE_MINTING_ENABLED = True
 
 # Debug
 # =====
@@ -182,8 +192,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
         max_result_window=10000,
     ),
 )
-#: Enable the DataCite minding of DOIs after Deposit publishing
-DEPOSIT_DATACITE_MINTING_ENABLED = True
+
 
 # SIPStore
 # ========

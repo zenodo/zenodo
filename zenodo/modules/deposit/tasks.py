@@ -46,10 +46,11 @@ def datacite_register(pid_value, record_uuid):
     """
     record = Record.get_record(record_uuid)
     dcp = DataCiteProvider.get(record['doi'])
+
     url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
         recid=pid_value)
-    pid = dcp.pid
-    doc = datacite_v31.serialize(pid, record)
+    doc = datacite_v31.serialize(dcp.pid, record)
+
     dcp.update(url, doc) if dcp.pid.status == PIDStatus.REGISTERED \
         else dcp.register(url, doc)
     db.session.commit()
