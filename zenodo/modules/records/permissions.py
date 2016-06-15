@@ -44,8 +44,11 @@ class RESTFilePermissionFactory(object):
 
     def can(self):
         """Check if the current user has permission to access file."""
-        rb = RecordsBuckets.query.filter_by(bucket_id=self.bucket.id).one()
-        return has_access(current_user, rb.record.json)
+        rb = RecordsBuckets.query.filter_by(
+            bucket_id=self.bucket.id).one_or_none()
+        if rb is not None:
+            return has_access(current_user, rb.record.json)
+        return True
 
 
 def has_access(user=None, record=None):
