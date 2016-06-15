@@ -57,9 +57,9 @@
     </dd>
   {%- endif %}
 
-  {%- if record.isbn %}
+  {%- if record.imprint_isbn %}
     <dt>{{_('ISBN')}}:</dt>
-    <dd itemprop="isbn">{{ record.isbn }}</dd>
+    <dd itemprop="isbn">{{ record.imprint_isbn }}</dd>
   {%- endif %}
 
   {%- if record.keywords %}
@@ -139,9 +139,9 @@
 
   {#- FIXME: Communities -#}
 
-  {%- if record.license %}
+  {%- if resolved_record.license %}
     <dt>{{_('License (for files)')}}:</dt>
-    <dd><a href="{{record.license.url}}">{{record.license.license}}</a></dd>
+    <dd><a href="{{resolved_record.license.url}}"><i class="fa fa-external-link"></i> {{resolved_record.license.title}}</a></dd>
   {%- endif %}
 
   {%- set userprofile = record.owner.id|userprofile if record.owner and record.owner.id else None %}

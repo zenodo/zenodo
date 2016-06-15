@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 import json
 from collections import OrderedDict
 
+from flask import current_app
 from invenio_db import db
 from invenio_opendefinition.minters import license_minter
 from invenio_opendefinition.resolvers import license_resolver
@@ -122,6 +123,11 @@ def update_legacy_meta(license):
     l['osd_conformance'] = 'approved' if l['is_osi_compliant'] else 'rejected'
     del l['is_okd_compliant']
     del l['is_osi_compliant']
+    l['$schema'] = 'http://{0}{1}/{2}'.format(
+        current_app.config['JSONSCHEMAS_HOST'],
+        current_app.config['JSONSCHEMAS_ENDPOINT'],
+        current_app.config['OPENDEFINITION_SCHEMAS_DEFAULT_LICENSE']
+    )
     return l
 
 
