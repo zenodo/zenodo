@@ -31,6 +31,10 @@ def indexer_receiver(sender, json=None, record=None, index=None,
                      **dummy_kwargs):
     """Connect to before_record_index signal to transform record for ES.
 
+    In order to avoid that a record and published deposit differs (e.g. if an
+    embargo task updates the record), every time we index a record we also
+    index the deposit and overwrite the content with that of the record.
+
     :param sender: Sender of the signal.
     :param json: JSON to be passed for the elastic search.
     :type json: `invenio_records.api.Deposit`
@@ -44,9 +48,12 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     if record['_deposit']['status'] == 'published':
         pub_pid, pub_rec = record.fetch_published()
         schema = json['$schema']
-        json['_deposit']['status'] = 'draft'  # Cannot call `clear` otherwise
+        # Temporarily set to draft mode to to ensure that `clear` can be called
+        json['_deposit']['status'] = 'draft'
         json.clear()
         json.update(pub_rec)
+        # Set back to published mode.
+        json['_deposit']['status'] = 'published'
         json['_updated'] = pub_rec.updated
         json['$schema'] = schema
     else:
