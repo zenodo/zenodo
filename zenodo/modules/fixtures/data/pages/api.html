@@ -111,7 +111,8 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> r.status_code
 401
 >>> r.json()
-{u'status': 401, u'message': u'Unauthorized'}
+{'message': "The server could not verify that you are authorized to access the URL requested.  You either supplied the wrong credentials (e.g. a bad password), or your browser doesn't understand how to supply the credentials required.",
+ 'status': 401}
 </pre>
 </li>
 
@@ -132,7 +133,22 @@ Type "help", "copyright", "credits" or "license" for more information.
 >>> r.status_code
 201
 >>> r.json()
-{u'files': [], u'title': u'', u'created': u'2013-11-14T18:34:08+00:00', u'modified': u'2013-11-14T18:34:08+00:00', u'state': u'unsubmitted', u'owner': 1, u'id': 1234, u'metadata': {}}
+{'created': '2016-06-15T16:10:03.319363+00:00',
+ 'files': [],
+ 'id': 1234,
+ 'links': {'discard': 'http://localhost:5000/api/deposit/depositions/1234/actions/discard',
+  'edit': 'http://localhost:5000/api/deposit/depositions/1234/actions/edit',
+  'files': 'http://localhost:5000/api/deposit/depositions/1234/files',
+  'publish': 'http://localhost:5000/api/deposit/depositions/1234/actions/publish',
+  'self': 'http://localhost:5000/api/deposit/depositions/1234'},
+ 'metadata': {'prereserve_doi': {'doi': '10.5072/zenodo.1234',
+   'recid': 1234}},
+ 'modified': '2016-06-15T16:10:03.319371+00:00',
+ 'owner': 1,
+ 'record_id': 1234,
+ 'state': 'unsubmitted',
+ 'submitted': False,
+ 'title': ''}
 >>> deposition_id = r.json()['id']
 </pre>
 </li>
