@@ -47,12 +47,27 @@
     </div>
   </div>
 </div>
-<div ng-if="vm.invenioSearchResults.hits.total == 0 && !vm.invenioSearchArgs.q">
+<div ng-if="vm.invenioSearchResults.hits.total == 0 && !vm.invenioSearchArgs.q && vm.invenioSearchResults.aggregations.status.buckets.length == 0">
   <div class="list-group">
     <div class="list-group-item">
       <div class="jumbotron" align="center" class="hidden-sm hidden-xs">
         <h1>Get started!</h1>{{}}
         <p>Make your first upload - all research outputs from across all fields of research are welcome.</p>
+        <h1>
+          <a class="btn btn-success btn-lg" href="/deposit/new">
+            <i class="fa fa-upload"></i> New Upload
+          </a>
+        </h1>
+      </div>
+    </div>
+  </div>
+</div>
+<div ng-if="vm.invenioSearchResults.hits.total == 0 && !vm.invenioSearchArgs.q && vm.invenioSearchResults.aggregations.status.buckets.length != 0">
+  <div class="list-group">
+    <div class="list-group-item">
+      <div class="jumbotron" align="center" class="hidden-sm hidden-xs">
+        <h1>Research. Shared.</h1>{{}}
+        <p>All research outputs from across all fields of research are welcome.</p>
         <h1>
           <a class="btn btn-success btn-lg" href="/deposit/new">
             <i class="fa fa-upload"></i> New Upload
