@@ -27,7 +27,9 @@
 from __future__ import absolute_import, print_function
 
 import os
+from datetime import timedelta
 
+from celery.schedules import crontab
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.utils import check_oauth2_scope_write, \
@@ -90,6 +92,17 @@ BROKER_URL = "amqp://guest:guest@localhost:5672//"
 CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 #: Accepted content types for Celery.
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
+#: Beat schedule
+CELERYBEAT_SCHEDULE = {
+    'embargo-updater': {
+        'task': 'zenodo.modules.records.tasks.update_expired_embargos',
+        'schedule': crontab(minute=2, hour=0),
+    },
+    'indexer': {
+        'task': 'invenio_indexer.tasks.process_bulk_queue',
+        'schedule': timedelta(minutes=5),
+    },
+}
 
 # Cache
 # =========
