@@ -233,7 +233,10 @@ class MetadataSchemaV1(common.CommonMetadataSchemaV1):
 
     def dump_access_right_category(self, obj):
         """Get access right category."""
-        return AccessRight.as_category(obj.get('access_right'))
+        acc = obj.get('access_right')
+        if acc:
+            return AccessRight.as_category(acc)
+        return missing
 
 
 class RecordSchemaV1(common.CommonRecordSchemaV1):
