@@ -3,8 +3,8 @@
     <div class="pull-right view-record">
       <span class="pull-right" id="curate_{{ record.id }}">
         <span class="ajaxmsg text-muted" style="display: none;"></span>
-        <a class="btn 10 btn-default" ng-class="pressedClassSucc" ng-click="handleClick('accept', record.id);isPressed=true;pressedClassSucc='btn-success'" ng-disabled="isPressed"><i class="fa fa-check"></i>Accept</a>
-        <a class="btn 10 btn-default" ng-class="pressedClassWarn" ng-click="handleClick('reject', record.id);isPressed=true;pressedClassWarn='btn-danger'" ng-disabled="isPressed"><i class="fa fa-check"></i>Reject</a>
+        <a class="btn 10 btn-default" ng-class="pressedClassSucc" ng-click="handleCommunityClick('accept', record.id);isPressed=true;pressedClassSucc='btn-success'" ng-disabled="isPressed"><i class="fa fa-check"></i>Accept</a>
+        <a class="btn 10 btn-default" ng-class="pressedClassWarn" ng-click="handleCommunityClick('reject', record.id);isPressed=true;pressedClassWarn='btn-danger'" ng-disabled="isPressed"><i class="fa fa-check"></i>Reject</a>
       </span>
     </div>
     <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ record.metadata.
