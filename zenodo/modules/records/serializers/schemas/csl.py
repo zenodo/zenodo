@@ -69,13 +69,41 @@ class RecordSchemaCSLJSON(Schema):
     ISBN = fields.Str(attribute='metadata.imprint.isbn')
     ISSN = fields.Method('get_issn')
 
-    container_title = fields.Str(attribute='metadata.part_of.title')
-    page = fields.Str(attribute='metadata.part_of.pages')
+    container_title = fields.Method('get_container_title')
+    page = fields.Method('get_pages')
     volume = fields.Str(attribute='metadata.journal.volume')
     issue = fields.Str(attribute='metadata.journal.issue')
 
-    publisher = fields.Str(attribute='metadata.imprint.publisher',
-                           default='Zenodo')
+    publisher = fields.Method('get_publisher')
+    publisher_place = fields.Str(attribute='metadata.imprint.place')
+
+    def get_journal_or_part_of(self, obj, key):
+        """Get journal or part of."""
+        m = obj['metadata']
+        journal = m.get('journal', {}).get(key)
+        part_of = m.get('part_of', {}).get(key)
+
+        return journal or part_of or missing
+
+    def get_container_title(self, obj):
+        """Get container title."""
+        return self.get_journal_or_part_of(obj, 'title')
+
+    def get_pages(self, obj):
+        """Get pages."""
+        return self.get_journal_or_part_of(obj, 'pages')
+
+    def get_publisher(self, obj):
+        """Get publisher."""
+        m = obj['metadata']
+        publisher = m.get('imprint', {}).get('publisher')
+        if publisher:
+            return publisher
+
+        if m.get('doi', '').startswith('10.5281/'):
+            return 'Zenodo'
+
+        return missing
 
     def get_type(self, obj):
         """Get record CSL type."""

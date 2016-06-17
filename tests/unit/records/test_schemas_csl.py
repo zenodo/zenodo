@@ -47,8 +47,7 @@ def test_minimal(app, minimal_record, recid_pid):
         ],
         'issued': {
             'date-parts': [[d.year, d.month, d.day]]
-        },
-        'publisher': 'Zenodo',
+        }
     }
 
 
@@ -97,6 +96,12 @@ def test_identifiers(app, minimal_record, recid_pid):
     minimal_record['doi'] = '10.1234/foo'
     obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
     assert obj['DOI'] == '10.1234/foo'
+    assert 'publisher' not in obj
+
+    minimal_record['doi'] = '10.5281/foo'
+    obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
+    assert obj['DOI'] == '10.5281/foo'
+    assert obj['publisher'] == 'Zenodo'
 
     minimal_record['imprint'] = {'isbn': '978-1604598933'}
     obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
@@ -115,8 +120,6 @@ def test_journal(app, minimal_record, recid_pid):
     minimal_record['journal'] = {
         'volume': '42',
         'issue': '7',
-    }
-    minimal_record['part_of'] = {
         'title': 'Journal title',
         'pages': '10-20',
     }
@@ -125,6 +128,23 @@ def test_journal(app, minimal_record, recid_pid):
     assert obj['volume'] == '42'
     assert obj['issue'] == '7'
     assert obj['page'] == '10-20'
+
+
+def test_part_of(app, minimal_record, recid_pid):
+    """Test journal record."""
+    minimal_record['part_of'] = {
+        'title': 'Conference proceedings title',
+        'pages': '10-20',
+    }
+    minimal_record['imprint'] = {
+        'publisher': 'The Good Publisher',
+        'place': 'Somewhere',
+    }
+    obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
+    assert obj['container_title'] == 'Conference proceedings title'
+    assert obj['page'] == '10-20'
+    assert obj['publisher'] == 'The Good Publisher'
+    assert obj['publisher_place'] == 'Somewhere'
 
 
 def test_other(app, minimal_record, recid_pid):
