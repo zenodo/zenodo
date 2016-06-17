@@ -35,7 +35,7 @@
   <!-- AddThis Button END -->
   <h4>{{_('Cite as')}}</h4>
   <div id='invenio-csl'>
-    <invenio-csl>
+    <invenio-csl ng-init="vm.citationResult='{{record|citation(pid, style='apa')}}'">
       <invenio-csl-citeproc
        endpoint="{{ config.CSL_RECORDS_API_ENDPOINT ~ pid.pid_value }}"
        template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_CITEPROC) }}"></invenio-csl-citeproc>

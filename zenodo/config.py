@@ -380,12 +380,12 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         order=1,
     ),
     'csl': dict(
-        title='CSL',
+        title='Citation Style Language JSON',
         serializer='zenodo.modules.records.serializers.csl_v1',
         order=6,
     ),
     'cp': dict(
-        title='CiteProc',
+        title='Citation',
         serializer='zenodo.modules.records.serializers.citeproc_v1',
         order=7,
     ),
