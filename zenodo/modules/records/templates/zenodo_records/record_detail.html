@@ -90,6 +90,24 @@
 {%- block javascript %}{{super()}}
 <script type="text/javascript">var addthis_config = {"data_track_addressbar": true};</script>
 <script type="text/javascript">
+  // Bootstrap the Invenio CSL Formatter
+  require([
+    "jquery",
+    'typeahead.js',
+    'bloodhound',
+    "node_modules/angular/angular",
+    "node_modules/invenio-csl-js/dist/invenio-csl-js",
+    "js/zenodo/module",
+    ], function(typeahead, Bloodhound) {
+      angular.element(document).ready(function() {
+        angular.bootstrap(document.getElementById("invenio-csl"), [
+            'invenioCsl',
+          ]
+        );
+      });
+    }
+  );
+
   $(function () {
     $('.preview-link').on('click', function(event) {
       $('#preview').show();

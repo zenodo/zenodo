@@ -32,16 +32,19 @@ import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
 from invenio_formatter.filters.datetime import from_isodate
+from invenio_i18n.ext import current_i18n
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from .models import AccessRight, ObjectType
 from .permissions import has_access
+from .serializers import citeproc_v1
 
 blueprint = Blueprint(
     'zenodo_records',
     __name__,
     template_folder='templates',
+    static_folder='static',
     url_prefix='/search'
 )
 
@@ -195,6 +198,14 @@ def relation_title(relation):
     """Map relation type to title."""
     return dict(current_app.config['ZENODO_RELATION_TYPES']).get(relation) or \
         relation
+
+
+@blueprint.app_template_filter('citation')
+def citation(record, pid, style=None, ln=None):
+    """Render citation for record according to style and language."""
+    locale = ln or current_i18n.language
+    style = style or 'science'
+    return citeproc_v1.serialize(pid, record, style=style, locale=locale)
 
 
 @blueprint.app_template_filter('pid_url')

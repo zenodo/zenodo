@@ -33,9 +33,21 @@
   </div>
   {#- NOTE: zenodo_records/record_detail.html includes the JavaScript #}
   <!-- AddThis Button END -->
-  {% if record.doi %}
   <h4>{{_('Cite as')}}</h4>
-  <i class="fa fa-flash"></i> {{_('Coming soon...')}}
-  {# {% from "citationformatter/macros.html" import citationformatter %} #}
-  {# citationformatter(record.doi) #}
-{% endif %}
+  <div id='invenio-csl'>
+    <invenio-csl ng-init="vm.citationResult='{{record|citation(pid, style='apa')}}'">
+      <invenio-csl-citeproc
+       endpoint="{{ config.CSL_RECORDS_API_ENDPOINT ~ pid.pid_value }}"
+       template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_CITEPROC) }}"></invenio-csl-citeproc>
+      <invenio-csl-error
+       template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_ERROR) }}"></invenio-csl-error>
+      <invenio-csl-loading
+       template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_LOADING) }}"></invenio-csl-loading>
+      <invenio-csl-typeahead
+       lazy="true"
+       placeholder="Start typing a citation style..."
+       remote="{{ config.CSL_STYLES_API_ENDPOINT }}"
+       template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_TYPEAHEAD) }}"></invenio-csl-typeahead>
+    </invenio-csl>
+  </div>
+  {#- NOTE: Angular initialization in zenodo_records/record_detail.html #}
