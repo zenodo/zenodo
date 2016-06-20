@@ -43,6 +43,8 @@ from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all, check_elasticsearch
 
+from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
+
 
 def _(x):
     """Identity function for string extraction."""
@@ -424,6 +426,8 @@ RECORDS_UI_ENDPOINTS = dict(
         record_class='invenio_records_files.api:Record',
     ),
 )
+RECORDS_UI_ENDPOINTS.update(ACCESSREQUESTS_RECORDS_UI_ENDPOINTS)
+
 #: Default tombstone template.
 RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"
 
