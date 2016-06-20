@@ -1,0 +1,98 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2016 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends "invenio_deposit/edit.html" %}
+
+{%- block css %}
+  {% assets "zenodo_theme_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
+  <style>
+    .deposit-half {
+      width: 48%;
+    }
+  </style>
+{%- endblock css %}
+
+{%- block javascript %}
+  {% assets "invenio_deposit_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  <script type="text/javascript">
+    angular.element(document).ready(function() {
+        angular.bootstrap(
+          document.getElementById("invenio-records"),
+          ['invenioFiles', 'invenioRecords', 'schemaForm']
+        );
+    });
+  </script>
+{%- endblock javascript %}
+
+{%- block page_body %}
+  <div class="container">
+    <div class="row">
+      <div class="col-md-12">
+        <div id="invenio-records">
+          <invenio-records
+            {% if pid %}
+              action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
+            {% else %}
+              initialization="{{ config.DEPOSIT_SEARCH_API }}"
+            {% endif %}
+            extra-params='{"headers":{"Content-Type": "application/json"}}'
+            form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
+            record='{{ record | tojson }}'
+            schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_DEFAULT_JSONSCHEMA) }}">
+            <invenio-records-loading
+              template="{{ url_for('static', filename='node_modules/invenio-records-js/dist/templates/loading.html') }}">
+            </invenio-records-loading>
+            <invenio-records-alert
+              template="{{ url_for('static', filename='node_modules/invenio-records-js/dist/templates/alert.html') }}">
+            </invenio-records-alert>
+            <invenio-records-actions
+              template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
+            </invenio-records-actions>
+            <invenio-records-form
+              template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FORM) }}">
+            </invenio-records-form>
+          </invenio-records>
+
+          <invenio-files-uploader
+            method="PUT"
+            endpoint="/api/files"
+            {% if pid %}
+              action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
+            {% else %}
+              initialization="{{ config.DEPOSIT_SEARCH_API }}"
+            {% endif %}
+            extra-params='{"headers":{"Content-Type": "application/json"}}'
+          >
+            <invenio-files-upload-zone
+              template="{{ url_for('static', filename='node_modules/invenio-files-js/dist/templates/upload.html') }}">
+            </invenio-files-upload-zone>
+            <invenio-files-list
+              template="{{ url_for('static', filename='node_modules/invenio-files-js/dist/templates/list.html') }}"
+            ></invenio-files-list>
+        </invenio-files-uploader>
+        </div>
+      </div>
+    </div>
+  </div>
+{%- endblock %}

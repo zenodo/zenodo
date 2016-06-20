@@ -196,7 +196,6 @@
       {
         "key": "title",
         "title": "Title",
-        "description": "Required.",
         "required": true
       },
       {
@@ -226,7 +225,6 @@
       {
         "type": "textarea",
         "key": "description",
-        "required": true,
         "description": "Required.",
         "minLength": 1
       },
@@ -243,8 +241,7 @@
       {
         "type": "textarea",
         "key": "notes",
-        "description": "Optional.",
-        "required": false
+        "description": "Optional."
       }
     ]
   },
@@ -274,8 +271,7 @@
             "value": "closed",
             "name": "Closed Access"
           }
-        ],
-        "required": true
+        ]
       },
       {
         "description": "Required only for Embargoed Access uploads. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.",

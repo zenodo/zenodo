@@ -110,6 +110,8 @@ DEPOSIT_SEARCH_API = '/api/deposit/depositions'
 DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
 #: Template for deposit list view.
 DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
+#: Template for new deposit view.
+DEPOSIT_UI_NEW_TEMPLATE = 'zenodo_deposit/edit.html'
 #: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),
@@ -134,6 +136,8 @@ DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'
 
 #: Angular Schema Form for deposit
 DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
+
+DEPOSIT_RECORDS_API = '/api/deposits/{pid_value}'
 
 #: Endpoints for deposit.
 DEPOSIT_REST_ENDPOINTS = dict(
