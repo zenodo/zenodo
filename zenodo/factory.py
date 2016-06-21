@@ -40,7 +40,7 @@ from . import config
 
 env_prefix = 'APP'
 
-conf_loader = create_conf_loader(config=config, env_prefix=env_prefix)
+invenio_conf_loader = create_conf_loader(config=config, env_prefix=env_prefix)
 
 instance_path = os.getenv(env_prefix + '_INSTANCE_PATH') or \
     os.path.join(sys.prefix, 'var', 'instance')
@@ -57,6 +57,12 @@ static_folder = os.getenv(env_prefix + '_STATIC_FOLDER') or \
 Defaults to ``<virtualenv>/var/instance/static/``. Can be overwritten
 using the environment variable ``APP_STATIC_FOLDER``
 """
+
+
+def conf_loader(app, **kwargs_config):
+    """Zenodo conf loader."""
+    app.url_map.strict_slahes = False  # Legacy support
+    invenio_conf_loader(app, **kwargs_config)
 
 
 def create_wsgi_statsd_factory(mounts_factories):

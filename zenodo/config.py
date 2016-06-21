@@ -32,8 +32,8 @@ from datetime import timedelta
 from celery.schedules import crontab
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
-from invenio_deposit.utils import check_oauth2_scope_write, \
-    check_oauth2_scope_write_elasticsearch
+from invenio_deposit.scopes import write_scope
+from invenio_deposit.utils import check_oauth2_scope
 from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
@@ -41,9 +41,11 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
-from invenio_records_rest.utils import allow_all, check_elasticsearch
-
+from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
+
+from zenodo.modules.deposit.permissions import DepositPermission, \
+    can_edit_deposit
 
 
 def _(x):
@@ -220,10 +222,13 @@ DEPOSIT_REST_ENDPOINTS = dict(
                 _PID)),
         default_media_type='application/json',
         links_factory_imp='invenio_deposit.links:deposit_links_factory',
-        create_permission_factory_imp=check_oauth2_scope_write,
-        read_permission_factory_imp=check_elasticsearch,
-        update_permission_factory_imp=check_oauth2_scope_write_elasticsearch,
-        delete_permission_factory_imp=check_oauth2_scope_write_elasticsearch,
+        create_permission_factory_imp=check_oauth2_scope(
+            lambda x: True, write_scope.id),
+        read_permission_factory_imp=DepositPermission,
+        update_permission_factory_imp=check_oauth2_scope(
+            can_edit_deposit, write_scope.id),
+        delete_permission_factory_imp=check_oauth2_scope(
+            can_edit_deposit, write_scope.id),
         max_result_window=10000,
     ),
 )
