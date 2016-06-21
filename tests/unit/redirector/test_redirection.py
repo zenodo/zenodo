@@ -47,7 +47,7 @@ def check_redirection(response, expected_url):
                for k, v in response.headers)
 
 
-def test_redirection_community(app_client):
+def test_redirection_community(app_client, db):
     """Check the redirection using a direct translation."""
     url_redirection = url_for('invenio_communities.detail', community_id=1,
                               _external=True)
@@ -100,13 +100,13 @@ def test_redirection_communities_about(app_client):
 def test_redirection_collections_type(app_client):
     """Check the redirection using a direct translation."""
     # Type
-    url_redirection = url_for('invenio_search_ui.search', type='videos',
+    url_redirection = url_for('invenio_search_ui.search', type='video',
                               _external=True)
     response = app_client.get('/collection/videos')
     check_redirection(response, url_redirection)
 
     # Type and subtype
-    url_redirection = url_for('invenio_search_ui.search', type='publications',
+    url_redirection = url_for('invenio_search_ui.search', type='publication',
                               subtype='deliverable', _external=True)
     response = app_client.get('/collection/deliverable')
     check_redirection(response, url_redirection)
@@ -115,19 +115,19 @@ def test_redirection_collections_type(app_client):
 def test_redirection_collections_search(app_client):
     """Check the redirection using a direct translation."""
     # Type
-    url_redirection = url_for('invenio_search_ui.search', type='videos',
+    url_redirection = url_for('invenio_search_ui.search', type='video',
                               _external=True)
     response = app_client.get('/search?cc=videos')
     check_redirection(response, url_redirection)
 
     # Type and subtype
-    url_redirection = url_for('invenio_search_ui.search', type='publications',
+    url_redirection = url_for('invenio_search_ui.search', type='publication',
                               subtype='deliverable', _external=True)
     response = app_client.get('/search?cc=deliverable')
     check_redirection(response, url_redirection)
 
     # Query translation
-    url_redirection = url_for('invenio_search_ui.search', type='publications',
+    url_redirection = url_for('invenio_search_ui.search', type='publication',
                               subtype='deliverable', q='test', _external=True)
 
     response = app_client.get('/search?cc=deliverable&p=test')

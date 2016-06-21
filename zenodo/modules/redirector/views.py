@@ -81,8 +81,16 @@ def collections_type_redirect(type):
     return redirect(url_for('invenio_search_ui.search', **values))
 
 
+def _pop_p(values):
+    if 'p' in values:
+        values['q'] = values.pop('p')
+    values.pop('action_search', None)
+    # May need to be removed later:
+    values.pop('ln', None)
+
+
 def search_handler():
-    """."""
+    """Search handler."""
     if 'cc' in request.args:
         if request.args.get('cc', '').startswith('user-'):
             return community_search_redirect()
@@ -90,6 +98,10 @@ def search_handler():
             return communities_provisional_user_redirect()
         else:
             return collections_search_redirect()
+    elif 'p' in request.args:
+        values = request.args.to_dict()
+        _pop_p(values)
+        return redirect(url_for('invenio_search_ui.search', **values))
     else:
         return search_ui_search()
 
@@ -99,12 +111,8 @@ def search_handler():
 def community_search_redirect():
     """Redirect from the old community search to the new one."""
     values = request.args.to_dict()
-
     values['community_id'] = values.pop('cc')[5:]  # len('user-') == 5
-
-    if 'p' in values:
-        values['q'] = values.pop('p')
-
+    _pop_p(values)
     return redirect(url_for('invenio_communities.search', **values))
 
 
@@ -113,13 +121,9 @@ def community_search_redirect():
 def communities_provisional_user_redirect():
     """Redirect from the old communities provisional search to the new one."""
     values = request.args.to_dict()
-
     # len('provisional-user-') == 17
     values['community_id'] = values.pop('cc')[17:]
-
-    if 'p' in values:
-        values['q'] = values.pop('p')
-
+    _pop_p(values)
     return redirect(url_for('invenio_communities.curate', **values))
 
 
@@ -128,14 +132,10 @@ def communities_provisional_user_redirect():
 def collections_search_redirect():
     """."""
     values = request.args.to_dict()
-
     type, subtype = ZENODO_TYPE_SUBTYPE_LEGACY.get(
         values.pop('cc'), ('', None))
     values['type'] = type
     if subtype:
         values['subtype'] = subtype
-
-    if 'p' in values:
-        values['q'] = values.pop('p')
-
+    _pop_p(values)
     return redirect(url_for('invenio_search_ui.search', **values))
