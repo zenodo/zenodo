@@ -94,6 +94,7 @@ search_js = NpmBundle(
     filters='jsmin',
     output="gen/zenodo.search.%(version)s.js",
     npm={
+        'clipboard': '1.5.12',
         'invenio-search-js': '~0.2.0',
     }
 )

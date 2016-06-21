@@ -21,6 +21,7 @@
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 require([
   "jquery",
+  "clipboard",
   "bootstrap",
   "typeahead",
   "bloodhound",
@@ -29,7 +30,8 @@ require([
   "node_modules/angular-loading-bar/build/loading-bar",
   "node_modules/invenio-csl-js/dist/invenio-csl-js",
   "js/zenodo/module",
-  ], function() {
-  // On document ready bootstrap angular
+  ], function($, Clipboard) {
+    // On document ready bootstrap angular
+    new Clipboard('.btn.clip-button');
   }
 );

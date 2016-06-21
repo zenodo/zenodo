@@ -28,6 +28,7 @@ require.config({
     angular: "node_modules/angular/angular",
     typeahead: 'node_modules/typeahead.js/dist/typeahead.jquery',
     bloodhound: 'node_modules/typeahead.js/dist/bloodhound',
+    clipboard: 'node_modules/clipboard/dist/clipboard',
   },
   shim: {
     angular: {
@@ -38,6 +39,9 @@ require.config({
     },
     bootstrap: {
       deps: ["jquery"]
+    },
+    clipboard: {
+      exports: "Clipboard"
     }
   }
 });

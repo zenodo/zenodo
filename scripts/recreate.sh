@@ -26,6 +26,7 @@ zenodo db destroy --yes-i-know
 zenodo db init
 zenodo db create
 zenodo index destroy --force --yes-i-know
+zenodo index queue init
 zenodo index init
 zenodo fixtures init
 zenodo users create info@zenodo.org -a --password=123456
