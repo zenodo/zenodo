@@ -98,7 +98,8 @@ def pytest_generate_tests(metafunc):
 
     For each test in this directory which uses the `env_browser` fixture,
     the given test is called once for each value found in the
-    `E2E_WEBDRIVER_BROWSERS` environment variable."""
+    `E2E_WEBDRIVER_BROWSERS` environment variable.
+    """
     if 'env_browser' in metafunc.fixturenames:
         # In Python 2.7 the fallback kwarg of os.environ.get is `failobj`,
         # in 3.x it's `default`.

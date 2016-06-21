@@ -32,8 +32,8 @@ from marshmallow import Schema, ValidationError, fields, missing, \
     validates_schema
 from werkzeug.routing import BuildError
 
-from ...models import AccessRight, ObjectType
 from . import common
+from ...models import AccessRight, ObjectType
 
 
 class StrictKeysSchema(Schema):

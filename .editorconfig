@@ -37,7 +37,7 @@ charset = utf-8
 indent_size = 4
 # isort plugin configuration
 known_first_party = zenodo
-known_third_party = dojson, flask-celeryext, invenio-access, invenio-accounts, invenio-admin, invenio-assets, invenio-base, invenio-celery, invenio-config, invenio-db, invenio-files-rest, invenio-formatter, invenio-i18n, invenio-indexer, invenio-jsonschemas, invenio-logging, invenio-mail, invenio-marc21, invenio-migrator, invenio-oaiserver, invenio-oauth2server, invenio-oauthclient, invenio-openaire, invenio-pages, invenio-pidstore, invenio-previewer, invenio-records-rest, invenio-records-ui, invenio-records, invenio-rest, invenio-search-ui, invenio-search, invenio-theme, invenio-userprofiles, invenio, zenodo-migrationkit
+known_third_party = dojson, flask-celeryext, invenio-access, invenio-accounts, invenio-admin, invenio-assets, invenio-base, invenio-celery, invenio-config, invenio-db, invenio-files-rest, invenio-formatter, invenio-i18n, invenio-indexer, invenio-jsonschemas, invenio-logging, invenio-mail, invenio-marc21, invenio-migrator, invenio-oaiserver, invenio-oauth2server, invenio-oauthclient, invenio-openaire, invenio-pages, invenio-pidstore, invenio-previewer, invenio-records-rest, invenio-records-ui, invenio-records, invenio-rest, invenio-search-ui, invenio-search, invenio-theme, invenio-userprofiles, invenio
 multi_line_output = 2
 default_section = THIRDPARTY
 

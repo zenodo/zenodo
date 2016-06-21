@@ -38,7 +38,6 @@ from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingFilesError
 
-
 PRESERVE_FIELDS = (
     '_deposit',
     '_files',

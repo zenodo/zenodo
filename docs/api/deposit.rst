@@ -50,11 +50,6 @@ Loaders
    :undoc-members:
 
 
-.. automodule:: zenodo.modules.deposit.loaders.utils
-   :members:
-   :undoc-members:
-
-
 Minters and fetchers
 ~~~~~~~~~~~~~~~~~~~~
 
