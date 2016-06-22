@@ -176,11 +176,34 @@ DEPOSIT_CONTRIBUTOR_DATACITE2MARC = {
     x['datacite']: x['marc'] for x in DEPOSIT_CONTRIBUTOR_TYPES
 }
 
-#: Default JSON Schema for deposit
+#: Default JSON Schema for deposit.
 DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'
 
-#: Angular Schema Form for deposit
+#: Angular Schema Form for deposit.
 DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
+
+#: Template for deposit records API.
+DEPOSIT_RECORDS_API = '/api/deposit/depositions/{pid_value}'
+
+#: Alerts shown when actions are completed on deposit.
+DEPOSIT_RESPONSE_MESSAGES = dict(
+    self=dict(
+        message="Saved successfully"
+    ),
+    publish=dict(
+        message="Published successfully",
+        backlink=True,
+        hide=True
+    ),
+    discard=dict(
+        message="Discarded successfully"
+    ),
+    delete=dict(
+        message="Deleted successfully",
+        backlink=True,
+        hide=True
+    )
+)
 
 #: Endpoints for deposit.
 DEPOSIT_REST_ENDPOINTS = dict(
