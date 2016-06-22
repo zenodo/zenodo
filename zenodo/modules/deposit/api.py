@@ -32,8 +32,10 @@ from invenio_communities.models import Community, InclusionRequest
 from invenio_deposit.api import Deposit as _Deposit
 from invenio_deposit.api import preserve
 from invenio_records_files.api import FileObject
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
+from invenio_db import db
 
-from zenodo.modules.records.minters import is_local_doi
+from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingFilesError
@@ -219,6 +221,7 @@ class ZenodoDeposit(_Deposit):
         record['communities'] = sorted(list(new_rec_comms))
         if not record['communities']:
             del record['communities']
+        zenodo_doi_updater(record.id, record)
         return record
 
     def validate_publish(self):
@@ -251,3 +254,11 @@ class ZenodoDeposit(_Deposit):
     def patch(self, *args, **kwargs):
         """Patch only drafts."""
         return super(ZenodoDeposit, self).patch(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        """Delete the deposit."""
+        recid = PersistentIdentifier.get(pid_type='recid',
+                                         pid_value=self['recid'])
+        if recid.status == PIDStatus.RESERVED:
+            db.session.delete(recid)
+        return super(ZenodoDeposit, self).delete(*args, **kwargs)
