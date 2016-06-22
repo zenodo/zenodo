@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import current_app, session
+from flask_babelex import gettext as _
 from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access import DynamicPermission
@@ -206,9 +207,11 @@ def deny(user, record):
 def has_read_permission(user, record):
     """Check if user has read access to the record."""
     # Allow if record is open access
+    reason = 'You have access because {0}'
+
     if AccessRight.get(record['access_right'], record.get('embargo_date')) \
             == AccessRight.OPEN:
-        return True
+        return _(reason.format('the record has open access'))
 
     # Allow token bearers
     token = session.get('accessrequests-secret-token')
@@ -221,12 +224,14 @@ def has_read_permission(user, record):
 
 def has_update_permission(user, record):
     """Check if user has update access to the record."""
+    reason = 'You have access because {0}'
     # Allow owners
     user_id = int(user.get_id()) if user.is_authenticated else None
     if user_id in record.get('owners', []):
-        return True
+        return _(reason.format('you are the owner'))
 
-    return has_admin_permission(user, record)
+    if has_admin_permission(user, record):
+        return _(reason.format('you have administrator access'))
 
 
 def has_admin_permission(user, record):

@@ -22,7 +22,8 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
-{%- set files = record.files if current_user|has_access_to(record) else [] %}
+{%- set has_access = current_user|has_access_to(record) %}
+{%- set files = record.files if has_access else [] %}
 {%- if record._files -%}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
@@ -63,18 +64,24 @@
       </tbody>
     </table>
   {%- endif %}
-  {%- if not current_user|has_access_to(record) and record.access_right in ['restricted'] %}
-    {%- if record.access_conditions %}
-    <div class="panel-body">
-    <hr/>
-    {{record.access_conditions|safe}}
-    <hr/>
-    </div>
+    {%- if has_access %}
+      <div class="panel-body">
+        <hr/>
+          {{has_access|safe}}
+        <hr/>
+      </div>
+    {%- else %}
+      {%- if record['access_right'] in ['restricted'] %}
+        <div class="panel-body">
+          <hr/>
+            {{record['access_conditions']|safe}}
+          <hr/>
+        </div>
+      {% endif %}
+      <div class="panel-body" align="center">
+        <a class="btn btn-primary" href="{{access_request_url}}"><i class="fa fa-edit"></i> Request access...</a>
+      </div>
     {%- endif %}
-    <div class="panel-body" align="center">
-      <a class="btn btn-primary" href="{{access_request_url}}"><i class="fa fa-edit"></i> Request access...</a>
-    </div>
-  {%- endif %}
   </div>
 </div>
 {%- endif %}
