@@ -113,15 +113,8 @@ def test_simple_rest_flow(datacite_mock, api, api_client, db, es,
 
     # Publish deposition
     # Enable datacite minting
-    api.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = True
     response = client.post(links['publish'], headers=auth_headers)
     record_id = get_json(response, code=202)['record_id']
-    api.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = False
-
-    # Check if the datacite DOI has been minted
-    assert datacite_mock().metadata_post.call_count == 1
-    datacite_mock().doi_post.assert_called_once_with(
-        '10.5072/zenodo.1', 'https://zenodo.org/record/1')
 
     # Check that same id is being used for both deposit and record.
     assert deposit_id == record_id

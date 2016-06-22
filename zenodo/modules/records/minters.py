@@ -28,8 +28,10 @@ from __future__ import absolute_import
 
 import idutils
 from flask import current_app
+from invenio_db import db
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
+from invenio_pidstore.errors import PIDValueError
 
 
 def doi_generator(recid, prefix=None):
@@ -65,30 +67,65 @@ def zenodo_record_minter(record_uuid, data):
 def zenodo_doi_minter(record_uuid, data):
     """Mint DOI."""
     doi = data.get('doi')
-    status = PIDStatus.RESERVED
-    provider = None
+    assert 'recid' in data
 
     # Create a DOI if no DOI was found.
     if not doi:
-        assert 'recid' in data
         doi = doi_generator(data['recid'])
         data['doi'] = doi
-    else:
-        assert 'recid' in data
 
-    if doi != doi_generator(data['recid']):
-        return
-
+    # Make sure it's a proper DOI
     assert idutils.is_doi(doi)
 
-    if is_local_doi(doi):
-        provider = 'datacite'
+    # user-provided DOI (external or Zenodo DOI)
+    if doi != doi_generator(data['recid']):
+        if is_local_doi(doi):
+            # User should not provide a custom Zenodo DOI
+            # which is not dependent on the recid
+            raise PIDValueError('doi', doi)
+        else:
+            return PersistentIdentifier.create(
+                'doi',
+                doi,
+                object_type='rec',
+                object_uuid=record_uuid,
+                status=PIDStatus.RESERVED,
+            )
+    else:  # Zenodo-generated DOI
+        return PersistentIdentifier.create(
+            'doi',
+            doi,
+            pid_provider='datacite',
+            object_type='rec',
+            object_uuid=record_uuid,
+            status=PIDStatus.RESERVED,
+        )
 
-    return PersistentIdentifier.create(
-        'doi',
-        doi,
-        pid_provider=provider,
-        object_type='rec',
-        object_uuid=record_uuid,
-        status=status,
-    )
+
+def zenodo_doi_updater(record_uuid, data):
+    """Update the DOI (only external DOIs)."""
+    assert 'recid' in data
+    doi = data.get('doi')
+    assert doi
+    assert idutils.is_doi(doi)
+
+    # If the DOI is the same as an already generated one, do nothing
+    if doi == doi_generator(data['recid']):
+        return
+    if is_local_doi(doi):  # Zenodo DOI, but different than recid
+        # ERROR, user provided a custom ZENODO DOI!
+        raise PIDValueError('doi', doi)
+
+    doi_pid = PersistentIdentifier.get_by_object(
+        pid_type='doi', object_type='rec', object_uuid=record_uuid)
+
+    if doi_pid.pid_value != doi:
+        with db.session.begin_nested():
+            db.session.delete(doi_pid)
+            return PersistentIdentifier.create(
+                'doi',
+                doi,
+                object_type='rec',
+                object_uuid=record_uuid,
+                status=PIDStatus.RESERVED,
+            )

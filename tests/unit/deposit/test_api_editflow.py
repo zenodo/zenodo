@@ -29,15 +29,19 @@ from __future__ import absolute_import, print_function
 import json
 
 from flask import url_for
+from mock import patch
 from invenio_communities.models import Community
-from invenio_pidstore.models import PersistentIdentifier
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_search import current_search
 from six import BytesIO
 
+from zenodo.modules.deposit.tasks import datacite_register
 
-def test_edit_flow(api_client, db, es, location, json_auth_headers,
-                   deposit_url, get_json, auth_headers, json_headers,
-                   license_record, communities, resolver):
+
+@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
+def test_edit_flow(datacite_mock, api_client, db, es, location,
+                   json_auth_headers, deposit_url, get_json, auth_headers,
+                   json_headers, license_record, communities, resolver):
     """Test simple flow using REST API."""
     headers = json_auth_headers
     client = api_client
@@ -88,6 +92,20 @@ def test_edit_flow(api_client, db, es, location, json_auth_headers,
     response = client.post(links['publish'], headers=auth_headers)
     data = get_json(response, code=202)
     record_id = data['record_id']
+
+    assert PersistentIdentifier.query.filter_by(pid_type='depid').count() == 1
+    recid_pid = PersistentIdentifier.query.filter_by(pid_type='recid').one()
+    doi_pid = PersistentIdentifier.get(
+        pid_type='doi', pid_value='10.5072/zenodo.1')
+    assert doi_pid.status == PIDStatus.RESERVED
+    # This task (datacite_register) would normally be executed asynchronously
+    datacite_register(recid_pid.pid_value, recid_pid.object_uuid)
+    assert doi_pid.status == PIDStatus.REGISTERED
+
+    # Make sure it was registered properly in datacite
+    assert datacite_mock().metadata_post.call_count == 1
+    datacite_mock().doi_post.assert_called_once_with(
+         '10.5072/zenodo.1', 'https://zenodo.org/record/1')
 
     # Does record exists?
     current_search.flush_and_refresh(index='records')
@@ -257,7 +275,8 @@ def test_edit_doi(api_client, db, es, location, json_auth_headers,
         'invenio_records_rest.recid_item', pid_value=data['record_id'])
 
     # Create a persistent identifier
-    PersistentIdentifier.create('doi', '10.1234/exists', status='R')
+    PersistentIdentifier.create('doi', '10.1234/exists',
+                                status=PIDStatus.REGISTERED)
     db.session.commit()
 
     # DOI exists
@@ -276,9 +295,16 @@ def test_edit_doi(api_client, db, es, location, json_auth_headers,
     data = get_json(res, code=202)
     assert data['doi'] == '10.1234/bar'
 
-    # TODO
-    # 1 depid, 1 recid, 1 doi + 1 pre-existing doi + 1 license + 1 grant record
-    # assert PersistentIdentifier.query.count() == 6
+    assert PersistentIdentifier.query.filter_by(pid_type='depid').count() == 1
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 1
+    assert PersistentIdentifier.query.filter_by(pid_type='doi').count() == 2
+    doi_exists = PersistentIdentifier.get(pid_type='doi',
+                                          pid_value='10.1234/exists')
+    doi_external = PersistentIdentifier.get(pid_type='doi',
+                                            pid_value='10.1234/bar')
+    assert doi_exists.status == PIDStatus.REGISTERED
+    # User-provided DOIs are not registered
+    assert doi_external.status == PIDStatus.RESERVED
 
     # Get record
     res = client.get(record_url, headers=json_headers)
@@ -311,9 +337,18 @@ def test_edit_doi(api_client, db, es, location, json_auth_headers,
     data = get_json(res, code=200)
     assert data['doi'] == '10.4321/foo'
 
-    # TODO
-    # 1 depid, 1 recid, 1 doi + 1 pre-existing doi + 1 license + 1 grant record
-    # assert PersistentIdentifier.query.count() == 6
+    # Make sure the PIDs are correct
+    assert PersistentIdentifier.query.filter_by(pid_type='depid').count() == 1
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 1
+    assert PersistentIdentifier.query.filter_by(pid_type='doi').count() == 2
+    doi_exists = PersistentIdentifier.get(pid_type='doi',
+                                          pid_value='10.1234/exists')
+
+    # external DOI should be updated
+    doi_external = PersistentIdentifier.get(pid_type='doi',
+                                            pid_value='10.4321/foo')
+    assert doi_exists.status == PIDStatus.REGISTERED
+    assert doi_external.status == PIDStatus.RESERVED
 
 
 def test_noedit_doi(api_client, db, es, location, json_auth_headers,
@@ -366,8 +401,11 @@ def test_noedit_doi(api_client, db, es, location, json_auth_headers,
     res = client.post(links['publish'], headers=auth_headers)
     data = get_json(res, code=202)
 
-    # depid, recid, doi + license and grant record.
-    assert PersistentIdentifier.query.count() == 5
+    # Check if PIDs have been created (depid, recid, doi)
+    PersistentIdentifier.query.filter_by(pid_type='depid').one()
+    PersistentIdentifier.query.filter_by(pid_type='recid').one()
+    doi_pid = PersistentIdentifier.query.filter_by(pid_type='doi').one()
+    assert doi_pid.status == PIDStatus.RESERVED
 
 
 def test_publish_empty(api_client, db, es, location, json_auth_headers,
@@ -396,3 +434,34 @@ def test_publish_empty(api_client, db, es, location, json_auth_headers,
     # Publish deposition - not possible
     response = client.post(links['publish'], headers=auth_headers)
     data = get_json(response, code=400)
+
+
+def test_delete_draft(api, api_client, db, es, location, json_auth_headers,
+                      auth_headers, deposit_url, get_json, license_record):
+    """Test deleting of Deposit draft using REST API."""
+    # Setting var this way doesn't work
+    headers = json_auth_headers
+    client = api_client
+    links, data = create_deposit(
+        client, headers, auth_headers, deposit_url, get_json, {})
+
+    recid = PersistentIdentifier.query.filter_by(pid_type='recid').one()
+    depid = PersistentIdentifier.query.filter_by(pid_type='depid').one()
+    assert recid.status == PIDStatus.RESERVED
+    assert depid.status == PIDStatus.REGISTERED
+
+    # Get deposition
+    current_search.flush_and_refresh(index='deposits')
+    response = client.get(links['self'], headers=auth_headers)
+    assert response.status_code == 200
+
+    # Delete deposition
+    current_search.flush_and_refresh(index='deposits')
+    response = client.delete(links['self'], headers=auth_headers)
+    assert response.status_code == 204
+    # 'recid' PID shuld be removed, while 'depid' should have status deleted.
+    # No 'doi' PIDs should be created without publishing
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 0
+    depid = PersistentIdentifier.query.filter_by(pid_type='depid').one()
+    assert PersistentIdentifier.query.filter_by(pid_type='doi').count() == 0
+    assert depid.status == PIDStatus.DELETED
