@@ -119,10 +119,14 @@ def matchlicenses(legacy_lic_filename, od_filename, destination):
 def update_legacy_meta(license):
     """Update the Zenodo legacy terms for license metadata."""
     l = dict(license)
-    l['od_conformance'] = 'approved' if l['is_okd_compliant'] else 'rejected'
-    l['osd_conformance'] = 'approved' if l['is_osi_compliant'] else 'rejected'
-    del l['is_okd_compliant']
-    del l['is_osi_compliant']
+    if 'od_conformance' not in l:
+        l['od_conformance'] = 'approved' if l['is_okd_compliant'] \
+            else 'rejected'
+    if 'osd_conformance' not in l:
+        l['osd_conformance'] = 'approved' if l['is_osi_compliant'] \
+            else 'rejected'
+    l.pop('is_okd_compliant', None)
+    l.pop('is_osi_compliant', None)
     l['$schema'] = 'http://{0}{1}/{2}'.format(
         current_app.config['JSONSCHEMAS_HOST'],
         current_app.config['JSONSCHEMAS_ENDPOINT'],
