@@ -301,3 +301,55 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
     ir2 = InclusionRequest.query.filter_by(id_community='c2').one()
     assert ir1.id_record == record.id
     assert ir2.id_record == record.id
+
+
+def test_fixed_communities(app, db, users, communities, deposit, deposit_file):
+    """Test automatic adding and requesting to fixed communities."""
+
+    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = ['zenodo', ]
+    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = ['ecfunded', ]
+
+    deposit['grants'] = [{'title': 'SomeGrant'}, ]
+    # 'c3' is owned by one of the deposit owner
+    assert Community.get('c3').id_user in deposit['_deposit']['owners']
+    deposit['communities'] = ['c3', ]
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert record['communities'] == ['c3', 'ecfunded']
+    assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
+    ir = InclusionRequest.query.one()
+    assert ir.id_community == 'zenodo'
+    assert ir.id_record == record.id
+
+    # FIXME: Since app is yielded, those two variables have to be unset.
+    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = list()
+    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = list()
+
+
+def test_fixed_communities_after_edit(app, db, users, communities, deposit,
+                                      deposit_file):
+    """Test automatic adding and requesting to fixed communities.
+
+    Add to ecfunded also after later addition of grant information.
+    """
+
+    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = ['zenodo', ]
+    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = ['ecfunded', ]
+
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['zenodo', ]
+    assert 'communities' not in record
+    ir = InclusionRequest.query.one()
+    assert ir.id_community == 'zenodo'
+    assert ir.id_record == record.id
+
+    deposit = deposit.edit()
+    deposit['grants'] = [{'title': 'SomeGrant'}, ]
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['ecfunded', 'zenodo', ]
+    assert record['communities'] == ['ecfunded', ]
+
+    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = list()
+    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = list()
