@@ -28,6 +28,8 @@ from __future__ import absolute_import
 
 from os.path import splitext
 
+from flask import current_app
+
 from invenio_communities.models import Community, InclusionRequest
 from invenio_deposit.api import Deposit as _Deposit
 from invenio_deposit.api import preserve
@@ -151,7 +153,8 @@ class ZenodoDeposit(_Deposit):
         """
         for comm_id in comms:
             comm = Community.get(comm_id)
-            comm.add_record(record)  # Handles oai-sets internally
+            if not comm.has_record(record):
+                comm.add_record(record)  # Handles oai-sets internally
 
     def _filter_by_owned_communities(self, comms):
         """Filter the list of communities for auto accept.
@@ -166,28 +169,32 @@ class ZenodoDeposit(_Deposit):
 
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
-        if 'communities' in self:
-            # pop the 'communities' entry so they aren't added to the Record
-            dep_comms = self.pop('communities')
+        # pop the 'communities' entry so they aren't added to the Record
+        dep_comms = self.pop('communities', [])
 
-            # Communities for automatic acceptance
-            owned_comms = self._filter_by_owned_communities(dep_comms)
+        # Communities for automatic acceptance
+        owned_comms = set(self._filter_by_owned_communities(dep_comms))
 
-            # Communities for which the InclusionRequest should be made
-            requested_comms = set(dep_comms) - set(owned_comms)
+        # Communities for which the InclusionRequest should be made
+        requested_comms = set(dep_comms) - owned_comms
 
-            # Add the owned communities to the record
-            self._autoadd_communities(owned_comms, self)
+        grant_comms = []
+        if self.get('grants'):
+            grant_comms = current_app.config[
+                'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
+        auto_request = current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST']
 
-            record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+        # Add the owned communities to the record
+        self._autoadd_communities(owned_comms | set(grant_comms), self)
 
-            # Push the communities back so they appear in deposit
-            self['communities'] = dep_comms
-            self._create_inclusion_requests(requested_comms, record)
-            return record
-        else:
-            record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+        record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+        self._create_inclusion_requests(requested_comms | set(auto_request),
+                                        record)
 
+        # Push the communities back (if any) so they appear in deposit
+        self['communities'] = sorted(dep_comms + grant_comms + auto_request)
+        if not self['communities']:  # No key rather than empty list
+            del self['communities']
         return record
 
     def _publish_edited(self):
@@ -209,15 +216,26 @@ class ZenodoDeposit(_Deposit):
         new_ir_comms = set(new_comms) - new_owned_comms
 
         self._remove_accepted_communities(removals, record)
-        self._autoadd_communities(new_owned_comms, record)
+
+        grant_comms = []
+        if self.get('grants'):
+            grant_comms = current_app.config[
+                'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
+        self._autoadd_communities(new_owned_comms | set(grant_comms), record)
         self._create_inclusion_requests(new_ir_comms, record)
 
         # Remove obsolete InclusionRequests
         self._remove_obsolete_irs(dep_comms, record)
 
         # Communities, which should be in record after publishing:
-        new_rec_comms = (set(dep_comms) & set(rec_comms)) | new_owned_comms
+        new_rec_comms = ((set(dep_comms) & set(rec_comms)) |
+                         new_owned_comms | set(grant_comms))
         record = super(ZenodoDeposit, self)._publish_edited()
+
+        self['communities'] = sorted(self.get('communities', []) + grant_comms)
+        if not self['communities']:
+            del self['communities']
+
         record['communities'] = sorted(list(new_rec_comms))
         if not record['communities']:
             del record['communities']

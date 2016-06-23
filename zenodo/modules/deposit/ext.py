@@ -31,6 +31,7 @@ from invenio_indexer.signals import before_record_index
 
 from .indexer import indexer_receiver
 from .receivers import datacite_register_after_publish
+from . import config
 
 
 class ZenodoDeposit(object):
@@ -44,6 +45,7 @@ class ZenodoDeposit(object):
 
     def init_app(self, app):
         """Flask application initialization."""
+        self.init_config(app)
         app.extensions['zenodo-deposit'] = self
 
     @staticmethod
@@ -52,3 +54,10 @@ class ZenodoDeposit(object):
         before_record_index.connect(indexer_receiver, sender=app, weak=False)
         post_action.connect(datacite_register_after_publish, sender=app,
                             weak=False)
+
+    @staticmethod
+    def init_config(app):
+        """Initialize configuration."""
+        for k in dir(config):
+            if k.startswith('ZENODO_'):
+                app.config.setdefault(k, getattr(config, k))
