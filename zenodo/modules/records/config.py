@@ -76,7 +76,12 @@ ZENODO_RELATION_TYPES = [
     ('references', _('References')),
     ('isReferencedBy', _('Referenced by')),
     ('isNewVersionOf', _('Previous versions')),
-    ('isPreviousVersionOf', _('New versions'))
+    ('isPreviousVersionOf', _('New versions')),
+    ('isPartOf', _('Part of')),
+    ('hasPart', _('Has part')),
+    ('compiles', _('Compiles')),
+    ('isCompiledBy', _('Compiled by')),
+    ('isIdenticalTo', _('Identical to')),
 ]
 
 ZENODO_LOCAL_DOI_PREFIXES = []
