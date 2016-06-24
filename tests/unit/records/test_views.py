@@ -106,7 +106,7 @@ def test_relation_title(app):
     assert render_template_string(
         "{{ 'isCitedBy'|relation_title }}") == "Cited by"
     assert render_template_string(
-        "{{ 'isIdenticalTo'|relation_title }}") == "isIdenticalTo"
+        "{{ 'nonExistingRelation'|relation_title }}") == "nonExistingRelation"
 
 
 def test_relation_logo():
