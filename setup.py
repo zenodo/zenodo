@@ -90,6 +90,7 @@ install_requires = [
     'dojson>=1.2.1',
     'Flask-Admin>=1.4.2',
     'Flask-BabelEx>=0.9.2',
+    'Flask-Cache>=0.13.1',
     'Flask-CLI>=0.4.0',
     'Flask-Debugtoolbar>=0.10.0',
     'Flask>=0.11.1',
@@ -170,7 +171,8 @@ setup(
             'zenodo = zenodo.cli:cli',
         ],
         'invenio_base.apps': [
-            'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
+            'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
+            'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
