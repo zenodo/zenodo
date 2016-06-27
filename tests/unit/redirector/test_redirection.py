@@ -36,14 +36,16 @@ except ImportError:
 
 def compare_url(url, expected):
     """Compare two urls replying if they are the same."""
-    return (parse_qs(url) == parse_qs(expected) and
+    def get_querystring_dict(url):
+        return parse_qs(urlparse(url).query)
+    return (get_querystring_dict(url) == get_querystring_dict(expected) and
             urlparse(url).path == urlparse(expected).path)
 
 
 def check_redirection(response, expected_url):
     """."""
     assert response.status_code == 302
-    compare_url(response.headers['Location'], expected_url)
+    assert compare_url(response.headers['Location'], expected_url)
 
 
 def test_redirection_community(app_client, db):
