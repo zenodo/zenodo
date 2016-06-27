@@ -30,7 +30,7 @@ from invenio_indexer.signals import before_record_index
 
 from . import config
 from .indexer import indexer_receiver
-from .views import blueprint
+from .views import blueprint, record_communities
 
 
 class ZenodoRecords(object):
@@ -44,6 +44,10 @@ class ZenodoRecords(object):
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
+
+        # Register context processors
+        app.context_processor(record_communities)
+        # Register blueprint
         app.register_blueprint(blueprint)
         before_record_index.connect(indexer_receiver, sender=app)
         app.extensions['zenodo-records'] = self

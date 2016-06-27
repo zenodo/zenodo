@@ -68,6 +68,12 @@
       {%- endblock record_body_extra %}
     </div>
     <div class="col-sm-4 col-md-4">
+      {%- set pending_comms, accepted_comms=community_curation(record, current_user) %}
+      {% if pending_comms or accepted_comms %}
+      <div class="well metadata">
+        {%- include "zenodo_records/box/curate.html" %}
+      </div>
+      {% endif %}
       {%- if record.doi %}
         {{ almetric_badge(record.doi, css_class='well') }}
       {%- endif %}

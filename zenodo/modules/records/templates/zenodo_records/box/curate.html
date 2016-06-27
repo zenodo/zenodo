@@ -1,0 +1,100 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2016 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+<script type="text/javascript" src="https://code.jquery.com/jquery-2.2.4.min.js"></script>
+<script>
+$(document).ready(function(){
+    $(".btn-accept,.btn-reject,.btn-remove").click(function(){
+        var endpoint = $(this).attr('endpoint');
+        var action = $(this).attr('action');
+        var recid = $(this).attr('recid');
+        var commId = $(this).attr('commId');
+        var data = {recid: recid, action: action};
+        var commIdElem = "#span-comm-" + commId;
+        $.ajax({
+          url: endpoint,
+          method: "post",
+          contentType: "application/json; charset=utf-8",
+          data: JSON.stringify(data),
+          dataType: "json",
+          success: function(result, status, xhr) {
+            $(commIdElem + " > .btn").addClass("disabled");
+            $(commIdElem + " > .btn").prop("disabled", true);
+            if (action == "accept") {
+              $(commIdElem + " > .btn-accept").addClass("btn-success");
+            } else if (action == "reject") {
+              $(commIdElem + " > .btn-reject").addClass("btn-danger");
+            } else if (action == "remove") {
+              $(commIdElem + " > .btn-remove").addClass("btn-danger");
+            }
+          }
+        });
+    });
+});
+</script>
+
+  <dl>
+    <dt>{{_('Community curation')}}:</dt>
+    {% if pending_comms %}
+    <h5><i class="fa fa-legal"></i> <strong>Pending approvals</strong></h5>
+      {% for comm, can_curate in pending_comms %}
+        <dd>
+        {% if can_curate %}
+        <span class="pull-right" id="span-comm-{{ comm.id }}">
+        <button class="btn-accept btn btn-xs"
+                type="button"
+                action="accept"
+                commId="{{ comm.id }}"
+                endpoint="{{url_for('invenio_communities.curate', community_id=comm.id)}}"
+                recid="{{record.recid}}"><i class="fa fa-check"></i> Accept</button>
+        <button class="btn-reject btn btn-xs"
+                type="button"
+                action="reject"
+                commId="{{ comm.id }}"
+                endpoint="{{url_for('invenio_communities.curate', community_id=comm.id)}}"
+                recid="{{record.recid}}"><i class="fa fa-times"></i> Reject</button>
+        </span>
+        {% endif %}
+        {{ comm.title }}
+        </dd>
+      {% endfor %}
+    {% endif %}
+    {% if accepted_comms %}
+      <h5><i class="fa fa-group"></i> <strong>Communities</strong></h5>
+      {% for comm, can_curate in accepted_comms %}
+        <dd>
+        {% if can_curate %}
+        <span class="pull-right" id="span-comm-{{ comm.id }}">
+        <button class="btn-remove btn btn-xs"
+                type="button"
+                action="remove"
+                commId="{{ comm.id }}"
+                endpoint="{{ url_for('invenio_communities.curate', community_id=comm.id) }}"
+                recid="{{ record.recid }}"><i class="fa fa-times"></i> Remove</button>
+        </span>
+        {% endif %}
+        {{ comm.title }}
+        </dd>
+      {% endfor %}
+    {% endif %}
+  </dl>

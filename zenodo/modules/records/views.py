@@ -31,10 +31,14 @@ import copy
 import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
+from flask_principal import ActionNeed
+from werkzeug.utils import import_string
+
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_previewer.proxies import current_previewer
-from werkzeug.utils import import_string
+from invenio_communities.models import InclusionRequest, Community
+from invenio_access.permissions import DynamicPermission
 
 from .models import AccessRight, ObjectType
 from .permissions import has_access
@@ -251,3 +255,41 @@ def records_ui_export(pid, record, template=None):
         return render_template(
             template, pid=pid, record=record,
             data=data, format_title=formats[fmt]['title'])
+
+
+def _can_curate(community, user, record, removal=False):
+    """Determine whether user can curate."""
+    if DynamicPermission(ActionNeed('admin-access')).can():
+        return True
+    if community.id_user == user.id:
+        return True
+    if removal and (user.id in record['owners']):
+        return True
+    return False
+
+
+def pending_communities(record, user):
+    """Generate a list of pending communities with curation permissions."""
+    irs = InclusionRequest.query.filter_by(id_record=record.id).order_by(
+        InclusionRequest.id_community).all()
+    communities = [ir.community for ir in irs]
+    permissions = [_can_curate(c, user, record) for c in communities]
+    return zip(communities, permissions)
+
+
+def accepted_communities(record, user):
+    """Generate a list of accepted communities with curation permissions."""
+    communities = [Community.get(c) for c in record.get('communities')]
+    permissions = [_can_curate(c, user, record, removal=True) for c in
+                   communities]
+    return zip(communities, permissions)
+
+
+def record_communities():
+    """Context processor for community curation for given record."""
+    def community_curation(record, user):
+        pending_comms = pending_communities(record, user)
+        accepted_comms = accepted_communities(record, user)
+        return pending_comms, accepted_comms
+
+    return dict(community_curation=community_curation)
