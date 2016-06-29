@@ -30,7 +30,8 @@ require([
   "node_modules/angular-loading-bar/build/loading-bar",
   "node_modules/invenio-csl-js/dist/invenio-csl-js",
   "js/zenodo/module",
-  ], function($, Clipboard) {
+  "js/zenodo/functions",
+  ], function($, Clipboard, recordCommunityCurate) {
     // On document ready bootstrap angular
     new Clipboard('.btn.clip-button');
   }

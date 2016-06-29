@@ -257,39 +257,47 @@ def records_ui_export(pid, record, template=None):
             data=data, format_title=formats[fmt]['title'])
 
 
-def _can_curate(community, user, record, removal=False):
-    """Determine whether user can curate."""
-    if DynamicPermission(ActionNeed('admin-access')).can():
-        return True
-    if community.id_user == user.id:
-        return True
-    if removal and (user.id in record['owners']):
+def _can_curate(community, user, record, accepted=False):
+    """Determine whether user can curate given community."""
+    if (community.id_user == user.id) or \
+            (accepted and (user.id in record['owners'])):
         return True
     return False
 
 
-def pending_communities(record, user):
-    """Generate a list of pending communities with curation permissions."""
+def community_curation(record, user):
+    """Generate a list of pending and accepted communities with permissions.
+
+    Return a 2-tuple containing two lists, first for 'pending' and second
+    for 'accepted' communities. Each item in both of the list is another
+    2-tuple of (Community, bool), describing community itself,
+    and the permission (bool) to curate it.
+    """
     irs = InclusionRequest.query.filter_by(id_record=record.id).order_by(
         InclusionRequest.id_community).all()
-    communities = [ir.community for ir in irs]
-    permissions = [_can_curate(c, user, record) for c in communities]
-    return zip(communities, permissions)
+    pending = [ir.community for ir in irs]
+    accepted = [Community.get(c) for c in record.get('communities', [])]
+    # Additionally filter out community IDs that did not resolve (None)
+    accepted = [c for c in accepted if c]
 
-
-def accepted_communities(record, user):
-    """Generate a list of accepted communities with curation permissions."""
-    communities = [Community.get(c) for c in record.get('communities')]
-    permissions = [_can_curate(c, user, record, removal=True) for c in
-                   communities]
-    return zip(communities, permissions)
+    # Check for global curation permission (all communites on this record).
+    global_perm = None
+    if user.is_anonymous:
+        global_perm = False
+    elif DynamicPermission(ActionNeed('admin-access')).can():
+        global_perm = True
+    if global_perm:
+        return (zip(pending, [global_perm, ] * len(pending)),
+                zip(accepted, [global_perm, ] * len(accepted)))
+    # Otherwise, determine fine-grained permissions
+    else:
+        pending_perm = [_can_curate(c, user, record) for c in pending]
+        accepted_perm = [_can_curate(c, user, record, accepted=True)
+                         for c in accepted]
+        return (zip(pending, pending_perm),
+                zip(accepted, accepted_perm))
 
 
 def record_communities():
     """Context processor for community curation for given record."""
-    def community_curation(record, user):
-        pending_comms = pending_communities(record, user)
-        accepted_comms = accepted_communities(record, user)
-        return pending_comms, accepted_comms
-
     return dict(community_curation=community_curation)

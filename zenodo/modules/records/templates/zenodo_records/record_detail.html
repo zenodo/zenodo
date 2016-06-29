@@ -114,13 +114,20 @@
     }
   );
 
-  $(function () {
-    $('.preview-link').on('click', function(event) {
-      $('#preview').show();
-      var filename = encodeURIComponent($(event.target).data('filename'));
-      $('#preview-iframe').attr("src","{{ url_for('invenio_records_ui.recid_preview', pid_value=record.recid, filename='') }}" + filename);
-    });
-  });
+  require([
+    "jquery",
+    "js/zenodo/functions",
+    ], function($, recordCommunityCurate) {
+      $(function () {
+        $("#recordCommunityCuration .btn").click(recordCommunityCurate);
+        $('.preview-link').on('click', function(event) {
+          $('#preview').show();
+          var filename = encodeURIComponent($(event.target).data('filename'));
+          $('#preview-iframe').attr("src","{{ url_for('invenio_records_ui.recid_preview', pid_value=record.recid, filename='') }}" + filename);
+        });
+      });
+    }
+  );
 </script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>
 <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
