@@ -20,10 +20,12 @@
 """Test Zenodo deposit workflow."""
 
 from __future__ import absolute_import, print_function
+import pytest
 
 from invenio_communities.models import Community, InclusionRequest
 
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
+from zenodo.modules.deposit.errors import MissingCommunityError
 
 
 def _publish_and_expunge(db, deposit):
@@ -353,3 +355,10 @@ def test_fixed_communities_after_edit(app, db, users, communities, deposit,
 
     app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = list()
     app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = list()
+
+
+def test_nonexisting_communities(app, db, users, communities, deposit,
+                                 deposit_file):
+    """Test adding nonexisting community."""
+    deposit['communities'] = ['nonexisting', ]
+    pytest.raises(MissingCommunityError, _publish_and_expunge, db, deposit)

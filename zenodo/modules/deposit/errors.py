@@ -40,6 +40,16 @@ class MissingFilesError(RESTValidationError):
     ]
 
 
+class MissingCommunityError(RESTValidationError):
+    """Error for invalid community IDs."""
+
+    def __init__(self, community_ids):
+        """Initialize the error with community IDs."""
+        msg = _('Provided community does not exist: ')
+        self.errors = [FieldError('metadata.communities', msg + c_id)
+                       for c_id in community_ids]
+
+
 class MarshmallowErrors(RESTValidationError):
     """Marshmallow validation errors."""
 

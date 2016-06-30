@@ -40,7 +40,7 @@ from invenio_db import db
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.sipstore.api import ZenodoSIP
 
-from .errors import MissingFilesError
+from .errors import MissingFilesError, MissingCommunityError
 
 PRESERVE_FIELDS = (
     '_deposit',
@@ -247,6 +247,11 @@ class ZenodoDeposit(_Deposit):
         super(ZenodoDeposit, self).validate()
         if len(self.files) == 0:
             raise MissingFilesError()
+        if 'communities' in self:
+            missing = [c for c in self['communities']
+                       if Community.get(c) is None]
+            if missing:
+                raise MissingCommunityError(missing)
 
     def publish(self, pid=None, id_=None):
         """Publish the Zenodo deposit."""
