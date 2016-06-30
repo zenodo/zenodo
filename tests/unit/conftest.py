@@ -98,8 +98,6 @@ def default_config():
         MAIL_SUPPRESS_SEND=True,
         LOGIN_DISABLED=False,
         DEPOSIT_DATACITE_MINTING_ENABLED=False,
-        ZENODO_COMMUNITIES_AUTO_REQUEST=list(),
-        ZENODO_COMMUNITIES_ADD_IF_GRANTS=list(),
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
@@ -115,6 +113,14 @@ def app(env_config, default_config):
 
     with app.app_context():
         yield app
+
+
+@pytest.yield_fixture()
+def communities_autoadd_enabled(app):
+    """Temporarily enable auto-adding and auto-requesting of communities."""
+    app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = True
+    yield app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']
+    app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = False
 
 
 @pytest.yield_fixture(scope='session')

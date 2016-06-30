@@ -1,0 +1,14 @@
+[
+  {
+      "ranking": 10000,
+      "curation_policy": "See https://zenodo.org/policies",
+      "id": "zenodo",
+      "title": "Zenodo"
+  },
+  {
+      "ranking": 20000,
+      "curation_policy": "Uploads must have been fully or partially funded by the European Commission.",
+      "id": "ecfunded",
+      "title": "European Commission Funded Research (OpenAIRE)"
+  }
+]

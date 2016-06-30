@@ -167,6 +167,22 @@ class ZenodoDeposit(_Deposit):
         return [c for c in comms if Community.get(c).id_user in
                 self['_deposit']['owners']]
 
+    def _get_auto_requested(self):
+        """Get communities which are to be auto-requested to each record."""
+        if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
+            return []
+        return current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST']
+
+    def _get_auto_added(self):
+        """Get communities which are to be auto added to each record."""
+        if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
+            return []
+        grant_comms = []
+        if self.get('grants'):
+            grant_comms = current_app.config[
+                'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
+        return grant_comms
+
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
         # pop the 'communities' entry so they aren't added to the Record
@@ -178,21 +194,20 @@ class ZenodoDeposit(_Deposit):
         # Communities for which the InclusionRequest should be made
         requested_comms = set(dep_comms) - owned_comms
 
-        grant_comms = []
-        if self.get('grants'):
-            grant_comms = current_app.config[
-                'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
-        auto_request = current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST']
+        auto_added = self._get_auto_added()
+
+        # Communities which are to be auto-requested to each published record
+        auto_request = self._get_auto_requested()
 
         # Add the owned communities to the record
-        self._autoadd_communities(owned_comms | set(grant_comms), self)
+        self._autoadd_communities(owned_comms | set(auto_added), self)
 
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
         self._create_inclusion_requests(requested_comms | set(auto_request),
                                         record)
 
         # Push the communities back (if any) so they appear in deposit
-        self['communities'] = sorted(dep_comms + grant_comms + auto_request)
+        self['communities'] = sorted(dep_comms + auto_added + auto_request)
         if not self['communities']:  # No key rather than empty list
             del self['communities']
         return record
@@ -217,11 +232,10 @@ class ZenodoDeposit(_Deposit):
 
         self._remove_accepted_communities(removals, record)
 
-        grant_comms = []
-        if self.get('grants'):
-            grant_comms = current_app.config[
-                'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
-        self._autoadd_communities(new_owned_comms | set(grant_comms), record)
+        # Communities which are to be added to every published record
+        auto_added = self._get_auto_added()
+
+        self._autoadd_communities(new_owned_comms | set(auto_added), record)
         self._create_inclusion_requests(new_ir_comms, record)
 
         # Remove obsolete InclusionRequests
@@ -229,10 +243,10 @@ class ZenodoDeposit(_Deposit):
 
         # Communities, which should be in record after publishing:
         new_rec_comms = ((set(dep_comms) & set(rec_comms)) |
-                         new_owned_comms | set(grant_comms))
+                         new_owned_comms | set(auto_added))
         record = super(ZenodoDeposit, self)._publish_edited()
 
-        self['communities'] = sorted(self.get('communities', []) + grant_comms)
+        self['communities'] = sorted(self.get('communities', []) + auto_added)
         if not self['communities']:
             del self['communities']
 

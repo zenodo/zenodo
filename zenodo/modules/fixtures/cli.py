@@ -31,6 +31,7 @@ from os.path import dirname, join
 
 import click
 from flask_cli import with_appcontext
+from sqlalchemy.orm.exc import NoResultFound
 from invenio_communities.utils import initialize_communities_bucket
 
 from .files import loaddemofiles, loadlocation
@@ -39,6 +40,7 @@ from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .pages import loadpages
 from .records import loaddemorecords
+from .communities import loadcommunities
 
 
 @click.group()
@@ -133,3 +135,14 @@ def loadlicenses_cli():
 def matchlicenses_cli(legacy_source, od_source, destination):
     """Match legacy Zenodo licenses with OpenDefinition.org licenses."""
     matchlicenses(legacy_source, od_source, destination)
+
+
+@fixtures.command('loadcommunities')
+@click.argument('owner_email')
+@with_appcontext
+def loadcommunities_cli(owner_email):
+    """Load Zenodo communities."""
+    try:
+        loadcommunities(owner_email)
+    except NoResultFound:
+        click.echo("Error: Provided owner email does not exist.")

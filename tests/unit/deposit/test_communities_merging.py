@@ -305,11 +305,9 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
     assert ir2.id_record == record.id
 
 
-def test_fixed_communities(app, db, users, communities, deposit, deposit_file):
+def test_fixed_communities(app, db, users, communities, deposit, deposit_file,
+                           communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
-
-    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = ['zenodo', ]
-    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = ['ecfunded', ]
 
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
     # 'c3' is owned by one of the deposit owner
@@ -323,20 +321,13 @@ def test_fixed_communities(app, db, users, communities, deposit, deposit_file):
     assert ir.id_community == 'zenodo'
     assert ir.id_record == record.id
 
-    # FIXME: Since app is yielded, those two variables have to be unset.
-    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = list()
-    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = list()
 
-
-def test_fixed_communities_after_edit(app, db, users, communities, deposit,
-                                      deposit_file):
+def test_fixed_communities_edit(app, db, users, communities, deposit,
+                                deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
     Add to ecfunded also after later addition of grant information.
     """
-
-    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = ['zenodo', ]
-    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = ['ecfunded', ]
 
     deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
@@ -352,9 +343,6 @@ def test_fixed_communities_after_edit(app, db, users, communities, deposit,
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['ecfunded', 'zenodo', ]
     assert record['communities'] == ['ecfunded', ]
-
-    app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'] = list()
-    app.config['ZENODO_COMMUNITIES_ADD_IF_GRANTS'] = list()
 
 
 def test_nonexisting_communities(app, db, users, communities, deposit,

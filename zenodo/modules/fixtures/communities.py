@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,20 +22,29 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Records."""
+"""Zenodo communities fixture loading."""
 
 from __future__ import absolute_import, print_function
 
-from flask_babelex import gettext
-from speaklater import make_lazy_gettext
 
-_ = make_lazy_gettext(lambda: gettext)
+from invenio_db import db
+from invenio_accounts.models import User
+from invenio_communities.models import Community
 
-ZENODO_COMMUNITIES_AUTO_ENABLED = False
-"""Automatically add and request to communities upon publishing."""
+from .utils import read_json
 
-ZENODO_COMMUNITIES_AUTO_REQUEST = ['zenodo', ]
-"""Communities which are to be auto-requested upon first publishing."""
 
-ZENODO_COMMUNITIES_ADD_IF_GRANTS = ['ecfunded', ]
-"""Communities which are to be auto-added if it contains grant information."""
+def loadcommunities(owner_email):
+    """Load the Zenodo communities fixture.
+
+    Create extra PID if license is to be mapped and already exists, otherwise
+    create a new license record and a PID.
+    """
+    data = read_json('data/communities.json')
+    owner = User.query.filter_by(email=owner_email).one()
+
+    for comm_data in data:
+        community_id = comm_data.pop('id')
+        user_id = owner.id
+        Community.create(community_id, user_id, **comm_data)
+    db.session.commit()
