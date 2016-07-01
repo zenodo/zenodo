@@ -19,6 +19,13 @@
 
 {%- extends "invenio-apache-vhost.tpl" -%}
 
+{%- block logging %}
+        ErrorLog {{ config.CFG_LOGDIR }}/apache{{ log_suffix }}.err
+        LogLevel warn
+        LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\" %D" combined_with_timing
+        CustomLog {{ config.CFG_LOGDIR }}/apache{{ log_suffix }}.log combined_with_timing
+{%- endblock logging -%}
+
 {%- block aliases %}
         DirectoryIndex index.en.html index.html
         # Auto-generated aliasses
