@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from datetime import date
+from datetime import datetime
 
 from invenio_records.api import Record
 
@@ -36,7 +36,7 @@ from zenodo.modules.records.serializers import csl_v1
 def test_minimal(app, minimal_record, recid_pid):
     """Test minimal record."""
     obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
-    d = date.today()
+    d = datetime.utcnow().date()
     assert obj == {
         'id': '123',
         'type': 'dataset',

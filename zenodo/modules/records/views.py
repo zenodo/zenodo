@@ -32,16 +32,15 @@ import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
 from flask_principal import ActionNeed
-from werkzeug.utils import import_string
-
+from invenio_access.permissions import DynamicPermission
+from invenio_communities.models import Community, InclusionRequest
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_previewer.proxies import current_previewer
-from invenio_communities.models import InclusionRequest, Community
-from invenio_access.permissions import DynamicPermission
+from werkzeug.utils import import_string
 
 from .models import AccessRight, ObjectType
-from .permissions import has_access
+from .permissions import has_read_permission
 from .serializers import citeproc_v1
 
 blueprint = Blueprint(
@@ -123,7 +122,7 @@ def accessright_description(value, embargo_date=None):
 @blueprint.app_template_filter()
 def has_access_to(user, record):
     """Check whether the user has access to the record."""
-    return has_access(user, record)
+    return has_read_permission(user, record)
 
 
 #

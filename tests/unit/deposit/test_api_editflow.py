@@ -198,7 +198,7 @@ def test_edit_flow(datacite_mock, api_client, db, es, location,
     # - files should no longer be downloadable (closed access)
     # - download_url worked before edit, so make sure it doesn't work now.
     assert len(postedit_data['files']) == 0
-    assert client.get(download_url).status_code == 401
+    assert client.get(download_url).status_code == 404
 
     # - c3 was removed, so only c1 one should be visible now
     assert postedit_data['metadata']['communities'] == [

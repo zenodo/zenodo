@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -91,8 +91,8 @@ install_requires = [
     'Flask-Admin>=1.4.2',
     'Flask-BabelEx>=0.9.2',
     'Flask-Cache>=0.13.1',
-    'Flask-CLI>=0.4.0',
     'Flask-Debugtoolbar>=0.10.0',
+    'Flask-Konch>=1.1.0',
     'Flask>=0.11.1',
     'idutils>=0.2.0',
     'invenio-access>=1.0.0a6',
@@ -246,8 +246,6 @@ setup(
         'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3',
-        'Programming Language :: Python :: 3.3',
-        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Development Status :: 3 - Alpha',
     ],

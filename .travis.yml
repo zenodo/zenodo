@@ -52,7 +52,6 @@ env:
   - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db" ES_VERSION=2.2.0
   - REQUIREMENTS=prod E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_VERSION=2.2.0
 
-
 python:
   - "2.7"
   - "3.5"
@@ -61,7 +60,7 @@ before_install:
   - "mkdir /tmp/elasticsearch"
   - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/elasticsearch &"
-  - "travis_retry pip install --upgrade pip setuptools py"
+  - "travis_retry pip install --upgrade pip setuptools py 'sphinx==1.4.4'"
   - "travis_retry pip install wheel coveralls requirements-builder"
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-prod-requirements.txt"

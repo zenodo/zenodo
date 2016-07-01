@@ -26,8 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
-from flask_security import current_user
 from functools import wraps
+
+from flask_security import current_user
+
 from .proxies import current_cache as cache
 
 

@@ -31,7 +31,7 @@ uses:
     - flask
 autodetect: yes
 requirements:
-    - requirements.devel.txt
+    - requirements.txt
 ignore-paths:
     - docs
 python-targets:

@@ -24,27 +24,22 @@
 
 from __future__ import absolute_import, print_function
 
-import uuid
-
 import pytest
 from flask import url_for
 from flask_principal import ActionNeed
 from invenio_access.models import ActionUsers
 from invenio_accounts.models import User
-from invenio_pidstore.models import PersistentIdentifier, PIDStatus
-from invenio_records import Record
-from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.records.models import AccessRight
 
 
 @pytest.mark.parametrize('user,access_right,expected', [
     (None, AccessRight.OPEN, 200),
-    (None, AccessRight.EMBARGOED, 401),
-    (None, AccessRight.CLOSED, 401),
+    (None, AccessRight.EMBARGOED, 404),
+    (None, AccessRight.CLOSED, 404),
     ('auth', AccessRight.OPEN, 200),
-    ('auth', AccessRight.EMBARGOED, 403),
-    ('auth', AccessRight.CLOSED, 403),
+    ('auth', AccessRight.EMBARGOED, 404),
+    ('auth', AccessRight.CLOSED, 404),
     ('owner', AccessRight.OPEN, 200),
     ('owner', AccessRight.EMBARGOED, 200),
     ('owner', AccessRight.CLOSED, 200),
@@ -52,9 +47,11 @@ from zenodo.modules.records.models import AccessRight
     ('admin', AccessRight.EMBARGOED, 200),
     ('admin', AccessRight.CLOSED, 200),
 ])
-def test_file_permissions(app, db, test_object,  # fixtures
+def test_file_permissions(app, db, record_with_files_creation,
                           user, access_right, expected):
     """Test file permissions."""
+    pid, record, record_url = record_with_files_creation
+
     # Create test users
     admin = User(email='admin@zenodo.org', password='123456')
     owner = User(email='owner@zenodo.org', password='123456')
@@ -63,40 +60,19 @@ def test_file_permissions(app, db, test_object,  # fixtures
     db.session.add(
         ActionUsers.allow(ActionNeed('admin-access'), user=admin)
     )
+    db.session.commit()
 
     # Create test record
-    rec_uuid = uuid.uuid4()
-    PersistentIdentifier.create(
-        'recid',
-        '1',
-        object_type='rec',
-        object_uuid=rec_uuid,
-        status=PIDStatus.REGISTERED
-    )
-    Record.create({
-        'recid': 1,
-        'owners': [2],
-        'access_right': access_right,
-        '_files': [
-            {
-                'key': test_object.key,
-                'bucket': str(test_object.bucket_id),
-                'checksum': 'invalid'
-            },
-        ]
-    }, id_=rec_uuid)
-    db.session.add(
-        RecordsBuckets(record_id=rec_uuid, bucket_id=test_object.bucket_id)
-    )
+    record['access_right'] = access_right
+    record['owners'] = [owner.id]
+    record.commit()
+    db.session.commit()
 
     file_url = url_for(
         'invenio_records_ui.recid_files',
-        pid_value='1',
-        filename=test_object.key
+        pid_value=pid.pid_value,
+        filename='Test.pdf',
     )
-
-    db.session.commit()
-
     with app.test_client() as client:
         if user:
             # Login as user

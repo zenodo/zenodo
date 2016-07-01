@@ -26,7 +26,7 @@
 -r requirements.pinned.txt
 
 # Development requirement
-git+https://github.com/inveniosoftware/invenio-files-rest.git@5243826da9183ce3a5841c6d7b45a8fe95c3c57e#egg=invenio-files-rest
+git+https://github.com/inveniosoftware/invenio-files-rest.git@75bfbb59ebac5576123cbf827a187b21e39098a7#egg=invenio-files-rest
 git+https://github.com/zenodo/zenodo-migrationkit.git@8f4e06b6a0f8e8625157f4569dc2c6ff8651119e#egg=zenodo-migrationkit
 
 # Production requirements
@@ -71,10 +71,10 @@ Flask-BabelEx==0.9.3
 Flask-Breadcrumbs==0.3.0
 Flask-Cache==0.13.1
 Flask-CeleryExt==0.2.0
-Flask-CLI==0.4.0
 Flask-Collect==1.2.2
 Flask-Cors==2.1.2
 Flask-DebugToolbar==0.10.0
+Flask-Konch==1.1.0
 Flask-KVSession==0.6.2
 Flask-Limiter==0.9.3
 Flask-Login==0.3.2
@@ -149,6 +149,7 @@ jsonresolver==0.2.1
 jsonschema==2.5.1
 jupyter-core==4.1.0
 kombu==3.0.35
+Konch==2.0.0
 limits==1.1.1
 lxml==3.6.0
 MarkupSafe==0.23

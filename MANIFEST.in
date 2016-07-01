@@ -34,6 +34,7 @@ include LICENSE
 include pytest.ini
 include zenodo/modules/theme/static/img/LICENSE
 recursive-include .tx *
+recursive-include benchmarks *.py
 recursive-include docker *
 recursive-include docker *.yml
 recursive-include docs *.bat

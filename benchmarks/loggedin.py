@@ -26,9 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from locust import HttpLocust
-
 from anonymous import AnonymousWebsiteTasks
+from locust import HttpLocust
 
 
 class LoggedInWebsiteTasks(AnonymousWebsiteTasks):

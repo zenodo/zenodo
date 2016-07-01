@@ -448,7 +448,7 @@ ZENODO_RECORDS_UI_LINKS_FORMAT = "https://zenodo.org/record/{recid}"
 
 #: Files REST permission factory
 FILES_REST_PERMISSION_FACTORY = \
-    'zenodo.modules.records.permissions:RESTFilePermissionFactory'
+    'zenodo.modules.records.permissions:files_permission_factory'
 
 #: Records REST API endpoints.
 RECORDS_REST_ENDPOINTS = dict(

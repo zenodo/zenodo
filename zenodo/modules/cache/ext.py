@@ -53,5 +53,5 @@ class ZenodoCache(object):
         self.app.jinja_options = dict(
             self.app.jinja_options,
             auto_reload=False,
-            cache_size=-1,
+            cache_size=1000,
             bytecode_cache=RedisBytecodeCache(self.app, self.cache))
