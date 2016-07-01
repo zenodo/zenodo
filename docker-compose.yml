@@ -11,8 +11,8 @@ frontend:
 web:
   build: .
   restart: "always"
-  command: zenodo run -h 0.0.0.0 -p 5000
-  #command: gunicorn zenodo.wsgi --workers 1 -b 0.0.0.0:5000
+  command: uwsgi /code/zenodo/docker/uwsgi/uwsgi.ini
+  # command: zenodo --debug run -h 0.0.0.0 -p 5000
   ports:
     - "5000:5000"
   environment:
@@ -108,9 +108,11 @@ es:
 static:
   restart: "no"
   build: .
-  command: /bin/true
+  command: tail -f /var/log/*
   user: zenodo
   volumes:
+    - "/usr/local/lib/python3.5/site-packages"
+    - "/usr/local/src"
     - "/usr/local/var/instance/static"
     - "/usr/local/var/data"
     - ".:/code/zenodo"
