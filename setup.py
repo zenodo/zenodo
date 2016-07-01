@@ -98,7 +98,7 @@ install_requires = [
     'invenio-accounts>=1.0.0a10',
     'invenio-admin>=1.0.0a3',
     'invenio-assets>=1.0.0a4',
-    'invenio-base>=1.0.0a11',
+    'invenio-base>=1.0.0a12',
     'invenio-celery>=1.0.0a4',
     'invenio-communities>=1.0.0a9',
     'invenio-config>=1.0.0a1',
@@ -139,7 +139,7 @@ install_requires = [
     'python-slugify>=1.2.0',
     'raven<=5.1.0',
     'wsgi-statsd>=0.3.1',
-    'zenodo-accessrequests>=1.0.0.dev20150000',
+    'zenodo-accessrequests>=1.0.0a1',
 ]
 
 packages = find_packages()

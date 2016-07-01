@@ -46,16 +46,15 @@ Next, create a virtual environment (using
     $ mkvirtualenv zenodo
     (zenodo)$
 
-Zenodo works on both on Python 2.7 and 3.3+. However in case you need to use
+Zenodo works on both on Python 2.7 and 3.5+. However in case you need to use
 the XRootD storage interface, you will need Python 2.7 as the underlying
-libraries don't support Python 3.3+ yet.
+libraries don't support Python 3.5+ yet.
 
 Next, install Invenio extensions and Zenodo itself:
 
 .. code-block:: console
 
-    (zenodo)$ pip install -r requirements.developer.txt \
-    --src ~/src/ --pre --exists-action i
+    (zenodo)$ pip install -r requirements.txt --src ~/src/ --pre --exists-action i
     (zenodo)$ pip install -e .[all,postgresql]
 
 Above command will checkout development versions of certain Invenio extensions
