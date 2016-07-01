@@ -24,7 +24,8 @@ RUN apt-get update \
     && find /usr/share/doc -depth -type f ! -name copyright -delete
 
 # Basic Python and Node.js tools
-RUN pip install --upgrade pip setuptools ipython gunicorn \
+RUN pip install --upgrade pip setuptools ipython \
+    && pip install uwsgi \
     && npm update \
     && npm install --silent -g node-sass clean-css uglify-js requirejs
 
@@ -61,6 +62,11 @@ RUN adduser --uid 1000 --disabled-password --gecos '' zenodo \
     && chown -R zenodo:zenodo /code ${APP_INSTANCE_PATH}
 
 COPY ./docker/docker-entrypoint.sh /
+
+RUN mkdir -p /usr/local/var/data && \
+    chown zenodo:zenodo /usr/local/var/data -R && \
+    mkdir -p /var/log/zenodo && \
+    chown zenodo:zenodo /var/log/zenodo -R
 
 USER zenodo
 RUN echo "export PATH=${PATH}:/usr/local/bin >> ~/.bashrc"
