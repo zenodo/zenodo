@@ -30,6 +30,7 @@ from flask import Blueprint, render_template
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
 
+from ...modules.cache.pages import cached
 from .api import FrontpageRecordsSearch
 
 blueprint = Blueprint(
@@ -58,6 +59,7 @@ def init_menu():
 
 
 @blueprint.route('/')
+@cached(timeout=600, key_prefix='frontpage')
 def index():
     """Frontpage blueprint."""
     return render_template(

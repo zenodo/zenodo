@@ -140,6 +140,7 @@ install_requires = [
     'raven<=5.1.0',
     'wsgi-statsd>=0.3.1',
     'zenodo-accessrequests>=1.0.0.dev20150000',
+    'Flask-Cache>=0.13.1',
 ]
 
 packages = find_packages()
@@ -170,7 +171,8 @@ setup(
             'zenodo = zenodo.cli:cli',
         ],
         'invenio_base.apps': [
-            'zenodo_fixtures = zenodo.modules.fixtures:ZenodoFixtures',
+            'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
+            'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
