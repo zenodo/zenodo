@@ -40,8 +40,8 @@ from zenodo.modules.records.models import AccessRight
 
 @pytest.mark.parametrize('user,access_right,expected', [
     (None, AccessRight.OPEN, 200),
-    (None, AccessRight.EMBARGOED, 401),
-    (None, AccessRight.CLOSED, 401),
+    (None, AccessRight.EMBARGOED, 403),
+    (None, AccessRight.CLOSED, 403),
     ('auth', AccessRight.OPEN, 200),
     ('auth', AccessRight.EMBARGOED, 403),
     ('auth', AccessRight.CLOSED, 403),

@@ -39,6 +39,10 @@ from invenio_i18n.ext import current_i18n
 from invenio_previewer.proxies import current_previewer
 from invenio_communities.models import InclusionRequest, Community
 from invenio_access.permissions import DynamicPermission
+from flask_security import current_user
+from invenio_files_rest.views import \
+    file_download_ui as files_rest_file_download_ui
+from invenio_files_rest.errors import InvalidOperationError
 
 from .models import AccessRight, ObjectType
 from .permissions import has_access
@@ -301,3 +305,10 @@ def community_curation(record, user):
 def record_communities():
     """Context processor for community curation for given record."""
     return dict(community_curation=community_curation)
+
+
+def file_download_ui(pid, record, **kwargs):
+    """Invenio-Files-Rest record file factory with permission check."""
+    if not has_access(current_user, record):
+        raise InvalidOperationError()
+    return files_rest_file_download_ui(pid, record, **kwargs)
