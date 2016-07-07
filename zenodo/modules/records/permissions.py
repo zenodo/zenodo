@@ -33,7 +33,7 @@ from invenio_access import DynamicPermission
 from invenio_records_files.models import RecordsBuckets
 from zenodo_accessrequests.models import SecretLink
 
-from zenodo.modules.records.fetchers import zenodo_record_fetcher
+from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
 from zenodo.modules.records.models import AccessRight
 
 
@@ -47,8 +47,17 @@ class RESTFilePermissionFactory(object):
 
     def can(self):
         """Check if the current user has permission to access file."""
+        if isinstance(self.bucket, Bucket):
+            bucket_id = str(self.bucket.id)
+        elif isinstance(self.bucket, ObjectVersion):
+            bucket_id = str(self.bucket.bucket_id)
+        elif isinstance(self.bucket, MultipartObject):
+            bucket_id = str(self.bucket.bucket_id)
+        else:
+            raise RuntimeError('Unknown object')
+
         rb = RecordsBuckets.query.filter_by(
-            bucket_id=self.bucket.id).one_or_none()
+            bucket_id=bucket_id).one_or_none()
         if rb is not None:
             return has_access(current_user, rb.record.json)
         return True
