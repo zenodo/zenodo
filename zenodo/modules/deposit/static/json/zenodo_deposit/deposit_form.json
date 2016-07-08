@@ -211,13 +211,14 @@
         "items": [
           {
             "key": "creators[].name",
-            "title": "",
-            "placeholder": "Full name"
+            "placeholder": "Full name",
+            "notitle": true
           },
           {
             "key": "creators[].affliation",
             "title": "",
-            "placeholder": "Affliation"
+            "placeholder": "Affliation",
+            "notitle": true
           }
         ],
         "minItems": 1

@@ -256,6 +256,16 @@ DEPOSIT_REST_ENDPOINTS = dict(
     ),
 )
 
+#: Endpoints for depositions
+DEPOSIT_RECORDS_UI_ENDPOINTS = dict(
+    depid=dict(
+        pid_type='depid',
+        route='/deposit/<pid_value>',
+        template='zenodo_deposit/edit.html',
+        record_class='invenio_deposit.api:Deposit',
+    ),
+)
+
 # SIPStore
 # ========
 #: Default JSON schema for the SIP agent

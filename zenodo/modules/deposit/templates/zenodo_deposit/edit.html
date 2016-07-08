@@ -30,15 +30,8 @@
 {%- endblock css %}
 
 {%- block javascript %}
+  {% assets "invenio_deposit_dependencies_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
   {% assets "invenio_deposit_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-  <script type="text/javascript">
-    angular.element(document).ready(function() {
-        angular.bootstrap(
-          document.getElementById("invenio-records"),
-          ['invenioFiles', 'invenioRecords', 'schemaForm']
-        );
-    });
-  </script>
 {%- endblock javascript %}
 
 {%- block page_body %}
@@ -73,13 +66,12 @@
           </invenio-records>
           <invenio-files-uploader
             method="PUT"
-            endpoint="/api/files"
             {% if pid %}
-              action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
+              initialization="{{ config.DEPOSIT_RECORDS_API.format(pid_value=pid.pid_value) }}"
             {% else %}
-              initialization="{{ config.DEPOSIT_SEARCH_API }}"
+              bucket="http://localhost:5000/api/files/d1608600-4476-464e-b943-b2ff440f19de"
             {% endif %}
-            extra-params='{"headers":{"Content-Type": "application/json"}}'
+            extra-params='{"resumeChunkSize": 9000000}'
           >
             <invenio-files-upload-zone
               template="{{ url_for('static', filename='node_modules/invenio-files-js/dist/templates/upload.html') }}">
