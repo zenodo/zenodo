@@ -100,11 +100,17 @@ above to work.
 
 Demo records
 ~~~~~~~~~~~~
-You can now load the demo records:
+You can now load the demo records (licenses, funders, grants, records):
 
 .. code-block:: console
 
    (zenodo)$ celery worker -A zenodo.celery -l INFO --purge
+   (zenodo)$ zenodo opendefinition loadlicenses
+   (zenodo)$ zenodo fixtures loadlicenses
+   (zenodo)$ zenodo openaire loadfunders \
+    --source=~/src/invenio-openaire/invenio_openaire/data/fundref_registry.rdf
+   (zenodo)$ zenodo fixtures loadfp6grants
+   (zenodo)$ zenodo openaire loadgrants --setspec=FP7Projects
    (zenodo)$ zenodo fixtures loaddemorecords
    (zenodo)$ zenodo migration recordsrun
    (zenodo)$ zenodo migration reindex recid
