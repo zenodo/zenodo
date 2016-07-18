@@ -40,7 +40,7 @@ WORKDIR /code/zenodo
 # Copy and install requirements. Faster build utilizing the Docker cache.
 COPY requirements*.txt /code/zenodo/
 RUN mkdir -p /usr/local/src/ \
-    && pip install -r requirements.developer.txt --src /usr/local/src
+    && pip install -r requirements.txt --src /usr/local/src
 
 # Copy source code
 COPY . /code/zenodo/
