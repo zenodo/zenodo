@@ -151,13 +151,6 @@ requirements files which broadly falls in two categories:
    with packages that cannot be upgraded to their latest version due
    to either problems in Zenodo or problems in the related packages.
  - ``requirements.txt``: Base requirements for all installations (includes all above requirements files as well).
- - ``requirements.devel.txt``: Requirements for development versions of dependent packages.
-
-**Zenodo developer requirements:**
-
- - ``requirements.developer.txt``: Requirements for quickly installing all of
-   Zenodo requirements as well as development dependencies for e.g. running
-   tests.
 
 .. _updateing_requirements:
 

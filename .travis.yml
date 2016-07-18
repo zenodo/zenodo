@@ -64,7 +64,7 @@ before_install:
   - "travis_retry pip install wheel coveralls requirements-builder"
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-prod-requirements.txt"
-  - "requirements-builder --level=dev --req requirements.devel.txt setup.py > .travis-latest-requirements.txt"
+  - "requirements-builder --level=pypi setup.py > .travis-latest-requirements.txt"
 
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt --pre"
