@@ -126,6 +126,8 @@ CACHE_REDIS_URL = "redis://{0}:{1}/{2}".format(
 CACHE_TYPE = "redis"
 #: Default cache URL for sessions.
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
+#: Cache for storing access restrictions
+ACCESS_CACHE = 'zenodo.modules.cache:current_cache'
 
 # CSL Citation Formatter
 # ======================

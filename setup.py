@@ -181,6 +181,7 @@ setup(
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
         ],
         'invenio_base.api_apps': [
+            'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
