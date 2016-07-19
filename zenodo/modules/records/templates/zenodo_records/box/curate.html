@@ -22,12 +22,10 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
   <dl id="recordCommunityCuration">
-    <dt>{{_('Community curation')}}:</dt>
     {%- if pending_comms %}
     <h5><i class="fa fa-legal"></i> <strong>Pending approvals</strong></h5>
-      {%- for comm, can_curate in pending_comms %}
+      {%- for comm in pending_comms %}
         <dd>
-        {%- if can_curate %}
         <span class="pull-right" id="span-comm-{{ comm.id }}">
         <button class="btn-accept btn btn-xs btn-info"
                 type="button"
@@ -42,16 +40,14 @@
                 endpoint="{{url_for('invenio_communities.curate', community_id=comm.id)}}"
                 recid="{{record.recid}}"><i class="fa fa-times"></i> Reject</button>
         </span>
-        {%- endif %}
         {{ comm.title }}
         </dd>
       {%- endfor %}
     {%- endif %}
     {%- if accepted_comms %}
       <h5><i class="fa fa-group"></i> <strong>Communities</strong></h5>
-      {%- for comm, can_curate in accepted_comms %}
+      {%- for comm in accepted_comms %}
         <dd>
-        {%- if can_curate %}
         <span class="pull-right" id="span-comm-{{ comm.id }}">
         <button class="btn-remove btn btn-xs btn-info"
                 type="button"
@@ -60,7 +56,6 @@
                 endpoint="{{ url_for('invenio_communities.curate', community_id=comm.id) }}"
                 recid="{{ record.recid }}"><i class="fa fa-times"></i> Remove</button>
         </span>
-        {%- endif %}
         {{ comm.title }}
         </dd>
       {%- endfor %}

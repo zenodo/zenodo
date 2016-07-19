@@ -258,8 +258,8 @@ def records_ui_export(pid, record, template=None):
 
 def _can_curate(community, user, record, accepted=False):
     """Determine whether user can curate given community."""
-    if (community.id_user == user.id) or \
-            (accepted and (user.id in record['owners'])):
+    if (community.id_user == user.get_id()) or \
+            (accepted and (user.get_id() in record.get('owners', []))):
         return True
     return False
 
@@ -285,16 +285,15 @@ def community_curation(record, user):
         global_perm = False
     elif DynamicPermission(ActionNeed('admin-access')).can():
         global_perm = True
+
     if global_perm:
-        return (zip(pending, [global_perm, ] * len(pending)),
-                zip(accepted, [global_perm, ] * len(accepted)))
-    # Otherwise, determine fine-grained permissions
+        return (pending, accepted)
     else:
-        pending_perm = [_can_curate(c, user, record) for c in pending]
-        accepted_perm = [_can_curate(c, user, record, accepted=True)
-                         for c in accepted]
-        return (zip(pending, pending_perm),
-                zip(accepted, accepted_perm))
+        return (
+            [c for c in pending if _can_curate(c, user, record)],
+            [c for c in accepted
+             if _can_curate(c, user, record, accepted=True)]
+        )
 
 
 def record_communities():
