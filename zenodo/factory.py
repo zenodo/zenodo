@@ -36,6 +36,8 @@ from statsd import StatsClient
 from werkzeug.contrib.fixers import HeaderRewriterFix
 from wsgi_statsd import StatsdTimingMiddleware
 
+from zenodo.modules.cache.bccache import RedisBytecodeCache
+
 from . import config
 
 env_prefix = 'APP'
@@ -62,6 +64,11 @@ using the environment variable ``APP_STATIC_FOLDER``
 def conf_loader(app, **kwargs_config):
     """Zenodo conf loader."""
     app.url_map.strict_slahes = False  # Legacy support
+    app.jinja_options = dict(
+        app.jinja_options,
+        cache_size=1000,
+        bytecode_cache=RedisBytecodeCache(app)
+    )
     invenio_conf_loader(app, **kwargs_config)
 
 

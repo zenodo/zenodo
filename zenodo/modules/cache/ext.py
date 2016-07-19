@@ -28,8 +28,6 @@ from __future__ import absolute_import, print_function
 
 from flask.ext.cache import Cache
 
-from .bccache import RedisBytecodeCache
-
 
 class ZenodoCache(object):
     """Zenodo cache extension."""
@@ -43,15 +41,4 @@ class ZenodoCache(object):
         """Flask application initialization."""
         self.cache = Cache(app)
         self.app = app
-        self.enable_jinja_cache()
         app.extensions['zenodo-cache'] = self
-
-    def enable_jinja_cache(self):
-        """Enable Jinja cache."""
-        self.app.jinja_env.bytecode_cache = RedisBytecodeCache(
-            self.app, self.cache)
-        self.app.jinja_options = dict(
-            self.app.jinja_options,
-            auto_reload=False,
-            cache_size=1000,
-            bytecode_cache=RedisBytecodeCache(self.app, self.cache))
