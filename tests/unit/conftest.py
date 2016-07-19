@@ -573,8 +573,8 @@ def license_record(db):
 
 
 @pytest.fixture()
-def deposit(app, es, users, location):
-    """New deposit with files."""
+def deposit_metadata():
+    """Raw metadata of deposit."""
     data = dict(
         title='Test title',
         creators=[
@@ -586,12 +586,18 @@ def deposit(app, es, users, location):
         publication_date='2013-05-08',
         access_right='open'
     )
+    return data
+
+
+@pytest.fixture()
+def deposit(app, es, users, location, deposit_metadata):
+    """New deposit with files."""
     with app.test_request_context():
         datastore = app.extensions['security'].datastore
         login_user(datastore.get_user(users[0]['email']))
         id_ = uuid4()
-        zenodo_deposit_minter(id_, data)
-        deposit = Deposit.create(data, id_=id_)
+        zenodo_deposit_minter(id_, deposit_metadata)
+        deposit = Deposit.create(deposit_metadata, id_=id_)
         db_.session.commit()
     current_search.flush_and_refresh(index='deposits')
     return deposit
