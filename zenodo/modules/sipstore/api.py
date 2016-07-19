@@ -47,12 +47,13 @@ class ZenodoSIP(object):
         agent = dict()
         if has_request_context() and request.remote_addr:
             agent['ip_address'] = request.remote_addr
-        if current_user.is_authenticated and current_user.email:
-            agent['email'] = current_user.email
+            if current_user.is_authenticated and current_user.email:
+                agent['email'] = current_user.email
         return agent
 
     @classmethod
-    def create(cls, pid, record, create_sip_files=True):
+    def create(cls, pid, record, create_sip_files=True, user_id=None,
+               agent=None):
         """Create a Zenodo SIP, from the PID and the Record.
 
         Apart from the SIP itself, it also creates ``RecordSIP`` for the
@@ -69,8 +70,12 @@ class ZenodoSIP(object):
         :returns: A Zenodo-specifi SIP object.
         :rtype: ``invenio_sipstore.models.SIP``
         """
-        user_id = None if current_user.is_anonymous else current_user.get_id()
-        agent = cls._build_agent_info()
+        if not user_id:
+            user_id = (None if current_user.is_anonymous
+                       else current_user.get_id())
+        if not agent:
+            agent = cls._build_agent_info()
+
         with db.session.begin_nested():
             sip = SIP.create('json', json.dumps(record.dumps()),
                              user_id=user_id, agent=agent)

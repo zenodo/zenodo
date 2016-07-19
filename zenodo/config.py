@@ -52,8 +52,6 @@ from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.scopes import write_scope
 from invenio_deposit.utils import check_oauth2_scope
-from invenio_oauthclient.contrib.github import REMOTE_APP as GITHUB_REMOTE_APP
-from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
@@ -62,6 +60,8 @@ from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
+from invenio_github.config import GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from zenodo.modules.deposit.permissions import DepositPermission, \
     can_edit_deposit
 
@@ -185,6 +185,25 @@ FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
 #: Overwrite default Sentry extension class to support Sentry 6.
 LOGGING_SENTRY_CLASS = 'invenio_logging.sentry6:Sentry6'
 
+# GitHub
+# ======
+#: Set if webhooks check SSL certificate
+# CHANGEME: Should be `True` in production
+GITHUB_INSECURE_SSL = False
+#: GitHub webhook url override
+GITHUB_WEBHOOK_RECEIVER_URL = \
+    'http://CHANGEME/api/hooks/receivers/github/events/?access_token={token}'
+#: GitHub shared secret
+GITHUB_SHARED_SECRET = 'CHANGEME'
+#: Set Zenodo deposit class
+GITHUB_RELEASE_CLASS = 'zenodo.modules.github.api:ZenodoGitHubRelease'
+#: Set Zenodo deposit class
+GITHUB_DEPOSIT_CLASS = 'zenodo.modules.deposit.api:ZenodoDeposit'
+#: GitHub metdata file
+GITHUB_METADATA_FILE = '.zenodo.json'
+#: SIPStore
+SIPSTORE_GITHUB_AGENT_JSONSCHEMA = 'sipstore/agent-githubclient-v1.0.0.json'
+#: Set OAuth client application config.
 GITHUB_REMOTE_APP.update(dict(
     description='Software collaboration platform, with one-click '
                 'software preservation in Zenodo.',
@@ -192,30 +211,6 @@ GITHUB_REMOTE_APP.update(dict(
 
 #: Defintion of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
-    # github=dict(
-    #     title='GitHub',
-    #     description='Software collaboration platform, with one-click '
-    #                 'software preservation in Zenodo.',
-    #     icon='fa fa-github',
-    #     authorized_handler="zenodo.modules.github.views.handlers:authorized",
-    #     disconnect_handler="zenodo.modules.github.views.handlers:disconnect",
-    #     signup_handler=dict(
-    #         info="zenodo.modules.github.views.handlers:account_info",
-    #         setup="zenodo.modules.github.views.handlers:account_setup",
-    #         view="invenio.modules.oauthclient.handlers:signup_handler",
-    #     ),
-    #     params=dict(
-    #         request_token_params={
-    #             'scope': 'user:email,admin:repo_hook,read:org'
-    #         },
-    #         base_url='https://api.github.com/',
-    #         request_token_url=None,
-    #         access_token_url="https://github.com/login/oauth/access_token",
-    #         access_token_method='POST',
-    #         authorize_url="https://github.com/login/oauth/authorize",
-    #         app_key="OAUTHCLIENT_GITHUB_CREDENTIALS",
-    #     )
-    # ),
     github=GITHUB_REMOTE_APP,
     orcid=ORCID_REMOTE_APP,
 )
@@ -453,13 +448,13 @@ RECORDS_UI_ENDPOINTS = dict(
     ),
     recid_preview=dict(
         pid_type='recid',
-        route='/record/<pid_value>/preview/<filename>',
+        route='/record/<pid_value>/preview/<path:filename>',
         view_imp='invenio_previewer.views.preview',
         record_class='invenio_records_files.api:Record',
     ),
     recid_files=dict(
         pid_type='recid',
-        route='/record/<pid_value>/files/<filename>',
+        route='/record/<pid_value>/files/<path:filename>',
         view_imp='invenio_files_rest.views.file_download_ui',
         record_class='invenio_records_files.api:Record',
     ),

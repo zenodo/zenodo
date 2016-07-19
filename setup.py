@@ -107,6 +107,7 @@ install_requires = [
     'invenio-deposit>=1.0.0a2',
     'invenio-files-rest>=1.0.0a7',
     'invenio-formatter>=1.0.0a2',
+    'invenio-github>=1.0.0a1.dev20160000',
     'invenio-i18n>=1.0.0a4',
     'invenio-indexer>=1.0.0a6',
     'invenio-jsonschemas>=1.0.0a3',
