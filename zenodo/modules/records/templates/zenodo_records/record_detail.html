@@ -64,7 +64,7 @@
       {%- set files = record.files if current_user|has_access_to(record) else [] %}
       {%-  include "zenodo_records/box/preview.html" %}
       {%-  include "zenodo_records/box/files.html" %}
-      {# TODO: include references #}
+      {%-  include "zenodo_records/box/references.html" %}
       {%- endblock record_body_extra %}
     </div>
     <div class="col-sm-4 col-md-4">
