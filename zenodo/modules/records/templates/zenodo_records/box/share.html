@@ -47,7 +47,9 @@
        lazy="true"
        placeholder="Start typing a citation style..."
        remote="{{ config.CSL_STYLES_API_ENDPOINT }}"
-       template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_TYPEAHEAD) }}"></invenio-csl-typeahead>
+       template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_TYPEAHEAD) }}"
+       item-template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_LIST_ITEM) }}">
+      </invenio-csl-typeahead>
     </invenio-csl>
   </div>
   {#- NOTE: Angular initialization in zenodo_records/record_detail.html #}

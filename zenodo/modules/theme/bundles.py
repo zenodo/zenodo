@@ -75,7 +75,7 @@ js = NpmBundle(
         'angular': '~1.4.9',
         'angular-sanitize': '~1.4.9',
         'angular-loading-bar': '~0.9.0',
-        'invenio-csl-js': '~0.1.2',
+        'invenio-csl-js': '~0.1.3',
         'typeahead.js': '~0.11.1',
     }
 )
