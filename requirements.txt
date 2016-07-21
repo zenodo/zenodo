@@ -88,6 +88,7 @@ fs==0.5.4
 future==0.15.2
 github3.py==1.0.0a4
 gnureadline==6.3.3
+humanize==0.5.1
 html5lib==0.9999999
 idna==2.1
 IDUtils==0.2.1
@@ -107,6 +108,7 @@ invenio-db==1.0.0a9
 invenio-deposit==1.0.0a2
 invenio-files-rest==1.0.0a7
 invenio-formatter==1.0.0a2
+invenio-github==1.0.0a1
 invenio-i18n==1.0.0a4
 invenio-indexer==1.0.0a6
 invenio-jsonschemas==1.0.0a3
@@ -116,7 +118,7 @@ invenio-marc21==1.0.0a3
 invenio-migrator==1.0.0a6
 invenio-oaiserver==1.0.0a6
 invenio-oauth2server==1.0.0a9
-invenio-oauthclient==1.0.0a7
+invenio-oauthclient==1.0.0a8
 invenio-openaire==1.0.0a4
 invenio-opendefinition==1.0.0a3
 invenio-pages==1.0.0a3
