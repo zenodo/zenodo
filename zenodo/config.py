@@ -22,7 +22,25 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo default application configuration."""
+"""Zenodo default application configuration.
+
+You can customize these configuration variables on your instance by either
+setting environment variables prefixed with ``APP_``, e.g.
+
+.. code-block:: console
+
+   export APP_SUPPORT_EMAIL=info@example.org
+
+or provide an instance configuration file (Python syntax):
+
+.. code-block:: python
+
+    # ${VIRTUAL_ENV}/var/instance/zenodo.cfg
+    SUPPORT_EMAIL = "info@example.org"
+
+Configuration variables
+~~~~~~~~~~~~~~~~~~~~~~~
+"""
 
 from __future__ import absolute_import, print_function
 

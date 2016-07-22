@@ -25,18 +25,28 @@
 Applications
 ------------
 
+Flask
+~~~~~
 .. automodule:: zenodo.factory
    :members:
    :undoc-members:
+
+CLI
+~~~
 
 .. automodule:: zenodo.cli
    :members:
    :undoc-members:
 
+Celery
+~~~~~~
+
 .. automodule:: zenodo.celery
    :members:
    :undoc-members:
 
+WSGI
+~~~~
 .. automodule:: zenodo.wsgi
    :members:
    :undoc-members:

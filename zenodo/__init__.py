@@ -33,13 +33,19 @@ simply run ``docker-compose up``):
 
 .. code-block:: console
 
-   $ zenodo --debug run
+   $ zenodo run
 
 Celery workers can be started using the command:
 
 .. code-block:: console
 
    $ celery worker -A zenodo.celery -l INFO
+
+You can enable debug mode by setting the ``FLASK_DEBUG`` environment variable:
+
+.. code-block:: console
+
+   $ export FLASK_DEBUG=1
 
 Configuration
 -------------
@@ -51,8 +57,9 @@ for how to configure them.
 
 Instance configuration
 ~~~~~~~~~~~~~~~~~~~~~~
-You can configure your specific instance by either environment variables
-and/or using the instance configuration file located at:
+You can configure your specific instance by either setting environment
+variables (prefixed with ``APP_``) and/or using the instance configuration
+file (recommended) located at:
 
 .. code-block:: console
 
@@ -83,7 +90,8 @@ secret from ORCID and add them to:
 GitHub Login
 ~~~~~~~~~~~~
 In order to enable GitHub login you must get an OAuth client id and client
-secret from GitHub and add them to:
+secret from GitHub (register a new application on e.g.
+https://github.com/settings/developers) and add them to:
 
 .. code-block:: python
 
@@ -100,12 +108,52 @@ to set (only use this during development):
 
    GITHUB_INSECURE_SSL = True
 
-Also, for production instances, you should set the following shared secret
-(note, do not use your `SECRET_KEY` for this):
+For production instances, you should set the following shared secret
+(note, do not use your ``SECRET_KEY`` for this):
 
 .. code-block:: python
 
    GITHUB_SHARED_SECRET = '...'
+
+
+Last, set the URL template on which GitHub will send webhook events:
+
+.. code-block:: python
+
+   GITHUB_WEBHOOK_RECEIVER_URL = \
+       'http://example.org/' \
+       'api/receivers/github/events/?access_token={token}'
+
+Note, ``{token}`` will be interpolated with the user's OAuth access token.
+
+
+GitHub for localhost
+~~~~~~~~~~~~~~~~~~~~
+
+For development machines runnning Zenodo on localhost and/or behind firewalls,
+you also need a public IP address which GitHub can reach you on. You can
+achieve this by using a service such as `ngrok <https://ngrok.com>`_:
+
+1. Go to https://ngrok.com and sign-up with your GitHub account.
+
+2. Install ngrok (e.g. ``brew cask install ngrok`` on OS X).
+
+3. Get the authtoken from the dashboard and start a tunnel to
+   ``localhost:5000``:
+
+   .. code-block:: console
+
+      $ ngrok authtoken <your-authtoken>
+      $ ngrok http 5000
+
+4. Grab the public ngrok address (e.g. ``http://<id>.ngrok.io``) and set the
+   ``GITHUB_WEBHOOK_RECEIVER_URL`` configuration variable:
+
+   .. code-block:: python
+
+      GITHUB_WEBHOOK_RECEIVER_URL = \
+          'http://<id>.ngrok.io/' \
+          'api/receivers/github/events/?access_token={token}'
 
 
 DataCite DOI minting
