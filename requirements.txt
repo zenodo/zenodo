@@ -26,9 +26,7 @@
 -r requirements.pinned.txt
 
 # Requirements not on PyPI
-git+https://github.com/inveniosoftware/invenio-access.git@e39a726f60574744766df0bc5b0671b655d32e0c#egg=invenio-access
 git+https://github.com/inveniosoftware/invenio-deposit.git@c37cd943bd42954f0168db3147d61c8b40c7fe6f#egg=invenio-deposit
-git+https://github.com/inveniosoftware/invenio-oauth2server.git@8d7c81babb8fe22d8bd3e85b23870edd89eaa9a7#egg=invenio-oauth2server
 git+https://github.com/zenodo/zenodo-migrationkit.git@8f4e06b6a0f8e8625157f4569dc2c6ff8651119e#egg=zenodo-migrationkit
 
 # PyPI requirements
@@ -97,7 +95,7 @@ IDUtils==0.2.1
 imagesize==0.7.1
 infinity==1.4
 intervals==0.7.1
-# invenio-access==1.0.0a9
+invenio-access==1.0.0a9
 invenio-accounts==1.0.0a13
 invenio-admin==1.0.0a3
 invenio-assets==1.0.0a5
@@ -118,7 +116,7 @@ invenio-mail==1.0.0a4
 invenio-marc21==1.0.0a3
 invenio-migrator==1.0.0a6
 invenio-oaiserver==1.0.0a6
-# invenio-oauth2server==1.0.0a8
+invenio-oauth2server==1.0.0a8
 invenio-oauthclient==1.0.0a7
 invenio-openaire==1.0.0a4
 invenio-opendefinition==1.0.0a3
