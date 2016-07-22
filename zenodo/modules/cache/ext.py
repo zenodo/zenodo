@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from flask.ext.cache import Cache
+from flask_cache import Cache
 
 
 class ZenodoCache(object):
