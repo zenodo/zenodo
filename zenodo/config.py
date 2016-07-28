@@ -52,6 +52,8 @@ from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.scopes import write_scope
 from invenio_deposit.utils import check_oauth2_scope
+from invenio_github.config import GITHUB_REMOTE_APP
+from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
@@ -60,8 +62,6 @@ from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
-from invenio_github.config import GITHUB_REMOTE_APP
-from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from zenodo.modules.deposit.permissions import DepositPermission, \
     can_edit_deposit
 
@@ -199,6 +199,8 @@ GITHUB_SHARED_SECRET = 'CHANGEME'
 GITHUB_RELEASE_CLASS = 'zenodo.modules.github.api:ZenodoGitHubRelease'
 #: Set Zenodo deposit class
 GITHUB_DEPOSIT_CLASS = 'zenodo.modules.deposit.api:ZenodoDeposit'
+#: GitHub PID fetcher
+GITHUB_PID_FETCHER = 'zenodo_doi_fetcher'
 #: GitHub metdata file
 GITHUB_METADATA_FILE = '.zenodo.json'
 #: SIPStore
@@ -376,6 +378,7 @@ SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
 
 #: Max length of SIPFile.filepath
 SIPSTORE_FILEPATH_MAX_LEN = 1000
+
 
 # Records
 # =======

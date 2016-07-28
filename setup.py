@@ -213,7 +213,9 @@ setup(
             'zenodo_record_fetcher '
             '= zenodo.modules.records.fetchers:zenodo_record_fetcher',
             'zenodo_deposit_fetcher '
-            '= zenodo.modules.deposit.fetchers:zenodo_deposit_fetcher'
+            '= zenodo.modules.deposit.fetchers:zenodo_deposit_fetcher',
+            'zenodo_doi_fetcher '
+            '= zenodo.modules.records.fetchers:zenodo_doi_fetcher',
         ],
         'invenio_assets.bundles': [
             'zenodo_theme_css = zenodo.modules.theme.bundles:css',

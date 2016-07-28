@@ -76,4 +76,4 @@ class ZenodoGitHubRelease(GitHubRelease):
                 'email': self.gh.account.user.email,
             }
             deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
-            self.release_model.record = deposit.model
+            self.model.recordmetadata = deposit.model
