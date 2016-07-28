@@ -27,7 +27,7 @@
 
 # Requirements not on PyPI
 git+https://github.com/inveniosoftware/invenio-deposit.git@c37cd943bd42954f0168db3147d61c8b40c7fe6f#egg=invenio-deposit
-git+https://github.com/zenodo/zenodo-migrationkit.git@8f4e06b6a0f8e8625157f4569dc2c6ff8651119e#egg=zenodo-migrationkit
+git+https://github.com/zenodo/zenodo-migrationkit.git@e2f965aa383d9b7a39a5e4e560250f7df6ea70b0#egg=zenodo-migrationkit
 
 # PyPI requirements
 alabaster==0.7.8
