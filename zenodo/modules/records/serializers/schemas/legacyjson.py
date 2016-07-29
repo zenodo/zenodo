@@ -39,36 +39,52 @@ from ..fields import DOILink, TrimmedString
 
 
 class FileSchemaV1(Schema):
-    """Schema for files depositions."""
+    """Schema for files depositions.
 
-    id = fields.String(dump_only=True)
+    Expects a ObjectVersion/FileObject instance, which is normally delivered
+    by LegacyJSONSerializer.
+    """
+
+    id = fields.String(attribute='file_id', dump_only=True)
     filename = fields.String(attribute='key', dump_only=True)
-    filesize = fields.Integer(attribute='size', dump_only=True)
+    filesize = fields.Integer(attribute='file.size', dump_only=True)
     checksum = fields.Method('dump_checksum', dump_only=True)
     links = fields.Method('dump_links', dump_only=True)
 
     def dump_checksum(self, obj):
         """Dump checksum."""
-        if 'checksum' not in obj:
+        checksum = obj.file.checksum
+        if not checksum:
             return missing
-        algo, hashval = obj['checksum'].split(':')
+
+        algo, hashval = checksum.split(':')
         if algo != 'md5':
             return missing
         return hashval
 
     def dump_links(self, obj):
         """Dump links."""
+        links = {}
+
         try:
-            return dict(
-                download=url_for(
-                    'invenio_files_rest.object_api',
-                    bucket_id=obj['bucket'],
-                    key=obj['key'],
-                    _external=True,
-                )
+            links['download'] = url_for(
+                'invenio_files_rest.object_api',
+                bucket_id=obj.bucket_id,
+                key=obj.key,
+                _external=True,
+            )
+            links['self'] = url_for(
+                'invenio_deposit_rest.depid_file',
+                pid_value=self.context['pid'].pid_value,
+                key=obj.file_id,
+                _external=True,
             )
         except BuildError:
+            pass
+
+        if not links:
             return missing
+        return links
 
 
 class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):

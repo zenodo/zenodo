@@ -239,8 +239,9 @@ DEPOSIT_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers:deposit_json_v1_search'),
         },
         files_serializers={
-            'application/json': ('invenio_deposit.serializers'
-                                 ':json_v1_files_response'),
+            'application/json': (
+                'zenodo.modules.records.serializers'
+                ':legacyjson_v1_files_response'),
         },
         list_route='/deposit/depositions',
         item_route='/deposit/depositions/<{0}:pid_value>'.format(_PID),

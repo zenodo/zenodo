@@ -4,6 +4,10 @@
   "title": "Zenodo Files Schema v1.0.0",
   "type": "object",
   "properties": {
+    "_bucket": {
+      "description": "Bucket ID for record.",
+      "type": "string"
+    },
     "_files": {
       "type": "array",
       "items": {

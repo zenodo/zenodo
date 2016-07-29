@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 import arrow
 import idutils
 import jsonref
-from flask import current_app, has_request_context
+from flask import current_app, has_request_context, url_for
 from flask_babelex import lazy_gettext as _
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
@@ -356,7 +356,7 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     created = fields.Str(dump_only=True)
 
     def dump_links(self, obj):
-        """."""
+        """Dump links."""
         links = obj.get('links', {})
 
         doi = obj.get('metadata', {}).get('doi')
@@ -364,6 +364,14 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             links['doi_badge'] = "{base}/badge/DOI/{value}.svg".format(
                 base=current_app.config.get('THEME_SITEURL'),
                 value=quote(doi),
+            )
+
+        bucket_id = obj.get('metadata', {}).get('_bucket')
+        if bucket_id and has_request_context():
+            links['bucket'] = url_for(
+                'invenio_files_rest.bucket_api',
+                bucket_id=bucket_id,
+                _external=True,
             )
 
         return links

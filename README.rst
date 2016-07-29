@@ -57,7 +57,7 @@ See INSTALL.rst
 
 Developer documentation
 =======================
-See http://zenodo.readthedocs.org
+See http://pythonhosted.org/zenodo/
 
 License
 =======

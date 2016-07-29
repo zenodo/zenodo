@@ -13,7 +13,7 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
-# You should have received a copy of the GNU General Public Licnse
+# You should have received a copy of the GNU General Public License
 # along with Zenodo; if not, write to the
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307, USA.
@@ -26,28 +26,25 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import json
+from flask import current_app, json
+from invenio_records_files.api import FilesIterator
 
-from .json import ZenodoJSONSerializer
 
+def files_responsify(schema_class, mimetype):
+    """Create a deposit files JSON serializer.
 
-class LegacyJSONSerializer(ZenodoJSONSerializer):
-    """Legacy JSON Serializer."""
-
-    def preprocess_record(self, pid, record, links_factory=None):
-        """Include files for single record retrievals."""
-        result = super(LegacyJSONSerializer, self).preprocess_record(
-            pid, record, links_factory=links_factory
+    :param schema_class: Marshmallow schema class.
+    :param mimetype: MIME type of response.
+    """
+    def view(obj=None, pid=None, record=None, status=None):
+        schema = schema_class(
+            context={'pid': pid},
+            many=isinstance(obj, FilesIterator)
         )
-        if 'files' in result:
-            result['files'] = [f.obj for f in record.files]
-        return result
+        return current_app.response_class(
+            json.dumps(schema.dump(obj).data),
+            mimetype=mimetype,
+            status=status
+        )
 
-    def serialize_search(self, pid_fetcher, search_result, links=None,
-                         item_links_factory=None):
-        """Serialize as a json array."""
-        return json.dumps([self.transform_search_hit(
-            pid_fetcher(hit['_id'], hit['_source']),
-            hit,
-            links_factory=item_links_factory,
-        ) for hit in search_result['hits']['hits']])
+    return view

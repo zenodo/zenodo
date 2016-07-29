@@ -2,6 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "id": "http://zenodo.org/schemas/records/file-v1.0.0.json",
   "properties": {
+    "_bucket": {
+      "description": "Bucket ID for record.",
+      "type": "string"
+    },
     "_files": {
       "items": {
         "description": "Describe information needed for files in records.",

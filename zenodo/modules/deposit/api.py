@@ -29,18 +29,19 @@ from __future__ import absolute_import
 from os.path import splitext
 
 from flask import current_app
-
 from invenio_communities.models import Community, InclusionRequest
-from invenio_deposit.api import Deposit as _Deposit
-from invenio_deposit.api import preserve
-from invenio_records_files.api import FileObject
-from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_db import db
+from invenio_deposit.api import Deposit, preserve
+from invenio_files_rest.models import Bucket
+from invenio_pidstore.errors import PIDInvalidAction
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
+from invenio_records_files.api import FileObject
+from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.sipstore.api import ZenodoSIP
 
-from .errors import MissingFilesError, MissingCommunityError
+from .errors import MissingCommunityError, MissingFilesError
 
 PRESERVE_FIELDS = (
     '_deposit',
@@ -67,7 +68,7 @@ class ZenodoFileObject(FileObject):
         return self.data
 
 
-class ZenodoDeposit(_Deposit):
+class ZenodoDeposit(Deposit):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject
@@ -242,8 +243,11 @@ class ZenodoDeposit(_Deposit):
         self._remove_obsolete_irs(dep_comms, record)
 
         # Communities, which should be in record after publishing:
-        new_rec_comms = ((set(dep_comms) & set(rec_comms)) |
-                         new_owned_comms | set(auto_added))
+        new_rec_comms = (
+            (set(dep_comms) & set(rec_comms)) |
+            new_owned_comms |
+            set(auto_added)
+        )
         record = super(ZenodoDeposit, self)._publish_edited()
 
         self['communities'] = sorted(self.get('communities', []) + auto_added)
@@ -259,8 +263,10 @@ class ZenodoDeposit(_Deposit):
     def validate_publish(self):
         """Validate deposit."""
         super(ZenodoDeposit, self).validate()
+
         if len(self.files) == 0:
             raise MissingFilesError()
+
         if 'communities' in self:
             missing = [c for c in self['communities']
                        if Community.get(c) is None]
@@ -275,6 +281,18 @@ class ZenodoDeposit(_Deposit):
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         pid, record = deposit.fetch_published()
         ZenodoSIP.create(pid, record, create_sip_files=is_first_publishing)
+        return deposit
+
+    @classmethod
+    def create(cls, data, id_=None):
+        """Create a deposit.
+
+        Adds bucket creation immediately on deposit creation.
+        """
+        bucket = Bucket.create()
+        data['_bucket'] = str(bucket.id)
+        deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
+        RecordsBuckets.create(record=deposit.model, bucket=bucket)
         return deposit
 
     @preserve(result=False, fields=PRESERVE_FIELDS)
@@ -294,8 +312,21 @@ class ZenodoDeposit(_Deposit):
 
     def delete(self, *args, **kwargs):
         """Delete the deposit."""
-        recid = PersistentIdentifier.get(pid_type='recid',
-                                         pid_value=self['recid'])
-        if recid.status == PIDStatus.RESERVED:
-            db.session.delete(recid)
+        if self['_deposit'].get('pid'):
+            raise PIDInvalidAction()
+
+        # Delete reserved recid.
+        pid_recid = PersistentIdentifier.get(
+            pid_type='recid', pid_value=self['recid'])
+
+        if pid_recid.status == PIDStatus.RESERVED:
+            db.session.delete(pid_recid)
+
+        # Completely remove bucket
+        q = RecordsBuckets.query.filter_by(record_id=self.id)
+        bucket = q.one().bucket
+        with db.session.begin_nested():
+            q.delete()
+        bucket.remove()
+
         return super(ZenodoDeposit, self).delete(*args, **kwargs)

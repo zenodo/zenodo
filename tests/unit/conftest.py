@@ -293,6 +293,24 @@ def minimal_record():
 
 
 @pytest.fixture()
+def minimal_deposit():
+    """Minimal deposit."""
+    return {
+        'metadata': {
+            'upload_type': 'presentation',
+            'title': 'Test title',
+            'creators': [
+                {'name': 'Doe, John', 'affiliation': 'Atlantis'},
+                {'name': 'Smith, Jane', 'affiliation': 'Atlantis'},
+            ],
+            'description': 'Test Description',
+            'publication_date': '2013-05-08',
+            'access_right': 'open'
+        }
+    }
+
+
+@pytest.fixture()
 def minimal_record_model(minimal_record):
     """Minimal record."""
     model = RecordMetadata()

@@ -210,6 +210,10 @@
       ],
       "type": "object"
     },
+    "_bucket": {
+      "description": "Bucket ID for record.",
+      "type": "string"
+    },
     "_files": {
       "items": {
         "description": "Describe information needed for files in records.",

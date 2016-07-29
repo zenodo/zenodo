@@ -28,7 +28,6 @@ from __future__ import absolute_import, print_function
 
 import json
 
-from invenio_files_rest.models import Bucket, ObjectVersion
 from invenio_search import current_search
 from six import BytesIO
 
@@ -145,9 +144,9 @@ def test_file_ops(api_client, deposit, json_auth_headers, auth_headers,
     assert data['filename'] == 'rename.txt'
 
 
-def test_deletion(api_client, deposit, json_auth_headers, deposit_url,
-                  get_json, license_record, auth_headers):
-    """Test data validation."""
+def test_deposit_deletion(api_client, deposit, json_auth_headers, deposit_url,
+                          get_json, license_record, auth_headers):
+    """Test file accessibility after deposit deletion."""
     client = api_client
     headers = json_auth_headers
     auth = auth_headers
@@ -159,15 +158,49 @@ def test_deletion(api_client, deposit, json_auth_headers, deposit_url,
     current_search.flush_and_refresh(index='deposits')
 
     # Upload file
-    client.post(
+    res = client.post(
         links['files'],
         data=dict(file=(BytesIO(b'test'), 'test.txt'), name='test.txt'),
         headers=auth
     )
-    assert Bucket.query.count() == 1
+    assert res.status_code == 201
 
+    # Get deposit links
+    res = client.get(links['self'], headers=headers)
+    data = get_json(res, code=200)
+    file_link = data['files'][0]['links']['self']
+    download_link = data['files'][0]['links']['download']
+
+    # Get file
+    res = client.get(file_link, headers=headers)
+    assert res.status_code == 200
+    res = client.get(download_link, headers=auth)
+    assert res.status_code == 200
+
+    # Get file - unauthenticated
+    res = client.get(file_link)
+    assert res.status_code == 401  # Any request requires auth.
+    res = client.get(download_link)
+    assert res.status_code == 404
+
+    #
     # Delete upload
+    #
     res = client.delete(links['self'], headers=auth)
     assert res.status_code == 204
 
-    # TODO - check if files cannot be downloaded.
+    # Try to get deposit.
+    res = client.get(links['self'], headers=auth)
+    assert res.status_code == 410
+
+    # Try to get file
+    res = client.get(file_link, headers=headers)
+    assert res.status_code == 410
+    res = client.get(download_link, headers=auth)
+    assert res.status_code == 404
+
+    # Try to get file - unauthenticated
+    res = client.get(file_link)
+    assert res.status_code == 410
+    res = client.get(download_link)
+    assert res.status_code == 404

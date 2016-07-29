@@ -225,6 +225,8 @@ def has_update_permission(user, record):
     user_id = int(user.get_id()) if user.is_authenticated else None
     if user_id in record.get('owners', []):
         return True
+    if user_id in record.get('_deposit', {}).get('owners'):
+        return True
 
     return has_admin_permission(user, record)
 

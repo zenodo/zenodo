@@ -35,15 +35,39 @@ from ..permissions import has_read_permission
 
 
 class ZenodoJSONSerializer(JSONSerializer):
-    """Legacy JSON Serializer."""
+    """Zenodo JSON serializer.
+
+    Adds or removes files from depending on access rights and provides a
+    context to the request serializer.
+    """
 
     def preprocess_record(self, pid, record, links_factory=None):
         """Include files for single record retrievals."""
-        result = super(JSONSerializer, self).preprocess_record(
+        result = super(ZenodoJSONSerializer, self).preprocess_record(
             pid, record, links_factory=links_factory
         )
-        if isinstance(record, Record) and '_files' in record:
+        # Add/remove files depending on access right.
+        if isinstance(record, Record):
             if not has_request_context() or has_read_permission(
                     current_user, record):
-                result['files'] = record['_files']
+                result['files'] = record.files.dumps()
         return result
+
+    def dump(self, obj, context=None):
+        """Serialize object with schema."""
+        return self.schema_class(context=context).dump(obj).data
+
+    def transform_record(self, pid, record, links_factory=None):
+        """Transform record into an intermediate representation."""
+        return self.dump(
+            self.preprocess_record(pid, record, links_factory=links_factory),
+            context={'pid': pid}
+        )
+
+    def transform_search_hit(self, pid, record_hit, links_factory=None):
+        """Transform search result hit into an intermediate representation."""
+        return self.dump(
+            self.preprocess_search_hit(
+                pid, record_hit, links_factory=links_factory),
+            context={'pid': pid}
+        )

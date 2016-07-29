@@ -36,13 +36,14 @@ from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
 from .bibtex import BibTeXSerializer
+from .files import files_responsify
 from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import LegacyJSONSerializer
 from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
-from .schemas.legacyjson import LegacyRecordSchemaV1
+from .schemas.legacyjson import FileSchemaV1, LegacyRecordSchemaV1
 from .schemas.marcxml import RecordSchemaMARC
 
 # Serializers
@@ -115,6 +116,12 @@ datacite_v31_search = search_responsify(
     datacite_v31, 'application/x-datacite+xml')
 #: DublinCore record serializer for search records.
 dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
+
+# Deposit serializers
+# ===================
+#: JSON files legacy serializer for files.
+legacyjson_v1_files_response = files_responsify(
+    FileSchemaV1, 'application/json')
 
 # OAI-PMH record serializers.
 # ===========================
