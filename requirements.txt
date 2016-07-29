@@ -116,7 +116,7 @@ invenio-mail==1.0.0a4
 invenio-marc21==1.0.0a3
 invenio-migrator==1.0.0a6
 invenio-oaiserver==1.0.0a6
-invenio-oauth2server==1.0.0a8
+invenio-oauth2server==1.0.0a9
 invenio-oauthclient==1.0.0a7
 invenio-openaire==1.0.0a4
 invenio-opendefinition==1.0.0a3
