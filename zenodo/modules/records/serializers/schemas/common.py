@@ -41,6 +41,7 @@ from six.moves.urllib.parse import quote
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
 from zenodo.modules.records.models import AccessRight
 
+from ...utils import is_deposit
 from ..fields import DOI as DOIField
 from ..fields import DateString, PersistentId, SanitizedHTML, TrimmedString
 
@@ -358,23 +359,40 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     def dump_links(self, obj):
         """Dump links."""
         links = obj.get('links', {})
+        m = obj.get('metadata', {})
 
-        doi = obj.get('metadata', {}).get('doi')
+        doi = m.get('doi')
         if current_app and doi:
-            links['doi_badge'] = "{base}/badge/DOI/{value}.svg".format(
+            links['badge'] = "{base}/badge/doi/{value}.svg".format(
                 base=current_app.config.get('THEME_SITEURL'),
                 value=quote(doi),
             )
+            links['doi'] = idutils.to_url(doi, 'doi')
 
-        bucket_id = obj.get('metadata', {}).get('_bucket')
-        if bucket_id and has_request_context():
-            links['bucket'] = url_for(
-                'invenio_files_rest.bucket_api',
-                bucket_id=bucket_id,
-                _external=True,
-            )
+        if has_request_context():
+            if is_deposit(m):
+                bucket_id = m.get('_buckets', {}).get('deposit')
+                recid = m.get('recid') if m.get('_deposit', {}).get('pid') \
+                    else None
+            else:
+                bucket_id = m.get('_buckets', {}).get('record')
+                recid = None
 
-        return links
+            if bucket_id:
+                links['bucket'] = url_for(
+                    'invenio_files_rest.bucket_api',
+                    bucket_id=bucket_id,
+                    _external=True,
+                )
+
+            if recid:
+                links['record'] = url_for(
+                    'invenio_records_rest.recid_item',
+                    pid_value=recid,
+                    _external=True,
+                )
+
+            return links
 
     @post_load(pass_many=False)
     def remove_envelope(self, data):

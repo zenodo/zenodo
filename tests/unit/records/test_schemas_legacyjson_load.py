@@ -709,7 +709,7 @@ def test_communities_invalid(comms):
 
 
 def test_legacyjson_to_record_translation(app, db, es, grant_record,
-                                          license_record):
+                                          license_record, dummy_location):
     """Test the translator legacy_zenodo and zenodo_legacy."""
     test_data = dict(
         metadata=dict(

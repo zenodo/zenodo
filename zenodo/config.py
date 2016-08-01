@@ -166,114 +166,6 @@ CSL_JSTEMPLATE_LOADING = os.path.join(CSL_JSTEMPLATE_DIR, 'loading.html')
 #: Template for CSL typeahead
 CSL_JSTEMPLATE_TYPEAHEAD = os.path.join(CSL_JSTEMPLATE_DIR, 'typeahead.html')
 
-# Deposit
-# =======
-#: PID minter used during record creation.
-DEPOSIT_PID_MINTER = 'zenodo_record_minter'
-#: REST API configuration.
-_PID = 'pid(depid,record_class="zenodo.modules.deposit.api:ZenodoDeposit")'
-
-DEPOSIT_REST_ENDPOINTS = dict(
-    dep=dict(
-
-    ),
-)
-#: Template for deposit list view.
-DEPOSIT_SEARCH_API = '/api/deposit/depositions'
-#: Mimetype for deposit search.
-DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
-#: Template for deposit list view.
-DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
-#: Template to use for UI.
-DEPOSIT_UI_NEW_TEMPLATE = "zenodo_deposit/edit.html"
-#: Allow list of contributor types.
-DEPOSIT_CONTRIBUTOR_TYPES = [
-    dict(label='Contact person', marc='prc', datacite='ContactPerson'),
-    dict(label='Data collector', marc='col', datacite='DataCollector'),
-    dict(label='Data curator', marc='cur', datacite='DataCurator'),
-    dict(label='Data manager', marc='dtm', datacite='DataManager'),
-    dict(label='Editor', marc='edt', datacite='Editor'),
-    dict(label='Researcher', marc='res', datacite='Researcher'),
-    dict(label='Rights holder', marc='cph', datacite='RightsHolder'),
-    dict(label='Sponsor', marc='spn', datacite='Sponsor'),
-    dict(label='Other', marc='oth', datacite='Other'),
-]
-DEPOSIT_CONTRIBUTOR_MARC2DATACITE = {
-    x['marc']: x['datacite'] for x in DEPOSIT_CONTRIBUTOR_TYPES
-}
-DEPOSIT_CONTRIBUTOR_DATACITE2MARC = {
-    x['datacite']: x['marc'] for x in DEPOSIT_CONTRIBUTOR_TYPES
-}
-
-#: Default JSON Schema for deposit
-DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'
-
-#: Angular Schema Form for deposit
-DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
-
-#: Endpoints for deposit.
-DEPOSIT_REST_ENDPOINTS = dict(
-    depid=dict(
-        pid_type='depid',
-        pid_minter='zenodo_deposit_minter',
-        pid_fetcher='zenodo_deposit_fetcher',
-        record_class='zenodo.modules.deposit.api:ZenodoDeposit',
-        record_loaders={
-            'application/json': (
-                'zenodo.modules.deposit.loaders:legacyjson_v1'),
-            'application/vnd.zenodo.v1+json': (
-                'zenodo.modules.deposit.loaders:deposit_json_v1'),
-        },
-        record_serializers={
-            'application/json': (
-                'zenodo.modules.records.serializers:legacyjson_v1_response'),
-            'application/vnd.zenodo.v1+json': (
-                'zenodo.modules.records.serializers:deposit_json_v1_response'),
-        },
-        search_class='invenio_deposit.search:DepositSearch',
-        search_factory_imp='zenodo.modules.deposit.query.search_factory',
-        search_serializers={
-            'application/json': (
-                'zenodo.modules.records.serializers:legacyjson_v1_search'),
-            'application/vnd.zenodo.v1+json': (
-                'zenodo.modules.records.serializers:deposit_json_v1_search'),
-        },
-        files_serializers={
-            'application/json': (
-                'zenodo.modules.records.serializers'
-                ':legacyjson_v1_files_response'),
-        },
-        list_route='/deposit/depositions',
-        item_route='/deposit/depositions/<{0}:pid_value>'.format(_PID),
-        file_list_route=(
-            '/deposit/depositions/<{0}:pid_value>/files'.format(_PID)),
-        file_item_route=(
-            '/deposit/depositions/<{0}:pid_value>/files/<file_key:key>'.format(
-                _PID)),
-        default_media_type='application/json',
-        links_factory_imp='invenio_deposit.links:deposit_links_factory',
-        create_permission_factory_imp=check_oauth2_scope(
-            lambda x: True, write_scope.id),
-        read_permission_factory_imp=DepositPermission,
-        update_permission_factory_imp=check_oauth2_scope(
-            can_edit_deposit, write_scope.id),
-        delete_permission_factory_imp=check_oauth2_scope(
-            can_edit_deposit, write_scope.id),
-        max_result_window=10000,
-    ),
-)
-
-# SIPStore
-# ========
-#: Default JSON schema for the SIP agent
-SIPSTORE_DEFAULT_AGENT_JSONSCHEMA = 'sipstore/agent-webclient-v1.0.0.json'
-
-#: Enable the agent JSON schema
-SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
-
-#: Max length of SIPFile.filepath
-SIPSTORE_FILEPATH_MAX_LEN = 1000
-
 # Formatter
 # =========
 #: List of allowed titles in badges.
@@ -379,6 +271,116 @@ PAGES_TEMPLATES = [
     ('invenio_pages/dynamic.html', 'Default dynamic'),
     ('zenodo_theme/full_page.html', 'Default full page'),
 ]
+
+# Deposit
+# =======
+#: PID minter used during record creation.
+DEPOSIT_PID_MINTER = 'zenodo_record_minter'
+#: REST API configuration.
+_PID = 'pid(depid,record_class="zenodo.modules.deposit.api:ZenodoDeposit")'
+
+DEPOSIT_REST_ENDPOINTS = dict(
+    dep=dict(
+
+    ),
+)
+#: Template for deposit list view.
+DEPOSIT_SEARCH_API = '/api/deposit/depositions'
+#: Mimetype for deposit search.
+DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
+#: Template for deposit list view.
+DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
+#: Template to use for UI.
+DEPOSIT_UI_NEW_TEMPLATE = "zenodo_deposit/edit.html"
+#: Allow list of contributor types.
+DEPOSIT_CONTRIBUTOR_TYPES = [
+    dict(label='Contact person', marc='prc', datacite='ContactPerson'),
+    dict(label='Data collector', marc='col', datacite='DataCollector'),
+    dict(label='Data curator', marc='cur', datacite='DataCurator'),
+    dict(label='Data manager', marc='dtm', datacite='DataManager'),
+    dict(label='Editor', marc='edt', datacite='Editor'),
+    dict(label='Researcher', marc='res', datacite='Researcher'),
+    dict(label='Rights holder', marc='cph', datacite='RightsHolder'),
+    dict(label='Sponsor', marc='spn', datacite='Sponsor'),
+    dict(label='Other', marc='oth', datacite='Other'),
+]
+DEPOSIT_CONTRIBUTOR_MARC2DATACITE = {
+    x['marc']: x['datacite'] for x in DEPOSIT_CONTRIBUTOR_TYPES
+}
+DEPOSIT_CONTRIBUTOR_DATACITE2MARC = {
+    x['datacite']: x['marc'] for x in DEPOSIT_CONTRIBUTOR_TYPES
+}
+
+#: Default JSON Schema for deposit
+DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'
+
+#: Angular Schema Form for deposit
+DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
+
+#: Endpoints for deposit.
+DEPOSIT_REST_ENDPOINTS = dict(
+    depid=dict(
+        pid_type='depid',
+        pid_minter='zenodo_deposit_minter',
+        pid_fetcher='zenodo_deposit_fetcher',
+        record_class='zenodo.modules.deposit.api:ZenodoDeposit',
+        record_loaders={
+            'application/json': (
+                'zenodo.modules.deposit.loaders:legacyjson_v1'),
+            # 'application/vnd.zenodo.v1+json': (
+            #    'zenodo.modules.deposit.loaders:deposit_json_v1'),
+        },
+        record_serializers={
+            'application/json': (
+                'zenodo.modules.records.serializers'
+                ':deposit_legacyjson_v1_response'),
+            'application/vnd.zenodo.v1+json': (
+                'zenodo.modules.records.serializers:deposit_json_v1_response'),
+        },
+        search_class='invenio_deposit.search:DepositSearch',
+        search_factory_imp='zenodo.modules.deposit.query.search_factory',
+        search_serializers={
+            'application/json': (
+                'zenodo.modules.records.serializers'
+                ':deposit_legacyjson_v1_search'),
+            'application/vnd.zenodo.v1+json': (
+                'zenodo.modules.records.serializers:deposit_json_v1_search'),
+        },
+        files_serializers={
+            'application/json': (
+                'zenodo.modules.records.serializers'
+                ':deposit_legacyjson_v1_files_response'),
+        },
+        list_route='/deposit/depositions',
+        item_route='/deposit/depositions/<{0}:pid_value>'.format(_PID),
+        file_list_route=(
+            '/deposit/depositions/<{0}:pid_value>/files'.format(_PID)),
+        file_item_route=(
+            '/deposit/depositions/<{0}:pid_value>/files/<file_key:key>'.format(
+                _PID)),
+        default_media_type='application/json',
+        links_factory_imp='invenio_deposit.links:deposit_links_factory',
+        create_permission_factory_imp=check_oauth2_scope(
+            lambda x: True, write_scope.id),
+        read_permission_factory_imp=DepositPermission,
+        update_permission_factory_imp=check_oauth2_scope(
+            can_edit_deposit, write_scope.id),
+        delete_permission_factory_imp=check_oauth2_scope(
+            can_edit_deposit, write_scope.id),
+        max_result_window=10000,
+    ),
+)
+
+# SIPStore
+# ========
+#: Default JSON schema for the SIP agent
+SIPSTORE_DEFAULT_AGENT_JSONSCHEMA = 'sipstore/agent-webclient-v1.0.0.json'
+
+#: Enable the agent JSON schema
+SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
+
+#: Max length of SIPFile.filepath
+SIPSTORE_FILEPATH_MAX_LEN = 1000
 
 # Records
 # =======

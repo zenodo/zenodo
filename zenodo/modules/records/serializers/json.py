@@ -47,10 +47,10 @@ class ZenodoJSONSerializer(JSONSerializer):
             pid, record, links_factory=links_factory
         )
         # Add/remove files depending on access right.
-        if isinstance(record, Record):
+        if isinstance(record, Record) and '_files' in record:
             if not has_request_context() or has_read_permission(
                     current_user, record):
-                result['files'] = record.files.dumps()
+                result['files'] = record['_files']
         return result
 
     def dump(self, obj, context=None):

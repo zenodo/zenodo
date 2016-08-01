@@ -83,7 +83,7 @@ def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
             )
             assert res.status_code == 201
             data = json.loads(res.get_data(as_text=True))
-            assert data['checksum'] == 'md5:66ce05ea43c73b8e33c74c12d0371bc9'
+            assert data['checksum'] == '66ce05ea43c73b8e33c74c12d0371bc9'
             assert data['filename'] == 'myfirstfile.csv'
             assert data['filesize'] == 7
             assert data['id']

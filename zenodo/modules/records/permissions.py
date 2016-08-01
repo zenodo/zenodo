@@ -34,11 +34,11 @@ from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
 from invenio_records.api import Record
 from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
-from invenio_search import current_search
-from invenio_search.utils import schema_to_index
+
 from zenodo_accessrequests.models import SecretLink
 
-from zenodo.modules.records.models import AccessRight
+from .models import AccessRight
+from .utils import is_deposit, is_record
 
 
 def files_permission_factory(obj, action=None):
@@ -76,28 +76,6 @@ def files_permission_factory(obj, action=None):
                 return DepositFilesPermission.create(record, action)
 
     return DynamicPermission(ActionNeed('admin-access'))
-
-
-#
-# Helper methods
-#
-def schema_prefix(schema):
-    """Get index prefix for a given schema."""
-    if not schema:
-        return None
-    index, doctype = schema_to_index(
-        schema, index_names=current_search.mappings.keys())
-    return index.split('-')[0]
-
-
-def is_record(record):
-    """Determine if a record is a bibliographic record."""
-    return schema_prefix(record.get('$schema')) == 'records'
-
-
-def is_deposit(record):
-    """Determine if a record is a deposit record."""
-    return schema_prefix(record.get('$schema')) == 'deposits'
 
 
 #
@@ -225,7 +203,7 @@ def has_update_permission(user, record):
     user_id = int(user.get_id()) if user.is_authenticated else None
     if user_id in record.get('owners', []):
         return True
-    if user_id in record.get('_deposit', {}).get('owners'):
+    if user_id in record.get('_deposit', {}).get('owners', []):
         return True
 
     return has_admin_permission(user, record)

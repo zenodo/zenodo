@@ -27,21 +27,13 @@
 from __future__ import absolute_import, print_function
 
 from flask import json
+from invenio_records_files.api import Record
 
 from .json import ZenodoJSONSerializer
 
 
 class LegacyJSONSerializer(ZenodoJSONSerializer):
     """Legacy JSON Serializer."""
-
-    def preprocess_record(self, pid, record, links_factory=None):
-        """Include files for single record retrievals."""
-        result = super(LegacyJSONSerializer, self).preprocess_record(
-            pid, record, links_factory=links_factory
-        )
-        if 'files' in result:
-            result['files'] = [f.obj for f in record.files]
-        return result
 
     def serialize_search(self, pid_fetcher, search_result, links=None,
                          item_links_factory=None):
@@ -51,3 +43,19 @@ class LegacyJSONSerializer(ZenodoJSONSerializer):
             hit,
             links_factory=item_links_factory,
         ) for hit in search_result['hits']['hits']])
+
+
+class DepositLegacyJSONSerializer(LegacyJSONSerializer):
+    """Legacy JSON serializer.
+
+    Dumps files directly from Bucket instead of relying on record metadata.
+    """
+
+    def preprocess_record(self, pid, record, links_factory=None):
+        """Include files for single record retrievals."""
+        result = super(LegacyJSONSerializer, self).preprocess_record(
+            pid, record, links_factory=links_factory
+        )
+        if isinstance(record, Record):
+            result['files'] = record.files.dumps()
+        return result

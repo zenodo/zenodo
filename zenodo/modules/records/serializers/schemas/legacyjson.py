@@ -39,21 +39,17 @@ from ..fields import DOILink, TrimmedString
 
 
 class FileSchemaV1(Schema):
-    """Schema for files depositions.
-
-    Expects a ObjectVersion/FileObject instance, which is normally delivered
-    by LegacyJSONSerializer.
-    """
+    """Schema for files depositions."""
 
     id = fields.String(attribute='file_id', dump_only=True)
     filename = fields.String(attribute='key', dump_only=True)
-    filesize = fields.Integer(attribute='file.size', dump_only=True)
+    filesize = fields.Integer(attribute='size', dump_only=True)
     checksum = fields.Method('dump_checksum', dump_only=True)
     links = fields.Method('dump_links', dump_only=True)
 
     def dump_checksum(self, obj):
         """Dump checksum."""
-        checksum = obj.file.checksum
+        checksum = obj.get('checksum')
         if not checksum:
             return missing
 
@@ -69,14 +65,14 @@ class FileSchemaV1(Schema):
         try:
             links['download'] = url_for(
                 'invenio_files_rest.object_api',
-                bucket_id=obj.bucket_id,
-                key=obj.key,
+                bucket_id=obj.get('bucket'),
+                key=obj.get('key'),
                 _external=True,
             )
             links['self'] = url_for(
                 'invenio_deposit_rest.depid_file',
                 pid_value=self.context['pid'].pid_value,
-                key=obj.file_id,
+                key=obj.get('file_id'),
                 _external=True,
             )
         except BuildError:
@@ -344,7 +340,7 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
 
     doi_url = DOILink(attribute='metadata.doi', dump_only=True)
     files = fields.List(
-        fields.Nested(FileSchemaV1), default=[], dump_only=True)
+        fields.Nested(FileSchemaV1), dump_only=True)
     metadata = fields.Nested(LegacyMetadataSchemaV1)
     modified = fields.Str(attribute='updated', dump_only=True)
     owner = fields.Method('dump_owners', dump_only=True)

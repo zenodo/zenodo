@@ -32,3 +32,4 @@ zenodo fixtures init
 zenodo users create info@zenodo.org -a --password=123456
 zenodo access allow admin-access -e info@zenodo.org
 zenodo access allow deposit-admin-access -e info@zenodo.org
+zenodo fixtures loadcommunities info@zenodo.org

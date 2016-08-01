@@ -38,7 +38,7 @@ from invenio_records_rest.serializers.response import record_responsify, \
 from .bibtex import BibTeXSerializer
 from .files import files_responsify
 from .json import ZenodoJSONSerializer as JSONSerializer
-from .legacyjson import LegacyJSONSerializer
+from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
 from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
@@ -54,6 +54,9 @@ json_v1 = JSONSerializer(RecordSchemaV1, replace_refs=True)
 deposit_json_v1 = JSONSerializer(DepositSchemaV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 legacyjson_v1 = LegacyJSONSerializer(
+    LegacyRecordSchemaV1, replace_refs=True)
+#: Zenodo legacy deposit JSON serialzier version 1.0.0
+deposit_legacyjson_v1 = DepositLegacyJSONSerializer(
     LegacyRecordSchemaV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
 marcxml_v1 = MARCXMLSerializer(
@@ -79,9 +82,6 @@ citeproc_v1 = CiteprocSerializer(csl_v1)
 # ========================
 #: JSON record serializer for individual records.
 json_v1_response = record_responsify(json_v1, 'application/json')
-#: JSON record serializer for individual records.
-deposit_json_v1_response = record_responsify(
-    deposit_json_v1, 'application/vnd.zenodo.v1+json')
 #: JSON record legacy serializer for individual records.
 legacyjson_v1_response = record_responsify(legacyjson_v1, 'application/json')
 #: MARCXML record serializer for individual records.
@@ -102,9 +102,6 @@ citeproc_v1_response = record_responsify(citeproc_v1, 'text/x-bibliography')
 
 #: JSON record serializer for search results.
 json_v1_search = search_responsify(json_v1, 'application/json')
-#: JSON record serializer for search results.
-deposit_json_v1_search = search_responsify(
-    deposit_json_v1, 'application/vnd.zenodo.v1+json')
 #: JSON record legacy serializer for search results.
 legacyjson_v1_search = search_responsify(legacyjson_v1, 'application/json')
 #: MARCXML record serializer for search records.
@@ -119,9 +116,21 @@ dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
 
 # Deposit serializers
 # ===================
-#: JSON files legacy serializer for files.
-legacyjson_v1_files_response = files_responsify(
+#: JSON record legacy serializer for individual deposits.
+deposit_legacyjson_v1_response = record_responsify(
+    deposit_legacyjson_v1, 'application/json')
+#: JSON record legacy serializer for deposit search results.
+deposit_legacyjson_v1_search = search_responsify(
+    deposit_legacyjson_v1, 'application/json')
+#: JSON files legacy serializer for deposit files.
+deposit_legacyjson_v1_files_response = files_responsify(
     FileSchemaV1, 'application/json')
+#: JSON record serializer for individual records.
+deposit_json_v1_response = record_responsify(
+    deposit_json_v1, 'application/json')
+#: JSON record serializer for search results.
+deposit_json_v1_search = search_responsify(
+    deposit_json_v1, 'application/json')
 
 # OAI-PMH record serializers.
 # ===========================

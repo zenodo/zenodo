@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import
 
+from contextlib import contextmanager
 from os.path import splitext
 
 from flask import current_app
@@ -45,6 +46,7 @@ from .errors import MissingCommunityError, MissingFilesError
 
 PRESERVE_FIELDS = (
     '_deposit',
+    '_buckets',
     '_files',
     '_internal',
     '_oai',
@@ -62,9 +64,9 @@ class ZenodoFileObject(FileObject):
         super(ZenodoFileObject, self).dumps()
         self.data.update({
             # Remove dot from extension.
-            'type': splitext(self.data['key'])[1][1:].lower()
+            'type': splitext(self.data['key'])[1][1:].lower(),
+            'file_id': str(self.file_id),
         })
-
         return self.data
 
 
@@ -184,6 +186,22 @@ class ZenodoDeposit(Deposit):
                 'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
         return grant_comms
 
+    @contextmanager
+    def _process_files(self, record_id, data):
+        """Snapshot bucket and add files in record during first publishing."""
+        if self.files:
+            assert not self.files.bucket.locked
+            self.files.bucket.locked = True
+            snapshot = self.files.bucket.snapshot(lock=True)
+            data['_files'] = self.files.dumps(bucket=snapshot.id)
+            data['_buckets']['record'] = str(snapshot.id)
+            yield data
+            db.session.add(RecordsBuckets(
+                record_id=record_id, bucket_id=snapshot.id
+            ))
+        else:
+            yield data
+
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
         # pop the 'communities' entry so they aren't added to the Record
@@ -204,6 +222,7 @@ class ZenodoDeposit(Deposit):
         self._autoadd_communities(owned_comms | set(auto_added), self)
 
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+
         self._create_inclusion_requests(requested_comms | set(auto_request),
                                         record)
 
@@ -289,8 +308,11 @@ class ZenodoDeposit(Deposit):
 
         Adds bucket creation immediately on deposit creation.
         """
-        bucket = Bucket.create()
-        data['_bucket'] = str(bucket.id)
+        bucket = Bucket.create(
+            quota_size=current_app.config['ZENODO_BUCKET_QUOTA_SIZE'],
+            max_file_size=current_app.config['ZENODO_MAX_FILE_SIZE'],
+        )
+        data['_buckets'] = {'deposit': str(bucket.id)}
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
         return deposit

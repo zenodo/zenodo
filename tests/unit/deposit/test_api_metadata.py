@@ -56,7 +56,7 @@ def test_invalid_create(api_client, es, json_auth_headers, deposit_url,
 
 
 def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
-                      license_record, grant_record):
+                      license_record, grant_record, dummy_location):
     """Rough validation of input against output data."""
     client = api_client
     headers = json_auth_headers

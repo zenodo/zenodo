@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import current_app, json
+from invenio_files_rest.models import ObjectVersion
 from invenio_records_files.api import FilesIterator
 
 
@@ -41,8 +42,13 @@ def files_responsify(schema_class, mimetype):
             context={'pid': pid},
             many=isinstance(obj, FilesIterator)
         )
+
+        if isinstance(obj, ObjectVersion):
+            from zenodo.modules.deposit.api import ZenodoFileObject
+            obj = ZenodoFileObject(obj, {})
+
         return current_app.response_class(
-            json.dumps(schema.dump(obj).data),
+            json.dumps(schema.dump(obj.dumps()).data),
             mimetype=mimetype,
             status=status
         )

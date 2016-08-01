@@ -208,9 +208,18 @@
       },
       "type": "object"
     },
-    "_bucket": {
-      "description": "Bucket ID for record.",
-      "type": "string"
+    "_buckets": {
+      "type": "object",
+      "properties": {
+        "deposit": {
+          "description": "Deposit bucket ID.",
+          "type": "string"
+        },
+        "record": {
+          "description": "Record bucket ID.",
+          "type": "string"
+        }
+      }
     },
     "_files": {
       "items": {

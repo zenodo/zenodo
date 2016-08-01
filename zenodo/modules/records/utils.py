@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,26 +22,28 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Records."""
+"""Helper methods for Zenodo records."""
 
 from __future__ import absolute_import, print_function
 
-from flask_babelex import gettext
-from speaklater import make_lazy_gettext
+from invenio_search import current_search
+from invenio_search.utils import schema_to_index
 
-_ = make_lazy_gettext(lambda: gettext)
 
-ZENODO_COMMUNITIES_AUTO_ENABLED = False
-"""Automatically add and request to communities upon publishing."""
+def schema_prefix(schema):
+    """Get index prefix for a given schema."""
+    if not schema:
+        return None
+    index, doctype = schema_to_index(
+        schema, index_names=current_search.mappings.keys())
+    return index.split('-')[0]
 
-ZENODO_COMMUNITIES_AUTO_REQUEST = ['zenodo', ]
-"""Communities which are to be auto-requested upon first publishing."""
 
-ZENODO_COMMUNITIES_ADD_IF_GRANTS = ['ecfunded', ]
-"""Communities which are to be auto-added if it contains grant information."""
+def is_record(record):
+    """Determine if a record is a bibliographic record."""
+    return schema_prefix(record.get('$schema')) == 'records'
 
-ZENODO_BUCKET_QUOTA_SIZE = 50 * 1024 * 1024 * 1024
-"""Maximum quota per bucket."""
 
-ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
-"""Maximum file size accepted."""
+def is_deposit(record):
+    """Determine if a record is a deposit record."""
+    return schema_prefix(record.get('$schema')) == 'deposits'
