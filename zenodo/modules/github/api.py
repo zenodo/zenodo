@@ -27,12 +27,12 @@
 from __future__ import absolute_import
 
 from flask import current_app
-from invenio_github.api import GitHubRelease
-from invenio_github.utils import get_owner, get_contributors
 from invenio_db import db
+from invenio_github.api import GitHubRelease
+from invenio_github.utils import get_contributors, get_owner
 
-from ..jsonschemas.utils import current_jsonschemas
 from ..deposit.loaders import legacyjson_v1_translator
+from ..jsonschemas.utils import current_jsonschemas
 
 
 class ZenodoGitHubRelease(GitHubRelease):

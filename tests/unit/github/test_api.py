@@ -26,12 +26,12 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.github.api import ZenodoGitHubRelease
-from mock import patch, MagicMock
-from six import BytesIO
 import pytest
 from invenio_sipstore.models import SIP
+from mock import MagicMock, patch
+from six import BytesIO
 
+from zenodo.modules.github.api import ZenodoGitHubRelease
 
 creators_params = (
     (dict(),

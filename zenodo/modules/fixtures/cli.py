@@ -31,16 +31,16 @@ from os.path import dirname, join
 
 import click
 from flask_cli import with_appcontext
-from sqlalchemy.orm.exc import NoResultFound
 from invenio_communities.utils import initialize_communities_bucket
+from sqlalchemy.orm.exc import NoResultFound
 
+from .communities import loadcommunities
 from .files import loaddemofiles, loadlocation
 from .grants import loadfp6grants
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .pages import loadpages
 from .records import loaddemorecords
-from .communities import loadcommunities
 
 
 @click.group()

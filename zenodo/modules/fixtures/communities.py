@@ -26,10 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-
-from invenio_db import db
 from invenio_accounts.models import User
 from invenio_communities.models import Community
+from invenio_db import db
 
 from .utils import read_json
 

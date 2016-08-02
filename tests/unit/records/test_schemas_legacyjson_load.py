@@ -31,8 +31,7 @@ from flask import Flask
 from marshmallow.exceptions import ValidationError
 
 from zenodo.modules.deposit.api import ZenodoDeposit
-from zenodo.modules.records.serializers.schemas.legacyjson import \
-    LegacyMetadataSchemaV1, LegacyRecordSchemaV1
+from zenodo.modules.records.serializers.schemas import legacyjson
 
 
 def d(**kwargs):
@@ -53,7 +52,7 @@ def d(**kwargs):
 ])
 def test_title(val, expected):
     """Test titles."""
-    assert LegacyMetadataSchemaV1(strict=True).load(
+    assert legacyjson.LegacyMetadataSchemaV1(strict=True).load(
         d(title=val)).data['title'] == expected
 
 
@@ -66,14 +65,14 @@ def test_title_invalid(val):
     """Test invalid titles."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(title=val)
     )
 
 
 def test_upload_type():
     """Test upload type deserialization."""
-    s = LegacyMetadataSchemaV1(
+    s = legacyjson.LegacyMetadataSchemaV1(
         partial=['upload_type', 'publication_type', 'image_type'],
         strict=True
     )
@@ -91,7 +90,7 @@ def test_upload_type():
 
 def test_upload_type_invalid():
     """Test upload type deserialization."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
 
     # Missing value
     obj = d()
@@ -113,7 +112,7 @@ def test_upload_type_invalid():
 
 def test_related_alternate_identifiers():
     """Test related alternate identifiers."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
 
     result = s.load(d(related_identifiers=[
         dict(identifier='10.1234/foo.bar2', relation='isCitedBy'),
@@ -151,7 +150,7 @@ def test_related_identifiers_invalid_relations(relation):
     """Test invalid related identifiers."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(related_identifiers=[
             dict(identifier='10.1234/foo.bar2', relation=relation),
         ])
@@ -160,7 +159,7 @@ def test_related_identifiers_invalid_relations(relation):
 
 def test_related_identifiers_invalid():
     """Test missing relation."""
-    s = LegacyMetadataSchemaV1(strict=True).load
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True).load
     # Missing relation
     pytest.raises(ValidationError, s, d(related_identifiers=[
         dict(identifier='10.1234/foo.bar2'),
@@ -184,14 +183,15 @@ def test_related_identifiers_invalid():
 ])
 def test_related_identifiers_normalization(input, output, scheme):
     """Test missing relation."""
-    assert LegacyMetadataSchemaV1(strict=True).load(d(related_identifiers=[
-        dict(identifier=input, relation='isCitedBy', scheme=scheme)
-    ])).data['related_identifiers'][0]['identifier'] == output
+    assert legacyjson.LegacyMetadataSchemaV1(strict=True).load(
+        d(related_identifiers=[
+            dict(identifier=input, relation='isCitedBy', scheme=scheme)])
+    ).data['related_identifiers'][0]['identifier'] == output
 
 
 def test_creators():
     """Test creators."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
 
     assert s.load(d(creators=[
         dict(name="Doe, John", affiliation="Atlantis",
@@ -206,7 +206,7 @@ def test_creators():
     # Min length required
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(creators=[])
     )
 
@@ -220,7 +220,7 @@ def test_creators_invalid(creator):
     """Test creators."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(creators=[creator])
     )
 
@@ -232,7 +232,7 @@ def test_creators_invalid(creator):
 ])
 def test_publication_date(date):
     """Test creators."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(
         d(publication_date=date)
     ).data['publication_date'] == date
@@ -248,7 +248,7 @@ def test_publication_date_invalid(date):
     """Test creators."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(publication_date=date)
     )
 
@@ -268,7 +268,7 @@ def test_description(desc, expected):
     Note, we only do limited sanitize test because we use the bleach library
     to sanitize and it already have extensive tests.
     """
-    assert LegacyMetadataSchemaV1(strict=True).load(
+    assert legacyjson.LegacyMetadataSchemaV1(strict=True).load(
         d(description=desc)
     ).data['description'] == (expected or desc)
 
@@ -282,7 +282,7 @@ def test_description_invalid(desc):
     """Test invalid description."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(description=desc)
     )
 
@@ -293,7 +293,7 @@ def test_description_invalid(desc):
 ])
 def test_notes(desc, expected):
     """Test notes."""
-    assert LegacyMetadataSchemaV1(strict=True).load(
+    assert legacyjson.LegacyMetadataSchemaV1(strict=True).load(
         d(notes=desc)
     ).data['notes'] == expected
 
@@ -306,14 +306,14 @@ def test_notes_invalid(desc):
     """Test invalid notes."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(notes=desc)
     )
 
 
 def test_keywords():
     """Test keywords."""
-    assert LegacyMetadataSchemaV1(strict=True).load(
+    assert legacyjson.LegacyMetadataSchemaV1(strict=True).load(
         d(keywords=['kw1', ' kw2 ', ' '])
     ).data['keywords'] == ['kw1', 'kw2']
 
@@ -328,7 +328,7 @@ def test_keywords_invalid(keywords):
     """Test invalid keywords."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(keywords=keywords)
     )
 
@@ -343,7 +343,7 @@ def test_access_rights_invalid(val):
     """Test creators."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(access_right=val)
     )
 
@@ -363,7 +363,7 @@ def test_access_rights(val, removedkeys):
         access_conditions='TEST'
     )
 
-    result = LegacyMetadataSchemaV1(strict=True).load(
+    result = legacyjson.LegacyMetadataSchemaV1(strict=True).load(
         d(access_right=val, **data)
     )
     assert result.data['access_right'] == val
@@ -383,7 +383,7 @@ def test_embargo_date_invalid(dt):
     """Test embargo date."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(access_right='embargoed', embargo_date=dt)
     )
 
@@ -399,7 +399,7 @@ def test_embargo_date_invalid(dt):
 ])
 def test_acess_conditions(desc, expected):
     """Test access conditions."""
-    assert LegacyMetadataSchemaV1(strict=True).load(
+    assert legacyjson.LegacyMetadataSchemaV1(strict=True).load(
         d(access_right='restricted', access_conditions=desc)
     ).data['access_conditions'] == (expected or desc)
 
@@ -413,14 +413,15 @@ def test_acess_conditions(desc, expected):
 ])
 def test_valid_doi(input_val):
     """Test DOI."""
-    data, errors = LegacyMetadataSchemaV1(partial=['doi'], strict=True).load(
+    data, errors = legacyjson.LegacyMetadataSchemaV1(
+        partial=['doi'], strict=True).load(
         d(doi=input_val))
     assert data['doi'] == '10.1234/foo.bar'
 
 
 def test_subjects():
     """Test subjects."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(subjects=[{
         "term": "Astronomy",
         "identifier": "http://id.loc.gov/authorities/subjects/sh85009003",
@@ -447,7 +448,7 @@ def test_contributors():
         Other='...',
         DataCurator='...',
     )))
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     with app.app_context():
         assert s.load(d(**{'contributors': [
             dict(name="Doe, John", affiliation="Atlantis",
@@ -478,14 +479,14 @@ def test_contributors_invalid(contributor):
     with app.app_context():
         pytest.raises(
             ValidationError,
-            LegacyMetadataSchemaV1(strict=True).load,
+            legacyjson.LegacyMetadataSchemaV1(strict=True).load,
             d(contributors=[contributor])
         )
 
 
 def test_references():
     """Test references."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(references=[
         "Reference 1",
         "  ",
@@ -498,7 +499,7 @@ def test_references():
 
 def test_thesis():
     """Test creators and thesis supervisors."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(**{
         'thesis_supervisors': [
             dict(name="Doe, John", affiliation="Atlantis",
@@ -518,7 +519,7 @@ def test_thesis():
 
 def test_journal():
     """Test journal."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         journal_issue="Some issue",
         journal_pages="Some pages",
@@ -534,7 +535,7 @@ def test_journal():
 
 def test_meetings():
     """Test meetings."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         conference_acronym='Some acronym',
         conference_dates='Some dates',
@@ -556,7 +557,7 @@ def test_meetings():
 
 def test_imprint():
     """Test part of vs imprint."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         imprint_isbn="Some isbn",
         imprint_place="Some place",
@@ -578,7 +579,7 @@ def test_imprint():
 
 def test_partof():
     """Test part of vs imprint."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         partof_pages="Some pages",
         partof_title="Some title",
@@ -607,7 +608,7 @@ def test_partof():
 
 def test_prereserve_doi():
     """Test license."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert 'prereserve_doi' not in s.load(d(
         prereserve_doi=True
     )).data
@@ -615,7 +616,7 @@ def test_prereserve_doi():
 
 def test_license():
     """Test license."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         access_right='open', license="cc-zero"
     )).data['license'] == {
@@ -625,7 +626,8 @@ def test_license():
 
 def test_license_refresolver(app, db, license_record):
     """Test license."""
-    s = LegacyMetadataSchemaV1(strict=True, context=dict(replace_refs=True))
+    s = legacyjson.LegacyMetadataSchemaV1(
+        strict=True, context=dict(replace_refs=True))
     assert s.load(d(
         access_right='open', license='CC0-1.0'
     )).data['license'] == {
@@ -638,7 +640,7 @@ def test_license_refresolver(app, db, license_record):
     )
 
     # Without ref resolving
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         access_right='open', license='invalid'
     )).data['license'] == {
@@ -648,7 +650,7 @@ def test_license_refresolver(app, db, license_record):
 
 def test_grants():
     """Test grants."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         grants=[dict(id='283595'), dict(id='10.13039/501100000780::643410')],
     )).data['grants'] == [
@@ -663,7 +665,8 @@ def test_grants():
 
 def test_grants_refresolver(app, db, grant_record, license_record):
     """Test license."""
-    s = LegacyMetadataSchemaV1(strict=True, context=dict(replace_refs=True))
+    s = legacyjson.LegacyMetadataSchemaV1(
+        strict=True, context=dict(replace_refs=True))
     assert s.load(d(
         grants=[dict(id='282896'), dict(id='10.13039/501100000780::282896')],
         license='CC0-1.0'
@@ -675,7 +678,7 @@ def test_grants_refresolver(app, db, grant_record, license_record):
     ))
 
     # Without ref resolving
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(
         d(grants=[dict(id='invalid')], license='CC0-1.0')
     ).data['grants'] == [{
@@ -685,7 +688,7 @@ def test_grants_refresolver(app, db, grant_record, license_record):
 
 def test_communities():
     """Test communities."""
-    s = LegacyMetadataSchemaV1(strict=True)
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         communities=[
             dict(identifier='zenodo'), dict(), dict(identifier='ecfunded'),
@@ -703,7 +706,7 @@ def test_communities_invalid(comms):
     """Test communities."""
     pytest.raises(
         ValidationError,
-        LegacyMetadataSchemaV1(strict=True).load,
+        legacyjson.LegacyMetadataSchemaV1(strict=True).load,
         d(communities=comms)
     )
 
@@ -782,5 +785,5 @@ def test_legacyjson_to_record_translation(app, db, es, grant_record,
         )
     )
     ZenodoDeposit.create(
-        LegacyRecordSchemaV1(strict=True).load(test_data).data
+        legacyjson.LegacyRecordSchemaV1(strict=True).load(test_data).data
     ).validate()

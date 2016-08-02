@@ -29,10 +29,10 @@ from __future__ import absolute_import, print_function
 import json
 
 from flask import url_for
-from mock import patch
 from invenio_communities.models import Community
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_search import current_search
+from mock import patch
 from six import BytesIO
 
 from zenodo.modules.deposit.tasks import datacite_register

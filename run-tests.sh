@@ -24,7 +24,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 pydocstyle zenodo tests && \
-isort -rc -c -df **/*.py && \
+isort -rc -c -df . && \
 check-manifest --ignore ".travis-*,docs/_build*" && \
 sphinx-build -qnNW docs docs/_build/html && \
 py.test tests/unit/ && \

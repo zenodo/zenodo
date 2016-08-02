@@ -29,9 +29,9 @@ from __future__ import absolute_import, print_function
 from invenio_deposit.signals import post_action
 from invenio_indexer.signals import before_record_index
 
+from . import config
 from .indexer import indexer_receiver
 from .receivers import datacite_register_after_publish
-from . import config
 
 
 class ZenodoDeposit(object):
