@@ -108,7 +108,7 @@ invenio-db==1.0.0a9
 invenio-deposit==1.0.0a2
 invenio-files-rest==1.0.0a7
 invenio-formatter==1.0.0a2
-invenio-github==1.0.0a1
+invenio-github==1.0.0a3
 invenio-i18n==1.0.0a4
 invenio-indexer==1.0.0a6
 invenio-jsonschemas==1.0.0a3
@@ -135,7 +135,7 @@ invenio-search-ui==1.0.0a5
 invenio-sipstore==1.0.0a2
 invenio-theme==1.0.0a13
 invenio-userprofiles==1.0.0a7
-invenio-webhooks==1.0.0a2
+invenio-webhooks==1.0.0a3
 ipython==4.2.0
 ipython-genutils==0.1.0
 isbnid==0.4.2.1

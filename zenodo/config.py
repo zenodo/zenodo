@@ -187,14 +187,16 @@ LOGGING_SENTRY_CLASS = 'invenio_logging.sentry6:Sentry6'
 
 # GitHub
 # ======
-#: Set if webhooks check SSL certificate
-# CHANGEME: Should be `True` in production
-GITHUB_INSECURE_SSL = False
+#: Repositories list template.
+GITHUB_TEMPLATE_INDEX = 'zenodo_github/settings/index.html'
+#: Repository detail view template.
+GITHUB_TEMPLATE_VIEW = 'zenodo_github/settings/view.html'
+#: Record serializer to use for serialize record metadata
+GITHUB_RECORD_SERIALIZER = 'zenodo.modules.records.serializers.githubjson_v1'
 #: GitHub webhook url override
 GITHUB_WEBHOOK_RECEIVER_URL = \
-    'http://CHANGEME/api/hooks/receivers/github/events/?access_token={token}'
-#: GitHub shared secret
-GITHUB_SHARED_SECRET = 'CHANGEME'
+    'http://localhost:5000' \
+    '/api/hooks/receivers/github/events/?access_token={token}'
 #: Set Zenodo deposit class
 GITHUB_RELEASE_CLASS = 'zenodo.modules.github.api:ZenodoGitHubRelease'
 #: Set Zenodo deposit class

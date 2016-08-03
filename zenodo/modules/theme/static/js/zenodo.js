@@ -29,8 +29,10 @@ require([
   "node_modules/angular-sanitize/angular-sanitize",
   "node_modules/angular-loading-bar/build/loading-bar",
   "node_modules/invenio-csl-js/dist/invenio-csl-js",
+  "node_modules/bootstrap-switch/dist/js/bootstrap-switch",
   "js/zenodo/module",
   "js/zenodo/functions",
+  "js/github/view",
   ], function($, Clipboard, recordCommunityCurate) {
     // On document ready bootstrap angular
     new Clipboard('.btn.clip-button');

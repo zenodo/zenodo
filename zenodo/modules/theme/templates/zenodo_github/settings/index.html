@@ -1,0 +1,21 @@
+{%- extends "invenio_github/settings/index.html" %}
+
+{%- block css -%}
+  {% include "zenodo_theme/css.html" %}
+{%- endblock css -%}
+
+{%- block javascript -%}
+  {% include "zenodo_theme/javascript.html" %}
+  <script type="text/javascript">
+  require(['jquery', 'js/github/view'], function($, view) {
+    $(document).ready(function(){
+      view({
+        hook_url: "{{url_for('invenio_github.hook')}}",
+        sync_url: "{{url_for('invenio_github.index')}}",
+        sync_button: "button[name='sync-repos']",
+        github_view: "#github-view"
+      });
+    });
+  });
+  </script>
+{%- endblock javascript -%}

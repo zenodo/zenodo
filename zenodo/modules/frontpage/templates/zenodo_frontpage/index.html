@@ -82,9 +82,9 @@
         <span class="pull-right"><i class="fa fa-github fa-5x"></i></span>
         <h4>{{_('Using GitHub?')}}</h4>
         {% if current_user.is_authenticated %}
-        <a href="{#url_for('zenodo_github.index')#}">Check out</a> our GitHub integration. Software Preservation Made Simple!
+        <a href="{{ url_for('invenio_github.index') }}">Check out</a> our GitHub integration. Software Preservation Made Simple!
         {% else %}
-        Just <a href="{{ url_for('security.login') }}" data-toggle="modal">Log in</a> with your GitHub account and <a href="{#url_for('zenodo_github.index')#}">click here</a> to start preserving your repositories.
+        Just <a href="{{ url_for('security.login') }}" data-toggle="modal">Log in</a> with your GitHub account and <a href="{{ url_for('invenio_github.index') }}">click here</a> to start preserving your repositories.
         {% endif %}
       </div>
       <div class="well">

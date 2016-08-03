@@ -43,7 +43,8 @@ from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
-from .schemas.legacyjson import FileSchemaV1, LegacyRecordSchemaV1
+from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
+    LegacyRecordSchemaV1
 from .schemas.marcxml import RecordSchemaMARC
 
 # Serializers
@@ -55,6 +56,9 @@ deposit_json_v1 = JSONSerializer(DepositSchemaV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 legacyjson_v1 = LegacyJSONSerializer(
     LegacyRecordSchemaV1, replace_refs=True)
+#: Zenodo legacy deposit JSON serialzier version 1.0.0
+githubjson_v1 = LegacyJSONSerializer(
+    GitHubRecordSchemaV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 deposit_legacyjson_v1 = DepositLegacyJSONSerializer(
     LegacyRecordSchemaV1, replace_refs=True)

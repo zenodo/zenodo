@@ -37,6 +37,7 @@ from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, post_dump, \
     post_load, pre_load, validate, validates, validates_schema
 from six.moves.urllib.parse import quote
+from werkzeug.routing import BuildError
 
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
 from zenodo.modules.records.models import AccessRight
@@ -379,18 +380,24 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                 recid = None
 
             if bucket_id:
-                links['bucket'] = url_for(
-                    'invenio_files_rest.bucket_api',
-                    bucket_id=bucket_id,
-                    _external=True,
-                )
+                try:
+                    links['bucket'] = url_for(
+                        'invenio_files_rest.bucket_api',
+                        bucket_id=bucket_id,
+                        _external=True,
+                    )
+                except BuildError:
+                    pass
 
             if recid:
-                links['record'] = url_for(
-                    'invenio_records_rest.recid_item',
-                    pid_value=recid,
-                    _external=True,
-                )
+                try:
+                    links['record'] = url_for(
+                        'invenio_records_rest.recid_item',
+                        pid_value=recid,
+                        _external=True,
+                    )
+                except BuildError:
+                    pass
 
             return links
 

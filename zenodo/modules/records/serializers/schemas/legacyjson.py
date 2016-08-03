@@ -27,8 +27,8 @@
 import six
 from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
-from marshmallow import Schema, ValidationError, fields, missing, post_load, \
-    pre_dump, pre_load, validate, validates, validates_schema
+from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
+    post_load, pre_dump, pre_load, validate, validates, validates_schema
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records.models import AccessRight, ObjectType
@@ -374,3 +374,17 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
         elif 'owners' in obj['metadata']:
             return obj['metadata']['owners'][0]
         return None
+
+
+class GitHubRecordSchemaV1(LegacyRecordSchemaV1):
+    """JSON which can be added to the .zenodo.json file in a repository."""
+
+    @post_dump()
+    def remove_envelope(self, data):
+        """Remove envelope."""
+        if 'metadata' in data:
+            data = data['metadata']
+        for k in ['doi', 'prereserve_doi']:
+            if k in data:
+                del data[k]
+        return data
