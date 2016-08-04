@@ -23,6 +23,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 zenodo db create
+zenodo index queue init
 zenodo index init
 zenodo fixtures init
 zenodo users create info@zenodo.org -a --password=123456
