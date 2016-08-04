@@ -39,17 +39,22 @@ Now visit the following URL in your browser:
 You can use the following web interface to inspect Elasticsearch and RabbitMQ:
 
 - Elasticsearch: http://<docker ip>:9200/_plugin/hq/
+- Kibana: http://<docker ip>:5601/
 - RabbitMQ: http://<docker ip>:15672/ (guest/guest)
+- HAProxy: http://<docker ip>:8080/ (guest/guest)
 
 Also the following ports are exposed on the Docker host:
 
-- ``80``: Nginx
-- ``443``: Nginx
+- ``80``: HAProxy
+- ``81``: Nginx
+- ``443``: HAProxy
+- ``444``: Nginx
 - ``5000``: Zenodo
 - ``5432``: PostgreSQL
 - ``5601``: Kibana
 - ``5672``: RabbitMQ
 - ``6379``: Redis
+- ``8080``: HAProxy stats
 - ``8125``: StatsD (UDP)
 - ``9200``: Elasticsearch
 - ``9300``: Elasticsearch
