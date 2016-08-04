@@ -13,9 +13,9 @@ RUN apt-get update \
     && apt-get -qy install --fix-missing --no-install-recommends \
         curl libcairo2-dev fonts-dejavu libfreetype6-dev \
     # Node.js
-    && curl -sL https://deb.nodesource.com/setup_iojs_2.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_4.x | bash - \
     && apt-get -qy install --fix-missing --no-install-recommends \
-        iojs \
+        nodejs \
 
     && apt-get clean autoclean \
     && apt-get autoremove -y \
