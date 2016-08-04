@@ -26,7 +26,7 @@
 -r requirements.pinned.txt
 
 # Requirements not on PyPI
-git+https://github.com/zenodo/zenodo-migrationkit.git@e2f965aa383d9b7a39a5e4e560250f7df6ea70b0#egg=zenodo-migrationkit
+git+https://github.com/zenodo/zenodo-migrator.git@3cb8f1feda5362695fe9eaf9718bc28995366d73#egg=zenodo-migrator
 
 # PyPI requirements
 alabaster==0.7.8

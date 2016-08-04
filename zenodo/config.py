@@ -673,10 +673,6 @@ OAISERVER_METADATA_FORMATS = {
     }
 }
 
-# Migrator
-# ========
-# MIGRATOR_RECORDS_POST_TASK = 'zenodo_migrationkit.tasks.migrate_record'
-
 # REST
 # ====
 #: Enable CORS support.
