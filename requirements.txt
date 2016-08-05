@@ -26,8 +26,8 @@
 -r requirements.pinned.txt
 
 # Requirements not on PyPI
-git+https://github.com/zenodo/zenodo-migrator.git@3cb8f1feda5362695fe9eaf9718bc28995366d73#egg=zenodo-migrator
 git+https://github.com/inveniosoftware/invenio-deposit.git@1dab8292e9194af15f38f7b7f305611045c98f5d#egg=invenio-deposit
+git+https://github.com/zenodo/zenodo-migrator.git@bca1577d8efcadf1cf9e4cdc5a5fff34beea6886#egg=zenodo-migrator
 
 # PyPI requirements
 alabaster==0.7.8
@@ -116,7 +116,7 @@ invenio-jsonschemas==1.0.0a3
 invenio-logging==1.0.0a2
 invenio-mail==1.0.0a4
 invenio-marc21==1.0.0a3
-invenio-migrator==1.0.0a6
+invenio-migrator==1.0.0a7
 invenio-oaiserver==1.0.0a6
 invenio-oauth2server==1.0.0a9
 invenio-oauthclient==1.0.0a8
