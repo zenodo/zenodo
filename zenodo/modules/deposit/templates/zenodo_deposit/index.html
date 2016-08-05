@@ -25,6 +25,7 @@
 {%- extends "invenio_deposit/index.html" %}
 
 {%- block css %}
+    {% assets "invenio_deposit_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
     {% assets "zenodo_theme_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
 {%- endblock css %}
 

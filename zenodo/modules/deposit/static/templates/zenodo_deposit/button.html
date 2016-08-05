@@ -1,0 +1,12 @@
+<div class="form-group schema-form-submit {{ form.htmlClass }}">
+    <div class="col-sm-9 col-sm-offset-3">
+        <button class="btn {{ form.style || 'btn-default' }}"
+                type="button"
+                ng-click="buttonClick($event,form)"
+                ng-disabled="form.readonly">
+            <span ng-if="form.fa_cls"><i ng-class="'fa fa-fw ' + form.fa_cls"></i></span>
+            <span ng-if="form.icon" class="{{ form.icon }}"></span>
+            {{ form.title }}
+        </button>
+    </div>
+</div>

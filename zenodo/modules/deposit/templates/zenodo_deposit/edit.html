@@ -24,19 +24,23 @@
 
 {%- extends "invenio_deposit/edit.html" %}
 
-{%- block css %}
-  {% assets "zenodo_theme_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
-  {% assets "invenio_deposit_css" %}<link href="{{ ASSET_URL }}" rel="stylesheet">{% endassets %}
-{%- endblock css %}
-
 {%- block javascript %}
-  {% assets "invenio_deposit_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "invenio_deposit_dependencies_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+  {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
   <script type="text/javascript">
-    angular.element(document).ready(function() {
+
+    require([
+      'node_modules/angular/angular',
+    ], function() {
+      angular.element(document).ready(function() {
         angular.bootstrap(
-          document.getElementById("invenio-records"),
-          ['invenioFiles', 'invenioRecords', 'schemaForm']
+          document.getElementById('invenio-records'), [
+            'invenioRecords', 'schemaForm', 'mgcrea.ngStrap',
+            'mgcrea.ngStrap.modal', 'pascalprecht.translate', 'ui.select',
+            'mgcrea.ngStrap.select', 'invenioFiles'
+          ]
         );
+      });
     });
   </script>
 {%- endblock javascript %}
@@ -71,6 +75,9 @@
               form-templates-base="{{ url_for('static', filename=config.DEPOSIT_FORM_TEMPLATES_BASE) }}"
               template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FORM) }}">
             </invenio-records-form>
+            <invenio-records-actions
+              template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
+            </invenio-records-actions>
           </invenio-records>
           <invenio-files-uploader
             method="PUT"
@@ -80,15 +87,14 @@
             {% else %}
               initialization="{{ config.DEPOSIT_SEARCH_API }}"
             {% endif %}
-            extra-params='{"headers":{"Content-Type": "application/json"}}'
-          >
+            extra-params='{"headers":{"Content-Type": "application/json"}}'>
             <invenio-files-upload-zone
               template="{{ url_for('static', filename='node_modules/invenio-files-js/dist/templates/upload.html') }}">
             </invenio-files-upload-zone>
             <invenio-files-list
-              template="{{ url_for('static', filename='node_modules/invenio-files-js/dist/templates/list.html') }}"
-            ></invenio-files-list>
-        </invenio-files-uploader>
+              template="{{ url_for('static', filename='node_modules/invenio-files-js/dist/templates/list.html') }}">
+            </invenio-files-list>
+          </invenio-files-uploader>
         </div>
       </div>
     </div>

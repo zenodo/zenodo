@@ -1,0 +1,20 @@
+<fieldset class="schema-form-fieldset {{ form.htmlClass }}"
+          ng-disabled="form.readonly"
+          ng-init="collapsed = form.collapsed">
+  <div class="panel panel-default deposit-panel">
+    <div class="panel-heading" ng-click="collapsed = !collapsed">
+      <a class="panel-toggle">
+        {{ form.title }}
+        <span class="pull-right" ng-show="collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span><span class="pull-right" ng-hide="collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+      </a>
+      <span class="text-muted pull-right"
+      style="padding-right: 10px;">{{ form.fieldhint || 'required' }}</span>
+    </div>
+    <div class="panel-body" ng-hide="collapsed">
+      <p ng-if="form.description"
+      ng-bind-html="form.description"></p>
+      <sf-decorator ng-repeat="item in form.items"
+      form="item"></sf-decorator>
+    </div>
+  </div>
+</fieldset>

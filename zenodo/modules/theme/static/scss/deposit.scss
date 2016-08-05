@@ -10,19 +10,21 @@
         }
     }
 
-    .upload-type {
-        li:hover {
-            color: $brand-primary;
-        }
-
-        span {
-          font-weight: normal;
-        }
-    }
-
     .field-required:after {
         content: " *";
         color: red;
+    }
+
+    .help-block {
+        font-size: 0.9em;
+    }
+
+    .panel-heading {
+        cursor: pointer;
+
+        a {
+            text-decoration: none;
+        }
     }
 
     .panel {
@@ -52,6 +54,24 @@
         height: 30px;
     }
 
+
+    a.add-button {
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .schema-form-array {
+        ol {
+            margin-left: 0;
+            padding-left: 0;
+            list-style: none;
+
+            li {
+                padding-top: 5px;
+            }
+        }
+    }
+
     .deposit-inline {
         padding-bottom: 0;
         margin-bottom: -10px;
@@ -68,6 +88,34 @@
                     margin-top: -5px;
                 }
             }
+        }
+    }
+
+    // Field-specific styling
+    .resource-type-field {
+        li {
+            padding-left: 20px;
+            padding-right: 20px;
+
+            label:hover {
+                color: $brand-primary;
+            }
+        }
+
+        span {
+          font-weight: normal;
+        }
+    }
+}
+
+// Setting classes on ui-select components in angular schema form is pretty
+// much impossible until the next version of angular-schema-form-dynamic-select
+// comes out
+.required-ui-select {
+    div[ng-controller=dynamicSelectController] {
+        label.control-label:after {
+            content: " *";
+            color: red;
         }
     }
 }

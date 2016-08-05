@@ -27,6 +27,7 @@
 
 # Requirements not on PyPI
 git+https://github.com/zenodo/zenodo-migrator.git@3cb8f1feda5362695fe9eaf9718bc28995366d73#egg=zenodo-migrator
+git+https://github.com/inveniosoftware/invenio-deposit.git@1dab8292e9194af15f38f7b7f305611045c98f5d#egg=invenio-deposit
 
 # PyPI requirements
 alabaster==0.7.8
@@ -105,7 +106,7 @@ invenio-communities==1.0.0a9
 invenio-config==1.0.0b1
 invenio-csl-rest==1.0.0a1
 invenio-db==1.0.0a9
-invenio-deposit==1.0.0a2
+# invenio-deposit==1.0.0a3
 invenio-files-rest==1.0.0a7
 invenio-formatter==1.0.0a2
 invenio-github==1.0.0a3

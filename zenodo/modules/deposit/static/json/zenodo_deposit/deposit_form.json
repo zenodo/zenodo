@@ -5,7 +5,9 @@
     "items": [
       {
         "type": "radios-inline",
+        "description": "",
         "notitle": true,
+        "htmlClass": "resource-type-field",
         "key": "resource_type.type",
         "titleMap": [
           {
@@ -41,7 +43,7 @@
           {
             "value": "software",
             "name": "Software",
-            "fa_cls": "fa-cogs"
+            "fa_cls": "fa-code"
           },
           {
             "value": "lesson",
@@ -149,36 +151,6 @@
             "name": "Other"
           }
         ]
-      },
-      {
-        "type": "section",
-        "key": "thesis",
-        "title": "Thesis",
-        "condition": "model.resource_type.type == 'publication' && model.resource_type.subtype == 'publication-thesis'",
-        "items": [
-          {
-            "title": "Awarding University",
-            "key": "thesis.university",
-            "description": ""
-          },
-          {
-            "title": "Supervisors",
-            "key": "thesis.supervisors",
-            "add": "Add another supervisor",
-            "items": [
-              {
-                "key": "thesis.supervisors[].name",
-                "notitle": true,
-                "placeholder": "Family name, given names, e.g., Smith, John James"
-              },
-              {
-                "key": "thesis_supervisors[].affiliation",
-                "notitle": true,
-                "placeholder": "Affiliation"
-              }
-            ]
-          }
-        ]
       }
     ]
   },
@@ -188,65 +160,77 @@
     "items": [
       {
         "key": "doi",
-        "fa_cls": "fa-barcode",
-        "required": true,
+        "title": "Digital Object Identifier",
         "description": "Optional. Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allows others to easily and unambiguously cite your upload.",
-        "placeholder": "e.g., 10.1234/foobar.567890"
+        "placeholder": "e.g. 10.1234/foobar.567890",
+        "fa_cls": "fa-barcode"
       },
       {
-        "fa_cls": "fa-barcode",
+        "title": "Pre-reserve DOI",
         "type": "button",
-        "title": "Pre-reserve DOI"
+        "fa_cls": "fa-barcode"
       },
       {
         "key": "publication_date",
-        "fa_cls": "fa-calendar",
         "title": "Publication Date",
+        "placeholder": "eg. 2016-04-22",
         "description": "Required. Format: YYYY-MM-DD. In case your upload was already published elsewhere, please use the date of first publication.",
-        "format": "yyyy-mm-dd"
+        "format": "yyyy-mm-dd",
+        "fa_cls": "fa-calendar",
+        "required": true
       },
       {
         "key": "title",
         "title": "Title",
         "description": "Required.",
+        "fa_cls": "fa-book",
         "required": true
       },
       {
         "key": "creators",
         "title": "Authors",
+        "description": "",
+        "fa_cls": "fa-user",
+        "required": true,
         "add": "Add another author",
         "inline": true,
+        "minItems": 1,
         "items": [
           {
             "key": "creators[].name",
             "title": "",
-            "placeholder": "Full name",
+            "placeholder": "Family Name, First name",
+            "description": "",
             "notitle": true
           },
           {
             "key": "creators[].affliation",
             "title": "",
-            "placeholder": "Affliation",
+            "placeholder": "Affiliation",
+            "description": "",
             "notitle": true
           }
-        ],
-        "minItems": 1
+        ]
       },
       {
         "type": "textarea",
+        "title": "Description",
         "key": "description",
+        "fa_cls": "fa-pencil",
         "required": true,
         "description": "Required.",
         "minLength": 1
       },
       {
-        "type": "array",
         "key": "keywords",
+        "type": "array",
+        "description": "",
+        "fa_cls": "fa-tags",
         "add": "Add another keyword",
+        "inline": true,
         "items": [
           {
             "notitle": true,
-            "type": "string",
             "key": "keywords[]"
           }
         ]
@@ -255,6 +239,7 @@
         "type": "textarea",
         "key": "notes",
         "description": "Optional.",
+        "fa_cls": "fa-pencil",
         "required": false
       }
     ]
@@ -265,9 +250,10 @@
     "items": [
       {
         "type": "radios",
+        "key": "access_right",
         "title": "Access Right",
         "description": "Required. Open access uploads have considerably higher visibility on Zenodo.",
-        "key": "access_right",
+        "required": true,
         "titleMap": [
           {
             "value": "open",
@@ -276,18 +262,20 @@
           },
           {
             "value": "embargoed",
-            "name": "Embargoed Access"
+            "name": "Embargoed Access",
+            "fa_cls": "fa-ban"
           },
           {
             "value": "restricted",
-            "name": "Restricted Access"
+            "name": "Restricted Access",
+            "fa_cls": "fa-key"
           },
           {
             "value": "closed",
-            "name": "Closed Access"
+            "name": "Closed Access",
+            "fa_cls": "fa-lock"
           }
-        ],
-        "required": true
+        ]
       },
       {
         "description": "Required only for Embargoed Access uploads. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.",
@@ -301,13 +289,22 @@
         "condition": "model.access_right == 'restricted'"
       },
       {
-        "description": "Required. The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license missing is in the list, please inform us at info@zenodo.org.",
         "type": "uiselect",
-        "options": {
-          "asyncCallback": "autocompleteSuggest('/api/licenses', 'hits.hits', 'metadata.suggest.output', 'metadata.suggest.payload')"
-        },
         "key": "license",
-        "placeholder": "License",
+        "description": "Required. The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license is missing from the list, please inform us at <a href='mailto:info@zenodo.org'>info@zenodo.org</a>",
+        "placeholder": "Start typing a license name...",
+        "options": {
+          "asyncCallback": "autocompleteSuggest",
+          "url": "/api/licenses/_suggest",
+          "urlParameters": {
+            "text": "value"
+          },
+          "map": {
+            "resultsProperty": "text.0.options",
+            "valueProperty": "payload.id",
+            "nameProperty": "text"
+          }
+        },
         "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
       }
     ]
@@ -316,19 +313,59 @@
     "type": "fieldset",
     "key": "communities",
     "title": "Communities",
-    "fieldhint": "Recommended",
-    "description": "Any user can create a community collection on Zenodo (browse communities). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
+    "description": "Any user can create a community collection on Zenodo (<a href='http://zenodo.org/communities/'>browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
+    "fieldhint": "recommended",
     "items": [
-      "communities"
+      {
+        "type": "uiselect",
+        "key": "communities[]",
+        "title": "Communities",
+        "placeholder": "Start typing a community name...",
+        "options": {
+          "asyncCallback": "autocompleteSuggest",
+          "url": "/api/communities/",
+          "urlParameters": {
+            "q": "value"
+          },
+          "map": {
+            "resultsProperty": "text.0.options",
+            "valueProperty": "payload.id",
+            "nameProperty": "text"
+          }
+        },
+        "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
+      }
     ]
   },
   {
     "type": "fieldset",
     "key": "grants",
     "title": "Funding",
-    "description": "Zenodo is integrated into reporting lines for research funded by the European Commission via OpenAIRE (http://www.openaire.eu). Specify grants which have funded your research, and we will let your funding agency know!",
+    "description": "Zenodo is integrated into reporting lines for research funded by the European Commission via OpenAIRE (<a href='http://www.openaire.eu'>http://www.openaire.eu</a>). Specify grants which have funded your research, and we will let your funding agency know!",
+    "fieldhint": "recommended",
     "items": [
-      "grants"
+      {
+        "type": "uiselect",
+        "key": "grants[]",
+        "title": "Grants",
+        "placeholder": "Start typing a grant number, name or abbreviation...",
+        "description": "Optional. Note, a human Zenodo curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay before your upload is available in OpenAIRE.",
+        "options": {
+          "asyncCallback": "autocompleteSuggest",
+          "url": "/api/grants/_suggest",
+          "_comment": "Funder filtering is set to European Commission",
+          "urlParameters": {
+            "text": "value",
+            "funder": "'10.13039/501100000780'"
+          },
+          "map": {
+            "resultsProperty": "text.0.options",
+            "valueProperty": "payload.id",
+            "nameProperty": "text"
+          }
+        },
+        "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
+      }
     ]
   },
   {
@@ -336,22 +373,30 @@
     "key": "related_identifiers",
     "title": "Related/alternate identifiers",
     "description": "Specify identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs.",
+    "fieldhint": "recommended",
+    "collapsed": true,
     "items": [
       {
         "type": "array",
         "title": "Related identifiers",
         "key": "related_identifiers",
+        "fa_cls": "fa-barcode",
+        "description": "",
         "add": "Add another related identifier",
         "inline": true,
         "items": [
           {
             "notitle": true,
             "key": "related_identifiers[].identifier",
-            "placeholder": "e.g., 10.1234/foobar.567890"
+            "description": "",
+            "placeholder": "e.g. 10.1234/foobar.567890"
           },
           {
-            "notitle": true,
             "key": "related_identifiers[].relation",
+            "type": "select",
+            "description": "",
+            "notitle": true,
+            "placeholder": "e.g. isPartOf",
             "titleMap": [
               {
                 "value": "isCitedBy",
@@ -370,6 +415,14 @@
                 "name": "is a supplement to this upload"
               },
               {
+                "value": "references",
+                "name": "is referenced by this upload"
+              },
+              {
+                "value": "isReferencedBy",
+                "name": "references this upload"
+              },
+              {
                 "value": "isNewVersionOf",
                 "name": "is previous version of this upload"
               },
@@ -386,27 +439,18 @@
                 "name": "is part of this upload"
               },
               {
+                "value": "compiles",
+                "name": "is compiled/create by this upload"
+              },
+              {
                 "value": "isCompiledBy",
                 "name": "compiled/created this upload"
               },
               {
-                "value": "compiles",
-                "name": "is compiled/created by this upload"
-              },
-              {
                 "value": "isIdenticalTo",
-                "name": "is identical to upload"
-              },
-              {
-                "value": "isAlternativeIdentifier",
-                "name": "is alternate identifier"
+                "name": "is identical to this upload"
               }
             ]
-          },
-          {
-            "notitle": true,
-            "key": "related_identifiers[].scheme",
-            "type": "string"
           }
         ]
       }
@@ -418,24 +462,32 @@
     "title": "Contributors",
     "fieldhint": "optional",
     "collapsed": true,
-    "add": "Add another contributor",
+    "required": false,
     "items": [
       {
+        "type": "array",
         "key": "contributors",
         "title": "Contributors",
+        "description": "",
+        "add": "Add another contributor",
+        "inline": true,
         "items": [
           {
             "key": "contributors[].name",
-            "placeholder": "Family name, given names, e.g., Smith, John James",
+            "placeholder": "Family name, First name",
+            "description": "",
             "notitle": true
           },
           {
             "key": "contributors[].affiliation",
             "placeholder": "Affiliation",
+            "description": "",
             "notitle": true
           },
           {
+            "type": "select",
             "key": "contributors[].type",
+            "placeholder": "Contact person",
             "notitle": true,
             "titleMap": [
               {
@@ -484,115 +536,178 @@
     "type": "fieldset",
     "title": "References",
     "key": "references",
-    "add": "Add another reference.",
+    "description": "",
+    "fieldhint": "optional",
+    "collapsed": true,
     "items": [
       {
-        "key": "references[].raw_reference",
-        "title": "Reference"
-      }
-    ]
-  },
-  {
-    "type": "fieldset",
-    "title": "Journal",
-    "items": [
-      {
-        "key": "journal.title",
-        "description": "Optional."
-      },
-      {
-        "key": "journal.year",
-        "description": "Optional."
-      },
-      {
-        "key": "journal.volume",
-        "description": "Optional."
-      },
-      {
-        "key": "journal.issue",
-        "description": "Optional."
-      },
-      {
-        "key": "journal.pages",
-        "description": "Optional."
-      }
-    ]
-  },
-  {
-    "type": "fieldset",
-    "title": "Associated meetings",
-    "description": "Meetings associated with given publication.",
-    "items": [
-      {
-        "notitle": true,
-        "key": "meetings",
+        "type": "array",
+        "key": "references",
+        "title": "References",
         "description": "",
-        "add": "Add another meeting.",
+        "fa_cls": "fa-bookmark",
+        "add": "Add another reference.",
         "items": [
           {
-            "key": "meetings[].title",
-            "description": "Optional."
-          },
-          {
-            "key": "meetings[].acronym",
-            "description": "Optional."
-          },
-          {
-            "key": "meetings[].dates",
-            "description": "Optional.",
-            "placeholder": "e.g., 21-22 November 2012..."
-          },
-          {
-            "key": "meetings[].place",
-            "description": "Optional.",
-            "placeholder": "e.g., Geneva, Switzerland"
-          },
-          {
-            "key": "meetings[].url",
-            "description": "Optional. URL with more information about the meeting, e.g., http://zenodo.org"
-          },
-          {
-            "key": "meetings[].session",
-            "description": "Optional. Number of session within the conference.",
-            "placeholder": "e.g., VI"
-          },
-          {
-            "key": "meetings[].session_part",
-            "description": "Optional. Number of part within a session.",
-            "placeholder": "e.g., 1"
+            "key": "refereces[].raw_reference",
+            "notitle": true,
+            "placeholder": "eg. Cranmer, Kyle et al. (2014). Decouple software associated to arXiv:1401.0080."
           }
-
         ]
       }
     ]
   },
   {
     "type": "fieldset",
-    "title": "Book/Report/Chapter",
-    "key": "part_of",
+    "title": "Journal",
+    "key": "journal",
+    "fieldhint": "optional",
+    "collapsed": true,
     "items": [
       {
-        "key": "part_of.title",
-        "description": "Title of the book or report which this upload is part of. Optional."
+        "key": "journal.title",
+        "title": "Journal title",
+        "description": "Optional."
       },
       {
+        "key": "journal.year",
+        "title": "Year",
+        "description": "Optional."
+      },
+      {
+        "key": "journal.volume",
+        "title": "Volume",
+        "description": "Optional."
+      },
+      {
+        "key": "journal.issue",
+        "title": "Issue",
+        "description": "Optional."
+      },
+      {
+        "key": "journal.pages",
+        "title": "Pages",
+        "description": "Optional."
+      }
+    ]
+  },
+  {
+    "key": "meeting",
+    "type": "fieldset",
+    "title": "Conference",
+    "description": "",
+    "fieldhint": "optional",
+    "collapsed": true,
+    "items": [
+      {
+        "key": "meeting.title",
+        "title": "Conference title",
+        "description": "Optional."
+      },
+      {
+        "key": "meeting.acronym",
+        "title": "Acronym",
+        "description": "Optional."
+      },
+      {
+        "key": "meeting.dates",
+        "description": "Optional.",
+        "placeholder": "e.g. 21-22 November 2012..."
+      },
+      {
+        "key": "meeting.place",
+        "description": "Optional.",
+        "placeholder": "e.g. city, country"
+      },
+      {
+        "key": "meeting.url",
+        "title": "Website",
+        "description": "Optional. e.g. <a href='http://zenodo.org'>http://zenodo.org</a>"
+      },
+      {
+        "key": "meeting.session",
+        "title": "Session",
+        "description": "Optional. Number of session within the conference.",
+        "placeholder": "e.g. VI"
+      },
+      {
+        "key": "meeting.session_part",
+        "title": "Part",
+        "description": "Optional. Number of part within a session.",
+        "placeholder": "e.g. 1"
+      }
+    ]
+  },
+  {
+    "key": "part_of",
+    "type": "fieldset",
+    "title": "Book/Report/Chapter",
+    "description": "For parts of books and reports.",
+    "fieldhint": "optional",
+    "collapsed": true,
+    "items": [
+      {
         "key": "part_of.publisher",
-        "description": "Name of the publisher. Optional."
+        "title": "Publisher",
+        "description": "Optional."
       },
       {
         "key": "part_of.place",
-        "description": "City, country. Optional.",
-        "placeholder": "e.g., Geneva, Switzerland"
+        "title": "Place",
+        "description": "Optional.",
+        "placeholder": "e.g. city, country"
       },
       {
         "key": "part_of.isbn",
-        "description": "ISBN. Optional.",
-        "placeholder": "e.g., 0-06-251587-X"
+        "title": "ISBN",
+        "description": "Optional.",
+        "placeholder": "e.g. 0-06-251587-X"
+      },
+      {
+        "key": "part_of.title",
+        "title": "Book title",
+        "description": "Optional. Title of the book or report which this upload is part of."
       },
       {
         "key": "part_of.pages",
-        "placeholder": "e.g., 321-332, 344-345",
+        "title": "Pages",
         "description": "Optional."
+      }
+    ]
+  },
+  {
+    "key": "thesis",
+    "type": "fieldset",
+    "title": "Thesis",
+    "fieldhint": "optional",
+    "collapsed": true,
+    "items": [
+      {
+        "title": "Awarding University",
+        "fa_cls": "fa-building",
+        "key": "thesis.university",
+        "description": "Optional."
+      },
+      {
+        "title": "Supervisors",
+        "fa_cls": "fa-user",
+        "key": "thesis.supervisors",
+        "add": "Add another supervisor",
+        "description": "",
+        "inline": true,
+        "items": [
+          {
+            "key": "thesis.supervisors[].name",
+            "notitle": true,
+            "description": "",
+            "placeholder": "Family name, Fisrt name"
+          },
+          {
+            "key": "thesis_supervisors[].affiliation",
+            "notitle": true,
+            "placeholder": "Affiliation"
+          }
+        ]
       }
     ]
   },
@@ -600,19 +715,28 @@
     "type": "fieldset",
     "title": "Subjects",
     "description": "Specify subjects from a taxonomy or controlled vocabulary. Each term must be uniquely identified (e.g. a URL). For free form text, use the keywords field in basic information section.",
+    "fieldhint": "optional",
+    "collapsed": true,
     "items": [
       {
         "key": "subjects",
+        "title": "Subjects",
+        "fa_cls": "fa-tags",
+        "description": "",
         "add": "Add another subject",
         "inline": true,
         "items": [
           {
             "key": "subjects[].term",
+            "notitle": true,
+            "description": "",
             "placeholder": "Term"
 
           },
           {
             "key": "subjects[].identifier",
+            "notitle": true,
+            "description": "",
             "placeholder": "Identifier"
 
           }

@@ -290,7 +290,11 @@ DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
 #: Template for deposit list view.
 DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
 #: Template to use for UI.
-DEPOSIT_UI_NEW_TEMPLATE = "zenodo_deposit/edit.html"
+DEPOSIT_UI_NEW_TEMPLATE = 'zenodo_deposit/edit.html'
+#: Main deposit angular form
+DEPOSIT_UI_JSTEMPLATE_FORM = 'templates/zenodo_deposit/form.html'
+#: Template path for angular form elements.
+DEPOSIT_FORM_TEMPLATES_BASE = 'templates/zenodo_deposit'
 #: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),
