@@ -9,4 +9,65 @@
             color: $brand-success;
         }
     }
+
+    .upload-type {
+        li:hover {
+            color: $brand-primary;
+        }
+
+        span {
+          font-weight: normal;
+        }
+    }
+
+    .field-required:after {
+        content: " *";
+        color: red;
+    }
+
+    .panel {
+      margin-bottom: 10px;
+    }
+
+    div[ng-controller=dynamicSelectController] {
+      &>label {
+        @extend .col-md-3;
+      }
+
+      &>.form-group {
+        @extend .col-md-9;
+        margin-left: 0;
+
+        .caret {
+          display: none;
+        }
+      }
+    }
+
+    input.ui-select-search {
+        width: 100% !important;
+    }
+
+    .close-container.clear-form {
+        height: 30px;
+    }
+
+    .deposit-inline {
+        padding-bottom: 0;
+        margin-bottom: -10px;
+        padding-top: 15px;
+
+        .schema-form-section {
+            display: flex;
+
+            sf-decorator {
+                flex: 1;
+
+                & > div {
+                    margin-right: 0;
+                    margin-top: -5px;
+                }
+            }
+        }
+    }
 }

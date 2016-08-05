@@ -10,35 +10,43 @@
         "titleMap": [
           {
             "value": "publication",
-            "name": "Publication"
+            "name": "Publication",
+            "fa_cls": "fa-file-text"
           },
           {
             "value": "poster",
-            "name": "Poster"
+            "name": "Poster",
+            "fa_cls": "fa-columns"
           },
           {
             "value": "presentation",
-            "name": "Presentation"
+            "name": "Presentation",
+            "fa_cls": "fa-group"
           },
           {
             "value": "dataset",
-            "name": "Dataset"
+            "name": "Dataset",
+            "fa_cls": "fa-table"
           },
           {
             "value": "image",
-            "name": "Image"
+            "name": "Image",
+            "fa_cls": "fa-bar-chart-o"
           },
           {
             "value": "video",
-            "name": "Video/Audio"
+            "name": "Video/Audio",
+            "fa_cls": "fa-film"
           },
           {
             "value": "software",
-            "name": "Software"
+            "name": "Software",
+            "fa_cls": "fa-cogs"
           },
           {
             "value": "lesson",
-            "name": "Lesson"
+            "name": "Lesson",
+            "fa_cls": "fa-graduation-cap"
           }
         ]
       },
@@ -180,15 +188,19 @@
     "items": [
       {
         "key": "doi",
+        "fa_cls": "fa-barcode",
+        "required": true,
         "description": "Optional. Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allows others to easily and unambiguously cite your upload.",
         "placeholder": "e.g., 10.1234/foobar.567890"
       },
       {
+        "fa_cls": "fa-barcode",
         "type": "button",
         "title": "Pre-reserve DOI"
       },
       {
         "key": "publication_date",
+        "fa_cls": "fa-calendar",
         "title": "Publication Date",
         "description": "Required. Format: YYYY-MM-DD. In case your upload was already published elsewhere, please use the date of first publication.",
         "format": "yyyy-mm-dd"
@@ -203,22 +215,19 @@
         "key": "creators",
         "title": "Authors",
         "add": "Add another author",
+        "inline": true,
         "items": [
           {
             "key": "creators[].name",
-            "placeholder": "Family name, given names, e.g., Smith, John James"
+            "title": "",
+            "placeholder": "Full name",
+            "notitle": true
           },
           {
             "key": "creators[].affliation",
-            "placeholder": "Affliation"
-          },
-          {
-            "key": "creators[].gnd",
-            "placeholder": "GND number"
-          },
-          {
-            "key": "creators[].orcid",
-            "placeholder": "ORCID"
+            "title": "",
+            "placeholder": "Affliation",
+            "notitle": true
           }
         ],
         "minItems": 1
@@ -231,11 +240,13 @@
         "minLength": 1
       },
       {
+        "type": "array",
         "key": "keywords",
         "add": "Add another keyword",
         "items": [
           {
             "notitle": true,
+            "type": "string",
             "key": "keywords[]"
           }
         ]
@@ -260,7 +271,8 @@
         "titleMap": [
           {
             "value": "open",
-            "name": "Open Access"
+            "name": "Open Access",
+            "fa_cls": "fa-unlock"
           },
           {
             "value": "embargoed",
@@ -290,7 +302,12 @@
       },
       {
         "description": "Required. The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license missing is in the list, please inform us at info@zenodo.org.",
+        "type": "uiselect",
+        "options": {
+          "asyncCallback": "autocompleteSuggest('/api/licenses', 'hits.hits', 'metadata.suggest.output', 'metadata.suggest.payload')"
+        },
         "key": "license",
+        "placeholder": "License",
         "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
       }
     ]
@@ -299,6 +316,7 @@
     "type": "fieldset",
     "key": "communities",
     "title": "Communities",
+    "fieldhint": "Recommended",
     "description": "Any user can create a community collection on Zenodo (browse communities). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
     "items": [
       "communities"
@@ -320,9 +338,11 @@
     "description": "Specify identifiers of related publications and datasets. Supported identifiers include: DOI, Handle, ARK, PURL, ISSN, ISBN, PubMed ID, PubMed Central ID, ADS Bibliographic Code, arXiv, Life Science Identifiers (LSID), EAN-13, ISTC, URNs and URLs.",
     "items": [
       {
+        "type": "array",
         "title": "Related identifiers",
         "key": "related_identifiers",
         "add": "Add another related identifier",
+        "inline": true,
         "items": [
           {
             "notitle": true,
@@ -396,6 +416,8 @@
     "type": "fieldset",
     "key": "contributors",
     "title": "Contributors",
+    "fieldhint": "optional",
+    "collapsed": true,
     "add": "Add another contributor",
     "items": [
       {
@@ -459,6 +481,7 @@
     ]
   },
   {
+    "type": "fieldset",
     "title": "References",
     "key": "references",
     "add": "Add another reference.",
@@ -581,16 +604,17 @@
       {
         "key": "subjects",
         "add": "Add another subject",
+        "inline": true,
         "items": [
           {
             "key": "subjects[].term",
-            "placeholder": "Term",
-            "notitle": true
+            "placeholder": "Term"
+
           },
           {
             "key": "subjects[].identifier",
-            "placeholder": "Identifier",
-            "notitle": true
+            "placeholder": "Identifier"
+
           }
         ]
       }
