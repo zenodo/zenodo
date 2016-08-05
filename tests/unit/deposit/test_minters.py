@@ -27,6 +27,7 @@ from __future__ import absolute_import, print_function
 from uuid import uuid4
 
 import pytest
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
@@ -90,3 +91,58 @@ def test_invalid_doi(db, doi):
     data = dict(doi=doi)
     zenodo_deposit_minter(dep_uuid, data)
     assert PersistentIdentifier.query.count() == 2
+
+
+def test_unpublished_deposit_and_pid_deletion(deposit):
+    """Test deletion of deposit and pid."""
+    recid = PersistentIdentifier.get('recid', str(deposit['recid']))
+    assert recid and recid.status == PIDStatus.RESERVED
+    assert not recid.has_object()
+    depid = PersistentIdentifier.get('depid', str(deposit['_deposit']['id']))
+    assert depid and depid.status == PIDStatus.REGISTERED
+    assert depid.has_object()
+
+    # Delete deposit
+    deposit.delete()
+
+    pytest.raises(
+        PIDDoesNotExistError,
+        PersistentIdentifier.get,
+        'recid', str(deposit['recid'])
+    )
+    depid = PersistentIdentifier.get('depid', str(deposit['_deposit']['id']))
+    assert depid and depid.status == PIDStatus.DELETED
+
+
+def test_published_external_doi(db, deposit, deposit_file):
+    """Test published external DOI."""
+    ext_doi1 = '10.1234/foo'
+    ext_doi2 = '10.1234/bar'
+    deposit['doi'] = ext_doi1
+    deposit.publish()
+    db.session.commit()
+
+    # Published record with external DOI must have:
+    # 1) a registered recid with object
+    recid = PersistentIdentifier.get('recid', str(deposit['recid']))
+    assert recid and recid.status == PIDStatus.REGISTERED \
+        and recid.has_object()
+    # 2) a reserved external doi with object
+    doi = PersistentIdentifier.get('doi', ext_doi1)
+    assert doi and doi.status == PIDStatus.RESERVED \
+        and doi.has_object()
+
+    # Now change external DOI.
+    deposit = deposit.edit()
+    deposit['doi'] = ext_doi2
+    deposit.publish()
+    db.session.commit()
+
+    # Ensure DOI 1 has been removed.
+    pytest.raises(
+        PIDDoesNotExistError, PersistentIdentifier.get, 'doi', ext_doi1)
+
+    # Ensure DOI 2 has been reserved.
+    doi = PersistentIdentifier.get('doi', ext_doi2)
+    assert doi and doi.status == PIDStatus.RESERVED \
+        and doi.has_object()
