@@ -84,12 +84,13 @@ def upload(token, metadata, files, publish=True):
 def upload_test(token, publish=True):
     """Test upload."""
     metadata = {
-        "title": "My first upload",
-        "upload_type": "poster",
-        "description": "This is my first upload",
-        'access_right': 'restricted',
-        'access_conditions': 'fuuu',
-        "creators": [{"name": "Doe, John", "affiliation": "Zenodo"}]
+        'title': 'My first upload',
+        'upload_type': 'publication',
+        'publication_type': 'book',
+        'description': 'This is my first upload',
+        'access_right': 'open',
+        'license': 'cc-by',
+        'creators': [{'name': 'Doe, John', 'affiliation': 'Zenodo'}]
     }
     files = [('test.txt', BytesIO(b'My first test upload.'))]
     return upload(token, metadata, files, publish=publish)

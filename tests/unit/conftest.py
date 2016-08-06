@@ -381,28 +381,42 @@ def full_record():
     record = dict(
         recid=12345,
         doi='10.1234/foo.bar',
-        _oai={'id': 'oai:zenodo.org:1',
-              'sets': ['user-zenodo', 'user-ecfunded']},
         resource_type={'type': 'publication', 'subtype': 'book'},
         publication_date=date(2014, 2, 27).isoformat(),
         title='Test title',
         creators=[
-            {'name': 'Doe, John', 'affiliation': 'CERN', 'orcid': '',
-             'familyname': 'Doe', 'givennames': 'John'},
-            {'name': 'Smith, John', 'affiliation': 'CERN', 'orcid': '',
-             'familyname': 'Smith', 'givennames': 'John'},
+            {'name': 'Doe, John', 'affiliation': 'CERN',
+             'gnd': '170118215', 'orcid': '0000-0002-1694-233X',
+             'familyname': 'Doe', 'givennames': 'John',
+             },
+            {'name': 'Doe, Jane', 'affiliation': 'CERN',
+             'gnd': '', 'orcid': '0000-0002-1825-0097',
+             'familyname': 'Doe', 'givennames': 'Jane',
+             },
+            {'name': 'Smith, John', 'affiliation': 'CERN',
+             'gnd': '', 'orcid': '',
+             'familyname': 'Smith', 'givennames': 'John',
+             },
+            {'name': 'Nowak, Jack', 'affiliation': 'CERN',
+             'gnd': '170118215', 'orcid': '',
+             'familyname': 'Nowak', 'givennames': 'Jack',
+             },
         ],
         description='Test Description',
         keywords=['kw1', 'kw2', 'kw3'],
+        subjects=[
+            {'term': 'Astronomy',
+             'identifier': 'http://id.loc.gov/authorities/subjects/sh85009003',
+             'scheme': 'url',
+             },
+        ],
         notes='notes',
+        language='en',
         access_right='open',
-        license={'identifier': 'cc-by', 'url': 'http://zenodo.org',
-                 'source': 'opendefinition.org',
-                 'license': 'Creative Commons', },
-        imprint={
-            'place': 'Staszkowka',
-            'publisher': 'Jol'
-        },
+        # embargo_date
+        # access_conditions
+        license={'id': 'cc-by', 'url': 'http://zenodo.org',
+                 'title': 'Creative Commons', },
         communities=['zenodo'],
         grants=[
             {'title': 'Grant Title', 'code': '1234', 'identifiers': {},
@@ -412,13 +426,41 @@ def full_record():
              'internal_id': '10.1234/foo::4321',
              'funder': {'name': 'EC', 'doi': '10.1234/foo'}},
         ],
-        # Test all schemes
         related_identifiers=[
             {'identifier': '10.1234/foo.bar',
                 'scheme': 'doi', 'relation': 'cites'},
             {'identifier': '1234.4321', 'scheme':
                 'arxiv', 'relation': 'cites'},
         ],
+        alternate_identifiers=[
+            {'identifier': 'urn:lsid:ubio.org:namebank:11815',
+             'scheme': 'lsid', },
+            {'identifier': '2011ApJS..192...18K',
+             'scheme': 'issn', },
+            {'identifier': '10.1234/alternate.doi',
+             'scheme': 'doi', },
+        ],
+        contributors=[
+            {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
+             'gnd': '', 'orcid': '0000-0002-1825-0097'},
+            {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
+             'gnd': '', 'orcid': ''},
+            {'affiliation': 'CERN', 'name': 'Kowalski, Manager',
+             'type': 'DataManager'},
+        ],
+        references=[
+            {'raw_reference': 'Doe, John et al (2012). Some title. Zenodo. '
+             '10.5281/zenodo.12'},
+            {'raw_reference': 'Smith, Jane et al (2012). Some title. Zenodo. '
+             '10.5281/zenodo.34'},
+        ],
+        journal={
+            'issue': '2',
+            'pages': '20',
+            'volume': '20',
+            'title': 'Bam',
+            'year': '2014',
+        },
         meeting={
             'title': 'The 13th Biennial HITRAN Conference',
             'place': 'Harvard-Smithsonian Center for Astrophysics',
@@ -427,25 +469,51 @@ def full_record():
             'session': 'VI',
             'session_part': '1',
         },
-        references=[
-            {'raw_reference': 'Doe, John et al (2012). Some title. ZENODO. '
-             '10.5281/zenodo.12'},
-            {'raw_reference': 'Smith, Jane et al (2012). Some title. ZENODO. '
-             '10.5281/zenodo.34'},
-        ],
+        imprint={
+            'place': 'Staszkowka',
+            'publisher': 'Jol',
+            'isbn': '978-0201633610'
+        },
         part_of={
             'title': 'Bum',
             'pages': '1-2',
         },
-        journal={
-            'title': 'Bam',
-            'issue': '2',
-            'pages': '20',
-            'volume': '20'
-        },
         thesis={
             'university': 'I guess important',
-        }
+            'supervisors': [
+                {'name': 'Smith, Professor'},
+            ],
+        },
+        owners=[1, ],
+        _oai={
+            'id': 'oai:zenodo.org:1',
+            'sets': ['user-zenodo', 'user-ecfunded']
+        },
+        _deposit={
+            'id': '1',
+            'created_by': 1,
+            'owners': [1, ],
+            'pid': {
+                'revision_id': 1,
+                'type': 'recid',
+                'value': '12345',
+            },
+            'status': 'published'
+        },
+        _buckets={
+            'deposit': '11111111-1111-1111-1111-111111111111',
+            'record': '22222222-2222-2222-2222-222222222222',
+        },
+        _files=[
+            {
+                'bucket': '22222222-2222-2222-2222-222222222222',
+                'version_id': '11111111-1111-1111-1111-111111111111',
+                'checksum': 'md5:098f6bcd4621d373cade4e832627b4f6',
+                'key': 'test',
+                'size': 4,
+                'type': 'txt',
+            }
+        ],
     )
     record['$schema'] = 'http://zenodo.org/schemas/records/record-v1.0.0.json'
     return record

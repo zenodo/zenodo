@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 from dateutil.parser import parse
 from flask import current_app
-from marshmallow import Schema, fields, post_dump
+from marshmallow import Schema, fields, missing, post_dump
 
 
 class RecordSchemaMARC(Schema):
@@ -44,23 +44,21 @@ class RecordSchemaMARC(Schema):
         lambda o: dict(copyright_status=o['metadata']['access_right']))
 
     index_term_uncontrolled = fields.Function(
-        lambda o: dict(uncontrolled_term=o['metadata'].get('keywords'))
+        lambda o: [
+            dict(uncontrolled_term=kw)
+            for kw in o['metadata'].get('keywords', [])
+        ]
     )
 
-    subject_added_entry_topical_term = fields.Function(
-        lambda o: dict(
-            topical_term_or_geographic_name_entry_element=o[
-                'metadata'].get('license', {}).get('identifier'),
-            source_of_heading_or_term=o[
-                'metadata'].get('license', {}).get('source')
-        ))
+    subject_added_entry_topical_term = fields.Method(
+        'get_subject_added_entry_topical_term')
 
     terms_governing_use_and_reproduction_note = fields.Function(
         lambda o: dict(
             uniform_resource_identifier=o[
                 'metadata'].get('license', {}).get('url'),
             terms_governing_use_and_reproduction=o[
-                'metadata'].get('license', {}).get('license')
+                'metadata'].get('license', {}).get('title')
         ))
 
     title_statement = fields.Function(
@@ -72,10 +70,8 @@ class RecordSchemaMARC(Schema):
     information_relating_to_copyright_status = fields.Function(
         lambda o: dict(copyright_status=o['metadata'].get('access_right')))
 
-    publication_distribution_imprint = fields.Function(
-        lambda o: dict(
-            date_of_publication_distribution=o['metadata'].get(
-                'publication_date')))
+    publication_distribution_imprint = fields.Method(
+        'get_publication_distribution_imprint')
 
     funding_information_note = fields.Function(
         lambda o: [dict(
@@ -83,11 +79,7 @@ class RecordSchemaMARC(Schema):
             grant_number=v.get('code')
         ) for v in o['metadata'].get('grants', [])])
 
-    other_standard_identifier = fields.Function(
-        lambda o: [dict(
-            standard_number_or_code=v.get('identifier'),
-            source_of_number_or_code=v.get('scheme'),
-        ) for v in o['metadata'].get('alternate_identifiers', [])])
+    other_standard_identifier = fields.Method('get_other_standard_identifier')
 
     added_entry_meeting_name = fields.Method('get_added_entry_meeting_name')
 
@@ -98,11 +90,11 @@ class RecordSchemaMARC(Schema):
     summary = fields.Function(
         lambda o: dict(summary=o['metadata'].get('description')))
 
-    host_item_entry = fields.Function(
-        lambda o: [dict(
-            relationship_information=v.get('relation'),
-            note=v.get('scheme'),
-        ) for v in o['metadata'].get('related_identifiers', [])])
+    host_item_entry = fields.Method('get_host_item_entry')
+
+    dissertation_note = fields.Function(
+        lambda o: dict(name_of_granting_institution=o[
+            'metadata'].get('thesis', {}).get('university')))
 
     # Custom
     # ======
@@ -115,7 +107,101 @@ class RecordSchemaMARC(Schema):
 
     embargo_date = fields.Raw(attribute='metadata.embargo_date')
 
+    journal = fields.Raw(attribute='metadata.journal')
+
     _oai = fields.Raw(attribute='metadata._oai')
+
+    def get_host_item_entry(self, o):
+        """Get host items."""
+        res = []
+        for v in o['metadata'].get('related_identifiers', []):
+            res.append(dict(
+                main_entry_heading=v.get('identifier'),
+                relationship_information=v.get('relation'),
+                note=v.get('scheme'),
+            ))
+
+        imprint = o['metadata'].get('imprint', {})
+        part_of = o['metadata'].get('part_of', {})
+        if part_of and imprint:
+            res.append(dict(
+                main_entry_heading=imprint.get('place'),
+                edition=imprint.get('publisher'),
+                title=part_of.get('title'),
+                related_parts=part_of.get('pages'),
+                international_standard_book_number=imprint.get('isbn'),
+            ))
+
+        return res or missing
+
+    def get_publication_distribution_imprint(self, o):
+        """Get publication date and imprint."""
+        res = []
+
+        pubdate = o['metadata'].get('publication_date')
+        if pubdate:
+            res.append(dict(date_of_publication_distribution=pubdate))
+
+        imprint = o['metadata'].get('imprint')
+        part_of = o['metadata'].get('part_of')
+        if not part_of and imprint:
+            res.append(dict(
+                place_of_publication_distribution=imprint.get('place'),
+                name_of_publisher_distributor=imprint.get('publisher'),
+                date_of_publication_distribution=pubdate,
+            ))
+
+        return res or missing
+
+    def get_subject_added_entry_topical_term(self, o):
+        """Get licenses and subjects."""
+        res = []
+
+        license = o['metadata'].get('license', {}).get('id')
+        if license:
+            res.append(dict(
+                topical_term_or_geographic_name_entry_element='cc-by',
+                source_of_heading_or_term='opendefinition.org',
+                level_of_subject='Primary',
+                thesaurus='Source specified in subfield $2',
+            ))
+
+        def _subject(term, id_, scheme):
+            return dict(
+                topical_term_or_geographic_name_entry_element=term,
+                authority_record_control_number_or_standard_number=(
+                    '({0}){1}'.format(scheme, id_)),
+                level_of_subject='Primary',
+            )
+
+        for s in o['metadata'].get('subjects', []):
+            res.append(_subject(
+                s.get('term'), s.get('identifier'), s.get('scheme'), ))
+
+        return res or missing
+
+    def get_other_standard_identifier(self, o):
+        """Get other standard identifiers."""
+        res = []
+
+        def stdid(pid, scheme, q=None):
+            return dict(
+                standard_number_or_code=pid,
+                source_of_number_or_code=scheme,
+                qualifying_information=q,
+            )
+        m = o['metadata']
+        if m.get('doi'):
+            res.append(stdid(m['doi'], 'doi'))
+
+        for id_ in m.get('alternate_identifiers', []):
+            res.append(stdid(
+                id_.get('identifier'),
+                id_.get('scheme'),
+                q='alternateidentifier'
+            ))
+
+        return res or missing
 
     def _get_personal_name(self, v, relator_code=None):
         ids = []

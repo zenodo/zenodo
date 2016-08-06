@@ -27,8 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from dojson import utils
-
-from .model import to_marc21
+from dojson.contrib.to_marc21 import to_marc21
 
 
 @to_marc21.over('980', '^(resource_type|communities)$')
@@ -74,13 +73,25 @@ def reverse_embargo_date(dummy_self, dummy_key, value):
     }
 
 
-@to_marc21.over('909', '^oai$')
+@to_marc21.over('909', '^(_oai|journal)$')
 @utils.filter_values
-def reverse_oai(dummy_self, dummy_key, value):
-    """Reverse - OAI."""
-    return {
-        'o': value.get('id'),
-        'p': utils.reverse_force_list(value.get('sets')),
-        '$ind1': 'C',
-        '$ind2': 'O',
-    }
+def reverse_oai(dummy_self, key, value):
+    """Reverse - OAI/Journal."""
+    if key == '_oai':
+        return {
+            'o': value.get('id'),
+            'p': utils.reverse_force_list(value.get('sets')),
+            '$ind1': 'C',
+            '$ind2': 'O',
+        }
+    elif key == 'journal':
+        return {
+            'n': value.get('issue'),
+            'c': value.get('pages'),
+            'v': value.get('volume'),
+            'p': value.get('title'),
+            'y': value.get('year'),
+            '$ind1': 'C',
+            '$ind2': '4',
+        }
+    return
