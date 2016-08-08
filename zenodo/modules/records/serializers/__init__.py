@@ -45,7 +45,7 @@ from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
 from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
     LegacyRecordSchemaV1
-from .schemas.marcxml import RecordSchemaMARC
+from .schemas.marc21 import RecordSchemaMARC21
 
 # Serializers
 # ===========
@@ -64,7 +64,7 @@ deposit_legacyjson_v1 = DepositLegacyJSONSerializer(
     LegacyRecordSchemaV1, replace_refs=True)
 #: MARCXML serializer version 1.0.0
 marcxml_v1 = MARCXMLSerializer(
-    to_marc21, schema_class=RecordSchemaMARC, replace_refs=True)
+    to_marc21, schema_class=RecordSchemaMARC21, replace_refs=True)
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializer

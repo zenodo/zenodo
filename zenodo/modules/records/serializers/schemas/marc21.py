@@ -31,7 +31,7 @@ from flask import current_app
 from marshmallow import Schema, fields, missing, post_dump
 
 
-class RecordSchemaMARC(Schema):
+class RecordSchemaMARC21(Schema):
     """Schema for records in MARC."""
 
     control_number = fields.Function(

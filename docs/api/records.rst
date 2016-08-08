@@ -105,7 +105,7 @@ Marshmallow schemas
    :members:
    :undoc-members:
 
-.. automodule:: zenodo.modules.records.serializers.schemas.marcxml
+.. automodule:: zenodo.modules.records.serializers.schemas.marc21
    :members:
    :undoc-members:
 
