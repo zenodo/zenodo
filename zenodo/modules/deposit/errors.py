@@ -70,6 +70,12 @@ class MarshmallowErrors(RESTValidationError):
         self.errors = errors
         super(MarshmallowErrors, self).__init__()
 
+    def __str__(self):
+        """Print exception with errors."""
+        return "{base}. Encountered errors: {errors}".format(
+            base=super(RESTValidationError, self).__str__(),
+            errors=self.errors)
+
     def iter_errors(self, errors, prefix=''):
         """Iterator over marshmallow errors."""
         res = []
