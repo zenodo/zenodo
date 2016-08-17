@@ -1,13 +1,9 @@
-<div class="row">
-    <div>
-        <form
-          name="depositionForm"
-          class="form-horizontal"
-          ng-hide="recordsVM.invenioRecordsAlert.type == 'success' && recordsVM.invenioRecordsArgs.responseParams[recordsVM.invenioRecordsAlert.action].hide"
-          sf-schema="recordsVM.invenioRecordsSchema"
-          sf-form="recordsVM.invenioRecordsForm"
-          sf-model="recordsVM.invenioRecordsModel"
-          sf-options="{ formDefaults: { disableSuccessState: true, feedback: false, onChange: 'recordsVM.removeValidationMessage(modelValue,form)', ngModelOptions: { updateOn: 'default blur', allowInvalid: true} } }"
-          ></form>
-    </div>
-</div>
+<form
+  name="depositionForm"
+  class="form-horizontal"
+  ng-hide="recordsVM.invenioRecordsAlert.type == 'success' && recordsVM.invenioRecordsArgs.responseParams[recordsVM.invenioRecordsAlert.action].hide"
+  sf-schema="recordsVM.invenioRecordsSchema"
+  sf-form="recordsVM.invenioRecordsForm"
+  sf-model="recordsVM.invenioRecordsModel"
+  sf-options="{ formDefaults: { disableSuccessState: true, feedback: false, onChange: 'recordsVM.removeValidationMessage(modelValue,form)', ngModelOptions: { updateOn: 'default blur', allowInvalid: true} } }">
+</form>

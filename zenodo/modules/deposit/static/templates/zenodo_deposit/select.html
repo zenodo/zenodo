@@ -3,9 +3,9 @@
   <label class="control-label col-sm-3 {{form.labelHtmlClass}}"
          ng-show="showTitle()"
          ng-class="{'field-required': form.required}">
-    {{form.title}}
+    <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>{{form.title}}
   </label>
-  <div class="col-sm-9">
+  <div ng-class="{'col-sm-9': !form.notitle, 'col-sm-12': form.notitle}">
     <select ng-model="$$value$$"
             ng-model-options="form.ngModelOptions"
             ng-disabled="form.readonly"

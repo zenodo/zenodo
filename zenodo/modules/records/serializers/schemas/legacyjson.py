@@ -154,9 +154,11 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
 
     def load_license(self, data):
         """Load license."""
-        if not isinstance(data, six.string_types):
-            raise ValidationError(_('Not a string.'))
-        return {'$ref': 'https://dx.zenodo.org/licenses/{0}'.format(data)}
+        if isinstance(data, six.string_types):
+            license = data
+        if isinstance(data, dict):
+            license = data['id']
+        return {'$ref': 'https://dx.zenodo.org/licenses/{0}'.format(license)}
 
     def dump_grants(self, obj):
         """Get grants."""

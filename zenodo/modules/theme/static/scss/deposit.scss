@@ -3,6 +3,10 @@
         background-color: transparent;
     }
 
+    .deposit-actions .list-inline>li {
+        padding-right: 0;
+    }
+
     .active {
         font-weight: bold;
         .glyphicon {
@@ -15,12 +19,20 @@
         color: red;
     }
 
+    .has-feedback .form-control-feedback {
+        right: 30px;
+    }
+
     .help-block {
         font-size: 0.9em;
     }
 
     .panel-heading {
         cursor: pointer;
+
+        .fieldset-hint {
+            padding-right: 10px;
+        }
 
         a {
             text-decoration: none;
@@ -31,34 +43,54 @@
       margin-bottom: 10px;
     }
 
-    div[ng-controller=dynamicSelectController] {
-      &>label {
-        @extend .col-md-3;
-      }
 
-      &>.form-group {
-        @extend .col-md-9;
-        margin-left: 0;
-
-        .caret {
-          display: none;
+    .schema-form-datepicker {
+        input {
+            background-color: white;
         }
-      }
     }
 
-    input.ui-select-search {
-        width: 100% !important;
+
+    .cke {
+        border: 0;
+        box-shadow: none;
+
+        .cke_inner {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-shadow: inset 0 1px 1px rgba(0,0,0,.075);
+            padding: 1px;
+        }
     }
+
+
+    .schema-form-uiselect {
+
+        .form-group {
+            margin-left: 0;
+
+        }
+        .caret {
+            display: none;
+        }
+
+        input.ui-select-search {
+            width: 100% !important;
+        }
+
+        .ui-select-placeholder, .ui-select-match-text {
+          width: 95%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          position: absolute;
+        }
+    }
+
 
     .close-container.clear-form {
         height: 30px;
     }
 
-
-    a.add-button {
-        text-decoration: none;
-        cursor: pointer;
-    }
 
     .schema-form-array {
         ol {
@@ -77,11 +109,16 @@
         margin-bottom: -10px;
         padding-top: 15px;
 
+        .sort-handle {
+            cursor: move
+        }
+
         .schema-form-section {
             display: flex;
+            flex-direction: row;
 
             sf-decorator {
-                flex: 1;
+                flex: auto;
 
                 & > div {
                     margin-right: 0;
@@ -91,7 +128,11 @@
         }
     }
 
-    // Field-specific styling
+    a.add-button {
+        text-decoration: none;
+        cursor: pointer;
+    }
+
     .resource-type-field {
         li {
             padding-left: 20px;
@@ -108,14 +149,3 @@
     }
 }
 
-// Setting classes on ui-select components in angular schema form is pretty
-// much impossible until the next version of angular-schema-form-dynamic-select
-// comes out
-.required-ui-select {
-    div[ng-controller=dynamicSelectController] {
-        label.control-label:after {
-            content: " *";
-            color: red;
-        }
-    }
-}

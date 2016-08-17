@@ -30,6 +30,7 @@ from invenio_indexer.signals import before_record_index
 
 from . import config
 from .indexer import indexer_receiver
+from .utils import serialize_record
 from .views import blueprint, record_communities
 
 
@@ -49,6 +50,8 @@ class ZenodoRecords(object):
         app.context_processor(record_communities)
         # Register blueprint
         app.register_blueprint(blueprint)
+        # Add global record serializer template filter
+        app.add_template_filter(serialize_record, 'serialize_record')
         before_record_index.connect(indexer_receiver, sender=app)
         app.extensions['zenodo-records'] = self
 

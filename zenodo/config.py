@@ -291,8 +291,10 @@ DEPOSIT_SEARCH_MIMETYPE = 'application/vnd.zenodo.v1+json'
 DEPOSIT_UI_INDEX_TEMPLATE = 'zenodo_deposit/index.html'
 #: Template to use for UI.
 DEPOSIT_UI_NEW_TEMPLATE = 'zenodo_deposit/edit.html'
-#: Main deposit angular form
+#: Template for <invenio-records-form>
 DEPOSIT_UI_JSTEMPLATE_FORM = 'templates/zenodo_deposit/form.html'
+#: Template for <invenio-records-actions>
+DEPOSIT_UI_JSTEMPLATE_ACTIONS = 'templates/zenodo_deposit/actions.html'
 #: Template path for angular form elements.
 DEPOSIT_FORM_TEMPLATES_BASE = 'templates/zenodo_deposit'
 #: Allow list of contributor types.
@@ -319,6 +321,8 @@ DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'
 
 #: Angular Schema Form for deposit.
 DEPOSIT_DEFAULT_SCHEMAFORM = 'json/zenodo_deposit/deposit_form.json'
+#: JSON Schema for deposit Angular Schema Form.
+DEPOSIT_FORM_JSONSCHEMA = 'deposits/records/legacyrecord.json'
 
 #: Template for deposit records API.
 DEPOSIT_RECORDS_API = '/api/deposit/depositions/{pid_value}'
@@ -396,6 +400,16 @@ DEPOSIT_REST_ENDPOINTS = dict(
         max_result_window=10000,
     ),
 )
+
+#: Depoist UI endpoints
+DEPOSIT_RECORDS_UI_ENDPOINTS = {
+    'depid': {
+        'pid_type': 'depid',
+        'route': '/deposit/<pid_value>',
+        'template': 'zenodo_deposit/edit.html',
+        'record_class': 'zenodo.modules.deposit.api:ZenodoDeposit',
+    },
+}
 
 # SIPStore
 # ========

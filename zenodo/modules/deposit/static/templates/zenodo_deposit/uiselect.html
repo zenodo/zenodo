@@ -1,0 +1,50 @@
+<div
+  class="form-group schema-form-uiselect {{form.htmlClass}}"
+  ng-controller="dynamicSelectController"
+  ng-class="{'has-error': hasError(), 'has-success': hasSuccess(), 'has-feedback': form.feedback !== false}"
+  ng-init="insideModel=$$value$$;">
+  <label
+    class="control-label col-sm-3"
+    for="{{ form.key.slice(-1)[0] }}"
+    ng-class="{'sr-only': !showTitle(), 'field-required': form.required}"
+    ng-show="showTitle()">
+    <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>&nbsp;{{ form.title }}
+  </label>
+  <div ng-class="{'col-sm-9': !form.notitle, 'col-sm-12': form.notitle}">
+    <ui-select
+      class="{{form.options.uiClass}}"
+      theme="bootstrap"
+      ng-model="select_model.selected"
+      ng-if="!(form.options.tagging||false)"
+      ng-disabled="form.disabled"
+      on-select="$$value$$=$item.value">
+      <ui-select-match placeholder="{{form.placeholder || form.schema.placeholder || ('placeholders.select' | translate)}}">
+        {{select_model.selected.name}}
+      </ui-select-match>
+      <ui-select-choices
+        refresh="populateTitleMap(form, $select.search)"
+        refresh-delay="form.options.refreshDelay"
+        group-by="form.options.groupBy"
+        repeat="item in form.titleMap | propsFilter: {name: $select.search, description: (form.options.searchDescriptions===true ? $select.search : 'NOTSEARCHINGFORTHIS') }">
+        <div ng-bind-html="item.name | highlight: $select.search"></div>
+        <div ng-if="item.description">
+          <span ng-bind-html="'<small>' + (''+item.description | highlight: (form.options.searchDescriptions===true ? $select.search : 'NOTSEARCHINGFORTHIS'))+ '</small>'"></span>
+        </div>
+      </ui-select-choices>
+    </ui-select>
+
+    <input
+      type="hidden"
+      name="{{form.key.slice(-1)[0]}}"
+      toggle-single-model
+      sf-changed="form"
+      ng-model="insideModel"
+      schema-validate="form"/>
+    <span
+      id="{{form.key.slice(-1)[0] + 'Status'}}"
+      class="form-control-feedback"
+      ng-if="form.feedback !== false"
+      ng-class="evalInScope(form.feedback) || {'glyphicon': true, 'glyphicon-ok': hasSuccess(), 'glyphicon-remove': hasError() }"></span>
+    <div class="help-block" sf-message="form.description"></div>
+  </div>
+</div>

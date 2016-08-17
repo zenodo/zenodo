@@ -1,28 +1,31 @@
-<div class="form-group schema-form-radios-inline {{ form.htmlClass }}"
-     align="center"
-     ng-class="{'has-error': form.disableErrorState !== true && hasError(), 'has-success': form.disableSuccessState !== true && hasSuccess()}">
-    <label class="control-label {{ form.labelHtmlClass }}"
-           schema-validate="form"
-           ng-model="$$value$$"
-           ng-model-options="form.ngModelOptions"
-           ng-class="{'field-required': form.required}"
-           ng-show="showTitle()">{{ form.title }}</label>
-    <ul class="list-inline center-block">
-        <li ng-repeat="item in form.titleMap">
-            <label>
-                <i class="fa {{ item.fa_cls }} fa-2x fa-fw"></i>
-                <br/>
-                <span ng-bind-html="item.name"></span>
-                <br/>
-                <input class="{{ form.fieldHtmlClass }}"
-                       type="radio"
-                       sf-changed="form"
-                       ng-disabled="form.readonly"
-                       ng-model="$$value$$"
-                       ng-value="item.value"
-                       name="{{ form.key.join('.') }}">
-             </label>
-        </li>
-    </ul>
-    <div class="help-block" sf-message="form.description"></div>
+<div
+  class="form-group schema-form-radios-inline {{ form.htmlClass }}"
+  align="center"
+  ng-class="{'has-error': form.disableErrorState !== true && hasError(), 'has-success': form.disableSuccessState !== true && hasSuccess()}">
+  <label
+    class="control-label {{ form.labelHtmlClass }}"
+    schema-validate="form"
+    ng-model="$$value$$"
+    ng-model-options="form.ngModelOptions"
+    ng-class="{'field-required': form.required}"
+    ng-show="showTitle()">{{ form.title }}</label>
+  <ul class="list-inline center-block">
+    <li ng-repeat="item in form.titleMap">
+      <label>
+        <i class="fa {{ item.fa_cls }} fa-2x fa-fw"></i>
+        <br/>
+        <span ng-bind-html="item.name"></span>
+        <br/>
+        <input
+          class="{{ form.fieldHtmlClass }}"
+          name="{{ form.key.join('.') }}"
+          type="radio"
+          sf-changed="form"
+          ng-disabled="form.readonly"
+          ng-model="$$value$$"
+          ng-value="item.value">
+      </label>
+    </li>
+  </ul>
+  <div class="help-block" sf-message="form.description"></div>
 </div>

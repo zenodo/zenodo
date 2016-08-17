@@ -3,37 +3,39 @@
   <label class="control-label col-sm-3 {{ form.labelHtmlClass }}"
          ng-class="{'sr-only': !showTitle(), 'field-required': form.required}"
          for="{{ form.key.slice(-1)[0] }}">
-    <i class="fa fa-fw {{ form.fa_cls }}"></i>
+    <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>
     {{ form.title }}
   </label>
-  <div class="col-sm-9">
-    <textarea ng-if="!form.fieldAddonLeft && !form.fieldAddonRight"
-    class="form-control {{ form.fieldHtmlClass }}"
-    id="{{ form.key.slice(-1)[0] }}"
-    sf-changed="form"
-    placeholder="{{ form.placeholder }}"
-    ng-disabled="form.readonly"
-    ng-model="$$value$$"
-    ng-model-options="form.ngModelOptions"
-    schema-validate="form"
-    name="{{ form.key.slice(-1)[0] }}"></textarea>
-    <div ng-if="form.fieldAddonLeft || form.fieldAddonRight"
-      ng-class="{'input-group': (form.fieldAddonLeft || form.fieldAddonRight)}">
-      <span ng-if="form.fieldAddonLeft"
-        class="input-group-addon"
-      ng-bind-html="form.fieldAddonLeft"></span>
-      <textarea class="form-control {{ form.fieldHtmlClass }}"
+  <div ng-class="{'col-sm-9': !form.notitle, 'col-sm-12': form.notitle}">
+    <textarea
       id="{{ form.key.slice(-1)[0] }}"
-      sf-changed="form"
+      class="form-control {{ form.fieldHtmlClass }}"
+      name="{{ form.key.slice(-1)[0] }}"
       placeholder="{{ form.placeholder }}"
+      ng-if="!form.fieldAddonLeft && !form.fieldAddonRight"
+      sf-changed="form"
       ng-disabled="form.readonly"
       ng-model="$$value$$"
       ng-model-options="form.ngModelOptions"
-      schema-validate="form"
-      name="{{ form.key.slice(-1)[0] }}"></textarea>
-      <span ng-if="form.fieldAddonRight"
+      schema-validate="form"></textarea>
+    <div
+      ng-if="form.fieldAddonLeft || form.fieldAddonRight"
+      ng-class="{'input-group': (form.fieldAddonLeft || form.fieldAddonRight)}">
+      <span
         class="input-group-addon"
-      ng-bind-html="form.fieldAddonRight"></span>
+        ng-if="form.fieldAddonLeft"
+        ng-bind-html="form.fieldAddonLeft"></span>
+      <textarea
+        class="form-control {{ form.fieldHtmlClass }}"
+        id="{{ form.key.slice(-1)[0] }}"
+        sf-changed="form"
+        placeholder="{{ form.placeholder }}"
+        ng-disabled="form.readonly"
+        ng-model="$$value$$"
+        ng-model-options="form.ngModelOptions"
+        schema-validate="form"
+        name="{{ form.key.slice(-1)[0] }}"></textarea>
+      <span ng-if="form.fieldAddonRight" class="input-group-addon" ng-bind-html="form.fieldAddonRight"></span>
     </div>
     <div class="help-block" sf-message="form.description"></div>
   </div>

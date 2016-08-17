@@ -1,0 +1,525 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "additionalProperties": false,
+  "description": "Describe information needed for deposit module.",
+  "id": "http://zenodo.org/schemas/deposits/records/record-v1.0.0.json",
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "_deposit": {
+      "name": "_deposit",
+      "properties": {
+        "created_by": {
+          "name": "created_by",
+          "type": "integer"
+        },
+        "id": {
+          "name": "id",
+          "type": "string"
+        },
+        "owners": {
+          "items": [
+            {
+              "type": "integer"
+            }
+          ],
+          "name": "owners",
+          "type": "array"
+        },
+        "pid": {
+          "name": "pid",
+          "properties": {
+            "revision_id": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "published"
+          ],
+          "name": "status",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "_buckets": {
+      "type": "object",
+      "properties": {
+        "deposit": {
+          "description": "Deposit bucket ID.",
+          "type": "string"
+        },
+        "record": {
+          "description": "Record bucket ID.",
+          "type": "string"
+        }
+      }
+    },
+    "_files": {
+      "items": {
+        "description": "Describe information needed for files in records.",
+        "properties": {
+          "bucket": {
+            "type": "string"
+          },
+          "checksum": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "previewer": {
+            "description": "Identifier for previewer needed to preview this file.",
+            "type": "string"
+          },
+          "size": {
+            "type": "integer"
+          },
+          "type": {
+            "description": "File type extension.",
+            "type": "string"
+          },
+          "version_id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "access_conditions": {
+      "description": "Conditions under which access is given if record is restricted.",
+      "title": "Access conditions",
+      "type": "string"
+    },
+    "access_right": {
+      "default": "open",
+      "description": "Access right for record.",
+      "enum": [
+        "open",
+        "embargoed",
+        "restricted",
+        "closed"
+      ],
+      "type": "string"
+    },
+    "communities": {
+      "description": "List of community identifiers.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "ifentifier": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "contributors": {
+      "description": "Contributors in order of importance.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "affiliation": {
+            "description": "Affiliation for the purpose of this specific record.",
+            "type": "string"
+          },
+          "gnd": {
+            "description": "Gemeinsame Normdatei identifier for creator.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Full name of person or organisation. Personal name format: family, given.",
+            "type": "string"
+          },
+          "orcid": {
+            "description": "ORCID identifier for creator.",
+            "type": "string"
+          },
+          "type": {
+            "enum": [
+              "ContactPerson",
+              "DataCollector",
+              "DataCurator",
+              "DataManager",
+              "Distributor",
+              "Editor",
+              "Funder",
+              "HostingInstitution",
+              "Other",
+              "Producer",
+              "ProjectLeader",
+              "ProjectManager",
+              "ProjectMember",
+              "RegistrationAgency",
+              "RegistrationAuthority",
+              "RelatedPerson",
+              "ResearchGroup",
+              "RightsHolder",
+              "Researcher",
+              "Sponsor",
+              "Supervisor",
+              "WorkPackageLeader"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "title": "Contributors",
+      "type": "array"
+    },
+    "creators": {
+      "description": "Creators of record in order of importance.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "affiliation": {
+            "description": "Affiliation for the purpose of this specific record.",
+            "type": "string"
+          },
+          "gnd": {
+            "description": "Gemeinsame Normdatei identifier for creator.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Full name of person or organisation. Personal name format: family, given.",
+            "type": "string"
+          },
+          "orcid": {
+            "description": "ORCID identifier for creator.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "description": {
+      "description": "Description/abstract for record.",
+      "type": "string"
+    },
+    "doi": {
+      "description": "Digital Object Identifier (DOI).",
+      "type": "string"
+    },
+    "embargo_date": {
+      "description": "Embargo date of record (ISO8601 formatted date).",
+      "title": "Embargo Date",
+      "type": "string"
+    },
+    "grants": {
+      "description": "Source of grants/awards which have funded all or part of this particular record.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "imprint_isbn": {
+      "type": "string"
+    },
+    "imprint_place": {
+      "type": "string"
+    },
+    "imprint_publisher": {
+      "type": "string"
+    },
+    "journal_issue": {
+      "description": "Journal issue.",
+      "title": "Journal issue",
+      "type": "string"
+    },
+    "journal_pages": {
+      "description": "Journal page(s).",
+      "title": "Journal page(s)",
+      "type": "string"
+    },
+    "journal_title": {
+      "description": "Journal title.",
+      "title": "Journal title",
+      "type": "string"
+    },
+    "journal_volume": {
+      "description": "Journal volume.",
+      "title": "Journal volume",
+      "type": "string"
+    },
+    "keywords": {
+      "description": "Free text keywords.",
+      "items": {
+        "title": "Keyword",
+        "type": "string"
+      },
+      "title": "Keywords",
+      "type": "array"
+    },
+    "license": {
+      "description": "License for embargoed/open access content.",
+      "title": "License",
+      "type": "string",
+      "default": "CC-BY-4.0"
+    },
+    "conference_acronym": {
+      "title": "Acronym",
+      "type": "string"
+    },
+    "conference_dates": {
+      "title": "Dates",
+      "type": "string"
+    },
+    "conference_place": {
+      "title": "Place",
+      "type": "string"
+    },
+    "conference_session": {
+      "title": "Session",
+      "type": "string"
+    },
+    "conference_session_part": {
+      "title": "Part of session",
+      "type": "string"
+    },
+    "conference_title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "conference_url": {
+      "title": "URL",
+      "type": "string"
+    },
+    "notes": {
+      "description": "Additional notes for record.",
+      "title": "Additional notes",
+      "type": "string"
+    },
+    "partof_pages": {
+      "title": "Pages",
+      "type": "string"
+    },
+    "partof_title": {
+      "title": "Title",
+      "type": "string"
+    },
+    "publication_date": {
+      "description": "Record publication date (IS8601-formatted). EDTF support to be added for field.",
+      "type": "string"
+    },
+    "references": {
+      "description": "Raw textual references when identifier is not known.",
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "related_identifiers": {
+      "description": "Related research outputs.",
+      "items": {
+        "properties": {
+          "identifier": {
+            "description": "Identifier of research output.",
+            "type": "string"
+          },
+          "relation": {
+            "description": "Relation type.",
+            "enum": [
+              "isCitedBy",
+              "cites",
+              "isSupplementTo",
+              "isSupplementedBy",
+              "isContinuedBy",
+              "continues",
+              "hasMetadata",
+              "isMetadataFor",
+              "isNewVersionOf",
+              "isPreviousVersionOf",
+              "isPartOf",
+              "hasPart",
+              "isReferencedBy",
+              "references",
+              "isDocumentedBy",
+              "documents",
+              "isCompiledBy",
+              "compiles",
+              "isVariantFormOf",
+              "isOrignialFormOf",
+              "isIdenticalTo",
+              "isReviewedBy",
+              "reviews",
+              "isDerivedFrom",
+              "isSourceOf"
+            ],
+            "type": "string"
+          },
+          "scheme": {
+            "description": "Persistent identifier scheme.",
+            "enum": [
+              "ark",
+              "arxiv",
+              "doi",
+              "bibcode",
+              "ean8",
+              "ean13",
+              "eissn",
+              "handle",
+              "isbn",
+              "issn",
+              "istc",
+              "lissn",
+              "lsid",
+              "pmid",
+              "pmcid",
+              "purl",
+              "upc",
+              "url",
+              "urn",
+              "orcid",
+              "gnd",
+              "ads"
+            ],
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "upload_type": {
+      "additionalProperties": false,
+      "default": "publication",
+      "description": "Record upload type.",
+      "type": {
+        "enum": [
+          "publication",
+          "poster",
+          "presentation",
+          "dataset",
+          "image",
+          "video",
+          "software",
+          "lsesson"
+        ],
+        "type": "string"
+      }
+    },
+    "publication_type": {
+      "additionalProperties": false,
+      "description": "Publication type.",
+      "default": "article",
+      "type": {
+        "enum": [
+          "book",
+          "section",
+          "conferencepaper",
+          "article",
+          "patent",
+          "preprint",
+          "report",
+          "deliverable",
+          "milestone",
+          "proposal",
+          "softwaredocumentation",
+          "thesis",
+          "technicalnote",
+          "workingpaper",
+          "other"
+        ],
+        "type": "string"
+      }
+    },
+    "image_type": {
+      "additionalProperties": false,
+      "default": "figure",
+      "description": "Image type.",
+      "type": {
+        "enum": [
+          "figure",
+          "plot",
+          "drawing",
+          "diagram",
+          "photo",
+          "other"
+        ],
+        "type": "string"
+      }
+    },
+    "subjects": {
+      "description": "Subjects from specific vocabularies.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Subjects term identifier.",
+            "type": "string"
+          },
+          "scheme": {
+            "description": "Identifier scheme.",
+            "type": "string"
+          },
+          "term": {
+            "description": "Subject term value.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "thesis_supervisors": {
+      "description": "Supervisors of thesis in order of importance.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "affiliation": {
+            "description": "Affiliation for the purpose of this specific record.",
+            "type": "string"
+          },
+          "gnd": {
+            "description": "Gemeinsame Normdatei identifier for creator.",
+            "type": "string"
+          },
+          "name": {
+            "description": "Full name of person or organisation. Personal name format: family, given.",
+            "type": "string"
+          },
+          "orcid": {
+            "description": "ORCID identifier for creator.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "thesis_university": {
+      "description": "Awarding university in case of a thesis.",
+      "type": "string"
+    },
+    "title": {
+      "description": "Record title.",
+      "type": "string"
+    }
+  },
+  "required": [
+    "_deposit"
+  ],
+  "title": "Zenodo Deposit Schema v1.0.0",
+  "type": "object"
+}

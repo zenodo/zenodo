@@ -1,0 +1,35 @@
+<div
+  class="form-group schema-form-datepicker {{form.htmlClass}}"
+  ng-class="{'has-error': hasError()}">
+  <label
+    class="control-label col-sm-3"
+    for="{{ form.key.slice(-1)[0] }}"
+    ng-class="{'sr-only': !showTitle(), 'field-required': form.required}"
+    ng-show="showTitle()">
+    <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>&nbsp;{{ form.title }}
+  </label>
+  <div
+    class="col-sm-9"
+    ng-class="{'input-group': (form.fieldAddonLeft || form.fieldAddonRight)}">
+    <span
+      ng-if="form.fieldAddonLeft"
+      class="input-group-addon"
+      ng-bind-html="form.fieldAddonLeft"></span>
+    <input
+      ng-show="form.key"
+      type="text"
+      class="form-control {{form.fieldHtmlClass}}"
+      schema-validate="form"
+      ng-model="$$value$$"
+      pick-a-date="form.pickadate"
+      min-date="form.minDate"
+      max-date="form.maxDate"
+      name="{{form.key.slice(-1)[0]}}"
+      format="form.format"/>
+    <span
+      ng-if="form.fieldAddonRight"
+      class="input-group-addon"
+      ng-bind-html="form.fieldAddonRight"></span>
+    <span class="help-block">{{ (hasError() && errorMessage(schemaError())) || form.description}}</span>
+  </div>
+</div>

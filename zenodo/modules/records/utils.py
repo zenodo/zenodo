@@ -26,8 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_records.api import Record
 from invenio_search import current_search
 from invenio_search.utils import schema_to_index
+from werkzeug.utils import import_string
 
 
 def schema_prefix(schema):
@@ -47,3 +49,11 @@ def is_record(record):
 def is_deposit(record):
     """Determine if a record is a deposit record."""
     return schema_prefix(record.get('$schema')) == 'deposits'
+
+
+def serialize_record(record, pid, serializer, module=None, **kwargs):
+    """Serialize record according to the passed serializer."""
+    if isinstance(record, Record):
+        module = module or 'zenodo.modules.records.serializers'
+        serializer = import_string('.'.join((module, serializer)))
+        return serializer.serialize(pid, record, **kwargs)
