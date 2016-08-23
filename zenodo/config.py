@@ -98,6 +98,12 @@ DEPOSIT_DATACITE_MINTING_ENABLED = False
 #: Do not allow DebugToolbar to redirects redirects.
 DEBUG_TB_INTERCEPT_REDIRECTS = False
 
+# Assets
+#: Switch of assets debug.
+ASSETS_DEBUG = False
+#: Switch of automatic building.
+ASSETS_AUTO_BUILD = False
+
 # Language
 # ========
 #: Default language.
