@@ -1,42 +1,29 @@
 <div
-  class='deposit-actions'
+  class="deposit-actions well"
   ng-hide="recordsVM.invenioRecordsAlert.type == 'success' && recordsVM.invenioRecordsArgs.responseParams[recordsVM.invenioRecordsAlert.action].hide">
-  <div ng-show="recordsVM.invenioRecordsEndpoints.self">
-    <ul class="list-inline text-right">
-      <li>
-        <button
-          class="btn btn-default"
-          ng-disabled="depositionForm.$invalid || depositionForm.$prestine || recordsVM.invenioRecordsLoading"
-          ng-click="recordsVM.actionHandler('self')">Save</button>
-      </li>
-      <li>
-        <button
-          class="btn btn-success"
-          ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
-          ng-click="recordsVM.actionHandler('publish')">Publish</button>
-      </li>
-      <li>
-        <button
-          ng-disabled="recordsVM.invenioRecordsLoading"
-          ng-hide="!recordsVM.invenioRecordsEndpoints.discard"
-          class="btn btn-danger"
-          ng-click="recordsVM.actionHandler('discard')">Discard</button>
-        </li>
-    </ul>
-  </div>
-
-  <div ng-show="!recordsVM.invenioRecordsEndpoints.self">
-    <ul class="list-inline text-right">
-      <li>
-        <button ng-disabled="depositionForm.$invalid || recordsVM.invenioRecordsLoading" class="btn btn-default" ng-click="recordsVM.actionHandler('self')">Save</button>
-      </li>
-      <li>
-        <button
-          class="btn btn-danger"
-          ng-disabled="recordsVM.invenioRecordsLoading"
-          ng-hide="!recordsVM.invenioRecordsEndpoints.initialization"
-          ng-click="recordsVM.actionHandler('delete')">Delete</button>
-      </li>
-    </ul>
-  </div>
+  <ul class="list-inline text-right">
+    <li class="pull-left">
+      <button
+        class="btn btn-danger"
+        ng-disabled="recordsVM.invenioRecordsLoading || recordsVM.invenioRecordsEndpoints.initialization"
+        ng-click="recordsVM.actionHandler('delete')"><i class="fa fa-trash-o fa-inverse"></i> Delete</button>
+    </li>
+    <li class="pull-left">
+      <button
+        ng-disabled="recordsVM.invenioRecordsLoading"
+        ng-hide="!recordsVM.invenioRecordsEndpoints.discard"
+        class="btn btn-warning"
+        ng-click="recordsVM.actionHandler('delete')"><i class="fa fa-times icon-white"></i> Discard</button>
+    </li>
+    <li ng-show="recordsVM.invenioRecordsLoading"><i class="fa fa-spinner"></i></li>
+    <li>
+      <button ng-disabled="depositionForm.$invalid || recordsVM.invenioRecordsLoading" class="btn btn-default" ng-click="recordsVM.actionHandler('self')"><i class="fa fa-file-o"></i> Save</button>
+    </li>
+    <li>
+      <button
+        class="btn btn-primary"
+        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading || recordsVM.invenioRecordsEndpoints.initialization"
+        ng-click="recordsVM.actionHandler('publish')"><i class="fa fa-check"></i> Publish</button>
+    </li>
+  </ul>
 </div>

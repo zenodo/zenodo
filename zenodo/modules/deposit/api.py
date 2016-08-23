@@ -33,7 +33,7 @@ from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
-from invenio_files_rest.models import Bucket
+from invenio_files_rest.models import Bucket, MultipartObject
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.api import FileObject
@@ -42,7 +42,8 @@ from invenio_records_files.models import RecordsBuckets
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.sipstore.api import ZenodoSIP
 
-from .errors import MissingCommunityError, MissingFilesError
+from .errors import MissingCommunityError, MissingFilesError, \
+    OngoingMultipartUploadError
 from .fetchers import zenodo_deposit_fetcher
 from .minters import zenodo_deposit_minter
 
@@ -291,6 +292,9 @@ class ZenodoDeposit(Deposit):
 
         if len(self.files) == 0:
             raise MissingFilesError()
+
+        if MultipartObject.query_by_bucket(self.files.bucket).count() != 0:
+            raise OngoingMultipartUploadError()
 
         if 'communities' in self:
             missing = [c for c in self['communities']

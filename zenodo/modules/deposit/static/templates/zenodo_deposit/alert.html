@@ -1,0 +1,7 @@
+<div ng-show="recordsVM.invenioRecordsAlert" class="alert alert-{{recordsVM.invenioRecordsAlert.type}} fixed">
+  <div class="container">
+    <a class="close" data-dismiss="alert" href="#">&times;</a>
+    <strong>{{ recordsVM.invenioRecordsAlert.data.status }}</strong>
+      {{ recordsVM.invenioRecordsAlert.data.message || recordsVM.invenioRecordsArgs.responseParams[recordsVM.invenioRecordsAlert.action].message }}
+    </div>
+</div>

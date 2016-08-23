@@ -1,0 +1,98 @@
+<div
+ class="panel panel-default deposit-panel"
+ ngf-drag-over-class="'dragover'"
+ ngf-drop=""
+ ngf-change="filesVM.addFiles($newFiles)"
+ ngf-max-size="50GB"
+ ngf-allow-dir="false"
+ ngf-include-dir="false"
+ ngf-max-files="100"
+ ngf-multiple="true"
+ ngf-drop-available="files.dropSupported"
+>
+  <div class="panel-heading">
+    <div class="row">
+      <div class="col-sm-6" ng-click="collapsed = !collapsed">
+        <a class="panel-toggle ng-binding">Files&nbsp;&nbsp;&nbsp;
+        <span ng-show="collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
+        <span ng-hide="collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
+        </a>
+      </div>
+      <div class="col-sm-offset-2 col-sm-4">
+        <span class="pull-right">
+          <span class="text-muted" ng-show="filesVM.invenioFilesBusy && filesVM.getCompleted().length < filesVM.files.length">
+            <i class="fa fa-spinner"></i>
+          </span>
+          <button class="btn btn-xs btn-danger" type="submit" ng-show="filesVM.invenioFilesBusy" ng-click="filesVM.cancel()"><i class="fa fa-times icon-white"></i> Cancel</button>
+          <button class="btn btn-xs btn-default"
+            ngf-max-size="50GB"
+            ngf-multiple="true"
+            ngf-allow-dir="false"
+            ngf-include-dir="false"
+            ngf-max-files="100"
+            ngf-select=""
+            ngf-change="filesVM.addFiles($newFiles)"
+          ><i class="fa fa-files-o"></i> Choose files</button>
+          <button class="btn btn-xs btn-success" type="submit" ng-disabled="filesVM.invenioFilesBusy || filesVM.getCompleted().length === filesVM.files.length" ng-click="filesVM.upload()">
+          <i class="glyphicon glyphicon-upload"></i> Start upload</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <table class="table" ng-hide="collapsed || filesVM.files.length == 0">
+    <tr>
+      <th>Filename
+      <small class="text-muted">({{ (filesVM.files | filter:fileSearch).length }} files)</small>
+      </th>
+      <th>Size</th>
+      <th class="text-center">Progress</th>
+      <th class="text-center">Delete</th>
+    </tr>
+    <tr class="sel-file" ng-repeat="f in filesVM.files | filter:fileSearch | orderBy:'key'">
+      <td>
+        <a ng-show="f.links.self" ng-href="{{f.links.self}}">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></a>
+        <span ng-hide="f.links.self">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></span>
+        <small class="text-muted" ng-show="f.checksum" data-toggle="tooltip" data-placement="top" title="This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity."><br />{{f.checksum}}</small>
+      </td>
+      <td>{{ f.size | bytesToHumanReadable }}</td>
+      <td class="text-center">
+        <span ng-show="f.progress < 100 && !f.errored">{{ f.progress }} %</span>
+        <span ng-show="f.processing && !f.errored">Processing...</span>
+        <span ng-show="f.errored" class="text-danger">Error</span>
+        <span ng-show="f.completed" class="text-success"><i class="fa fa-check"></i></span>
+      </td>
+      <td ng-show="f" class="text-center"><a href="#" ng-click="filesVM.remove(f)"><i class="fa fa-trash-o"></a></td>
+    </tr>
+    <tr ng-show="(filesVM.files | filter:fileSearch).length == 0">
+      <td colspan="4" class="text-center text-muted"> No results.</td>
+    </tr>
+  </table>
+
+  <div class="list-group file-upload" ng-hide="collapsed || filesVM.files.length > 0">
+    <div class="list-group-item">
+      <div class="jumbotron ng-binding" align="center">
+        <h2 ng-show="files.dropSupported">Drag and drop files here</h2>
+        <h4 ng-show="files.dropSupported" class="text-muted">&mdash; or &mdash;</h4>
+        <h1>
+          <button class="btn btn-lg btn-primary"
+            ngf-max-size="50GB"
+            ngf-multiple="true"
+            ngf-allow-dir="false"
+            ngf-include-dir="false"
+            ngf-max-files="100"
+            ngf-select=""
+            ngf-change="filesVM.addFiles($newFiles)"
+          ><i class="fa fa-upload"></i> Choose files</button>
+        </h1>
+      </div>
+
+    </div>
+  </div>
+
+  <p class="text-center" ng-hide="collapsed">
+    <small class="text-muted">
+    (minimum 1 file required, max 50 GB per dataset - <a href="/contact">contact us</a> for larger datasets)
+    </small>
+  </p>
+</div>

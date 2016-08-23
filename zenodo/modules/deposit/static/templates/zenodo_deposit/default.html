@@ -1,6 +1,6 @@
 <div
   class="form-group {{form.htmlClass}}"
-  ng-class="{ '{{'schema-form-' + form.type}}': true, 'has-error': form.disableErrorState !== true && hasError(), 'has-success': form.disableSuccessState !== true && hasSuccess(), 'has-feedback': form.feedback !== false }">
+  ng-class="{ '{{'schema-form-' + form.type}}': true, 'has-error': form.disableErrorState !== true && hasError(), 'has-feedback': form.feedback !== false }">
   <label
     class="col-sm-3 control-label {{ form.labelHtmlClass }}"
     for="{{ form.key.slice(-1)[0] }}"

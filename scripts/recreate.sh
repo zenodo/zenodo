@@ -22,6 +22,10 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+if [ -d "$VIRTUAL_ENV/var/instance/data" ]; then
+    rm -Rf $VIRTUAL_ENV/var/instance/data
+fi
+
 zenodo db destroy --yes-i-know
 zenodo db init
 zenodo db create

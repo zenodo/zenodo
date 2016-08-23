@@ -42,7 +42,7 @@ css = NpmBundle(
         filters='cleancss',
     ),
     depends=('scss/*.scss', ),
-    output='gen/zenodo.%(version)s.css',
+    output='gen/zenodo.css',
     npm={
         'bootstrap-sass': '~3.3.5',
         'bootstrap-switch': '~3.0.2',

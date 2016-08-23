@@ -1,10 +1,48 @@
+.deposit-actions {
+    padding: 10px 15px;
+
+    ul.list-inline {
+        margin: 0;
+
+        li {
+            padding-right: 0;
+        }
+    }
+}
+
+.deposit-panel.dragover {
+    border-color: darken(#f00, 20%);
+}
+
 .deposit-panel {
+    margin-bottom: 2px;
+
     .jumbotron {
         background-color: transparent;
     }
 
-    .deposit-actions .list-inline>li {
-        padding-right: 0;
+    .file-upload {
+        .list-group-item {
+            border: 0;
+        }
+        .jumbotron {
+            padding-top: 30px;
+            padding-bottom: 30px;
+
+            h4 {
+                margin-top: 20px;
+                margin-bottom: 5px;
+            }
+
+            h1, h2 {
+                margin-top: 5px;
+                margin-bottom: 5px;
+            }
+        }
+
+        .rmlink {
+            cursor: pointer !important;
+        }
     }
 
     .active {
@@ -110,7 +148,8 @@
         padding-top: 15px;
 
         .sort-handle {
-            cursor: move
+            cursor: move;
+            margin-right: 10px;
         }
 
         .schema-form-section {

@@ -1,5 +1,5 @@
 <div class="form-group has-feedback {{ form.htmlClass }} schema-form-textarea"
-     ng-class="{'has-error': form.disableErrorState !== true && hasError(), 'has-success': form.disableSuccessState !== true &&  hasSuccess()}">
+     ng-class="{'has-error': form.disableErrorState !== true && hasError()}">
   <label class="control-label col-sm-3 {{ form.labelHtmlClass }}"
          ng-class="{'sr-only': !showTitle(), 'field-required': form.required}"
          for="{{ form.key.slice(-1)[0] }}">

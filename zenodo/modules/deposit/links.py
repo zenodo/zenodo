@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,32 +22,23 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Fixtures for Zenodo."""
+"""Deposit links factory."""
 
 from __future__ import absolute_import, print_function
 
-import sys
-from os.path import join
+from flask import current_app, request
 
-from .cli import fixtures
+from invenio_deposit.links import deposit_links_factory
 
 
-class ZenodoFixtures(object):
-    """Zenodo records extension."""
+def links_factory(pid):
+    """Deposit links factory."""
+    links = deposit_links_factory(pid)
 
-    def __init__(self, app=None):
-        """Extension initialization."""
-        if app:
-            self.init_app(app)
+    links['html'] = current_app.config['DEPOSIT_UI_ENDPOINT'].format(
+        host=request.host,
+        scheme=request.scheme,
+        pid_value=pid.pid_value,
+    )
 
-    def init_app(self, app):
-        """Flask application initialization."""
-        self.init_config(app.config)
-        app.cli.add_command(fixtures)
-
-    def init_config(self, config):
-        """Flask application initialization."""
-        config.setdefault(
-            'FIXTURES_FILES_LOCATION',
-            join(sys.prefix, 'var/instance/data')
-        )
+    return links

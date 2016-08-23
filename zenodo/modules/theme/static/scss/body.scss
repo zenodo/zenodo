@@ -92,3 +92,12 @@
 .nowrap {
   white-space: nowrap;
 }
+
+.alert.fixed {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  border-radius: 0px;
+}
