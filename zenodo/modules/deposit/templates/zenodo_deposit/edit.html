@@ -33,9 +33,6 @@
   {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
   <script type="text/javascript">
 
-    require([
-      'node_modules/angular/angular',
-    ], function($) {
       angular.element(document).ready(function() {
 
         // Set CKEditor global settings
@@ -56,7 +53,6 @@
           ]
         );
       });
-    });
   </script>
 {%- endblock javascript %}
 
