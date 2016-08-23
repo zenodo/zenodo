@@ -32,6 +32,7 @@ import sys
 from invenio_base.app import create_app_factory
 from invenio_base.wsgi import create_wsgi_factory, wsgi_proxyfix
 from invenio_config import create_conf_loader
+from invenio_files_rest.app import Flask
 from statsd import StatsClient
 from werkzeug.contrib.fixers import HeaderRewriterFix
 from wsgi_statsd import StatsdTimingMiddleware
@@ -117,6 +118,7 @@ create_api = create_app_factory(
     blueprint_entry_points=['invenio_base.api_blueprints'],
     converter_entry_points=['invenio_base.api_converters'],
     instance_path=instance_path,
+    app_class=Flask,
 )
 """Create Flask API application."""
 
