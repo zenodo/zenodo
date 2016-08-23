@@ -281,14 +281,8 @@ PAGES_TEMPLATES = [
 # =======
 #: PID minter used during record creation.
 DEPOSIT_PID_MINTER = 'zenodo_record_minter'
-#: REST API configuration.
+
 _PID = 'pid(depid,record_class="zenodo.modules.deposit.api:ZenodoDeposit")'
-
-DEPOSIT_REST_ENDPOINTS = dict(
-    dep=dict(
-
-    ),
-)
 #: Template for deposit list view.
 DEPOSIT_SEARCH_API = '/api/deposit/depositions'
 #: Mimetype for deposit search.
@@ -301,6 +295,8 @@ DEPOSIT_UI_NEW_TEMPLATE = 'zenodo_deposit/edit.html'
 DEPOSIT_UI_JSTEMPLATE_FORM = 'templates/zenodo_deposit/form.html'
 #: Template for <invenio-records-actions>
 DEPOSIT_UI_JSTEMPLATE_ACTIONS = 'templates/zenodo_deposit/actions.html'
+#: Endpoint for deposit.
+DEPOSIT_UI_ENDPOINT = '{scheme}://{host}/deposit/{pid_value}'
 #: Template path for angular form elements.
 DEPOSIT_FORM_TEMPLATES_BASE = 'templates/zenodo_deposit'
 #: Allow list of contributor types.
@@ -353,7 +349,7 @@ DEPOSIT_RESPONSE_MESSAGES = dict(
     )
 )
 
-#: Endpoints for deposit.
+#: REST API configuration.
 DEPOSIT_REST_ENDPOINTS = dict(
     depid=dict(
         pid_type='depid',
@@ -395,7 +391,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
             '/deposit/depositions/<{0}:pid_value>/files/<file_key:key>'.format(
                 _PID)),
         default_media_type='application/json',
-        links_factory_imp='invenio_deposit.links:deposit_links_factory',
+        links_factory_imp='zenodo.modules.deposit.links:links_factory',
         create_permission_factory_imp=check_oauth2_scope(
             lambda x: True, write_scope.id),
         read_permission_factory_imp=DepositPermission,
@@ -406,7 +402,6 @@ DEPOSIT_REST_ENDPOINTS = dict(
         max_result_window=10000,
     ),
 )
-
 #: Depoist UI endpoints
 DEPOSIT_RECORDS_UI_ENDPOINTS = {
     'depid': {
@@ -416,6 +411,15 @@ DEPOSIT_RECORDS_UI_ENDPOINTS = {
         'record_class': 'zenodo.modules.deposit.api:ZenodoDeposit',
     },
 }
+#: Endpoint for uploading files.
+DEPOSIT_FILES_API = '/api/files'
+
+#: Size after which files are chunked when uploaded
+DEPOSIT_FILEUPLOAD_CHUNKSIZE = 15 * 1024 * 1024  # 15mb
+
+#: Maximum upload file size via application/mulitpart-formdata
+MAX_CONTENT_LENGTH = DEPOSIT_FILEUPLOAD_CHUNKSIZE + 1 * 1024 * 1024  # 16mb
+
 
 # SIPStore
 # ========
