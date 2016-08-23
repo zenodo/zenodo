@@ -50,4 +50,9 @@ class ZenodoXRootD(object):
     def init_app(self, app):
         """Flask application initialization."""
         app.config['XROOTD_ENABLED'] = XROOTD_ENABLED
+        if XROOTD_ENABLED:
+            #: Overwrite reported checksum from CERN EOS (due to XRootD 3.3.6).
+            app.config['XROOTD_CHECKSUM_ALGO'] = 'md5'
+            app.config['FILES_REST_STORAGE_FACTORY'] = \
+                'invenio_xrootd:eos_storage_factory'
         app.extensions['zenodo-xrootd'] = self
