@@ -61,7 +61,7 @@ def to_files_js(deposit):
 
     for f in deposit.files:
         res.append({
-            'name': f.key,
+            'key': f.key,
             'size': f.file.size,
             'completed': True,
             'progress': 100,
