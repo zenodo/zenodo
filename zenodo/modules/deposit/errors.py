@@ -40,6 +40,18 @@ class MissingFilesError(RESTValidationError):
     ]
 
 
+class OngoingMultipartUploadError(RESTValidationError):
+    """Error for when no files have been provided."""
+
+    errors = [
+        FieldError(None, _(
+            'We are still merging chunks from a large file upload (large files'
+            ' are uploaded chunks of 10MB for a more reliable file transfer).'
+            ' Please hold on for a short moment while we finish merging.'
+        ), code=10)
+    ]
+
+
 class MissingCommunityError(RESTValidationError):
     """Error for invalid community IDs."""
 

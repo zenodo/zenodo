@@ -26,8 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, redirect, request, url_for
+from flask import Blueprint, current_app, redirect, request, url_for
 from invenio_communities.models import Community
+
+from .api import ZenodoDeposit
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -47,6 +49,34 @@ def legacy_index():
         c = Community.get(c_id)
         return redirect('/communities/{0}/upload'.format(c.id))
     return redirect(url_for('invenio_deposit_ui.new'))
+
+
+@blueprint.app_template_filter('tofilesjs')
+def to_files_js(deposit):
+    """List files in a deposit."""
+    if not isinstance(deposit, ZenodoDeposit):
+        return []
+
+    res = []
+
+    for f in deposit.files:
+        res.append({
+            'key': f.key,
+            'size': f.file.size,
+            'completed': True,
+            'progress': 100,
+            'links': {
+                'self': (
+                    current_app.config['DEPOSIT_FILES_API'] +
+                    '/{bucket}/{key}?versionId={version_id}'.format(
+                        bucket=f.bucket_id,
+                        key=f.key,
+                        version_id=f.version_id,
+                    )),
+            }
+        })
+
+    return res
 
 
 # @blueprint.route('/deposit/<int:deposit_id>/')

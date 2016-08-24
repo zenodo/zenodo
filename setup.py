@@ -71,7 +71,8 @@ for name, reqs in extras_require.items():
 
 # Do not include in all requirement
 extras_require['xrootd'] = [
-    'xrootdpyfs>=0.1.1',
+    'invenio-xrootd>=1.0.0a1',
+    'xrootdpyfs>=0.1.2',
 ]
 
 setup_requires = [
@@ -99,13 +100,13 @@ install_requires = [
     'invenio-accounts>=1.0.0a13',
     'invenio-admin>=1.0.0a3',
     'invenio-assets>=1.0.0a5',
-    'invenio-base>=1.0.0a13',
+    'invenio-base>=1.0.0a14',
     'invenio-celery>=1.0.0a4',
     'invenio-communities>=1.0.0a9',
     'invenio-config>=1.0.0b1',
     'invenio-csl-rest>=1.0.0a1',
     'invenio-deposit>=1.0.0a3.dev20160000',
-    'invenio-files-rest>=1.0.0a7',
+    'invenio-files-rest>=1.0.0a9.dev20160000',
     'invenio-formatter>=1.0.0a2',
     'invenio-github>=1.0.0a3',
     'invenio-i18n>=1.0.0a4',

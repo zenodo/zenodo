@@ -31,6 +31,12 @@ addons:
 
 notifications:
   email: false
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/8d72dd7ee741cd5e98c6
+    on_success: change  always
+    on_failure: always  always
+    on_start: never     always
 
 sudo: false
 

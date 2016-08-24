@@ -22,37 +22,23 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Initialization of XRootD."""
+"""Deposit links factory."""
 
 from __future__ import absolute_import, print_function
 
-from pkg_resources import DistributionNotFound, get_distribution
+from flask import current_app, request
 
-try:
-    # Import XRootDPyFS if available so opener gets registered on
-    # PyFilesystem.
-    get_distribution('xrootdpyfs')
-    import xrootdpyfs  # noqa
-    XROOTD_ENABLED = True
-except DistributionNotFound:
-    XROOTD_ENABLED = False
-    xrootdpyfs = None
+from invenio_deposit.links import deposit_links_factory
 
 
-class ZenodoXRootD(object):
-    """Zenodo xrootd extension."""
+def links_factory(pid):
+    """Deposit links factory."""
+    links = deposit_links_factory(pid)
 
-    def __init__(self, app=None):
-        """Extension initialization."""
-        if app:
-            self.init_app(app)
+    links['html'] = current_app.config['DEPOSIT_UI_ENDPOINT'].format(
+        host=request.host,
+        scheme=request.scheme,
+        pid_value=pid.pid_value,
+    )
 
-    def init_app(self, app):
-        """Flask application initialization."""
-        app.config['XROOTD_ENABLED'] = XROOTD_ENABLED
-        if XROOTD_ENABLED:
-            #: Overwrite reported checksum from CERN EOS (due to XRootD 3.3.6).
-            app.config['XROOTD_CHECKSUM_ALGO'] = 'md5'
-            app.config['FILES_REST_STORAGE_FACTORY'] = \
-                'invenio_xrootd:eos_storage_factory'
-        app.extensions['zenodo-xrootd'] = self
+    return links
