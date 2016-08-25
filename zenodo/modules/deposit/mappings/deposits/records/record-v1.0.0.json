@@ -1,6 +1,8 @@
 {
   "mappings": {
     "deposit-record-v1.0.0": {
+      "date_detection": false,
+      "numeric_detection": false,
       "properties": {
         "title": {
           "type": "string"

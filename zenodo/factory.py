@@ -64,7 +64,7 @@ using the environment variable ``APP_STATIC_FOLDER``
 
 def conf_loader(app, **kwargs_config):
     """Zenodo conf loader."""
-    app.url_map.strict_slahes = False  # Legacy support
+    app.url_map.strict_slashes = False  # Legacy support
     app.jinja_options = dict(
         app.jinja_options,
         cache_size=1000,
