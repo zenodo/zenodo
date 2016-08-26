@@ -57,6 +57,7 @@
 {%- endblock javascript %}
 
 {%- block page_body %}
+{%- set is_published = record.is_published and record.is_published() %}
   <div class="container">
     <div id="invenio-records">
     <invenio-files-uploader
@@ -77,6 +78,7 @@
         {% endif %}
         response-params='{{ config.DEPOSIT_RESPONSE_MESSAGES | tojson }}'
         extra-params='{"headers":{"Content-Type": "application/json"}}'
+        template-params='{"is_published": {{'true' if is_published else 'false'}} }'
         form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
         record='{{ record | serialize_record(pid, "githubjson_v1") or ""}}'
         schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}">
@@ -86,10 +88,14 @@
         <invenio-records-actions
           template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
         </invenio-records-actions>
+        {%- if is_published %}
+        <h1>Edit upload</h1>
+        <p class="text-muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
+        {%- else %}
         <h1>New upload</h1>
-        <p class="text-muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Publish" to finalize and make your upload public.
-
-</small></p>
+        <p class="text-muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
+        {%- endif %}
+        </p>
         <invenio-files-list
           template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FILESLIST) }}">
         </invenio-files-list>

@@ -28,8 +28,10 @@ from __future__ import absolute_import, print_function
 
 from flask import Blueprint, current_app, redirect, request, url_for
 from invenio_communities.models import Community
+from invenio_pidstore.resolver import Resolver
 
 from .api import ZenodoDeposit
+from .fetchers import zenodo_deposit_fetcher
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -49,6 +51,35 @@ def legacy_index():
         c = Community.get(c_id)
         return redirect('/communities/{0}/upload'.format(c.id))
     return redirect(url_for('invenio_deposit_ui.new'))
+
+
+@blueprint.route(
+    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>',
+    methods=['POST']
+)
+def edit(pid_value):
+    """Edit a record."""
+    # Resolve pid_value to record pid and record
+    pid, record = pid_value.data
+
+    # Fetch deposit id from record and resolve to deposit record and pid.
+    depid = zenodo_deposit_fetcher(None, record)
+    depid, deposit = Resolver(
+        pid_type=depid.pid_type,
+        object_type='rec',
+        getter=ZenodoDeposit.get_record,
+    ).resolve(depid.pid_value)
+
+    deposit_url = url_for(
+        'invenio_deposit_ui.{0}'.format(depid.pid_type),
+        pid_value=depid.pid_value
+    )
+
+    # Put deposit in edit mode if not already.
+    if deposit['_deposit']['status'] != 'draft':
+        deposit = deposit.edit()
+
+    return redirect(deposit_url)
 
 
 @blueprint.app_template_filter('tofilesjs')

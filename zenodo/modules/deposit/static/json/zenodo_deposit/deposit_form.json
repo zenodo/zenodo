@@ -170,8 +170,9 @@
         "type": "datepicker",
         "key": "publication_date",
         "title": "Publication Date",
-        "placeholder": "eg. 2017-03-17",
+        "placeholder": "eg. 2013-05-08",
         "format": "yyyy-mm-dd",
+        "editable": true,
         "description": "Required. Format: YYYY-MM-DD. In case your upload was already published elsewhere, please use the date of first publication.",
         "fa_cls": "fa-calendar",
         "required": true

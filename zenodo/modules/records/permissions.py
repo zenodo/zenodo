@@ -184,8 +184,9 @@ def deny(user, record):
 def has_read_permission(user, record):
     """Check if user has read access to the record."""
     # Allow if record is open access
-    if AccessRight.get(record['access_right'], record.get('embargo_date')) \
-            == AccessRight.OPEN:
+    if AccessRight.get(
+            record.get('access_right', 'closed'),
+            record.get('embargo_date')) == AccessRight.OPEN:
         return True
 
     # Allow token bearers

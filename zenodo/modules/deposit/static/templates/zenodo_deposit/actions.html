@@ -1,29 +1,41 @@
 <div
   class="deposit-actions well"
-  ng-hide="recordsVM.invenioRecordsAlert.type == 'success' && recordsVM.invenioRecordsArgs.responseParams[recordsVM.invenioRecordsAlert.action].hide">
+  ng-hide="recordsVM.invenioRecordsAlert.type == 'success' && recordsVM.invenioRecordsArgs.templateParams.responseParams[recordsVM.invenioRecordsAlert.action].hide">
   <ul class="list-inline text-right">
     <li class="pull-left">
       <button
         class="btn btn-danger"
+        ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
         ng-disabled="recordsVM.invenioRecordsLoading || recordsVM.invenioRecordsEndpoints.initialization"
-        ng-click="recordsVM.actionHandler('delete')"><i class="fa fa-trash-o fa-inverse"></i> Delete</button>
+        ng-click="recordsVM.actionHandler('self', 'DELETE')">
+        <i class="fa fa-trash-o fa-inverse"></i> Delete
+      </button>
     </li>
     <li class="pull-left">
       <button
         ng-disabled="recordsVM.invenioRecordsLoading"
-        ng-hide="!recordsVM.invenioRecordsEndpoints.discard"
+        ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
         class="btn btn-warning"
-        ng-click="recordsVM.actionHandler('delete')"><i class="fa fa-times icon-white"></i> Discard</button>
+        ng-click="recordsVM.actionHandler('discard', 'POST')">
+        <i class="fa fa-times icon-white"></i> Discard changes
+      </button>
     </li>
     <li ng-show="recordsVM.invenioRecordsLoading"><i class="fa fa-spinner"></i></li>
     <li>
-      <button ng-disabled="depositionForm.$invalid || recordsVM.invenioRecordsLoading" class="btn btn-default" ng-click="recordsVM.actionHandler('self')"><i class="fa fa-file-o"></i> Save</button>
+      <button
+        ng-disabled="depositionForm.$invalid || recordsVM.invenioRecordsLoading"
+        class="btn btn-default"
+        ng-click="recordsVM.actionHandler('self', 'PUT')">
+        <i class="fa fa-file-o"></i> Save
+      </button>
     </li>
     <li>
       <button
         class="btn btn-primary"
-        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading || recordsVM.invenioRecordsEndpoints.initialization"
-        ng-click="recordsVM.actionHandler('publish')"><i class="fa fa-check"></i> Publish</button>
+        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
+        ng-click="recordsVM.actionHandler('publish', 'POST')">
+        <i class="fa fa-check"></i> Publish
+      </button>
     </li>
   </ul>
 </div>

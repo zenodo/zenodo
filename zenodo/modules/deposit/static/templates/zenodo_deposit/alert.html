@@ -2,6 +2,6 @@
   <div class="container">
     <a class="close" data-dismiss="alert" href="#">&times;</a>
     <strong>{{ recordsVM.invenioRecordsAlert.data.status }}</strong>
-      {{ recordsVM.invenioRecordsAlert.data.message || recordsVM.invenioRecordsArgs.responseParams[recordsVM.invenioRecordsAlert.action].message }}
+      {{ recordsVM.invenioRecordsAlert.data.message || recordsVM.invenioRecordsArgs.templateParams.responseParams[recordsVM.invenioRecordsAlert.action].message }}
     </div>
 </div>
