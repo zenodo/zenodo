@@ -25,7 +25,10 @@
 """Record modification prior to indexing."""
 
 from __future__ import absolute_import, print_function
-from zenodo.modules.deposit.api import ZenodoDeposit
+
+import copy
+
+from .api import ZenodoDeposit
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,
@@ -46,18 +49,24 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     """
     if not index.startswith('deposits-records-'):
         return
-    record = ZenodoDeposit(record, model=record.model)
+
+    if not isinstance(record, ZenodoDeposit):
+        record = ZenodoDeposit(record, model=record.model)
+
     if record['_deposit']['status'] == 'published':
-        pub_pid, pub_rec = record.fetch_published()
         schema = json['$schema']
+
+        pub_record = record.fetch_published()[1]
+
         # Temporarily set to draft mode to ensure that `clear` can be called
         json['_deposit']['status'] = 'draft'
         json.clear()
-        json.update(pub_rec)
-        # Set back to published mode.
+        json.update(copy.deepcopy(pub_record.replace_refs()))
+
+        # Set back to published mode and restore schema.
         json['_deposit']['status'] = 'published'
-        json['_updated'] = pub_rec.updated
         json['$schema'] = schema
+        json['_updated'] = pub_record.updated
     else:
         json['_updated'] = record.updated
     json['_created'] = record.created
