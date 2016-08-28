@@ -375,9 +375,13 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                 bucket_id = m.get('_buckets', {}).get('deposit')
                 recid = m.get('recid') if m.get('_deposit', {}).get('pid') \
                     else None
+                api_key = 'record'
+                html_key = 'record_html'
             else:
                 bucket_id = m.get('_buckets', {}).get('record')
-                recid = None
+                recid = m.get('recid')
+                api_key = None
+                html_key = 'html'
 
             if bucket_id:
                 try:
@@ -391,11 +395,19 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
 
             if recid:
                 try:
-                    links['record'] = url_for(
-                        'invenio_records_rest.recid_item',
-                        pid_value=recid,
-                        _external=True,
-                    )
+                    if api_key:
+                        links[api_key] = url_for(
+                            'invenio_records_rest.recid_item',
+                            pid_value=recid,
+                            _external=True,
+                        )
+                    if html_key:
+                        links[html_key] = \
+                            current_app.config['RECORDS_UI_ENDPOINT'].format(
+                            host=request.host,
+                            scheme=request.scheme,
+                            pid_value=recid,
+                        )
                 except BuildError:
                     pass
 

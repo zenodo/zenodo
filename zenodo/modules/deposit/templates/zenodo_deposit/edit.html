@@ -39,11 +39,26 @@
         window.CKEDITOR.config.mathJaxLib = '{{config.THEME_MATHJAX_CDN}}';
 
         // Override templates
-        angular.module('invenioRecords').config(['schemaFormDecoratorsProvider', function(decoratorsProvider){
+        app = angular.module('invenioRecords').config(['schemaFormDecoratorsProvider', function(decoratorsProvider){
           decoratorsProvider.addMapping('bootstrapDecorator', 'uiselect', '{{ url_for("static", filename="templates/zenodo_deposit/uiselect.html")}}');
           decoratorsProvider.addMapping('bootstrapDecorator', 'ckeditor', '{{ url_for("static", filename="templates/zenodo_deposit/ckeditor.html")}}');
           decoratorsProvider.addMapping('bootstrapDecorator', 'datepicker', '{{ url_for("static", filename="templates/zenodo_deposit/datepicker.html")}}');
         }]);
+
+        app.directive('tooltip', function(){
+            return {
+                restrict: 'A',
+                link: function(scope, element, attrs){
+                    $(element).hover(function(){
+                        // on mouseenter
+                        $(element).tooltip('show');
+                    }, function(){
+                        // on mouseleave
+                        $(element).tooltip('hide');
+                    });
+                }
+            };
+        });
 
         angular.bootstrap(
           document.getElementById('invenio-records'), [
@@ -73,6 +88,7 @@
       <invenio-records
         {% if pid %}
           initialization="{{ config.DEPOSIT_RECORDS_API.format(pid_value=pid.pid_value) }}"
+          links='{{pid|tolinksjs(record)|tojson}}'
         {% else %}
           initialization="{{ config.DEPOSIT_SEARCH_API }}"
         {% endif %}

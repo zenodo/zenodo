@@ -54,7 +54,7 @@
       <td>
         <a ng-show="f.links.self" ng-href="{{f.links.self}}">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></a>
         <span ng-hide="f.links.self">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></span>
-        <small class="text-muted" ng-show="f.checksum" data-toggle="tooltip" data-placement="top" title="This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity."><br />{{f.checksum}}</small>
+        <small class="text-muted" ng-show="f.checksum"><br />{{f.checksum}} <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" tooltip title="This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity."></i></small>
       </td>
       <td>{{ f.size | bytesToHumanReadable }}</td>
       <td class="text-center">
@@ -123,7 +123,7 @@
       <small class="text-muted">({{ (filesVM.files | filter:fileSearch).length }} files)</small>
       </th>
       <th width="20%">Size</th>
-      <th>Checksum <i class="fa fa-question-circle" data-toggle="tooltip" data-placement="top" title="This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity."></i></th>
+      <th>Checksum <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip data-placement="top" title="This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity."></i></th>
     </tr>
     <tr class="sel-file" ng-repeat="f in filesVM.files | filter:fileSearch | orderBy:'key'">
       <td>
