@@ -54,3 +54,16 @@ def datacite_register(pid_value, record_uuid):
     dcp.update(url, doc) if dcp.pid.status == PIDStatus.REGISTERED \
         else dcp.register(url, doc)
     db.session.commit()
+
+
+@shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
+             rate_limit='100/m')
+def datacite_inactivate(pid_value):
+    """Mint the DOI with DataCite.
+
+    :param pid_value: Value of record PID, with pid_type='recid'.
+    :type pid_value: str
+    """
+    dcp = DataCiteProvider.get(pid_value)
+    dcp.delete()
+    db.session.commit()

@@ -82,6 +82,16 @@ def accessright_get(value, embargo_date=None):
     return AccessRight.get(value, embargo_date)
 
 
+@blueprint.app_template_filter('pidstatus')
+def pidstatus_title(pid):
+    """Get access right.
+
+    Better than comparing record.access_right directly as access_right
+    may have not yet been updated after the embargo_date has passed.
+    """
+    return PIDStatus(pid.status).title
+
+
 @blueprint.app_template_filter()
 def accessright_category(value, embargo_date=None, **kwargs):
     """Get category for access right."""

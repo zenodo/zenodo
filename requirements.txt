@@ -26,8 +26,7 @@
 -r requirements.pinned.txt
 
 # Requirements not on PyPI
-git+https://github.com/inveniosoftware/invenio-deposit.git@79907eba1ef516cdd40cb77a30c1798fffa774cd#egg=invenio-deposit
-git+https://github.com/inveniosoftware/invenio-files-rest.git@3f01024b0a795717559481cc8f5937a1013ac6a2#egg=invenio-files-rest
+git+https://github.com/lnielsen/invenio-deposit.git@tombstone#egg=invenio-deposit
 git+https://github.com/zenodo/zenodo-migrator.git@bca1577d8efcadf1cf9e4cdc5a5fff34beea6886#egg=zenodo-migrator
 
 # PyPI requirements
@@ -106,9 +105,9 @@ invenio-celery==1.0.0a4
 invenio-communities==1.0.0a9
 invenio-config==1.0.0b1
 invenio-csl-rest==1.0.0a1
-invenio-db==1.0.0a9
+invenio-db==1.0.0b1
 # invenio-deposit==1.0.0a3
-# invenio-files-rest==1.0.0a10
+invenio-files-rest==1.0.0a10
 invenio-formatter==1.0.0a2
 invenio-github==1.0.0a3
 invenio-i18n==1.0.0a4

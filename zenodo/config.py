@@ -422,6 +422,7 @@ DEPOSIT_RECORDS_UI_ENDPOINTS = {
         'record_class': 'zenodo.modules.deposit.api:ZenodoDeposit',
     },
 }
+
 #: Endpoint for uploading files.
 DEPOSIT_FILES_API = '/api/files'
 
@@ -446,6 +447,13 @@ SIPSTORE_FILEPATH_MAX_LEN = 1000
 
 # Records
 # =======
+#: Standard record removal reasons.
+ZENODO_REMOVAL_REASONS = [
+    ('', ''),
+    ('spam', 'Spam record, removed by Zenodo staff.'),
+    ('uploader', 'Record removed on request by uploader.'),
+    ('takedown', 'Record removed on request by third-party.'),
+]
 #: Mapping of old export formats to new content type.
 ZENODO_RECORDS_EXPORTFORMATS = {
     'dcite': dict(
@@ -527,6 +535,9 @@ RECORDS_UI_ENDPOINTS = dict(
     ),
 )
 RECORDS_UI_ENDPOINTS.update(ACCESSREQUESTS_RECORDS_UI_ENDPOINTS)
+
+#: Endpoint for record ui.
+RECORDS_UI_ENDPOINT = '{scheme}://{host}/record/{pid_value}'
 
 #: Default tombstone template.
 RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"

@@ -26,12 +26,28 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, current_app, redirect, request, url_for
+from functools import wraps
+
+from elasticsearch.exceptions import NotFoundError
+from flask import Blueprint, abort, current_app, flash, redirect, \
+    render_template, request, url_for
+from flask_babelex import gettext as _
+from flask_security import current_user, login_required
 from invenio_communities.models import Community
+from invenio_db import db
+from invenio_indexer.api import RecordIndexer
+from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
+from invenio_records_files.api import Record
+from invenio_records_files.models import RecordsBuckets
+
+from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
+from .forms import RecordDeleteForm
+from .tasks import datacite_inactivate
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -40,6 +56,43 @@ blueprint = Blueprint(
     template_folder='templates',
     static_folder='static',
 )
+
+
+@blueprint.errorhandler(PIDDeletedError)
+def tombstone_errorhandler(error):
+    """Render tombstone page."""
+    return render_template(
+        current_app.config['RECORDS_UI_TOMBSTONE_TEMPLATE'],
+        pid=error.pid,
+        record=error.record or {},
+    ), 410
+
+
+def pass_record(action, deposit_cls=ZenodoDeposit):
+    """Pass record and deposit record to function."""
+    def decorator(f):
+        @wraps(f)
+        def inner(pid_value):
+            # Resolve pid_value to record pid and record
+            pid, record = pid_value.data
+
+            # Check permissions.
+            permission = record_permission_factory(
+                record=record, action=action)
+            if not permission.can():
+                abort(403)
+
+            # Fetch deposit id from record and resolve deposit record and pid.
+            depid = zenodo_deposit_fetcher(None, record)
+            depid, deposit = Resolver(
+                pid_type=depid.pid_type,
+                object_type='rec',
+                getter=deposit_cls.get_record,
+            ).resolve(depid.pid_value)
+
+            return f(pid=pid, record=record, depid=depid, deposit=deposit)
+        return inner
+    return decorator
 
 
 @blueprint.route('/upload/')
@@ -57,29 +110,116 @@ def legacy_index():
     '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>',
     methods=['POST']
 )
-def edit(pid_value):
+@login_required
+@pass_record('update')
+def edit(pid=None, record=None, depid=None, deposit=None):
     """Edit a record."""
-    # Resolve pid_value to record pid and record
-    pid, record = pid_value.data
-
-    # Fetch deposit id from record and resolve to deposit record and pid.
-    depid = zenodo_deposit_fetcher(None, record)
-    depid, deposit = Resolver(
-        pid_type=depid.pid_type,
-        object_type='rec',
-        getter=ZenodoDeposit.get_record,
-    ).resolve(depid.pid_value)
-
-    deposit_url = url_for(
-        'invenio_deposit_ui.{0}'.format(depid.pid_type),
-        pid_value=depid.pid_value
-    )
-
     # Put deposit in edit mode if not already.
     if deposit['_deposit']['status'] != 'draft':
         deposit = deposit.edit()
+        db.session.commit()
 
-    return redirect(deposit_url)
+    return redirect(url_for(
+        'invenio_deposit_ui.{0}'.format(depid.pid_type),
+        pid_value=depid.pid_value
+    ))
+
+
+@blueprint.route(
+    '/record'
+    '/<pid(recid,record_class="invenio_records_files.api:Record"):pid_value>'
+    '/admin/delete',
+    methods=['GET', 'POST']
+)
+@login_required
+@pass_record('delete', deposit_cls=Record)
+def delete(pid=None, record=None, depid=None, deposit=None):
+    """Delete a record."""
+    # View disabled until properly implemented and tested.
+    abort(404)
+
+    try:
+        doi = PersistentIdentifier.get_by_object('doi', 'rec', record.id)
+    except PIDDoesNotExistError:
+        doi = None
+
+    form = RecordDeleteForm()
+    form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
+    if form.validate_on_submit():
+        # Remove from index
+        try:
+            RecordIndexer().delete(record)
+        except NotFoundError:
+            pass
+        try:
+            RecordIndexer().delete(deposit)
+        except NotFoundError:
+            pass
+        # Remove buckets
+        record_bucket = record.files.bucket
+        deposit_bucket = deposit.files.bucket
+        RecordsBuckets.query.filter_by(record_id=record.id).delete()
+        RecordsBuckets.query.filter_by(record_id=deposit.id).delete()
+        record_bucket.locked = False
+        record_bucket.remove()
+        deposit_bucket.locked = False
+        deposit_bucket.remove()
+        # Remove PIDs
+        pid.delete()
+        depid.delete()
+        # Remove record objects and record removal reason.
+        record.clear()
+
+        reason = form.reason.data or dict(
+            current_app.config['ZENODO_REMOVAL_REASONS']
+        )[form.standard_reason.data]
+
+        record.update({
+            'removal_reason': reason,
+            'removed_by': current_user.get_id(),
+        })
+        record.commit()
+        deposit.delete()
+        db.session.commit()
+        datacite_inactivate.delay(doi.pid_value)
+        flash(
+            _('Record %(recid)s and associated objects successfully deleted.',
+                recid=pid.pid_value),
+            category='success'
+        )
+        return redirect(url_for('zenodo_frontpage.index'))
+
+    return render_template(
+        'zenodo_deposit/delete.html',
+        form=form,
+        pid=pid,
+        pids=[pid, depid, doi],
+        record=record,
+        deposit=deposit,
+    )
+
+
+@blueprint.app_template_filter('tolinksjs')
+def to_links_js(pid, deposit=None):
+    """Get API links."""
+    if not isinstance(deposit, ZenodoDeposit):
+        return []
+
+    self_url = current_app.config['DEPOSIT_RECORDS_API'].format(
+        pid_value=pid.pid_value)
+
+    return {
+        'self': self_url,
+        'html': url_for(
+            'invenio_deposit_ui.{}'.format(pid.pid_type),
+            pid_value=pid.pid_value),
+        'bucket': current_app.config['DEPOSIT_FILES_API'] + '/{0}'.format(
+            str(deposit.files.bucket.id)),
+        'discard': self_url + '/actions/discard',
+        'edit': self_url + '/actions/edit',
+        'publish': self_url + '/actions/publish',
+        'files': self_url + '/files',
+    }
 
 
 @blueprint.app_template_filter('tofilesjs')
@@ -110,9 +250,3 @@ def to_files_js(deposit):
         })
 
     return res
-
-
-# @blueprint.route('/deposit/<int:deposit_id>/')
-# def deposit_index():
-#     """Legacy deposit."""
-#     return redirect(url_for('invenio_deposit_ui.new', deposit_id=deposit_id))

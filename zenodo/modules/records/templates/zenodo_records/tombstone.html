@@ -34,4 +34,9 @@
     metadata of the record is kept for archival purposes.
   {% endtrans %}
   </p>
+  {% if record and record.removal_reason %}
+  <p>
+    <strong>Reason for removal:</strong> {{record.removal_reason}}
+  </p>
+  {% endif %}
 {% endblock message %}
