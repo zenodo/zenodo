@@ -351,7 +351,7 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
     state = fields.Method('dump_state', dump_only=True)
     submitted = fields.Function(
         lambda o: o['metadata'].get(
-            '_deposit', {}).get('status', 'draft') == 'published',
+            '_deposit', {}).get('pid') is not None,
         dump_only=True
     )
     title = fields.String(

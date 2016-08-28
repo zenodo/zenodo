@@ -443,8 +443,16 @@ def test_submitted(minimal_record_model, depid_pid, legacyjson_v1):
     assert obj['submitted'] is False
 
     minimal_record_model.update(dict(
-        _deposit=dict(status='published')
+        _deposit=dict(
+            status='published',
+            pid=dict(type='recid', value='1')
+        )
     ))
+    obj = legacyjson_v1.transform_record(
+        depid_pid, minimal_record_model)
+    assert obj['submitted'] is True
+
+    minimal_record_model['_deposit']['status'] == 'draft'
     obj = legacyjson_v1.transform_record(
         depid_pid, minimal_record_model)
     assert obj['submitted'] is True
@@ -452,4 +460,4 @@ def test_submitted(minimal_record_model, depid_pid, legacyjson_v1):
     del minimal_record_model['_deposit']['status']
     obj = legacyjson_v1.transform_record(
         depid_pid, minimal_record_model)
-    assert obj['submitted'] is False
+    assert obj['submitted'] is True
