@@ -36,11 +36,12 @@ from invenio_access.permissions import DynamicPermission
 from invenio_communities.models import Community, InclusionRequest
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
+from invenio_pidstore.models import PIDStatus
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from .models import AccessRight, ObjectType
-from .permissions import has_read_permission
+from .permissions import RecordPermission
 from .serializers import citeproc_v1
 
 blueprint = Blueprint(
@@ -120,9 +121,9 @@ def accessright_description(value, embargo_date=None):
 
 
 @blueprint.app_template_filter()
-def has_access_to(user, record):
-    """Check whether the user has access to the record."""
-    return has_read_permission(user, record)
+def has_record_perm(user, record, action):
+    """Check if user has a given record permission."""
+    return RecordPermission.create(record, action, user=user).can()
 
 
 #

@@ -62,8 +62,9 @@ from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
-from zenodo.modules.deposit.permissions import DepositPermission, \
-    can_edit_deposit
+from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
+    deposit_read_permission_factory, record_create_permission_factory, \
+    record_update_permission_factory
 
 
 def _(x):
@@ -397,12 +398,18 @@ DEPOSIT_REST_ENDPOINTS = dict(
         default_media_type='application/json',
         links_factory_imp='zenodo.modules.deposit.links:links_factory',
         create_permission_factory_imp=check_oauth2_scope(
-            lambda x: True, write_scope.id),
-        read_permission_factory_imp=DepositPermission,
+            lambda record: record_create_permission_factory(
+                record=record).can(),
+            write_scope.id),
+        read_permission_factory_imp=deposit_read_permission_factory,
         update_permission_factory_imp=check_oauth2_scope(
-            can_edit_deposit, write_scope.id),
+            lambda record: record_update_permission_factory(
+                record=record).can(),
+            write_scope.id),
         delete_permission_factory_imp=check_oauth2_scope(
-            can_edit_deposit, write_scope.id),
+            lambda record: deposit_delete_permission_factory(
+                record=record).can(),
+            write_scope.id),
         max_result_window=10000,
     ),
 )

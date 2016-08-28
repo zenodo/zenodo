@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 import arrow
 import idutils
 import jsonref
-from flask import current_app, has_request_context, url_for
+from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier

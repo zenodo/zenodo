@@ -28,7 +28,7 @@
 {%- set meta_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value, _external=True) -%}
 {%- set meta_authors = record.creators|map(attribute='familyname') -%}
 {%- set meta_publication_date = record.publication_date|from_isodate -%}
-{%- set files = record.files if current_user|has_access_to(record) else [] %}
+{%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
 
 {%- if files | selectattr("type", "equalto", "pdf") | list | length is equalto 0 %}
   {% set pdf_url_meta_highwire = "" %}

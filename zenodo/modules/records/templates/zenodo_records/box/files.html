@@ -22,7 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
-{%- set files = record.files if current_user|has_access_to(record) else [] %}
+{%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
 {%- if record._files -%}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
@@ -63,7 +63,7 @@
       </tbody>
     </table>
   {%- endif %}
-  {%- if not current_user|has_access_to(record) and record.access_right in ['restricted'] %}
+  {%- if not current_user|has_record_perm(record, 'read-files') and record.access_right in ['restricted'] %}
     {%- if record.access_conditions %}
     <div class="panel-body">
     <hr/>

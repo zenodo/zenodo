@@ -78,6 +78,46 @@ def files_permission_factory(obj, action=None):
     return DynamicPermission(ActionNeed('admin-access'))
 
 
+def record_permission_factory(record=None, action=None):
+    """Record permission factory."""
+    return RecordPermission.create(record, action)
+
+
+def record_create_permission_factory(record=None):
+    """Create permission factory."""
+    return record_permission_factory(record=record, action='create')
+
+
+def record_read_permission_factory(record=None):
+    """Read permission factory."""
+    return record_permission_factory(record=record, action='read')
+
+
+def record_read_files_permission_factory(record=None):
+    """Read permission factory."""
+    return record_permission_factory(record=record, action='read-files')
+
+
+def record_update_permission_factory(record=None):
+    """Update permission factory."""
+    return record_permission_factory(record=record, action='update')
+
+
+def record_delete_permission_factory(record=None):
+    """Delete permission factory."""
+    return record_permission_factory(record=record, action='delete')
+
+
+def deposit_read_permission_factory(record=None):
+    """Record permission factory."""
+    return DepositPermission.create(record=record, action='read')
+
+
+def deposit_delete_permission_factory(record=None):
+    """Record permission factory."""
+    return DepositPermission.create(record=record, action='delete')
+
+
 #
 # Permission classes
 #
@@ -166,11 +206,70 @@ class RecordFilesPermission(DepositFilesPermission):
     def create(cls, record, action):
         """Create a record files permission."""
         if action in cls.read_actions:
-            return cls(record, has_read_permission)
+            return cls(record, has_read_files_permission)
         elif action in cls.admin_actions:
             return cls(record, has_admin_permission)
         else:
             return cls(record, deny)
+
+
+class RecordPermission(object):
+    """Record permission.
+
+    - Create action given to any authenticated user.
+    - Read access given to everyone.
+    - Update access given to record owners.
+    - Delete access given to admins only.
+    """
+
+    create_actions = ['create']
+    read_actions = ['read']
+    read_files_actions = ['read-files']
+    update_actions = ['update']
+    delete_actions = ['delete']
+
+    def __init__(self, record, func, user):
+        """Initialize a file permission object."""
+        self.record = record
+        self.func = func
+        self.user = user or current_user
+
+    def can(self):
+        """Determine access."""
+        return self.func(self.user, self.record)
+
+    @classmethod
+    def create(cls, record, action, user=None):
+        """Create a record permission."""
+        if action in cls.create_actions:
+            return cls(record, allow, user)
+        elif action in cls.read_actions:
+            return cls(record, allow, user)
+        elif action in cls.read_files_actions:
+            return cls(record, has_read_files_permission, user)
+        elif action in cls.update_actions:
+            return cls(record, has_update_permission, user)
+        elif action in cls.delete_actions:
+            return cls(record, has_admin_permission, user)
+        else:
+            return cls(record, deny, user)
+
+
+class DepositPermission(RecordPermission):
+    """Deposit permission.
+
+    - Read action given to record owners.
+    - Delete action given to record owners (still subject to being unpublished)
+    """
+
+    @classmethod
+    def create(cls, record, action, user=None):
+        """Create a deposit permission."""
+        if action in cls.read_actions:
+            return cls(record, has_update_permission, user)
+        elif action in cls.delete_actions:
+            return cls(record, has_update_permission, user)
+        return super(DepositPermission, cls).create(record, action, user=user)
 
 
 #
@@ -181,7 +280,12 @@ def deny(user, record):
     return False
 
 
-def has_read_permission(user, record):
+def allow(user, record):
+    """Allow access."""
+    return True
+
+
+def has_read_files_permission(user, record):
     """Check if user has read access to the record."""
     # Allow if record is open access
     if AccessRight.get(

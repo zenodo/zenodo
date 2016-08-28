@@ -31,7 +31,7 @@ from flask_security import current_user
 from invenio_records_files.api import Record
 from invenio_records_rest.serializers.json import JSONSerializer
 
-from ..permissions import has_read_permission
+from ..permissions import has_read_files_permission
 
 
 class ZenodoJSONSerializer(JSONSerializer):
@@ -48,7 +48,7 @@ class ZenodoJSONSerializer(JSONSerializer):
         )
         # Add/remove files depending on access right.
         if isinstance(record, Record) and '_files' in record:
-            if not has_request_context() or has_read_permission(
+            if not has_request_context() or has_read_files_permission(
                     current_user, record):
                 result['files'] = record['_files']
         return result

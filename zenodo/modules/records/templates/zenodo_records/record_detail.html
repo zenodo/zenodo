@@ -61,7 +61,7 @@
       {%- endif %}
       {%- endblock record_body %}
       {%- block record_body_extra %}
-      {%- set files = record.files if current_user|has_access_to(record) else [] %}
+      {%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
       {%-  include "zenodo_records/box/preview.html" %}
       {%-  include "zenodo_records/box/files.html" %}
       {%-  include "zenodo_records/box/references.html" %}
