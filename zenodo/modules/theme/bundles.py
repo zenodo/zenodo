@@ -32,7 +32,7 @@ from invenio_assets import NpmBundle
 css = NpmBundle(
     Bundle(
         'scss/styles.scss',
-        filters='scss, cleancss',
+        filters='node-scss, cleancss',
     ),
     Bundle(
         'node_modules/angular-loading-bar/build/loading-bar.css',
