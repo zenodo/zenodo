@@ -2,101 +2,10 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "additionalProperties": false,
   "description": "Describe information needed for deposit module.",
-  "id": "http://zenodo.org/schemas/deposits/records/record-v1.0.0.json",
+  "id": "http://zenodo.org/schemas/deposits/records/legacyjson.json",
   "properties": {
     "$schema": {
       "type": "string"
-    },
-    "_deposit": {
-      "name": "_deposit",
-      "properties": {
-        "created_by": {
-          "name": "created_by",
-          "type": "integer"
-        },
-        "id": {
-          "name": "id",
-          "type": "string"
-        },
-        "owners": {
-          "items": [
-            {
-              "type": "integer"
-            }
-          ],
-          "name": "owners",
-          "type": "array"
-        },
-        "pid": {
-          "name": "pid",
-          "properties": {
-            "revision_id": {
-              "type": "integer"
-            },
-            "type": {
-              "type": "string"
-            },
-            "value": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        },
-        "status": {
-          "enum": [
-            "draft",
-            "published"
-          ],
-          "name": "status",
-          "type": "string"
-        }
-      },
-      "type": "object"
-    },
-    "_buckets": {
-      "type": "object",
-      "properties": {
-        "deposit": {
-          "description": "Deposit bucket ID.",
-          "type": "string"
-        },
-        "record": {
-          "description": "Record bucket ID.",
-          "type": "string"
-        }
-      }
-    },
-    "_files": {
-      "items": {
-        "description": "Describe information needed for files in records.",
-        "properties": {
-          "bucket": {
-            "type": "string"
-          },
-          "checksum": {
-            "type": "string"
-          },
-          "key": {
-            "type": "string"
-          },
-          "previewer": {
-            "description": "Identifier for previewer needed to preview this file.",
-            "type": "string"
-          },
-          "size": {
-            "type": "integer"
-          },
-          "type": {
-            "description": "File type extension.",
-            "type": "string"
-          },
-          "version_id": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "type": "array"
     },
     "access_conditions": {
       "description": "Conditions under which access is given if record is restricted.",
@@ -119,7 +28,7 @@
       "items": {
         "additionalProperties": false,
         "properties": {
-          "ifentifier": {
+          "identifier": {
             "type": "string"
           }
         },
@@ -371,28 +280,28 @@
           "scheme": {
             "description": "Persistent identifier scheme.",
             "enum": [
+              "ads",
               "ark",
               "arxiv",
-              "doi",
               "bibcode",
-              "ean8",
+              "doi",
               "ean13",
+              "ean8",
               "eissn",
+              "gnd",
               "handle",
               "isbn",
               "issn",
               "istc",
               "lissn",
               "lsid",
-              "pmid",
+              "orcid",
               "pmcid",
+              "pmid",
               "purl",
               "upc",
               "url",
-              "urn",
-              "orcid",
-              "gnd",
-              "ads"
+              "urn"
             ],
             "type": "string"
           }
@@ -517,9 +426,6 @@
       "type": "string"
     }
   },
-  "required": [
-    "_deposit"
-  ],
-  "title": "Zenodo Deposit Schema v1.0.0",
+  "title": "Zenodo Legacy Deposit Schema v1.0.0",
   "type": "object"
 }
