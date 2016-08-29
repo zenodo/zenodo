@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function
 
 import json
 
+from invenio_files_rest.models import MultipartObject
 from invenio_search import current_search
 from six import BytesIO
 
@@ -50,9 +51,9 @@ def get_data(**kwargs):
     return test_data
 
 
-def test_missing_files(api_client, deposit, json_auth_headers,
-                       deposit_url, get_json, license_record):
-    """Test data validation."""
+def test_missing_files(api_client, json_auth_headers, deposit_url, location,
+                       es, get_json, license_record):
+    """Test data validation - no files added."""
     client = api_client
     headers = json_auth_headers
 
@@ -66,6 +67,41 @@ def test_missing_files(api_client, deposit, json_auth_headers,
     res = client.post(links['publish'], headers=headers)
     data = get_json(res, code=400)
     assert len(data['errors']) == 1
+
+
+def test_multipart_onging(api, api_client, db, deposit, deposit_file, get_json,
+                          json_auth_headers, deposit_url, license_record):
+    """Test data validation."""
+    api.config.update(dict(
+        FILES_REST_MULTIPART_CHUNKSIZE_MIN=2,
+    ))
+    client = api_client
+    headers = json_auth_headers
+    deposit_url = '{0}/{1}'.format(
+        deposit_url,
+        deposit['_deposit']['id']
+    )
+
+    # Get links
+    res = client.get(deposit_url, headers=headers)
+    links = get_json(res, code=200)['links']
+
+    # Create multipart upload
+    multipart_url = '{0}/bigfile?uploads&size=1000&partSize=500'.format(
+        links['bucket'])
+    res = client.post(multipart_url, headers=headers)
+    mp_links = get_json(res, code=200)['links']
+
+    # Publish - not possible (multipart object in progress)
+    res = client.post(links['publish'], headers=headers)
+    data = get_json(res, code=400)
+    assert len(data['errors']) == 1
+
+    # Delete multipart upload
+    assert client.delete(mp_links['self'], headers=headers).status_code == 204
+
+    # Now publishing is possible
+    assert client.post(links['publish'], headers=headers).status_code == 202
 
 
 def test_file_ops(api_client, deposit, json_auth_headers, auth_headers,

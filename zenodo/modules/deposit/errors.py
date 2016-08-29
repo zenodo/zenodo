@@ -45,9 +45,8 @@ class OngoingMultipartUploadError(RESTValidationError):
 
     errors = [
         FieldError(None, _(
-            'We are still merging chunks from a large file upload (large files'
-            ' are uploaded chunks of 10MB for a more reliable file transfer).'
-            ' Please hold on for a short moment while we finish merging.'
+            'A multipart file upload is in progress. Please wait for it to '
+            'finish or delete the multipart filed upload.'
         ), code=10)
     ]
 

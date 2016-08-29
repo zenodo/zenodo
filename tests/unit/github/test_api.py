@@ -70,7 +70,7 @@ def test_github_creators_metadata(m_ljv1t, m_get_contributors, m_get_owner,
 
 
 @patch('zenodo.modules.github.api.ZenodoGitHubRelease.metadata')
-def test_github_publish(zgh_meta, db, users, dummy_location, deposit_metadata):
+def test_github_publish(zgh_meta, db, users, location, deposit_metadata):
     """Test basic GitHub payload."""
     gh3mock = MagicMock()
     gh3mock.api.session.get().raw = BytesIO(b'foobar')

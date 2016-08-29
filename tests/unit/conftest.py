@@ -328,26 +328,8 @@ def recid_pid():
         object_uuid=uuid4())
 
 
-@pytest.yield_fixture()
-def dummy_location(db):
-    """File system location."""
-    tmppath = tempfile.mkdtemp()
-
-    loc = Location(
-        name='testloc',
-        uri=tmppath,
-        default=True
-    )
-    db.session.add(loc)
-    db.session.commit()
-
-    yield loc
-
-    shutil.rmtree(tmppath)
-
-
 @pytest.fixture()
-def bucket(db, dummy_location):
+def bucket(db, location):
     """File system location."""
     b1 = Bucket.create()
     db.session.commit()

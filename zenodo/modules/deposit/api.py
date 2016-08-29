@@ -82,6 +82,11 @@ class ZenodoDeposit(Deposit):
 
     deposit_minter = staticmethod(zenodo_deposit_minter)
 
+    @property
+    def multipart_files(self):
+        """Get all multipart files."""
+        return MultipartObject.query_by_bucket(self.files.bucket)
+
     def is_published(self):
         """Check if deposit is published."""
         return self['_deposit'].get('pid') is not None
@@ -293,7 +298,7 @@ class ZenodoDeposit(Deposit):
         if len(self.files) == 0:
             raise MissingFilesError()
 
-        if MultipartObject.query_by_bucket(self.files.bucket).count() != 0:
+        if self.multipart_files.count() != 0:
             raise OngoingMultipartUploadError()
 
         if 'communities' in self:
