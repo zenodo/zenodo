@@ -33,7 +33,7 @@ from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
-from invenio_files_rest.models import Bucket, MultipartObject
+from invenio_files_rest.models import Bucket, MultipartObject, Part
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.api import FileObject
@@ -364,7 +364,15 @@ class ZenodoDeposit(Deposit):
         q = RecordsBuckets.query.filter_by(record_id=self.id)
         bucket = q.one().bucket
         with db.session.begin_nested():
+            # Remove Record-Bucket link
             q.delete()
+            mp_q = MultipartObject.query_by_bucket(bucket)
+            # Remove multipart objects
+            Part.query.filter(
+                Part.upload_id.in_(mp_q.with_entities(
+                    MultipartObject.upload_id).subquery())
+            ).delete(synchronize_session='fetch')
+            mp_q.delete(synchronize_session='fetch')
         bucket.remove()
 
         return super(ZenodoDeposit, self).delete(*args, **kwargs)
