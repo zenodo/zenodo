@@ -335,23 +335,10 @@ DEPOSIT_FORM_JSONSCHEMA = 'deposits/records/legacyrecord.json'
 DEPOSIT_RECORDS_API = '/api/deposit/depositions/{pid_value}'
 
 #: Alerts shown when actions are completed on deposit.
-DEPOSIT_RESPONSE_MESSAGES = dict(
+DEPOSIT_UI_RESPONSE_MESSAGES = dict(
     self=dict(
-        message="Saved successfully"
+        message="Saved successfully."
     ),
-    publish=dict(
-        message="Published successfully",
-        backlink=True,
-        hide=True
-    ),
-    discard=dict(
-        message="Discarded successfully"
-    ),
-    delete=dict(
-        message="Deleted successfully",
-        backlink=True,
-        hide=True
-    )
 )
 
 #: REST API configuration.

@@ -59,6 +59,29 @@
                 }
             };
         });
+        app.filter('fieldtitle', function(){
+          return function(fieldname, schemaform) {
+            if (!fieldname){
+              return null;
+            }
+            var parts = fieldname.split('.');
+            parts.shift(); // pop metadata
+            var title = null;
+            for (var i = 0; i < schemaform.length && parts.length != 0; i++) {
+              var set = schemaform[i];
+              for (var j = 0; j < set.items.length && parts.length != 0; j++) {
+                var field = set.items[j];
+                if(field && field.type != "section" && field.key && field.key[0] == parts[0] ){
+                  if(field.title) {
+                      title = field.title;
+                  }
+                  parts.shift();
+                }
+              }
+            }
+            return title;
+          };
+        });
 
         angular.bootstrap(
           document.getElementById('invenio-records'), [
@@ -92,9 +115,8 @@
         {% else %}
           initialization="{{ config.DEPOSIT_SEARCH_API }}"
         {% endif %}
-        response-params='{{ config.DEPOSIT_RESPONSE_MESSAGES | tojson }}'
         extra-params='{"headers":{"Content-Type": "application/json"}}'
-        template-params='{"is_published": {{'true' if is_published else 'false'}} }'
+        template-params='{"is_published": {{'true' if is_published else 'false'}}, "messages": {{ config.DEPOSIT_UI_RESPONSE_MESSAGES | tojson }} }'
         form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
         record='{{ record | serialize_record(pid, "githubjson_v1") or ""}}'
         schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}">
@@ -106,11 +128,10 @@
         </invenio-records-actions>
         {%- if is_published %}
         <h1>Edit upload</h1>
-        <p class="text-muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
         {%- else %}
         <h1>New upload</h1>
-        <p class="text-muted"><small>Instructions: (i) Press "Save" to save your upload for editing later, as many times you like. (ii) Upload and remove extra files in the bottom of the form. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
         {%- endif %}
+        <p class="text-muted"><small><strong>Instructions:</strong> (i) Upload minimum one file or fill-in required fields (marked with a <span class="field-required">red star</span> ). (ii) Press "Save" to save your upload for editing later. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
         </p>
         <invenio-files-list
           template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FILESLIST) }}">

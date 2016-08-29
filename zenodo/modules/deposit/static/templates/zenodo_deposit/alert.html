@@ -1,7 +1,16 @@
-<div ng-show="recordsVM.invenioRecordsAlert" class="alert alert-{{recordsVM.invenioRecordsAlert.type}} fixed">
+<div ng-show="recordsVM.invenioRecordsAlert" class="alert alert-{{recordsVM.invenioRecordsAlert.type || 'info'}} fixed">
   <div class="container">
     <a class="close" data-dismiss="alert" href="#">&times;</a>
-    <strong>{{ recordsVM.invenioRecordsAlert.data.status }}</strong>
-      {{ recordsVM.invenioRecordsAlert.data.message || recordsVM.invenioRecordsArgs.templateParams.responseParams[recordsVM.invenioRecordsAlert.action].message }}
+    <div ng-show="recordsVM.invenioRecordsAlert.data.message">
+      {{recordsVM.invenioRecordsAlert.data.message}}
+      <ul ng-show="recordsVM.invenioRecordsAlert.data.errors">
+        <li ng-repeat="err in recordsVM.invenioRecordsAlert.data.errors">
+          <span ng-show="err.field">{{err.field|fieldtitle:recordsVM.invenioRecordsForm}}: </span>
+          {{err.message}}
+        </li>
+      </ul>
+    </div>
+    <div ng-show='!recordsVM.invenioRecordsAlert.data.message'>
+      {{ recordsVM.invenioRecordsArgs.templateParams['messages'][recordsVM.invenioRecordsAlert.action]['message'] }}
     </div>
 </div>

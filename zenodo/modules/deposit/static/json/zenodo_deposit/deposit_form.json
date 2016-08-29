@@ -665,10 +665,13 @@
         "key": "references",
         "title": "References",
         "description": "",
-        "fa_cls": "fa-bookmark",
         "sortOptions": {
-          "disabled": true
+          "axis": "y",
+          "cursor": "move",
+          "disabled": false,
+          "handle": "i.sort-handle"
         },
+        "fa_cls": "fa-bookmark",
         "add": "Add another reference.",
         "inline": true,
         "items": [
