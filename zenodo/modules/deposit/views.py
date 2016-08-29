@@ -249,4 +249,23 @@ def to_files_js(deposit):
             }
         })
 
+    for f in deposit.multipart_files.all():
+        res.append({
+            'key': f.key,
+            'size': f.size,
+            'multipart': True,
+            'completed': f.completed,
+            'processing': True,
+            'progress': 100,
+            'links': {
+                'self': (
+                    current_app.config['DEPOSIT_FILES_API'] +
+                    '/{bucket}/{key}?uploadId={upload_id}'.format(
+                        bucket=f.bucket_id,
+                        key=f.key,
+                        upload_id=f.upload_id,
+                    )),
+            }
+        })
+
     return res
