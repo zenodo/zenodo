@@ -1,0 +1,19 @@
+<div class="form-group {{form.htmlClass}}">
+  <div ng-class="{'col-sm-9 col-md-offset-3': !form.notitle, 'col-sm-12': form.notitle}">
+    <button
+      sf-field-model="replaceAll"
+      ng-click="model.doi=model.prereserve_doi.doi"
+      class="btn btn-xs btn-default form-button {{ form.fieldHtmlClass }}"
+      data-toggle="tooltip"
+      tooltip
+      title="Pre-reserve a Digital Object Identifier for your upload. This allows you to know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until you submit your upload."
+    >
+      <i class="fa fa-barcode"></i> Pre-reserve DOI
+    </button>
+    <span
+      class="text-success"
+      ng-show="model.prereserve_doi.doi && model.doi==model.prereserve_doi.doi">
+      <i class="glyphicon glyphicon-ok"></i>
+    </span>
+  </div>
+</div>

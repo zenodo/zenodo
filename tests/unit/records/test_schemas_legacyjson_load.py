@@ -114,7 +114,6 @@ def test_upload_type_invalid():
     assert s.load(obj).data['resource_type'] == {'type': 'dataset'}
 
 
-
 def test_related_alternate_identifiers():
     """Test related alternate identifiers."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)

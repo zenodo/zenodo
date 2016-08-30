@@ -38,9 +38,9 @@ class DOI(fields.String):
         'invalid_doi': _(
             'The provided DOI is invalid - it should look similar '
             ' to \'10.1234/foo.bar\'.'),
-        'managed_prefix': _(
+        'managed_prefix': (
             'The prefix {prefix} is administrated locally.'),
-        'banned_prefix': _(
+        'banned_prefix': (
             'The prefix {prefix} is invalid.'
         ),
         'test_prefix': _(
@@ -99,7 +99,7 @@ class DOI(fields.String):
         prefix = value.split('/')[0]
         # Check for managed prefix
         if managed_prefixes and prefix in managed_prefixes:
-            self.fail('managed_prefix')
+            self.fail('managed_prefix', prefix=prefix)
         # Check for banned prefixes
         if banned_prefixes and prefix in banned_prefixes:
             self.fail(

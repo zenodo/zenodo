@@ -163,8 +163,13 @@
         "key": "doi",
         "title": "Digital Object Identifier",
         "description": "Optional. Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allows others to easily and unambiguously cite your upload.",
-        "placeholder": "e.g. 10.1234/foobar.567890",
+        "placeholder": "e.g. 10.1234/foo.bar",
         "fa_cls": "fa-barcode"
+      },
+      {
+        "type": "template",
+        "key": "prereserve_doi.doi",
+        "templateUrl": "/static/templates/zenodo_deposit/prereserve_doi.html"
       },
       {
         "type": "datepicker",
