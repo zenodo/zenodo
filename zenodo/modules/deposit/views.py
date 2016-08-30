@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+from datetime import datetime
 from functools import wraps
 
 from elasticsearch.exceptions import NotFoundError
@@ -200,6 +201,17 @@ def delete(pid=None, record=None, depid=None, deposit=None):
         record=record,
         deposit=deposit,
     )
+
+
+@blueprint.app_context_processor
+def current_datetime():
+    """Template contex processor which adds current datetime to the context."""
+    now = datetime.utcnow()
+    return {
+        'current_datetime': now,
+        'current_date': now.date(),
+        'current_time': now.time(),
+    }
 
 
 @blueprint.app_template_filter('tolinksjs')

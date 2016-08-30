@@ -101,25 +101,26 @@
     <invenio-files-uploader
         method="PUT"
         endpoint="{{config.DEPOSIT_FILES_API}}"
-        {% if pid %}
-          action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
-        {% else %}
-          initialization="{{ config.DEPOSIT_SEARCH_API }}"
-        {% endif %}
+        {%- if pid %}
+        action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
+        {%- else %}
+        initialization="{{ config.DEPOSIT_SEARCH_API }}"
+        {%- endif %}
         files='{{record|tofilesjs|tojson}}'
        >
       <invenio-records
-        {% if pid %}
-          initialization="{{ config.DEPOSIT_RECORDS_API.format(pid_value=pid.pid_value) }}"
-          links='{{pid|tolinksjs(record)|tojson}}'
-        {% else %}
-          initialization="{{ config.DEPOSIT_SEARCH_API }}"
-        {% endif %}
+        {%- if pid %}
+        initialization="{{ config.DEPOSIT_RECORDS_API.format(pid_value=pid.pid_value) }}"
+        links='{{pid|tolinksjs(record)|tojson}}'
+        {%- else %}
+        initialization="{{ config.DEPOSIT_SEARCH_API }}"
+        {%- endif %}
         extra-params='{"headers":{"Content-Type": "application/json"}}'
         template-params='{"is_published": {{'true' if is_published else 'false'}}, "messages": {{ config.DEPOSIT_UI_RESPONSE_MESSAGES | tojson }} }'
+        record='{{ record | serialize_record(pid, "githubjson_v1") or {"publication_date": current_date.isoformat()}|tojson}}'
         form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
-        record='{{ record | serialize_record(pid, "githubjson_v1") or ""}}'
-        schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}">
+        schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}"
+      >
         <invenio-records-alert
           template="{{ url_for('static', filename='templates/zenodo_deposit/alert.html') }}">
         </invenio-records-alert>
