@@ -322,6 +322,9 @@ DEPOSIT_CONTRIBUTOR_MARC2DATACITE = {
 DEPOSIT_CONTRIBUTOR_DATACITE2MARC = {
     x['datacite']: x['marc'] for x in DEPOSIT_CONTRIBUTOR_TYPES
 }
+DEPOSIT_CONTRIBUTOR_TYPES_LABELS = {
+    x['datacite']: x['label'] for x in DEPOSIT_CONTRIBUTOR_TYPES
+}
 
 #: Default JSON Schema for deposit.
 DEPOSIT_DEFAULT_JSONSCHEMA = 'deposits/records/record-v1.0.0.json'

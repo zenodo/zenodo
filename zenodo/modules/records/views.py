@@ -178,6 +178,13 @@ def objecttype(value):
     return ObjectType.get_by_dict(value)
 
 
+@blueprint.app_template_filter()
+def contributortype_title(value):
+    """Get object type."""
+    return current_app.config.get('DEPOSIT_CONTRIBUTOR_TYPES_LABELS', {}).get(
+        value, value)
+
+
 #
 # Files related template filters.
 #
@@ -298,12 +305,13 @@ def community_curation(record, user):
         global_perm = True
 
     if global_perm:
-        return (pending, accepted)
+        return (pending, accepted, accepted)
     else:
         return (
             [c for c in pending if _can_curate(c, user, record)],
             [c for c in accepted
-             if _can_curate(c, user, record, accepted=True)]
+             if _can_curate(c, user, record, accepted=True)],
+            accepted
         )
 
 

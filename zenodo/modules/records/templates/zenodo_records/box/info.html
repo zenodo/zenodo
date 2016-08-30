@@ -74,8 +74,20 @@
     </dd>
   {%- endif %}
 
-  {#- FIXME: Book -#}
-  {#- FIXME: Publisher -#}
+  {% with i=record.imprint, p=record.part_of %}
+  {%- if i and not p %}
+    <dt>{{_('Imprint')}}:</dt>
+    <dd>
+      {{i.publisher}}{% if i.place %}, {{i.place}}{%- endif %}{% if i.isbn %} ({{i.isbn}}){%- endif %}.
+    </dd>
+  {%- elif p %}
+    <dt>{{_('Published in')}}:</dt>
+    <dd>
+      {{p.title}}{% if i.place %}, {{i.publisher}}{%- endif %}{% if i.place %}, {{i.place}}{%- endif %}{% if p.pages %}, pp. {{p.pages}}{%- endif %}{% if i.isbn %} ({{i.isbn}}){%- endif %}.
+    </dd>
+  {%- endif %}
+  {%- endwith %}
+
   {%- if record.journal %}
   {% with j=record.journal %}
     <dt>{{_('Published in')}}:</dt>
@@ -101,9 +113,29 @@
     </dd>
   {%- endif %}
 
-  {#- FIXME: University -#}
-  {#- FIXME: Meeting -#}
-  {#- FIXME: Number of pages  -#}
+  {%- if record.thesis and record.thesis.university %}
+    <dt>{{ _('Awarding University') }}:</dt>
+    <dd>{{record.thesis.university}}</dd>
+  {%- endif %}
+
+  {%- if record.meeting %}
+    {%- set m = record.meeting%}
+    {%- set m_title = '{0} ({1})'.format(m.title, m.acronym) if m.acronym and m.title else (m.title or m.acronym) %}
+    <dt>{{ _('Meeting') }}:</dt>
+    <dd>
+      {%- if m.url %}
+      <a href="{{m.url}}"><i class="fa fa-external-link"></i> {{m_title}}</a>
+      {%- else %}
+      {{m_title}}
+      {%- endif%}
+      {%- if m.place %}, {{m.place}} {%- endif %}
+      {%- if m.dates %}, {{m.dates}} {%- endif %}
+      {% if m.session %}(Session {{m.session}} {% if m.session_part %}, Part {{m.session_part}}{%- endif %}){%- endif %}
+    </dd>
+    {%- if m.url and not m_title %}
+      <dd><a href="{{m.url}}"><i class="fa fa-external-link"></i> {{_('Conference website')}}</a></dd>
+    {%- endif %}
+  {%- endif %}
 
   {%- for group in record.related_identifiers|groupby('relation') %}
     {%- if loop.first %}
@@ -112,7 +144,6 @@
     <dd>{{group.grouper|relation_title}}:<br />
     {%- for related_id in group.list %}
       {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}{#  #}
-
       {%- if related_url %}
       <a href="{{related_url}}">{{related_id.identifier}}</a>{%- if not loop.last %}, {% endif %}
       {%- else %}
@@ -137,7 +168,17 @@
     </dd>
   {%- endif %}
 
-  {#- FIXME: Communities -#}
+  {%- if all_comms %}
+    <dt>{{ _('Communities') }}:</dt>
+    <dd>
+      <ul class="list-unstyled">
+      {%- for c in all_comms %}
+        <li><a href="{{url_for('invenio_communities.detail', community_id=c.id)}}">{{c.title}}</a></li>
+      {%- endfor %}
+      </ul>
+    </dd>
+
+  {%- endif %}
 
   {%- if resolved_record.license %}
     <dt>{{_('License (for files)')}}:</dt>

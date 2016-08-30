@@ -27,7 +27,7 @@
 {%- from "zenodo_records/macros/accessright.html" import accessright_label -%}
 {%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
 {%- from "zenodo_records/macros/altmetric.html" import almetric_badge -%}
-{%- from "zenodo_records/macros/authors.html" import authors -%}
+{%- from "zenodo_records/macros/authors.html" import authors, contributors -%}
 
 {%- set title = record.title + " | " + config.THEME_SITENAME -%}
 {%- set publication_date = record.publication_date|from_isodate -%}
@@ -53,6 +53,13 @@
       </p>
       <h1 itemprop="name">{{ record.title }}</h1>
       <p>{{ authors(record.creators) }}</p>
+      {%- if record.contributors %}
+        <p>{{ contributors(record.contributors) }}</p>
+      {%- endif %}
+      {%- if record.thesis and record.thesis.supervisors %}
+        <h5>{{_('Thesis supervisor(s)')}}</h5>
+        <p>{{ authors(record.thesis.supervisors) }}</p>
+      {%- endif %}
       <p itemprop="description">{{ record.description|safe }}</p>
       {%- if record.notes %}
       <div class="alert alert-warning">
@@ -69,7 +76,7 @@
     </div>
     <div class="col-sm-4 col-md-4 col-right">
       {%- include "zenodo_records/box/edit.html" %}
-      {%- set pending_comms, accepted_comms=community_curation(record, current_user) %}
+      {%- set pending_comms, accepted_comms, all_comms = community_curation(record, current_user) %}
       {% if pending_comms or accepted_comms %}
       <div class="well metadata">
         {%- include "zenodo_records/box/curate.html" %}

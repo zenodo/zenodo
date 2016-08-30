@@ -30,3 +30,11 @@
 <span class="text-muted" {% if author.affiliation %}data-toggle="tooltip" title="{{author.affiliation}}"{% endif %}>{{author.name}}</span>{% if not loop.last %}; {% endif %}
 {%- endfor %}
 {%- endmacro %}
+
+
+{%- macro contributors(contributors_list) %}
+{%- for group in contributors_list|groupby('type')%}
+<h5>{{group.grouper|contributortype_title}}(s)</h5>
+{{authors(group.list)}}
+{%- endfor %}
+{%- endmacro %}
