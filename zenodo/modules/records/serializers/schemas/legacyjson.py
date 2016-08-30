@@ -378,14 +378,21 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
         return None
 
 
+class DepositFormSchemaV1(LegacyRecordSchemaV1):
+    @post_dump()
+    def remove_envelope(self, data):
+        """Remove envelope."""
+        if 'metadata' in data:
+            data = data['metadata']
+        return data
+
+
 class GitHubRecordSchemaV1(LegacyRecordSchemaV1):
     """JSON which can be added to the .zenodo.json file in a repository."""
 
     @post_dump()
     def remove_envelope(self, data):
         """Remove envelope."""
-        if 'metadata' in data:
-            data = data['metadata']
         for k in ['doi', 'prereserve_doi']:
             if k in data:
                 del data[k]

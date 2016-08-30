@@ -44,7 +44,7 @@ from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
 from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
-    LegacyRecordSchemaV1
+    LegacyRecordSchemaV1, DepositFormSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
 
 # Serializers
@@ -59,6 +59,9 @@ legacyjson_v1 = LegacyJSONSerializer(
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 githubjson_v1 = LegacyJSONSerializer(
     GitHubRecordSchemaV1, replace_refs=True)
+#: Deposit form JSON serialzier version 1.0.0
+deposit_formjson_v1 = LegacyJSONSerializer(
+    DepositFormSchemaV1, replace_refs=True)
 #: Zenodo legacy deposit JSON serialzier version 1.0.0
 deposit_legacyjson_v1 = DepositLegacyJSONSerializer(
     LegacyRecordSchemaV1, replace_refs=True)
