@@ -682,7 +682,7 @@
             "items": [
               {
                 "type": "text",
-                "key": "refereces[]",
+                "key": "references[]",
                 "notitle": true,
                 "placeholder": "eg. Cranmer, Kyle et al. (2014). Decouple software associated to arXiv:1401.0080."
               }
@@ -876,7 +876,7 @@
             "placeholder": "Term"
           },
           {
-            "key": "subjects[].id",
+            "key": "subjects[].identifier",
             "notitle": true,
             "description": "",
             "placeholder": "Identifier"

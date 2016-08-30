@@ -379,6 +379,8 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
 
 
 class DepositFormSchemaV1(LegacyRecordSchemaV1):
+    """Schema for deposit form JSON."""
+
     @post_dump()
     def remove_envelope(self, data):
         """Remove envelope."""

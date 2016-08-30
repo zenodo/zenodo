@@ -5,7 +5,7 @@
       {{recordsVM.invenioRecordsAlert.data.message}}
       <ul ng-show="recordsVM.invenioRecordsAlert.data.errors">
         <li ng-repeat="err in recordsVM.invenioRecordsAlert.data.errors">
-          <span ng-show="err.field">{{err.field|fieldtitle:recordsVM.invenioRecordsForm}}: </span>
+          <span ng-show="err.field|fieldtitle:recordsVM.invenioRecordsForm">{{err.field|fieldtitle:recordsVM.invenioRecordsForm}}: </span>
           {{err.message}}
         </li>
       </ul>
