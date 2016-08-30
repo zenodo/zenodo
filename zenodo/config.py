@@ -526,6 +526,10 @@ RECORDS_UI_ENDPOINTS.update(ACCESSREQUESTS_RECORDS_UI_ENDPOINTS)
 #: Endpoint for record ui.
 RECORDS_UI_ENDPOINT = '{scheme}://{host}/record/{pid_value}'
 
+#: Permission factory for records-ui and deposit-ui
+RECORDS_UI_DEFAULT_PERMISSION_FACTORY = \
+    "zenodo.modules.records.permissions:deposit_read_permission_factory"
+
 #: Default tombstone template.
 RECORDS_UI_TOMBSTONE_TEMPLATE = "zenodo_records/tombstone.html"
 

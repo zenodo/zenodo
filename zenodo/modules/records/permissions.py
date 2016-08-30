@@ -110,7 +110,10 @@ def record_delete_permission_factory(record=None):
 
 def deposit_read_permission_factory(record=None):
     """Record permission factory."""
-    return DepositPermission.create(record=record, action='read')
+    if record and 'deposits' in record['$schema']:
+        return DepositPermission.create(record=record, action='read')
+    else:
+        return RecordPermission.create(record=record, action='read')
 
 
 def deposit_delete_permission_factory(record=None):

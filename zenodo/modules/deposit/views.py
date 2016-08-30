@@ -84,6 +84,9 @@ def pass_record(action, deposit_cls=ZenodoDeposit):
 
             # Fetch deposit id from record and resolve deposit record and pid.
             depid = zenodo_deposit_fetcher(None, record)
+            if not depid:
+                abort(404)
+
             depid, deposit = Resolver(
                 pid_type=depid.pid_type,
                 object_type='rec',
