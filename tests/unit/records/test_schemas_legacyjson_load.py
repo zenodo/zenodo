@@ -109,6 +109,11 @@ def test_upload_type_invalid():
     obj.update(dict(upload_type='image', image_type='invalid'))
     pytest.raises(ValidationError, s.load, obj)
 
+    # Subtype provided for type without possibility of subtype.
+    obj.update(dict(upload_type='dataset', image_type='figure'))
+    assert s.load(obj).data['resource_type'] == {'type': 'dataset'}
+
+
 
 def test_related_alternate_identifiers():
     """Test related alternate identifiers."""

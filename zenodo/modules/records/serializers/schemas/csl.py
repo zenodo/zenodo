@@ -56,7 +56,7 @@ class RecordSchemaCSLJSON(Schema):
     """Schema for records in CSL-JSON."""
 
     id = fields.Str(attribute='pid.pid_value')
-    type = fields.Method('get_type', missing='article')
+    type = fields.Method('get_type')
     title = fields.Str(attribute='metadata.title')
     abstract = fields.Str(attribute='metadata.description')
     author = fields.List(fields.Nested(AuthorSchema),
@@ -109,7 +109,7 @@ class RecordSchemaCSLJSON(Schema):
         """Get record CSL type."""
         metadata = obj['metadata']
         obj_type = ObjectType.get_by_dict(metadata.get('resource_type'))
-        return obj_type.get('csl', missing) if obj_type else missing
+        return obj_type.get('csl', 'article') if obj_type else 'article'
 
     def get_issn(self, obj):
         """Get the record's ISSN."""

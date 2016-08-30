@@ -99,17 +99,14 @@ class ImprintSchemaV1(StrictKeysSchema):
 
     publisher = fields.Str()
     place = fields.Str()
+    isbn = fields.Str()
 
 
 class PartOfSchemaV1(StrictKeysSchema):
     """Schema for imprint."""
 
     pages = fields.Str()
-    place = fields.Str()
-    publisher = fields.Str()
     title = fields.Str()
-    year = fields.Str()
-    isbn = fields.Str()
 
 
 class ThesisSchemaV1(StrictKeysSchema):

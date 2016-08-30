@@ -267,10 +267,10 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
     @pre_load()
     def preload_resource_type(self, data):
         """Prepare data for easier deserialization."""
-        if data.get('upload_type') == 'publication':
-            data.pop('image_type', None)
-        elif data.get('upload_type') == 'image':
+        if data.get('upload_type') != 'publication':
             data.pop('publication_type', None)
+        if data.get('upload_type') != 'image':
+            data.pop('image_type', None)
 
     @pre_load()
     def preload_license(self, data):
