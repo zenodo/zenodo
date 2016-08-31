@@ -860,10 +860,23 @@ SQLALCHEMY_TRACK_MODIFICATIONS = True
 #: Default StatsD host (i.e. no request timing)
 STATSD_HOST = None
 #: Default StatsD port
-STATSD_port = 8125
+STATSD_PORT = 8125
 #: Default StatsD port
 STATSD_PREFIX = "zenodo"
 
 # Proxy configuration
 #: Number of proxies in front of application.
 WSGI_PROXIES = 0
+
+
+# Indexer
+# =======
+#: Provide a custom record_to_index function for invenio-indexer
+INDEXER_RECORD_TO_INDEX = "zenodo.modules.indexer.utils.record_to_index"
+INDEXER_SCHEMA_TO_INDEX_MAP = {
+    'records-record-v1.0.0': 'record-v1.0.0',
+    'licenses-license-v1.0.0': 'license-v1.0.0',
+    'grants-grant-v1.0.0': 'grant-v1.0.0',
+    'deposits-records-record-v1.0.0': 'deposit-record-v1.0.0',
+    'funders-funder-v1.0.0': 'funder-v1.0.0',
+}

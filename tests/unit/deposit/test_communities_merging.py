@@ -20,8 +20,8 @@
 """Test Zenodo deposit workflow."""
 
 from __future__ import absolute_import, print_function
-import pytest
 
+import pytest
 from invenio_communities.models import Community, InclusionRequest
 
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit

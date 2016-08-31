@@ -34,7 +34,6 @@ from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
 from invenio_records.api import Record
 from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
-
 from zenodo_accessrequests.models import SecretLink
 
 from .models import AccessRight
