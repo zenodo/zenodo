@@ -96,7 +96,7 @@ Next, install Invenio extensions and Zenodo itself:
 
 .. code-block:: console
 
-    (zenodo)$ pip install -r requirements.txt --src ~/src/ --pre
+    (zenodo)$ pip install -r requirements.txt --src ~/src/ --pre --upgrade
     (zenodo)$ pip install -e .[all,postgresql]
 
 Above command will checkout development versions of certain Invenio extensions

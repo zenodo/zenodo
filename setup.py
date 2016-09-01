@@ -52,13 +52,13 @@ extras_require = {
         'Sphinx>=1.4.2,<1.4.5',
     ],
     'postgresql': [
-        'invenio-db[postgresql,versioning]>=1.0.0a9',
+        'invenio-db[postgresql,versioning]>=1.0.0b2',
     ],
     'mysql': [
-        'invenio-db[mysql,versioning]>=1.0.0a9',
+        'invenio-db[mysql,versioning]>=1.0.0b2',
     ],
     'sqlite': [
-        'invenio-db[versioning]>=1.0.0a9',
+        'invenio-db[versioning]>=1.0.0b2',
     ],
     'tests': tests_require,
 }
@@ -110,7 +110,7 @@ install_requires = [
     'invenio-formatter>=1.0.0a2',
     'invenio-github>=1.0.0a3',
     'invenio-i18n>=1.0.0b1',
-    'invenio-indexer>=1.0.0a6',
+    'invenio-indexer>=1.0.0a7',
     'invenio-jsonschemas>=1.0.0a3',
     'invenio-logging>=1.0.0a2',
     'invenio-mail>=1.0.0a4',

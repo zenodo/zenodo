@@ -25,11 +25,8 @@
 # Pinned base requirements
 -r requirements.pinned.txt
 
-# Development version needed
-git+https://github.com/pallets/werkzeug.git@0.11-maintenance#egg=Werkzeug
-
 # Requirements not on PyPI
-git+https://github.com/zenodo/zenodo-migrator.git@bca1577d8efcadf1cf9e4cdc5a5fff34beea6886#egg=zenodo-migrator
+-e git+https://github.com/zenodo/zenodo-migrator.git@9fa4620c138bf33c80177d758a2cca8993c028ec#egg=zenodo-migrator
 
 # PyPI requirements
 alabaster==0.7.8
@@ -107,18 +104,18 @@ invenio-celery==1.0.0a4
 invenio-communities==1.0.0a9
 invenio-config==1.0.0b1
 invenio-csl-rest==1.0.0a1
-invenio-db==1.0.0b1
+invenio-db==1.0.0b2
 invenio-deposit==1.0.0a4
 invenio-files-rest==1.0.0a10
 invenio-formatter==1.0.0a2
 invenio-github==1.0.0a3
 invenio-i18n==1.0.0b1
-invenio-indexer==1.0.0a6
+invenio-indexer==1.0.0a7
 invenio-jsonschemas==1.0.0a3
 invenio-logging==1.0.0a2
 invenio-mail==1.0.0a4
 invenio-marc21==1.0.0a3
-invenio-migrator==1.0.0a7
+invenio-migrator==1.0.0a8
 invenio-oaiserver==1.0.0a6
 invenio-oauth2server==1.0.0a9
 invenio-oauthclient==1.0.0a8
@@ -215,7 +212,7 @@ urllib3==1.16
 validators==0.10.3
 webargs==1.3.4
 webassets==0.12.0
-# Werkzeug==0.11.11
+Werkzeug==0.11.11
 whichcraft==0.4.0
 wsgi-statsd==0.3.1
 WTForms==2.1
