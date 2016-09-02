@@ -542,6 +542,12 @@ ZENODO_RECORDS_UI_LINKS_FORMAT = "https://zenodo.org/record/{recid}"
 FILES_REST_PERMISSION_FACTORY = \
     'zenodo.modules.records.permissions:files_permission_factory'
 
+#: Max object key length
+FILES_REST_OBJECT_KEY_MAX_LEN = 1000
+
+#: Max URI length
+FILES_REST_FILE_URI_MAX_LEN = 1000
+
 #: Records REST API endpoints.
 RECORDS_REST_ENDPOINTS = dict(
     recid=dict(
