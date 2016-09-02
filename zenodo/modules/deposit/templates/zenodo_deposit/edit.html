@@ -42,7 +42,6 @@
         app = angular.module('invenioRecords').config(['schemaFormDecoratorsProvider', function(decoratorsProvider){
           decoratorsProvider.addMapping('bootstrapDecorator', 'uiselect', '{{ url_for("static", filename="templates/zenodo_deposit/uiselect.html")}}');
           decoratorsProvider.addMapping('bootstrapDecorator', 'ckeditor', '{{ url_for("static", filename="templates/zenodo_deposit/ckeditor.html")}}');
-          decoratorsProvider.addMapping('bootstrapDecorator', 'datepicker', '{{ url_for("static", filename="templates/zenodo_deposit/datepicker.html")}}');
         }]);
 
         app.directive('tooltip', function(){
@@ -87,7 +86,9 @@
           document.getElementById('invenio-records'), [
             'invenioRecords', 'schemaForm', 'mgcrea.ngStrap',
             'mgcrea.ngStrap.modal', 'pascalprecht.translate', 'ui.sortable',
-            'ui.select', 'mgcrea.ngStrap.select', 'invenioFiles'
+            'ui.select', 'mgcrea.ngStrap.select', 'mgcrea.ngStrap.datepicker',
+            'mgcrea.ngStrap.helpers.dateParser', 'mgcrea.ngStrap.tooltip',
+            'invenioFiles'
           ]
         );
       });

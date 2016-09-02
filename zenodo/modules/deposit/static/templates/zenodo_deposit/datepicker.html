@@ -16,19 +16,20 @@
       class="input-group-addon"
       ng-bind-html="form.fieldAddonLeft"></span>
     <input
-      ng-show="form.key"
       type="text"
       class="form-control {{form.fieldHtmlClass}}"
-      schema-validate="form"
-      ng-model="$$value$$"
-      pick-a-date="form.pickadate"
-      min-date="form.minDate"
-      max-date="form.maxDate"
       name="{{form.key.slice(-1)[0]}}"
-      format="form.format"/>
+      schema-validate="form"
+      sf-changed="form"
+      ng-show="form.key"
+      ng-model="$$value$$"
+      data-date-format="{{form.format}}"
+      data-date-type="string"
+      data-autoclose="true"
+      bs-datepicker/>
     <span
-      ng-if="form.fieldAddonRight"
       class="input-group-addon"
+      ng-if="form.fieldAddonRight"
       ng-bind-html="form.fieldAddonRight"></span>
     <span class="help-block">{{ (hasError() && errorMessage(schemaError())) || form.description}}</span>
   </div>

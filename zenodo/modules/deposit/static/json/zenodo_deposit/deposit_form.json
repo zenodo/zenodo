@@ -172,12 +172,12 @@
         "templateUrl": "/static/templates/zenodo_deposit/prereserve_doi.html"
       },
       {
-        "type": "datepicker",
+        "type": "template",
         "key": "publication_date",
         "title": "Publication Date",
         "placeholder": "eg. 2013-05-08",
-        "format": "yyyy-mm-dd",
-        "editable": true,
+        "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
+        "format": "yyyy-MM-dd",
         "description": "Required. Format: YYYY-MM-DD. In case your upload was already published elsewhere, please use the date of first publication.",
         "fa_cls": "fa-calendar",
         "required": true
@@ -327,12 +327,14 @@
         ]
       },
       {
-        "type": "datepicker",
+        "type": "template",
         "key": "embargo_date",
         "title": "Embargo Date",
         "description": "Required only for Embargoed Access uploads. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.",
         "placeholder": "eg. 2016-04-22",
-        "format": "yyyy-mm-dd",
+        "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
+        "format": "yyyy-MM-dd",
+        "fa_cls": "fa-calendar",
         "condition": "model.access_right == 'embargoed'"
       },
       {
@@ -473,9 +475,10 @@
                     "text": "value",
                     "funder": "'10.13039/501100000780'"
                   },
+                  "processQuery": "query.split('::').pop()",
                   "map": {
                     "resultSource": "text.0.options",
-                    "valueSource": "payload.id",
+                    "valueSource": "payload.legacy_id",
                     "nameSource": "text",
                     "valueProperty": "value",
                     "nameProperty": "text"

@@ -25,7 +25,7 @@
         refresh="populateTitleMap(form, $select.search)"
         refresh-delay="form.options.refreshDelay"
         group-by="form.options.groupBy"
-        repeat="item in form.titleMap | propsFilter: {name: $select.search, description: (form.options.searchDescriptions===true ? $select.search : 'NOTSEARCHINGFORTHIS') }">
+        repeat="item in form.titleMap">
         <div ng-bind-html="item.name | highlight: $select.search"></div>
         <div ng-if="item.description">
           <span ng-bind-html="'<small>' + (''+item.description | highlight: (form.options.searchDescriptions===true ? $select.search : 'NOTSEARCHINGFORTHIS'))+ '</small>'"></span>

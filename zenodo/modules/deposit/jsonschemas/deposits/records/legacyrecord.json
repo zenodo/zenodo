@@ -374,7 +374,7 @@
       "items": {
         "additionalProperties": false,
         "properties": {
-          "id": {
+          "identifier": {
             "description": "Subjects term identifier.",
             "type": "string"
           },
