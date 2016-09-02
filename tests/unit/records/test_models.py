@@ -44,25 +44,21 @@ def test_update_embargoed_records(app, db, es):
     """Test update embargoed records."""
     records = [
         Record.create({
-            '$schema': 'https://zenodo.org/schemas/records/record-v1.0.0.json',
             'title': 'yesterday',
             'access_right': 'embargoed',
             'embargo_date': _today_offset(-1)
         }),
         Record.create({
-            '$schema': 'https://zenodo.org/schemas/records/record-v1.0.0.json',
             'title': 'today',
             'access_right': 'embargoed',
             'embargo_date': _today_offset(0)
         }),
         Record.create({
-            '$schema': 'https://zenodo.org/schemas/records/record-v1.0.0.json',
             'title': 'tomorrow',
             'access_right': 'embargoed',
             'embargo_date': _today_offset(1)
         }),
         Record.create({
-            '$schema': 'https://zenodo.org/schemas/records/record-v1.0.0.json',
             'title': 'already open',
             'access_right': 'open',
             'embargo_date': _today_offset(-1)

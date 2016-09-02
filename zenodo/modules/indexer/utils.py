@@ -27,8 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import current_app
-from invenio_search import current_search
-from invenio_search.utils import schema_to_index
+from invenio_indexer.utils import default_record_to_index
 
 
 def record_to_index(record):
@@ -42,23 +41,6 @@ def record_to_index(record):
     :returns: Tuple of (index, doc_type)
     :rtype: (str, str)
     """
-    schema2index_map = current_app.config['INDEXER_SCHEMA_TO_INDEX_MAP']
-    index_names = current_search.mappings.keys()
-
-    schema = record.get('$schema', '')
-    if isinstance(schema, dict):
-        schema = schema.get('$ref', '')
-
-    if not schema:
-        raise Exception ("Record '{uuid}' does not specify a '$schema' key "
-            "in metadata.".format(uuid=record.id))
-
-    index, _ = schema_to_index(schema, index_names=index_names)
-
-    if index not in schema2index_map:
-        raise Exception ("Dictionary between schemas and index mappings "
-            "is not exhaustive ({index} not in {mapping}).".format(
-                index=index, mapping=schema2index_map))
-    doc_type = schema2index_map[index]
-
-    return index, doc_type
+    index, doc_type = default_record_to_index(record)
+    return index, current_app.config['INDEXER_SCHEMA_TO_INDEX_MAP'].get(
+        index, doc_type)
