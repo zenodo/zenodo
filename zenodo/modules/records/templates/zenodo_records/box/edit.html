@@ -27,7 +27,27 @@
 </form>
 {%- endif %}
 {%- if current_user|has_record_perm(record, 'delete') %}
-<a href="{{ url_for('zenodo_deposit.delete', pid_value=pid.pid_value) }}" class="btn btn-danger btn-block" type="submit">
-  <i class="fa fa-trash"></i> Delete ...
-</a>
+<!-- Single button -->
+<div class="btn-group btn-block">
+  <button type="button" class="btn btn-xs btn-block btn-default  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    Admin <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu">
+    <li><a href="{{ url_for('persistentidentifier.index_view', flt1_21=record.id) }}">
+      Persistent identifiers
+    </a></li>
+    <li><a href="{{ url_for('recordmetadata.details_view', id=record.id) }}">
+      Record
+    </a></li>
+    {% if record.files %}
+    <li><a href="{{ url_for('bucket.details_view', id=record.files.bucket) }}">
+      Bucket
+    </a></li>
+    {%- endif %}
+    <li role="separator" class="divider"></li>
+    <li><a href="{{ url_for('zenodo_deposit.delete', pid_value=pid.pid_value) }}" type="submit">
+      <span class="text-danger"><i class="fa fa-trash"></i> Delete ...</span>
+    </a></li>
+  </ul>
+</div>
 {%- endif %}

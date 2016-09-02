@@ -140,18 +140,18 @@ def has_record_perm(user, record, action):
 # Related identifiers filters.
 #
 @blueprint.app_template_filter('zenodo_related_links')
-def zenodo_related_links(record):
+def zenodo_related_links(record, communities):
     """Get logos for related links."""
     def apply_rule(item, rule):
         r = copy.deepcopy(rule)
         r['link'] = idutils.to_url(item['identifier'], item['scheme'])
         return r
 
-    def match_rules(item, communities):
+    def match_rules(item):
         rs = []
-        for c in set(communities):
-            if c in current_app.config['ZENODO_RELATION_RULES']:
-                rules = current_app.config['ZENODO_RELATION_RULES'][c]
+        for c in communities:
+            if c.id in current_app.config['ZENODO_RELATION_RULES']:
+                rules = current_app.config['ZENODO_RELATION_RULES'][c.id]
                 for r in rules:
                     if item['relation'] == r['relation'] and \
                        item['scheme'] == r['scheme'] and \
@@ -160,10 +160,8 @@ def zenodo_related_links(record):
         return rs
 
     ret = []
-    communities = record.get('communities', []) + \
-        record.get('provisional_communities', [])
     for item in record.get('related_identifiers', []):
-        for r in match_rules(item, communities):
+        for r in match_rules(item):
             ret.append(apply_rule(item, r))
 
     return ret
@@ -305,13 +303,14 @@ def community_curation(record, user):
         global_perm = True
 
     if global_perm:
-        return (pending, accepted, accepted)
+        return (pending, pending, accepted, accepted)
     else:
         return (
             [c for c in pending if _can_curate(c, user, record)],
             [c for c in accepted
              if _can_curate(c, user, record, accepted=True)],
-            accepted
+            pending,
+            accepted,
         )
 
 

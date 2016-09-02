@@ -109,10 +109,13 @@ def test_relation_title(app):
         "{{ 'nonExistingRelation'|relation_title }}") == "nonExistingRelation"
 
 
-def test_relation_logo():
+def test_relation_logo(app):
     """Test relation logo."""
     no_relations = {}
-    assert zenodo_related_links(no_relations) == []
+    assert zenodo_related_links(no_relations, []) == []
+
+    class MockCommunity(object):
+        id = 'zenodo'
 
     github_relation = {
         'communities': [
@@ -127,7 +130,7 @@ def test_relation_logo():
             }
         ],
     }
-    assert zenodo_related_links(github_relation) == [
+    assert zenodo_related_links(github_relation, [MockCommunity]) == [
         {
             'image': 'img/github.png',
             'link': 'https://github.com/TaghiAliyev/BBiCat/tree/v1.0.4-alpha',
