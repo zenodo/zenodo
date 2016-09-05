@@ -25,5 +25,5 @@
 # Normal requirements
 -r requirements.txt
 
-invenio-xrootd==1.0.0a1
+invenio-xrootd==1.0.0a2
 xrootdpyfs==0.1.2
