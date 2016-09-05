@@ -99,15 +99,21 @@ def pass_record(action, deposit_cls=ZenodoDeposit):
     return decorator
 
 
-@blueprint.route('/upload/')
-@blueprint.route('/deposit/')
+@login_required
 def legacy_index():
     """Legacy deposit."""
     c_id = request.args.get('c', type=str)
     if c_id:
-        c = Community.get(c_id)
-        return redirect('/communities/{0}/upload'.format(c.id))
-    return redirect(url_for('invenio_deposit_ui.new'))
+        return redirect(url_for('invenio_deposit_ui.new', c=c_id))
+    return render_template(current_app.config['DEPOSIT_UI_INDEX_TEMPLATE'])
+
+
+@login_required
+def new():
+    """Create a new deposit."""
+    c = Community.get(request.args.get('c', type=str))
+    return render_template(current_app.config['DEPOSIT_UI_NEW_TEMPLATE'],
+                           record={'_deposit': {'id': None}}, community=c)
 
 
 @blueprint.route(

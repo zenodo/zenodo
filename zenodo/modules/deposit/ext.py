@@ -46,6 +46,13 @@ class ZenodoDeposit(object):
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
+
+        @app.before_first_request
+        def deposit_redirect():
+            from .views import legacy_index, new
+            app.view_functions['invenio_deposit_ui.index'] = legacy_index
+            app.view_functions['invenio_deposit_ui.new'] = new
+
         app.extensions['zenodo-deposit'] = self
 
     @staticmethod
