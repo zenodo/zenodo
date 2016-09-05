@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 import pytest
 from invenio_sipstore.models import SIP
-from mock import MagicMock, patch
+from mock import MagicMock, Mock, patch
 from six import BytesIO
 
 from zenodo.modules.github.api import ZenodoGitHubRelease
@@ -72,8 +72,12 @@ def test_github_creators_metadata(m_ljv1t, m_get_contributors, m_get_owner,
 @patch('zenodo.modules.github.api.ZenodoGitHubRelease.metadata')
 def test_github_publish(zgh_meta, db, users, location, deposit_metadata):
     """Test basic GitHub payload."""
+    data = b'foobar'
+    resp = Mock()
+    resp.headers = {'Content-Length': len(data)}
+    resp.raw = BytesIO(b'foobar')
     gh3mock = MagicMock()
-    gh3mock.api.session.get().raw = BytesIO(b'foobar')
+    gh3mock.api.session.get = Mock(return_value=resp)
     gh3mock.account.user.email = 'foo@baz.bar'
     release = MagicMock()
     release.event.user_id = 1

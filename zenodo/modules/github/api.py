@@ -28,6 +28,7 @@ from __future__ import absolute_import
 
 from flask import current_app
 from invenio_db import db
+from invenio_files_rest.models import ObjectVersion
 from invenio_github.api import GitHubRelease
 from invenio_github.utils import get_contributors, get_owner
 
@@ -64,8 +65,17 @@ class ZenodoGitHubRelease(GitHubRelease):
 
             # Fetch the deposit files
             for key, url in self.files:
-                deposit.files[key] = self.gh.api.session.get(
-                    url, stream=True).raw
+                # Make a HEAD request to get GitHub to compute the
+                # content-length.
+                self.gh.api.session.head(url)
+                # Now, download the file
+                res = self.gh.api.session.get(url, stream=True)
+                ObjectVersion.create(
+                    bucket=deposit.files.bucket,
+                    key=key,
+                    stream=res.raw,
+                    size=res.headers['Content-Length'],
+                )
 
             # GitHub-specific SIP store agent
             sip_agent = {
