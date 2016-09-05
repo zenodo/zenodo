@@ -195,6 +195,9 @@ setup(
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
         ],
+        'invenio_base.api_blueprints': [
+            'zenodo_rest = zenodo.modules.rest.views:blueprint',
+        ],
         'invenio_base.api_converters': [
             'file_key = zenodo.modules.deposit.utils:FileKeyConverter',
         ],
