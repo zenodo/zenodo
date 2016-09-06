@@ -29,14 +29,15 @@ from __future__ import absolute_import
 from contextlib import contextmanager
 from os.path import splitext
 
-from flask import current_app
+from flask import current_app, request
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
-from invenio_files_rest.models import Bucket, MultipartObject, Part
+from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion, \
+    Part
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
-from invenio_records_files.api import FileObject
+from invenio_records_files.api import FileObject, FilesIterator, _writable
 from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
@@ -73,10 +74,28 @@ class ZenodoFileObject(FileObject):
         return self.data
 
 
+class ZenodoFilesIterator(FilesIterator):
+    """Zenodo files iterator."""
+
+    @_writable
+    def __setitem__(self, key, stream):
+        """Add file inside a deposit."""
+        with db.session.begin_nested():
+            size = None
+            if request and request.files and request.files.get('file'):
+                size = request.files['file'].content_length or None
+            obj = ObjectVersion.create(
+                bucket=self.bucket, key=key, stream=stream, size=size)
+            self.filesmap[key] = self.file_cls(obj, {}).dumps()
+            self.flush()
+
+
 class ZenodoDeposit(Deposit):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject
+
+    files_iter_cls = ZenodoFilesIterator
 
     deposit_fetcher = staticmethod(zenodo_deposit_fetcher)
 
