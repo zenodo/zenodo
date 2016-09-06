@@ -1,6 +1,6 @@
-<div ng-show="recordsVM.invenioRecordsAlert" class="alert alert-{{recordsVM.invenioRecordsAlert.type || 'info'}} fixed">
+<div ng-show="recordsVM.invenioRecordsAlert" class="alert alert-{{recordsVM.invenioRecordsAlert.type || 'info'}} alert-dismissible fixed">
   <div class="container">
-    <a class="close" data-dismiss="alert" href="#">&times;</a>
+    <button type="button" class="close" ng-click="recordsVM.invenioRecordsAlert = null" aria-hidden="true">&times;</button>
     <div ng-show="recordsVM.invenioRecordsAlert.data.message">
       {{recordsVM.invenioRecordsAlert.data.message}}
       <ul ng-show="recordsVM.invenioRecordsAlert.data.errors">
