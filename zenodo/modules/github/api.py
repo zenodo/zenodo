@@ -26,11 +26,14 @@
 
 from __future__ import absolute_import
 
+import uuid
+
 from flask import current_app
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_github.api import GitHubRelease
 from invenio_github.utils import get_contributors, get_owner
+from invenio_indexer.api import RecordIndexer
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
@@ -58,23 +61,28 @@ class ZenodoGitHubRelease(GitHubRelease):
 
     def publish(self):
         """Publish GitHub release as record."""
-        with db.session.begin_nested():
-            deposit = self.deposit_class.create(self.metadata)
+        id_ = uuid.uuid4()
+        deposit = None
+        try:
+            db.session.begin_nested()
+            deposit = self.deposit_class.create(self.metadata, id_=id_)
             deposit['_deposit']['created_by'] = self.event.user_id
             deposit['_deposit']['owners'] = [self.event.user_id]
 
             # Fetch the deposit files
             for key, url in self.files:
                 # Make a HEAD request to get GitHub to compute the
-                # content-length.
-                self.gh.api.session.head(url)
+                # Content-Length.
+                res = self.gh.api.session.head(url, allow_redirects=True)
                 # Now, download the file
                 res = self.gh.api.session.get(url, stream=True)
+                size = int(res.headers.get('Content-Length', 0))
                 ObjectVersion.create(
                     bucket=deposit.files.bucket,
                     key=key,
                     stream=res.raw,
-                    size=res.headers['Content-Length'],
+                    size=size or None,
+                    mimetype=res.headers.get('Content-Type'),
                 )
 
             # GitHub-specific SIP store agent
@@ -87,3 +95,14 @@ class ZenodoGitHubRelease(GitHubRelease):
             }
             deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
             self.model.recordmetadata = deposit.model
+            db.session.commit()
+        except Exception:
+            db.session.rollback()
+            # Remove deposit from index since it was not commited.
+            if deposit and deposit.id:
+                try:
+                    RecordIndexer().delete(deposit)
+                except Exception:
+                    current_app.logger.exception(
+                        "Failed to remove uncommited deposit from index.")
+            raise
