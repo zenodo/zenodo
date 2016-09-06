@@ -673,7 +673,7 @@ RECORDS_REST_FACETS = dict(
                 terms=dict(field="access_right"),
             ),
             file_type=dict(
-                terms=dict(field="_files.type"),
+                terms=dict(field="filetype"),
             ),
             keywords=dict(
                 terms=dict(field="keywords"),
@@ -685,7 +685,7 @@ RECORDS_REST_FACETS = dict(
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
-            file_type=terms_filter('_files.type'),
+            file_type=terms_filter('filetype'),
             keywords=terms_filter('keywords'),
             subtype=terms_filter('resource_type.subtype'),
             type=terms_filter('resource_type.type'),
