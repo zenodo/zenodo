@@ -57,9 +57,9 @@
     </dd>
   {%- endif %}
 
-  {%- if record.imprint_isbn %}
+  {%- if record.imprint and record.imprint.isbn %}
     <dt>{{_('ISBN')}}:</dt>
-    <dd itemprop="isbn">{{ record.imprint_isbn }}</dd>
+    <dd itemprop="isbn">{{ record.imprint.isbn }}</dd>
   {%- endif %}
 
   {%- if record.keywords %}
@@ -74,7 +74,7 @@
     </dd>
   {%- endif %}
 
-  {% with i=record.imprint, p=record.part_of %}
+  {% with i=record.get('imprint'), p=record.get('part_of') %}
   {%- if i and not p %}
     <dt>{{_('Imprint')}}:</dt>
     <dd>
@@ -120,7 +120,7 @@
 
   {%- if record.meeting %}
     {%- set m = record.meeting%}
-    {%- set m_title = '{0} ({1})'.format(m.title, m.acronym) if m.acronym and m.title else (m.title or m.acronym) %}
+    {%- set m_title = m|meeting_title %}
     <dt>{{ _('Meeting') }}:</dt>
     <dd>
       {%- if m.url %}

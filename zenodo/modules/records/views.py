@@ -183,6 +183,17 @@ def contributortype_title(value):
         value, value)
 
 
+@blueprint.app_template_filter()
+def meeting_title(m):
+    """Get meeting title."""
+    acronym = m.get('acronym')
+    title = m.get('title')
+    if acronym and title:
+        return u'{0} ({1})'.format(title, acronym)
+    else:
+        return title or acronym
+
+
 #
 # Files related template filters.
 #
