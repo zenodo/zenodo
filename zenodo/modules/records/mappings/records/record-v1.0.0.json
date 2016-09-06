@@ -364,7 +364,7 @@
             }
           }
         },
-        "meetings": {
+        "meeting": {
           "properties": {
             "dates": {
               "type": "string"
@@ -386,63 +386,72 @@
             "acronym": {
               "type": "string",
               "index": "not_analyzed"
+            },
+            "url": {
+              "type": "string",
+              "index": "not_analyzed"
             }
           },
           "type": "object"
         },
         "part_of": {
+          "type": "object",
           "properties": {
-            "publisher": {
-              "type": "string"
-            },
             "title": {
               "type": "string"
             },
-            "isbn": {
+            "pages": {
+              "type": "string"
+            }
+          }
+        },
+        "imprint": {
+          "properties": {
+            "publisher": {
               "type": "string"
             },
             "place": {
               "type": "string"
             },
-            "pages": {
+            "isbn": {
               "type": "string"
-            },
-            "year": {
-              "type": "string",
-              "index": "not_analyzed"
-            }
-          },
-          "type": "object"
-        },
-        "thesis_university": {
-          "type": "string"
-        },
-        "thesis_supervisors": {
-          "type": "object",
-          "properties": {
-            "name": {
-              "type": "string"
-            },
-            "affiliation": {
-              "type": "string"
-            },
-            "familyname": {
-              "type": "string"
-            },
-            "givennames": {
-              "type": "string"
-            },
-            "gnd": {
-              "type": "string",
-              "index": "not_analyzed"
-            },
-            "orcid": {
-              "type": "string",
-              "index": "not_analyzed"
             }
           }
         },
-        "files": {
+        "thesis": {
+          "type": "nested",
+          "properties": {
+            "university": {
+              "type": "string"
+            },
+            "supervisors": {
+              "type": "nested",
+              "properties": {
+                "name": {
+                  "type": "string"
+                },
+                "affiliation": {
+                  "type": "string"
+                },
+                "familyname": {
+                  "type": "string"
+                },
+                "givennames": {
+                  "type": "string"
+                },
+                "gnd": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "orcid": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
+            }
+          }
+        },
+        "_files": {
           "type": "object",
           "properties": {
             "bucket": {
