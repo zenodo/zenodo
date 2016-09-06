@@ -30,5 +30,15 @@ from flask_celeryext import create_celery_app
 
 from .factory import create_celery
 
-celery = create_celery_app(create_celery())
-"""Celery application for Zenodo."""
+celery = create_celery_app(create_celery(
+    SENTRY_TRANSPORT='raven.transport.http.HTTPTransport'
+))
+"""Celery application for Zenodo.
+
+Override SENTRY_TRANSPORT since Celery does not deal nicely with the default
+threaded transport.
+"""
+
+# Trigger an app log message upon import. Somehow this makes Sentry logging
+# work with `get_task_logger(__name__)`.
+celery.flask_app.logger.info('Created Celery app')

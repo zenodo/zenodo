@@ -191,6 +191,8 @@ FRONTPAGE_ENDPOINT = "zenodo_frontpage.index"
 # =======
 #: Overwrite default Sentry extension class to support Sentry 6.
 LOGGING_SENTRY_CLASS = 'invenio_logging.sentry6:Sentry6'
+#: Celery sentry logging
+LOGGING_SENTRY_CELERY = True
 
 # GitHub
 # ======
