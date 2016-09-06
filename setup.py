@@ -71,7 +71,7 @@ for name, reqs in extras_require.items():
 
 # Do not include in all requirement
 extras_require['xrootd'] = [
-    'invenio-xrootd>=1.0.0a2',
+    'invenio-xrootd>=1.0.0a3',
     'xrootdpyfs>=0.1.2',
 ]
 
@@ -108,7 +108,7 @@ install_requires = [
     'invenio-deposit>=1.0.0a4',
     'invenio-files-rest>=1.0.0a10',
     'invenio-formatter>=1.0.0a2',
-    'invenio-github>=1.0.0a3',
+    'invenio-github>=1.0.0a4',
     'invenio-i18n>=1.0.0b1',
     'invenio-indexer>=1.0.0a7',
     'invenio-jsonschemas>=1.0.0a3',
@@ -118,7 +118,7 @@ install_requires = [
     'invenio-migrator>=1.0.0a7',
     'invenio-oaiserver>=1.0.0a6',
     'invenio-oauth2server>=1.0.0a9',
-    'invenio-oauthclient[github]>=1.0.0a8',
+    'invenio-oauthclient[github]>=1.0.0a10',
     'invenio-openaire>=1.0.0a6',
     'invenio-opendefinition>=1.0.0a3',
     'invenio-pages>=1.0.0a3',
