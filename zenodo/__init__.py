@@ -122,7 +122,7 @@ Last, set the URL template on which GitHub will send webhook events:
 
    GITHUB_WEBHOOK_RECEIVER_URL = \
        'http://example.org/' \
-       'api/receivers/github/events/?access_token={token}'
+       'api/hooks/receivers/github/events/?access_token={token}'
 
 Note, ``{token}`` will be interpolated with the user's OAuth access token.
 
@@ -153,7 +153,7 @@ achieve this by using a service such as `ngrok <https://ngrok.com>`_:
 
       GITHUB_WEBHOOK_RECEIVER_URL = \
           'http://<id>.ngrok.io/' \
-          'api/receivers/github/events/?access_token={token}'
+          'api/hooks/receivers/github/events/?access_token={token}'
 
 
 DataCite DOI minting
