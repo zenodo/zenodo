@@ -76,6 +76,12 @@ class ZenodoGitHubRelease(GitHubRelease):
                 res = self.gh.api.session.head(url, allow_redirects=True)
                 # Now, download the file
                 res = self.gh.api.session.get(url, stream=True)
+                if res.status_code != 200:
+                    raise Exception(
+                        "Could not retrieve archive from GitHub: {url}"
+                        .format(url=url)
+                    )
+
                 size = int(res.headers.get('Content-Length', 0))
                 ObjectVersion.create(
                     bucket=deposit.files.bucket,

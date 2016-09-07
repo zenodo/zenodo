@@ -76,6 +76,7 @@ def test_github_publish(zgh_meta, db, users, location, deposit_metadata):
     resp = Mock()
     resp.headers = {'Content-Length': len(data)}
     resp.raw = BytesIO(b'foobar')
+    resp.status_code = 200
     gh3mock = MagicMock()
     gh3mock.api.session.get = Mock(return_value=resp)
     gh3mock.account.user.email = 'foo@baz.bar'
