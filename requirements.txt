@@ -105,7 +105,7 @@ invenio-communities==1.0.0a10
 invenio-config==1.0.0b1
 invenio-csl-rest==1.0.0a1
 invenio-db==1.0.0b2
-invenio-deposit==1.0.0a4
+invenio-deposit==1.0.0a5
 invenio-files-rest==1.0.0a10
 invenio-formatter==1.0.0a2
 invenio-github==1.0.0a4

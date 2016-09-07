@@ -344,6 +344,15 @@ DEPOSIT_UI_RESPONSE_MESSAGES = dict(
     self=dict(
         message="Saved successfully."
     ),
+    delete=dict(
+        message="Deleted succesfully."
+    ),
+    discard=dict(
+        message="Changes discarded succesfully."
+    ),
+    publish=dict(
+        message="Published succesfully."
+    ),
 )
 
 #: REST API configuration.
