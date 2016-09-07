@@ -422,8 +422,7 @@ DEPOSIT_FILES_API = '/api/files'
 DEPOSIT_FILEUPLOAD_CHUNKSIZE = 15 * 1024 * 1024  # 15mb
 
 #: Maximum upload file size via application/mulitpart-formdata
-MAX_CONTENT_LENGTH = DEPOSIT_FILEUPLOAD_CHUNKSIZE + 1 * 1024 * 1024  # 16mb
-
+MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100mb
 
 # SIPStore
 # ========
