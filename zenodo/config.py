@@ -419,10 +419,10 @@ DEPOSIT_RECORDS_UI_ENDPOINTS = {
 DEPOSIT_FILES_API = '/api/files'
 
 #: Size after which files are chunked when uploaded
-DEPOSIT_FILEUPLOAD_CHUNKSIZE = 15 * 1024 * 1024  # 15mb
+DEPOSIT_FILEUPLOAD_CHUNKSIZE = 15 * 1024 * 1024  # 15 MiB
 
 #: Maximum upload file size via application/mulitpart-formdata
-MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100mb
+MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MiB
 
 # SIPStore
 # ========

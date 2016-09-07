@@ -40,7 +40,7 @@ ZENODO_COMMUNITIES_AUTO_REQUEST = ['zenodo', ]
 ZENODO_COMMUNITIES_ADD_IF_GRANTS = ['ecfunded', ]
 """Communities which are to be auto-added if it contains grant information."""
 
-ZENODO_BUCKET_QUOTA_SIZE = 50 * 1024 * 1024 * 1024
+ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
 """Maximum quota per bucket."""
 
 ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
