@@ -39,9 +39,32 @@
         window.CKEDITOR.config.mathJaxLib = '{{config.THEME_MATHJAX_CDN}}';
 
         // Override templates
-        app = angular.module('invenioRecords').config(['schemaFormDecoratorsProvider', function(decoratorsProvider){
+        app = angular.module('invenioRecords').config(['schemaFormDecoratorsProvider', '$provide', function(decoratorsProvider, $provide){
           decoratorsProvider.addMapping('bootstrapDecorator', 'uiselect', '{{ url_for("static", filename="templates/zenodo_deposit/uiselect.html")}}');
           decoratorsProvider.addMapping('bootstrapDecorator', 'ckeditor', '{{ url_for("static", filename="templates/zenodo_deposit/ckeditor.html")}}');
+
+          // Extend the default invenioRecords directive
+          $provide.decorator('invenioRecordsDirective', function($delegate) {
+            var directive = $delegate[0];
+            var link = directive.link;
+            directive.compile = function() {
+              return function Link(scope, element, attrs, ctrls) {
+                ctrls.requestPrepare = function(url, method, model, extraParams) {
+                  var _model = ctrls.removeEmptyValues(model);
+                  return {
+                    url: url,
+                    method: method,
+                    headers: extraParams.headers,
+                    data: {
+                      metadata: _model,
+                    }
+                  };
+                }
+                return link.apply(this, arguments);
+              };
+            };
+            return $delegate;
+          });
         }]);
 
         app.directive('tooltip', function(){
