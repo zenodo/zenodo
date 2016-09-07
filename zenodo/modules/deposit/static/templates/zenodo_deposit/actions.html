@@ -5,7 +5,7 @@
         class="btn btn-danger"
         ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
         ng-disabled="recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self"
-        ng-click="recordsVM.actionHandler('self', 'DELETE', '/deposit')">
+        ng-click="recordsVM.actionHandler(['self', 'DELETE'], '/deposit')">
         <i class="fa fa-trash-o fa-inverse"></i> Delete
       </button>
     </li>
@@ -14,7 +14,7 @@
         ng-disabled="recordsVM.invenioRecordsLoading"
         ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
         class="btn btn-warning"
-        ng-click="recordsVM.actionHandler('discard', 'POST', 'record_html')">
+        ng-click="recordsVM.actionHandler(['discard', 'POST'], 'record_html')">
         <i class="fa fa-times icon-white"></i> Discard changes
       </button>
     </li>
@@ -23,7 +23,7 @@
       <button
         ng-disabled="depositionForm.$invalid || recordsVM.invenioRecordsLoading"
         class="btn btn-default"
-        ng-click="recordsVM.actionHandler('self', 'PUT')">
+        ng-click="recordsVM.actionHandler(['self', 'PUT'])">
         <i class="fa fa-file-o"></i> Save
       </button>
     </li>
@@ -31,7 +31,7 @@
       <button
         class="btn btn-primary"
         ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
-        ng-click="recordsVM.actionHandler('publish', 'POST', 'record_html')">
+        ng-click="recordsVM.actionHandler(['publish', 'POST'], 'record_html')">
         <i class="fa fa-check"></i> Publish
       </button>
     </li>
