@@ -1,53 +1,53 @@
 {
   "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
   "id": "http://zenodo.org/schemas/records/file-v1.0.0.json",
   "properties": {
     "_buckets": {
       "type": "object",
       "properties": {
-        "deposit": {
-          "description": "Deposit bucket ID.",
-          "type": "string"
-        },
         "record": {
-          "description": "Record bucket ID.",
-          "type": "string"
+          "type": "string",
+          "description": "Record bucket ID."
+        },
+        "deposit": {
+          "type": "string",
+          "description": "Deposit bucket ID."
         }
       }
     },
     "_files": {
       "items": {
+        "type": "object",
         "description": "Describe information needed for files in records.",
         "properties": {
+          "previewer": {
+            "type": "string",
+            "description": "Identifier for previewer needed to preview this file."
+          },
+          "checksum": {
+            "type": "string"
+          },
           "bucket": {
             "type": "string"
           },
-          "checksum": {
+          "version_id": {
             "type": "string"
           },
           "key": {
             "type": "string"
           },
-          "previewer": {
-            "description": "Identifier for previewer needed to preview this file.",
-            "type": "string"
+          "type": {
+            "type": "string",
+            "description": "File type extension."
           },
           "size": {
             "type": "integer"
-          },
-          "type": {
-            "description": "File type extension.",
-            "type": "string"
-          },
-          "version_id": {
-            "type": "string"
           }
-        },
-        "type": "object"
+        }
       },
       "type": "array"
     }
   },
-  "title": "Zenodo Files Schema v1.0.0",
-  "type": "object"
+  "title": "Zenodo Files Schema v1.0.0"
 }

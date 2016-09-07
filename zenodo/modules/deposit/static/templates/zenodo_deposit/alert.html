@@ -10,7 +10,7 @@
         </li>
       </ul>
     </div>
-    <div ng-show='!recordsVM.invenioRecordsAlert.data.message'>
-      {{ recordsVM.invenioRecordsArgs.templateParams['messages'][recordsVM.invenioRecordsAlert.action]['message'] }}
+    <div ng-show='!recordsVM.invenioRecordsAlert.data.message && recordsVM.invenioRecordsAlert.type == "success"'>
+      <span ng-repeat="action in recordsVM.invenioRecordsAlert.action">{{ recordsVM.invenioRecordsArgs.templateParams.messages[action[0]].message }}</span>
     </div>
 </div>
