@@ -258,4 +258,4 @@ class DepositSchemaV1(RecordSchemaV1):
         OwnerSchema, dump_only=True, attribute='metadata._deposit.owners',
         many=True)
     status = fields.Str(dump_only=True, attribute='metadata._deposit.status')
-    recid = fields.Str(dump_only=True, attribute='metadata._deposit.recid')
+    recid = fields.Str(dump_only=True, attribute='metadata.recid')
