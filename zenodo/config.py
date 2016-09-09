@@ -106,7 +106,7 @@ ASSETS_DEBUG = False
 #: Switch of automatic building.
 ASSETS_AUTO_BUILD = False
 #: Remove app.static_folder from source list of static folders.
-COLLECT_FILTER = 'zenodo.modules.theme.collect:appstaticfolder_filter'
+COLLECT_FILTER = 'zenodo.modules.theme.collect:collect_staticroot_removal'
 
 # Language
 # ========

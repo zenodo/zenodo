@@ -29,6 +29,8 @@ from __future__ import absolute_import, print_function
 from flask import current_app
 
 
-def appstaticfolder_filter(static_folders):
-    """Remove the Flask application's own static folder."""
-    return [f for f in static_folders if f != current_app.static_folder]
+def collect_staticroot_removal(blueprints):
+    """Remove collect's static root folder from list."""
+    collect_root = current_app.extensions['collect'].static_root
+    return [bp for bp in blueprints if (
+        bp.has_static_folder and bp.static_folder != collect_root)]
