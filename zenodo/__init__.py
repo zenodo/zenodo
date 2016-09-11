@@ -246,7 +246,7 @@ variable:
 
 .. code-block:: python
 
-   FIXTURES_DEFAULT_LOCATION = \
+   FIXTURES_FILES_LOCATION = \
     'root://eospublic.cern.ch//eos/zenodo/prod/data/'
 
 In case you need XRootD support, please ensure that
