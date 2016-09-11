@@ -44,8 +44,13 @@ def doi_generator(recid, prefix=None):
 
 def is_local_doi(doi):
     """Check if DOI is a locally managed DOI."""
-    return doi.startswith('{0}/'.format(
-        current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']))
+    prefixes = [
+        current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']
+    ] + current_app.config['ZENODO_LOCAL_DOI_PREFIXES']
+    for p in prefixes:
+        if doi.startswith('{0}/'.format(p)):
+            return True
+    return False
 
 
 def zenodo_record_minter(record_uuid, data):
