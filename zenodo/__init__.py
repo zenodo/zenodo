@@ -41,11 +41,24 @@ Celery workers can be started using the command:
 
    $ celery worker -A zenodo.celery -l INFO
 
-You can enable debug mode by setting the ``FLASK_DEBUG`` environment variable:
+You enable debug mode by setting the ``FLASK_DEBUG`` environment variable:
 
 .. code-block:: console
 
    $ export FLASK_DEBUG=1
+
+An interactive Python shell is started with the command:
+
+.. code-block:: console
+
+   $ zenodo shell
+
+or, if you prefer to use IPython, you can start an interactive IPython shell
+using the command:
+
+.. code-block:: console
+
+   $ zenodo konch
 
 Configuration
 -------------
@@ -64,6 +77,18 @@ file (recommended) located at:
 .. code-block:: console
 
     ${VIRTUAL_ENV}/var/instance/zenodo.cfg
+
+Secure session cookie
+~~~~~~~~~~~~~~~~~~~~~
+By default, the Flask session cookie will be sent over both HTTP and HTTPS
+as mostly during development we run the local Flask development server which is
+HTTP-only. Production deployments are however are HTTPS only, and thus for
+better security you should ensure the session cookie is only set over HTTPS
+using the following Flask configuration variable:
+
+.. code-block:: python
+
+   SESSION_COOKIE_SECURE = True
 
 Recaptcha
 ~~~~~~~~~

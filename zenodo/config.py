@@ -887,8 +887,8 @@ STATSD_PREFIX = "zenodo"
 #: Number of proxies in front of application.
 WSGI_PROXIES = 0
 
-#: Set the session cookie to be secure.
-SESSION_COOKIE_SECURE = True
+#: Set the session cookie to be secure - should be set to true in production.
+SESSION_COOKIE_SECURE = False
 
 # Indexer
 # =======
