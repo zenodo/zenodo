@@ -30,7 +30,7 @@ import pytest
 from invenio_sipstore.models import SIP
 from mock import MagicMock, Mock, patch
 from six import BytesIO
-
+from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.github.api import ZenodoGitHubRelease
 
 creators_params = (
@@ -70,7 +70,9 @@ def test_github_creators_metadata(m_ljv1t, m_get_contributors, m_get_owner,
 
 
 @patch('zenodo.modules.github.api.ZenodoGitHubRelease.metadata')
-def test_github_publish(zgh_meta, db, users, location, deposit_metadata):
+@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
+def test_github_publish(datacite_mock, zgh_meta, db, users, location,
+                        deposit_metadata):
     """Test basic GitHub payload."""
     data = b'foobar'
     resp = Mock()
@@ -91,7 +93,18 @@ def test_github_publish(zgh_meta, db, users, location, deposit_metadata):
     zgh.release = dict(author=dict(id=1))
     zgh.metadata = deposit_metadata
     zgh.files = (('foobar.txt', None), )
-    zgh.publish()
+
+    datacite_task_mock = MagicMock()
+    # We have to make the call to the task synchronous
+    datacite_task_mock.delay = datacite_register.apply
+    with patch('zenodo.modules.deposit.tasks.datacite_register',
+               new=datacite_task_mock):
+        zgh.publish()
+
+    # assert datacite_task_mock.delay.call_count == 1
+    assert datacite_mock().metadata_post.call_count == 1
+    datacite_mock().doi_post.assert_called_once_with(
+        '10.5072/zenodo.1', 'https://zenodo.org/record/1')
 
     expected_sip_agent = {
         'email': 'foo@baz.bar',

@@ -34,6 +34,7 @@ from invenio_files_rest.models import ObjectVersion
 from invenio_github.api import GitHubRelease
 from invenio_github.utils import get_contributors, get_owner
 from invenio_indexer.api import RecordIndexer
+from zenodo.modules.deposit.tasks import datacite_register
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
@@ -102,6 +103,10 @@ class ZenodoGitHubRelease(GitHubRelease):
             deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
             self.model.recordmetadata = deposit.model
             db.session.commit()
+
+            # Send Datacite DOI registration task
+            recid_pid, record = deposit.fetch_published()
+            datacite_register.delay(recid_pid.pid_value, str(record.id))
         except Exception:
             db.session.rollback()
             # Remove deposit from index since it was not commited.
