@@ -23,7 +23,7 @@
 -#}
 {%- if current_user|has_record_perm(record, 'update') %}
 <form action="{{ url_for('zenodo_deposit.edit', pid_value=pid.pid_value) }}" method="POST">
-    <button class="btn btn-warning btn-block" type="submit"><i class="fa fa-pencil-square-o"></i> Edit</button>
+    <button class="btn btn-warning btn-block" type="submit" {{ 'disabled' if not record.doi else ''}}><i class="fa fa-pencil-square-o"></i> Edit</button>
 </form>
 {%- endif %}
 {%- if current_user|has_record_perm(record, 'delete') %}
