@@ -35,7 +35,14 @@
   <!-- AddThis Button END -->
   <h4>{{_('Cite as')}}</h4>
   <div id='invenio-csl'>
-    <invenio-csl ng-init="vm.citationResult='{{record|citation(pid, style='apa')}}'">
+    {% set citation_result = record|citation(pid, style='apa') %}
+    <invenio-csl
+      {%- if citation_result %}
+        ng-init="vm.citationResult = '{{citation_result}}'"
+      {%- else %}
+        ng-init="vm.error = '{{_('Your record could not be processed by the citation formatter')}}'"
+      {%- endif %}
+    >
       <invenio-csl-citeproc
        endpoint="{{ config.CSL_RECORDS_API_ENDPOINT ~ pid.pid_value }}"
        template="{{ url_for('static', filename=config.CSL_JSTEMPLATE_CITEPROC) }}"></invenio-csl-citeproc>
