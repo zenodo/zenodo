@@ -124,6 +124,10 @@ def new():
 @pass_record('update')
 def edit(pid=None, record=None, depid=None, deposit=None):
     """Edit a record."""
+    # If the record doesn't have a DOI, its deposit shouldn't be editable.
+    if 'doi' not in record:
+        abort(404)
+
     # Put deposit in edit mode if not already.
     if deposit['_deposit']['status'] != 'draft':
         deposit = deposit.edit()
