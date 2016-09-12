@@ -133,7 +133,7 @@ invenio-records-ui==1.0.0a7
 invenio-rest==1.0.0a9
 invenio-search==1.0.0a7
 invenio-search-ui==1.0.0a5
-invenio-sipstore==1.0.0a2
+invenio-sipstore==1.0.0a3
 invenio-theme==1.0.0a14
 invenio-userprofiles==1.0.0a7
 invenio-webhooks==1.0.0a3
