@@ -235,7 +235,13 @@ def citation(record, pid, style=None, ln=None):
     """Render citation for record according to style and language."""
     locale = ln or current_i18n.language
     style = style or 'science'
-    return citeproc_v1.serialize(pid, record, style=style, locale=locale)
+    try:
+        return citeproc_v1.serialize(pid, record, style=style, locale=locale)
+    except Exception:
+        current_app.logger.exception(
+            'Citation formatting for record {0} failed.'
+            .format(str(record.id)))
+        return None
 
 
 @blueprint.app_template_filter('pid_url')
