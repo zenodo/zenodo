@@ -146,8 +146,6 @@ def edit(pid=None, record=None, depid=None, deposit=None):
 def delete(pid=None, record=None, depid=None, deposit=None):
     """Delete a record."""
     # View disabled until properly implemented and tested.
-    abort(404)
-
     try:
         doi = PersistentIdentifier.get_by_object('doi', 'rec', record.id)
     except PIDDoesNotExistError:
