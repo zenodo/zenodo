@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import re
 from invenio_formatter.filters.datetime import from_isodate
 from marshmallow import Schema, fields, missing
 
@@ -91,6 +92,9 @@ class RecordSchemaCSLJSON(Schema):
 
     def get_pages(self, obj):
         """Get pages."""
+        # Remove multiple dashes between page numbers (eg. 12--15)
+        pages = self.get_journal_or_part_of(obj, 'pages')
+        pages = re.sub('-+', '-', pages) if pages else pages
         return self.get_journal_or_part_of(obj, 'pages')
 
     def get_publisher(self, obj):
