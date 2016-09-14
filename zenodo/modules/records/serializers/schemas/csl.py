@@ -95,7 +95,7 @@ class RecordSchemaCSLJSON(Schema):
         # Remove multiple dashes between page numbers (eg. 12--15)
         pages = self.get_journal_or_part_of(obj, 'pages')
         pages = re.sub('-+', '-', pages) if pages else pages
-        return self.get_journal_or_part_of(obj, 'pages')
+        return pages
 
     def get_publisher(self, obj):
         """Get publisher."""
