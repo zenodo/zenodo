@@ -280,13 +280,31 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
             required_doi = self.context.get('required_doi')
             if value == required_doi:
                 return
+
+            err =  ValidationError(_('DOI already exists in Zenodo.'),
+                                   field_names=['doi'])
+
             try:
-                PersistentIdentifier.get('doi', value)
-                raise ValidationError(
-                    _('DOI already exists in Zenodo.'),
-                    field_names=['doi'])
+                doi_pid = PersistentIdentifier.get('doi', value)
             except PIDDoesNotExistError:
-                pass
+                return
+
+            # If the DOI exists, check if it's been assigned to this record
+            # by fetching the recid and comparing both PIDs record UUID
+            try:
+                recid_pid = PersistentIdentifier.get(
+                    'recid', self.context['recid'])
+            except PIDDoesNotExistError:
+                # There's no way to verify if this DOI belongs to this record
+                raise err
+
+            doi_uuid = doi_pid.get_assigned_object()
+            recid_uuid = recid_pid.get_assigned_object()
+
+            if doi_uuid and doi_uuid == recid_uuid:
+                return
+            else:  # DOI exists and belongs to a different record
+                raise err
 
     @validates_schema()
     def validate_license(self, data):

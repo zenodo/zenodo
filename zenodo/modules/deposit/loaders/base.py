@@ -60,6 +60,7 @@ def marshmallow_loader(schema_class, **kwargs):
             managed_prefix = current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']
 
             _, record = request.view_args.get('pid_value').data
+            context['recid'] = record['recid']
             if record.has_minted_doi():
                 context['required_doi'] = record['doi']
             elif not record.is_published():
