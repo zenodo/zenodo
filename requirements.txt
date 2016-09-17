@@ -92,7 +92,7 @@ gnureadline==6.3.3
 humanize==0.5.1
 html5lib==0.9999999
 idna==2.1
-IDUtils==0.2.1
+IDUtils==0.2.2
 imagesize==0.7.1
 infinity==1.4
 intervals==0.7.1
@@ -117,7 +117,7 @@ invenio-logging==1.0.0a3
 invenio-mail==1.0.0a4
 invenio-marc21==1.0.0a3
 # invenio-migrator==1.0.0a8
-invenio-oaiserver==1.0.0a6
+invenio-oaiserver==1.0.0a7
 invenio-oauth2server==1.0.0a9
 invenio-oauthclient==1.0.0a10
 invenio-openaire==1.0.0a6
