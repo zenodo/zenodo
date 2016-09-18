@@ -201,7 +201,7 @@ def meeting_title(m):
 def select_preview_file(files):
     """Get list of files and select one for preview."""
     selected = None
-    for f in files:
+    for f in (files or []):
         try:
             if f['type'] in current_previewer.previewable_extensions:
                 if selected is None:
