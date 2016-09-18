@@ -428,7 +428,7 @@ DEPOSIT_RECORDS_UI_ENDPOINTS = {
 }
 
 #: Endpoint for uploading files.
-DEPOSIT_FILES_API = '/api/files'
+DEPOSIT_FILES_API = u'/api/files'
 
 #: Size after which files are chunked when uploaded
 DEPOSIT_FILEUPLOAD_CHUNKSIZE = 15 * 1024 * 1024  # 15 MiB

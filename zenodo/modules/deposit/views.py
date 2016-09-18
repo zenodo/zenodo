@@ -264,7 +264,7 @@ def to_files_js(deposit):
             'links': {
                 'self': (
                     current_app.config['DEPOSIT_FILES_API'] +
-                    '/{bucket}/{key}?versionId={version_id}'.format(
+                    u'/{bucket}/{key}?versionId={version_id}'.format(
                         bucket=f.bucket_id,
                         key=f.key,
                         version_id=f.version_id,
@@ -283,7 +283,7 @@ def to_files_js(deposit):
             'links': {
                 'self': (
                     current_app.config['DEPOSIT_FILES_API'] +
-                    '/{bucket}/{key}?uploadId={upload_id}'.format(
+                    u'/{bucket}/{key}?uploadId={upload_id}'.format(
                         bucket=f.bucket_id,
                         key=f.key,
                         upload_id=f.upload_id,
