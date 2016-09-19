@@ -92,7 +92,7 @@ gnureadline==6.3.3
 humanize==0.5.1
 html5lib==0.9999999
 idna==2.1
-IDUtils==0.2.2
+IDUtils==0.2.3
 imagesize==0.7.1
 infinity==1.4
 intervals==0.7.1

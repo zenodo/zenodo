@@ -245,7 +245,7 @@ def citation(record, pid, style=None, ln=None):
 
 
 @blueprint.app_template_filter('pid_url')
-def pid_url(identifier, scheme=None):
+def pid_url(identifier, scheme=None, url_scheme='https'):
     """Convert persistent identifier into a link."""
     if scheme is None:
         try:
@@ -253,7 +253,7 @@ def pid_url(identifier, scheme=None):
         except IndexError:
             scheme = None
     if scheme and identifier:
-        return idutils.to_url(identifier, scheme)
+        return idutils.to_url(identifier, scheme, url_scheme=url_scheme)
     return ""
 
 

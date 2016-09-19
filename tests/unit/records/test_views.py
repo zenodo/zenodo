@@ -147,10 +147,19 @@ def test_pid_url(app):
     assert render_template_string(
         "{{ '10.123/foo'|pid_url }}") == "https://doi.org/10.123/foo"
     assert render_template_string(
+        "{{ 'doi: 10.123/foo'|pid_url(scheme='doi') }}") \
+        == "https://doi.org/10.123/foo"
+    assert render_template_string(
         "{{ 'asfasdf'|pid_url }}") == ""
     assert render_template_string(
+        "{{ 'arXiv:1512.01558'|pid_url(scheme='arxiv', url_scheme='http') }}"
+    ) == "http://arxiv.org/abs/arXiv:1512.01558"
+    assert render_template_string(
         "{{ 'arXiv:1512.01558'|pid_url(scheme='arxiv') }}") \
-        == "http://arxiv.org/abs/arXiv:1512.01558"
+        == "https://arxiv.org/abs/arXiv:1512.01558"
+    assert render_template_string(
+        "{{ 'hdl.handle.net/1234/5678'|pid_url(scheme='handle') }}") \
+        == "https://hdl.handle.net/1234/5678"
 
 
 def test_records_ui_export(app, db, full_record):

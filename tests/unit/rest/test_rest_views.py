@@ -149,8 +149,11 @@ def test_pid_url(app):
     assert render_template_string(
         "{{ 'asfasdf'|pid_url }}") == ""
     assert render_template_string(
+        "{{ 'arXiv:1512.01558'|pid_url(scheme='arxiv', url_scheme='http') }}"
+    ) == "http://arxiv.org/abs/arXiv:1512.01558"
+    assert render_template_string(
         "{{ 'arXiv:1512.01558'|pid_url(scheme='arxiv') }}") \
-        == "http://arxiv.org/abs/arXiv:1512.01558"
+        == "https://arxiv.org/abs/arXiv:1512.01558"
 
 
 def test_records_ui_export(app, db, full_record):
