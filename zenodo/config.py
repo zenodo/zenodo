@@ -224,6 +224,9 @@ GITHUB_REMOTE_APP.update(dict(
     description='Software collaboration platform, with one-click '
                 'software preservation in Zenodo.',
 ))
+GITHUB_REMOTE_APP['params']['request_token_params']['scope'] = \
+    'user:email,admin:repo_hook,read:org'
+
 
 #: Defintion of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
