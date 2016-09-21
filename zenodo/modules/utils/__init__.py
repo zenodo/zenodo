@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,15 +22,6 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo CLI module."""
+"""Zenodo utils."""
 
 from __future__ import absolute_import, print_function
-
-from invenio_base.app import create_cli
-
-from .factory import create_app
-from .modules.utils.cli import utils
-
-cli = create_cli(create_app=create_app)
-cli.add_command(utils)
-"""Zenodo Click CLI."""

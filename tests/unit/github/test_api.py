@@ -30,6 +30,7 @@ import pytest
 from invenio_sipstore.models import SIP
 from mock import MagicMock, Mock, patch
 from six import BytesIO
+
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.github.api import ZenodoGitHubRelease
 

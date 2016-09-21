@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import re
+
 from invenio_formatter.filters.datetime import from_isodate
 from marshmallow import Schema, fields, missing
 

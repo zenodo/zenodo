@@ -34,6 +34,7 @@ from invenio_files_rest.models import ObjectVersion
 from invenio_github.api import GitHubRelease
 from invenio_github.utils import get_contributors, get_owner
 from invenio_indexer.api import RecordIndexer
+
 from zenodo.modules.deposit.tasks import datacite_register
 
 from ..deposit.loaders import legacyjson_v1_translator
