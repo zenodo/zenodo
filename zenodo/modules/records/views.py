@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import copy
+from operator import itemgetter
 
 import idutils
 import six
@@ -201,15 +202,15 @@ def meeting_title(m):
 def select_preview_file(files):
     """Get list of files and select one for preview."""
     selected = None
-    for f in (files or []):
-        try:
+    try:
+        for f in sorted(files or [], key=itemgetter('key')):
             if f['type'] in current_previewer.previewable_extensions:
                 if selected is None:
                     selected = f
                 elif f['default']:
                     selected = f
-        except KeyError:
-            pass
+    except KeyError:
+        pass
     return selected
 
 
