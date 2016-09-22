@@ -38,7 +38,7 @@ def test_loadpages(script_info, db):
     runner = CliRunner()
     res = runner.invoke(loadpages_cli, [], obj=script_info)
     assert res.exit_code == 0
-    assert Page.query.count() == 9
+    assert Page.query.count() == 10
     page = Page.query.filter_by(url='/about').one()
     assert page.title == 'About Zenodo'
     assert len(page.description) > 20

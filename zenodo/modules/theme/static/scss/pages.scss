@@ -1,4 +1,9 @@
-.features-page{
+.features-page {
+
+  p, h1, h2 {
+    text-rendering: optimizeLegibility;
+  }
+
   h1, h2{
     font-weight: 100;
   }
@@ -23,5 +28,33 @@
   }
   .row{
     margin-bottom: 50px;
+  }
+
+  .features {
+    .jumbotron h1 {
+      font-size: 3em;
+    }
+
+    .container-fluid:nth-child(odd) {
+      background-color: $color6;
+      text-align: left;
+    }
+
+    .container-fluid:nth-child(even) {
+      text-align: right;
+    }
+
+    .centered {
+      height: 100%;
+      text-align: center;
+
+      img {
+        padding: 15px;
+        max-width: 100%;
+        max-height: 100%;
+        display: inline-block;
+        vertical-align: middle;
+      }
+    }
   }
 }

@@ -34,20 +34,12 @@
 {%- block page_body %}
 <div class="container body-container">
   <div class="row">
-    <div class="col-md-12">
-      <div class="alert alert-info row">
-        <strong>September 12:</strong> Welcome to the improved Zenodo. See <a href="https://github.com/zenodo/zenodo/wiki/What's-new%3F">what's new</a> and <a href="https://github.com/zenodo/zenodo/labels/known_issues">known issues</a>. If you experience problems report it on <a href="https://github.com/zenodo/zenodo/issues/new">GitHub</a> or <a href="mailto:info@zenodo.org">info@zenodo.org</a>.
-      </div>
-    </div>
-  </div>
-  <div class="row">
     <div class="col-md-8">
       <div class="row">
         <div class="col-xs-12">
           <h2>{{_('Recent uploads')}}</h2>
         </div>
       </div>
-
       {%- for r in records %}
         {%- set publication_date = r.publication_date|from_isodate -%}
         {%- set creation_date = r._created|from_isodatetime -%}
@@ -84,6 +76,11 @@
       {%- endfor %}
     </div>
     <div class="col-md-4">
+      <div class="well">
+        <span class="pull-right"><i class="fa fa-flag fa-5x"></i></span>
+        <h4>Sep 12: Major update</h4>
+        <p>Welcome to the improved Zenodo. See <a href="/whatsnew">what's new</a> and <a href="https://github.com/zenodo/zenodo/labels/known_issues">known issues</a>.</p>
+      </div>
       <div class="well">
         <span class="pull-right"><i class="fa fa-github fa-5x"></i></span>
         <h4>{{_('Using GitHub?')}}</h4>
