@@ -724,7 +724,6 @@ PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
 PREVIEWER_CSV_VALIDATION_BYTES = 2 * 1024
 """Number of bytes read by CSV previewer to validate the file."""
 
-
 # OAI-PMH
 # =======
 #: Index to use for the OAI-PMH server.
