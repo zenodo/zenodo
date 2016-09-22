@@ -241,10 +241,11 @@ class ZenodoDeposit(Deposit):
         # Communities for automatic acceptance
         owned_comms = set(self._filter_by_owned_communities(dep_comms))
 
-        # Communities for which the InclusionRequest should be made
-        requested_comms = set(dep_comms) - owned_comms
-
         auto_added = self._get_auto_added()
+
+        # Communities for which the InclusionRequest should be made
+        # Exclude owned ones and auto added ones
+        requested_comms = set(dep_comms) - owned_comms - set(auto_added)
 
         # Communities which are to be auto-requested to each published record
         auto_request = self._get_auto_requested()
@@ -258,7 +259,8 @@ class ZenodoDeposit(Deposit):
                                         record)
 
         # Push the communities back (if any) so they appear in deposit
-        self['communities'] = sorted(dep_comms + auto_added + auto_request)
+        self['communities'] = sorted(set(dep_comms + auto_added +
+                                         auto_request))
         if not self['communities']:  # No key rather than empty list
             del self['communities']
         return record
@@ -278,13 +280,13 @@ class ZenodoDeposit(Deposit):
         # New communities, which should be added automatically
         new_owned_comms = set(self._filter_by_owned_communities(new_comms))
 
-        # New communities, for which the InclusionRequests should be made
-        new_ir_comms = set(new_comms) - new_owned_comms
-
-        self._remove_accepted_communities(removals, record)
-
         # Communities which are to be added to every published record
         auto_added = self._get_auto_added()
+
+        # New communities, for which the InclusionRequests should be made
+        new_ir_comms = set(new_comms) - new_owned_comms - set(auto_added)
+
+        self._remove_accepted_communities(removals, record)
 
         self._autoadd_communities(new_owned_comms | set(auto_added), record)
         self._create_inclusion_requests(new_ir_comms, record)
@@ -300,7 +302,8 @@ class ZenodoDeposit(Deposit):
         )
         record = super(ZenodoDeposit, self)._publish_edited()
 
-        self['communities'] = sorted(self.get('communities', []) + auto_added)
+        self['communities'] = sorted(set(self.get('communities', []) +
+                                         auto_added))
         if not self['communities']:
             del self['communities']
 
