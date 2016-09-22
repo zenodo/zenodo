@@ -721,6 +721,8 @@ PREVIEWER_BASE_CSS_BUNDLES = ['zenodo_theme_css']
 #: Base JS bundle to include in all previewers
 PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
 """Basic bundle which includes Bootstrap/jQuery."""
+PREVIEWER_CSV_VALIDATION_BYTES = 2 * 1024
+"""Number of bytes read by CSV previewer to validate the file."""
 
 
 # OAI-PMH
