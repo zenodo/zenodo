@@ -54,7 +54,7 @@ click==6.6
 cookiecutter==1.4.0
 coverage==4.1
 cryptography==1.4
-datacite==0.2.1
+datacite==0.2.2
 dcxml==0.1.0
 decorator==4.0.10
 dictdiffer==0.6.0
