@@ -61,7 +61,7 @@ def test_double_minting_depid_recid(db):
     assert pid.status == PIDStatus.REGISTERED
     assert pid.object_uuid == rec_uuid
     assert data['doi'] == '10.5072/zenodo.1'
-    assert data['_oai']['id'] == 'oai:zenodo.org:recid/1'
+    assert data['_oai']['id'] == 'oai:zenodo.org:1'
 
 
 @pytest.mark.parametrize('doi_in, doi_out', [
