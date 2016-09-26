@@ -22,15 +22,16 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+include .dockerignore
+include .editorconfig
 include *.rst
 include *.sh
 include *.json
 include *.txt
 include *.yml
-include .dockerignore
-include .editorconfig
 include babel.ini
 include Dockerfile
+include docs/requirements.txt
 include LICENSE
 include pytest.ini
 include zenodo/modules/theme/static/img/LICENSE

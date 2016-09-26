@@ -250,8 +250,8 @@ variable:
     'root://eospublic.cern.ch//eos/zenodo/prod/data/'
 
 In case you need XRootD support, please ensure that
-`XRootDPyFS <http://pythonhosted.org/xrootdpyfs/>`_ have been installed by e.g.
-installing Zenodo with the ``xrootd`` extras:
+`XRootDPyFS <https://github.com/inveniosoftware/xrootdpyfs>`_ have been
+installed by e.g. installing Zenodo with the ``xrootd`` extras:
 
 .. code-block:: console
 
