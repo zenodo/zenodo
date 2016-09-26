@@ -198,6 +198,7 @@ def test_full_record(app, full_record):
             u'location_of_meeting':
             u'Harvard-Smithsonian Center for Astrophysics'
         }],
+        u'conference_url': 'http://hitran.org/conferences/hitran-13-2014/',
         u'dissertation_note': {
             u'name_of_granting_institution': u'I guess important',
         },

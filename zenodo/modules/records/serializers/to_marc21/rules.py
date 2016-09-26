@@ -95,3 +95,15 @@ def reverse_oai(dummy_self, key, value):
             '$ind2': '4',
         }
     return
+
+
+@to_marc21.over('856', '^conference_url$')
+@utils.filter_values
+def reverse_conkerence_url(dummy_self, key, value):
+    """Reverse - Meeting."""
+    return {
+        'y': 'Conference website',
+        'u': value,
+        '$ind1': '4',
+        '$ind2': '_',
+    }

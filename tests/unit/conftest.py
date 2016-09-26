@@ -450,6 +450,7 @@ def full_record():
             'acronym': 'HITRAN13',
             'session': 'VI',
             'session_part': '1',
+            'url': 'http://hitran.org/conferences/hitran-13-2014/'
         },
         imprint={
             'place': 'Staszkowka',

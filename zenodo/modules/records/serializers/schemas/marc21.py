@@ -111,6 +111,8 @@ class RecordSchemaMARC21(Schema):
 
     _oai = fields.Raw(attribute='metadata._oai')
 
+    conference_url = fields.Raw(attribute='metadata.meeting.url')
+
     def get_host_item_entry(self, o):
         """Get host items."""
         res = []
