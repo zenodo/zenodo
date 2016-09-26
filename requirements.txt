@@ -102,7 +102,7 @@ invenio-admin==1.0.0a3
 invenio-assets==1.0.0b2
 invenio-base==1.0.0a14
 invenio-celery==1.0.0a4
-invenio-communities==1.0.0a11
+invenio-communities==1.0.0a13
 invenio-config==1.0.0b1
 invenio-csl-rest==1.0.0a1
 invenio-db==1.0.0b2
@@ -117,7 +117,7 @@ invenio-logging==1.0.0a3
 invenio-mail==1.0.0a4
 invenio-marc21==1.0.0a3
 # invenio-migrator==1.0.0a8
-invenio-oaiserver==1.0.0a7
+invenio-oaiserver==1.0.0a8
 invenio-oauth2server==1.0.0a9
 invenio-oauthclient==1.0.0a10
 invenio-openaire==1.0.0a6
