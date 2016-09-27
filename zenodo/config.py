@@ -755,7 +755,17 @@ OAISERVER_METADATA_FORMATS = {
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v31',
     },
+    'datacite': {
+        'namespace': 'http://datacite.org/schema/kernel-3',
+        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v31',
+    },
     'oai_datacite': {
+        'namespace': 'http://datacite.org/schema/kernel-3',
+        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
+    },
+    'oai_datacite3': {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
