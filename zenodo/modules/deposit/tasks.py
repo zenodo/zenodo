@@ -52,8 +52,10 @@ def datacite_register(pid_value, record_uuid):
             recid=pid_value)
         doc = datacite_v31.serialize(dcp.pid, record)
 
-        dcp.update(url, doc) if dcp.pid.status == PIDStatus.REGISTERED \
-            else dcp.register(url, doc)
+        if dcp.pid.status == PIDStatus.REGISTERED:
+            dcp.update(url, doc)
+        else:
+            dcp.register(url, doc)
         db.session.commit()
     except Exception as exc:
         datacite_register.retry(exc=exc)

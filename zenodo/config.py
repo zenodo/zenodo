@@ -731,7 +731,9 @@ OAISERVER_RECORD_INDEX = 'records'
 #: OAI identifier prefix
 OAISERVER_ID_PREFIX = 'oai:zenodo.org:'
 #: Number of records to return per page in OAI-PMH results.
-OAISERVER_PAGE_SIZE = 25
+OAISERVER_PAGE_SIZE = 100
+#: Increase resumption token expire time.
+OAISERVER_RESUMPTION_TOKEN_EXPIRE_TIME = 2 * 60
 #: Support email for OAI-PMH.
 OAISERVER_ADMIN_EMAILS = [SUPPORT_EMAIL]
 #: Do not register signals to automatically update record on updates.
