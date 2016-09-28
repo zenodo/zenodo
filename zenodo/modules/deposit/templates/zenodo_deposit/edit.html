@@ -82,6 +82,41 @@
           };
         });
 
+        // Overriding ui-select's controller to handle arrays
+        //
+        // Note: UI-Select by default doesn't play well while being inside an
+        // array. What happens is that if the array gets modified from the
+        // outside (eg. delete an array element), the changes are not picked up
+        // by UI-Select, and thus aren't refelcted on its internal model and
+        // view. This leads to inconsistent view state for the end user, eg.
+        // an item from the middle of a ui-select list gets removed using the
+        // 'X' button, but the view will still display it and remove the last
+        // item of the list.
+        //
+        // The remedy for this issue is to handle the update of ui-select's
+        // model manually, by overriding its controller.
+        angular.module('schemaForm')
+          .controller('invenioDynamicSelectController', ['$scope', '$controller',
+            function ($scope, $controller) {
+              $controller('dynamicSelectController', {$scope: $scope});
+              // If it is ui-select inside an array...
+              if ($scope.modelArray) {
+                $scope.$watchCollection('modelArray', function(newValue) {
+                  // If this is not the initial setting of the element...
+                  if (!angular.equals($scope.select_model, {})) {
+                    // Get the element's correct value from the array model
+                    var value = $scope.modelArray[$scope.arrayIndex][$scope.form.key.slice(-1)[0]];
+                    // Set ui-select's model to the correct value if needed
+                    if ($scope.insideModel !== value) {
+                      $scope.insideModel = value;
+                      $scope.populateTitleMap($scope.form, value);
+                      $scope.select_model.selected = $scope.find_in_titleMap(value);
+                    }
+                  }
+                });
+              }
+        }]);
+
         angular.bootstrap(
           document.getElementById('invenio-records'), [
             'invenioRecords', 'schemaForm', 'mgcrea.ngStrap',
