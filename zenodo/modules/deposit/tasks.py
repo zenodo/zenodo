@@ -44,16 +44,19 @@ def datacite_register(pid_value, record_uuid):
     :param pid_value: Value of record PID, with pid_type='recid'.
     :type pid_value: str
     """
-    record = Record.get_record(record_uuid)
-    dcp = DataCiteProvider.get(record['doi'])
+    try:
+        record = Record.get_record(record_uuid)
+        dcp = DataCiteProvider.get(record['doi'])
 
-    url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
-        recid=pid_value)
-    doc = datacite_v31.serialize(dcp.pid, record)
+        url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+            recid=pid_value)
+        doc = datacite_v31.serialize(dcp.pid, record)
 
-    dcp.update(url, doc) if dcp.pid.status == PIDStatus.REGISTERED \
-        else dcp.register(url, doc)
-    db.session.commit()
+        dcp.update(url, doc) if dcp.pid.status == PIDStatus.REGISTERED \
+            else dcp.register(url, doc)
+        db.session.commit()
+    except Exception as exc:
+        datacite_register.retry(exc=exc)
 
 
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
@@ -64,6 +67,9 @@ def datacite_inactivate(pid_value):
     :param pid_value: Value of record PID, with pid_type='recid'.
     :type pid_value: str
     """
-    dcp = DataCiteProvider.get(pid_value)
-    dcp.delete()
-    db.session.commit()
+    try:
+        dcp = DataCiteProvider.get(pid_value)
+        dcp.delete()
+        db.session.commit()
+    except Exception as exc:
+        datacite_inactivate.retry(exc=exc)

@@ -253,9 +253,13 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
             scheme = idutils.detect_identifier_schemes(identifier)[0]
         except IndexError:
             scheme = None
-    if scheme and identifier:
-        return idutils.to_url(identifier, scheme, url_scheme=url_scheme)
-    return ""
+    try:
+        if scheme and identifier:
+            return idutils.to_url(identifier, scheme, url_scheme=url_scheme)
+    except Exception:
+        current_app.logger.warning('URL generation for identifier {0} failed.'
+                                   .format(identifier), exc_info=True)
+    return ''
 
 
 def records_ui_export(pid, record, template=None):
