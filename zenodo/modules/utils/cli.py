@@ -87,7 +87,7 @@ def add_file(recid, fp, replace_existing):
             key=key,
             bucket=bucket.id,
             size=size),
-        fg='orange'))
+        fg='green'))
     click.echo('to record:\n')
     click.echo(click.style(
         '  Title: "{title}"\n'
@@ -114,7 +114,7 @@ def add_file(recid, fp, replace_existing):
         bucket.locked = False
         if obj is not None and replace_existing:
             ObjectVersion.delete(bucket, obj.key)
-        ObjectVersion.create(bucket, key, stream=fp)
+        ObjectVersion.create(bucket, key, stream=fp, size=size)
         bucket.locked = True
 
         record.files.flush()
