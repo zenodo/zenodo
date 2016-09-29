@@ -425,7 +425,8 @@
                   "asyncCallback": "autocompleteSuggest",
                   "url": "/api/communities/",
                   "urlParameters": {
-                    "q": "value"
+                    "q": "value",
+                    "size": 20
                   },
                   "map": {
                     "resultSource": "hits.hits",
@@ -473,7 +474,8 @@
                   "url": "/api/grants/_suggest",
                   "urlParameters": {
                     "text": "value",
-                    "funder": "'10.13039/501100000780'"
+                    "funder": "'10.13039/501100000780'",
+                    "size": 20
                   },
                   "processQuery": "query.split('::').pop()",
                   "map": {

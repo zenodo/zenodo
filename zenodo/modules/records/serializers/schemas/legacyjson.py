@@ -175,7 +175,7 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Load grants."""
         if not isinstance(data, list):
             raise ValidationError(_('Not a list.'))
-        res = []
+        res = set()
         for g in data:
             if not isinstance(g, dict):
                 raise ValidationError(_('Element not an object.'))
@@ -185,8 +185,9 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             # FP7 project grant
             if not g.startswith('10.13039/'):
                 g = '10.13039/501100000780::{0}'.format(g)
-            res.append({'$ref': 'https://dx.zenodo.org/grants/{0}'.format(g)})
-        return res or missing
+            res.add(g)
+        return [{'$ref': 'https://dx.zenodo.org/grants/{0}'.format(grant_id)}
+                for grant_id in res] or missing
 
     def dump_communities(self, obj):
         """Dump communities type."""

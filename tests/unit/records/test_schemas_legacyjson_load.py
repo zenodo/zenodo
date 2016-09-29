@@ -655,16 +655,15 @@ def test_license_refresolver(app, db, license_record):
 def test_grants():
     """Test grants."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
-    assert s.load(d(
+    loaded_grants = s.load(d(
         grants=[dict(id='283595'), dict(id='10.13039/501100000780::643410')],
-    )).data['grants'] == [
-        {'$ref': (
-            'https://dx.zenodo.org/grants/10.13039/501100000780::283595'
-        )},
-        {'$ref': (
-            'https://dx.zenodo.org/grants/10.13039/501100000780::643410'
-        )},
-    ]
+    )).data['grants']
+    assert {
+        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::283595'
+    } in loaded_grants
+    assert {
+        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::643410'
+    } in loaded_grants
 
 
 def test_grants_refresolver(app, db, grant_record, license_record):
