@@ -257,8 +257,8 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
         if scheme and identifier:
             return idutils.to_url(identifier, scheme, url_scheme=url_scheme)
     except Exception:
-        current_app.logger.info('URL generation for identifier {0} failed.'
-                                .format(identifier), exc_info=True)
+        current_app.logger.warning('URL generation for identifier {0} failed.'
+                                   .format(identifier), exc_info=True)
     return ''
 
 
