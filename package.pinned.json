@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "invenio-records-js": "0.0.6"
+  }
+}

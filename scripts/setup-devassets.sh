@@ -24,7 +24,9 @@
 
 # First install all node modules
 CWD=`pwd`
-zenodo npm
+ZENODO_SOURCE=$(dirname $(dirname $(readlink -f $0)))
+
+zenodo npm --pinned-file ${ZENODO_SOURCE}/package.pinned.json
 cd ${VIRTUAL_ENV}/var/instance/static
 npm install
 
