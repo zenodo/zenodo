@@ -69,8 +69,8 @@ def add_file(recid, fp, replace_existing):
 
     obj = ObjectVersion.get(bucket, key)
     if obj is not None and not replace_existing:
-        click.echo(click.style('File with key "{key}" alreay exists.'
-                   ' Use `--replace-existing/-f` to overwrite it.'.format(
+        click.echo(click.style(u'File with key "{key}" alreay exists.'
+                   u' Use `--replace-existing/-f` to overwrite it.'.format(
                         key=key, recid=recid), fg='red'))
         return
 
@@ -78,39 +78,39 @@ def add_file(recid, fp, replace_existing):
     size = fp.tell()
     fp.seek(SEEK_SET)
 
-    click.echo('Will add the following file:\n')
+    click.echo(u'Will add the following file:\n')
     click.echo(click.style(
-        '  key: "{key}"\n'
-        '  bucket: {bucket}\n'
-        '  size: {size}\n'
-        ''.format(
+        u'  key: "{key}"\n'
+        u'  bucket: {bucket}\n'
+        u'  size: {size}\n'
+        u''.format(
             key=key,
             bucket=bucket.id,
             size=size),
         fg='green'))
-    click.echo('to record:\n')
+    click.echo(u'to record:\n')
     click.echo(click.style(
-        '  Title: "{title}"\n'
-        '  RECID: {recid}\n'
-        '  UUID: {uuid}\n'
-        ''.format(
+        u'  Title: "{title}"\n'
+        u'  RECID: {recid}\n'
+        u'  UUID: {uuid}\n'
+        u''.format(
             recid=record['recid'],
             title=record['title'],
             uuid=record.id),
         fg='green'))
     if replace_existing and obj is not None:
-        click.echo('and remove the file:\n')
+        click.echo(u'and remove the file:\n')
         click.echo(click.style(
-            '  key: "{key}"\n'
-            '  bucket: {bucket}\n'
-            '  size: {size}\n'
-            ''.format(
+            u'  key: "{key}"\n'
+            u'  bucket: {bucket}\n'
+            u'  size: {size}\n'
+            u''.format(
                 key=obj.key,
                 bucket=obj.bucket,
                 size=obj.file.size),
             fg='green'))
 
-    if click.confirm('Continue?'):
+    if click.confirm(u'Continue?'):
         bucket.locked = False
         if obj is not None and replace_existing:
             ObjectVersion.delete(bucket, obj.key)
@@ -120,9 +120,9 @@ def add_file(recid, fp, replace_existing):
         record.files.flush()
         record.commit()
         db.session.commit()
-        click.echo(click.style('File added successfully.', fg='green'))
+        click.echo(click.style(u'File added successfully.', fg='green'))
     else:
-        click.echo(click.style('File addition aborted.', fg='green'))
+        click.echo(click.style(u'File addition aborted.', fg='green'))
 
 
 @utils.command('remove_file')
@@ -135,41 +135,41 @@ def remove_file(recid, key=None, index=None):
     bucket = record.files.bucket
     obj = ObjectVersion.get(bucket, key)
     if obj is None:
-        click.echo(click.style('File with key "{key}" not found.'.format(
+        click.echo(click.style(u'File with key "{key}" not found.'.format(
             key=key, recid=recid), fg='red'))
         return
 
-    click.echo('Will remove the following file:\n')
+    click.echo(u'Will remove the following file:\n')
     click.echo(click.style(
-        '  key: "{key}"\n'
-        '  {checksum}\n'
-        '  bucket: {bucket}\n'
-        ''.format(
+        u'  key: "{key}"\n'
+        u'  {checksum}\n'
+        u'  bucket: {bucket}\n'
+        u''.format(
             key=key,
             checksum=obj.file.checksum,
             bucket=bucket.id),
         fg='green'))
     click.echo('from record:\n')
     click.echo(click.style(
-        '  Title: "{title}"\n'
-        '  RECID: {recid}\n'
-        '  UUID: {uuid}\n'
-        ''.format(
+        u'  Title: "{title}"\n'
+        u'  RECID: {recid}\n'
+        u'  UUID: {uuid}\n'
+        u''.format(
             recid=record['recid'],
             title=record['title'],
             uuid=record.id),
         fg='green'))
 
-    if click.confirm('Continue?'):
+    if click.confirm(u'Continue?'):
         bucket.locked = False
         ObjectVersion.delete(bucket, obj.key)
         bucket.locked = True
         record.files.flush()
         record.commit()
         db.session.commit()
-        click.echo(click.style('File removed successfully.', fg='green'))
+        click.echo(click.style(u'File removed successfully.', fg='green'))
     else:
-        click.echo(click.style('Aborted file removal.', fg='green'))
+        click.echo(click.style(u'Aborted file removal.', fg='green'))
 
 
 @utils.command('rename_file')
@@ -184,18 +184,18 @@ def rename_file(recid, key, new_key):
 
     obj = ObjectVersion.get(bucket, key)
     if obj is None:
-        click.echo(click.style('File with key "{key}" not found.'.format(
+        click.echo(click.style(u'File with key "{key}" not found.'.format(
             key=key), fg='red'))
         return
 
     new_obj = ObjectVersion.get(bucket, new_key)
     if new_obj is not None:
-        click.echo(click.style('File with key "{key}" already exists.'.format(
+        click.echo(click.style(u'File with key "{key}" already exists.'.format(
             key=new_key), fg='red'))
         return
 
-    if click.confirm('Rename "{key}" to "{new_key}" on bucket {bucket}.'
-                     ' Continue?'.format(
+    if click.confirm(u'Rename "{key}" to "{new_key}" on bucket {bucket}.'
+                     u' Continue?'.format(
                         key=obj.key, new_key=new_key, bucket=bucket.id)):
         record.files.bucket.locked = False
 
@@ -206,9 +206,9 @@ def rename_file(recid, key, new_key):
         record.files.flush()
         record.commit()
         db.session.commit()
-        click.echo(click.style('File renamed successfully.', fg='green'))
+        click.echo(click.style(u'File renamed successfully.', fg='green'))
     else:
-        click.echo(click.style('Aborted file rename.', fg='green'))
+        click.echo(click.style(u'Aborted file rename.', fg='green'))
 
 
 @utils.command('list_files')
@@ -217,11 +217,11 @@ def rename_file(recid, key, new_key):
 def list_files(recid):
     """List files for the record."""
     pid, record = record_resolver.resolve(recid)
-    click.echo('Files for record {recid} (UUID:{uuid}) ({cnt} file(s)):\n'
-               ''.format(recid=recid, uuid=record.id, cnt=len(record.files)))
+    click.echo(u'Files for record {recid} (UUID:{uuid}) ({cnt} file(s)):\n'
+               u''.format(recid=recid, uuid=record.id, cnt=len(record.files)))
     for idx, key in enumerate(record.files.keys):
         f = record.files[key].obj.file
         click.echo(click.style(
-            '{idx:3}: "{key}", {checksum}, size:{size}'
-            ''.format(idx=idx, key=key, checksum=f.checksum, size=f.size),
+            u'{idx:3}: "{key}", {checksum}, size:{size}'
+            u''.format(idx=idx, key=key, checksum=f.checksum, size=f.size),
             fg='green'))
