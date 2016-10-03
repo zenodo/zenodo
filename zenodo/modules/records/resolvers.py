@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Zenodo.
+# This file is part of Invenio.
 # Copyright (C) 2016 CERN.
 #
-# Zenodo is free software; you can redistribute it
+# Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of the
 # License, or (at your option) any later version.
 #
-# Zenodo is distributed in the hope that it will be
+# Invenio is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Zenodo; if not, write to the
+# along with Invenio; if not, write to the
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307, USA.
 #
@@ -22,17 +22,14 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Record API."""
+"""Resolvers for ZenodoRecords."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function
 
 from invenio_pidstore.resolver import Resolver
-from invenio_records_files.api import Record
+from .api import ZenodoRecord
 
-from zenodo.modules.deposit.api import ZenodoFileObject
-
-
-class ZenodoRecord(Record):
-    """Zenodo Record."""
-
-    file_cls = ZenodoFileObject
+record_resolver = Resolver(
+    pid_type='recid', object_type='rec', getter=ZenodoRecord.get_record
+)
+"""'recid'-PID resolver for Zenodo Records."""

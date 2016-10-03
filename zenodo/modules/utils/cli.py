@@ -35,7 +35,7 @@ from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 
 from zenodo.modules.deposit.tasks import datacite_register
-from zenodo.modules.records.api import record_resolver
+from zenodo.modules.records.resolvers import record_resolver
 
 
 @click.group()
