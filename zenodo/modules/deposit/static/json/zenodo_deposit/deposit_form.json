@@ -426,7 +426,7 @@
                   "url": "/api/communities/",
                   "urlParameters": {
                     "q": "value",
-                    "size": 20
+                    "size": 15
                   },
                   "map": {
                     "resultSource": "hits.hits",
@@ -475,7 +475,7 @@
                   "urlParameters": {
                     "text": "value",
                     "funder": "'10.13039/501100000780'",
-                    "size": 20
+                    "size": 15
                   },
                   "processQuery": "query.split('::').pop()",
                   "map": {

@@ -82,6 +82,22 @@
           };
         });
 
+        // Excludes items from an array if they exist in some other array
+        app.filter('notIn', function($filter){
+          return function(srcArray, filterArray, srcKey, filterKey){
+            if(srcArray && srcArray.length && filterArray && filterArray.length){
+              return $filter('filter')(srcArray, function(srcItem){
+                return !filterArray.some(function(filterItem) {
+                  srcValue = srcKey ? srcItem[srcKey] : srcItem;
+                  filterValue = filterKey ? filterItem[filterKey] : filterItem;
+                  return srcValue === filterValue;
+                });
+              });
+            }
+            return srcArray;
+          }
+        });
+
         // Overriding ui-select's controller to handle arrays
         //
         // Note: UI-Select by default doesn't play well while being inside an
