@@ -125,7 +125,8 @@
                     // Set ui-select's model to the correct value if needed
                     if ($scope.insideModel !== value) {
                       $scope.insideModel = value;
-                      $scope.populateTitleMap($scope.form, '');
+                      var query = $scope.$eval($scope.form.options.processQuery || 'query', {query: value});
+                      $scope.populateTitleMap($scope.form, query);
                       $scope.select_model.selected = $scope.find_in_titleMap(value);
                     }
                   }
