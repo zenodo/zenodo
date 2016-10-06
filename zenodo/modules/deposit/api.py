@@ -27,6 +27,7 @@
 from __future__ import absolute_import
 
 from contextlib import contextmanager
+from copy import copy
 from os.path import splitext
 
 from flask import current_app, request
@@ -231,17 +232,21 @@ class ZenodoDeposit(Deposit):
         """Get communities which are to be auto-requested to each record."""
         if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
             return []
-        return current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST']
+        comms = copy(current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'])
+        if self.get('grants'):
+            comms.extend(
+                current_app.config['ZENODO_COMMUNITIES_REQUEST_IF_GRANTS'])
+        return comms
 
     def _get_auto_added(self):
         """Get communities which are to be auto added to each record."""
         if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
             return []
-        grant_comms = []
+        comms = []
         if self.get('grants'):
-            grant_comms = current_app.config[
-                'ZENODO_COMMUNITIES_ADD_IF_GRANTS']
-        return grant_comms
+            comms = copy(current_app.config[
+                'ZENODO_COMMUNITIES_ADD_IF_GRANTS'])
+        return comms
 
     @contextmanager
     def _process_files(self, record_id, data):
@@ -271,7 +276,7 @@ class ZenodoDeposit(Deposit):
 
         # Communities for which the InclusionRequest should be made
         # Exclude owned ones and auto added ones
-        requested_comms = set(dep_comms) - owned_comms - set(auto_added)
+        new_ir_comms = set(dep_comms) - owned_comms - set(auto_added)
 
         # Communities which are to be auto-requested to each published record
         auto_request = self._get_auto_requested()
@@ -281,7 +286,7 @@ class ZenodoDeposit(Deposit):
 
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
 
-        self._create_inclusion_requests(requested_comms | set(auto_request),
+        self._create_inclusion_requests(new_ir_comms | set(auto_request),
                                         record)
 
         # Push the communities back (if any) so they appear in deposit
@@ -313,13 +318,17 @@ class ZenodoDeposit(Deposit):
         # New communities, for which the InclusionRequests should be made
         new_ir_comms = set(new_comms) - new_owned_comms - set(auto_added)
 
+        # Communities which are to be auto-requested to each published record
+        auto_request = self._get_auto_requested()
+
         self._remove_accepted_communities(removals, record)
 
         self._autoadd_communities(new_owned_comms | set(auto_added), record)
-        self._create_inclusion_requests(new_ir_comms, record)
+        self._create_inclusion_requests(new_ir_comms | set(auto_request),
+                                        record)
 
         # Remove obsolete InclusionRequests
-        self._remove_obsolete_irs(dep_comms, record)
+        self._remove_obsolete_irs(dep_comms + auto_request, record)
 
         # Communities, which should be in record after publishing:
         new_rec_comms = (
@@ -337,7 +346,7 @@ class ZenodoDeposit(Deposit):
 
         # Add communities entry to deposit (self)
         self['communities'] = sorted(set(self.get('communities', []) +
-                                         auto_added))
+                                         auto_added + auto_request))
         if not self['communities']:
             del self['communities']
 

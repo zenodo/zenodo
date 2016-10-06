@@ -36,7 +36,7 @@ from uuid import UUID, uuid4
 import pytest
 from elasticsearch.exceptions import RequestError
 from flask import url_for
-from flask_cli import ScriptInfo
+from flask.cli import ScriptInfo
 from flask_security import login_user
 from helpers import bearer_auth
 from invenio_access.models import ActionUsers
@@ -99,6 +99,9 @@ def default_config():
         MAIL_SUPPRESS_SEND=True,
         LOGIN_DISABLED=False,
         DEPOSIT_DATACITE_MINTING_ENABLED=False,
+        ZENODO_COMMUNITIES_AUTO_REQUEST=['zenodo', ],
+        ZENODO_COMMUNITIES_ADD_IF_GRANTS=['grants_comm', ],
+        ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
@@ -225,6 +228,7 @@ def communities(db, users):
         {'id': 'c4', 'user_id': users[0]['id']},
         {'id': 'zenodo', 'user_id': users[2]['id']},
         {'id': 'ecfunded', 'user_id': users[2]['id']},
+        {'id': 'grants_comm', 'user_id': users[2]['id']},
     ]
     for c in comm_data:
         Community.create(c['id'], user_id=c['user_id'])

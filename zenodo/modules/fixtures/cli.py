@@ -30,7 +30,7 @@ import json
 from os.path import dirname, join
 
 import click
-from flask_cli import with_appcontext
+from flask.cli import with_appcontext
 from invenio_communities.utils import initialize_communities_bucket
 from sqlalchemy.orm.exc import NoResultFound
 
