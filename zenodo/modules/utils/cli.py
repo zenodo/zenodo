@@ -30,7 +30,7 @@ import os
 from io import SEEK_END, SEEK_SET
 
 import click
-from flask_cli import with_appcontext
+from flask.cli import with_appcontext
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier

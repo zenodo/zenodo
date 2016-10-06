@@ -310,48 +310,49 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
 def test_fixed_communities(app, db, users, communities, deposit, deposit_file,
                            communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
-
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
     # 'c3' is owned by one of the deposit owner
     assert Community.get('c3').id_user in deposit['_deposit']['owners']
     deposit['communities'] = ['c3', ]
     deposit = publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
-    assert record['communities'] == ['c3', 'ecfunded']
-    assert set(record['_oai']['sets']) == set(['user-c3', 'user-ecfunded', ])
-    assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
-    ir = InclusionRequest.query.one()
-    assert ir.id_community == 'zenodo'
-    assert ir.id_record == record.id
+    assert record['communities'] == ['c3', 'grants_comm']
+    assert deposit['communities'] == ['c3', 'ecfunded', 'grants_comm',
+                                      'zenodo']
+    InclusionRequest.query.count() == 2
+    ir1 = InclusionRequest.query.filter_by(id_community='zenodo').one()
+    assert ir1.id_record == record.id
+    ir2 = InclusionRequest.query.filter_by(id_community='ecfunded').one()
+    assert ir2.id_record == record.id
 
 
 def test_fixed_autoadd_redundant(app, db, users, communities, deposit,
                                  deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
-
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
     # 'c3' is owned by one of the deposit owner
     assert Community.get('c3').id_user in deposit['_deposit']['owners']
-    # Requesting for 'ecfunded', which would be added automatically
+    # Requesting for 'grants_comm', which would be added automatically
     # shouldn't cause problems
-    deposit['communities'] = ['c3', 'ecfunded', 'zenodo']
+    deposit['communities'] = ['c3', 'grants_comm', 'zenodo']
     deposit = publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
-    assert record['communities'] == ['c3', 'ecfunded']
-    assert set(record['_oai']['sets']) == set(['user-c3', 'user-ecfunded', ])
-    assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
-    ir = InclusionRequest.query.one()
-    assert ir.id_community == 'zenodo'
-    assert ir.id_record == record.id
+    assert record['communities'] == ['c3', 'grants_comm']
+    assert deposit['communities'] == ['c3', 'ecfunded', 'grants_comm',
+                                      'zenodo']
+    InclusionRequest.query.count() == 2
+    ir1 = InclusionRequest.query.filter_by(id_community='zenodo').one()
+    assert ir1.id_record == record.id
+    ir2 = InclusionRequest.query.filter_by(id_community='ecfunded').one()
+    assert ir2.id_record == record.id
 
 
 def test_fixed_communities_edit(app, db, users, communities, deposit,
                                 deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
-    Add to ecfunded also after later addition of grant information.
+    Add to grants_comm also after later addition of grant information.
     """
-
     deposit = publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['zenodo', ]
@@ -364,18 +365,50 @@ def test_fixed_communities_edit(app, db, users, communities, deposit,
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
     deposit = publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
-    assert deposit['communities'] == ['ecfunded', 'zenodo', ]
-    assert record['communities'] == ['ecfunded', ]
-    assert record['_oai']['sets'] == ['user-ecfunded']
+    assert deposit['communities'] == ['ecfunded', 'grants_comm', 'zenodo', ]
+    assert record['communities'] == ['grants_comm', ]
+    InclusionRequest.query.count() == 2
+    ir1 = InclusionRequest.query.filter_by(id_community='zenodo').one()
+    assert ir1.id_record == record.id
+    ir2 = InclusionRequest.query.filter_by(id_community='ecfunded').one()
+    assert ir2.id_record == record.id
+
+    # Remove 'grants' without auto requested community being accepted.
+    # We should not remove the inclusion request as we don't know if user
+    # requested it manually or whether it was an automatic request
+    deposit = deposit.edit()
+    deposit['grants'] = []
+    deposit = publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['ecfunded', 'grants_comm', 'zenodo', ]
+    assert record['communities'] == ['grants_comm', ]
+    InclusionRequest.query.count() == 2
+    ir1 = InclusionRequest.query.filter_by(id_community='zenodo').one()
+    assert ir1.id_record == record.id
+    ir2 = InclusionRequest.query.filter_by(id_community='ecfunded').one()
+    assert ir2.id_record == record.id
+
+    # However, if user explicitly removed auto-requested community, and grants
+    # have been removed too, the IR should be removed.
+    deposit = deposit.edit()
+    deposit['grants'] = []
+    # Removed 'ecfunded' and 'grants_comm' from deposit
+    deposit['communities'] = ['zenodo', ]
+    deposit = publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['zenodo', ]
+    assert 'communities' not in record
+    InclusionRequest.query.count() == 1
+    ir1 = InclusionRequest.query.filter_by(id_community='zenodo').one()
+    assert ir1.id_record == record.id
 
 
 def test_fixed_autoadd_edit(app, db, users, communities, deposit,
                             deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
-    Add to ecfunded also after later addition of grant information.
+    Add to grants_comm also after later addition of grant information.
     """
-
     deposit = publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['zenodo', ]
@@ -386,14 +419,20 @@ def test_fixed_autoadd_edit(app, db, users, communities, deposit,
 
     deposit = deposit.edit()
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
+    # Requesting for 'grants_comm' and 'ecfunded' manually even though it will
+    # be added due to specifying 'grants' shouldn't cause problems
+    deposit['communities'] = ['ecfunded', 'grants_comm', 'zenodo']
     deposit = publish_and_expunge(db, deposit)
-    # Requesting for 'ecfunded' manually even though it will be added
-    # automatically due to specifying 'grants' shouldn't cause problems
-    deposit['communities'] == deposit['communities'] + ['ecfunded', ]
     pid, record = deposit.fetch_published()
-    assert deposit['communities'] == ['ecfunded', 'zenodo', ]
-    assert record['communities'] == ['ecfunded', ]
-    assert record['_oai']['sets'] == ['user-ecfunded']
+
+    InclusionRequest.query.count() == 2
+    ir1 = InclusionRequest.query.filter_by(id_community='zenodo').one()
+    assert ir1.id_record == record.id
+    ir2 = InclusionRequest.query.filter_by(id_community='ecfunded').one()
+    assert ir2.id_record == record.id
+
+    assert deposit['communities'] == ['ecfunded', 'grants_comm', 'zenodo', ]
+    assert record['communities'] == ['grants_comm', ]
 
 
 def test_nonexisting_communities(app, db, users, communities, deposit,

@@ -37,8 +37,11 @@ ZENODO_COMMUNITIES_AUTO_ENABLED = False
 ZENODO_COMMUNITIES_AUTO_REQUEST = ['zenodo', ]
 """Communities which are to be auto-requested upon first publishing."""
 
-ZENODO_COMMUNITIES_ADD_IF_GRANTS = ['ecfunded', ]
-"""Communities which are to be auto-added if it contains grant information."""
+ZENODO_COMMUNITIES_REQUEST_IF_GRANTS = ['ecfunded', ]
+"""Communities which are to be auto-requested if record has grants."""
+
+ZENODO_COMMUNITIES_ADD_IF_GRANTS = []
+"""Communities which are to be auto-added if record has grants."""
 
 ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
 """Maximum quota per bucket."""

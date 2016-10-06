@@ -30,7 +30,7 @@ import json
 
 import click
 from flask import current_app
-from flask_cli import with_appcontext
+from flask.cli import with_appcontext
 
 from .compilers import compile_deposit_jsonschema, compile_file_jsonschema, \
     compile_record_jsonschema

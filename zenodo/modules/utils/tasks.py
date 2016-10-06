@@ -34,6 +34,7 @@ from invenio_oaiserver.models import OAISet
 from invenio_oaiserver.utils import datetime_to_datestamp
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
+from six.moves import filter
 
 from zenodo.modules.records.minters import zenodo_oaiid_minter
 
