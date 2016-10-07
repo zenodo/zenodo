@@ -731,11 +731,13 @@ OAISERVER_RECORD_INDEX = 'records'
 #: OAI identifier prefix
 OAISERVER_ID_PREFIX = 'oai:zenodo.org:'
 #: Number of records to return per page in OAI-PMH results.
+OAISERVER_CONTROL_NUMBER_FETCHER = 'zenodo_record_fetcher'
+#: PIDStore fetcher for OAI ID control numbers
 OAISERVER_PAGE_SIZE = 25
 #: Support email for OAI-PMH.
 OAISERVER_ADMIN_EMAILS = [SUPPORT_EMAIL]
 #: Do not register signals to automatically update record on updates.
-OAISERVER_REGISTER_RECORD_SIGNALS = False
+OAISERVER_REGISTER_RECORD_SIGNALS = True
 #: Metadata formats for OAI-PMH server
 OAISERVER_METADATA_FORMATS = {
     'marcxml': {
