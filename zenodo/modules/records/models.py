@@ -62,8 +62,8 @@ class AccessRight(object):
 
     _icon = {
         OPEN: 'fa-unlock',
-        EMBARGOED: 'fa-warning',
-        RESTRICTED: 'fa-ban',
+        EMBARGOED: 'fa-ban',
+        RESTRICTED: 'fa-key',
         CLOSED: 'fa-lock',
     }
 

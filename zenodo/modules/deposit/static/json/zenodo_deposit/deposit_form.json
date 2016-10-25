@@ -55,7 +55,7 @@
       {
         "type": "select",
         "key": "publication_type",
-        "title": "Publication Type",
+        "title": "Publication type",
         "condition": "model.upload_type == 'publication'",
         "titleMap": [
           {
@@ -123,7 +123,7 @@
       {
         "type": "select",
         "key": "image_type",
-        "title": "Image Type",
+        "title": "Image type",
         "condition": "model.upload_type == 'image'",
         "titleMap": [
           {
@@ -174,7 +174,7 @@
       {
         "type": "template",
         "key": "publication_date",
-        "title": "Publication Date",
+        "title": "Publication date",
         "placeholder": "eg. 2013-05-08",
         "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
         "format": "yyyy-MM-dd",
@@ -287,6 +287,7 @@
       {
         "type": "textarea",
         "key": "notes",
+        "title": "Additional notes",
         "description": "Optional.",
         "fa_cls": "fa-pencil",
         "required": false
@@ -300,7 +301,7 @@
       {
         "type": "radios",
         "key": "access_right",
-        "title": "Access Right",
+        "title": "Access right",
         "description": "Required. Open access uploads have considerably higher visibility on Zenodo.",
         "required": true,
         "titleMap": [
@@ -329,7 +330,7 @@
       {
         "type": "template",
         "key": "embargo_date",
-        "title": "Embargo Date",
+        "title": "Embargo date",
         "description": "Required only for Embargoed Access uploads. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.",
         "placeholder": "eg. 2016-04-22",
         "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
@@ -368,7 +369,7 @@
           {
             "type": "uiselect",
             "key": "license",
-            "description": "Required. The selected license applies to all of your files displayed in the bottom of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license is missing from the list, please inform us at <a href='mailto:info@zenodo.org'>info@zenodo.org</a>",
+            "description": "Required. The selected license applies to all of your files displayed in the top of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license is missing from the list, please inform us at <a href='mailto:info@zenodo.org'>info@zenodo.org</a>",
             "fa_cls": "fa-certificate",
             "placeholder": "Start typing a license name...",
             "required": true,
@@ -452,7 +453,7 @@
         "key": "grants",
         "title": "Grants",
         "fa_cls": "fa-money",
-        "description": "Optional. Note, a human Zenodo curator will validate your upload before reporting it to OpenAIRE, and you may thus experience a delay before your upload is available in OpenAIRE.",
+        "description": "Optional. European Commission FP7 and Horizon 2020 grants only. For general funding acknowledgements, please use the <i>Additional Notes</i> field.<br>Note: a human Zenodo curator will need to validate your upload - you may experience a delay before it is available in OpenAIRE.",
         "sortOptions": {
           "disabled": true
         },
@@ -819,7 +820,7 @@
     "collapsed": true,
     "items": [
       {
-        "title": "Awarding University",
+        "title": "Awarding university",
         "key": "thesis_university",
         "fa_cls": "fa-building",
         "required": false,
