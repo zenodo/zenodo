@@ -62,3 +62,8 @@ ZENODO_TYPE_SUBTYPE_LEGACY = {
 
     'lessons': ('lesson', None),
 }
+
+
+#: Zenodo donate redirection page
+REDIRECTOR_DONATE_PAGE = 'https://giving.web.cern.ch/civicrm/contribute/' \
+                         'transact%3Freset%3D1%26id%3D20'

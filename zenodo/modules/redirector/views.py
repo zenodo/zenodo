@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 from flask import Blueprint, redirect, request, url_for
 from invenio_search_ui.views import search as search_ui_search
 
-from .config import ZENODO_TYPE_SUBTYPE_LEGACY
+from .config import REDIRECTOR_DONATE_PAGE, ZENODO_TYPE_SUBTYPE_LEGACY
 
 blueprint = Blueprint(
     'zenodo_redirector',
@@ -139,3 +139,9 @@ def collections_search_redirect():
         values['subtype'] = subtype
     _pop_p(values)
     return redirect(url_for('invenio_search_ui.search', **values))
+
+
+@blueprint.route('/donate')
+def donate():
+    """Reddirect to external donate page."""
+    return redirect(REDIRECTOR_DONATE_PAGE)
