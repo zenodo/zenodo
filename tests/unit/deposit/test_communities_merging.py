@@ -56,6 +56,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
 
     # Should contain just an InclusionRequest
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
     assert InclusionRequest.query.count() == 1
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'c1'
@@ -68,6 +69,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     db.session.commit()
     assert InclusionRequest.query.count() == 0
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
 
     # Open for edit and request another community
     deposit = deposit.edit()
@@ -77,6 +79,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     deposit['communities'] = ['c1', 'c2', ]
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
     assert InclusionRequest.query.count() == 1
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'c2'
@@ -93,6 +96,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     assert InclusionRequest.query.count() == 0
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
 
     # Request for removal from a previously accepted community 'c1'
     deposit['communities'] = []
@@ -100,10 +104,12 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     assert not deposit.get('communities', [])
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
     assert InclusionRequest.query.count() == 0
 
 
-def test_accept_while_edit(app, db, communities, deposit, deposit_file):
+def test_accept_while_edit(app, db, communities, deposit, es, oaisets,
+                           deposit_file):
     """Test deposit publishing with concurrent events.
 
     Accept a record, while deposit in open edit and then published.
@@ -114,12 +120,14 @@ def test_accept_while_edit(app, db, communities, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
 
     # Open for edit
     deposit = deposit.edit()
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
     assert InclusionRequest.query.count() == 2
 
     # Accept a record meanwhile
@@ -133,6 +141,7 @@ def test_accept_while_edit(app, db, communities, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
     assert InclusionRequest.query.count() == 1
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'c2'
@@ -305,8 +314,8 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
     assert ir2.id_record == record.id
 
 
-def test_fixed_communities(app, db, users, communities, deposit, deposit_file,
-                           communities_autoadd_enabled):
+def test_fixed_communities(app, db, users, communities, es, oaisets, deposit,
+                           deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
 
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
@@ -316,14 +325,17 @@ def test_fixed_communities(app, db, users, communities, deposit, deposit_file,
     deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c3', 'ecfunded']
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'user-c3', 'openaire'])
     assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'zenodo'
     assert ir.id_record == record.id
 
 
-def test_fixed_autoadd_redundant(app, db, users, communities, deposit,
-                                 deposit_file, communities_autoadd_enabled):
+def test_fixed_autoadd_redundant(app, db, users, communities, es, oaisets,
+                                 deposit, deposit_file,
+                                 communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
 
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
@@ -335,14 +347,17 @@ def test_fixed_autoadd_redundant(app, db, users, communities, deposit,
     deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c3', 'ecfunded']
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'user-c3', 'openaire'])
     assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'zenodo'
     assert ir.id_record == record.id
 
 
-def test_fixed_communities_edit(app, db, users, communities, deposit,
-                                deposit_file, communities_autoadd_enabled):
+def test_fixed_communities_edit(app, db, users, communities, es, oaisets,
+                                deposit, deposit_file,
+                                communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
     Add to ecfunded also after later addition of grant information.
@@ -362,10 +377,11 @@ def test_fixed_communities_edit(app, db, users, communities, deposit,
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['ecfunded', 'zenodo', ]
     assert record['communities'] == ['ecfunded', ]
+    assert set(record['_oai']['sets']) == set(['user-ecfunded', 'openaire'])
 
 
 def test_fixed_autoadd_edit_redundant(app, db, users, communities, deposit,
-                                      deposit_file,
+                                      es, oaisets, deposit_file,
                                       communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
@@ -389,6 +405,7 @@ def test_fixed_autoadd_edit_redundant(app, db, users, communities, deposit,
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['ecfunded', 'zenodo', ]
     assert record['communities'] == ['ecfunded', ]
+    assert set(record['_oai']['sets']) == set(['user-ecfunded', 'openaire'])
 
 
 def test_nonexisting_communities(app, db, users, communities, deposit,
@@ -396,3 +413,69 @@ def test_nonexisting_communities(app, db, users, communities, deposit,
     """Test adding nonexisting community."""
     deposit['communities'] = ['nonexisting', ]
     pytest.raises(MissingCommunityError, _publish_and_expunge, db, deposit)
+
+
+def test_openaire_oaisets(app, db, users, communities, es, oaisets, deposit,
+                          deposit_file):
+    """Test automatic adding of openaire OAI sets."""
+
+    assert deposit['resource_type']['type'] == 'publication'
+    deposit['communities'] = ['ecfunded', ]
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+
+    c = Community.get('ecfunded')
+    c.accept_record(record)
+    record.commit()
+    db.session.commit()
+    pid, record = deposit.fetch_published()
+    assert set(record['_oai']['sets']) == set(['user-ecfunded', 'openaire'])
+
+
+def test_openaire_data_oaisets(app, db, users, communities, es, oaisets,
+                               deposit, deposit_file):
+    """Test automatic adding of openaire OAI sets."""
+
+    deposit['resource_type']['type'] = 'dataset'
+    deposit['communities'] = ['ecfunded', ]
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+
+    c = Community.get('ecfunded')
+    c.accept_record(record)
+    record.commit()
+    db.session.commit()
+    pid, record = deposit.fetch_published()
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'openaire_data'])
+
+
+def test_openaire_oaisets_edit(app, db, users, communities, es, oaisets,
+                               deposit, deposit_file):
+    """Test openaire OAI sets after editing the resource type."""
+
+    assert deposit['resource_type']['type'] == 'publication'
+    deposit['communities'] = ['ecfunded', 'c1']
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+
+    c = Community.get('ecfunded')
+    c.accept_record(record)
+    c = Community.get('c1')
+    c.accept_record(record)
+    record.commit()
+    db.session.commit()
+    pid, record = deposit.fetch_published()
+    # record should belong to community OAI set and 'openaire'
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'openaire', 'user-c1'])
+
+    # Change resource type to 'software'
+    deposit = deposit.edit()
+    deposit['resource_type']['type'] = 'software'
+    deposit['communities'] = ['ecfunded', ]  # Remove 'c1'
+    deposit = _publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    # record should belong to community OAI set and 'openaire_data'
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'openaire_data'])

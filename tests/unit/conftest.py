@@ -53,6 +53,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
+from invenio_oaiserver.models import OAISet
 from invenio_records_files.api import Record as RecordFile
 from invenio_records_files.api import RecordsBuckets
 from invenio_search import current_search, current_search_client
@@ -94,6 +95,7 @@ def default_config():
         DEBUG_TB_ENABLED=False,
         CELERY_ALWAYS_EAGER=True,
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
+        OAISERVER_REGISTER_RECORD_SIGNALS=True,
         COMMUNITIES_MAIL_ENABLED=False,
         MAIL_SUPPRESS_SEND=True,
         LOGIN_DISABLED=False,
@@ -229,6 +231,28 @@ def communities(db, users):
         Community.create(c['id'], user_id=c['user_id'])
     db.session.commit()
     return comm_data
+
+
+@pytest.fixture
+def oaisets(db):
+    """Create OAISets for OpenAIRE."""
+    oai_data = [
+        {
+            'spec': 'openaire',
+            'search_pattern': '(communities:ecfunded AND '
+                              'resource_type.type:publication)'
+        },
+        {
+            'spec': 'openaire_data',
+            'search_pattern': '(communities:ecfunded AND '
+                              '-resource_type.type:publication)'
+        },
+    ]
+    for oai_d in oai_data:
+        o = OAISet(spec=oai_d['spec'], search_pattern=oai_d['search_pattern'])
+        db.session.add(o)
+    db.session.commit()
+    return oai_data
 
 
 @pytest.fixture()

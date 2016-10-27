@@ -190,6 +190,32 @@ class ZenodoDeposit(Deposit):
             if not comm.has_record(record):
                 comm.add_record(record)  # Handles oai-sets internally
 
+    @staticmethod
+    def _sync_oaisets_with_communities(record):
+        """Sync oaiset specs with communities in the record.
+
+        This is necessary as not all communities modifications go through
+        Community.add_record/remove_record API, hence OAISet can be left
+        outdated.
+        """
+        if current_app.config['COMMUNITIES_OAI_ENABLED']:
+            from invenio_oaiserver.models import OAISet
+            comms = record.get('communities', [])
+            oai_sets = record['_oai'].get('sets', [])
+            c_sets = [s for s in oai_sets if s.startswith('user-') and
+                      not OAISet.query.filter_by(spec=s).one().search_pattern]
+            fmt = current_app.config['COMMUNITIES_OAI_FORMAT']
+            new_c_sets = [fmt.format(community_id=c) for c in comms]
+            removals = set(c_sets) - set(new_c_sets)
+            additions = set(new_c_sets) - set(c_sets)
+            for s in removals:
+                oaiset = OAISet.query.filter_by(spec=s).one()
+                oaiset.remove_record(record)
+            for s in additions:
+                oaiset = OAISet.query.filter_by(spec=s).one()
+                oaiset.add_record(record)
+            return record
+
     def _filter_by_owned_communities(self, comms):
         """Filter the list of communities for auto accept.
 
@@ -261,6 +287,7 @@ class ZenodoDeposit(Deposit):
         # Push the communities back (if any) so they appear in deposit
         self['communities'] = sorted(set(dep_comms + auto_added +
                                          auto_request))
+        self._sync_oaisets_with_communities(record)
         if not self['communities']:  # No key rather than empty list
             del self['communities']
         return record
@@ -302,12 +329,15 @@ class ZenodoDeposit(Deposit):
         )
         record = super(ZenodoDeposit, self)._publish_edited()
 
+        # Add communities entry to deposit (self)
         self['communities'] = sorted(set(self.get('communities', []) +
                                          auto_added))
         if not self['communities']:
             del self['communities']
 
+        # Add communities entry to record
         record['communities'] = sorted(list(new_rec_comms))
+        record = self._sync_oaisets_with_communities(record)
         if not record['communities']:
             del record['communities']
         zenodo_doi_updater(record.id, record)
