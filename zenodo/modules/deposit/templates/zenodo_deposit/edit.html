@@ -44,20 +44,6 @@
           decoratorsProvider.addMapping('bootstrapDecorator', 'ckeditor', '{{ url_for("static", filename="templates/zenodo_deposit/ckeditor.html")}}');
         }]);
 
-        app.directive('tooltip', function(){
-            return {
-                restrict: 'A',
-                link: function(scope, element, attrs){
-                    $(element).hover(function(){
-                        // on mouseenter
-                        $(element).tooltip('show');
-                    }, function(){
-                        // on mouseleave
-                        $(element).tooltip('hide');
-                    });
-                }
-            };
-        });
         app.filter('fieldtitle', function(){
           return function(fieldname, schemaform) {
             if (!fieldname){
@@ -97,6 +83,54 @@
             return srcArray;
           }
         });
+
+        // TODO: Move angular related things to their own zenodo module
+        angular.module('invenioRecords.directives')
+        .directive('prereserveButton',['$rootScope', 'InvenioRecordsAPI', function($rootScope, InvenioRecordsAPI) {
+
+          function link($scope, elem, attrs, vm) {
+            $scope.prereserveDOI = function() {
+              if ($scope.model.prereserve_doi &&
+                  $scope.model.prereserve_doi.doi) {
+                $scope.model.doi = $scope.model.prereserve_doi.doi;
+              } else {
+                // We need to get a depid to reserve and get a DOI, so we make
+                // a POST to the Deposit API.
+                $rootScope.$broadcast('invenio.records.loading.start');
+                InvenioRecordsAPI.request({
+                  method: 'POST',
+                  url: vm.invenioRecordsEndpoints.initialization,
+                  data: {},
+                  headers: vm.invenioRecordsArgs.headers || {}
+                }).then(function success(resp) {
+                  if (resp.data.metadata &&
+                      resp.data.metadata.prereserve_doi &&
+                      resp.data.metadata.prereserve_doi.doi) {
+                    $scope.model.prereserve_doi = resp.data.metadata.prereserve_doi;
+                    $scope.model.doi = resp.data.metadata.prereserve_doi.doi;
+                  }
+                  $rootScope.$broadcast(
+                    'invenio.records.endpoints.updated', resp.data.links);
+                }, function error(resp) {
+                  $rootScope.$broadcast('invenio.records.alert', {
+                    type: 'danger',
+                    data: resp.data,
+                  });
+                })
+                .finally(function() {
+                  $rootScope.$broadcast('invenio.records.loading.stop');
+                });
+              }
+            };
+          }
+
+          return {
+            scope: false,
+            restrict: 'A',
+            require: '^invenioRecords',
+            link: link,
+          };
+        }]);
 
         // Overriding ui-select's controller to handle arrays
         //

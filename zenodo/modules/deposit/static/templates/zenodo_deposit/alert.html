@@ -12,8 +12,6 @@
     </div>
     <div ng-show='!recordsVM.invenioRecordsAlert.data.message && recordsVM.invenioRecordsAlert.type == "success"'>
       <span ng-repeat="action in recordsVM.invenioRecordsAlert.action">{{ recordsVM.invenioRecordsArgs.templateParams.messages[action[0]].message }}</span>
-      <span ng-if='recordsVM.invenioRecordsAlert.data.metadata.prereserve_doi.doi'>
-        {{ recordsVM.invenioRecordsModel.prereserve_doi = recordsVM.invenioRecordsAlert.data.metadata.prereserve_doi;''}}
-      </span>
     </div>
+  </div>
 </div>

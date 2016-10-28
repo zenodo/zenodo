@@ -1,19 +1,32 @@
 <div class="form-group {{form.htmlClass}}">
   <div ng-class="{'col-sm-9 col-sm-offset-3': !form.notitle, 'col-sm-12': form.notitle}">
-    <button
-      sf-field-model="replaceAll"
-      ng-click="model.doi=model.prereserve_doi.doi"
-      class="btn btn-xs btn-default form-button {{ form.fieldHtmlClass }}"
-      data-toggle="tooltip"
-      tooltip
-      title="Pre-reserve a Digital Object Identifier for your upload. This allows you to know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until you submit your upload."
+    <div
+      class="tooltip-wrapper"
+      bs-tooltip
+      data-container="div"
+      data-title="{{model.doi && model.doi != model.prereserve_doi.doi ? 'Clear the DOI field above to Pre-reserve a Zenodo DOI.' : 'Pre-reserve a Digital Object Identifier for your upload. This allows you to know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until you submit your upload.'}}"
+      data-placement="right"
+      ng-class="{'disabled': model.doi}"
     >
-      <i class="fa fa-barcode"></i> Pre-reserve DOI
-    </button>
+      <button
+        sf-field-model="replaceAll"
+        class="btn btn-xs btn-default form-button {{ form.fieldHtmlClass }}"
+        ng-click="prereserveDOI()"
+        ng-disabled="model.doi && model.doi != model.prereserve_doi.doi"
+        prereserve-button
+      >
+        <i class="fa fa-barcode"></i> Pre-reserve DOI
+      </button>
+    </div>
     <span
       class="text-success"
       ng-show="model.prereserve_doi.doi && model.doi==model.prereserve_doi.doi">
       <i class="glyphicon glyphicon-ok"></i>
     </span>
+    <div
+      class="help-block"
+      ng-show="(hasError() && errorMessage(schemaError())) || form.description"
+      ng-bind-html="(hasError() && errorMessage(schemaError())) || form.description">
+    </div>
   </div>
 </div>

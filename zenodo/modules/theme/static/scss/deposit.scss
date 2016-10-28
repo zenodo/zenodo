@@ -17,6 +17,18 @@
 .deposit-panel {
     margin-bottom: 2px;
 
+    .tooltip-wrapper {
+        display: inline-block;
+
+        .btn[disabled] {
+            pointer-events: none;
+        }
+
+        &.disabled {
+            cursor: not-allowed;
+        }
+    }
+
     .jumbotron {
         background-color: transparent;
     }
