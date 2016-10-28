@@ -56,9 +56,11 @@
                   <br><div class="altmetric-embed altmetric-hidden" data-badge-type="donut" data-badge-popover="left" data-hide-no-mentions="true" data-doi="{{r.doi}}"></div>
               </span>
             {% endif %}
-            <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}</span>
-            {{ objecttype_label(object_type, lang=current_i18n.language) }}
-            {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
+            <div class="pull-left">
+              <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}</span>
+              {{ objecttype_label(object_type, lang=current_i18n.language) }}
+              {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
+            </div>
             <br />
             <h4><a href="{{ record_url }}">{{r.title}}</a></h4>
             <p>{{ authors(r.creators) }}</p>
@@ -106,4 +108,9 @@
 {% block javascript %}
 <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+"://platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");</script>
 {{ super() }}
+<script type="text/javascript">
+$(function () {
+  $('[data-toggle="tooltip"]').tooltip();
+});
+</script>
 {% endblock javascript %}

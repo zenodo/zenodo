@@ -94,6 +94,7 @@ search_js = NpmBundle(
     ),
     depends=(
         'node_modules/invenio-search-js/dist/*.js',
+        'node_modules/angular-strap/dist/*.js',
         'js/invenio_communities/*.js',
         'js/invenio_communities/directives/*.js',
     ),
@@ -102,6 +103,7 @@ search_js = NpmBundle(
     npm={
         'clipboard': '1.5.12',
         'invenio-search-js': '~0.2.0',
+        'angular-strap': '~2.3.9',
     }
 )
 """Search JavaScript bundle (with communities support)."""

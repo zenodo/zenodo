@@ -3,12 +3,12 @@
     <div class="pull-right view-record hidden-xs">
       <a target="_self" ng-href="/record/{{record.id}}" class="btn btn-default">View</a>
     </div>
-    <span class="label label-info" data-toggle="tooltip" title="Publication date">{{ record.metadata.
+    <span class="label label-info" bs-tooltip data-container="div" data-title="Publication date">{{ record.metadata.
     publication_date|date:'longDate' }}</span>
     <span class="label label-default">{{ record.metadata.resource_type.title }}</span>
     <span ng-switch on="record.metadata.access_right">
       <span ng-switch-when="embargoed">
-          <span class="label label-{{record.metadata.access_right_category}} titlecase" data-toggle="tooltip" data-placement="top" title="Available as Open Access after {{ record.metadata.embargo_date|date:'longDate' }}">{{ record.metadata.access_right }} Access</span>
+          <span class="label label-{{record.metadata.access_right_category}} titlecase" bs-tooltip data-container="div" data-placement="top" data-title="Available as Open Access after {{ record.metadata.embargo_date|date:'longDate' }}">{{ record.metadata.access_right }} Access</span>
       </span>
       <span ng-switch-default>
           <span class="label label-{{record.metadata.access_right_category}} titlecase">{{ record.metadata.access_right }} Access</span>

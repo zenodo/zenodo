@@ -21,6 +21,10 @@
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 require([
   "node_modules/invenio-search-js/dist/invenio-search-js",
+  "node_modules/angular-strap/dist/modules/dimensions",
+  "node_modules/angular-strap/dist/modules/compiler",
+  "node_modules/angular-strap/dist/modules/tooltip",
+  "node_modules/angular-strap/dist/modules/tooltip.tpl",
   "js/invenio_communities/module",
   ], function() {
   // On document ready bootstrap angular
