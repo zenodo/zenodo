@@ -210,13 +210,27 @@
           "type" : "nested",
           "properties": {
             "term": {
-              "type": "string"
+              "type": "string",
+              "copy_to": "subject.term"
             },
             "identifier": {
               "type": "string",
-              "index": "not_analyzed"
+              "index": "not_analyzed",
+              "copy_to": "subject.identifier"
             },
             "scheme": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
+        "subject": {
+          "type": "object",
+          "properties": {
+            "term": {
+              "type": "string"
+            },
+            "identifier": {
               "type": "string",
               "index": "not_analyzed"
             }
@@ -282,11 +296,13 @@
           "properties": {
             "identifier": {
               "type": "string",
-              "index": "not_analyzed"
+              "index": "not_analyzed",
+              "copy_to": "related.identifier"
             },
             "scheme": {
               "type": "string",
-              "index": "not_analyzed"
+              "index": "not_analyzed",
+              "copy_to": "related.scheme"
             },
             "relation": {
               "type": "string",
@@ -294,8 +310,36 @@
             }
           }
         },
+        "related": {
+          "type": "object",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "scheme": {
+              "type": "string",
+              "index": "not_analyzed"
+            }
+          }
+        },
         "alternate_identifiers": {
           "type": "nested",
+          "properties": {
+            "identifier": {
+              "type": "string",
+              "index": "not_analyzed",
+              "copy_to": "alternate.identifier"
+            },
+            "scheme": {
+              "type": "string",
+              "index": "not_analyzed",
+              "copy_to": "alternate.scheme"
+            }
+          }
+        },
+        "alternate": {
+          "type": "object",
           "properties": {
             "identifier": {
               "type": "string",
