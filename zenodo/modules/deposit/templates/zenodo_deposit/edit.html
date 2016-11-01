@@ -94,12 +94,15 @@
                   $scope.model.prereserve_doi.doi) {
                 $scope.model.doi = $scope.model.prereserve_doi.doi;
               } else {
-                // We need to get a depid to reserve and get a DOI, so we make
-                // a POST to the Deposit API.
+                // We need to make a 'POST' call to create a deposit, or a
+                // 'GET' in case we already have one, in order to get the
+                // pre-reserved DOI.
+                var method = angular.isUndefined(vm.invenioRecordsEndpoints.self) ? 'POST': 'GET';
+                var url = vm.invenioRecordsEndpoints.self || vm.invenioRecordsEndpoints.initialization;
                 $rootScope.$broadcast('invenio.records.loading.start');
                 InvenioRecordsAPI.request({
-                  method: 'POST',
-                  url: vm.invenioRecordsEndpoints.initialization,
+                  method: method,
+                  url: url,
                   data: {},
                   headers: vm.invenioRecordsArgs.headers || {}
                 }).then(function success(resp) {
