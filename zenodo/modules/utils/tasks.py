@@ -30,13 +30,12 @@ from dictdiffer import diff
 from flask import current_app
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
+from invenio_oaiserver.minters import oaiid_minter
 from invenio_oaiserver.models import OAISet
 from invenio_oaiserver.utils import datetime_to_datestamp
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from six.moves import filter
-
-from zenodo.modules.records.minters import zenodo_oaiid_minter
 
 logger = get_task_logger(__name__)
 
@@ -112,7 +111,7 @@ def sync_record_oai(uuid, cache=None):
     oai_pid_q = PersistentIdentifier.query.filter_by(pid_type='oai',
                                                      object_uuid=rec.id)
     if oai_pid_q.count() == 0:
-        pid = zenodo_oaiid_minter(rec.id, rec)
+        pid = oaiid_minter(rec.id, rec)
         synced_sets = get_synced_sets(rec, cache=cache)
         rec['_oai']['sets'] = synced_sets
         rec.commit()

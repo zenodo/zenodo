@@ -749,6 +749,8 @@ OAISERVER_MANAGED_ID_PREFIXES = [OAISERVER_ID_PREFIX,
 OAISERVER_PAGE_SIZE = 100
 #: Increase resumption token expire time.
 OAISERVER_RESUMPTION_TOKEN_EXPIRE_TIME = 2 * 60
+#: PIDStore fetcher for OAI ID control numbers
+OAISERVER_CONTROL_NUMBER_FETCHER = 'zenodo_record_fetcher'
 #: Support email for OAI-PMH.
 OAISERVER_ADMIN_EMAILS = [SUPPORT_EMAIL]
 #: Do not register signals to automatically update record on updates.
