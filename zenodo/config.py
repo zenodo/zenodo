@@ -715,14 +715,14 @@ RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
 # Previewer
 # =========
-#: Base CSS bundle to include in all previewers
+#: Basic bundle which includes Font-Awesome/Bootstrap.
 PREVIEWER_BASE_CSS_BUNDLES = ['zenodo_theme_css']
-"""Basic bundle which includes Font-Awesome/Bootstrap."""
-#: Base JS bundle to include in all previewers
+#: Basic bundle which includes Bootstrap/jQuery.
 PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
-"""Basic bundle which includes Bootstrap/jQuery."""
+#: Number of bytes read by CSV previewer to validate the file.
 PREVIEWER_CSV_VALIDATION_BYTES = 2 * 1024
-"""Number of bytes read by CSV previewer to validate the file."""
+#: Max file size to preview for images
+PREVIEWER_MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 
 # OAI-PMH
 # =======
