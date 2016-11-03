@@ -208,6 +208,7 @@ setup(
         ],
         'invenio_celery.tasks': [
             'zenodo_records = zenodo.modules.records.tasks',
+            'zenodo_utils = zenodo.modules.utils.tasks',
         ],
         'invenio_pidstore.minters': [
             'zenodo_record_minter '

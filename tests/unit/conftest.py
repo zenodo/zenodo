@@ -48,6 +48,7 @@ from invenio_deposit.permissions import \
     action_admin_access as deposit_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
+from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
@@ -229,6 +230,30 @@ def communities(db, users):
         Community.create(c['id'], user_id=c['user_id'])
     db.session.commit()
     return comm_data
+
+
+@pytest.fixture()
+def oaisets(db, communities):
+    """Create custom OAISet objects.
+
+    Those should be custom OAISet objects which are not community based.
+    """
+    oaisets_data = [
+        {
+            'spec': 'extra',
+            'search_pattern': 'title:extra'
+        },
+        {
+            'spec': 'user-extra',  # Looks like a community-based OAISet
+            'search_pattern': 'title:foobar'  # but has a search_pattern
+        },
+    ]
+    for oai_data in oaisets_data:
+        obj = OAISet(**oai_data)
+        db.session.add(obj)
+        db.session.commit()
+        oai_data['id'] = obj.id
+    return oaisets_data
 
 
 @pytest.fixture()

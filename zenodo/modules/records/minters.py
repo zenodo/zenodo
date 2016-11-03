@@ -26,10 +26,13 @@
 
 from __future__ import absolute_import
 
+from datetime import datetime
+
 import idutils
 from flask import current_app
 from invenio_db import db
 from invenio_oaiserver.provider import OAIIDProvider
+from invenio_oaiserver.utils import datetime_to_datestamp
 from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
@@ -68,6 +71,7 @@ def zenodo_oaiid_minter(record_uuid, data):
     )
     data.setdefault('_oai', {})
     data['_oai']['id'] = provider.pid.pid_value
+    data['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
     return provider.pid
 
 
