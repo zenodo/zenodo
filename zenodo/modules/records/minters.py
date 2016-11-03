@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import
 
+from datetime import datetime
 import idutils
 from flask import current_app
 from invenio_db import db
@@ -54,6 +55,22 @@ def is_local_doi(doi):
     return False
 
 
+def datetime_to_datestamp(dt, day_granularity=False):
+    """Transform datetime to datestamp.
+
+    :param dt: The datetime to convert.
+    :param day_granularity: Set day granularity on datestamp.
+    :returns: The datestamp.
+    """
+    # assert dt.tzinfo is None  # only accept timezone naive datetimes
+    # ignore microseconds
+    dt = dt.replace(microsecond=0)
+    result = dt.isoformat() + 'Z'
+    if day_granularity:
+        result = result[:-10]
+    return result
+
+
 def zenodo_oaiid_minter(record_uuid, data):
     """Mint OAI identifiers."""
     pid_value = data.get('_oai', {}).get('id')
@@ -68,6 +85,7 @@ def zenodo_oaiid_minter(record_uuid, data):
     )
     data.setdefault('_oai', {})
     data['_oai']['id'] = provider.pid.pid_value
+    data['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
     return provider.pid
 
 
