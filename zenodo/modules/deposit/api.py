@@ -327,7 +327,13 @@ class ZenodoDeposit(Deposit):
             new_owned_comms |
             set(auto_added)
         )
-        record = super(ZenodoDeposit, self)._publish_edited()
+        edited_record = super(ZenodoDeposit, self)._publish_edited()
+
+        # Preserve some of the previously published record fields
+        preserve_record_fields = ['_files', '_oai', '_buckets', '_internal']
+        for k in preserve_record_fields:
+            if k in record:
+                edited_record[k] = record[k]
 
         # Add communities entry to deposit (self)
         self['communities'] = sorted(set(self.get('communities', []) +
@@ -336,12 +342,12 @@ class ZenodoDeposit(Deposit):
             del self['communities']
 
         # Add communities entry to record
-        record['communities'] = sorted(list(new_rec_comms))
-        record = self._sync_oaisets_with_communities(record)
-        if not record['communities']:
-            del record['communities']
-        zenodo_doi_updater(record.id, record)
-        return record
+        edited_record['communities'] = sorted(list(new_rec_comms))
+        edited_record = self._sync_oaisets_with_communities(edited_record)
+        if not edited_record['communities']:
+            del edited_record['communities']
+        zenodo_doi_updater(edited_record.id, edited_record)
+        return edited_record
 
     def validate_publish(self):
         """Validate deposit."""

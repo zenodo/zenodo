@@ -28,6 +28,8 @@ from copy import deepcopy
 
 from flask import current_app
 
+from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
+
 
 def bearer_auth(headers, token):
     """Create authentication headers (with a valid oauth2 token)."""
@@ -45,3 +47,17 @@ def login_user_via_session(client, user=None, email=None):
             email=email)
     with client.session_transaction() as sess:
         sess['user_id'] = user.get_id()
+
+
+def publish_and_expunge(db, deposit):
+    """Publish the deposit and expunge the session.
+
+    Use this if you want to be safe that session is synced with the DB after
+    the deposit publishing.
+    """
+    deposit.publish()
+    dep_uuid = deposit.id
+    db.session.commit()
+    db.session.expunge_all()
+    deposit = Deposit.get_record(dep_uuid)
+    return deposit
