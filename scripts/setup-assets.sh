@@ -23,9 +23,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 CWD=`pwd`
-ZENODO_SOURCE=$(dirname $(dirname $(readlink -f $0)))
+SOURCE=${1:-"package.pinned.json"}
 
-zenodo npm --pinned-file ${ZENODO_SOURCE}/package.pinned.json
+zenodo npm --pinned-file ${SOURCE}
 cd ${VIRTUAL_ENV}/var/instance/static
 npm install
 cd ${CWD}
