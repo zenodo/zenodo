@@ -26,8 +26,11 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_oaiserver.models import OAISet
+from mock import MagicMock, patch
+
 from zenodo.modules.utils.tasks import comm_sets_match, get_synced_sets, \
-    requires_sync
+    requires_sync, update_oaisets_cache
 
 
 def make_rec(comm, sets):
@@ -35,7 +38,7 @@ def make_rec(comm, sets):
     return {'communities': comm, '_oai': {'sets': sets}}
 
 
-def test_synced_communities(db, communities, oaisets):
+def test_synced_communities(db, oaisets):
     """Test OAI sets syncing."""
     assert get_synced_sets(make_rec(['c1', 'c2'],
                                     ['user-c1', 'user-c2'])) == \
@@ -54,7 +57,7 @@ def test_synced_communities(db, communities, oaisets):
     assert get_synced_sets({}) == []
 
 
-def test_sets_match(db, communities, oaisets):
+def test_sets_match(db, oaisets):
     """Test OAI sets and communities matching predicate."""
     # Should ignore the custom "extra" OAI Set
     assert comm_sets_match(make_rec(['c1', 'c2'],
@@ -78,7 +81,7 @@ def test_sets_match(db, communities, oaisets):
     assert not comm_sets_match(r)
 
 
-def test_syncing_required(db, communities, oaisets):
+def test_syncing_required(db, oaisets):
     """Test OAI syncing requirement criterion."""
     assert requires_sync({})
     r = {
@@ -156,3 +159,34 @@ def test_syncing_required(db, communities, oaisets):
         # _oai is missing completely
     }
     assert requires_sync(r)  # should not update it
+
+
+def test_sets_cache(db, oaisets):
+    """Test caching for OAISets."""
+    cache = {}
+    rec = {
+        '_oai': {
+            'sets': ['user-c1', 'extra', ],
+        }
+    }
+    update_oaisets_cache(cache, rec)
+    assert cache['user-c1'].search_pattern is None
+    assert cache['extra'].search_pattern == 'title:extra'  # see in conftest
+
+    with patch.object(OAISet, 'query') as query_mock:
+        # Mock the sqlalchemy query API
+        q_result_mock = MagicMock()
+        q_result_mock.count = 1
+        q_result_mock.one().search_pattern = None
+        query_mock.filter_by = MagicMock(return_value=q_result_mock)
+        r = {
+            'communities': ['c1', 'c2'],
+            '_oai': {
+                'id': 'some_id_1234',
+                'updated': 'timestamp',
+                'sets': ['user-c1', 'extra', 'user-c2']
+            }
+        }
+        assert not requires_sync(r, cache=cache)  # Should not require sync
+        # Should be only called once for the item not in cache
+        query_mock.filter_by.assert_called_once_with(spec='user-c2')
