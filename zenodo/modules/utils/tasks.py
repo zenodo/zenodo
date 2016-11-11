@@ -26,6 +26,7 @@ from datetime import datetime
 
 from celery import shared_task
 from celery.utils.log import get_task_logger
+from dictdiffer import diff
 from flask import current_app
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
@@ -38,6 +39,9 @@ from zenodo.modules.records.minters import zenodo_oaiid_minter
 
 logger = get_task_logger(__name__)
 
+#
+# OAI Syncing task
+#
 # Cache object for fetched OAISets
 OAISetCache = namedtuple('OAISetCache', ('search_pattern', ))
 
@@ -139,3 +143,46 @@ def sync_record_oai(uuid, cache=None):
             RecordIndexer().bulk_index([str(rec.id), ])
             logger.info('Matching OAI PID ({pid}) for record {id}'.format(
                 pid=pid, id=uuid))
+
+
+#
+# Files metadata repair task
+#
+def has_corrupted_files_meta(record):
+    """Determine whether the metadata contains corrupted files information."""
+    rb = record['_buckets']['record']
+    return any(f['bucket'] != rb for f in record.get('_files', []))
+
+
+def recent_non_corrupted_revision(record):
+    """Get the most recent non-corrupted revision of a record."""
+    return next(filter(lambda rev: not has_corrupted_files_meta(rev),
+                       reversed(record.revisions)))
+
+
+def files_diff_safe(files_diff):
+    """Make sure there is no unsafe operation on files dictionaries."""
+    # Mark diff as unsafe if there are any additions or removals of files
+    if any(op[0] in ('add', 'remove') for op in files_diff):
+        return False
+    # Mark diff as unsafe if the changes include fields other than the
+    # bucket or version_if
+    changes = filter(lambda op: op[0] == 'change', files_diff)
+    if any(op[1][1] not in ('bucket', 'version_id') for op in changes):
+        return False
+    return True
+
+
+@shared_task
+def repair_record_metadata(uuid):
+    """Repair the record's metadata using a reference revision."""
+    rec = Record.get_record(uuid)
+    good_revision = recent_non_corrupted_revision(rec)
+    if '_internal' in good_revision:
+        rec['_internal'] = good_revision['_internal']
+    files_diff = list(diff(rec['_files'], good_revision['_files']))
+    if files_diff_safe(files_diff):
+        rec['_files'] = good_revision['_files']
+    rec.commit()
+    db.session.commit()
+    RecordIndexer().bulk_index([str(rec.id), ])
