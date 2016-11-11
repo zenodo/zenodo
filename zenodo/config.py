@@ -730,6 +730,9 @@ PREVIEWER_CSV_VALIDATION_BYTES = 2 * 1024
 OAISERVER_RECORD_INDEX = 'records'
 #: OAI identifier prefix
 OAISERVER_ID_PREFIX = 'oai:zenodo.org:'
+#: Managed OAI identifier prefixes
+OAISERVER_MANAGED_ID_PREFIXES = [OAISERVER_ID_PREFIX,
+                                 'oai:openaire.cern.ch:', ]
 #: Number of records to return per page in OAI-PMH results.
 OAISERVER_PAGE_SIZE = 100
 #: Increase resumption token expire time.

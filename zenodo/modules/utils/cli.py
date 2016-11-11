@@ -33,9 +33,13 @@ import click
 from flask_cli import with_appcontext
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
+from invenio_pidstore.models import PersistentIdentifier
+from invenio_records.api import Record
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
+
+from .tasks import sync_record_oai, update_oaisets_cache
 
 
 @click.group()
@@ -225,3 +229,30 @@ def list_files(recid):
             u'{idx:3}: "{key}", {checksum}, size:{size}'
             u''.format(idx=idx, key=key, checksum=f.checksum, size=f.size),
             fg='green'))
+
+
+@utils.command('sync_oai')
+@click.option('--eager', '-e', is_flag=True)
+@click.option('--oai-cache', is_flag=True)
+@click.option('--uuid', '-i')
+@with_appcontext
+def sync_oai(eager, oai_cache, uuid):
+    """Update OAI IDs in the records."""
+    if uuid:
+        sync_record_oai(str(uuid))
+    else:
+        pids = PersistentIdentifier.query.filter(
+            PersistentIdentifier.pid_type == 'recid',
+            PersistentIdentifier.object_type == 'rec',
+            PersistentIdentifier.status == 'R')
+        uuids = (pid.get_assigned_object() for pid in pids)
+        oaisets_cache = {} if oai_cache else None
+        with click.progressbar(uuids, length=pids.count()) as uuids_bar:
+            for uuid in uuids_bar:
+                if oai_cache:
+                    rec = Record.get_record(uuid)
+                    update_oaisets_cache(oaisets_cache, rec)
+                if eager:
+                    sync_record_oai(str(uuid), cache=oaisets_cache)
+                else:
+                    sync_record_oai.delay(str(uuid), cache=oaisets_cache)

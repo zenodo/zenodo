@@ -41,6 +41,7 @@ known_first_party = zenodo
 known_third_party = dojson, flask_celeryext, invenio_access,invenio_accounts,invenio_admin,invenio_assets,invenio_base,invenio_celery,invenio_config,invenio_db,invenio_files_rest,invenio_formatter,invenio_github,invenio_i18n,invenio_indexer,invenio_jsonschemas,invenio_logging,invenio_mail,invenio_marc21,invenio_migrator,invenio_oaiserver,invenio_oauth2server,invenio_oauthclient,invenio_openaire,invenio_pages,invenio_pidstore,invenio_previewer,invenio_records_rest,invenio_records_ui,invenio_records,invenio_rest,invenio_search_ui,invenio_search,invenio_theme,invenio_userprofiles,invenio
 multi_line_output = 2
 default_section = THIRDPARTY
+skip = .eggs
 
 # RST files (used by sphinx)
 [*.rst]

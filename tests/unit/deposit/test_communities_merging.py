@@ -56,6 +56,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
 
     # Should contain just an InclusionRequest
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
     assert InclusionRequest.query.count() == 1
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'c1'
@@ -68,6 +69,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     db.session.commit()
     assert InclusionRequest.query.count() == 0
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
 
     # Open for edit and request another community
     deposit = deposit.edit()
@@ -77,6 +79,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     deposit['communities'] = ['c1', 'c2', ]
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
     assert InclusionRequest.query.count() == 1
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'c2'
@@ -93,6 +96,7 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     assert InclusionRequest.query.count() == 0
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
 
     # Request for removal from a previously accepted community 'c1'
     deposit['communities'] = []
@@ -100,10 +104,11 @@ def test_basic_community_workflow(app, db, communities, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     assert not deposit.get('communities', [])
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
     assert InclusionRequest.query.count() == 0
 
 
-def test_accept_while_edit(app, db, communities, deposit, deposit_file):
+def test_accept_while_edit(app, db, communities, deposit, es, deposit_file):
     """Test deposit publishing with concurrent events.
 
     Accept a record, while deposit in open edit and then published.
@@ -114,12 +119,14 @@ def test_accept_while_edit(app, db, communities, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
 
     # Open for edit
     deposit = deposit.edit()
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert not record.get('communities', [])
+    assert not record['_oai'].get('sets', [])
     assert InclusionRequest.query.count() == 2
 
     # Accept a record meanwhile
@@ -133,6 +140,7 @@ def test_accept_while_edit(app, db, communities, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['c1', 'c2']
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1', ])
     assert InclusionRequest.query.count() == 1
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'c2'
@@ -238,8 +246,9 @@ def test_remove_community_by_key_del(app, db, communities, deposit,
     """Test removal of communities by key deletion.
 
     Communities can be removed by not providing or deleting the communities
-    from the key depsit. Moremover, the redundant 'empty' keys should not be
-    automatically added to deposit nor record."""
+    from the key deposit. Moreover, the redundant 'empty' keys should not be
+    automatically added to deposit nor record.
+    """
     # If 'communities' key was not in deposit metadata,
     # it shouldn't be automatically added
     assert 'communities' not in deposit
@@ -247,6 +256,7 @@ def test_remove_community_by_key_del(app, db, communities, deposit,
     pid, record = deposit.fetch_published()
     assert 'communities' not in deposit
     assert 'communities' not in record
+    assert not record['_oai'].get('sets', [])
 
     # Request for 'c1' and 'c2'
     deposit = deposit.edit()
@@ -255,6 +265,7 @@ def test_remove_community_by_key_del(app, db, communities, deposit,
     pid, record = deposit.fetch_published()
     # No reason to have 'communities' in record since nothing was accepted
     assert 'communities' not in record
+    assert not record['_oai'].get('sets', [])
 
     # Accept 'c1'
     c1 = Community.get('c1')
@@ -265,6 +276,7 @@ def test_remove_community_by_key_del(app, db, communities, deposit,
     assert deposit['communities'] == ['c1', 'c2', ]
     assert InclusionRequest.query.count() == 1
     assert record['communities'] == ['c1', ]
+    assert set(record['_oai']['sets']) == set(['user-c1'])
 
     # Remove the key from deposit and publish
     deposit = deposit.edit()
@@ -274,6 +286,7 @@ def test_remove_community_by_key_del(app, db, communities, deposit,
     assert 'communities' not in deposit
     assert 'communities' not in record
     assert InclusionRequest.query.count() == 0
+    assert not record['_oai'].get('sets', [])
 
 
 def test_autoaccept_owned_communities(app, db, users, communities, deposit,
@@ -305,8 +318,8 @@ def test_autoaccept_owned_communities(app, db, users, communities, deposit,
     assert ir2.id_record == record.id
 
 
-def test_fixed_communities(app, db, users, communities, deposit, deposit_file,
-                           communities_autoadd_enabled):
+def test_fixed_communities(app, db, users, communities, es, deposit,
+                           deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
 
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
@@ -316,14 +329,17 @@ def test_fixed_communities(app, db, users, communities, deposit, deposit_file,
     deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c3', 'ecfunded']
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'user-c3'])
     assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'zenodo'
     assert ir.id_record == record.id
 
 
-def test_fixed_autoadd_redundant(app, db, users, communities, deposit,
-                                 deposit_file, communities_autoadd_enabled):
+def test_fixed_autoadd_redundant(app, db, users, communities, es,
+                                 deposit, deposit_file,
+                                 communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities."""
 
     deposit['grants'] = [{'title': 'SomeGrant'}, ]
@@ -335,14 +351,17 @@ def test_fixed_autoadd_redundant(app, db, users, communities, deposit,
     deposit = _publish_and_expunge(db, deposit)
     pid, record = deposit.fetch_published()
     assert record['communities'] == ['c3', 'ecfunded']
+    assert set(record['_oai']['sets']) == \
+        set(['user-ecfunded', 'user-c3'])
     assert deposit['communities'] == ['c3', 'ecfunded', 'zenodo']
     ir = InclusionRequest.query.one()
     assert ir.id_community == 'zenodo'
     assert ir.id_record == record.id
 
 
-def test_fixed_communities_edit(app, db, users, communities, deposit,
-                                deposit_file, communities_autoadd_enabled):
+def test_fixed_communities_edit(app, db, users, communities, es,
+                                deposit, deposit_file,
+                                communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
     Add to ecfunded also after later addition of grant information.
@@ -362,10 +381,11 @@ def test_fixed_communities_edit(app, db, users, communities, deposit,
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['ecfunded', 'zenodo', ]
     assert record['communities'] == ['ecfunded', ]
+    assert set(record['_oai']['sets']) == set(['user-ecfunded'])
 
 
 def test_fixed_autoadd_edit_redundant(app, db, users, communities, deposit,
-                                      deposit_file,
+                                      es, deposit_file,
                                       communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
@@ -389,6 +409,7 @@ def test_fixed_autoadd_edit_redundant(app, db, users, communities, deposit,
     pid, record = deposit.fetch_published()
     assert deposit['communities'] == ['ecfunded', 'zenodo', ]
     assert record['communities'] == ['ecfunded', ]
+    assert set(record['_oai']['sets']) == set(['user-ecfunded'])
 
 
 def test_nonexisting_communities(app, db, users, communities, deposit,

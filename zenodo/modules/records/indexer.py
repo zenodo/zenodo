@@ -30,14 +30,13 @@ from __future__ import absolute_import, print_function
 def indexer_receiver(sender, json=None, record=None, index=None,
                      **dummy_kwargs):
     """Connect to before_record_index signal to transform record for ES."""
-    if not index.startswith('records-'):
+    if not index.startswith('records-') or record.get('$schema') is None:
         return
-    # Remove files from index if record is not open access.
-    try:
-        if json['access_right'] != 'open' and '_files' in json:
-            del json['_files']
-    except Exception:
-        raise
 
+    # Remove files from index if record is not open access.
+    if json['access_right'] != 'open' and '_files' in json:
+        del json['_files']
+
+    # Remove internal data.
     if '_internal' in json:
         del json['_internal']
