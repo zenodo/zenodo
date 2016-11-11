@@ -35,11 +35,13 @@ from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
+from invenio_records.models import RecordMetadata
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
-from .tasks import sync_record_oai, update_oaisets_cache
+from .tasks import has_corrupted_files_meta, repair_record_metadata, \
+    sync_record_oai, update_oaisets_cache
 
 
 @click.group()
@@ -256,3 +258,33 @@ def sync_oai(eager, oai_cache, uuid):
                     sync_record_oai(str(uuid), cache=oaisets_cache)
                 else:
                     sync_record_oai.delay(str(uuid), cache=oaisets_cache)
+
+
+@utils.command('repair_corrupted_metadata')
+@click.option('--eager', '-e', is_flag=True)
+@click.option('--uuid', '-i')
+@with_appcontext
+def repair_corrupted_metadata(eager, uuid):
+    """Repair the corrupted '_files', '_oai' and '_internal' metadata."""
+    if uuid:
+        record = Record.get_record(uuid)
+        if has_corrupted_files_meta(record):
+            repair_record_metadata(str(uuid))
+    else:
+        rms = db.session.query(RecordMetadata).join(
+            PersistentIdentifier,
+            PersistentIdentifier.object_uuid == RecordMetadata.id).filter(
+                PersistentIdentifier.pid_type == 'recid',
+                PersistentIdentifier.status == 'R',
+                PersistentIdentifier.object_type == 'rec')
+
+        uuids = [r.id for r in rms if has_corrupted_files_meta(r.json)]
+        if not click.confirm('Will update {cnt} records. Continue?'.format(
+                cnt=len(uuids))):
+            return
+        with click.progressbar(uuids, length=len(uuids)) as uuids_bar:
+            for uuid in uuids_bar:
+                if eager:
+                    repair_record_metadata(str(uuid))
+                else:
+                    repair_record_metadata.delay(str(uuid))
