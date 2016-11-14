@@ -75,7 +75,7 @@ def add_file(recid, fp, replace_existing):
 
     obj = ObjectVersion.get(bucket, key)
     if obj is not None and not replace_existing:
-        click.echo(click.style(u'File with key "{key}" alreay exists.'
+        click.echo(click.style(u'File with key "{key}" already exists.'
                    u' Use `--replace-existing/-f` to overwrite it.'.format(
                         key=key, recid=recid), fg='red'))
         return
