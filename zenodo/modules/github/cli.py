@@ -40,51 +40,48 @@ def github():
     """Management commands for GitHub."""
 
 
-def user_param(ctx, param, value):
+def resolve_user(user_param):
     """Resolve user from CLI input parameter (email or User ID)."""
-    if value is None:
+    if user_param is None:
         return
-    if '@' in value:  # Try to resolve as email
+    if '@' in user_param:  # Try to resolve as email
         try:
-            user = User.query.filter_by(email=value.strip()).one()
-            # gha = GitHubAPI(user_id=user.id)
-            # if gha.api.me().email != user.email:
-
+            user = User.query.filter_by(email=user_param.strip()).one()
         except NoResultFound:
-            raise Exception("User {0} not found.".format(value))
+            raise Exception("User {0} not found.".format(user_param))
     else:
         try:
-            user_id = int(value)
+            user_id = int(user_param)
             user = User.query.get(user_id)
         except ValueError:
             raise Exception("User parameter must be either an email or ID")
         if user is None:
-            raise Exception("User {0} not found.".format(value))
+            raise Exception("User {0} not found.".format(user_param))
     return user
 
 
-def repo_param(ctx, param, value):
+def resolve_repo(repo_param):
     """Resolve GitGub repository CLI input parameter (name or GitHub ID)."""
-    if value is None:
+    if repo_param is None:
         return
     try:
-        if '/' in value:
-            repo = Repository.query.filter_by(name=value).one()
+        if '/' in repo_param:
+            repo = Repository.query.filter_by(name=repo_param).one()
         else:
             try:
-                github_id = int(value)
+                github_id = int(repo_param)
             except ValueError:
                 raise Exception('GitHub repository parameter must be either'
                                 ' a name or GitHub ID')
             repo = Repository.query.filter_by(github_id=github_id).one()
     except NoResultFound:
-        raise Exception("Repository {0} not found.".format(value))
+        raise Exception("Repository {0} not found.".format(repo_param))
     return repo
 
 
-def repo_param_multiple(ctx, param, value):
-    """Resolve GitHub repository param with 'multiple' flag."""
-    return tuple(repo_param(ctx, param, v) for v in value)
+def resolve_repos(repo_params):
+    """Resolve multiple GitHub repository param with 'multiple' flag."""
+    return tuple(resolve_repo(p) for p in repo_params)
 
 
 def verify_email(user):
@@ -98,13 +95,8 @@ def verify_email(user):
                       abort=True)
 
 
-@github.group()
-def repo():
-    """Repository management commands."""
-
-
-@repo.command('list')
-@click.argument('user', callback=user_param)
+@github.command('list')
+@click.argument('user')
 @click.option('--sync', '-s', is_flag=True,
               help='Sync the repository prior to listing.')
 @click.option('with_all', '--all', '-a', is_flag=True,
@@ -123,10 +115,11 @@ def repo_list(user, sync, with_all, skip_email):
 
     Examples:
 
-      repo list foo@bar.baz
+      github list foo@bar.baz
 
-      repo list 12345 --sync --all
+      github list 12345 --sync --all
     """
+    user = resolve_user(user)
     gha = GitHubAPI(user_id=user.id)
     if not skip_email:
         verify_email(user)
@@ -153,9 +146,9 @@ def move_repository(repo, gha_old_user, gha_new_user):
     db.session.commit()
 
 
-@repo.command()
-@click.argument('old_user', callback=user_param)
-@click.argument('new_user', callback=user_param)
+@github.command()
+@click.argument('old_user')
+@click.argument('new_user')
 @click.option('skip_email', '--skip-email-verification', '-E', is_flag=True,
               help="Skip GitHub email verification.")
 @click.option('--yes-i-know', is_flag=True, default=False,
@@ -168,10 +161,12 @@ def transfer(old_user, new_user, skip_email, yes_i_know):
 
     Examples:
 
-      transfer user1@foo.org user2@baz.bar
+      github transfer user1@foo.org user2@baz.bar
 
-      transfer 1234 4567
+      github transfer 1234 4567
     """
+    old_user = resolve_user(old_user)
+    new_user = resolve_user(new_user)
     repos = Repository.query.filter_by(user_id=old_user.id)
     prompt_msg = 'This will change the ownership for {0} repositories' \
         '. Continue?'.format(repos.count())
@@ -188,9 +183,9 @@ def transfer(old_user, new_user, skip_email, yes_i_know):
         move_repository(repo, gha_old, gha_new)
 
 
-@repo.command()
-@click.argument('user', callback=user_param)
-@click.argument('repos', callback=repo_param_multiple, nargs=-1)
+@github.command()
+@click.argument('user')
+@click.argument('repos', nargs=-1)
 @click.option('skip_email', '--skip-email-verification', '-E', is_flag=True,
               help="Skip GitHub email verification.")
 @click.option('--yes-i-know', is_flag=True, default=False,
@@ -208,12 +203,14 @@ def assign(user, repos, skip_email, yes_i_know):
 
         Assign repository 'foobar-org/repo-name' to user 'user1@foo.org':
 
-      assign user1@foo.org foobar-org/repo-name
+      github assign user1@foo.org foobar-org/repo-name
 
         Assign three GitHub repositories to user with ID 999:
 
-      assign 999 15001500 baz-org/somerepo 12001200
+      github assign 999 15001500 baz-org/somerepo 12001200
     """
+    user = resolve_user(user)
+    repos = resolve_repos(repos)
     prompt_msg = 'This will change the ownership for {0} repositories' \
         '. Continue?'.format(len(repos))
     if not (yes_i_know or click.confirm(prompt_msg)):
@@ -228,13 +225,8 @@ def assign(user, repos, skip_email, yes_i_know):
         move_repository(repo, gha_prev, gha_new)
 
 
-@github.group()
-def hook():
-    """Hook management commands."""
-
-
-@hook.command()
-@click.argument('user', callback=user_param)
+@github.command()
+@click.argument('user')
 @click.option('--hooks', default=False, type=bool,
               help='Synchronize with hooks (Warning: slower)')
 @click.option('--async-hooks', default=False, type=bool,
@@ -249,10 +241,11 @@ def sync(user, hooks, async_hooks, skip_email):
 
     Examples:
 
-      sync foo@bar.baz
+      github sync foo@bar.baz
 
-      sync 999
+      github sync 999
     """
+    user = resolve_user(user)
     gh_api = GitHubAPI(user_id=user.id)
     gh_api.sync(hooks=hooks, async_hooks=async_hooks)
     if not skip_email:
@@ -260,15 +253,15 @@ def sync(user, hooks, async_hooks, skip_email):
     db.session.commit()
 
 
-@hook.command()
-@click.argument('user', callback=user_param)
-@click.argument('repo', callback=repo_param)
+@github.command()
+@click.argument('user')
+@click.argument('repo')
 @click.option('skip_email', '--skip-email-verification', '-E', is_flag=True,
               help="Skip GitHub email verification.")
 @click.option('--yes-i-know', is_flag=True, default=False,
               help='Suppress the confirmation prompt.')
 @with_appcontext
-def create(user, repo, skip_email, yes_i_know):
+def createhook(user, repo, skip_email, yes_i_know):
     """Create the hook in repository for given user.
 
     USER can be either an email or a user ID.
@@ -277,10 +270,12 @@ def create(user, repo, skip_email, yes_i_know):
 
     Examples:
 
-      hook create abc@foo.bar foobar-org/foobar-repo
+      github createhook abc@foo.bar foobar-org/foobar-repo
 
-      hook create 12345 55555
+      github createhook 12345 55555
     """
+    user = resolve_user(user)
+    repo = resolve_repo(repo)
     if repo.user:
         click.secho('Hook is already installed for {user}'.format(
             user=repo.user), fg='red')
@@ -298,16 +293,15 @@ def create(user, repo, skip_email, yes_i_know):
     db.session.commit()
 
 
-@hook.command()
-@click.argument('repo', callback=repo_param)
-@click.option('--user', '-u', help='Attempt to remove hook using given user',
-              callback=user_param)
+@github.command()
+@click.argument('repo')
+@click.option('--user', '-u', help='Attempt to remove hook using given user')
 @click.option('skip_email', '--skip-email-verification', '-E', is_flag=True,
               help="Skip GitHub email verification.")
 @click.option('--yes-i-know', is_flag=True, default=False,
               help='Suppress the confirmation prompt.')
 @with_appcontext
-def remove(repo, user, skip_email, yes_i_know):
+def removehook(repo, user, skip_email, yes_i_know):
     """Remove the hook from GitHub repository.
 
     Positional argment REPO can be either the repository name, e.g.
@@ -316,15 +310,17 @@ def remove(repo, user, skip_email, yes_i_know):
 
     Examples:
 
-      hook remove foobar-org/foobar-repo
+      github removehook foobar-org/foobar-repo
 
-      hook remove 55555 -u foo@bar.baz
+      github removehook 55555 -u foo@bar.baz
     """
+    repo = resolve_repo(repo)
     if not repo.user and not user:
         click.secho("Repository doesn't have an owner, please specify a user.")
         return
 
     if user:
+        user = resolve_user(user)
         if not repo.user:
             click.secho('Warning: Repository is not owned by any user.',
                         fg='yellow')
