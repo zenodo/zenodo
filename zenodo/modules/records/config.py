@@ -85,3 +85,21 @@ ZENODO_RELATION_TYPES = [
 ]
 
 ZENODO_LOCAL_DOI_PREFIXES = []
+
+
+ZENODO_DOIID4RECID = {
+    7468: 7448,
+    7458: 7457,
+    7467: 7447,
+    7466: 7446,
+    7465: 7464,
+    7469: 7449,
+    7487: 7486,
+    7482: 7481,
+    7484: 7483,
+}
+"""Mapping of recids to the id used in generated DOIs.
+
+Wrong DOIs were minted for a short period in 2013 due to mistake in the legacy
+system.
+"""

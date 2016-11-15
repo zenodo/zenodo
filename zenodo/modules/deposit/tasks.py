@@ -33,6 +33,7 @@ from invenio_pidstore.models import PIDStatus
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
 
+from zenodo.modules.records.minters import is_local_doi
 from zenodo.modules.records.serializers import datacite_v31
 
 
@@ -46,6 +47,10 @@ def datacite_register(pid_value, record_uuid):
     """
     try:
         record = Record.get_record(record_uuid)
+        # Bail out if not a Zenodo DOI.
+        if not is_local_doi(record['doi']):
+            return
+
         dcp = DataCiteProvider.get(record['doi'])
 
         url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(

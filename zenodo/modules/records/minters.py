@@ -40,6 +40,7 @@ from invenio_pidstore.providers.recordid import RecordIdProvider
 
 def doi_generator(recid, prefix=None):
     """Generate a DOI."""
+    recid = current_app.config['ZENODO_DOIID4RECID'].get(recid, recid)
     return '{prefix}/zenodo.{recid}'.format(
         prefix=prefix or current_app.config['PIDSTORE_DATACITE_DOI_PREFIX'],
         recid=recid
