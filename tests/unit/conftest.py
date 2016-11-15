@@ -34,6 +34,7 @@ from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
+from click.testing import CliRunner
 from elasticsearch.exceptions import RequestError
 from flask import url_for
 from flask.cli import ScriptInfo
@@ -48,8 +49,10 @@ from invenio_deposit.permissions import \
     action_admin_access as deposit_admin_access
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
+from invenio_github.models import Repository
 from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
+from invenio_oauthclient.models import RemoteAccount
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
@@ -63,6 +66,7 @@ from sqlalchemy_utils.functions import create_database, database_exists
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
+from zenodo.modules.github.cli import github
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
@@ -749,3 +753,112 @@ def resolver():
     """Get a record resolver."""
     return Resolver(
         pid_type='recid', object_type='rec', getter=Record.get_record)
+
+
+#
+# GitHub-specific conftest
+#
+@pytest.yield_fixture
+def cli_run(app):
+    """Fixture for CLI runner function.
+
+    Returns a function accepting a single parameter (CLI command as string).
+    """
+    runner = CliRunner()
+    script_info = ScriptInfo(create_app=lambda info: app)
+
+    def run(command):
+        """Run the command from the CLI."""
+        command_args = command.split()
+        return runner.invoke(github, command_args, obj=script_info)
+    yield run
+
+
+@pytest.fixture
+def g_users_data():
+    """Data for users objects."""
+    return [
+        {'email': 'u1@foo.bar', 'password': '123456'},
+        {'email': 'u2@foo.bar', 'password': '123456'},
+    ]
+
+
+@pytest.fixture
+def g_users(app, db, g_users_data):
+    """Fixture that contains multiple users for CLI/API tests."""
+    datastore = app.extensions['security'].datastore
+    for ud in g_users_data:
+        user = datastore.create_user(**ud)
+        db.session.commit()
+        ud['id'] = user.id
+    return g_users_data
+
+
+@pytest.fixture
+def g_remoteaccounts_data(g_users):
+    """Data for RemoveAccount objects."""
+    return [
+        {
+            'user_id': g_users[0]['id'],
+            'extra_data': {
+                'repos': {
+                    '8000': {
+                        'full_name': 'foo/bar',
+                    },
+                    '8002': {
+                        'full_name': 'bacon/eggs',
+                    },
+                    '8003': {
+                        'full_name': 'other/repo',
+                    },
+                }
+            },
+        }
+    ]
+
+
+@pytest.fixture
+def g_remoteaccounts(app, db, g_remoteaccounts_data):
+    """Fixture for RemoteAccount objects."""
+    for rad in g_remoteaccounts_data:
+        ra = RemoteAccount.create(rad['user_id'], 'changeme',
+                                  rad['extra_data'])
+        db.session.add(ra)
+        db.session.commit()
+        rad['id'] = ra.id
+    return g_remoteaccounts_data
+
+
+@pytest.fixture
+def g_repositories_data(g_users):
+    """Data for repositories."""
+    return [
+        {'name': 'foo/bar', 'github_id': 8000, 'user_id': g_users[0]['id']},
+        {'name': 'baz/spam', 'github_id': 8001},
+        {'name': 'bacon/eggs', 'github_id': 8002, 'user_id': g_users[0]['id']},
+    ]
+
+
+@pytest.fixture
+def g_repositories(app, db, g_repositories_data):
+    """Fixture for GitHub Repository objects."""
+    for rd in g_repositories_data:
+        repository = Repository(**rd)
+        # We don't call GitHub hence the hook is not important, yet it should
+        # be not null
+        repository.hook = 12345
+        db.session.add(repository)
+        db.session.commit()
+        rd['id'] = repository.id
+    return g_repositories_data
+
+
+@pytest.fixture
+def g_tester_id(app, db):
+    """Fixture that contains the test data for models tests."""
+    datastore = app.extensions['security'].datastore
+    tester = datastore.create_user(
+        email='info@inveniosoftware.org', password='tester',
+    )
+    db.session.commit()
+    return tester.id
