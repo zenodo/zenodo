@@ -33,24 +33,24 @@ from mock import patch
 
 
 def test_hook_sync(app, cli_run, g_tester_id):
-    """Test 'hook sync' CLI."""
+    """Test 'sync' CLI."""
     # Test with user's email
     with patch.object(GitHubAPI, 'sync') as mock_obj:
-        ret = cli_run('hook sync info@inveniosoftware.org -E')
+        ret = cli_run('sync info@inveniosoftware.org -E')
     assert ret.exit_code == 0
     assert ret.output == ''
     mock_obj.assert_called_once_with(hooks=False, async_hooks=False)
 
     # Test call with user ID
     with patch.object(GitHubAPI, 'sync') as mock_obj:
-        ret = cli_run('hook sync {0} -E'.format(g_tester_id))
+        ret = cli_run('sync {0} -E'.format(g_tester_id))
     assert ret.exit_code == 0
     assert ret.output == ''
     mock_obj.assert_called_once_with(hooks=False, async_hooks=False)
 
     # Test call with flags
     with patch.object(GitHubAPI, 'sync') as mock_obj:
-        ret = cli_run('hook sync info@inveniosoftware.org --hooks True'
+        ret = cli_run('sync info@inveniosoftware.org --hooks True'
                       ' --async-hooks=True -E')
     assert ret.exit_code == 0
     assert ret.output == ''
@@ -58,22 +58,22 @@ def test_hook_sync(app, cli_run, g_tester_id):
 
 
 def test_hook_create(app, cli_run, g_users, g_repositories):
-    """Test 'hook create' CLI."""
+    """Test 'createhook' CLI."""
     with patch.object(GitHubAPI, 'create_hook') as mock_obj:
-        ret = cli_run('hook create u1@foo.bar foo/bar --yes-i-know -E')
+        ret = cli_run('createhook u1@foo.bar foo/bar --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output.startswith('Hook is already installed for')
     assert not mock_obj.called
 
     repo = g_repositories[1]  # baz/spam repository
     with patch.object(GitHubAPI, 'create_hook') as mock_obj:
-        ret = cli_run('hook create u1@foo.bar baz/spam --yes-i-know -E')
+        ret = cli_run('createhook u1@foo.bar baz/spam --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output == ''
     mock_obj.assert_called_once_with(repo['github_id'], repo['name'])
 
     with patch.object(GitHubAPI, 'create_hook') as mock_obj:
-        ret = cli_run('hook create u1@foo.bar {0} --yes-i-know -E'.format(
+        ret = cli_run('createhook u1@foo.bar {0} --yes-i-know -E'.format(
             repo['github_id']))
     assert ret.output == ''
     assert ret.exit_code == 0
@@ -81,27 +81,27 @@ def test_hook_create(app, cli_run, g_users, g_repositories):
 
 
 def test_hook_remove(app, cli_run, g_users, g_repositories):
-    """Test 'hook remove' CLI."""
+    """Test 'removehook' CLI."""
     repo0 = g_repositories[0]  # foo/bar repository, owned by u1
     repo1 = g_repositories[1]  # baz/spam repository, orphaned
 
     # Remove hook from an 'enabled' repo without a user
     with patch.object(GitHubAPI, 'remove_hook') as mock_obj:
-        ret = cli_run('hook remove foo/bar --yes-i-know -E')
+        ret = cli_run('removehook foo/bar --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output == ''
     mock_obj.assert_called_once_with(repo0['github_id'], repo0['name'])
 
     # Remove hook from an 'enabled' repo with owner specified
     with patch.object(GitHubAPI, 'remove_hook') as mock_obj:
-        ret = cli_run('hook remove foo/bar -u u1@foo.bar --yes-i-know -E')
+        ret = cli_run('removehook foo/bar -u u1@foo.bar --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output == ''
     mock_obj.assert_called_once_with(repo0['github_id'], repo0['name'])
 
     # Remove hook from an 'enabled' repo with non-owner specified
     with patch.object(GitHubAPI, 'remove_hook') as mock_obj:
-        ret = cli_run('hook remove foo/bar -u u2@foo.bar --yes-i-know -E')
+        ret = cli_run('removehook foo/bar -u u2@foo.bar --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output == \
         'Warning: Specified user is not the owner of this repository.\n'
@@ -109,7 +109,7 @@ def test_hook_remove(app, cli_run, g_users, g_repositories):
 
     # Remove hook from an orphaned repo without specifying a user
     with patch.object(GitHubAPI, 'remove_hook') as mock_obj:
-        ret = cli_run('hook remove baz/spam --yes-i-know -E')
+        ret = cli_run('removehook baz/spam --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output == \
         "Repository doesn't have an owner, please specify a user.\n"
@@ -117,16 +117,16 @@ def test_hook_remove(app, cli_run, g_users, g_repositories):
 
     # Remove hook from an orphaned repo with user specified
     with patch.object(GitHubAPI, 'remove_hook') as mock_obj:
-        ret = cli_run('hook remove baz/spam -u u1@foo.bar --yes-i-know -E')
+        ret = cli_run('removehook baz/spam -u u1@foo.bar --yes-i-know -E')
     assert ret.exit_code == 0
     assert ret.output == 'Warning: Repository is not owned by any user.\n'
     mock_obj.assert_called_once_with(repo1['github_id'], repo1['name'])
 
 
 def test_repo_list(app, cli_run, g_users, g_repositories, g_remoteaccounts):
-    """Test 'repo list' CLI."""
+    """Test 'list' CLI."""
     # List repos 'owned' by the user
-    ret = cli_run('repo list u1@foo.bar -E')
+    ret = cli_run('list u1@foo.bar -E')
     assert ret.exit_code == 0
     assert ret.output.startswith('User has 2 enabled repositories.')
     assert 'foo/bar:8000' in ret.output
@@ -137,8 +137,8 @@ def test_repo_list(app, cli_run, g_users, g_repositories, g_remoteaccounts):
 @patch.object(GitHubAPI, 'remove_hook')
 @patch.object(GitHubAPI, 'create_hook')
 def test_repo_assign(ch_mock, rh_mock, app, cli_run, g_users, g_repositories):
-    """Test 'repo assign' CLI."""
-    ret = cli_run('repo assign u2@foo.bar 8000 --yes-i-know -E')
+    """Test 'assign' CLI."""
+    ret = cli_run('assign u2@foo.bar 8000 --yes-i-know -E')
     assert ret.exit_code == 0
     rh_mock.assert_called_once_with(8000, 'foo/bar')
     ch_mock.assert_called_once_with(8000, 'foo/bar')
@@ -151,11 +151,11 @@ def test_repo_assign(ch_mock, rh_mock, app, cli_run, g_users, g_repositories):
 @patch.object(GitHubAPI, 'create_hook')
 def test_repo_assign_many(ch_mock, rh_mock, r2, r1, u2, app, cli_run,
                           g_users, g_repositories):
-    """Test 'repo assign' CLI."""
+    """Test 'assign' CLI."""
     # Make sure the 'u2' parameter is correct
     assert g_users[1]['email'] == 'u2@foo.bar'
     assert g_users[1]['id'] == 2
-    cmd = 'repo assign {0} {1} {2} --yes-i-know -E'.format(u2, r1, r2)
+    cmd = 'assign {0} {1} {2} --yes-i-know -E'.format(u2, r1, r2)
     ret = cli_run(cmd)
     assert ret.exit_code == 0
     rh_mock.call_count == 2
@@ -172,14 +172,14 @@ def test_repo_assign_many(ch_mock, rh_mock, r2, r1, u2, app, cli_run,
 @patch.object(GitHubAPI, 'create_hook')
 def test_repo_transfer(ch_mock, rh_mock, u1, u2, app, cli_run, g_users,
                        g_repositories):
-    """Test 'repo transfer' CLI."""
+    """Test 'transfer' CLI."""
     # Make sure the 'u1' and 'u2' parameters are correct
     assert g_users[0]['email'] == 'u1@foo.bar'
     assert g_users[0]['id'] == 1
     assert g_users[1]['email'] == 'u2@foo.bar'
     assert g_users[1]['id'] == 2
-    # 'repo transfer {u2@foo.bar,2} {u1@foo.bar,1} --yes-i-know'
-    cmd = 'repo transfer {0} {1} --yes-i-know -E'.format(u1, u2)
+    # 'transfer {u2@foo.bar,2} {u1@foo.bar,1} --yes-i-know'
+    cmd = 'transfer {0} {1} --yes-i-know -E'.format(u1, u2)
     ret = cli_run(cmd)
     assert ret.exit_code == 0
     rh_mock.call_count == 2
