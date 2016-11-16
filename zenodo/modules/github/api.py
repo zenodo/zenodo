@@ -61,6 +61,11 @@ class ZenodoGitHubRelease(GitHubRelease):
 
         return legacyjson_v1_translator({'metadata': output})
 
+    @property
+    def repo_model(self):
+        """Return repository model from relationship."""
+        return self.model.repository
+
     def publish(self):
         """Publish GitHub release as record."""
         id_ = uuid.uuid4()

@@ -164,27 +164,3 @@ def test_repo_assign_many(ch_mock, rh_mock, r2, r1, u2, app, cli_run,
     rh_mock.assert_any_call(8002, 'bacon/eggs')
     ch_mock.assert_any_call(8000, 'foo/bar')
     ch_mock.assert_any_call(8002, 'bacon/eggs')
-
-
-@pytest.mark.parametrize('u1', ['u1@foo.bar', '1'])
-@pytest.mark.parametrize('u2', ['u2@foo.bar', '2'])
-@patch.object(GitHubAPI, 'remove_hook')
-@patch.object(GitHubAPI, 'create_hook')
-def test_repo_transfer(ch_mock, rh_mock, u1, u2, app, cli_run, g_users,
-                       g_repositories):
-    """Test 'transfer' CLI."""
-    # Make sure the 'u1' and 'u2' parameters are correct
-    assert g_users[0]['email'] == 'u1@foo.bar'
-    assert g_users[0]['id'] == 1
-    assert g_users[1]['email'] == 'u2@foo.bar'
-    assert g_users[1]['id'] == 2
-    # 'transfer {u2@foo.bar,2} {u1@foo.bar,1} --yes-i-know'
-    cmd = 'transfer {0} {1} --yes-i-know -E'.format(u1, u2)
-    ret = cli_run(cmd)
-    assert ret.exit_code == 0
-    rh_mock.call_count == 2
-    ch_mock.call_count == 2
-    rh_mock.assert_any_call(8000, 'foo/bar')
-    rh_mock.assert_any_call(8002, 'bacon/eggs')
-    ch_mock.assert_any_call(8000, 'foo/bar')
-    ch_mock.assert_any_call(8002, 'bacon/eggs')
