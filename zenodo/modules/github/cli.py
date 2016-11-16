@@ -88,7 +88,7 @@ def verify_email(user):
     """Check if user's GitHub and account emails match."""
     gha = GitHubAPI(user_id=user.id)
     gh_email = gha.api.me().email
-    if gh_email == user.email:
+    if gh_email != user.email:
         click.confirm("Warning: User's GitHub email ({0}) does not match"
                       " the account's ({1}). Continue?".format(gh_email,
                                                                user.email),
@@ -141,46 +141,10 @@ def repo_list(user, sync, with_all, skip_email):
 
 def move_repository(repo, gha_old_user, gha_new_user):
     """Transfer repository model and hook from one user to another."""
+    # TODO: Check if both operations are permitted
     gha_old_user.remove_hook(repo.github_id, repo.name)
     gha_new_user.create_hook(repo.github_id, repo.name)
     db.session.commit()
-
-
-@github.command()
-@click.argument('old_user')
-@click.argument('new_user')
-@click.option('skip_email', '--skip-email-verification', '-E', is_flag=True,
-              help="Skip GitHub email verification.")
-@click.option('--yes-i-know', is_flag=True, default=False,
-              help='Suppress the confirmation prompt.')
-@with_appcontext
-def transfer(old_user, new_user, skip_email, yes_i_know):
-    """Transfer all repositories from OLD_USER to NEW_USER and register hooks.
-
-    Values of OLD_USER and NEW_USER can be either emails or user IDs.
-
-    Examples:
-
-      github transfer user1@foo.org user2@baz.bar
-
-      github transfer 1234 4567
-    """
-    old_user = resolve_user(old_user)
-    new_user = resolve_user(new_user)
-    repos = Repository.query.filter_by(user_id=old_user.id)
-    prompt_msg = 'This will change the ownership for {0} repositories' \
-        '. Continue?'.format(repos.count())
-    if not (yes_i_know or click.confirm(prompt_msg)):
-        click.echo('Aborted.')
-
-    gha_new = GitHubAPI(user_id=new_user.id)
-    gha_old = GitHubAPI(user_id=old_user.id)
-
-    if not skip_email:
-        verify_email(new_user)
-        verify_email(old_user)
-    for repo in repos:
-        move_repository(repo, gha_old, gha_new)
 
 
 @github.command()
