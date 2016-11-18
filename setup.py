@@ -141,6 +141,7 @@ install_requires = [
     'Pillow>=3.2.0',
     'python-slugify>=1.2.0',
     'raven<=5.1.0',
+    'sickle>=0.5',
     'uwsgi>=2.0.13.1',
     'uwsgitop>=0.9',
     'wsgi-statsd>=0.3.1',
@@ -175,6 +176,7 @@ setup(
             'zenodo = zenodo.cli:cli',
         ],
         'invenio_base.apps': [
+            'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
             'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
@@ -207,6 +209,7 @@ setup(
             'messages = zenodo',
         ],
         'invenio_celery.tasks': [
+            'zenodo_auditor = zenodo.modules.auditor.tasks',
             'zenodo_records = zenodo.modules.records.tasks',
             'zenodo_utils = zenodo.modules.utils.tasks',
         ],

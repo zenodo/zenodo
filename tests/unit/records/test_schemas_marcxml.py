@@ -132,7 +132,7 @@ def test_full_record(app, full_record):
             u'terms_governing_use_and_reproduction': u'Creative Commons'
         },
         u'communities': [
-            u'zenodo'
+            u'zenodo',
         ],
         u'funding_information_note': [
             {u'grant_number': u'1234', u'text_of_note': u'Grant Title'},

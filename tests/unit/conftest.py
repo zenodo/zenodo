@@ -30,6 +30,7 @@ import json
 import os
 import shutil
 import tempfile
+from copy import deepcopy
 from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
@@ -67,6 +68,7 @@ from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
 from zenodo.modules.github.cli import github
+from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
@@ -362,6 +364,14 @@ def recid_pid():
 
 
 @pytest.fixture()
+def oaiid_pid():
+    """PID for OAI id."""
+    return PersistentIdentifier(
+        pid_type='oai', pid_value='oai:zenodo.org:123', status='R',
+        object_type='rec', object_uuid=uuid4())
+
+
+@pytest.fixture()
 def bucket(db, location):
     """File system location."""
     b1 = Bucket.create()
@@ -503,7 +513,8 @@ def full_record():
         owners=[1, ],
         _oai={
             'id': 'oai:zenodo.org:1',
-            'sets': ['user-zenodo', 'user-ecfunded']
+            'sets': ['user-zenodo', 'user-ecfunded'],
+            'updated': '2016-01-01T12:00:00Z'
         },
         _deposit={
             'id': '1',
@@ -753,6 +764,32 @@ def resolver():
     """Get a record resolver."""
     return Resolver(
         pid_type='recid', object_type='rec', getter=Record.get_record)
+
+
+@pytest.fixture
+def audit_records(minimal_record, db):
+    """Audit test records."""
+    records = {}
+    for i in (1, 2, 3, 4):
+        record = RecordMetadata()
+        record.json = deepcopy(minimal_record)
+        record.json['recid'] = i
+        record.json['_oai'] = {
+            'id': 'oai:{}'.format(i),
+            'sets': [],
+            'updated': datetime.utcnow().date().isoformat(),
+        }
+
+        db.session.add(record)
+        db.session.commit()
+        records[i] = ZenodoRecord(data=record.json, model=record)
+
+        recid = PersistentIdentifier(pid_type='recid', pid_value=str(i),
+                                     status='R', object_type='rec',
+                                     object_uuid=record.id)
+        db.session.add(recid)
+        db.session.commit()
+    return records
 
 
 #
