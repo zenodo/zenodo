@@ -267,31 +267,29 @@ class ZenodoDeposit(Deposit):
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
         # pop the 'communities' entry so they aren't added to the Record
-        dep_comms = self.pop('communities', [])
+        dep_comms = set(self.pop('communities', []))
 
         # Communities for automatic acceptance
         owned_comms = set(self._filter_by_owned_communities(dep_comms))
 
-        auto_added = self._get_auto_added()
+        auto_added = set(self._get_auto_added())
 
         # Communities for which the InclusionRequest should be made
         # Exclude owned ones and auto added ones
-        new_ir_comms = set(dep_comms) - owned_comms - set(auto_added)
+        new_ir_comms = dep_comms - owned_comms - auto_added
 
         # Communities which are to be auto-requested to each published record
-        auto_request = self._get_auto_requested()
+        auto_request = set(self._get_auto_requested())
 
         # Add the owned communities to the record
-        self._autoadd_communities(owned_comms | set(auto_added), self)
+        self._autoadd_communities(owned_comms | auto_added, self)
 
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
 
-        self._create_inclusion_requests(new_ir_comms | set(auto_request),
-                                        record)
+        self._create_inclusion_requests(new_ir_comms | auto_request, record)
 
         # Push the communities back (if any) so they appear in deposit
-        self['communities'] = sorted(set(dep_comms + auto_added +
-                                         auto_request))
+        self['communities'] = sorted(dep_comms | auto_added | auto_request)
         self._sync_oaisets_with_communities(record)
         if not self['communities']:  # No key rather than empty list
             del self['communities']
@@ -300,42 +298,37 @@ class ZenodoDeposit(Deposit):
     def _publish_edited(self):
         """Publish the edited deposit with communities merging."""
         pid, record = self.fetch_published()
-        dep_comms = self.get('communities', [])
-        rec_comms = record.get('communities', [])
+        dep_comms = set(self.get('communities', []))
+        rec_comms = set(record.get('communities', []))
 
         # Already accepted communities which should be removed
-        removals = set(rec_comms) - set(dep_comms)
+        removals = rec_comms - dep_comms
 
         # New communities by user
-        new_comms = set(dep_comms) - set(rec_comms)
+        new_comms = dep_comms - rec_comms
 
         # New communities, which should be added automatically
         new_owned_comms = set(self._filter_by_owned_communities(new_comms))
 
         # Communities which are to be added to every published record
-        auto_added = self._get_auto_added()
+        auto_added = set(self._get_auto_added())
 
         # New communities, for which the InclusionRequests should be made
-        new_ir_comms = set(new_comms) - new_owned_comms - set(auto_added)
+        new_ir_comms = new_comms - new_owned_comms - auto_added
 
         # Communities which are to be auto-requested to each published record
-        auto_request = set(self._get_auto_requested()) - set(rec_comms)
+        auto_request = set(self._get_auto_requested()) - rec_comms
 
         self._remove_accepted_communities(removals, record)
 
-        self._autoadd_communities(new_owned_comms | set(auto_added), record)
-        self._create_inclusion_requests(new_ir_comms | auto_request,
-                                        record)
+        self._autoadd_communities(new_owned_comms | auto_added, record)
+        self._create_inclusion_requests(new_ir_comms | auto_request, record)
 
         # Remove obsolete InclusionRequests
-        self._remove_obsolete_irs(set(dep_comms) | auto_request, record)
+        self._remove_obsolete_irs(dep_comms | auto_request, record)
 
         # Communities, which should be in record after publishing:
-        new_rec_comms = (
-            (set(dep_comms) & set(rec_comms)) |
-            new_owned_comms |
-            set(auto_added)
-        )
+        new_rec_comms = (dep_comms & rec_comms) | new_owned_comms | auto_added
         edited_record = super(ZenodoDeposit, self)._publish_edited()
 
         # Preserve some of the previously published record fields
@@ -346,7 +339,7 @@ class ZenodoDeposit(Deposit):
 
         # Add communities entry to deposit (self)
         self['communities'] = sorted(set(self.get('communities', [])) |
-                                     set(auto_added) | auto_request)
+                                     auto_added | auto_request)
         if not self['communities']:
             del self['communities']
 

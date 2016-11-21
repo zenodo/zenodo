@@ -38,7 +38,6 @@ from mock import MagicMock, patch
 from zenodo.modules.auditor.oai import OAIAudit, OAICorrespondenceCheck, \
     OAISetResultCheck
 
-
 oai_set_result_count_params = (
     ([], [], [], []),
     (['a', 'b'], ['user-a', 'user-b'], [], []),
