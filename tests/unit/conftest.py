@@ -105,6 +105,7 @@ def default_config():
         MAIL_SUPPRESS_SEND=True,
         LOGIN_DISABLED=False,
         DEPOSIT_DATACITE_MINTING_ENABLED=False,
+        ZENODO_COMMUNITIES_AUTO_ENABLED=False,
         ZENODO_COMMUNITIES_AUTO_REQUEST=['zenodo', ],
         ZENODO_COMMUNITIES_ADD_IF_GRANTS=['grants_comm', ],
         ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],

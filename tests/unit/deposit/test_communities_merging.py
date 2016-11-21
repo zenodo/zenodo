@@ -349,6 +349,39 @@ def test_fixed_autoadd_redundant(app, db, users, communities, deposit,
 
 def test_fixed_communities_edit(app, db, users, communities, deposit,
                                 deposit_file, communities_autoadd_enabled):
+    """Test automatic adding and requesting to fixed communities."""
+    deposit = publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['zenodo', ]
+    assert 'communities' not in record
+    ir = InclusionRequest.query.one()
+    assert ir.id_community == 'zenodo'
+    assert ir.id_record == record.id
+
+    # Open for edit
+    deposit = deposit.edit()
+    # Make sure 'zenodo' community is requested
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['zenodo', ]
+    assert not record.get('communities', [])
+    assert InclusionRequest.query.count() == 1
+
+    comm = Community.get('zenodo')
+    comm.accept_record(record)
+    record.commit()
+    db.session.commit()
+
+    # Publish and make sure nothing is missing
+    deposit = publish_and_expunge(db, deposit)
+    pid, record = deposit.fetch_published()
+    assert deposit['communities'] == ['zenodo']
+    assert record['communities'] == ['zenodo', ]
+    assert record['_oai']['sets'] == ['user-zenodo', ]
+    assert InclusionRequest.query.count() == 0
+
+
+def test_fixed_communities_grants(app, db, users, communities, deposit,
+                                  deposit_file, communities_autoadd_enabled):
     """Test automatic adding and requesting to fixed communities.
 
     Add to grants_comm also after later addition of grant information.

@@ -31,7 +31,7 @@ from speaklater import make_lazy_gettext
 
 _ = make_lazy_gettext(lambda: gettext)
 
-ZENODO_COMMUNITIES_AUTO_ENABLED = False
+ZENODO_COMMUNITIES_AUTO_ENABLED = True
 """Automatically add and request to communities upon publishing."""
 
 ZENODO_COMMUNITIES_AUTO_REQUEST = ['zenodo', ]

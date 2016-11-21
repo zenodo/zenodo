@@ -319,16 +319,16 @@ class ZenodoDeposit(Deposit):
         new_ir_comms = set(new_comms) - new_owned_comms - set(auto_added)
 
         # Communities which are to be auto-requested to each published record
-        auto_request = self._get_auto_requested()
+        auto_request = set(self._get_auto_requested()) - set(rec_comms)
 
         self._remove_accepted_communities(removals, record)
 
         self._autoadd_communities(new_owned_comms | set(auto_added), record)
-        self._create_inclusion_requests(new_ir_comms | set(auto_request),
+        self._create_inclusion_requests(new_ir_comms | auto_request,
                                         record)
 
         # Remove obsolete InclusionRequests
-        self._remove_obsolete_irs(dep_comms + auto_request, record)
+        self._remove_obsolete_irs(set(dep_comms) | auto_request, record)
 
         # Communities, which should be in record after publishing:
         new_rec_comms = (
@@ -345,13 +345,13 @@ class ZenodoDeposit(Deposit):
                 edited_record[k] = record[k]
 
         # Add communities entry to deposit (self)
-        self['communities'] = sorted(set(self.get('communities', []) +
-                                         auto_added + auto_request))
+        self['communities'] = sorted(set(self.get('communities', [])) |
+                                     set(auto_added) | auto_request)
         if not self['communities']:
             del self['communities']
 
         # Add communities entry to record
-        edited_record['communities'] = sorted(list(new_rec_comms))
+        edited_record['communities'] = sorted(new_rec_comms)
         edited_record = self._sync_oaisets_with_communities(edited_record)
         if not edited_record['communities']:
             del edited_record['communities']
