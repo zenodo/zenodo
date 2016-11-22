@@ -24,6 +24,7 @@
   margin-bottom: 10px;
 }
 
+
 .well {
   word-wrap: break-word;
 
@@ -40,6 +41,26 @@
       line-height: inherit;
       text-align: left;
       white-space: normal;
+
+    }
+
+    a.label-link {
+      color: #fff;
+      text-decoration: none;
+
+      &:hover {
+        color: #fff;
+        text-decoration: none;
+      }
+
+    }
+
+    a.label-external-link {
+      color: #fff;
+
+      &:hover {
+        color: $brand-primary;
+      }
     }
   }
 }

@@ -67,8 +67,26 @@
     <dd>
     {%- for keyword in record.keywords %}
       {% set q = {"keywords": keyword}|make_query %}
-      <a href="{{url_for('invenio_search_ui.search', q=q)}}">
+      <a class="label-link" href="{{url_for('invenio_search_ui.search', q=q)}}">
         <span class="label label-default" itemprop="keywords">{{keyword}}</span>
+      </a>
+    {%- endfor %}
+    </dd>
+  {%- endif %}
+
+  {%- if record.subjects %}
+    <dt>{{_('Subject(s)')}}:</dt>
+    <dd>
+    {%- for subject in record.subjects %}
+      {%- set q = {"subject.term": subject.term}|make_query %}
+      {%- set subject_url = subject.identifier|pid_url(scheme=subject.scheme) %}
+      <a class="label-link" href="{{url_for('invenio_search_ui.search', q=q)}}">
+        <div class="label label-default" itemprop="subjects">
+          {{subject.term}}
+          <a class="label-external-link" href="{{subject_url}}">
+            <i data-toggle="tooltip" data-title="{{subject.identifier}}" class="fa fa-fw fa-external-link"></i>
+          </a>
+        </div>
       </a>
     {%- endfor %}
     </dd>
