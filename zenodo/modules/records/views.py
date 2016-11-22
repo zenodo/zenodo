@@ -262,7 +262,7 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
     return ''
 
 
-def records_ui_export(pid, record, template=None):
+def records_ui_export(pid, record, template=None, **kwargs):
     """Record serialization view.
 
     Plug this method into your ``RECORDS_UI_ENDPOINTS`` configuration:

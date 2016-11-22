@@ -67,7 +67,7 @@ def test_get_entry_type(bibtex_records):
 
     for rec, in RecordMetadata.query.values(RecordMetadata.id):
         if rec != record_bad.record.id:
-            r = Record.get_record(id=rec)
+            r = Record.get_record(id_=rec)
             b = Bibtex(r)
             assert r['resource_type']['type'] == b._get_entry_type()
 

@@ -34,12 +34,17 @@ from invenio_records import Record
 from zenodo.modules.records.serializers import marcxml_v1
 
 
-def test_full_record(app, full_record):
+def test_full_record(app, db, full_record):
     """Test MARC21 serialization of full record."""
-    now = datetime.utcnow()
+    record = Record.create(full_record)
+    record.model.updated = datetime.utcnow()
+    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    assert record.validate() is None
+
     expected = {
         u'control_number': u'12345',
-        u'date_and_time_of_latest_transaction': now.strftime("%Y%m%d%H%M%S.0"),
+        u'date_and_time_of_latest_transaction': (
+            record.model.updated.strftime("%Y%m%d%H%M%S.0")),
         u'resource_type': {
             u'subtype': u'book',
             u'type': u'publication'
@@ -226,15 +231,12 @@ def test_full_record(app, full_record):
     }
 
     # Create record and PID.
-    record = Record(full_record)
+    record = Record.create(full_record)
     pid = PersistentIdentifier(pid_type='recid', pid_value='2')
     assert record.validate() is None
 
     # Dump MARC21 JSON structure and compare against expected JSON.
     preprocessed_record = marcxml_v1.preprocess_record(record=record, pid=pid)
-    # - needed since we don't create a record backed by DB model.
-    preprocessed_record['updated'] = now.isoformat()
-
     assert_dict(
         expected,
         marcxml_v1.schema_class().dump(preprocessed_record).data
@@ -244,12 +246,19 @@ def test_full_record(app, full_record):
     marcxml_v1.serialize(record=record, pid=pid)
 
 
-def test_minimal_record(app, minimal_record):
+def test_minimal_record(app, db, minimal_record):
     """Test minimal record."""
+    # Create record and pid.
+    record = Record.create(minimal_record)
+    record.model.updated = datetime.utcnow()
+    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    assert record.validate() is None
+
     expected = {
+        u'date_and_time_of_latest_transaction': (
+            record.model.updated.strftime("%Y%m%d%H%M%S.0")),
         u'publication_distribution_imprint': [{
-            'date_of_publication_distribution': (
-                datetime.utcnow().date().isoformat())
+            'date_of_publication_distribution': record['publication_date']
         }],
         u'control_number': '123',
         u'information_relating_to_copyright_status': {
@@ -268,11 +277,6 @@ def test_minimal_record(app, minimal_record):
             'title': 'Test'
         }
     }
-
-    # Create record and pid.
-    record = Record(minimal_record)
-    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
-    assert record.validate() is None
 
     data = marcxml_v1.schema_class().dump(marcxml_v1.preprocess_record(
         pid=pid,

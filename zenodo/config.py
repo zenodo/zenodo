@@ -538,7 +538,7 @@ RECORDS_UI_ENDPOINTS = dict(
     recid_files=dict(
         pid_type='recid',
         route='/record/<pid_value>/files/<path:filename>',
-        view_imp='invenio_files_rest.views.file_download_ui',
+        view_imp='invenio_records_files.utils.file_download_ui',
         record_class='invenio_records_files.api:Record',
     ),
 )
@@ -713,6 +713,18 @@ RECORDS_REST_FACETS = dict(
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
+RECORDS_REST_ELASTICSEARCH_ERROR_HANDLERS = {
+    'query_parsing_exception': (
+        'invenio_records_rest.views'
+        ':elasticsearch_query_parsing_exception_handler'
+    ),
+    'token_mgr_error': (
+        'invenio_records_rest.views'
+        ':elasticsearch_query_parsing_exception_handler'
+    ),
+}
+"""Handlers for ElasticSearch error codes."""
+
 # Previewer
 # =========
 #: Basic bundle which includes Font-Awesome/Bootstrap.
@@ -784,6 +796,12 @@ OAISERVER_METADATA_FORMATS = {
 # ====
 #: Enable CORS support.
 REST_ENABLE_CORS = True
+
+# OAuth2 Server
+# =============
+#: Include '$' and "'" to cover various issues with search.
+OAUTH2SERVER_ALLOWED_URLENCODE_CHARACTERS = '=&;:%+~,*@!()/?$\'"'
+"""Special characters that should be valid inside a query string."""
 
 # Accounts
 # ========
