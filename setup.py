@@ -145,7 +145,7 @@ install_requires = [
     'uwsgi>=2.0.14',
     'uwsgitop>=0.9',
     'wsgi-statsd>=0.3.1',
-    'zenodo-accessrequests>=1.0.0a1',
+    'zenodo-accessrequests>=1.0.0a2',
 ]
 
 packages = find_packages()

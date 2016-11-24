@@ -233,4 +233,4 @@ wsgi-statsd==0.3.1
 WTForms==2.1
 WTForms-Alchemy==0.16.1
 WTForms-Components==0.10.0
-zenodo-accessrequests==1.0.0a1
+zenodo-accessrequests==1.0.0a2
