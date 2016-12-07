@@ -30,8 +30,10 @@ import idutils
 from flask_babelex import lazy_gettext as _
 from marshmallow import fields
 
+from .sanitizedunicode import SanitizedUnicode
 
-class DOI(fields.String):
+
+class DOI(SanitizedUnicode):
     """Special DOI field."""
 
     default_error_messages = {

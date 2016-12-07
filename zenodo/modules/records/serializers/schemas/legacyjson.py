@@ -35,14 +35,14 @@ from zenodo.modules.records.models import AccessRight, ObjectType
 
 from . import common
 from ...minters import doi_generator
-from ..fields import DOILink, TrimmedString
+from ..fields import DOILink, SanitizedUnicode, SanitizedUrl
 
 
 class FileSchemaV1(Schema):
     """Schema for files depositions."""
 
     id = fields.String(attribute='file_id', dump_only=True)
-    filename = fields.String(attribute='key', dump_only=True)
+    filename = SanitizedUnicode(attribute='key', dump_only=True)
     filesize = fields.Integer(attribute='size', dump_only=True)
     checksum = fields.Method('dump_checksum', dump_only=True)
     links = fields.Method('dump_links', dump_only=True)
@@ -109,28 +109,28 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
 
     prereserve_doi = fields.Method('dump_prereservedoi', 'load_prereservedoi')
 
-    journal_title = TrimmedString(attribute='journal.title')
-    journal_volume = TrimmedString(attribute='journal.volume')
-    journal_issue = TrimmedString(attribute='journal.issue')
-    journal_pages = TrimmedString(attribute='journal.pages')
+    journal_title = SanitizedUnicode(attribute='journal.title')
+    journal_volume = SanitizedUnicode(attribute='journal.volume')
+    journal_issue = SanitizedUnicode(attribute='journal.issue')
+    journal_pages = SanitizedUnicode(attribute='journal.pages')
 
-    conference_title = TrimmedString(attribute='meeting.title')
-    conference_acronym = TrimmedString(attribute='meeting.acronym')
-    conference_dates = TrimmedString(attribute='meeting.dates')
-    conference_place = TrimmedString(attribute='meeting.place')
-    conference_url = fields.Url(attribute='meeting.url')
-    conference_session = TrimmedString(attribute='meeting.session')
-    conference_session_part = TrimmedString(
+    conference_title = SanitizedUnicode(attribute='meeting.title')
+    conference_acronym = SanitizedUnicode(attribute='meeting.acronym')
+    conference_dates = SanitizedUnicode(attribute='meeting.dates')
+    conference_place = SanitizedUnicode(attribute='meeting.place')
+    conference_url = SanitizedUrl(attribute='meeting.url')
+    conference_session = SanitizedUnicode(attribute='meeting.session')
+    conference_session_part = SanitizedUnicode(
         attribute='meeting.session_part')
 
-    imprint_isbn = TrimmedString(attribute='imprint.isbn')
-    imprint_place = TrimmedString(attribute='imprint.place')
-    imprint_publisher = TrimmedString(attribute='imprint.publisher')
+    imprint_isbn = SanitizedUnicode(attribute='imprint.isbn')
+    imprint_place = SanitizedUnicode(attribute='imprint.place')
+    imprint_publisher = SanitizedUnicode(attribute='imprint.publisher')
 
-    partof_pages = TrimmedString(attribute='part_of.pages')
-    partof_title = TrimmedString(attribute='part_of.title')
+    partof_pages = SanitizedUnicode(attribute='part_of.pages')
+    partof_title = SanitizedUnicode(attribute='part_of.title')
 
-    thesis_university = TrimmedString(attribute='thesis.university')
+    thesis_university = SanitizedUnicode(attribute='thesis.university')
     thesis_supervisors = fields.Nested(
         common.PersonSchemaV1, many=True, attribute='thesis.supervisors')
 
@@ -355,7 +355,7 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
             '_deposit', {}).get('pid') is not None,
         dump_only=True
     )
-    title = fields.String(
+    title = SanitizedUnicode(
         attribute='metadata.title', default='', dump_only=True)
 
     def dump_state(self, o):

@@ -22,25 +22,34 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Custom marshmallow fields."""
+"""Sanitized Unicode string field."""
 
 from __future__ import absolute_import, print_function
 
-from .datetime import DateString
-from .doi import DOI, DOILink
-from .html import SanitizedHTML
-from .persistentid import PersistentId
-from .trimmedstring import TrimmedString
-from .sanitizedunicode import SanitizedUnicode
-from .sanitizedurl import SanitizedUrl
+from ftfy import fix_text
 
-__all__ = (
-    'DateString',
-    'DOI',
-    'DOILink',
-    'PersistentId',
-    'SanitizedHTML',
-    'SanitizedUnicode',
-    'SanitizedUrl',
-    'TrimmedString',
-)
+from .trimmedstring import TrimmedString
+
+
+class SanitizedUnicode(TrimmedString):
+    """String field that sanitizes and fixes problematic unicode characters."""
+
+    UNWANTED_CHARACTERS = {
+        # Zero-width space
+        u'\u200b',
+        # Line Tabulation
+        u'\u000b',
+        # Escape
+        u'\u001b',
+        # Cancel
+        u'\u0018',
+    }
+
+    def _deserialize(self, value, attr, data):
+        """Deserialize sanitized string value."""
+        value = super(SanitizedUnicode, self)._deserialize(value, attr, data)
+
+        value = fix_text(value)
+        for c in self.UNWANTED_CHARACTERS:
+            value = value.replace(c, '')
+        return value

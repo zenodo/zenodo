@@ -790,3 +790,23 @@ def test_legacyjson_to_record_translation(app, db, es, grant_record,
     ZenodoDeposit.create(
         legacyjson.LegacyRecordSchemaV1(strict=True).load(test_data).data
     ).validate()
+
+
+invalid_unicode_chars_params = (
+    # Zero-width space
+    u'\u200b',
+    # Line Tabulation
+    u'\u000b',
+    # Escape
+    u'\u001b',
+    # Cancel
+    u'\u0018',
+)
+
+
+@pytest.mark.parametrize('unicode_char', invalid_unicode_chars_params)
+def test_invalid_unicode_characters(app, db, es, grant_record, license_record,
+                                    location, unicode_char):
+    assert (legacyjson.LegacyMetadataSchemaV1(strict=True).load(
+            d(description=u'Invalid character: [{}]'.format(unicode_char)))
+            .data['description'] == u'Invalid character: []')

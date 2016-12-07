@@ -44,7 +44,7 @@ from zenodo.modules.records.models import AccessRight
 
 from ...utils import is_deposit
 from ..fields import DOI as DOIField
-from ..fields import DateString, PersistentId, SanitizedHTML, TrimmedString
+from ..fields import DateString, PersistentId, SanitizedHTML, SanitizedUnicode
 
 
 def clean_empty(data, keys):
@@ -99,8 +99,8 @@ class RefResolverMixin(object):
 class PersonSchemaV1(Schema, StrictKeysMixin):
     """Schema for a person."""
 
-    name = TrimmedString(required=True)
-    affiliation = TrimmedString()
+    name = SanitizedUnicode(required=True)
+    affiliation = SanitizedUnicode()
     gnd = PersistentId(scheme='GND')
     orcid = PersistentId(scheme='ORCID')
 
@@ -213,7 +213,7 @@ class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
 class SubjectSchemaV1(IdentifierSchemaV1):
     """Schema for a subject."""
 
-    term = TrimmedString()
+    term = SanitizedUnicode()
 
 
 class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
@@ -221,13 +221,13 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
 
     doi = DOIField()
     publication_date = DateString(required=True)
-    title = TrimmedString(required=True, validate=validate.Length(min=3))
+    title = SanitizedUnicode(required=True, validate=validate.Length(min=3))
     creators = fields.Nested(
         PersonSchemaV1, many=True, validate=validate.Length(min=1))
     description = SanitizedHTML(
         required=True, validate=validate.Length(min=3))
-    keywords = fields.List(TrimmedString())
-    notes = TrimmedString()
+    keywords = fields.List(SanitizedUnicode())
+    notes = SanitizedUnicode()
     access_right = fields.Str(validate=validate.OneOf(
         choices=[
             AccessRight.OPEN,
@@ -240,7 +240,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     access_conditions = SanitizedHTML()
     subjects = fields.Nested(SubjectSchemaV1, many=True)
     contributors = fields.List(fields.Nested(ContributorSchemaV1))
-    references = fields.List(TrimmedString(attribute='raw_reference'))
+    references = fields.List(SanitizedUnicode(attribute='raw_reference'))
     related_identifiers = fields.Nested(RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
@@ -281,8 +281,8 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
             if value == required_doi:
                 return
 
-            err =  ValidationError(_('DOI already exists in Zenodo.'),
-                                   field_names=['doi'])
+            err = ValidationError(_('DOI already exists in Zenodo.'),
+                                  field_names=['doi'])
 
             try:
                 doi_pid = PersistentIdentifier.get('doi', value)
@@ -371,7 +371,7 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     """Common record schema."""
 
     id = fields.Integer(attribute='pid.pid_value', dump_only=True)
-    doi = fields.Str(attribute='metadata.doi', dump_only=True)
+    doi = SanitizedUnicode(attribute='metadata.doi', dump_only=True)
     links = fields.Method('dump_links', dump_only=True)
     created = fields.Str(dump_only=True)
 

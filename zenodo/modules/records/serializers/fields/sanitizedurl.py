@@ -22,25 +22,20 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Custom marshmallow fields."""
+"""Sanitized Unicode string field."""
 
 from __future__ import absolute_import, print_function
 
-from .datetime import DateString
-from .doi import DOI, DOILink
-from .html import SanitizedHTML
-from .persistentid import PersistentId
-from .trimmedstring import TrimmedString
-from .sanitizedunicode import SanitizedUnicode
-from .sanitizedurl import SanitizedUrl
+from marshmallow import fields
 
-__all__ = (
-    'DateString',
-    'DOI',
-    'DOILink',
-    'PersistentId',
-    'SanitizedHTML',
-    'SanitizedUnicode',
-    'SanitizedUrl',
-    'TrimmedString',
-)
+from .sanitizedunicode import SanitizedUnicode
+
+
+class SanitizedUrl(SanitizedUnicode, fields.Url):
+    """SanitizedString-based URL field."""
+
+    def _deserialize(self, value, attr, data):
+        """Deserialize sanitized URL value."""
+        # Apply SanitizedUnicode first
+        value = SanitizedUnicode._deserialize(self, value, attr, data)
+        return fields.Url._deserialize(self, value, attr, data)

@@ -27,10 +27,11 @@
 from __future__ import absolute_import, print_function
 
 import bleach
-from marshmallow import fields
+
+from .sanitizedunicode import SanitizedUnicode
 
 
-class SanitizedHTML(fields.String):
+class SanitizedHTML(SanitizedUnicode):
     """String field which strips sanitizes HTML using the bleach library."""
 
     def __init__(self, tags=None, attrs=None, *args, **kwargs):

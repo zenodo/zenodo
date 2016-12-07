@@ -28,10 +28,12 @@ from __future__ import absolute_import, print_function
 
 import idutils
 from flask_babelex import lazy_gettext as _
-from marshmallow import fields, missing
+from marshmallow import missing
+
+from .sanitizedunicode import SanitizedUnicode
 
 
-class PersistentId(fields.String):
+class PersistentId(SanitizedUnicode):
     """Special DOI field."""
 
     default_error_messages = {
