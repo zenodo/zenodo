@@ -136,7 +136,11 @@ def update_legacy_meta(license):
 
 
 def create_new_license(license):
-    """Create a new license record."""
+    """Create a new license record.
+
+    :param license: License dictionary to be loaded.
+    :type license: dict
+    """
     license = update_legacy_meta(license)
     license_validator.validate(license)
     record = Record.create(license)

@@ -1447,5 +1447,18 @@
     "status": "active",
     "title": "Creative Commons Attribution-NonCommercial-ShareAlike",
     "is_okd_compliant": false
+  },
+  {
+    "family": "",
+    "domain_software": false,
+    "is_osi_compliant": false,
+    "maintainer": "Zenodo",
+    "url": "",
+    "domain_data": true,
+    "domain_content": true,
+    "id": "zenodo-freetoread-1.0",
+    "status": "active",
+    "title": "Free for private use; right holder retains other rights, including distribution",
+    "is_okd_compliant": false
   }
 ]
