@@ -111,7 +111,58 @@ class RecordSchemaMARC21(Schema):
 
     _oai = fields.Raw(attribute='metadata._oai')
 
+    _files = fields.Method('get_files')
+
+    leader = fields.Method('get_leader')
+
     conference_url = fields.Raw(attribute='metadata.meeting.url')
+
+    def get_leader(self, o):
+        """Return the leader information."""
+        rt = o['metadata']['resource_type']['type']
+        rec_types = {
+            'image': 'two-dimensional_nonprojectable_graphic',
+            'video': 'projected_medium',
+            'dataset': 'computer_file',
+            'software': 'computer_file',
+        }
+        type_of_record = rec_types[rt] if rt in rec_types \
+            else 'language_material'
+        res = {
+            'record_length': '00000',
+            'record_status': 'new',
+            'type_of_record': type_of_record,
+            'bibliographic_level': 'monograph_item',
+            'type_of_control': 'no_specified_type',
+            'character_coding_scheme': 'marc-8',
+            'indicator_count': 2,
+            'subfield_code_count': 2,
+            'base_address_of_data': '00000',
+            'encoding_level': 'unknown',
+            'descriptive_cataloging_form': 'unknown',
+            'multipart_resource_record_level':
+                'not_specified_or_not_applicable',
+            'length_of_the_length_of_field_portion': 4,
+            'length_of_the_starting_character_position_portion': 5,
+            'length_of_the_implementation_defined_portion': 0,
+            'undefined': 0,
+        }
+        return res
+
+    def get_files(self, o):
+        """Get the files provided the record is open access."""
+        if o['metadata']['access_right'] != 'open':
+            return missing
+        res = []
+        for f in o['metadata'].get('_files', []):
+            res.append(dict(
+                uri='https://zenodo.org/record/{0}/files/{1}'.format(
+                    o['metadata'].get('recid', ''), f['key']),
+                size=f['size'],
+                checksum=f['checksum'],
+                type=f['type'],
+            ))
+        return res or missing
 
     def get_host_item_entry(self, o):
         """Get host items."""
@@ -269,17 +320,29 @@ class RecordSchemaMARC21(Schema):
         return data
 
 
+def _is_non_empty(value):
+    """Conditional for regarding a value as 'non-empty'.
+
+    This enhances the default "bool" return value with some exceptions:
+     - number 0 resolves as True - non-empty.
+    """
+    if isinstance(value, int):
+        return True  # All integers are non-empty values
+    else:
+        return bool(value)
+
+
 def _filter_empty(record):
     """Filter empty fields."""
     if isinstance(record, dict):
         for k in list(record.keys()):
-            if record[k]:
+            if _is_non_empty(record[k]):
                 _filter_empty(record[k])
-            if not record[k]:
+            if not _is_non_empty(record[k]):
                 del record[k]
     elif isinstance(record, list) or isinstance(record, tuple):
         for (k, v) in list(enumerate(record)):
-            if v:
+            if _is_non_empty(v):
                 _filter_empty(record[k])
-            if not v:
+            if not _is_non_empty(v):
                 del record[k]

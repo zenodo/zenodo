@@ -220,7 +220,34 @@ def test_full_record(app, db, full_record):
         u'_oai': {
             u'sets': [u'user-zenodo', u'user-ecfunded'],
             u'id': u'oai:zenodo.org:1'
-        }
+        },
+        u'_files': [
+            {
+                'uri': 'https://zenodo.org/record/12345/files/test',
+                'checksum': 'md5:11111111111111111111111111111111',
+                'type': 'txt',
+                'size': 4,
+            },
+        ],
+        'leader': {
+            'base_address_of_data': '00000',
+            'bibliographic_level': 'monograph_item',
+            'character_coding_scheme': 'marc-8',
+            'descriptive_cataloging_form': 'unknown',
+            'encoding_level': 'unknown',
+            'indicator_count': 2,
+            'length_of_the_implementation_defined_portion': 0,
+            'length_of_the_length_of_field_portion': 4,
+            'length_of_the_starting_character_position_portion': 5,
+            'multipart_resource_record_level':
+                'not_specified_or_not_applicable',
+            'record_length': '00000',
+            'record_status': 'new',
+            'subfield_code_count': 2,
+            'type_of_control': 'no_specified_type',
+            'type_of_record': 'language_material',
+            'undefined': 0,
+        },
     }
 
     # Add embargo date and OAI-PMH set information.
@@ -275,7 +302,26 @@ def test_minimal_record(app, db, minimal_record):
         },
         u'title_statement': {
             'title': 'Test'
-        }
+        },
+        u'leader': {
+            'base_address_of_data': '00000',
+            'bibliographic_level': 'monograph_item',
+            'character_coding_scheme': 'marc-8',
+            'descriptive_cataloging_form': 'unknown',
+            'encoding_level': 'unknown',
+            'indicator_count': 2,
+            'length_of_the_implementation_defined_portion': 0,
+            'length_of_the_length_of_field_portion': 4,
+            'length_of_the_starting_character_position_portion': 5,
+            'multipart_resource_record_level':
+                'not_specified_or_not_applicable',
+            'record_length': '00000',
+            'record_status': 'new',
+            'subfield_code_count': 2,
+            'type_of_control': 'no_specified_type',
+            'type_of_record': 'computer_file',
+            'undefined': 0,
+        },
     }
 
     data = marcxml_v1.schema_class().dump(marcxml_v1.preprocess_record(
@@ -295,6 +341,7 @@ def assert_array(a1, a2):
             assert_array(a1[i], a2[i])
         else:
             assert a1[i] in a2
+
     assert len(a1) == len(a2)
 
 

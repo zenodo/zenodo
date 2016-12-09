@@ -107,3 +107,24 @@ def reverse_conkerence_url(dummy_self, key, value):
         '$ind1': '4',
         '$ind2': '_',
     }
+
+
+@to_marc21.over('856', '^_files$')
+@utils.reverse_for_each_value
+@utils.filter_values
+def reverse_files(dummy_self, key, value):
+    """Reverse - Files."""
+    return {
+        's': str(value['size']),
+        'u': value['uri'],
+        'z': value['checksum'],
+        'q': value['type'],
+        '$ind1': '4',
+        '$ind2': '_',
+    }
+
+
+# @to_marc21.over('foobar', '^foobar$')
+# def to_leader_field(dummy_self, key, value):
+#     """Reverse - Files."""
+#     return value
