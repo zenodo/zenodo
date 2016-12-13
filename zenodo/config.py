@@ -135,6 +135,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'invenio_indexer.tasks.process_bulk_queue',
         'schedule': timedelta(minutes=5),
     },
+    'openaire-updater': {
+        'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
+        'schedule': timedelta(hours=2),
+    },
 }
 
 # Cache
@@ -753,8 +757,10 @@ OAISERVER_RESUMPTION_TOKEN_EXPIRE_TIME = 2 * 60
 OAISERVER_CONTROL_NUMBER_FETCHER = 'zenodo_record_fetcher'
 #: Support email for OAI-PMH.
 OAISERVER_ADMIN_EMAILS = [SUPPORT_EMAIL]
-#: Do not register signals to automatically update record on updates.
+#: Do not register signals to automatically update records on updates.
 OAISERVER_REGISTER_RECORD_SIGNALS = False
+#: Do not register signals to automatically update records on oaiset updates.
+OAISERVER_REGISTER_OAISET_SIGNALS = False
 #: Metadata formats for OAI-PMH server
 OAISERVER_METADATA_FORMATS = {
     'marcxml': {

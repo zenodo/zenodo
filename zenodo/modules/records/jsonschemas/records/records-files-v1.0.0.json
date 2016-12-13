@@ -1,0 +1,23 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "object",
+  "title": "File schema.",
+  "description": "Describe information needed for files in records.",
+  "properties": {
+    "key": {
+      "type": "string"
+    },
+    "bucket": {
+      "type": "string"
+    },
+    "checksum": {
+      "type": "string"
+    },
+    "size": {
+        "type": "integer"
+    },
+    "version_id": {
+        "type": "string"
+    }
+  }
+}

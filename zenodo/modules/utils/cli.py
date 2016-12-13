@@ -41,7 +41,7 @@ from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
-    sync_record_oai, update_oaisets_cache
+    sync_record_oai, update_oaisets_cache, update_search_pattern_sets
 
 
 @click.group()
@@ -288,3 +288,10 @@ def repair_corrupted_metadata(eager, uuid):
                     repair_record_metadata(str(uuid))
                 else:
                     repair_record_metadata.delay(str(uuid))
+
+
+@utils.command('update_search_pattern_sets')
+@with_appcontext
+def update_search_pattern_sets_cli():
+    """Update records belonging to all search-pattern OAISets."""
+    update_search_pattern_sets.delay()

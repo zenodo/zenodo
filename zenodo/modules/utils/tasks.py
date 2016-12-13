@@ -23,15 +23,18 @@ from __future__ import absolute_import
 
 from collections import namedtuple
 from datetime import datetime
+from itertools import chain as ichain
 
-from celery import shared_task
+from celery import chain, group, shared_task
 from celery.utils.log import get_task_logger
 from dictdiffer import diff
+from elasticsearch_dsl import Q
 from flask import current_app
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.minters import oaiid_minter
 from invenio_oaiserver.models import OAISet
+from invenio_oaiserver.query import OAIServerSearch
 from invenio_oaiserver.utils import datetime_to_datestamp
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
@@ -186,3 +189,75 @@ def repair_record_metadata(uuid):
     rec.commit()
     db.session.commit()
     RecordIndexer().bulk_index([str(rec.id), ])
+
+
+@shared_task
+def remove_oaiset_spec(record_uuid, spec):
+    """Remove the OAI spec from the record and commit."""
+    rec = Record.get_record(record_uuid)
+    rec['_oai']['sets'] = sorted([s for s in rec['_oai'].get('sets', [])
+                                  if s != spec])
+    rec['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
+    if not rec['_oai']['sets']:
+        del rec['_oai']['sets']
+    rec.commit()
+    db.session.commit()
+
+
+@shared_task
+def add_oaiset_spec(record_uuid, spec):
+    """Add the OAI spec to the record and commit."""
+    rec = Record.get_record(record_uuid)
+    rec['_oai']['sets'] = sorted(rec['_oai'].get('sets', []) + [spec, ])
+    rec['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
+    rec.commit()
+    db.session.commit()
+
+
+def iter_record_oai_tasks(query, spec, func):
+    """Turn an ES query and a task function into an iterable of celery tasks.
+
+    :param query: Elasticsearch query
+    :type query: elasticsearch_dsl.Q
+    :param spec: OAISet.spec name
+    :type spec: str
+    :param func: shared_task function to execute for given record
+    :type func: function
+    """
+    search = OAIServerSearch(
+        index=current_app.config['OAISERVER_RECORD_INDEX'],
+    ).query(query)
+    for result in search.scan():
+        yield func.s(result.meta.id, spec)
+
+
+def make_oai_task_group(oais):
+    """Make a celery group for an OAISet.
+
+    Since for each OAISet any given record has to be modified by either
+    removing or adding the OAISet.spec, it's save to create a single
+    group per OAISet for all records (no risk of racing conditions in parallel
+    execution).
+
+    :param oais: OAISet for which the task group is to be made.
+    :type oais: invenio_oaiserver.modules.OAISet
+    """
+    spec_q = Q('match', **{'_oai.sets': oais.spec})
+    pattern_q = Q('query_string', query=oais.search_pattern)
+    spec_remove_q = Q('bool', must=spec_q, must_not=pattern_q)
+    spec_add_q = Q('bool', must=pattern_q, must_not=spec_q)
+    return group(ichain(iter_record_oai_tasks(spec_remove_q, oais.spec,
+                                              remove_oaiset_spec),
+                        iter_record_oai_tasks(spec_add_q, oais.spec,
+                                              add_oaiset_spec)))
+
+
+@shared_task
+def update_search_pattern_sets():
+    """Update all records affected by search-patterned OAISets.
+
+    In order to avoid racing condition when editing the records, all
+    OAISet task groups are chained.
+    """
+    oaisets = OAISet.query.filter(OAISet.search_pattern.isnot(None))
+    chain(make_oai_task_group(oais) for oais in oaisets).apply_async()

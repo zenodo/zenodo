@@ -51,6 +51,7 @@ from invenio_deposit.permissions import \
 from invenio_deposit.scopes import write_scope
 from invenio_files_rest.models import Bucket, Location, ObjectVersion
 from invenio_github.models import Repository
+from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
 from invenio_oauthclient.models import RemoteAccount
@@ -791,6 +792,38 @@ def audit_records(minimal_record, db):
         db.session.add(recid)
         db.session.commit()
     return records
+
+
+@pytest.fixture
+def oaiset_update_records(minimal_record, db, es):
+    """Fixture with records for query-based OAISet updating tests."""
+    rec_ok = {
+        'title': 'extra',
+        '_oai': {
+            'id': '12345',
+            'sets': ['extra', 'user-foobar'],
+            'updated': datetime(1970, 1, 1).isoformat(),
+        }
+    }
+    # Record which needs removal of 'extra' from oai sets
+    rec_remove = deepcopy(rec_ok)
+    rec_remove['title'] = 'other'
+
+    # Record which needs addition of 'extra' to oai sets
+    rec_add = deepcopy(rec_ok)
+    rec_add['_oai']['sets'] = ['user-foobar', ]
+    records = [rec_ok, rec_remove, rec_add, ]
+
+    rec_uuids = []
+    for record_meta in records:
+        rec = RecordMetadata()
+        rec.json = deepcopy(record_meta)
+        db.session.add(rec)
+        db.session.commit()
+        RecordIndexer().index_by_id(rec.id)
+        rec_uuids.append(rec.id)
+    current_search.flush_and_refresh('records')
+    return rec_uuids
 
 
 #
