@@ -202,6 +202,7 @@ def remove_oaiset_spec(record_uuid, spec):
         del rec['_oai']['sets']
     rec.commit()
     db.session.commit()
+    RecordIndexer().bulk_index([str(rec.id), ])
 
 
 @shared_task
@@ -212,6 +213,7 @@ def add_oaiset_spec(record_uuid, spec):
     rec['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
     rec.commit()
     db.session.commit()
+    RecordIndexer().bulk_index([str(rec.id), ])
 
 
 def iter_record_oai_tasks(query, spec, func):
