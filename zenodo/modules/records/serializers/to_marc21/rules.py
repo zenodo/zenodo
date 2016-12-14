@@ -118,7 +118,6 @@ def reverse_files(dummy_self, key, value):
         's': str(value['size']),
         'u': value['uri'],
         'z': value['checksum'],
-        'q': value['type'],
         '$ind1': '4',
         '$ind2': '_',
     }

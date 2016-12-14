@@ -156,7 +156,7 @@ class RecordSchemaMARC21(Schema):
         res = []
         for f in o['metadata'].get('_files', []):
             res.append(dict(
-                uri='https://zenodo.org/record/{0}/files/{1}'.format(
+                uri=u'https://zenodo.org/record/{0}/files/{1}'.format(
                     o['metadata'].get('recid', ''), f['key']),
                 size=f['size'],
                 checksum=f['checksum'],
