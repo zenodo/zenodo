@@ -795,6 +795,7 @@ def test_legacyjson_to_record_translation(app, db, es, grant_record,
 invalid_unicode_chars_params = (
     # Zero-width space
     u'\u200b',
+
     # Line Tabulation
     u'\u000b',
     # Escape
