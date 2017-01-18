@@ -162,7 +162,7 @@
         "type": "text",
         "key": "doi",
         "title": "Digital Object Identifier",
-        "description": "Optional. Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allows others to easily and unambiguously cite your upload.",
+        "description": "Optional. Did your publisher already assign a DOI to your upload? If not, leave the field empty and we will register a new DOI for you. A DOI allows others to easily and unambiguously cite your upload. Please note that it is NOT possible to edit a Zenodo DOI once it has been registered by us, while it is always possible to edit a custom DOI.",
         "placeholder": "e.g. 10.1234/foo.bar",
         "fa_cls": "fa-barcode"
       },
