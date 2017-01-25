@@ -26,8 +26,6 @@
 
 from __future__ import absolute_import
 
-from datetime import datetime
-
 import idutils
 from flask import current_app
 from invenio_db import db

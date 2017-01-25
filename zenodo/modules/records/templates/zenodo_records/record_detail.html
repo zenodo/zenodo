@@ -28,6 +28,7 @@
 {%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
 {%- from "zenodo_records/macros/altmetric.html" import almetric_badge -%}
 {%- from "zenodo_records/macros/authors.html" import authors, contributors -%}
+{%- from "zenodo_records/macros/pid_versions.html" import pid_versions_dropdown -%}
 
 {%- set title = record.title + " | " + config.THEME_SITENAME -%}
 {%- set publication_date = record.publication_date|from_isodate -%}
@@ -40,6 +41,26 @@
 {%- endblock head %}
 
 {%- block page_body %}
+
+
+
+{# FIXME: Move to `record.scss` after finishing tests #}
+<style type="text/css">
+.pid-versions-dropdown {
+}
+
+.pid-versions-dropdown button.dropdown-toggle .latest {
+  color: black;
+}
+
+.pid-versions-dropdown .latest {
+  font-weight: 400;
+}
+
+</style>
+
+
+
 <div class="container record-detail">
   <div class="row" itemscope itemtype="{{object_type['schema.org']}}">
     <div class="col-sm-8 col-md-8 col-left">

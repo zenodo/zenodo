@@ -1,0 +1,48 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+#}
+
+{%- macro pid_versions_dropdown(pid) %}
+{% if pid is versioned_pid %}
+<div class="dropdown pid-versions-dropdown">
+  {% set current_record = {'version' : 0, 'latest': False } %}
+  <ul class="dropdown-menu" aria-labelledby="pid-versions-dropdown">
+    {% set record_pid_versions = pid | pid_versions | reverse %}
+    {% for pid_version in record_pid_versions %}
+      {% set is_latest = pid_version is latest_pid_version %}
+
+      {# Set the current record's version #}
+      {% if pid_version.id == pid.id and current_record.update({'version': loop.revindex, 'latest': is_latest}) %}{% endif %}
+
+      <li class="pid-version-item {{ 'latest' if is_latest else '' }}"><a href="{{ url_for('invenio_records_ui.recid', pid_value=pid_version.pid_value) }}">Version {{ loop.revindex }} {{ ' (latest)' if is_latest else '' }}</a></li>
+    {% endfor %}
+  </ul>
+  <button class="btn btn-default dropdown-toggle" type="button" id="pid-versions-dropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+    <div class="dropdown-head {{ 'latest' if current_record.latest else '' }}">
+      Version {{ current_record.version }}{{ ' (latest)' if current_record.latest else '' }}
+      <span class="caret"></span>
+    </div>
+  </button>
+</div>
+{% endif %}
+{%- endmacro %}

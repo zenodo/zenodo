@@ -35,9 +35,13 @@
   {%- endif %}
 
   {%- if record.doi %}
+    {% if pid is versioned_pid %}
+      <dt>{{_('Record Versions')}}:</dt>
+      <dd>{{ pid_versions_dropdown(pid) }}</dd>
+    {% endif %}
     <dt>{{_('DOI')}}:</dt>
     <dd itemprop="doi">
-      <span class="get-badge" data-toggle="tooltip" data-placement="bottom"
+      <span class="get-badge" data-toggle="toolt  ip" data-placement="bottom"
             title="Get the DOI badge!">
         <img data-toggle="modal" data-target="[data-modal='{{ record.doi }}']"
              src="{{ url_for('invenio_formatter_badges.badge', title='DOI', value=record.doi, ext='svg') }}" alt="{{ record.doi }}">
@@ -55,6 +59,30 @@
         </div>
       </div>
     </dd>
+    {% if pid is versioned_pid %}
+      <dt>{{_('Concept DOI')}}:</dt>
+      {% set head_pid = pid | head_pid_version %}
+      {% set head_doi = record.doi.rsplit('.', 1)[0] + '.' + head_pid.pid_value %}
+      <dd itemprop="doi">
+      <span class="get-badge" data-toggle="tooltip" data-placement="bottom"
+            title="Get the Concpet DOI badge!">
+        <img data-toggle="modal" data-target="[data-modal='{{ head_doi }}']"
+             src="{{ url_for('invenio_formatter_badges.badge', title='DOI', value=head_doi, ext='svg') }}" alt="{{ head_doi }}">
+        </img>
+      </span>
+      <div class="modal fade badge-modal" data-modal="{{ head_doi }}">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body">
+              <h4>Zenodo DOI Badge</h4>
+              {% from "invenio_formatter/macros/badges.html" import badges_formats_list %}
+              {{ badges_formats_list(url_for('invenio_formatter_badges.badge', title='DOI', value=head_doi, ext='svg', _external=True, _scheme='https'), head_doi|pid_url(scheme='doi')) }}
+            </div>
+          </div>
+        </div>
+      </div>
+      </dd>
+    {% endif %}
   {%- endif %}
 
   {%- if record.imprint and record.imprint.isbn %}
