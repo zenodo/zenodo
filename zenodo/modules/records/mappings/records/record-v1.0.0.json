@@ -537,6 +537,12 @@
           "type": "string",
           "index": "not_analyzed"
         },
+        "filecount": {
+          "type": "integer"
+        },
+        "size": {
+          "type": "long"
+        },
         "owners": {
           "type": "integer",
           "index": "not_analyzed"

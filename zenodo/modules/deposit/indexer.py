@@ -70,3 +70,8 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     else:
         json['_updated'] = record.updated
     json['_created'] = record.created
+
+    # Compute filecount and total file size
+    files = json.get('_files', [])
+    json['filecount'] = len(files)
+    json['size'] = sum([f.get('size', 0) for f in files])
