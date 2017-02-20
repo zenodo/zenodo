@@ -147,6 +147,32 @@
             }
           }
         },
+        "relations": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "object",
+              "properties": {
+                "parent": {
+                  "type": "string",
+                  "index": "not_analyzed",
+                  "copy_to": "parent_pid"
+                },
+                "is_latest": {
+                  "type": "boolean",
+                  "copy_to": "is_latest_version"
+                }
+              }
+            }
+          }
+        },
+        "parent_pid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "is_latest_version": {
+          "type": "boolean"
+        },
         "_deposit": {
           "type": "object",
           "properties": {

@@ -3,8 +3,7 @@
     <div class="pull-right view-record hidden-xs">
       <a target="_self" ng-href="/record/{{record.id}}" class="btn btn-default">View</a>
     </div>
-    <span class="label label-info" bs-tooltip data-container="div" data-title="Publication date">{{ record.metadata.
-    publication_date|date:'longDate' }}</span>
+    <span class="label label-info" bs-tooltip data-container="div" data-title="Publication date">{{ record.metadata.publication_date|date:'longDate' }}</span>
     <span class="label label-default">{{ record.metadata.resource_type.title }}</span>
     <span ng-switch on="record.metadata.access_right">
       <span ng-switch-when="embargoed">
@@ -25,9 +24,15 @@
       </span>
     </p>
     <p class="hidden-xs"><a target="_self" ng-href="/record/{{record.id}}"><span ng-bind-html="record.metadata.description|striptags|limitTo:300"></span></a></p>
+    <p>
       <small class="text-muted hidden-xs">
         Uploaded on {{ record.created|date:'longDate' }}
       </small>
+    </p>
+    <p>
+      <span class="text-muted hidden-xs" ng-if="vm.invenioSearchArgs.is_latest_version"><small><i>{{ record.metadata.version_index }} more Version(s) exist for this record</i></small></span>
+    </p>
+
     <hr />
   </div>
 </div>

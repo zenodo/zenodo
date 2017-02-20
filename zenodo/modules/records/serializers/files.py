@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -30,6 +30,8 @@ from flask import current_app, json
 from invenio_files_rest.models import ObjectVersion
 from invenio_records_files.api import FilesIterator
 
+from zenodo.modules.records.api import ZenodoFileObject
+
 
 def files_responsify(schema_class, mimetype):
     """Create a deposit files JSON serializer.
@@ -44,7 +46,6 @@ def files_responsify(schema_class, mimetype):
         )
 
         if isinstance(obj, ObjectVersion):
-            from zenodo.modules.deposit.api import ZenodoFileObject
             obj = ZenodoFileObject(obj, {})
 
         return current_app.response_class(

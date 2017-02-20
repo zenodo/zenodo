@@ -28,6 +28,23 @@
 .well {
   word-wrap: break-word;
 
+  .pid-versions-dropdown {
+
+    .dropdown-head {
+      color: black;
+      font-weight: 500;
+    }
+
+    .dropdown-item.latest a, .dropdown-head.latest {
+      color: #0047a8;
+      // color: goldenrod;
+    }
+
+    .dropdown-item.current a {
+      font-weight: 500;
+    }
+  }
+
   dl {
     margin-bottom: 0;
   }

@@ -519,6 +519,19 @@
       "type": "array",
       "description": "Subjects from specific vocabularies."
     },
+    "relations": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "object",
+          "properties": {
+            "parent": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "_deposit": {
       "description": "Internal deposit metadata.",
       "title": "Deposit",

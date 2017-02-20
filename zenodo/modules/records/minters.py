@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -33,6 +33,7 @@ from invenio_oaiserver.minters import oaiid_minter
 from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
+from invenio_pidrelations.contrib.records import RecordDraft, versioned_minter
 
 
 def doi_generator(recid, prefix=None):
@@ -69,9 +70,17 @@ def zenodo_record_minter(record_uuid, data):
     zenodo_doi_minter(record_uuid, data)
     oaiid_minter(record_uuid, data)
 
+    depid = data.pid
+    RecordDraft.unlink(recid, depid)
+
     return recid
 
 
+# def zenodo_doi_parent_minter(record_uuid, data, pid_type, object_type):
+#     doi = data.get('doi')
+
+
+# @versioned_minter(pid_type='doi', object_type='rec')
 def zenodo_doi_minter(record_uuid, data):
     """Mint DOI."""
     doi = data.get('doi')

@@ -704,6 +704,7 @@ RECORDS_REST_FACETS = dict(
         filters=dict(
             communities=terms_filter('communities'),
             provisional_communities=terms_filter('provisional_communities'),
+            is_latest_version=terms_filter('is_latest_version'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),

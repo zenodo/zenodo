@@ -31,7 +31,8 @@ from invenio_indexer.signals import before_record_index
 
 from . import config
 from .indexer import indexer_receiver
-from .receivers import datacite_register_after_publish
+from .receivers import datacite_register_after_publish, \
+    index_versioned_record_siblings
 
 
 class ZenodoDeposit(object):
@@ -60,6 +61,8 @@ class ZenodoDeposit(object):
         """Register Zenodo Deposit signals."""
         before_record_index.connect(indexer_receiver, sender=app, weak=False)
         post_action.connect(datacite_register_after_publish, sender=app,
+                            weak=False)
+        post_action.connect(index_versioned_record_siblings, sender=app,
                             weak=False)
 
     @staticmethod

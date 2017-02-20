@@ -22,5 +22,10 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-zenodo index reindex
-zenodo index run -c 4 -d
+zenodo index destroy --force --yes-i-know
+zenodo index init --force
+zenodo migration reindex -t recid
+zenodo migration reindex -t depid
+# zenodo migration reindex -t od_lic
+# zenodo migration reindex -t grants
+zenodo index run -c 8 -d

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -26,26 +26,28 @@
 
 from __future__ import absolute_import
 
+import uuid
 from contextlib import contextmanager
-from copy import copy
-from os.path import splitext
+from copy import copy, deepcopy
 
-from flask import current_app, request
+from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
-from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion, \
-    Part
+from invenio_deposit.utils import mark_as_action
+from invenio_files_rest.models import Bucket, MultipartObject, Part
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
-from invenio_records_files.api import FileObject, FilesIterator, _writable
 from invenio_records_files.models import RecordsBuckets
+from invenio_pidrelations.contrib.records import get_latest_draft
 
+from zenodo.modules.records.api import (ZenodoFileObject, ZenodoFilesIterator,
+                                        ZenodoRecord)
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.sipstore.api import ZenodoSIP
 
-from .errors import MissingCommunityError, MissingFilesError, \
-    OngoingMultipartUploadError
+from .errors import (MissingCommunityError, MissingFilesError,
+                     OngoingMultipartUploadError)
 from .fetchers import zenodo_deposit_fetcher
 from .minters import zenodo_deposit_minter
 
@@ -55,40 +57,11 @@ PRESERVE_FIELDS = (
     '_files',
     '_internal',
     '_oai',
+    'relations',
     'owners',
     'recid',
 )
 """Fields which will not be overwritten on edit."""
-
-
-class ZenodoFileObject(FileObject):
-    """Zenodo file object."""
-
-    def dumps(self):
-        """Create a dump."""
-        super(ZenodoFileObject, self).dumps()
-        self.data.update({
-            # Remove dot from extension.
-            'type': splitext(self.data['key'])[1][1:].lower(),
-            'file_id': str(self.file_id),
-        })
-        return self.data
-
-
-class ZenodoFilesIterator(FilesIterator):
-    """Zenodo files iterator."""
-
-    @_writable
-    def __setitem__(self, key, stream):
-        """Add file inside a deposit."""
-        with db.session.begin_nested():
-            size = None
-            if request and request.files and request.files.get('file'):
-                size = request.files['file'].content_length or None
-            obj = ObjectVersion.create(
-                bucket=self.bucket, key=key, stream=stream, size=size)
-            self.filesmap[key] = self.file_cls(obj, {}).dumps()
-            self.flush()
 
 
 class ZenodoDeposit(Deposit):
@@ -97,6 +70,8 @@ class ZenodoDeposit(Deposit):
     file_cls = ZenodoFileObject
 
     files_iter_cls = ZenodoFilesIterator
+
+    published_record_class = ZenodoRecord
 
     deposit_fetcher = staticmethod(zenodo_deposit_fetcher)
 
@@ -282,6 +257,8 @@ class ZenodoDeposit(Deposit):
         auto_request = set(self._get_auto_requested())
 
         # Add the owned communities to the record
+        # FIXME: This fails if the Community was added by the user...
+        # May be unique case though if you are Zenodo admin (user 1)
         self._autoadd_communities(owned_comms | auto_added, self)
 
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
@@ -367,6 +344,7 @@ class ZenodoDeposit(Deposit):
             if missing:
                 raise MissingCommunityError(missing)
 
+    @mark_as_action
     def publish(self, pid=None, id_=None, user_id=None, sip_agent=None):
         """Publish the Zenodo deposit."""
         self['owners'] = self['_deposit']['owners']
@@ -390,6 +368,7 @@ class ZenodoDeposit(Deposit):
         )
         data['_buckets'] = {'deposit': str(bucket.id)}
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
+
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
         return deposit
 
@@ -436,3 +415,41 @@ class ZenodoDeposit(Deposit):
         bucket.remove()
 
         return super(ZenodoDeposit, self).delete(*args, **kwargs)
+
+    @mark_as_action
+    def newversion(self, pid=None):
+        """Create a new version deposit."""
+        assert self.is_published()
+
+        # Check that there is not a newer draft version for this record
+        pid, record = self.fetch_published()
+        _, latest_draft = get_latest_draft(pid)
+        if not latest_draft:
+            # Let's create the new version draft!
+            with db.session.begin_nested():
+
+                # Get copy of the record
+                data = record.dumps()
+
+                # TODO: Check other data that may need to be removed
+                keys_to_remove = (
+                    '_deposit', 'doi', '_oai', '_files', '_buckets', '$schema')
+                for k in keys_to_remove:
+                    data.pop(k, None)
+
+                # NOTE: We call the superclass `create()` method, because we don't
+                # want a new empty bucket, but an unlocked snapshot of the old
+                # record's bucket.
+                deposit = (super(ZenodoDeposit, self).create(data))
+
+                with db.session.begin_nested():
+                    # Create snapshot from the record's bucket and update data
+                    snapshot = record.files.bucket.snapshot(lock=False)
+                    snapshot.locked = False
+                # FIXME: `snapshot.id` might not be present because we need to
+                # commit first to the DB.
+                # db.session.commit()
+                deposit['_buckets'] = {'deposit': str(snapshot.id)}
+                RecordsBuckets.create(record=deposit.model, bucket=snapshot)
+                deposit.commit()
+        return self

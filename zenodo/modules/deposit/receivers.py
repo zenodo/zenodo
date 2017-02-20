@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 from flask import current_app
 
 from zenodo.modules.deposit.tasks import datacite_register
+from invenio_pidrelations.contrib.records import index_siblings
 
 
 def datacite_register_after_publish(sender, action=None, pid=None,
@@ -38,3 +39,14 @@ def datacite_register_after_publish(sender, action=None, pid=None,
             current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
         recid_pid, record = deposit.fetch_published()
         datacite_register.delay(recid_pid.pid_value, str(record.id))
+
+
+def index_versioned_record_siblings(sender, action=None, pid=None,
+                                    deposit=None):
+    """Send previous version of published record for indexing."""
+    first_publish = (deposit.get('_deposit', {}).get('pid', {})
+                     .get('revision_id')) == 0
+    if action == "publish" and first_publish:
+        recid_pid, _ = deposit.fetch_published()
+        print('sending for indexing siblings of', recid_pid)
+        index_siblings(recid_pid, only_previous_version=True)

@@ -26,30 +26,46 @@
 
 from __future__ import absolute_import
 
-from invenio_pidstore.models import PersistentIdentifier, PIDStatus, \
-    RecordIdentifier
+from invenio_pidstore.models import (PersistentIdentifier, PIDStatus,
+                                     RecordIdentifier)
+
+from invenio_pidrelations.contrib.records import RecordDraft, versioned_minter
 
 
 def zenodo_deposit_minter(record_uuid, data):
     """Mint deposit identifier."""
-    id_ = RecordIdentifier.next()
+
+    # Reserve the record pid
+    recid = zenodo_reserved_record_minter(data=data)
+
+    # Create depid with same pid_value of the recid
     depid = PersistentIdentifier.create(
         'depid',
-        str(id_),
+        str(recid.pid_value),
         object_type='rec',
         object_uuid=record_uuid,
         status=PIDStatus.REGISTERED,
     )
-    # Reserve recid with same number.
-    PersistentIdentifier.create(
-        'recid', depid.pid_value,
-        status=PIDStatus.RESERVED
-    )
+
     data.update({
         '_deposit': {
             'id': depid.pid_value,
             'status': 'draft',
         },
-        'recid': id_,
     })
+
+    RecordDraft.link(recid, depid)
+
     return depid
+
+
+# NOTE: We only add the decorator here since we only want to version the recid
+@versioned_minter(pid_type='recid', object_type='rec')
+def zenodo_reserved_record_minter(record_uuid=None, data=None):
+    id_ = RecordIdentifier.next()
+    recid = PersistentIdentifier.create(
+        'recid', id_, status=PIDStatus.RESERVED
+    )
+    data['recid'] = recid.pid_value
+
+    return recid

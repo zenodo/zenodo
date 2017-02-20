@@ -141,5 +141,17 @@
         <small class="text-muted">Note: File addition, removal or modification are not allowed after an upload has been published. This is because a Digital Object Identifier (DOI) is registered with <a href="http://www.datacite.org"><i class="fa fa-external-link"></i> DataCite</a> for each upload. If you've made a mistake please <a href="/contact">contact us</a>.</small>
       </td>
     </tr>
+    <tr>
+      <td colspan="3">
+        <div align="center">
+          <p>If you have an updated version of your files, you can create a new
+            record version, with a completely new DOI.</p>
+          <button
+            class="btn btn-success"
+            ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
+            ng-click="recordsVM.actionHandler(['newversion', 'POST'], 'latest_draft_html')">New Version</button>
+        </div>
+      </td>
+    </tr>
   </table>
 </div>

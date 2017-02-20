@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -187,6 +187,22 @@
 {%- block page_body %}
 {%- set is_published = record.is_published and record.is_published() %}
   <div class="container">
+
+
+    {#
+      {% if is_published %}
+        <form style="padding-bottom: 15px" action="{{ url_for('zenodo_deposit.newversion', pid_value=pid.pid_value) }}" method="POST">
+          <button type="submit" title="Create a new version for this record." class="btn btn-success"><i class="fa fa-plus fa-inverse"></i> Create New Version</button>
+        </form>
+      {% else %}
+        {%- set latest_record_pid = record | to_latest_published_version %}
+        {% if latest_record_pid %}
+          <form style="padding-bottom: 15px" action="{{ url_for('zenodo_deposit.edit', pid_value=latest_record_pid.pid_value) }}" method="POST">
+            <button type="submit" title="Edit the latest version of this record." class="btn btn-success"><i class="fa fa-forward fa-inverse"></i> Edit latest version</button>
+          </form>
+        {% endif %}
+      {% endif %}
+    #}
     <div id="invenio-records">
     <invenio-files-uploader
         method="PUT"

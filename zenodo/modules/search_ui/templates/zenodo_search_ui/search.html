@@ -24,7 +24,10 @@
 
 {% extends "invenio_search_ui/search.html" %}
 
+{%- set search_extra_params = {'is_latest_version': True } -%}
+
 {%- block search_loading %}{% endblock %}
+
 
 {%- block javascript %}
   {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}

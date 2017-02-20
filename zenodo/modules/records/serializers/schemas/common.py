@@ -31,6 +31,7 @@ import idutils
 import jsonref
 from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
+from invenio_pidrelations.contrib.records import get_latest_draft
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
@@ -245,6 +246,10 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
 
+    parent_pid = SanitizedUnicode(attribute='relations.version.parent', dump_only=True)
+    is_latest_version = fields.Bool(attribute='relations.version.is_latest', dump_only=True)
+    version_index = fields.Int(attribute='relations.version.index', dump_only=True)
+
     @validates('embargo_date')
     def validate_embargo_date(self, value):
         """Validate that embargo date is in the future."""
@@ -422,12 +427,49 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                     if html_key:
                         links[html_key] = \
                             current_app.config['RECORDS_UI_ENDPOINT'].format(
-                            host=request.host,
-                            scheme=request.scheme,
-                            pid_value=recid,
+                                host=request.host,
+                                scheme=request.scheme,
+                                pid_value=recid,
+                            )
+
+                    # Check for draft versions and include a link to the latest
+                    # draft if there is one...
+                    # TODO: Move all of this link generation to someplace
+                    # else...
+                    r_pid = PersistentIdentifier.get('recid', recid)
+                    latest_version, latest_draft = get_latest_draft(r_pid)
+                    if api_key:
+                        links['latest'] = url_for(
+                            'invenio_records_rest.recid_item',
+                            pid_value=latest_version.pid_value,
+                            _external=True,
                         )
+                    if html_key:
+                        links['latest_html'] = (
+                            current_app.config['RECORDS_UI_ENDPOINT'].format(
+                                host=request.host,
+                                scheme=request.scheme,
+                                pid_value=latest_version.pid_value)
+                        )
+                    if latest_draft:
+                        if api_key:
+                            links['latest_draft'] = (
+                                current_app.config['DEPOSIT_RECORDS_API']
+                                .format(host=request.host,
+                                        scheme=request.scheme,
+                                        pid_value=latest_draft.pid_value)
+                            )
+                        if html_key:
+                            links['latest_draft_html'] = (
+                                current_app.config['DEPOSIT_UI_ENDPOINT']
+                                .format(host=request.host,
+                                        scheme=request.scheme,
+                                        pid_value=latest_draft.pid_value)
+                            )
                 except BuildError:
                     pass
+
+
 
             return links
 

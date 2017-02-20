@@ -38,7 +38,6 @@ from invenio_communities.models import Community, InclusionRequest
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_pidstore.models import PIDStatus
-from invenio_pidrelations.api import PIDVersionRelation
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
@@ -82,46 +81,6 @@ def accessright_get(value, embargo_date=None):
     may have not yet been updated after the embargo_date has passed.
     """
     return AccessRight.get(value, embargo_date)
-
-
-#
-# PID related filters and tests
-#
-@blueprint.app_template_filter('pidstatus')
-def pidstatus_title(pid):
-    """Get access right.
-
-    Better than comparing record.access_right directly as access_right
-    may have not yet been updated after the embargo_date has passed.
-    """
-    return PIDStatus(pid.status).title
-
-
-@blueprint.app_template_filter()
-def pid_versions(pid):
-    """Get PID versions.
-
-    Return a list of all the versions
-    """
-    return PIDVersionRelation.get_all_versions(pid)
-
-
-@blueprint.app_template_filter()
-def head_pid_version(pid):
-    """Get the Head PID version."""
-    return PIDVersionRelation.get_head(pid)
-
-
-@blueprint.app_template_test()
-def versioned_pid(pid):
-    """Test if the PID is versioned."""
-    return PIDVersionRelation.is_version(pid)
-
-
-@blueprint.app_template_test()
-def latest_pid_version(pid):
-    """Test if the PID is the latest version."""
-    return PIDVersionRelation.is_latest(pid)
 
 
 @blueprint.app_template_filter()
