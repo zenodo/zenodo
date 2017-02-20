@@ -25,37 +25,48 @@
   <div class="menu-wrapper">
     <div class="container">
       <div class="row footer-menu">
-        <div class="col-xs-3 col-md-2">
-          <h5>{{_('About')}}</h5>
-          <ul class="list-unstyled">
-            <li><a href="/about">{{_('About')}}</a></li>
-            <li><a href="/contact">{{_('Contact')}}</a></li>
-            <li><a href="/policies">{{_('Policies')}}</a></li>
-          </ul>
+        <div class="col-xs-12 col-md-8">
+          <div class="row">
+            <div class="col-xs-2 col-md-2">
+              <h5>{{_('About')}}</h5>
+              <ul class="list-unstyled">
+                <li><a href="http://about.zenodo.org">{{_('About')}}</a></li>
+                <li><a href="http://about.zenodo.org/policies">{{_('Policies')}}</a></li>
+                <li><a href="http://about.zenodo.org/contact">{{_('Contact')}}</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-2 col-md-2">
+              <h5>{{_('Blog')}}</h5>
+              <ul class="list-unstyled">
+                <li><a href="http://blog.zenodo.org">{{_('Blog')}}</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-2 col-md-2">
+              <h5>{{_('Help')}}</h5>
+              <ul class="list-unstyled">
+                <li><a href="http://help.zenodo.org">{{_('FAQ')}}</a></li>
+                <li><a href="http://help.zenodo.org/features">{{_('Features')}}</a></li>
+                <li><a href="http://help.zenodo.org/whatsnew">{{_("What's New")}}</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-2 col-md-2">
+              <h5>{{_('Developers')}}</h5>
+              <ul class="list-unstyled">
+              <li><a href="http://developers.zenodo.org">{{_('REST API')}}</a></li>
+              <li><a href="http://developers.zenodo.org#oai-pmh">{{_('OAI-PMH')}}</a></li>
+              </ul>
+            </div>
+            <div class="col-xs-2 col-md-2">
+              <h5>{{_('Contribute')}}</h5>
+              <ul class="list-unstyled">
+                <li><a href="http://github.com/zenodo/zenodo"><i class="fa fa-external-link"></i> {{_('GitHub')}}</a></li>
+                <li><a href="/donate"><i class="fa fa-external-link"></i> {{_('Donate')}}</a></li>
+              </ul>
+            </div>
+          </div>
         </div>
-        <div class="col-xs-3 col-md-2">
-          <h5>{{_('Resources')}}</h5>
-          <ul class="list-unstyled">
-            <li><a href="/features">{{_('Features')}}</a></li>
-            <li><a href="/faq">{{_('FAQ')}}</a></li>
-          </ul>
-        </div>
-        <div class="col-xs-3 col-md-2">
-          <h5>{{_('Developers')}}</h5>
-          <ul class="list-unstyled">
-          <li><a href="/dev">{{_('REST API')}}</a></li>
-          <li><a href="/dev">{{_('OAI-PMH')}}</a></li>
-          </ul>
-        </div>
-        <div class="col-xs-3 col-md-2">
-          <h5>{{_('Contribute')}}</h5>
-          <ul class="list-unstyled">
-          <li><a href="http://github.com/zenodo/zenodo"><i class="fa fa-external-link"></i> {{_('GitHub')}}</a></li>
-          <li><a href="/donate"><i class="fa fa-external-link"></i> {{_('Donate')}}</a></li>
-          </ul>
-        </div>
-        <div class="col-xs-12 text-center-sm col-md-4">
-          <div class="pull-right-md text-center-xs">
+        <div class="col-xs-12 col-md-4">
+          <div class="pull-right-md text-center-sm text-center-xs">
             <h5>{{_('Funded by')}}</h5>
             <ul class="list-inline">
               <li><a href="http://home.cern"><img src="{{ url_for('static', filename='img/cern.png') }}" width="60" height="60" /></a></li>
@@ -72,9 +83,9 @@
       <div class="col-xs-12 col-sm-6 col-sm-push-6">
         <div class="pull-right-sm text-center-xs">
           <ul class="list-inline">
-            <li><a href="/privacy-policy">{{_('Privacy policy')}}</a></li>
-            <li><a href="/terms">{{_('Terms of Use')}}</a></li>
-            <li><a href="/support">{{_('Support')}}</a></li>
+            <li><a href="http://about.zenodo.org/privacy-policy">{{_('Privacy policy')}}</a></li>
+            <li><a href="http://about.zenodo.org/terms">{{_('Terms of Use')}}</a></li>
+            <li><a href="http://about.zenodo.org/contact">{{_('Support')}}</a></li>
           </ul>
         </div>
       </div>
