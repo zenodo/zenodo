@@ -37,6 +37,10 @@
 
 .. image:: https://img.shields.io/github/license/zenodo/zenodo.svg
    :target: https://github.com/zenodo/zenodo/blob/master/LICENSE
+   
+.. image:: https://badges.gitter.im/Join%20Chat.svg
+   :alt: Join the chat at https://gitter.im/zenodo/zenodo
+   :target: https://gitter.im/zenodo/zenodo?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge
 
 
 Zenodo, a CERN service, is an open dependable home for the long-tail of
@@ -46,14 +50,14 @@ any size, any format and from any science.
 Powered by Invenio
 ------------------
 Zenodo is a small layer on top of
-`Invenio <http://github.com/inveniosoftware/invenio>`, a ​free software
+`Invenio <http://github.com/inveniosoftware/invenio>`_, a ​free software
 suite enabling you to run your own ​digital library or document repository on
 the web.
 
 
 Installation
 ============
-See INSTALL.rst
+See `INSTALL.rst <https://github.com/zenodo/zenodo/blob/master/INSTALL.rst>`_
 
 Developer documentation
 =======================
