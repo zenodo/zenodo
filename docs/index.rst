@@ -66,8 +66,9 @@ development processes.
 .. toctree::
    :maxdepth: 2
 
-   development
-   projectlifecycle
+   development/guide
+   development/process
+   development/projectlifecycle
 
 Additional Notes
 ----------------

@@ -143,7 +143,7 @@ packages.
    https://caremad.io/2013/07/setup-vs-requirement/
 
 The concrete requirements for Zenodo are divided over a number of
-requirements files which broadly falls in two categories:
+requirements files which broadly fall in two categories:
 
 **Base requirements:**
 
