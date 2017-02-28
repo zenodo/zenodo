@@ -149,7 +149,7 @@ You can now load the demo records (licenses, funders, grants, records):
    (zenodo)$ zenodo openaire loadgrants --setspec=FP7Projects
    (zenodo)$ zenodo fixtures loaddemorecords
    (zenodo)$ zenodo migration recordsrun
-   (zenodo)$ zenodo migration reindex recid
+   (zenodo)$ zenodo migration reindex -t recid
    (zenodo)$ zenodo index run -d
 
 
