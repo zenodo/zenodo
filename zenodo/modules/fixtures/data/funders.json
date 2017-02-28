@@ -1,0 +1,19 @@
+[
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "EC"
+    ],
+    "country": "BE",
+    "doi": "10.13039/501100000780",
+    "identifiers": {
+      "oaf": "ec__________::EC"
+    },
+    "name": "European Commission",
+    "parent": {},
+    "remote_created": "2011-06-08T16:00:03.000000",
+    "remote_modified": "2015-10-28T13:27:02.000000",
+    "subtype": "federal",
+    "type": "gov"
+  }
+]
