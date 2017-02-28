@@ -123,5 +123,6 @@ static:
   user: zenodo
   volumes:
     - "/usr/local/var/instance/static"
+    - "/usr/local/lib/python3.5/site-packages"
     - "/usr/local/var/data"
     - ".:/code/zenodo"

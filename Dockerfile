@@ -11,9 +11,9 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update \
     && apt-get -qy upgrade --fix-missing --no-install-recommends \
     && apt-get -qy install --fix-missing --no-install-recommends \
-        curl libcairo2-dev fonts-dejavu libfreetype6-dev \
+        apt-utils curl libcairo2-dev fonts-dejavu libfreetype6-dev \
     # Node.js
-    && curl -sL https://deb.nodesource.com/setup_4.x | bash - \
+    && curl -sL https://deb.nodesource.com/setup_6.x | bash - \
     && apt-get -qy install --fix-missing --no-install-recommends \
         nodejs \
 
@@ -53,7 +53,7 @@ RUN pip install -e .[postgresql] \
     && python -O -m compileall .
 
 # Install bower dependencies and build assets.
-RUN zenodo npm \
+RUN zenodo npm --pinned-file /code/zenodo/package.pinned.json \
     && cd ${APP_INSTANCE_PATH}/static \
     && npm install \
     && cd /code/zenodo \

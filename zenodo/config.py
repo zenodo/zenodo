@@ -915,7 +915,7 @@ USERPROFILES_EXTEND_SECURITY_FORMS = True
 #: Default database host.
 SQLALCHEMY_DATABASE_URI = os.environ.get(
     "SQLALCHEMY_DATABASE_URI",
-    "postgresql+psycopg2://localhost/zenodo")
+    "postgresql+psycopg2://zenodo:zenodo@localhost/zenodo")
 #: Do not print SQL queries to console.
 SQLALCHEMY_ECHO = False
 #: Track modifications to objects.
