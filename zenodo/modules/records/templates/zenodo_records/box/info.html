@@ -101,7 +101,7 @@
   {%- elif p %}
     <dt>{{_('Published in')}}:</dt>
     <dd>
-      {{p.title}}{% if i.place %}, {{i.publisher}}{%- endif %}{% if i.place %}, {{i.place}}{%- endif %}{% if p.pages %}, pp. {{p.pages}}{%- endif %}{% if i.isbn %} ({{i.isbn}}){%- endif %}.
+      {{p.title}}{% if i.publisher %}, {{i.publisher}}{%- endif %}{% if i.place %}, {{i.place}}{%- endif %}{% if p.pages %}, pp. {{p.pages}}{%- endif %}{% if i.isbn %} ({{i.isbn}}){%- endif %}.
     </dd>
   {%- endif %}
   {%- endwith %}
