@@ -3,7 +3,7 @@
 Development guide
 ===================
 
-This guide is intended for Zenodo developers, in in you will learn how to
+This guide is intended for Zenodo developers, in it you will learn how to
 contribute the code to Zenodo.
 
 Developing code locally
@@ -11,7 +11,7 @@ Developing code locally
 
 To make a code contribution to Zenodo you will either have to submit a patch
 to Zenodo repository, but most likely also to one or more of the corresponding
-Invenio modules. This is because most of Zenodo's code is referring to Invenio,
+Invenio modules. This is because most of Zenodo's code is referring to Invenio
 modules, with only a thin customization and configuration layer on top.
 Making changes to Zenodo's code on your local
 instance are straightforward - just edit the code and restart the Zenodo
@@ -66,7 +66,7 @@ Making a contribution
 ~~~~~~~~~~~~~~~~~~~~~
 
 If the feature you've implemented involves only the changes in Zenodo
-repository, you will only need to create a one PR to Zenodo. If the changes
+repository, you will only need to create one PR to Zenodo. If the changes
 involve also any of the Invenio modules, you will also have to create a PR in
 that corresponding Invenio repository on GitHub.
 

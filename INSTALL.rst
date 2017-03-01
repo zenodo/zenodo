@@ -31,7 +31,7 @@ build all docker images and boot them up using ``docker-compose``:
 
     $ cd ~/src/
     $ git clone https://github.com/zenodo/zenodo.git
-    $ cd zenodo
+    $ cd ~/src/zenodo
     $ git checkout master
     $ docker-compose build
     $ docker-compose up
@@ -43,13 +43,13 @@ build all docker images and boot them up using ``docker-compose``:
     checked into ``~/src/`` directory.
 
 
-Keep the session with the docker-compose above alive, and in a separate shell
+Keep the session with the docker-compose above alive, and in a new shell
 run the init script which creates the database tables, search indexes
 and some data fixtures:
 
 .. code-block:: console
 
-    $ cd zenodo
+    $ cd ~/src/zenodo
     $ docker-compose run --rm web bash /code/zenodo/scripts/init.sh
     $ docker-compose run --rm statsd bash /init.sh
 
@@ -133,7 +133,8 @@ in which we will install Zenodo code and its dependencies:
 
 .. code-block:: console
 
-    (zenodo)$ mkvirtualenv zenodo
+    $ mkvirtualenv zenodo
+    (zenodo)$
 
 .. note::
 
@@ -261,11 +262,25 @@ Finally, run the Zenodo application:
 
 .. code-block:: console
 
-    (zenodo)$ export FLASK_DEBUG=True
     (zenodo)$ zenodo run
 
 If you go to http://localhost:5000, you should see an instance of Zenodo,
 similar to the production instance at https://zenodo.org
+
+.. note::
+
+    When running the development server, it's sometimes convenient to run
+    it in ``debug`` mode. You can do that by setting up the evironment flag:
+
+    .. code-block:: console
+
+        (zenodo)$ export FLASK_DEBUG=True
+        (zenodo)$ zenodo run  --reload --with-threads
+
+    Additionally, the flags ``--reload`` (already on when in debug mode)
+    and ``--with-threads`` which allows you to have the application reload
+    automatically to any detected changes in the code as well as run the
+    development server with multithreading (see ``zenodo run --help``).
 
 Badges
 ~~~~~~
