@@ -10,6 +10,7 @@ using Docker Compose:
 .. code-block:: console
 
     $ git clone https://github.com/zenodo/zenodo.git
+    $ cd zenodo
     $ git checkout master
     $ docker-compose build
     $ docker-compose up
@@ -151,6 +152,13 @@ You can now load the demo records (licenses, funders, grants, records):
    (zenodo)$ zenodo migration recordsrun
    (zenodo)$ zenodo migration reindex -t recid
    (zenodo)$ zenodo index run -d
+
+Finally, you can run the web app:
+
+.. code-block:: console
+
+    (zenodo)$ zenodo run
+
 
 
 Badges
