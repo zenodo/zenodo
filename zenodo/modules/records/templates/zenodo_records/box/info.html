@@ -96,22 +96,24 @@
   {%- if i and not p %}
     <dt>{{_('Imprint')}}:</dt>
     <dd>
-      {{i.publisher}}{% if i.place %}, {{i.place}}{%- endif %}{% if i.isbn %} ({{i.isbn}}){%- endif %}.
+      {{i.publisher}}{% if i.place %}, {{i.place}}{%- endif %}{% if i.isbn %}({{i.isbn}}){%- endif %}.
     </dd>
-  {%- elif p %}
-    <dt>{{_('Published in')}}:</dt>
-    <dd>
-      {{p.title}}{% if i.publisher %}, {{i.publisher}}{%- endif %}{% if i.place %}, {{i.place}}{%- endif %}{% if p.pages %}, pp. {{p.pages}}{%- endif %}{% if i.isbn %} ({{i.isbn}}){%- endif %}.
-    </dd>
+  {%- elif p.title %}
+          <dt>{{_('Published in')}}:</dt>
+          <dd>
+              {{p.title}}{% if i.publisher %}, {{i.publisher}}{%- endif %}{% if i.place %}, {{i.place}}{%- endif %}{% if p.pages %}, pp. {{p.pages}}{%- endif %}{% if i.isbn %}({{i.isbn}}){%- endif %}.
+          </dd>
   {%- endif %}
   {%- endwith %}
 
   {%- if record.journal %}
   {% with j=record.journal %}
+    {% if j.title %}
     <dt>{{_('Published in')}}:</dt>
     <dd>
       {{j.title}}:{% if j.volume %} {{j.volume}}{% endif%}{% if j.year %} ({{j.year}}){% endif %}{% if j.number %} no. {{j.number}},{% endif %}{% if j.pages %} pp. {{j.pages}}{% endif %}.
     </dd>
+    {% endif %}
   {%- endwith %}
   {%- endif %}
 

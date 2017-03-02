@@ -27,14 +27,28 @@
 from __future__ import absolute_import, print_function
 
 from invenio_db import db
-from invenio_openaire.minters import grant_minter
+from invenio_openaire.minters import funder_minter, grant_minter
 from invenio_records.api import Record
 
 from .utils import read_json
 
 
+def loadfp6funders(force=False):
+    """Load FP6 funder fixtures."""
+    data = read_json('data/funders.json')
+    try:
+        for f in data:
+            r = Record.create(f)
+            funder_minter(r.id, r)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+
+
+
 def loadfp6grants(force=False):
-    """Load default file store location."""
+    """Load FP6 grant fixtures."""
     data = read_json('data/grants.json')
     try:
         for g in data:

@@ -40,20 +40,34 @@ Credits
 
 * **Developers:**
 
+  * Alexander Ioannidis
+  * Krzysztof Nowak
+
+* **Contributors:**
+
   * Adrian Pawel Baran
+  * Aman Jain
   * Amit Kapadia
+  * Antonin Delpeuch
+  * Bertrand Néron
   * Bruno Cuc
   * Dan Blanchard
+  * David Zerulla
   * Dimitrios Semitsoglou-Tsiapos
   * Esteban J. G. Gabancho
+  * Harris Tzovanakis
+  * Javier Delgado Fernandez
   * Jiri Kuncar
   * João Gonçalves
-  * Krzysztof Nowak
+  * Johnny Mariéthoz
   * Katrin Leinweber
   * Leonardo Rossi
+  * Nikos Filippakis
   * Odd Magnus Trondrud
   * Sami Hiltunen
   * Samuele Kaplun
+  * Satwik Kansal
+  * Sertan Senturk
 
 * **Funders**:
 
