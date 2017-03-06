@@ -245,7 +245,9 @@ Launch the data loading scripts in a separate shell:
 
 .. code-block:: console
 
-   $ cd ~/src/zenodo
+   $ cd ~/src
+   $ git clone https://github.com/inveniosoftware/invenio-openaire.git
+   $ cd zenodo
    $ workon zenodo
    (zenodo)$ zenodo opendefinition loadlicenses
    (zenodo)$ zenodo fixtures loadlicenses
