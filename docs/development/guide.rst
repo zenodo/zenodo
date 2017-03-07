@@ -58,7 +58,7 @@ should be propagated to the Zenodo application.
 
     Please know that if you check out the master version of any Invenio
     module, it's usually much newer version than the release (PyPI) version.
-    This means that if the Zenodo-specified version of the module (see setup.py)
+    This means that if the Zenodo-specified version of the module (see `setup.py <https://github.com/zenodo/zenodo/blob/master/setup.py>`_)
     is far behind the master branch, you can expect some incompatibilities
     or strange behaviour.
 
