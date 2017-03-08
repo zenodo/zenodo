@@ -46,7 +46,7 @@ def test_recid(app, minimal_record):
 
 
 def test_resource_type(app, db, minimal_record):
-    """Test recid property."""
+    """Test resource type."""
     # String instead of number
     minimal_record['resource_type'] = 'publication'
     pytest.raises(ValidationError, Record.create, minimal_record)
@@ -55,14 +55,14 @@ def test_resource_type(app, db, minimal_record):
 
 
 def test_publication_date(app, db, minimal_record):
-    """Test recid property."""
+    """Test publication date."""
     # String instead of number
     minimal_record['publication_date'] = datetime.utcnow().date().isoformat()
     Record.create(minimal_record)
 
 
 def test_contributors(app, db, minimal_record):
-    """Test recid property."""
+    """Test contributors."""
     # String instead of number
     minimal_record['contributors'] = [
         {'name': 'test', 'affiliation': 'test', 'type': 'ContactPerson'}
