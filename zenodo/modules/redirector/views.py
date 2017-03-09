@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 from flask import Blueprint, redirect, request, url_for
 from invenio_search_ui.views import search as search_ui_search
 
-from .config import REDIRECTOR_DONATE_PAGE, ZENODO_TYPE_SUBTYPE_LEGACY
+from .config import REDIRECTOR_EXTERNAL_REDIRECTS, ZENODO_TYPE_SUBTYPE_LEGACY
 
 blueprint = Blueprint(
     'zenodo_redirector',
@@ -141,7 +141,11 @@ def collections_search_redirect():
     return redirect(url_for('invenio_search_ui.search', **values))
 
 
-@blueprint.route('/donate')
-def donate():
-    """Reddirect to external donate page."""
-    return redirect(REDIRECTOR_DONATE_PAGE)
+def redirect_view_factory(url):
+    """Create a view which redirects to given URL."""
+    return (lambda: redirect(url))
+
+
+# Add url rules for external redirects
+for rule, endpoint, url in REDIRECTOR_EXTERNAL_REDIRECTS:
+    blueprint.add_url_rule(rule, endpoint, redirect_view_factory(url))
