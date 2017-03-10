@@ -64,6 +64,19 @@ ZENODO_TYPE_SUBTYPE_LEGACY = {
 }
 
 
-#: Zenodo donate redirection page
-REDIRECTOR_DONATE_PAGE = 'https://giving.web.cern.ch/civicrm/contribute/' \
-                         'transact%3Freset%3D1%26id%3D20'
+#: External redirect URLs
+REDIRECTOR_EXTERNAL_REDIRECTS = [
+    ['/dev', 'dev', 'http://developers.zenodo.org'],
+    ['/faq', 'faq', 'http://help.zenodo.org'],
+    ['/features', 'features', 'http://help.zenodo.org/features/'],
+    ['/whatsnew', 'whatsnew', 'http://help.zenodo.org/whatsnew/'],
+    ['/about', 'about', 'http://about.zenodo.org'],
+    ['/contact', 'contact', 'http://about.zenodo.org/contact/'],
+    ['/policies', 'policies', 'http://about.zenodo.org/policies/'],
+    ['/privacy-policy', 'privacy-policy',
+     'http://about.zenodo.org/privacy-policy/'],
+    ['/terms', 'terms', 'http://about.zenodo.org/terms/'],
+    ['/support', 'support', 'http://about.zenodo.org/contact/'],
+    ['/donate', 'donate', 'https://giving.web.cern.ch/civicrm/contribute/'
+                          'transact%3Freset%3D1%26id%3D20'],
+]
