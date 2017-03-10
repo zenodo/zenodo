@@ -38,7 +38,7 @@ def test_minimal_json(app, db, minimal_record):
     Record.create(minimal_record)
 
 
-def test_recid(app, minimal_record):
+def test_recid(app, db, minimal_record):
     """Test recid property."""
     # String instead of number
     minimal_record['recid'] = '123'
