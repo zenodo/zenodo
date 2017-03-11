@@ -53,13 +53,13 @@ services:
   - rabbitmq
 
 env:
-  - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz"
+  - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL_2="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz"
   - REQUIREMENTS=latest E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz"
-  - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db" ES_URL="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz"
-  - REQUIREMENTS=prod E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz"
+  - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db" ES_URL_2="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz"
+  - REQUIREMENTS=prod E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL_2="https://download.elastic.co/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.2.0/elasticsearch-2.2.0.tar.gz"
 
 jdk:
-  - "oraclejdk8"  
+  - "oraclejdk8"
 
 python:
   - "2.7"
@@ -68,11 +68,13 @@ python:
 matrix:
   fast_finish: true
   allow_failures:
-    - python: pypy
     - env: REQUIREMENTS=latest E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz"
 
 before_install:
   - "mkdir /tmp/elasticsearch"
+  - "wget -O - $ES_URL_2 | tar xz --directory=/tmp/elasticsearch --strip-components=1"
+  - "/tmp/elasticsearch/bin/plugin install -b mapper-attachments"
+  - "/tmp/elasticsearch/bin/elasticsearch &"
   - "wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/plugin install -b ingest-attachments"
   - "/tmp/elasticsearch/bin/elasticsearch &"
