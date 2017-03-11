@@ -104,7 +104,7 @@ def full_test_contributors(app, db, full_record):
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
              'gnd': '', 'orcid': ''} 
     ]
-    pytest.raises(ValidationError, Record.create, full_record)     
+    pytest.raises(ValidationError, Record.create, full_record)          
     
     
     
