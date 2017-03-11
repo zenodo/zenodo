@@ -76,7 +76,7 @@ def test_contributors(app, db, minimal_record):
     
 def test_full_json(app, db, full_record) :
       """Test full json."""
-    Record.create( full_record)
+    Record.create(full_record)
       
 def full_test_recid(app,db,full_record):
     """Test recid property."""
