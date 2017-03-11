@@ -73,26 +73,26 @@ def test_contributors(app, db, minimal_record):
     ]
     pytest.raises(ValidationError, Record.create, minimal_record)
      # validation of full_record fixture
-    
 
-def test_full_json(app, db, full_record) :
+
+def test_full_json(app, db, full_record):
       """Test full json."""
     Record.create(full_record)
-      
 
-def full_test_recid(app,db,full_record):
+
+def full_test_recid(app, db, full_record):
     """Test recid property."""
     full_record['recid'] = '12345'
     pytest.raises(ValidationError, Record.create, full_record)
-      
+
 
 def full_test_resource_type(app, db, full_record):
     """Test resource type."""
     full_record['resource_type'] = 'publication'
     pytest.raises(ValidationError, Record.create, full_record)
     full_record['resource_type'] = {'type': 'publication', 'subtype': 'book'}
-    Record.create(full_record) 
-    
+    Record.create(full_record)
+
 
 def full_test_contributors(app, db, full_record):
     """Test contributors."""
@@ -103,12 +103,6 @@ def full_test_contributors(app, db, full_record):
     Record.create(full_record)
     full_record['contributors'] = [
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
-             'gnd': '', 'orcid': ''} 
+             'gnd': '', 'orcid': ''}
     ]
-    pytest.raises(ValidationError, Record.create, full_record)             
-    
-    
-    
-      
-     
-
+    pytest.raises(ValidationError, Record.create, full_record)
