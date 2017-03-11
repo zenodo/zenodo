@@ -60,7 +60,7 @@ def test_publication_date(app, db, minimal_record):
     minimal_record['publication_date'] = datetime.utcnow().date().isoformat()
     Record.create(minimal_record)
 
-    
+
 def test_contributors(app, db, minimal_record):
     """Test contributors."""
     # String instead of number
@@ -72,7 +72,7 @@ def test_contributors(app, db, minimal_record):
         {'name': 'test', 'affiliation': 'test', 'type': 'Invalid'}
     ]
     pytest.raises(ValidationError, Record.create, minimal_record)
-     # validation of full_record fixture
+# validation of full_record fixture
 
 
 def test_full_json(app, db, full_record):
