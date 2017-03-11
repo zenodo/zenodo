@@ -73,8 +73,8 @@ matrix:
 before_install:
   - "mkdir /tmp/elasticsearch"
   - "wget -O - $ES_URL | tar xz --directory=/tmp/elasticsearch --strip-components=1"
-  - "/tmp/elasticsearch/bin/plugin install -b mapper-attachments"
-  # - "/tmp/elasticsearch/bin/plugin install -b ingest-attachments"
+  # - "/tmp/elasticsearch/bin/plugin install -b mapper-attachments"
+  - "/tmp/elasticsearch/bin/plugin install -b ingest-attachments"
   - "/tmp/elasticsearch/bin/elasticsearch &"
   - "travis_retry pip install --upgrade pip setuptools py 'sphinx==1.4.4'"
   - "travis_retry pip install wheel coveralls requirements-builder"
