@@ -98,11 +98,11 @@ def full_test_contributors(app, db, full_record):
     """Test contributors."""
     full_record['contributors'] = [
        {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
-             'gnd': '', 'orcid': '0000-0002-1825-0097'}
+                       'gnd': '', 'orcid': '0000-0002-1825-0097'}
     ]
     Record.create(full_record)
     full_record['contributors'] = [
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
-             'gnd': '', 'orcid': ''}
+                            'gnd': '', 'orcid': ''}
     ]
     pytest.raises(ValidationError, Record.create, full_record)
