@@ -64,7 +64,6 @@ jdk:
 python:
   - "2.7"
   - "3.5"
-  - "pypy"
 
 matrix:
   fast_finish: true
