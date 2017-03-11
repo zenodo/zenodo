@@ -56,7 +56,7 @@ def test_resource_type(app, db, minimal_record):
 
 def test_publication_date(app, db, minimal_record):
     """Test publication date."""
-    # String instead of number
+    # String instead of numbe
     minimal_record['publication_date'] = datetime.utcnow().date().isoformat()
     Record.create(minimal_record)
 
