@@ -29,6 +29,11 @@ from __future__ import absolute_import, print_function
 from flask import url_for
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from signal import signal, SIGPIPE, SIG_DFL
+
+# Ignore SIG_PIPE and don't throw exceptions on it...
+# (http://docs.python.org/library/signal.html)
+signal(SIGPIPE, SIG_DFL)
 
 
 def test_loginpage(live_server, env_browser):
