@@ -651,7 +651,7 @@ RECORDS_REST_SORT_OPTIONS = dict(
             order=4,
         ),
         conference_session=dict(
-            fields=['meetings.session:asc', 'meetings.session_part:desc'],
+            fields=['meeting.session', '-meeting.session_part'],
             title='Conference session',
             default_order='desc',
             order=4,
