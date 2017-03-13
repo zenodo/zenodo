@@ -131,7 +131,7 @@ class DataCiteSchemaV1(Schema):
         lambda o: str(arrow.get(o['metadata']['publication_date']).year))
     subjects = fields.Method('get_subjects')
     contributors = fields.Method('get_contributors')
-    # TOOD: Contributors
+    # TODO: Contributors
     dates = fields.Method('get_dates')
     language = fields.Str(attribute='metadata.language')
     resourceType = fields.Method('get_type')
