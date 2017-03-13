@@ -251,7 +251,7 @@ Launch the data loading scripts in a separate shell:
    $ workon zenodo
    (zenodo)$ zenodo opendefinition loadlicenses
    (zenodo)$ zenodo openaire loadfunders \
-    --source=~/src/invenio-openaire/invenio_openaire/data/fundref_registry.rdf
+    --source=$HOME/src/invenio-openaire/invenio_openaire/data/fundref_registry.rdf
    (zenodo)$ zenodo openaire loadgrants --setspec=FP7Projects
    (zenodo)$ zenodo fixtures loaddemorecords
    (zenodo)$ zenodo migration recordsrun
