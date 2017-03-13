@@ -42,14 +42,16 @@ def test_recid(app, db, minimal_record):
     """Test recid property."""
     # String instead of number
     minimal_record['recid'] = '123'
-    pytest.raises(ValidationError, Record.create, minimal_record)
+    exc = pytest.raises(ValidationError, Record.create, minimal_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
 
 
 def test_resource_type(app, db, minimal_record):
     """Test resource type."""
     # String instead of number
     minimal_record['resource_type'] = 'publication'
-    pytest.raises(ValidationError, Record.create, minimal_record)
+    exc = pytest.raises(ValidationError, Record.create, minimal_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
     minimal_record['resource_type'] = {'type': 'publication', 'subtype': 'x'}
     Record.create(minimal_record)
 
@@ -71,8 +73,8 @@ def test_contributors(app, db, minimal_record):
     minimal_record['contributors'] = [
         {'name': 'test', 'affiliation': 'test', 'type': 'Invalid'}
     ]
-    pytest.raises(ValidationError, Record.create, minimal_record)
-# validation of full_record fixture
+    exc = pytest.raises(ValidationError, Record.create, minimal_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
 
 
 def test_full_json(app, db, full_record):
@@ -80,29 +82,33 @@ def test_full_json(app, db, full_record):
     Record.create(full_record)
 
 
-def full_test_recid(app, db, full_record):
+def test_full_recid(app, db, full_record):
     """Test recid property."""
     full_record['recid'] = '12345'
-    pytest.raises(ValidationError, Record.create, full_record)
+    exc = pytest.raises(ValidationError, Record.create, full_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
 
 
-def full_test_resource_type(app, db, full_record):
+def test_full_resource_type(app, db, full_record):
     """Test resource type."""
     full_record['resource_type'] = 'publication'
-    pytest.raises(ValidationError, Record.create, full_record)
+    exc = pytest.raises(ValidationError, Record.create, full_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
     full_record['resource_type'] = {'type': 'publication', 'subtype': 'book'}
     Record.create(full_record)
 
 
-def full_test_contributors(app, db, full_record):
+def test_full_contributors(app, db, full_record):
     """Test contributors."""
     full_record['contributors'] = [
-       {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
+       {'affiliation': 'CERN', 'name': ' '', '' ', 'type': 'Other',
                        'gnd': '', 'orcid': '0000-0002-1825-0097'}
     ]
-    Record.create(full_record)
+    exc = pytest.raises(ValidationError, Record.create, full_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
     full_record['contributors'] = [
-        {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Other',
+        {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Author',
                             'gnd': '', 'orcid': ''}
     ]
-    pytest.raises(ValidationError, Record.create, full_record)
+    exc = pytest.raises(ValidationError, Record.create, full_record)
+    assert exc.value.message == "'publication' is not of type 'object'"
