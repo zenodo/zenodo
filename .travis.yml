@@ -53,8 +53,9 @@ services:
   - rabbitmq
 
 env:
+  - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz"
   - REQUIREMENTS=latest E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo" ES_URL="https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-5.2.2.tar.gz"
-  
+
 jdk:
   - "oraclejdk8"
 
