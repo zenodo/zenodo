@@ -51,6 +51,19 @@ def file_id_to_key(value):
         return object_version.key
     return value
 
+def scan_zip_for_extensions(archive_name):
+	'''Scan zip file for __MACOSX and .DS_Store'''
+	if zipfile.is_zipfile(archive_name) != True:
+		return False
+	zf = zipfile.ZipFile(archive_name)
+	for info in zf.infolist():
+		if '.zip' in info.filename:
+			return print_info(info.filename)
+		if '__MACOSX' in info.filename:
+			return True
+		if '.DS_Store' in info.filename:
+			return True
+	return False
 
 class FileKeyConverter(PathConverter):
     """Convert file UUID for key."""
