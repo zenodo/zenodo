@@ -104,8 +104,7 @@ def test_full_contributors(app, db, full_record):
        {'affiliation': 'CERN', 'name': ' '', '' ', 'type': 'Other',
                        'gnd': '', 'orcid': '0000-0002-1825-0097'}
     ]
-    exc = pytest.raises(ValidationError, Record.create, full_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    Record.create(full_record)
     full_record['contributors'] = [
         {'affiliation': '', 'name': 'Hansen, Viggo', 'type': 'Author',
                             'gnd': '', 'orcid': ''}
