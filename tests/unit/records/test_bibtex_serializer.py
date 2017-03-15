@@ -207,6 +207,29 @@ def test_get_volume(bibtex_records):
     assert "" == record_empty._get_volume()
 
 
+def test_clean_input(full_record):
+    """Test."""
+    full_record['resource_type']['subtype'] = 'article'
+    full_record['title'] = "Test title & escaped character"
+    bibtex = ("""@article{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Doe, Jane and\n"""
+              """                  Smith, John and\n"""
+              """                  Nowak, Jack},\n"""
+              """  title        = {Test title \& escaped character},\n"""
+              """  journal      = {Bam},\n"""
+              """  year         = 2014,\n"""
+              """  volume       = 20,\n"""
+              """  number       = 2,\n"""
+              """  pages        = 20,\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
 def test_format_article(full_record):
     """Test."""
     full_record['resource_type']['subtype'] = 'article'
