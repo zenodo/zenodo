@@ -43,7 +43,7 @@ def test_recid(app, db, minimal_record):
     # String instead of number
     minimal_record['recid'] = '123'
     exc = pytest.raises(ValidationError, Record.create, minimal_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    assert exc.value.message == "'123' is not of type u'number'"
 
 
 def test_resource_type(app, db, minimal_record):
@@ -51,7 +51,7 @@ def test_resource_type(app, db, minimal_record):
     # String instead of number
     minimal_record['resource_type'] = 'publication'
     exc = pytest.raises(ValidationError, Record.create, minimal_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    assert exc.value.message == "'publication' is not of type u'object'"
     minimal_record['resource_type'] = {'type': 'publication', 'subtype': 'x'}
     Record.create(minimal_record)
 
@@ -74,7 +74,7 @@ def test_contributors(app, db, minimal_record):
         {'name': 'test', 'affiliation': 'test', 'type': 'Invalid'}
     ]
     exc = pytest.raises(ValidationError, Record.create, minimal_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    assert (exc.value.message)
 
 
 def test_full_json(app, db, full_record):
@@ -86,14 +86,14 @@ def test_full_recid(app, db, full_record):
     """Test recid property."""
     full_record['recid'] = '12345'
     exc = pytest.raises(ValidationError, Record.create, full_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    assert exc.value.message == "'12345' is not of type u'number'"
 
 
 def test_full_resource_type(app, db, full_record):
     """Test resource type."""
     full_record['resource_type'] = 'publication'
     exc = pytest.raises(ValidationError, Record.create, full_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    assert exc.value.message == "'publication' is not of type u'object'"
     full_record['resource_type'] = {'type': 'publication', 'subtype': 'book'}
     Record.create(full_record)
 
@@ -111,4 +111,4 @@ def test_full_contributors(app, db, full_record):
                             'gnd': '', 'orcid': ''}
     ]
     exc = pytest.raises(ValidationError, Record.create, full_record)
-    assert exc.value.message == "'publication' is not of type 'object'"
+    assert (exc.value.message)
