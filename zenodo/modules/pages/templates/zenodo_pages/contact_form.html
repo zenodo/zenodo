@@ -1,0 +1,103 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_theme/page.html" %}
+
+{% from "invenio_userprofiles/settings/_macros.html" import render_field %}
+
+{%- block page_body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2>Get help with Zenodo</h2>
+      <hr />
+      <div class="panel-body">
+      <form action="" method="POST" enctype="multipart/form-data">
+        {% if not current_user.is_authenticated %}
+          It is recommended to login first.
+        {% endif %}
+
+        {{ form.csrf_token }}
+        {{ render_field(form.name) }}
+
+        {% if current_user.is_authenticated %}
+          Zenodo staff will get back to you by your Zenodo email: <b>{{ form.email.data }}</b>
+        {% else %}
+          {{ render_field(form.email) }}
+        {% endif %}
+
+        {{ render_field(form.subject) }}
+        {{ render_field(form.issue_category) }}
+        <p id="issue_text"></p>
+        {{ render_field(form.description) }}
+        {{ render_field(form.attachments) }}
+
+        {{ form.include_os_browser }} Send the browser and system information.
+        <br />
+        To better address your problem,
+        the following information can be sent to us (recommended) alongside with your message:
+        <br />
+        <b>Operating system:</b> {{ form.os.data }}
+        <br />
+        <b>Browser:</b> {{ form.browser.data }}
+        <br />
+        <b>Version:</b> {{ form.version.data }}
+        <br />
+
+        {{ render_field(form.recaptcha) }}
+
+        <button class="btn btn-block btn-success" type="submit">
+          Send Request
+        </button>
+      </form>
+      </div>
+    </div>
+    <div class="col-md-3"></div>
+  </div>
+</div>
+{%- endblock page_body %}
+
+{%- block javascript %}
+<script type="text/javascript">
+  data = {{ content|safe }};
+
+  display_guidelines();
+
+  document.getElementById('issue_category').onchange = function(){
+    display_guidelines();
+  };
+
+  function display_guidelines(){
+    var dropdown = document.getElementById('issue_category');
+    var current_value = dropdown.options[dropdown.selectedIndex].value;
+
+    for(each in data){
+      if(data[each][0]==current_value){
+        document.getElementById('issue_text').innerHTML = data[each][1];
+      }
+    }
+  }
+</script>
+{% endblock javascript %}

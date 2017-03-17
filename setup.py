@@ -180,6 +180,7 @@ setup(
             'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
             'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
+            'zenodo_pages = zenodo.modules.pages.ext:ZenodoPages',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
@@ -196,6 +197,7 @@ setup(
         'invenio_base.blueprints': [
             'zenodo_deposit = zenodo.modules.deposit.views:blueprint',
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
+            'zenodo_pages = zenodo.modules.pages.views:blueprint',
             'zenodo_redirector = zenodo.modules.redirector.views:blueprint',
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
