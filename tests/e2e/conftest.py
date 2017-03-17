@@ -38,12 +38,9 @@ from invenio_db import db as db_
 from invenio_search import current_search, current_search_client
 from selenium import webdriver
 from sqlalchemy_utils.functions import create_database, database_exists
-from invenio_accounts.testutils import create_test_user
-from invenio_admin.permissions import action_admin_access
-from invenio_access.models import ActionUsers
-from invenio_deposit.permissions import \
-        action_admin_access as deposit_admin_access
+
 from zenodo.factory import create_app
+
 
 @pytest.yield_fixture(scope='session', autouse=True)
 def base_app(request):
@@ -124,25 +121,3 @@ def env_browser(request):
 
     # Quit the webdriver instance
     browser.quit()
-
-@pytest.fixture()
-def users(db):
-    """Create users."""
-    user1 = create_test_user(email='info@zenodo.org', password='tester')
-    user2 = create_test_user(email='test@zenodo.org', password='tester2')
-    user_admin = create_test_user(email='admin@zenodo.org',
-                                  password='admin')
-
-    with db.session.begin_nested():
-        # set admin permissions
-        db.session.add(ActionUsers(action=action_admin_access.value,
-                                   user=user_admin))
-        db.session.add(ActionUsers(action=deposit_admin_access.value,
-                                   user=user_admin))
-    db.session.commit()
-
-    return [
-        {'email': user1.email, 'id': user1.id},
-        {'email': user2.email, 'id': user2.id},
-        {'email': user_admin.email, 'id': user_admin.id}
-    ]
