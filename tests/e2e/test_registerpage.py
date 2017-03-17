@@ -27,24 +27,42 @@
 from __future__ import absolute_import, print_function
 
 from flask import url_for
-from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support\
+        import expected_conditions as EC
 from signal import signal, SIGPIPE, SIG_DFL
-
+import time
 # Ignore SIG_PIPE and don't throw exceptions on it...
 # (http://docs.python.org/library/signal.html)
 signal(SIGPIPE, SIG_DFL)
 
 
-def test_loginpage(live_server, env_browser, users):
-    """Test retrieval of loginpage"""
-    """ as well as enters email and password in the form"""
-    env_browser.get(url_for('security.login', _external=True))
-    email = users[0].email
-    password = users[0].password
+def test_registerpage(live_server, env_browser):
+    """Test retrieval of registerpage."""
+    env_browser.get(
+        url_for('security.register', _external=True))
+    email = 'info@zenodo.org'
+    username = 'info'
+    password = 'tester'
     elem = env_browser.find_element_by_id("email")
     elem.send_keys(email)
+    elem = env_browser.find_element_by_id("profile.username")
+    elem.send_keys(username)
     elem = env_browser.find_element_by_id("password")
     elem.send_keys(password)
     elem.send_keys(Keys.RETURN)
-    env_browser.close()
+    env_browser.find_element_by_tag_name("form").submit()
+    success = "Thank you. Confirmation instructions have been\
+         sent to test@zenodo.org"
+    already = "info@zenodo.org is already associated with an account."
+    time.sleep(5)
+    # element = WebDriverWait(env_browser, 10)
+    # .until(lambda x: x.find_element_by_class_name(""))
+    # elem = env_browser.find_element_by_class_name("alert-danger").p.text
+    if success in elem:
+        assert success in elem
+    elif already in elem:
+        assert already in elem
+    else:
+        assert already in elem

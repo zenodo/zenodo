@@ -33,3 +33,4 @@ def test_frontpage(live_server, env_browser):
     """Test retrieval of frontpage."""
     env_browser.get(
         url_for('zenodo_frontpage.index', _external=True))
+    assert env_browser.title == "Zenodo - Research. Shared."
