@@ -53,16 +53,11 @@ def test_registerpage(live_server, env_browser):
     elem.send_keys(password)
     elem.send_keys(Keys.RETURN)
     env_browser.find_element_by_tag_name("form").submit()
-    success = "Thank you. Confirmation instructions have been\
-         sent to test@zenodo.org"
-    already = "info@zenodo.org is already associated with an account."
+    success = "Thank you. Confirmation instructions have been sent to"
+    already = "is already associated with an account."
     time.sleep(5)
-    # element = WebDriverWait(env_browser, 10)
-    # .until(lambda x: x.find_element_by_class_name(""))
-    # elem = env_browser.find_element_by_class_name("alert-danger").p.text
-    if success in elem:
-        assert success in elem
-    elif already in elem:
+    elem = env_browser.find_element_by_tag_name("body").text
+    if already in elem:
         assert already in elem
     else:
-        assert already in elem
+        assert success in elem
