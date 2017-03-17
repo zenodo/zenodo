@@ -45,10 +45,11 @@ from invenio_deposit.permissions import \
         action_admin_access as deposit_admin_access
 from zenodo.factory import create_app
 
-@pytest.yield_fixture(scope='session', autouse=True)
-def base_app(request):
+
+@pytest.yield_fixture(scope='session')
+def app():
     """Flask application fixture."""
-    app = create_app(
+    _app = create_app(
         # CELERY_ALWAYS_EAGER=True,
         # CELERY_CACHE_BACKEND="memory",
         # CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
@@ -62,12 +63,12 @@ def base_app(request):
         TESTING=True,
     )
 
-    with app.app_context():
-        yield app
+    with _app.app_context():
+        yield _app
 
 
-@pytest.yield_fixture(scope='session')
-def es(base_app):
+@pytest.yield_fixture()
+def es(app):
     """Provide elasticsearch access."""
     try:
         list(current_search.create())
@@ -79,8 +80,8 @@ def es(base_app):
     list(current_search.delete(ignore=[404]))
 
 
-@pytest.yield_fixture(scope='session')
-def db(base_app):
+@pytest.yield_fixture()
+def db(app):
     """Setup database."""
     if not database_exists(str(db_.engine.url)):
         create_database(str(db_.engine.url))
@@ -88,12 +89,6 @@ def db(base_app):
     yield db_
     db_.session.remove()
     db_.drop_all()
-
-
-@pytest.yield_fixture(scope='session', autouse=True)
-def app(base_app, es, db):
-    """Application with ES and DB."""
-    yield base_app
 
 
 def pytest_generate_tests(metafunc):
