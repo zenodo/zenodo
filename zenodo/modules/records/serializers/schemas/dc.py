@@ -26,28 +26,11 @@
 
 from __future__ import absolute_import, print_function
 
+import lxml.html
+
 from marshmallow import Schema, fields
 
 from ...models import ObjectType
-
-from html.parser import HTMLParser
-
-
-class HTMLStripper(HTMLParser):
-    def __init__(self):
-        self.reset()
-        self.strict = False
-        self.convert_charrefs= True
-        self.fed = []
-    def handle_data(self, d):
-        self.fed.append(d)
-    def get_data(self):
-        return ''.join(self.fed)
-
-def strip_tags(html):
-    s = HTMLStripper()
-    s.feed(html)
-    return s.get_data()
 
 
 class DublinCoreV1(Schema):
@@ -128,7 +111,7 @@ class DublinCoreV1(Schema):
 
     def get_descriptions(self, obj):
         """Get descriptions."""
-        return [strip_tags(obj['metadata']['description'])]
+        return [lxml.html.document_fromstring(obj['metadata']['description']).text_content()]
 
     def get_subjects(self, obj):
         """Get subjects."""
