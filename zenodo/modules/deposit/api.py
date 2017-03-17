@@ -34,6 +34,8 @@ from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
+from zenodo.modules.deposit.minters import zenodo_recid_concept_minter
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_deposit.utils import mark_as_action
 from invenio_files_rest.models import Bucket, MultipartObject, Part
 from invenio_pidstore.errors import PIDInvalidAction
@@ -320,6 +322,9 @@ class ZenodoDeposit(Deposit):
         if not self['communities']:
             del self['communities']
 
+        from .utils import get_all_deposit_siblings
+        get_all_deposit_siblings(self)
+
         # Add communities entry to record
         edited_record['communities'] = sorted(new_rec_comms)
         edited_record = self._sync_oaisets_with_communities(edited_record)
@@ -352,6 +357,8 @@ class ZenodoDeposit(Deposit):
         is_first_publishing = not self.is_published()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         pid, record = deposit.fetch_published()
+        versioning = PIDVersioning(child=pid)
+        versioning.update_redirect()
         ZenodoSIP.create(pid, record, create_sip_files=is_first_publishing,
                          user_id=user_id, agent=sip_agent)
         return deposit
@@ -367,7 +374,13 @@ class ZenodoDeposit(Deposit):
             max_file_size=current_app.config['ZENODO_MAX_FILE_SIZE'],
         )
         data['_buckets'] = {'deposit': str(bucket.id)}
+        # 'depid' and 'recid' PIDs are minted in parent's 'create' call
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
+
+        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
+        recid = PersistentIdentifier.get('recid', data['recid'])
+        versioning = PIDVersioning(parent=conceptrecid)
+        versioning.insert_draft_child(child=recid)
 
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
         return deposit
@@ -395,6 +408,10 @@ class ZenodoDeposit(Deposit):
         # Delete reserved recid.
         pid_recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
+
+        from invenio_pidrelations.contrib.versioning import PIDVersioning
+        versioning = PIDVersioning(child=pid_recid)
+        versioning.remove_draft_child()
 
         if pid_recid.status == PIDStatus.RESERVED:
             db.session.delete(pid_recid)
@@ -437,11 +454,10 @@ class ZenodoDeposit(Deposit):
                 for k in keys_to_remove:
                     data.pop(k, None)
 
-                # NOTE: We call the superclass `create()` method, because we don't
-                # want a new empty bucket, but an unlocked snapshot of the old
-                # record's bucket.
+                # NOTE: We call the superclass `create()` method, because we
+                # don't want a new empty bucket, but an unlocked snapshot of
+                # the old record's bucket.
                 deposit = (super(ZenodoDeposit, self).create(data))
-
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data
                     snapshot = record.files.bucket.snapshot(lock=False)

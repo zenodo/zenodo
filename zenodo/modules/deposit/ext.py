@@ -30,9 +30,8 @@ from invenio_deposit.signals import post_action
 from invenio_indexer.signals import before_record_index
 
 from . import config
-from .indexer import indexer_receiver
-from .receivers import datacite_register_after_publish, \
-    index_versioned_record_siblings
+from .indexer import indexer_receiver, index_versioned_record_siblings
+from .receivers import datacite_register_after_publish
 
 
 class ZenodoDeposit(object):

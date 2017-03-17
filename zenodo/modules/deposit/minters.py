@@ -29,13 +29,26 @@ from __future__ import absolute_import
 from invenio_pidstore.models import (PersistentIdentifier, PIDStatus,
                                      RecordIdentifier)
 
-from invenio_pidrelations.contrib.records import RecordDraft, versioned_minter
+from invenio_pidrelations.contrib.records import RecordDraft
+
+
+def zenodo_recid_concept_minter(record_uuid=None, data=None):
+    """Basic RecordIdentifier-based minter for parent PIDs."""
+    parent_id = RecordIdentifier.next()
+    conceptrecid = PersistentIdentifier.create(
+        pid_type='recid',
+        pid_value=str(parent_id),
+        status=PIDStatus.RESERVED,
+    )
+    data['conceptrecid'] = conceptrecid.pid_value
+    return conceptrecid
 
 
 def zenodo_deposit_minter(record_uuid, data):
     """Mint deposit identifier."""
 
     # Reserve the record pid
+    zenodo_recid_concept_minter(data=data)
     recid = zenodo_reserved_record_minter(data=data)
 
     # Create depid with same pid_value of the recid
@@ -59,8 +72,6 @@ def zenodo_deposit_minter(record_uuid, data):
     return depid
 
 
-# NOTE: We only add the decorator here since we only want to version the recid
-@versioned_minter(pid_type='recid', object_type='rec')
 def zenodo_reserved_record_minter(record_uuid=None, data=None):
     id_ = RecordIdentifier.next()
     recid = PersistentIdentifier.create(

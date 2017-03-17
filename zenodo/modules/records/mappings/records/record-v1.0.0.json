@@ -154,15 +154,22 @@
               "type": "object",
               "properties": {
                 "parent": {
-                  "type": "string",
-                  "index": "not_analyzed",
-                  "copy_to": "parent_pid"
+                  "type": "object",
+                  "properties": {
+                    "pid_type": {
+                      "type": "string"
+                    },
+                    "pid_value": {
+                      "type": "string",
+                      "copy_to": "concept_recid"
+                    }
+                  }
                 },
                 "index": {
                   "type": "integer",
                   "copy_to": "version_index"
                 },
-                "is_latest": {
+                "is_last": {
                   "type": "boolean",
                   "copy_to": "is_latest_version"
                 }
@@ -170,7 +177,7 @@
             }
           }
         },
-        "parent_pid": {
+        "concept_recid": {
           "type": "string",
           "index": "not_analyzed"
         },

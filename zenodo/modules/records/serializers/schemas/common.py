@@ -246,9 +246,9 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
 
-    parent_pid = SanitizedUnicode(attribute='relations.version.parent', dump_only=True)
-    is_latest_version = fields.Bool(attribute='relations.version.is_latest', dump_only=True)
-    version_index = fields.Int(attribute='relations.version.index', dump_only=True)
+    # parent_pid = SanitizedUnicode(attribute='relations.version.parent', dump_only=True)
+    # is_latest_version = fields.Bool(attribute='relations.version.is_latest', dump_only=True)
+    # version_index = fields.Int(attribute='relations.version.index', dump_only=True)
 
     @validates('embargo_date')
     def validate_embargo_date(self, value):
@@ -468,9 +468,6 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                             )
                 except BuildError:
                     pass
-
-
-
             return links
 
     @post_load(pass_many=False)

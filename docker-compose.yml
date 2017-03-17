@@ -68,18 +68,14 @@ worker:
     - statsd
   volumes_from:
     - static
-# Kibana v4.5.0 is required for Elasticsearch v2.3.x, although this version is
-# not is not available on the Docker registry anymore (Elasticsearch has its own
-# registry nowadays. Investigation required to resolve what ES/Kibana versions
-# are required to run everything smoothly.
-# kibana:
-#   image: kibana:4.5.0
-#   ports:
-#     - "5601:5601"
-#   environment:
-#     - "ELASTICSEARCH_URL=http://es:9200"
-#   links:
-#     - es
+kibana:
+  build: ./docker/kibana/
+  ports:
+    - "5601:5601"
+  environment:
+    - "ELASTICSEARCH_URL=http://es:9200"
+  links:
+    - es
 statsd:
   build: ./docker/statsd/
   restart: "always"

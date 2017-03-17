@@ -148,7 +148,7 @@ def edit(pid=None, record=None, depid=None, deposit=None):
 @login_required
 @pass_record('update')
 def newversion(pid=None, record=None, depid=None, deposit=None):
-    """Edit a record."""
+    """Create a new version of a record."""
     # If the record doesn't have a DOI, its deposit shouldn't be editable.
     if 'doi' not in record:
         abort(404)

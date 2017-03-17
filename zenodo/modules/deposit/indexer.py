@@ -30,6 +30,8 @@ import copy
 
 from .api import ZenodoDeposit
 
+from invenio_pidrelations.contrib.records import index_siblings
+
 
 def indexer_receiver(sender, json=None, record=None, index=None,
                      **dummy_kwargs):
@@ -75,3 +77,14 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     files = json.get('_files', [])
     json['filecount'] = len(files)
     json['size'] = sum([f.get('size', 0) for f in files])
+
+
+def index_versioned_record_siblings(sender, action=None, pid=None,
+                                    deposit=None):
+    """Send previous version of published record for indexing."""
+    first_publish = (deposit.get('_deposit', {}).get('pid', {})
+                     .get('revision_id')) == 0
+    if action == "publish" and first_publish:
+        recid_pid, _ = deposit.fetch_published()
+        print('sending for indexing siblings of', recid_pid)
+        index_siblings(recid_pid, only_neighbors=True)

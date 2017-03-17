@@ -170,6 +170,19 @@
       "description": "Digital Object Identifier (DOI).",
       "type": "string"
     },
+    "relations": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "object",
+          "properties": {
+            "parent": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
     "resource_type": {
       "description": "Record resource type.",
       "type": "object",

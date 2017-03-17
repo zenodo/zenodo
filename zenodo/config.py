@@ -60,6 +60,7 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all
+from invenio_pidrelations.config import RelationType
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
@@ -90,6 +91,17 @@ PIDSTORE_DATACITE_DOI_PREFIX = "10.5072"
 PIDSTORE_DATACITE_USERNAME = "CERN.ZENODO"
 #: DataCite MDS password.
 PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
+
+#: Zenodo PID relations
+PIDRELATIONS_RELATION_TYPES = [
+    RelationType(0, 'version', 'Version',
+                 'invenio_pidrelations.contrib.versioning:PIDVersioning',
+                 'zenodo.modules.records.serializers.schemas.pidrelations:'
+                 'VersionRelation'),
+    RelationType(1, 'record_draft', 'Record Draft',
+                 'invenio_pidrelations.contrib.records:RecordDraft',
+                 'invenio_pidrelations.serializers.schemas.RelationSchema'),
+]
 
 #: Enable the DataCite minding of DOIs after Deposit publishing
 DEPOSIT_DATACITE_MINTING_ENABLED = False

@@ -30,6 +30,7 @@ from flask import url_for
 from flask_babelex import lazy_gettext as _
 from marshmallow import Schema, ValidationError, fields, missing, \
     validates_schema
+from invenio_pidrelations.serializers.schemas import PIDRelationsMixin
 from werkzeug.routing import BuildError
 
 from . import common
@@ -213,7 +214,7 @@ class LicenseSchemaV1(StrictKeysSchema):
     id = fields.Str(attribute='id')
 
 
-class MetadataSchemaV1(common.CommonMetadataSchemaV1):
+class MetadataSchemaV1(common.CommonMetadataSchemaV1, PIDRelationsMixin):
     """Schema for a record."""
 
     resource_type = fields.Nested(ResourceTypeSchema)
