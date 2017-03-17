@@ -52,7 +52,7 @@ def test_registerpage(live_server, env_browser):
     elem = env_browser.find_element_by_id("password")
     elem.send_keys(password)
     elem.send_keys(Keys.RETURN)
-    env_browser.find_element_by_tag_name("form").submit()
+    # env_browser.find_element_by_tag_name("form").submit()
     success = "Thank you. Confirmation instructions have been sent to"
     already = "is already associated with an account."
     time.sleep(5)
