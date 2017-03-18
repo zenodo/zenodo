@@ -188,7 +188,7 @@ def test_sources_meetings(minimal_record, recid_pid):
 
 def test_description(minimal_record, recid_pid):
     """Test description"""
-    minimal_record['descriptions']: ['<p>TRPC1 and store-operated Ca2+&nbsp;(SOC) entry \
+    minimal_record['descriptions'] = ['<p>TRPC1 and store-operated Ca2+&nbsp;(SOC) entry \
     have previously been associated. The aim of the study was to determine \
     genes and processes associated with&nbsp;<em>TRPC1 </em>&nbsp;down- \
     regulation and the resulting increase of SOC entry. A total of 71 \
