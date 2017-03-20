@@ -41,29 +41,6 @@ signal(SIGPIPE, SIG_DFL)
 
 
 def test_registerpage(live_server, env_browser):
-    # """Test retrieval of registerpage."""
-    # env_browser.get(
-    #     url_for('security.register', _external=True))
-    # email = 'info@zenodo.org'
-    # username = 'info'
-    # password = 'tester'
-    # elem = env_browser.find_element_by_id("email")
-    # elem.send_keys(email)
-    # elem = env_browser.find_element_by_id("profile.username")
-    # elem.send_keys(username)
-    # elem = env_browser.find_element_by_id("password")
-    # elem.send_keys(password)
-    # elem.send_keys(Keys.RETURN)
-    # env_browser.find_element_by_name("register_user_form").submit()
-    # success = "Thank you. Confirmation instructions have been sent to"
-    # already = "is already associated with an account."
-    # time.sleep(5)
-    # elem = env_browser.find_element_by_tag_name("body").text
-    # if already in elem:
-    #     assert already in elem
-    # else:
-    #     assert success in elem
-
     """E2E user registration and login test."""
     browser = env_browser
     # 1. Go to user registration page

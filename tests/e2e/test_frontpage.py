@@ -36,9 +36,3 @@ def test_frontpage(live_server, env_browser):
     response = urlopen(url)
     assert response
     assert response.code == 200
-    # env_browser.get(
-    #     url_for('zenodo_frontpage.index', _external=True))
-    # response = urlopen(url)
-    # assert response
-    # assert response.code == 200
-    # assert env_browser.title == "Zenodo - Research. Shared."
