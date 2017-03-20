@@ -188,16 +188,7 @@ def test_sources_meetings(minimal_record, recid_pid):
 
 def test_description(minimal_record, recid_pid):
     """Test description"""
-    minimal_record['descriptions'] = ['<p>TRPC1 and store-operated Ca2+&nbsp;(SOC) entry \
-    have previously been associated. The aim of the study was to determine \
-    genes and processes associated with&nbsp;<em>TRPC1 </em>&nbsp;down- \
-    regulation and the resulting increase of SOC entry. A total of 71 \
-    genes were significantly differentially expressed (40 up- and 31 down- \
-    regulated).</p>']
+    minimal_record['description'] = ["<p><b>Foo&nbsp;Bar</b></p><em><p>&nbsp;\
+Foo&amp;Bar</p></em> &apos;This&apos;&nbsp;is&nbsp;<i>&lt;it&gt;<i>"]
     obj = dc_v1.transform_record(recid_pid, Record(minimal_record))
-    assert obj['descriptions'] == ['TRPC1 and store-operated Ca2+ (SOC) \
-    entry have previously been associated. The aim of the study was to \
-    determine genes and processes associated with TRPC1 down-regulation and \
-    the resulting increase of SOC entry. A total of 71 genes were \
-    significantly differentially expressed (40 up- and 31 down-regulated).']
-
+    assert obj['descriptions'] == ["Foo Bar Foo&Bar 'This' is <it>"]

@@ -111,7 +111,7 @@ class DublinCoreV1(Schema):
 
     def get_descriptions(self, obj):
         """Get descriptions."""
-        return [lxml.html.document_fromstring(obj['metadata']['description']).text_content()]
+        return [lxml.html.document_fromstring(obj['metadata']['description']).text_content().replace(u"\xa0", u" ")]
 
     def get_subjects(self, obj):
         """Get subjects."""
