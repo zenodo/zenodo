@@ -216,6 +216,7 @@ SQLAlchemy-Continuum==1.2.4
 SQLAlchemy-Utils==0.32.11
 statsd==3.2.1
 traitlets==4.3.1
+ua-parser==0.7.3
 Unidecode==0.4.19
 uritemplate.py==1.0.1
 uritools==2.0.0

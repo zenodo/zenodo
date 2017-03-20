@@ -12,7 +12,7 @@
   }
   .jumbotron{
     background-color: transparent;
-    padding-bottom: 0px;
+    padding-bottom: 0;
   }
   .introducing p {
     line-height: 28px;
@@ -54,6 +54,41 @@
         max-height: 100%;
         display: inline-block;
         vertical-align: middle;
+      }
+    }
+  }
+}
+
+#contact_page {
+
+  #information {
+    margin-top: 5px;
+  }
+
+  .login-email {
+    margin-top: -20px;
+  }
+
+  .header-form {
+    margin: 0;
+  }
+
+  textarea#description {
+    height: 110px;
+  }
+
+  .content-tab {
+    margin-bottom: 10px;
+  }
+
+  .contact {
+    margin-right: 3%;
+    margin-left: 1%;
+
+    .row {
+      div {
+        padding-left: 0;
+        padding-right: 0;
       }
     }
   }

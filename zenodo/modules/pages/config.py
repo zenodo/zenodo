@@ -27,13 +27,13 @@
 from __future__ import absolute_import, print_function
 
 #: Maximum size of attachment in contact form.
-PAGES_ATTACHMENT_MAX_SIZE = 1000 * 1000 * 10 # 10 MB
-
-#: Description minimum length.
-PAGES_DESCRIPTION_MIN_LENGTH = 20
+PAGES_ATTACHMENT_MAX_SIZE = 1000 * 1000 * 10  # 10 MB
 
 #: Description maximum length.
 PAGES_DESCRIPTION_MAX_LENGTH = 1000
+
+#: Description minimum length.
+PAGES_DESCRIPTION_MIN_LENGTH = 20
 
 #: Email body template.
 PAGES_EMAIL_BODY_TEMPLATE = 'zenodo_pages/email_body.html'
@@ -43,15 +43,23 @@ PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
 
 #: Issue category for contact form.
 PAGES_ISSUE_CATEGORY = [
-    ('Technical Support', "Please describe the error you are getting, "\
-     "include any error messages or link to screenshots which might be relevant"),
-    ('File upload request', "Please include the URL of the updated file, "\
-     "and specify which record and file you want to replace. Please use publicly accessible URLs."),
-    ('Others', "Specify the issue"),
+    ('tech-support',
+     'Technical Support',
+     'Please describe the error you are getting, include any error messages '
+     'or screenshots (through file upload or links) which might be relevant.'),
+    ('file-upload',
+     'File upload request',
+     'Please include the updated file (through file upload or publicly '
+     'accessible links), and specify which record and file you want to '
+     'replace. Consult our <a href="http://help.zenodo.org/#general">FAQ</a> '
+     'for updating files of already published records.'),
+    ('others',
+     'Others',
+     'Specify the issue.'),
 ]
-
-#: Email address for support.
-PAGES_SUPPORT_EMAIL = ['info@zenodo.org', ]
 
 #: Email address of sender.
 PAGES_SENDER_EMAIL = 'info@zenodo.org'
+
+#: Email address for support.
+PAGES_SUPPORT_EMAIL = ['info@zenodo.org', ]

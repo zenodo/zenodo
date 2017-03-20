@@ -150,6 +150,7 @@ install_requires = [
     'python-slugify>=1.2.1',
     'raven<=5.1.0',
     'sickle>=0.6.1',
+    'ua-parser>=0.7.3',
     'uwsgi>=2.0.14',
     'uwsgitop>=0.9',
     'wsgi-statsd>=0.3.1',
