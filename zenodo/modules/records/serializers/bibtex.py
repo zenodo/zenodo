@@ -65,14 +65,14 @@ class MissingRequiredFieldError(Exception):
     """Base class for exceptions in this module.
 
     The exception should be raised when the specific,
-    required filed doesn't exist in the record.
+    required field doesn't exist in the record.
     """
 
     def _init_(self, field):
         self.field = field
 
     def _str_(self):
-        return "Missing filed: " + self.field
+        return "Missing field: " + self.field
 
 
 class Bibtex(object):
