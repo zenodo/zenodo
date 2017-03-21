@@ -77,7 +77,8 @@ def test_registerpage(live_server, env_browser):
 
     # 3.5: logout.
     browser.get(flask.url_for('security.logout', _external=True))
-    assert not testutils.webdriver_authenticated(browser)
+    assert not testutils.webdriver_authenticated(
+        browser, flask.url_for('security.change_password', _external=True))
 
     # 4. go to login-form
     browser.get(flask.url_for('security.login', _external=True))
