@@ -302,6 +302,8 @@ def test_format_inproceedings(full_record):
               """  address      = {Staszkowka},\n"""
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
+              """  venue        = """
+              """{Harvard-Smithsonian Center for Astrophysics},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -322,6 +324,8 @@ def test_format_inproceedings(full_record):
               """  address      = {Staszkowka},\n"""
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
+              """  venue        = """
+              """{Harvard-Smithsonian Center for Astrophysics},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -341,6 +345,8 @@ def test_format_inproceedings(full_record):
               """  publisher    = {hello},\n"""
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
+              """  venue        = """
+              """{Harvard-Smithsonian Center for Astrophysics},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
