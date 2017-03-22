@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -444,6 +444,8 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                     # draft if there is one...
                     # TODO: Move all of this link generation to someplace
                     # else...
+                    # FIXME: This is run for every search result as well...
+                    # I see ourselves adding another value to the model...
                     r_pid = PersistentIdentifier.get('recid', recid)
                     latest_version, latest_draft = get_latest_draft(r_pid)
                     if api_key:

@@ -30,6 +30,7 @@ from celery import shared_task
 from flask import current_app
 from invenio_db import db
 from invenio_pidstore.models import PIDStatus
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
 
@@ -40,10 +41,12 @@ from zenodo.modules.records.serializers import datacite_v31
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
              rate_limit='100/m')
 def datacite_register(pid_value, record_uuid):
-    """Mint the DOI with DataCite.
+    """Mint DOI and Concept DOI with DataCite.
 
     :param pid_value: Value of record PID, with pid_type='recid'.
     :type pid_value: str
+    :param record_uuid: Record Metadata UUID.
+    :type record_uuid: str
     """
     try:
         record = Record.get_record(record_uuid)
@@ -52,15 +55,31 @@ def datacite_register(pid_value, record_uuid):
             return
 
         dcp = DataCiteProvider.get(record['doi'])
+        doc = datacite_v31.serialize(dcp.pid, record)
 
         url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
             recid=pid_value)
-        doc = datacite_v31.serialize(dcp.pid, record)
-
         if dcp.pid.status == PIDStatus.REGISTERED:
             dcp.update(url, doc)
         else:
             dcp.register(url, doc)
+
+        # If this is the latest record version, update/register the Concept DOI
+        # using the metadata of the record.
+        conceptdoi = record['metadata'].get('conceptdoi')
+        if PIDVersioning(child=record.pid).is_last_child:
+            conceptrecid = record['metadata'].get('conceptrecid')
+            concept_dcp = DataCiteProvider.get(conceptdoi)
+            url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+                recid=conceptrecid)
+
+            # FIXME: Enhance 'related_identifiers' here with
+            # "isPartOf"/"hasPart"?
+            if concept_dcp.pid.status == PIDStatus.REGISTERED:
+                concept_dcp.update(url, doc)
+            else:
+                concept_dcp.register(url, doc)
+
         db.session.commit()
     except Exception as exc:
         datacite_register.retry(exc=exc)

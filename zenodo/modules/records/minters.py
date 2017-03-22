@@ -33,7 +33,8 @@ from invenio_oaiserver.minters import oaiid_minter
 from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
-from invenio_pidrelations.contrib.records import RecordDraft, versioned_minter
+from invenio_pidrelations.contrib.records import RecordDraft
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 
 def doi_generator(recid, prefix=None):
@@ -70,17 +71,60 @@ def zenodo_record_minter(record_uuid, data):
     zenodo_doi_minter(record_uuid, data)
     oaiid_minter(record_uuid, data)
 
+    zenodo_concept_doi_minter(record_uuid, data)
+
+    # Remove the record draft link
+    if 'conceptrecid' in data:
+        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
+        PIDVersioning(parent=conceptrecid).update_redirect()
     depid = data.pid
     RecordDraft.unlink(recid, depid)
 
     return recid
 
 
-# def zenodo_doi_parent_minter(record_uuid, data, pid_type, object_type):
-#     doi = data.get('doi')
+def zenodo_concept_doi_minter(record_uuid, data):
+    """Mint Concept DOI.
+
+    .. note::
+
+        Only Zenodo DOIs are allowed to have a Concept DOI and in general have
+        versioning applied.
+    """
+    doi = data.get('doi')
+    assert 'conceptrecid' in data
+
+    # Only mint Concept DOI for Zenodo DOIs
+    if is_local_doi(doi):
+        conceptdoi = data.get('conceptdoi')
+
+        # Create a DOI if no DOI was found.
+        if not conceptdoi:
+            conceptdoi = doi_generator(data['conceptrecid'])
+            data['conceptdoi'] = conceptdoi
+
+        conceptdoi_pid = (PersistentIdentifier.query
+                          .filter_by(pid_type='doi', pid_value=conceptdoi)
+                          .one_or_none())
+        # Create if not already minted from previous versions
+        if not conceptdoi_pid:
+            return PersistentIdentifier.create(
+                'doi',
+                conceptdoi,
+                object_type='rec',
+                object_uuid=record_uuid,
+                status=PIDStatus.RESERVED,
+            )
+        else:
+            # Update to point to latest record
+            conceptdoi_pid.assign(
+                object_type='rec',
+                object_uuid=record_uuid,
+                overwrite=True,
+            )
+            return conceptdoi_pid
 
 
-# @versioned_minter(pid_type='doi', object_type='rec')
 def zenodo_doi_minter(record_uuid, data):
     """Mint DOI."""
     doi = data.get('doi')

@@ -26,31 +26,28 @@
 
 from __future__ import absolute_import
 
-import uuid
 from contextlib import contextmanager
-from copy import copy, deepcopy
+from copy import copy
 
 from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
-from zenodo.modules.deposit.minters import zenodo_recid_concept_minter
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_deposit.utils import mark_as_action
 from invenio_files_rest.models import Bucket, MultipartObject, Part
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.models import RecordsBuckets
-from invenio_pidrelations.contrib.records import get_latest_draft
 
-from zenodo.modules.records.api import (ZenodoFileObject, ZenodoFilesIterator,
-                                        ZenodoRecord)
+from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
+    ZenodoRecord
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.sipstore.api import ZenodoSIP
-from zenodo.modules.communities.api import ZenodoCommunity
 
-from .errors import (MissingCommunityError, MissingFilesError,
-                     OngoingMultipartUploadError)
+from .errors import MissingCommunityError, MissingFilesError, \
+    OngoingMultipartUploadError
 from .fetchers import zenodo_deposit_fetcher
 from .minters import zenodo_deposit_minter
 
@@ -63,6 +60,8 @@ PRESERVE_FIELDS = (
     'relations',
     'owners',
     'recid',
+    'conceptrecid',
+    'conceptdoi',
 )
 """Fields which will not be overwritten on edit."""
 
@@ -226,6 +225,28 @@ class ZenodoDeposit(Deposit):
                 'ZENODO_COMMUNITIES_ADD_IF_GRANTS'])
         return comms
 
+    @staticmethod
+    def _autoadd_versioning_related_identifiers(record):
+        """Add versioning related identifiers."""
+        conceptdoi = record.get('conceptdoi')
+        if conceptdoi:
+            pv = PIDVersioning(child=record.pid)
+            siblings = pv.children.all()
+            pid_index = siblings.index(record.pid)
+            index_pids = siblings[(pid_index - 1):(pid_index + 2)]
+
+            related_identifiers = record.get('related_identifiers')
+            version_related_identifiers = [
+                {'identifier': conceptdoi, 'scheme': 'doi', 'relation': 'isPartOf'},
+                {'identifier': conceptdoi, 'scheme': 'doi', 'relation': 'isNewVersionOf'},
+                {'identifier': conceptdoi, 'scheme': 'doi', 'relation': 'isPreviousVersionOf'},
+            ]
+            for ri in version_related_identifiers:
+                if ri not in related_identifiers:
+                    related_identifiers.append(ri)
+            record['related_identifiers'] = related_identifiers
+        return record
+
     @contextmanager
     def _process_files(self, record_id, data):
         """Snapshot bucket and add files in record during first publishing."""
@@ -333,6 +354,7 @@ class ZenodoDeposit(Deposit):
         for k in preserve_record_fields:
             if k in record:
                 edited_record[k] = record[k]
+
         zenodo_doi_updater(edited_record.id, edited_record)
 
         edited_record = self._sync_communities(dep_comms, rec_comms,
@@ -363,8 +385,6 @@ class ZenodoDeposit(Deposit):
         is_first_publishing = not self.is_published()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         pid, record = deposit.fetch_published()
-        versioning = PIDVersioning(child=pid)
-        versioning.update_redirect()
         ZenodoSIP.create(pid, record, create_sip_files=is_first_publishing,
                          user_id=user_id, agent=sip_agent)
         return deposit
@@ -380,13 +400,7 @@ class ZenodoDeposit(Deposit):
             max_file_size=current_app.config['ZENODO_MAX_FILE_SIZE'],
         )
         data['_buckets'] = {'deposit': str(bucket.id)}
-        # 'depid' and 'recid' PIDs are minted in parent's 'create' call
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
-
-        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
-        recid = PersistentIdentifier.get('recid', data['recid'])
-        versioning = PIDVersioning(parent=conceptrecid)
-        versioning.insert_draft_child(child=recid)
 
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
         return deposit
@@ -415,10 +429,6 @@ class ZenodoDeposit(Deposit):
         pid_recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
 
-        from invenio_pidrelations.contrib.versioning import PIDVersioning
-        versioning = PIDVersioning(child=pid_recid)
-        versioning.remove_draft_child()
-
         if pid_recid.status == PIDStatus.RESERVED:
             db.session.delete(pid_recid)
 
@@ -446,8 +456,7 @@ class ZenodoDeposit(Deposit):
 
         # Check that there is not a newer draft version for this record
         pid, record = self.fetch_published()
-        _, latest_draft = get_latest_draft(pid)
-        if not latest_draft:
+        if not PIDVersioning(child=pid).draft_child:
             # Let's create the new version draft!
             with db.session.begin_nested():
 
@@ -461,7 +470,6 @@ class ZenodoDeposit(Deposit):
                     '_deposit', 'doi', '_oai', '_files', '_buckets', '$schema')
                 for k in keys_to_remove:
                     data.pop(k, None)
-
 
                 # NOTE: We call the superclass `create()` method, because we
                 # don't want a new empty bucket, but an unlocked snapshot of
