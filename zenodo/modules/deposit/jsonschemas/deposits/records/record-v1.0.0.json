@@ -438,6 +438,14 @@
       },
       "type": "array"
     },
+    "conceptdoi": {
+      "description": "Digital Object Identifier (DOI).",
+      "type": "string"
+    },
+    "conceptrecid": {
+      "description": "Invenio record identifier (integer).",
+      "type": "string"
+    },
     "contributors": {
       "description": "Contributors in order of importance.",
       "items": {
@@ -774,6 +782,19 @@
         "type": "object"
       },
       "type": "array"
+    },
+    "relations": {
+      "properties": {
+        "version": {
+          "properties": {
+            "parent": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "type": "object"
     },
     "resource_type": {
       "additionalProperties": false,

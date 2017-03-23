@@ -166,7 +166,15 @@
       "description": "Invenio record identifier (integer).",
       "type": "number"
     },
+    "conceptrecid": {
+      "description": "Invenio record identifier (integer).",
+      "type": "string"
+    },
     "doi": {
+      "description": "Digital Object Identifier (DOI).",
+      "type": "string"
+    },
+    "conceptdoi": {
       "description": "Digital Object Identifier (DOI).",
       "type": "string"
     },
