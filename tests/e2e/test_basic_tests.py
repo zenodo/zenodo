@@ -84,7 +84,7 @@ def test_basic_tests(live_server, env_browser):
 
     # 4. go to login-form
     browser.get(flask.url_for('security.login', _external=True))
-    sleep(1)
+    slepp(1)
     assert (flask.url_for('security.login', _external=True) in
             browser.current_url)
     login_form = browser.find_element_by_name('login_user_form')
