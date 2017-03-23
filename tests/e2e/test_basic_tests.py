@@ -78,7 +78,6 @@ def test_basic_tests(live_server, env_browser):
 
     # 3.5: logout.
     browser.get(flask.url_for('security.logout', _external=True))
-    sleep(1)
     assert not testutils.webdriver_authenticated(
         browser, flask.url_for('security.change_password', _external=True))
 
