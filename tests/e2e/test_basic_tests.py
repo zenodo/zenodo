@@ -79,8 +79,8 @@ def test_basic_tests(live_server, env_browser):
     # 3.5: logout.
     browser.get(flask.url_for('security.logout', _external=True))
     sleep(1)
-    assert (flask.url_for('zenodo_frontpage.index', _external=True) in
-            browser.current_url)
+    assert not testutils.webdriver_authenticated(
+        browser, flask.url_for('security.change_password', _external=True))
 
     # 4. go to login-form
     browser.get(flask.url_for('security.login', _external=True))
@@ -95,8 +95,7 @@ def test_basic_tests(live_server, env_browser):
     login_form.submit()
     sleep(1)
 
-    assert (flask.url_for('zenodo_frontpage.index', _external=True) in
-            browser.current_url)
+    assert testutils.webdriver_authenticated(browser)
 
     browser.get(flask.url_for('security.change_password', _external=True))
     assert (flask.url_for('security.change_password', _external=True) in
