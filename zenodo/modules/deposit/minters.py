@@ -48,7 +48,8 @@ def zenodo_deposit_minter(record_uuid, data):
     """Mint deposit identifier."""
 
     # Reserve the record pid
-    zenodo_recid_concept_minter(data=data)
+    if 'conceptrecid' not in data:
+        zenodo_recid_concept_minter(data=data)
     recid = zenodo_reserved_record_minter(data=data)
 
     # Create depid with same pid_value of the recid

@@ -28,4 +28,4 @@ zenodo migration reindex -t recid
 zenodo migration reindex -t depid
 zenodo migration reindex -t od_lic
 zenodo migration reindex -t grants
-zenodo index run -c 8 -d
+zenodo index run -c 4 -d

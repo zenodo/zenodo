@@ -352,6 +352,7 @@ class ZenodoDeposit(Deposit):
     @mark_as_action
     def publish(self, pid=None, id_=None, user_id=None, sip_agent=None):
         """Publish the Zenodo deposit."""
+        import wdb; wdb.set_trace()
         self['owners'] = self['_deposit']['owners']
         self.validate_publish()
         is_first_publishing = not self.is_published()
@@ -458,6 +459,13 @@ class ZenodoDeposit(Deposit):
                 # don't want a new empty bucket, but an unlocked snapshot of
                 # the old record's bucket.
                 deposit = (super(ZenodoDeposit, self).create(data))
+                conceptrecid = PersistentIdentifier.get('recid',
+                                                        data['conceptrecid'])
+                recid = PersistentIdentifier.get('recid',
+                                                 data['recid'])
+                versioning = PIDVersioning(parent=conceptrecid)
+                versioning.insert_draft_child(child=recid)
+
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data
                     snapshot = record.files.bucket.snapshot(lock=False)
