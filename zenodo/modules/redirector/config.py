@@ -76,7 +76,6 @@ REDIRECTOR_EXTERNAL_REDIRECTS = [
     ['/privacy-policy', 'privacy-policy',
      'http://about.zenodo.org/privacy-policy/'],
     ['/terms', 'terms', 'http://about.zenodo.org/terms/'],
-    ['/support', 'support', 'http://about.zenodo.org/contact/'],
     ['/donate', 'donate', 'https://giving.web.cern.ch/civicrm/contribute/'
                           'transact%3Freset%3D1%26id%3D20'],
 ]
