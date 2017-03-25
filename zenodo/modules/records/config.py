@@ -103,3 +103,12 @@ ZENODO_DOIID4RECID = {
 Wrong DOIs were minted for a short period in 2013 due to mistake in the legacy
 system.
 """
+
+
+PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
+
+PAGES_EMAIL_BODY_TEMPLATE = 'zenodo_pages/email_body.html'
+
+PAGES_SENDER_EMAIL = 'info@zenodo.org'
+
+PAGES_SUPPORT_EMAIL = ['info@zenodo.org', ]

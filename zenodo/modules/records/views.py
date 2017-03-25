@@ -61,11 +61,7 @@ blueprint = Blueprint(
 )
 def contact_owner(pid_value=None):
     from pprint import pprint
-    pprint(pid_value)
-    pprint(request.form)
-    # Write code for sending response
-    return "Thanks for submitting response"
-
+    
 
 #
 # Access right template filters and tests.

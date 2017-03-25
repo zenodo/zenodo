@@ -75,6 +75,7 @@
       {%- endblock record_body_extra %}
     </div>
     <div class="col-sm-4 col-md-4 col-right">
+      {%- include "zenodo_records/box/contact.html" %}
       {%- include "zenodo_records/box/edit.html" %}
       {%- set pending_comms, accepted_comms, all_pending_comms, all_comms = community_curation(record, current_user) %}
       {% if pending_comms or accepted_comms %}

@@ -7,9 +7,9 @@ Coding standards
 ----------------
 Zenodo closely follows Invenio's coding standards, which is primarily based on existing standards:
 
- * PEP8 (Python source code style, including import sorting).
- * PEP257 (Python documentation).
- * PyFlakes (for liniting)
+ * `PEP8 <https://www.python.org/dev/peps/pep-0008>`_ (Python source code style, including import sorting).
+ * `PEP257 <https://www.python.org/dev/peps/pep-0257>`_ (Python documentation).
+ * `PyFlakes <https://pypi.python.org/pypi/pyflakes>`_ (for liniting)
 
 Don't hesitate to ask us if you have any questions.
 
