@@ -1,0 +1,52 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2016 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+<button class="btn btn-primary btn-block" type="" data-toggle="modal" data-target="#contactModal"><i class="fa fa-pencil-square-o"></i> Contact the uploader</button>
+
+
+<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="contactModalLabel">Contatct the Uploader</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <form action="{{ url_for('zenodo_records.contact_owner', pid_value=pid.pid_value) }}" method="POST" id="contactForm">
+          <input type="text" class="form-control" id="nameInput" placeholder="Full name" required="true">
+          <br>
+          <input type="text" class="form-control" id="emailInput" placeholder="Email address">
+          <br>
+          <input type="text" class="form-control input-lg" id="messageInput" placeholder="Your Message">
+        </form>
+      </div>        
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" form="contactForm" value="Submit">Submit</button>
+      </div>
+    </div>
+  </div>
+</div>

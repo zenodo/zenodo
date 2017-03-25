@@ -44,6 +44,8 @@ from werkzeug.utils import import_string
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
+from .forms import contact_form_factory
+
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -52,6 +54,17 @@ blueprint = Blueprint(
     static_folder='static',
     url_prefix='/search'
 )
+
+@blueprint.route(
+    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>/contact/',
+    methods=['POST']
+)
+def contact_owner(pid_value=None):
+    from pprint import pprint
+    pprint(pid_value)
+    pprint(request.form)
+    # Write code for sending response
+    return "Thanks for submitting response"
 
 
 #
