@@ -29,21 +29,22 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Contact the Owner</h4>
+        <h4 class="modal-title" id="myModalLabel">Contact the Uploader</h4>
       </div>
       <div class="modal-body">
-        <form action="{{ url_for('zenodo_deposit.edit', pid_value=pid.pid_value) }}" method="POST">
+        <form  method="POST">
           <div class="form-group">
-            <label for="Name">Name</label>
-            <input type="name" class="form-control" id="Name" placeholder="Email" ng-model="name">
+            <label for="Name">Full Name</label>
+            <input type="name" class="form-control" id="Name" placeholder="Full Name" ng-model="name">
           </div>
           <div class="form-group">
-            <label for="email">Password</label>
-            <input type="email" class="form-control" id="email" placeholder="Email" mg-model="email">
+            <label for="email">Email Address</label>
+            <input type="email" class="form-control" id="email" placeholder="Email Address" mg-model="email">
+            <div style="color: green">Uploader will see your message and will reply you on it shortly.</div>
           </div>
-          <div style="color: green">Uploader will see your message and will reply you on it shortly.</div>
+          
           <div class="form-group">
-            <textarea class="form-control" rows="3"></textarea>
+            <textarea class="form-control" rows="3" placeholder="Your message"></textarea>
           </div>
           <div class="modal-footer">
             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
