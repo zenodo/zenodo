@@ -21,9 +21,11 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+
 <button type="button" class="btn btn-warning btn-block" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil-square-o"></i> Contact the Owner </button>
 
 <!-- Modal -->
+
 <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
@@ -32,10 +34,12 @@
         <h4 class="modal-title" id="myModalLabel">Contact the Uploader</h4>
       </div>
       <div class="modal-body">
-        <form  method="POST">
+        
+        <form action="" method="POST">
           <div class="form-group">
             <label for="Name">Full Name</label>
             <input type="name" class="form-control" id="Name" placeholder="Full Name" ng-model="name">
+            
           </div>
           <div class="form-group">
             <label for="email">Email Address</label>
@@ -51,6 +55,7 @@
             <button type="submit" class="btn btn-primary">Send</button>
           </div>
         </form>
+       
       </div>
 
     </div>

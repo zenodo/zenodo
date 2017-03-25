@@ -339,3 +339,43 @@ def community_curation(record, user):
 def record_communities():
     """Context processor for community curation for given record."""
     return dict(community_curation=community_curation)
+
+
+@blueprint.route(
+    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>',
+    methods=['POST']
+)
+def contact_the_owner():
+    """Render contact form."""
+    form_class = contact_the_owner_form_factory()
+    form = form_class()
+
+    if current_user.is_authenticated:
+        form.email.data = current_user.email
+
+    """If form is validated send email to the admin."""
+    if form.validate_on_submit():
+        """Dictionary storing data to be sent."""
+        context = dict(
+            form=form,
+            current_user=current_user,
+        )
+
+        send_support_email(context)
+
+        flash(
+            _('Request sent successfully,'
+              'You should receive a confirmation email within 20 minutes - '
+              'if this does not happen you should retry or send us an email '
+              'directly to team@zenodo.org.',),
+            category='success'
+        )
+        return redirect('/')
+
+    content = current_app.config['PAGES_ISSUE_CATEGORY']
+    return render_template(
+        'zenodo_pages/contact_form.html',
+        form=form,
+        current_user=current_user,
+        content=json.dumps(content),
+        )
