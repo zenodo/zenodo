@@ -87,3 +87,38 @@ def support():
         current_user=current_user,
         content=json.dumps(content),
     )
+    
+@blueprint.route(
+    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>',
+    methods=['POST', 'GET']
+)
+def contact_the_owner():
+   """Render contact form."""
+    form_class = contact_the_owner_form_factory()
+    form = form_class()
+
+    if current_user.is_authenticated:
+        form.email.data = current_user.email
+    
+    """If form is validated send email to the admin."""
+    if form.validate_on_submit():
+        """Dictionary storing data to be sent."""
+        context = dict(
+            form=form,
+            current_user=current_user,
+        )
+
+        flash(
+            _('Request sent successfully,'
+             'You should receive a confirmation email within 20 minutes - '
+              'if this does not happen you should retry or send us an email '
+              'directly to team@zenodo.org.',),
+            category='success'
+        )
+        return redirect('/')
+
+    return render_template(
+        'zenodo_pages/contact_the_owner.html',
+        form=form,
+        current_user=current_user,
+        )

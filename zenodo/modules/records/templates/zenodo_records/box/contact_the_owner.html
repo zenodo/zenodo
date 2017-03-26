@@ -22,42 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-<button type="button" class="btn btn-warning btn-block" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#myModal"><i class="fa fa-pencil-square-o"></i> Contact the Owner </button>
+<form action="{{ url_for('zenodo_page.contact_the_owner', pid_value=pid.pid_value) }}" method="POST">
+    <button class="btn btn-warning btn-block" type="submit" ><i class="fa fa-pencil-square-o"></i>Contact the Owner</button>
+</form>
 
-<!-- Modal -->
-
-<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="myModalLabel">Contact the Uploader</h4>
-      </div>
-      <div class="modal-body">
-        
-        <form action="" method="POST">
-          <div class="form-group">
-            <label for="Name">Full Name</label>
-            <input type="name" class="form-control" id="Name" placeholder="Full Name" ng-model="name">
-            
-          </div>
-          <div class="form-group">
-            <label for="email">Email Address</label>
-            <input type="email" class="form-control" id="email" placeholder="Email Address" mg-model="email">
-            <div style="color: green">Uploader will see your email and will reply you on it shortly.</div>
-          </div>
-          
-          <div class="form-group">
-            <textarea class="form-control" rows="3" placeholder="Your message"></textarea>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            <button type="submit" class="btn btn-primary">Send</button>
-          </div>
-        </form>
-       
-      </div>
-
-    </div>
-  </div>
-</div>

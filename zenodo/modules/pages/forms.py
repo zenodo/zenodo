@@ -104,3 +104,39 @@ def contact_form_factory():
             read_only(self.version)
 
     return ContactForm
+
+def contact_the_owner_form_factory():
+    """Contact the Owner form factory."""
+
+    min_length = current_app.config['PAGES_DESCRIPTION_MIN_LENGTH']
+    max_length = current_app.config['PAGES_DESCRIPTION_MAX_LENGTH']
+
+    class ContactTheOwnerForm(FlaskForm):
+        """Form for contact the owner form."""
+
+        name = StringField(
+            _('Name'),
+            description=_(''),
+            filters=[strip_filter],
+            validators=[DataRequired()],
+        )
+        email = StringField(
+            _('Email'),
+            description=_(''),
+            filters=[strip_filter],
+            validators=[DataRequired()],
+        )
+        message = TextAreaField(
+            _('message'),
+            description=_(''),
+            filters=[strip_filter],
+            validators = [Length(
+                min=min_length,
+                max=max_length)],
+        )
+        submit = SubmitField(_("Send Request"))
+        recaptcha = RecaptchaField(validators=[
+            Recaptcha(message=_("Please complete the reCAPTCHA."))
+        ])
+
+    return ContactTheOwnerForm
