@@ -302,6 +302,8 @@ def test_format_inproceedings(full_record):
               """  address      = {Staszkowka},\n"""
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
+              """  venue        = """
+              """{Harvard-Smithsonian Center for Astrophysics},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -322,6 +324,8 @@ def test_format_inproceedings(full_record):
               """  address      = {Staszkowka},\n"""
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
+              """  venue        = """
+              """{Harvard-Smithsonian Center for Astrophysics},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -329,6 +333,26 @@ def test_format_inproceedings(full_record):
 
     del full_record['imprint']
     full_record['part_of']['publisher'] = "hello"
+    bibtex = ("""@inproceedings{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Doe, Jane and\n"""
+              """                  Smith, John and\n"""
+              """                  Nowak, Jack},\n"""
+              """  title        = {Test title},\n"""
+              """  booktitle    = {Bum},\n"""
+              """  year         = 2014,\n"""
+              """  pages        = 30,\n"""
+              """  publisher    = {hello},\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  venue        = """
+              """{Harvard-Smithsonian Center for Astrophysics},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+    del full_record['meeting']
     bibtex = ("""@inproceedings{doe_2014_12345,\n"""
               """  author       = {Doe, John and\n"""
               """                  Doe, Jane and\n"""
