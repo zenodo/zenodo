@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,31 +22,43 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-<button class="btn btn-primary btn-block" type="" data-toggle="modal" data-target="#contactModal"><i class="fa fa-pencil-square-o"></i> Contact the uploader</button>
+{% extends "zenodo_theme/page.html" %}
 
+{% from "invenio_userprofiles/settings/_macros.html" import render_field %}
 
-<div class="modal fade" id="contactModal" tabindex="-1" role="dialog" aria-labelledby="contactModalLabel" aria-hidden="true">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title" id="contactModalLabel">Contatct the Uploader</h3>
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-          <span aria-hidden="true">&times;</span>
+{%- block page_body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-3"></div>
+    <div class="col-md-6">
+      <h2>Get help with Zenodo</h2>
+      <hr />
+      <div class="panel-body">
+      <form action="" method="POST" enctype="multipart/form-data">
+        {% if not current_user.is_authenticated %}
+          It is recommended to login first.
+        {% endif %}
+
+        {{ form.csrf_token }}
+        {{ render_field(form.name) }}
+
+        {% if current_user.is_authenticated %}
+          The owner will get back to you by your Zenodo email: <b>{{ form.email.data }}</b>
+        {% else %}
+          {{ render_field(form.email) }}
+        {% endif %}
+
+        {{ render_field(form.message) }}
+
+        {{ render_field(form.recaptcha) }}
+
+        <button class="btn btn-block btn-success" type="submit">
+          Send Request
         </button>
-      </div>
-      <div class="modal-body">
-        <form action="{{ url_for('zenodo_records.contact_owner', pid_value=pid.pid_value) }}" method="POST" id="contactForm">
-          <input type="text" class="form-control" id="nameInput" placeholder="Full name" required="true">
-          <br>
-          <input type="text" class="form-control" id="emailInput" placeholder="Email address">
-          <br>
-          <input type="text" class="form-control input-lg" id="messageInput" placeholder="Your Message">
-        </form>
-      </div>        
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" form="contactForm" value="Submit">Submit</button>
+      </form>
       </div>
     </div>
+    <div class="col-md-3"></div>
   </div>
 </div>
+{%- endblock page_body %}

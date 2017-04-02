@@ -43,8 +43,6 @@ def strip_filter(text):
 
 def contact_form_factory():
     """Contact form factory."""
-    min_length = current_app.config['PAGES_DESCRIPTION_MIN_LENGTH']
-    max_length = current_app.config['PAGES_DESCRIPTION_MAX_LENGTH']
 
 
     class ContactForm(FlaskForm):
@@ -63,11 +61,12 @@ def contact_form_factory():
             validators=[DataRequired()],
         )
         message = StringField(
-            _('Subject'),
+            _('Message'),
             description=_(''),
             filters=[strip_filter],
             validators=[DataRequired()],
         )
+        submit = SubmitField(_("Send Request"))
         recaptcha = RecaptchaField(validators=[
             Recaptcha(message=_("Please complete the reCAPTCHA."))
         ])

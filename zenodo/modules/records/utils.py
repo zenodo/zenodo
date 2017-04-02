@@ -82,7 +82,7 @@ def format_request_email_title(context):
     :returns: Email message title.
     :rtype: str
     """
-    template = current_app.config['PAGES_EMAIL_TITLE_TEMPLATE'],
+    template = current_app.config['RECORD_CONTACT_EMAIL_TITLE_TEMPLATE'],
     return render_template_to_string(template, context)
 
 def format_request_email_body(context):
@@ -93,10 +93,10 @@ def format_request_email_body(context):
     :returns: Email message body.
     :rtype: str
     """
-    template = current_app.config['PAGES_EMAIL_BODY_TEMPLATE'],
+    template = current_app.config['RECORD_CONTACT_EMAIL_BODY_TEMPLATE'],
     return render_template_to_string(template, context)
 
-def send_support_email(context):
+def send_contact_email(context, sender, recipient):
     """Signal for sending emails after contact form validated."""
     msg_body = format_request_email_body(context)
     msg_title = format_request_email_title(context)
@@ -105,15 +105,10 @@ def send_support_email(context):
 
     msg = Message(
         msg_title,
-        sender=current_app.config['PAGES_SENDER_EMAIL'],
-        recipients=current_app.config['PAGES_SUPPORT_EMAIL'],
-        reply_to=context['form'].email.data,
+        sender=sender,
+        recipients=recipient,
+        reply_to=sender,
         body=msg_body
     )
-
-    if context['form'].attachments.data:
-        msg.attach(context['form'].attachments.data.filename,
-                   'application/octet-stream',
-                   context['form'].attachments.data.read())
 
     mail.send(msg)

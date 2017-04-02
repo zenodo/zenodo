@@ -105,10 +105,6 @@ system.
 """
 
 
-PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
+RECORD_CONTACT_EMAIL_TITLE_TEMPLATE = 'zenodo_records/template/email_title.html'
 
-PAGES_EMAIL_BODY_TEMPLATE = 'zenodo_pages/email_body.html'
-
-PAGES_SENDER_EMAIL = 'info@zenodo.org'
-
-PAGES_SUPPORT_EMAIL = ['info@zenodo.org', ]
+RECORD_CONTACT_EMAIL_BODY_TEMPLATE = 'zenodo_records/template/email_body.html'
