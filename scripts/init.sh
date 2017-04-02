@@ -22,6 +22,16 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+if [[ `uname` == 'Darwin' ]]; then
+    # When developing with docker on MacOS (or Windows), all the ports are exposed to a VM
+    # instead of localhost
+    # For example, we may have
+    #   DOCKER_HOST="tcp://192.168.99.100:2376"  (avaiable by running docker-machine env)
+    # then
+    #   ZENODO_DOCKER_HOST = "192.168.99.100"
+    export ZENODO_DOCKER_HOST=$(docker-machine env | awk -F '://' '/DOCKER_HOST=/ {print $2}' | awk -F ':' '{print $1}')
+    echo 'export ZENODO_DOCKER_HOST='$ZENODO_DOCKER_HOST
+fi
 zenodo db create
 zenodo index queue init
 zenodo index init
