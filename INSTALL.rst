@@ -231,7 +231,7 @@ Create the database and Elasticsearch indices in a new shell session:
 .. note::
 
     Here we assume all four services (db, es, mp, cache) are bound to
-    localhost. If you fail to connect those services, it is likely
+    localhost (see ``zenodo/config.py``). If you fail to connect those services, it is likely
     you are running docker through ``docker-machine`` and those services are
     bound to other IP addresses. In this case, you can redirect localhost ports
     to docker ports as follows.
