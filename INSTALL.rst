@@ -238,7 +238,7 @@ Create the database and Elasticsearch indices in a new shell session:
 
     ``ssh -L 6379:localhost:6379 -L 5432:localhost:5432 -L 9200:localhost:9200 -L 5672:localhost:5672 docker@$(docker-machine ip)``
 
-    The problems usually occur among Mac and Windows users. A better solution
+    The problem usually occurs among Mac and Windows users. A better solution
     is to install the native apps `Docker for Mac <https://docs.docker.com/docker-for-mac/>`_
     or `Docker for Windows <https://docs.docker.com/docker-for-windows/>`_
     (available since Docker v1.12) if possible,
