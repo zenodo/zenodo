@@ -55,7 +55,7 @@ from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
 from invenio_oauthclient.models import RemoteAccount
-from invenio_pidstore.models import PersistentIdentifier
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
@@ -242,6 +242,14 @@ def communities(db, users):
         Community.create(c['id'], user_id=c['user_id'])
     db.session.commit()
     return comm_data
+
+
+def versioned_records_and_pids(db, minimal_record, communities):
+
+    h1 = PersistentIdentifier.create('recid', '12345', object_type='rec',
+                                     status=PIDStatus.REGISTERED)
+    h1v1 = PersistentIdentifier.create('recid', '12345', object_type='rec',
+                                     status=PIDStatus.REGISTERED)
 
 
 @pytest.fixture()

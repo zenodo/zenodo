@@ -300,6 +300,8 @@ def community_curation(record, user):
     2-tuple of (Community, bool), describing community itself,
     and the permission (bool) to curate it.
     """
+
+    # TODO: needs to check for all children versions
     irs = InclusionRequest.query.filter_by(id_record=record.id).order_by(
         InclusionRequest.id_community).all()
     pending = [ir.community for ir in irs]
@@ -315,7 +317,7 @@ def community_curation(record, user):
         global_perm = True
 
     if global_perm:
-        return (pending, pending, accepted, accepted)
+        return (pending, accepted, pending, accepted)
     else:
         return (
             [c for c in pending if _can_curate(c, user, record)],

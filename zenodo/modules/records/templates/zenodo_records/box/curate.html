@@ -31,13 +31,13 @@
                 type="button"
                 action="accept"
                 commId="{{ comm.id }}"
-                endpoint="{{url_for('invenio_communities.curate', community_id=comm.id)}}"
+                endpoint="{{url_for('zenodo_communities.curate', community_id=comm.id)}}"
                 recid="{{record.recid}}"><i class="fa fa-check"></i> Accept</button>
         <button class="btn-reject btn btn-xs btn-info"
                 type="button"
                 action="reject"
                 commId="{{ comm.id }}"
-                endpoint="{{url_for('invenio_communities.curate', community_id=comm.id)}}"
+                endpoint="{{url_for('zenodo_communities.curate', community_id=comm.id)}}"
                 recid="{{record.recid}}"><i class="fa fa-times"></i> Reject</button>
         </span>
         {{ comm.title }}
@@ -53,7 +53,7 @@
                 type="button"
                 action="remove"
                 commId="{{ comm.id }}"
-                endpoint="{{ url_for('invenio_communities.curate', community_id=comm.id) }}"
+                endpoint="{{ url_for('zenodo_communities.curate', community_id=comm.id) }}"
                 recid="{{ record.recid }}"><i class="fa fa-times"></i> Remove</button>
         </span>
         {{ comm.title }}
