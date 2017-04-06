@@ -228,6 +228,22 @@ Create the database and Elasticsearch indices in a new shell session:
    $ workon zenodo
    (zenodo)$ ./scripts/init.sh
 
+.. note::
+
+    Here we assume all four services (db, es, mp, cache) are bound to
+    localhost (see ``zenodo/config.py``). If you fail to connect those services, it is likely
+    you are running docker through ``docker-machine`` and those services are
+    bound to other IP addresses. In this case, you can redirect localhost ports
+    to docker ports as follows.
+
+    ``ssh -L 6379:localhost:6379 -L 5432:localhost:5432 -L 9200:localhost:9200 -L 5672:localhost:5672 docker@$(docker-machine ip)``
+
+    The problem usually occurs among Mac and Windows users. A better solution
+    is to install the native apps `Docker for Mac <https://docs.docker.com/docker-for-mac/>`_
+    or `Docker for Windows <https://docs.docker.com/docker-for-windows/>`_
+    (available since Docker v1.12) if possible,
+    which binds docker to localhost by default.
+
 Demo records
 ~~~~~~~~~~~~
 Next, load some demo data (licenses, funders, grants, records).
