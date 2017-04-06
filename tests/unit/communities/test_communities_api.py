@@ -58,11 +58,11 @@ def test_basic_api(app, db, communities, deposit, deposit_file):
     c2_api = ZenodoCommunity('c2')
 
     # Inclusion requests should be visible for both records
-    assert c1_api.get_pending_irs_q(record_v1, pid=recid_v1).count() == 1
-    assert c1_api.get_pending_irs_q(record_v2, pid=recid_v2).count() == 1
+    assert c1_api.get_comm_irs(record_v1, pid=recid_v1).count() == 1
+    assert c1_api.get_comm_irs(record_v2, pid=recid_v2).count() == 1
 
-    assert c2_api.get_pending_irs_q(record_v1, pid=recid_v1).count() == 1
-    assert c2_api.get_pending_irs_q(record_v2, pid=recid_v2).count() == 1
+    assert c2_api.get_comm_irs(record_v1, pid=recid_v1).count() == 1
+    assert c2_api.get_comm_irs(record_v2, pid=recid_v2).count() == 1
 
     # Accept to 'c1' through record_v2 (as originally requested),
     # and 'c2' through record_v1 (version)
@@ -126,22 +126,22 @@ def test_autoadd(app, db, users, communities, deposit, deposit_file,
     zenodo_api = ZenodoCommunity('zenodo')
 
     # Inclusion requests should be visible for both records
-    assert c1_api.get_pending_irs_q(record_v1, pid=recid_v1).count() == 1
-    assert c1_api.get_pending_irs_q(record_v2, pid=recid_v2).count() == 1
-    assert c2_api.get_pending_irs_q(record_v1, pid=recid_v1).count() == 1
-    assert c2_api.get_pending_irs_q(record_v2, pid=recid_v2).count() == 1
-    assert c3_api.get_pending_irs_q(record_v1, pid=recid_v1).count() == 0
-    assert c3_api.get_pending_irs_q(record_v2, pid=recid_v2).count() == 0
-    assert grants_comm_api.get_pending_irs_q(
+    assert c1_api.get_comm_irs(record_v1, pid=recid_v1).count() == 1
+    assert c1_api.get_comm_irs(record_v2, pid=recid_v2).count() == 1
+    assert c2_api.get_comm_irs(record_v1, pid=recid_v1).count() == 1
+    assert c2_api.get_comm_irs(record_v2, pid=recid_v2).count() == 1
+    assert c3_api.get_comm_irs(record_v1, pid=recid_v1).count() == 0
+    assert c3_api.get_comm_irs(record_v2, pid=recid_v2).count() == 0
+    assert grants_comm_api.get_comm_irs(
         record_v1, pid=recid_v1).count() == 0
-    assert grants_comm_api.get_pending_irs_q(
+    assert grants_comm_api.get_comm_irs(
         record_v2, pid=recid_v2).count() == 0
-    assert ecfunded_api.get_pending_irs_q(
+    assert ecfunded_api.get_comm_irs(
         record_v1, pid=recid_v1).count() == 1
-    assert ecfunded_api.get_pending_irs_q(
+    assert ecfunded_api.get_comm_irs(
         record_v2, pid=recid_v2).count() == 1
-    assert zenodo_api.get_pending_irs_q(record_v1, pid=recid_v1).count() == 1
-    assert zenodo_api.get_pending_irs_q(record_v2, pid=recid_v2).count() == 1
+    assert zenodo_api.get_comm_irs(record_v1, pid=recid_v1).count() == 1
+    assert zenodo_api.get_comm_irs(record_v2, pid=recid_v2).count() == 1
 
     # Accept to 'c1' through record_v2 (as originally requested),
     # and 'c2' through record_v1 (resolved through version)
@@ -175,3 +175,86 @@ def test_autoadd(app, db, users, communities, deposit, deposit_file,
                                                  'zenodo']
     assert deposit_v2.get('communities', []) == ['ecfunded', 'grants_comm',
                                                  'zenodo']
+
+
+def test_autoadd_explicit(
+        app, db, users, communities, deposit, deposit_file,
+        communities_autoadd_enabled):
+    """Explicitly the autoadded communities."""
+    deposit['communities'] = ['ecfunded', 'grants_comm', 'zenodo']
+    deposit['grants'] = [{'title': 'SomeGrant'}, ]
+    deposit_v1 = publish_and_expunge(db, deposit)
+    recid_v1, record_v1 = deposit_v1.fetch_published()
+
+    assert record_v1.get('communities', []) == ['grants_comm', ]
+    assert deposit_v1.get('communities', []) == ['ecfunded', 'grants_comm',
+                                                 'zenodo']
+
+
+def test_autoadd_explicit_newversion(
+        app, db, users, communities, deposit, deposit_file,
+        communities_autoadd_enabled):
+    """Explicitly the autoadded communities in a new version."""
+    deposit_v1 = publish_and_expunge(db, deposit)
+    recid_v1, record_v1 = deposit_v1.fetch_published()
+    depid_v1_value = deposit_v1['_deposit']['id']
+    recid_v1_value = recid_v1.pid_value
+
+    deposit_v1 = deposit_v1.newversion()
+    pv = PIDVersioning(child=recid_v1)
+    depid_v2 = pv.draft_child_deposit
+    depid_v2_value = depid_v2.pid_value
+
+    deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+
+    deposit_v2['communities'] = ['ecfunded', 'grants_comm', 'zenodo']
+    deposit_v2['grants'] = [{'title': 'SomeGrant'}, ]
+    deposit_v2 = publish_and_expunge(db, deposit_v2)
+    recid_v2, record_v2 = deposit_v2.fetch_published()
+
+    depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
+    depid_v2, deposit_v2 = deposit_resolver.resolve(depid_v2_value)
+    recid_v1, record_v1 = record_resolver.resolve(recid_v1_value)
+    assert record_v1.get('communities', []) == ['grants_comm', ]
+    assert deposit_v1.get('communities', []) == ['ecfunded', 'grants_comm',
+                                                 'zenodo']
+    assert record_v2.get('communities', []) == ['grants_comm', ]
+    assert deposit_v2.get('communities', []) == ['ecfunded', 'grants_comm',
+                                                 'zenodo']
+
+
+def test_communities_newversion_addition(
+        app, db, users, communities, deposit, deposit_file):
+    """Make sure that new version of record synchronizes the communities."""
+    deposit['communities'] = ['c1', 'c2']
+    deposit_v1 = publish_and_expunge(db, deposit)
+    recid_v1, record_v1 = deposit_v1.fetch_published()
+    depid_v1_value = deposit_v1['_deposit']['id']
+    recid_v1_value = recid_v1.pid_value
+
+    c1_api = ZenodoCommunity('c1')
+    c2_api = ZenodoCommunity('c2')
+
+    c1_api.accept_record(record_v1, pid=recid_v1)
+    c2_api.accept_record(record_v1, pid=recid_v1)
+
+    deposit_v1 = deposit_v1.newversion()
+    pv = PIDVersioning(child=recid_v1)
+    depid_v2 = pv.draft_child_deposit
+    depid_v2_value = depid_v2.pid_value
+
+    deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+
+    # Remove 'c2' and request for 'c5'. Make sure that communities from
+    # previous record version are preserved/removed properly
+    deposit_v2['communities'] = ['c1', 'c5']
+    deposit_v2 = publish_and_expunge(db, deposit_v2)
+    recid_v2, record_v2 = deposit_v2.fetch_published()
+
+    depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
+    depid_v2, deposit_v2 = deposit_resolver.resolve(depid_v2_value)
+    recid_v1, record_v1 = record_resolver.resolve(recid_v1_value)
+    assert record_v1.get('communities', []) == ['c1', ]
+    assert deposit_v1.get('communities', []) == ['c1', 'c5', ]
+    assert record_v2.get('communities', []) == ['c1', ]
+    assert deposit_v2.get('communities', []) == ['c1', 'c5', ]

@@ -51,19 +51,36 @@ class ZenodoCommunity(object):
         else:
             self.community = community
 
-    def get_pending_irs_q(self, record, pid=None):
-        """Get all inclusion requests for record and all of its versions.
+    @staticmethod
+    def get_irs(record, community_id=None, pid=None):
+        """Get all inclusion requests for given record and community.
 
-        :rtype: BaseQuery
+        :param record: record for which the inclusion requests are fetched.
+            This includes all of the record's versions.
+        :param community_id: Narrow down the query to given community.
+            Query for all communities if 'None'.
         """
         if not pid:
             pid = PersistentIdentifier.get('recid', record['recid'])
         pv = PIDVersioning(child=pid)
         sq = pv.children.with_entities(
             PersistentIdentifier.object_uuid).subquery()
+        filter_cond = [
+            InclusionRequest.id_record.in_(sq),
+        ]
+        if community_id:
+            filter_cond.append(
+                InclusionRequest.id_community == community_id)
         return (db.session.query(InclusionRequest)
-                .filter(InclusionRequest.id_record.in_(sq),
-                        InclusionRequest.id_community == self.community.id))
+                .filter(*filter_cond))
+
+    def get_comm_irs(self, record, pid=None):
+        """Inclusion requests for record's versions made to this community.
+
+        :rtype: BaseQuery
+        """
+        return ZenodoCommunity.get_irs(
+            record, community_id=self.community.id, pid=pid)
 
     def has_record(self, record, pid=None, scope='any'):
         """Check if record is in a community.
@@ -112,7 +129,7 @@ class ZenodoCommunity(object):
         if not pid:
             pid = PersistentIdentifier.get('recid', record['recid'])
         with db.session.begin_nested():
-            pending_q = self.get_pending_irs_q(record, pid=pid)
+            pending_q = self.get_comm_irs(record, pid=pid)
             if not pending_q.count():
                 raise InclusionRequestMissingError(community=self,
                                                    record=record)

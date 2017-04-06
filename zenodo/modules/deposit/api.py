@@ -106,8 +106,8 @@ class ZenodoDeposit(Deposit):
         for comm_id in comms:
             comm_api = ZenodoCommunity(comm_id)
             # Check if InclusionRequest exists for any version already
-            pending_irs = comm_api.get_pending_irs_q(record)
-            if pending_irs.count() == 0:
+            pending_irs = comm_api.get_comm_irs(record)
+            if pending_irs.count() == 0 and not comm_api.has_record(record):
                 comm = Community.get(comm_id)
                 InclusionRequest.create(comm, record)
 
@@ -304,11 +304,19 @@ class ZenodoDeposit(Deposit):
 
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
-        dep_comms = set(self.get('communities', []))
+        dep_comms = set(self.pop('communities', []))
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
-        rec_comms = set(record.get('communities', []))
+        recid = PersistentIdentifier.get('recid', record['recid'])
+        pv = PIDVersioning(child=recid)
+        if pv.children.count() > 1:
+            prev_recid = pv.children.all()[-2]
+            rec_comms = set(ZenodoRecord.get_record(
+                prev_recid.get_assigned_object())['communities'])
+        else:
+            rec_comms = set()
 
         record = self._sync_communities(dep_comms, rec_comms, record)
+        record.commit()
 
         return record
 

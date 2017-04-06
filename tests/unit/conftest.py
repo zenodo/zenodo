@@ -234,6 +234,7 @@ def communities(db, users):
         {'id': 'c2', 'user_id': users[1]['id']},
         {'id': 'c3', 'user_id': users[0]['id']},
         {'id': 'c4', 'user_id': users[0]['id']},
+        {'id': 'c5', 'user_id': users[1]['id']},
         {'id': 'zenodo', 'user_id': users[2]['id']},
         {'id': 'ecfunded', 'user_id': users[2]['id']},
         {'id': 'grants_comm', 'user_id': users[2]['id']},
@@ -242,14 +243,6 @@ def communities(db, users):
         Community.create(c['id'], user_id=c['user_id'])
     db.session.commit()
     return comm_data
-
-
-def versioned_records_and_pids(db, minimal_record, communities):
-
-    h1 = PersistentIdentifier.create('recid', '12345', object_type='rec',
-                                     status=PIDStatus.REGISTERED)
-    h1v1 = PersistentIdentifier.create('recid', '12345', object_type='rec',
-                                     status=PIDStatus.REGISTERED)
 
 
 @pytest.fixture()
