@@ -38,5 +38,8 @@ class FrontpageRecordsSearch(RecordsSearch):
 
         index = 'records'
         default_filter = Q(
-            'query_string', query='communities:zenodo AND access_right:open'
+            'query_string',
+            query=('communities:zenodo '
+                   'AND access_right:open '
+                   'AND latest_version:true')
         )

@@ -66,8 +66,11 @@
             <p>{{ authors(r.creators) }}</p>
             <p class="hidden-xs"><a href="{{record_url}}">{{ r.description|striptags|truncate(300) }}</a></p>
             <small class="text-muted hidden-xs">
-              {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}.{% endtrans %}
+              {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}{% endtrans %}
             </small>
+            {%- if r.relations.version[0].index > 0 %}
+              <p class="text-muted"><small><i>{{ r.relations.version[0].index }} more Version(s) exist for this record</i> </small></p>
+            {% endif %}
           </div>
         </div>
         {%- if not loop.last %}

@@ -160,32 +160,19 @@
                       "type": "string"
                     },
                     "pid_value": {
-                      "type": "string",
-                      "copy_to": "concept_recid"
+                      "type": "string"
                     }
                   }
                 },
                 "index": {
-                  "type": "integer",
-                  "copy_to": "version_index"
+                  "type": "integer"
                 },
                 "is_last": {
-                  "type": "boolean",
-                  "copy_to": "is_latest_version"
+                  "type": "boolean"
                 }
               }
             }
           }
-        },
-        "concept_recid": {
-          "type": "string",
-          "index": "not_analyzed"
-        },
-        "is_latest_version": {
-          "type": "boolean"
-        },
-        "version_index": {
-          "type": "integer"
         },
         "_deposit": {
           "type": "object",
