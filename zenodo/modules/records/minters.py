@@ -73,7 +73,7 @@ def zenodo_record_minter(record_uuid, data):
 
     zenodo_concept_doi_minter(record_uuid, data)
 
-    # Remove the record draft link
+    # Update redirect and remove the record draft link
     if 'conceptrecid' in data:
         conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
         PIDVersioning(parent=conceptrecid).update_redirect()

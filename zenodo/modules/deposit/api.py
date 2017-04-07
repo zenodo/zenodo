@@ -429,6 +429,9 @@ class ZenodoDeposit(Deposit):
         pid_recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
 
+        versioning = PIDVersioning(child=pid_recid)
+        versioning.remove_draft_child()
+
         if pid_recid.status == PIDStatus.RESERVED:
             db.session.delete(pid_recid)
 
@@ -478,12 +481,6 @@ class ZenodoDeposit(Deposit):
                 # Injecting owners is required in case of creating new
                 # version this outside of request context
                 deposit['_deposit']['owners'] = owners
-                conceptrecid = PersistentIdentifier.get('recid',
-                                                        data['conceptrecid'])
-                recid = PersistentIdentifier.get('recid',
-                                                 data['recid'])
-                versioning = PIDVersioning(parent=conceptrecid)
-                versioning.insert_draft_child(child=recid)
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data

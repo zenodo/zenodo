@@ -55,8 +55,6 @@ def zenodo_deposit_minter(record_uuid, data):
             pid_type='recid', pid_value=data['conceptrecid'])
 
     recid = zenodo_reserved_record_minter(data=data)
-    pv = PIDVersioning(parent=conceptrecid)
-    pv.insert_draft_child(recid)
 
     # Create depid with same pid_value of the recid
     depid = PersistentIdentifier.create(
@@ -74,6 +72,7 @@ def zenodo_deposit_minter(record_uuid, data):
         },
     })
 
+    PIDVersioning(parent=conceptrecid).insert_draft_child(child=recid)
     RecordDraft.link(recid, depid)
 
     return depid

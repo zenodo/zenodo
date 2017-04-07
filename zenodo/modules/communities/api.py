@@ -32,7 +32,7 @@ from invenio_communities.errors import InclusionRequestMissingError
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_db import db
 from zenodo.modules.records.api import ZenodoRecord
-from six import text_type
+from six import string_types, text_type
 
 
 class ZenodoCommunity(object):
@@ -46,7 +46,7 @@ class ZenodoCommunity(object):
             (community ID).
         :type community: invenio_communities.model.Community or str
         """
-        if isinstance(community, text_type):
+        if isinstance(community, (text_type, string_types)):
             self.community = Community.get(community)
         else:
             self.community = community
