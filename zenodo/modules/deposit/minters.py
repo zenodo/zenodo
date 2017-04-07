@@ -37,7 +37,7 @@ def zenodo_recid_concept_minter(record_uuid=None, data=None):
     parent_id = RecordIdentifier.next()
     conceptrecid = PersistentIdentifier.create(
         pid_type='recid',
-        pid_value=parent_id,
+        pid_value=str(parent_id),
         status=PIDStatus.RESERVED,
     )
     data['conceptrecid'] = conceptrecid.pid_value
@@ -51,8 +51,8 @@ def zenodo_deposit_minter(record_uuid, data):
     if 'conceptrecid' not in data:
         conceptrecid = zenodo_recid_concept_minter(data=data)
     else:
-        conceptrecid = PersistentIdentifier.get(pid_type='recid',
-                                                pid_value=data['conceptrecid'])
+        conceptrecid = PersistentIdentifier.get(
+            pid_type='recid', pid_value=data['conceptrecid'])
 
     recid = zenodo_reserved_record_minter(data=data)
 
