@@ -320,11 +320,11 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
     @validates_schema
     def validate_data(self, obj):
         """Validate resource type."""
-        type_ = obj.get('resource_type.type')
+        type_ = obj.get('resource_type', {}).get('type')
         if type_ in ['publication', 'image']:
             type_dict = {
                 'type': type_,
-                'subtype': obj.get('resource_type.subtype'),
+                'subtype': obj.get('resource_type', {}).get('subtype')
             }
             field_names = ['{0}_type'.format(type_)]
         else:

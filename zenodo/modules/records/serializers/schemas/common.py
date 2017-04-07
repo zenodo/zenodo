@@ -393,6 +393,14 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             )
             links['doi'] = idutils.to_url(doi, 'doi')
 
+        concept_doi = m.get('conceptdoi')
+        if current_app and concept_doi:
+            links['conceptbadge'] = "{base}/badge/doi/{value}.svg".format(
+                base=current_app.config.get('THEME_SITEURL'),
+                value=quote(concept_doi),
+            )
+            links['conceptdoi'] = idutils.to_url(concept_doi, 'doi')
+
         if has_request_context():
             if is_deposit(m):
                 bucket_id = m.get('_buckets', {}).get('deposit')

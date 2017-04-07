@@ -49,3 +49,9 @@
   );
   </script>
 {%- endblock javascript -%}
+{%- block search_results %}
+<invenio-search-results-provisional
+ template="{{ url_for('static', filename=config.COMMUNITIES_JSTEMPLATE_RESULTS_CURATE) }}"
+ community-curation-endpoint="{{ url_for('zenodo_communities.curate', community_id=community.id) }}">
+</invenio-search-results-provisional>
+{%- endblock search_results %}
