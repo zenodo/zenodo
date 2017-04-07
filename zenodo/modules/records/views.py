@@ -41,6 +41,8 @@ from invenio_pidstore.models import PIDStatus
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
+from zenodo.modules.communities.api import ZenodoCommunity
+
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
@@ -301,9 +303,7 @@ def community_curation(record, user):
     and the permission (bool) to curate it.
     """
 
-    # TODO: needs to check for all children versions
-    irs = InclusionRequest.query.filter_by(id_record=record.id).order_by(
-        InclusionRequest.id_community).all()
+    irs = ZenodoCommunity.get_irs(record).all()
     pending = [ir.community for ir in irs]
     accepted = [Community.get(c) for c in record.get('communities', [])]
     # Additionally filter out community IDs that did not resolve (None)

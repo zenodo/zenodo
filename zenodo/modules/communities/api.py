@@ -69,10 +69,8 @@ class ZenodoCommunity(object):
             InclusionRequest.id_record.in_(sq),
         ]
         if community_id:
-            filter_cond.append(
-                InclusionRequest.id_community == community_id)
-        return (db.session.query(InclusionRequest)
-                .filter(*filter_cond))
+            filter_cond.append(InclusionRequest.id_community == community_id)
+        return (db.session.query(InclusionRequest).filter(*filter_cond))
 
     def get_comm_irs(self, record, pid=None):
         """Inclusion requests for record's versions made to this community.
@@ -145,12 +143,16 @@ class ZenodoCommunity(object):
                 rec.commit()
             pending_q.delete(synchronize_session=False)
 
-    def reject_record(self, record):
+    def reject_record(self, record, pid=None):
         """Reject the inclusion request.
 
         :type record: zenodo.modules.records.api.ZenodoRecord
         """
-        pass
+        if not pid:
+            pid = PersistentIdentifier.get('recid', record['recid'])
+        with db.session.begin_nested():
+            pending_q = self.get_comm_irs(record, pid=pid)
+            pending_q.delete(synchronize_session=False)
 
     def remove_record(self, record, pid=None):
         """Remove the record and all of its versions from the community.

@@ -77,7 +77,6 @@ def curate(community):
     elif action == "remove":
         api.remove_record(record, pid=pid)
 
-    record.commit()
     db.session.commit()
     RecordIndexer().index_by_id(record.id)
     return jsonify({'status': 'success'})

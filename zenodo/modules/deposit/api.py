@@ -332,7 +332,7 @@ class ZenodoDeposit(Deposit):
         if pv.children.count() > 1:
             prev_recid = pv.children.all()[-2]
             rec_comms = set(ZenodoRecord.get_record(
-                prev_recid.get_assigned_object())['communities'])
+                prev_recid.get_assigned_object()).get('communities', []))
         else:
             rec_comms = set()
 
