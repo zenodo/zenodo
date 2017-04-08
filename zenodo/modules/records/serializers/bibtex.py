@@ -207,7 +207,7 @@ class Bibtex(object):
         """
         name = "inproceedings"
         req_fields = ['author', 'title', 'booktitle', 'year']
-        opt_fields = ['pages', 'publisher', 'address', 'month', 'note']
+        opt_fields = ['pages', 'publisher', 'address', 'month', 'note', 'venue']
         ign_fields = ['doi', 'url']
         return self._format_entry(name, req_fields,
                                   opt_fields, ign_fields)
@@ -277,6 +277,7 @@ class Bibtex(object):
             'school': self._get_school,
             'title': self._get_title,
             'url': self._get_url,
+            'venue': self._get_venue,
             'volume': self._get_volume,
             'year': self._get_year,
             'doi': self._get_doi
@@ -483,6 +484,14 @@ class Bibtex(object):
         """Return the WWW address."""
         return "https://doi.org/%s" % self.record['doi'] \
             if "doi" in self.record else ""
+
+    def _get_venue(self):
+        """Return conference's venue."""
+        if "meeting" in self.record and\
+                "place" in self.record["meeting"]:
+            return self.record["meeting"]["place"]
+        else:
+            return ""
 
     def _get_volume(self):
         """Return the volume of a journal or multi-volume book."""

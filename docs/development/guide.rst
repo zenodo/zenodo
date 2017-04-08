@@ -43,15 +43,15 @@ Uninstall the installed PyPI version of the module and install the local one:
 .. note::
 
     The ``-e`` flag in the ``pip install`` is important for the development.
-    This way the module will be installed in "editable" mode, meaning that
-    you will be able edit the code in directly in
-    ``~/src/invenio-communities``, and have the changes be immediately
+    This way, the module will be installed in the "editable" mode, meaning that
+    you will be able to edit the code directly in
+    ``~/src/invenio-communities``, and have the changes immediately
     available in the installed library inside the virtual environment.
 
 If you now restart the Zenodo application, the relevant ``invenio_communities``
 module code should be executed from the locally stored repository in
 ``~/src/invenio-communities/``.
-If you now change the code in ~/src/invenio-communities/ the changes
+If you now change the code in ``~/src/invenio-communities/``, the changes
 should be propagated to the Zenodo application.
 
 .. note::
@@ -60,20 +60,20 @@ should be propagated to the Zenodo application.
     module, it's usually much newer version than the release (PyPI) version.
     This means that if the Zenodo-specified version of the module (see `setup.py <https://github.com/zenodo/zenodo/blob/master/setup.py>`_)
     is far behind the master branch, you can expect some incompatibilities
-    or strange behaviour.
+    or strange behaviours.
 
 Making a contribution
 ~~~~~~~~~~~~~~~~~~~~~
 
 If the feature you've implemented involves only the changes in Zenodo
 repository, you will only need to create one PR to Zenodo. If the changes
-involve also any of the Invenio modules, you will also have to create a PR in
+also involve any Invenio modules, you will also have to create a PR in
 that corresponding Invenio repository on GitHub.
 
 The recommended way to create a PR is to first fork the repository on GitHub
 (both Zenodo and Invenio repositories), push the changes to your fork's
-feature branch and create a PR on GitHub against
-``[upstream-repository]:[master]`` and ``[your-fork]:[feature-branch]``
+feature branch ``[your-fork]:[feature-branch]`` and create a PR on GitHub against
+``[upstream-repository]:[master]``.
 
 In the Zenodo PR, please refer to any relevant Invenio PR on which it depends
 so the Zenodo reviewers can also review the Invenio PR changes.
