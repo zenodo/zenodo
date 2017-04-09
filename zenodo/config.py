@@ -467,6 +467,7 @@ DEPOSIT_RECORDS_UI_ENDPOINTS = {
         'route': '/deposit/<pid_value>',
         'template': 'zenodo_deposit/edit.html',
         'record_class': 'zenodo.modules.deposit.api:ZenodoDeposit',
+        'view_imp': 'zenodo.modules.deposit.views.default_view_method',
     },
 }
 
