@@ -42,6 +42,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records_files.api import Record
 from invenio_records_files.models import RecordsBuckets
+from invenio_records_ui.signals import record_viewed
 
 from zenodo.modules.records.permissions import record_permission_factory
 
@@ -127,11 +128,6 @@ def edit(pid=None, record=None, depid=None, deposit=None):
     # If the record doesn't have a DOI, its deposit shouldn't be editable.
     if 'doi' not in record:
         abort(404)
-
-    # Put deposit in edit mode if not already.
-    if deposit['_deposit']['status'] != 'draft':
-        deposit = deposit.edit()
-        db.session.commit()
 
     return redirect(url_for(
         'invenio_deposit_ui.{0}'.format(depid.pid_type),
@@ -292,3 +288,44 @@ def to_files_js(deposit):
         })
 
     return res
+
+def default_view_method(pid, record, template=None):
+    """Default view method for updating record.
+
+    Sends ``record_viewed`` signal and renders template.
+
+    :param pid: PID object.
+    :param record: Record object.
+    :param template: Template to render.
+    """
+    # Fetch deposit id from record and resolve deposit record and pid.
+    depid = zenodo_deposit_fetcher(None, record)
+    if not depid:
+        abort(404)
+
+    depid, deposit = Resolver(
+        pid_type=depid.pid_type,
+        object_type='rec',
+        getter=ZenodoDeposit.get_record,
+    ).resolve(depid.pid_value)
+
+    '''If the record doesn't have a DOI,
+    its deposit shouldn't be editable.'''
+    if 'doi' not in record:
+        abort(404)
+
+    # Put deposit in edit mode if not already.
+    if deposit['_deposit']['status'] != 'draft':
+        deposit = deposit.edit()
+        db.session.commit()
+
+    record_viewed.send(
+        current_app._get_current_object(),
+        pid=pid,
+        record=record,
+    )
+    return render_template(
+        template,
+        pid=pid,
+        record=record,
+    )
