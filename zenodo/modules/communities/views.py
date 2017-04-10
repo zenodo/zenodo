@@ -38,6 +38,7 @@ from invenio_records.api import Record
 from invenio_communities.views.ui import pass_community, permission_required
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.resolvers import record_resolver
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 blueprint = Blueprint(
     'zenodo_communities',
@@ -69,7 +70,11 @@ def curate(community):
     pid, record = record_resolver.resolve(recid)
 
     # Perform actions
-    api = ZenodoCommunity(community)
+    pv = PIDVersioning(child=pid)
+    if pv.exists:
+        api = ZenodoCommunity(community)
+    else:
+        api = community
     if action == "accept":
         api.accept_record(record, pid=pid)
     elif action == "reject":

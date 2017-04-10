@@ -45,6 +45,7 @@ from invenio_records_files.models import RecordsBuckets
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 from zenodo.modules.records.permissions import record_permission_factory
+from zenodo.modules.records.minters import zenodo_mint_missing_concept_pids
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
@@ -168,6 +169,26 @@ def newversion(pid=None, record=None, depid=None, deposit=None):
         'invenio_deposit_ui.{0}'.format(new_deposit.pid.pid_type),
         pid_value=new_deposit.pid.pid_value
     ))
+
+
+@blueprint.route(
+    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>'
+    '/enableversioning',
+    methods=['POST']
+)
+@login_required
+@pass_record('update')
+def enableversioning(pid=None, record=None, depid=None, deposit=None):
+    """Enable versioning for a record."""
+    # If the record doesn't have a DOI, its deposit shouldn't be editable.
+    if 'conceptdoi' in record or 'conceptrecid' in record:
+        abort(404)  # TODO: Abort with better code if record is versioned
+
+    # TODO: Should be more generic name, since it does more than that
+    zenodo_mint_missing_concept_pids(record.id, record)
+
+    return redirect(url_for('invenio_records_ui.recid',
+                    pid_value=pid.pid_value))
 
 
 @blueprint.route(

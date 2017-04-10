@@ -25,6 +25,7 @@
 """Helper methods for Zenodo records."""
 
 from __future__ import absolute_import, print_function
+from flask import current_app
 
 from invenio_records.api import Record
 from invenio_search import current_search
@@ -57,3 +58,9 @@ def serialize_record(record, pid, serializer, module=None, **kwargs):
         module = module or 'zenodo.modules.records.serializers'
         serializer = import_string('.'.join((module, serializer)))
         return serializer.serialize(pid, record, **kwargs)
+
+
+def is_doi_locally_managed(doi_value):
+    """Determine if a DOI value is locally managed."""
+    return any(doi_value.startswith(prefix) for prefix in
+               current_app.config['ZENODO_LOCAL_DOI_PREFIXES'])

@@ -42,6 +42,7 @@ from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.records.utils import is_doi_locally_managed
 
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
@@ -252,6 +253,12 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
         current_app.logger.warning('URL generation for identifier {0} failed.'
                                    .format(identifier), exc_info=True)
     return ''
+
+
+@blueprint.app_template_filter('doi_locally_managed')
+def doi_locally_managed(pid):
+    """Determine if DOI is managed locally."""
+    return is_doi_locally_managed(pid)
 
 
 def records_ui_export(pid, record, template=None, **kwargs):

@@ -53,7 +53,7 @@
   <div class="row" itemscope itemtype="{{object_type['schema.org']}}">
     <div class="col-sm-8 col-md-8 col-left">
       {%- block record_body %}
-      {% if not pid_versioning.is_last_child %}
+      {% if pid_versioning.exists and (not pid_versioning.is_last_child) %}
         {% set latest_pid = pid_versioning.last_child %}
         <div class="alert alert-info" role="alert">
           There is a newer version of this record available <a class="alert-link" href="{{ url_for('invenio_records_ui.recid', pid_value=latest_pid.pid_value) }}">here</a>.

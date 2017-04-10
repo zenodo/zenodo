@@ -63,14 +63,20 @@ class ZenodoCommunity(object):
         if not pid:
             pid = PersistentIdentifier.get('recid', record['recid'])
         pv = PIDVersioning(child=pid)
-        sq = pv.children.with_entities(
-            PersistentIdentifier.object_uuid).subquery()
-        filter_cond = [
-            InclusionRequest.id_record.in_(sq),
-        ]
-        if community_id:
-            filter_cond.append(InclusionRequest.id_community == community_id)
-        return (db.session.query(InclusionRequest).filter(*filter_cond))
+        if pv.exists:
+            sq = pv.children.with_entities(
+                PersistentIdentifier.object_uuid).subquery()
+            filter_cond = [
+                InclusionRequest.id_record.in_(sq),
+            ]
+            if community_id:
+                filter_cond.append(
+                    InclusionRequest.id_community == community_id)
+            q = (db.session.query(InclusionRequest).filter(*filter_cond))
+        else:
+            q = InclusionRequest.query.filter_by(id_record=record.id).order_by(
+                InclusionRequest.id_community)
+        return q
 
     def get_comm_irs(self, record, pid=None):
         """Inclusion requests for record's versions made to this community.

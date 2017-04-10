@@ -44,6 +44,7 @@ from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoRecord
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
+from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingCommunityError, MissingFilesError, \
@@ -452,6 +453,7 @@ class ZenodoDeposit(Deposit):
 
         return super(ZenodoDeposit, self).delete(*args, **kwargs)
 
+
     @mark_as_action
     def newversion(self, pid=None):
         """Create a new version deposit."""
@@ -459,7 +461,8 @@ class ZenodoDeposit(Deposit):
 
         # Check that there is not a newer draft version for this record
         pid, record = self.fetch_published()
-        if not PIDVersioning(child=pid).draft_child:
+        if (not PIDVersioning(child=pid).draft_child and
+                is_doi_locally_managed(record['doi'])):
             # Let's create the new version draft!
             with db.session.begin_nested():
 

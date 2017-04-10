@@ -36,8 +36,10 @@
   {%- endif %}
 
   {%- if record.doi %}
+    {%- if record.conceptdoi %}
     <dt>{{_('Record Versions')}}:</dt>
     <dd>{{ pid_versions_dropdown(pid) }}</dd>
+    {%- endif %}
     <dt>{{_('DOI')}}:</dt>
     <dd itemprop="doi">
       <span class="get-badge" data-toggle="toolt  ip" data-placement="bottom"
@@ -78,6 +80,13 @@
             </div>
           </div>
         </div>
+      </dd>
+    {% elif (record.doi|doi_locally_managed) %}
+      <dt>{{_('Concept DOI')}}:</dt>
+      <dd>
+      <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
+          <button class="btn btn-success btn-xs" type="submit">Get the Concept DOI</button>
+        </form>
       </dd>
     {%- endif %}
   {%- endif %}
