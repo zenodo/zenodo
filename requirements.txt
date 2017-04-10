@@ -103,14 +103,14 @@ intervals==0.8.0
 invenio-access==1.0.0a11
 invenio-accounts==1.0.0b1
 invenio-admin==1.0.0a3
-invenio-assets==1.0.0b4
+invenio-assets==1.0.0b6
 invenio-base==1.0.0a14
 invenio-celery==1.0.0b1
 invenio-communities==1.0.0a13
 invenio-config==1.0.0b1
 invenio-csl-rest==1.0.0a1
 invenio-db==1.0.0b3
-invenio-deposit==1.0.0a7
+invenio-deposit==1.0.0a8
 invenio-files-rest==1.0.0a14
 invenio-formatter==1.0.0a2
 invenio-github==1.0.0a10
@@ -160,7 +160,7 @@ limits==1.2.0
 lxml==3.6.4
 Mako==1.0.6
 MarkupSafe==0.23
-marshmallow==2.10.4
+marshmallow==2.12.2
 mistune==0.7.3
 mock==2.0.0
 msgpack-python==0.4.8
