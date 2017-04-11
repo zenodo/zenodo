@@ -222,7 +222,7 @@
         initialization="{{ config.DEPOSIT_SEARCH_API }}"
         {%- endif %}
         extra-params='{"headers":{"Content-Type": "application/json"}}'
-        template-params='{"is_published": {{"true" if is_published else "false"}}, "messages": {{ config.DEPOSIT_UI_RESPONSE_MESSAGES | tojson }}, "is_local_doi": {{"true" if (record.doi|doi_locally_managed) else "false"}} }'
+        template-params='{"is_published": {{"true" if is_published else "false"}}, "messages": {{ config.DEPOSIT_UI_RESPONSE_MESSAGES | tojson }}, "is_local_doi": {{"true" if ("doi"in record and (record.doi|doi_locally_managed)) else "false"}} }'
         {% if community %}
         record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson}}'
         {% else %}
