@@ -258,3 +258,38 @@ def test_communities_newversion_addition(
     assert deposit_v1.get('communities', []) == ['c1', 'c5', ]
     assert record_v2.get('communities', []) == ['c1', ]
     assert deposit_v2.get('communities', []) == ['c1', 'c5', ]
+
+
+def test_propagation_with_newversion_open(
+        app, db, users, communities, deposit, deposit_file):
+    """Adding old versions to a community should propagate to all drafts."""
+    # deposit['communities'] = ['c1', 'c2']
+    deposit_v1 = publish_and_expunge(db, deposit)
+    deposit_v1 = deposit_v1.edit()
+
+    recid_v1, record_v1 = deposit_v1.fetch_published()
+    recid_v1_value = recid_v1.pid_value
+
+    deposit_v1 = deposit_v1.newversion()
+    pv = PIDVersioning(child=recid_v1)
+    depid_v2 = pv.draft_child_deposit
+    depid_v2_value = depid_v2.pid_value
+
+    # New version in 'deposit_v2' has not been published yet
+    deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+
+    # depid_v1_value = deposit_v1['_deposit']['id']
+    # depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
+    deposit_v1['communities'] = ['c1', 'c2', ]
+    deposit_v1 = publish_and_expunge(db, deposit_v1)
+
+    recid_v1, record_v1 = record_resolver.resolve(recid_v1_value)
+    c1_api = ZenodoCommunity('c1')
+    c1_api.accept_record(record_v1, pid=recid_v1)
+
+    depid_v2, deposit_v2 = deposit_resolver.resolve(depid_v2_value)
+    assert deposit_v2['communities'] == ['c1', 'c2']
+    deposit_v2 = publish_and_expunge(db, deposit_v2)
+    recid_v2, record_v2 = deposit_v2.fetch_published()
+
+    assert record_v2['communities'] == ['c1', ]

@@ -306,6 +306,16 @@ class ZenodoDeposit(Deposit):
                     del deposit['communities']
                 deposit.commit()
 
+        # Update new version deposit
+        if pv.draft_child_deposit:
+            draft_dep = ZenodoDeposit.get_record(
+                pv.draft_child_deposit.get_assigned_object())
+            if draft_dep.id != self.id:
+                draft_dep['communities'] = sorted(new_dep_comms)
+                if not draft_dep['communities']:
+                    del draft_dep['communities']
+                draft_dep.commit()
+
         record['communities'] = sorted(new_rec_comms)
         if current_app.config['COMMUNITIES_OAI_ENABLED']:
             record = self._sync_oaisets_with_communities(record)
