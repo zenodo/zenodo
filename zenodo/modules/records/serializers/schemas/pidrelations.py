@@ -32,4 +32,5 @@ class VersionRelation(RelationSchema):
 
     class Meta:
         """Meta fields of the schema."""
+
         fields = ("parent", "next", "previous", "is_last", "index")

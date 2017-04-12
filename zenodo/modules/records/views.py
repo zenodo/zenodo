@@ -309,7 +309,6 @@ def community_curation(record, user):
     2-tuple of (Community, bool), describing community itself,
     and the permission (bool) to curate it.
     """
-
     irs = ZenodoCommunity.get_irs(record).all()
     pending = [ir.community for ir in irs]
     accepted = [Community.get(c) for c in record.get('communities', [])]

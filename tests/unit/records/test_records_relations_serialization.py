@@ -25,8 +25,8 @@ from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
 
-from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.records.resolvers import record_resolver
 from zenodo.modules.records.serializers.pidrelations import \

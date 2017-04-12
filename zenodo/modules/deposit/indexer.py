@@ -28,15 +28,14 @@ from __future__ import absolute_import, print_function
 
 import copy
 
-from .api import ZenodoDeposit
-
 from invenio_indexer.api import RecordIndexer
-from invenio_pidstore.models import PersistentIdentifier
-
+from invenio_pidrelations.contrib.records import index_siblings
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.proxies import current_pidrelations
 from invenio_pidrelations.serializers.utils import serialize_relations
-from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_pidrelations.contrib.records import index_siblings
+from invenio_pidstore.models import PersistentIdentifier
+
+from .api import ZenodoDeposit
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,

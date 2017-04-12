@@ -61,6 +61,7 @@ class FileKeyConverter(PathConverter):
 
 
 def get_all_deposit_siblings(deposit):
+    """Get all siblings of the deposit."""
     from invenio_pidstore.models import PersistentIdentifier
     from invenio_pidrelations.contrib.versioning import PIDVersioning
     recid = deposit['recid']

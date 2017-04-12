@@ -37,15 +37,15 @@ from flask_security import current_user, login_required
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records_files.api import Record
 from invenio_records_files.models import RecordsBuckets
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 
-from zenodo.modules.records.permissions import record_permission_factory
 from zenodo.modules.records.minters import zenodo_mint_missing_concept_pids
+from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher

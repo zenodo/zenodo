@@ -28,15 +28,15 @@ from __future__ import absolute_import, print_function
 
 from flask import url_for
 from flask_babelex import lazy_gettext as _
+from invenio_pidrelations.serializers.utils import serialize_relations
 from marshmallow import Schema, ValidationError, fields, missing, \
     validates_schema
-from invenio_pidrelations.serializers.utils import serialize_relations
 from werkzeug.routing import BuildError
+
+from zenodo.modules.records.utils import is_deposit
 
 from . import common
 from ...models import AccessRight, ObjectType
-
-from zenodo.modules.records.utils import is_deposit
 
 
 class StrictKeysSchema(Schema):

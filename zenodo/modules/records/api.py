@@ -26,13 +26,14 @@
 
 from __future__ import absolute_import
 
-from flask import request
 from os.path import splitext
-from invenio_records_files.api import (FileObject, FilesIterator, Record,
-                                       _writable)
+
+from flask import request
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier
+from invenio_records_files.api import FileObject, FilesIterator, Record, \
+    _writable
 
 from .fetchers import zenodo_record_fetcher
 

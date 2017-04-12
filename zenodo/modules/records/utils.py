@@ -25,8 +25,8 @@
 """Helper methods for Zenodo records."""
 
 from __future__ import absolute_import, print_function
-from flask import current_app
 
+from flask import current_app
 from invenio_records.api import Record
 from invenio_search import current_search
 from invenio_search.utils import schema_to_index

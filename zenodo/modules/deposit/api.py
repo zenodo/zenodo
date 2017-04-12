@@ -35,6 +35,7 @@ from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
 from invenio_deposit.utils import mark_as_action
 from invenio_files_rest.models import Bucket, MultipartObject, Part
+from invenio_pidrelations.contrib.records import index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
@@ -46,7 +47,6 @@ from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
-from invenio_pidrelations.contrib.records import index_siblings
 
 from .errors import MissingCommunityError, MissingFilesError, \
     OngoingMultipartUploadError
@@ -122,7 +122,6 @@ class ZenodoDeposit(Deposit):
         :param record: Record corresponding to this deposit.
         :type record: `invenio_records.api.Record`
         """
-
         pid = PersistentIdentifier.get('recid', record['recid'])
         pv = PIDVersioning(child=pid)
         sq = pv.children.with_entities(

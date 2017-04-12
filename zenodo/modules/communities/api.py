@@ -26,13 +26,14 @@
 
 from __future__ import absolute_import
 
-from invenio_pidstore.models import PersistentIdentifier
-from invenio_communities.models import InclusionRequest, Community
 from invenio_communities.errors import InclusionRequestMissingError
-from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
-from zenodo.modules.records.api import ZenodoRecord
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
 from six import string_types, text_type
+
+from zenodo.modules.records.api import ZenodoRecord
 
 
 class ZenodoCommunity(object):

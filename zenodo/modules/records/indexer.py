@@ -26,10 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.proxies import current_pidrelations
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,

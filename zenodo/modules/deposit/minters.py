@@ -26,11 +26,10 @@
 
 from __future__ import absolute_import
 
-from invenio_pidstore.models import (PersistentIdentifier, PIDStatus,
-                                     RecordIdentifier)
-
 from invenio_pidrelations.contrib.records import RecordDraft
 from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus, \
+    RecordIdentifier
 
 
 def zenodo_recid_concept_minter(record_uuid=None, data=None):

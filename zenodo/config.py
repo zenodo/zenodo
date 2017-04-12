@@ -58,9 +58,9 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
+from invenio_pidrelations.config import RelationType
 from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all
-from invenio_pidrelations.config import RelationType
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \

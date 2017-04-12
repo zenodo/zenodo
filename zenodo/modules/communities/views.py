@@ -26,19 +26,15 @@
 
 from __future__ import absolute_import, print_function
 
-from functools import wraps
-
 from flask import Blueprint, abort, jsonify, request
 from flask_login import login_required
+from invenio_communities.views.ui import pass_community, permission_required
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
-from invenio_pidstore.resolver import Resolver
-from invenio_records.api import Record
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 
-from invenio_communities.views.ui import pass_community, permission_required
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.resolvers import record_resolver
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 blueprint = Blueprint(
     'zenodo_communities',
@@ -58,7 +54,6 @@ def curate(community):
 
     :param community_id: ID of the community to curate.
     """
-
     action = request.json.get('action')
     recid = request.json.get('recid')
     if not recid:
