@@ -28,6 +28,7 @@
 # Requirements not on PyPI
 -e git+https://github.com/zenodo/zenodo-migrator.git#egg=zenodo-migrator
 -e git+https://github.com/lnielsen/invenio-migrator.git@#egg=invenio-migrator
+-e git+https://github.com/krzysztof/invenio-pidrelations.git@master#egg=invenio-pidrelations
 
 # PyPI requirements
 alabaster==0.7.9
