@@ -36,6 +36,8 @@ from invenio_records_files.api import Record
 
 from zenodo.modules.records.minters import is_local_doi
 from zenodo.modules.records.serializers import datacite_v31
+from zenodo.modules.records.serializers.pidrelations import \
+    serialize_related_identifiers
 
 
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
@@ -66,15 +68,23 @@ def datacite_register(pid_value, record_uuid):
 
         # If this is the latest record version, update/register the Concept DOI
         # using the metadata of the record.
-        conceptdoi = record['metadata'].get('conceptdoi')
-        if PIDVersioning(child=record.pid).is_last_child:
+        pv = PIDVersioning(child=record.pid)
+        if pv.exists and pv.is_last_child:
+            conceptdoi = record['metadata'].get('conceptdoi')
             conceptrecid = record['metadata'].get('conceptrecid')
             concept_dcp = DataCiteProvider.get(conceptdoi)
             url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
                 recid=conceptrecid)
 
-            # FIXME: Enhance 'related_identifiers' here with
-            # "isPartOf"/"hasPart"?
+            # Update related identifiers
+            record_rel_ids = record.pop('related_identifiers', [])
+            parent_rel_ids = serialize_related_identifiers(pv.parent)
+            for version_ri in parent_rel_ids:
+                if version_ri not in record_rel_ids:
+                    record_rel_ids.append(version_ri)
+            record['related_identifiers'] = record_rel_ids
+
+            doc = datacite_v31.serialize(dcp.pid, record)
             if concept_dcp.pid.status == PIDStatus.REGISTERED:
                 concept_dcp.update(url, doc)
             else:

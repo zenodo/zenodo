@@ -42,6 +42,8 @@ from werkzeug.routing import BuildError
 
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
 from zenodo.modules.records.models import AccessRight
+from zenodo.modules.records.serializers.pidrelations import \
+    serialize_related_identifiers
 
 from ...utils import is_deposit
 from ..fields import DOI as DOIField
@@ -242,13 +244,19 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     subjects = fields.Nested(SubjectSchemaV1, many=True)
     contributors = fields.List(fields.Nested(ContributorSchemaV1))
     references = fields.List(SanitizedUnicode(attribute='raw_reference'))
-    related_identifiers = fields.Nested(RelatedIdentifierSchemaV1, many=True)
+    related_identifiers = fields.Method('dump_related_identifiers')
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
 
-    # parent_pid = SanitizedUnicode(attribute='relations.version.parent', dump_only=True)
-    # is_latest_version = fields.Bool(attribute='relations.version.is_latest', dump_only=True)
-    # version_index = fields.Int(attribute='relations.version.index', dump_only=True)
+    def dump_related_identifiers(self, obj):
+        """Dump related identifiers."""
+        rel_ids = obj.get('related_identifiers', [])
+        if not is_deposit(obj):
+            if 'relations' not in obj:
+                for ri in serialize_related_identifiers(self.context['pid']):
+                    if ri not in rel_ids:
+                        rel_ids.append(ri)
+        return RelatedIdentifierSchemaV1().dump(rel_ids, many=True).data
 
     @validates('embargo_date')
     def validate_embargo_date(self, value):
