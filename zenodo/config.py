@@ -729,6 +729,9 @@ RECORDS_REST_FACETS = dict(
 )
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
+RECORDS_REST_FACETS['deposits']['filters'] = dict(
+    latest_version=terms_filter('relations.version.is_last'),
+)
 
 RECORDS_REST_ELASTICSEARCH_ERROR_HANDLERS = {
     'query_parsing_exception': (

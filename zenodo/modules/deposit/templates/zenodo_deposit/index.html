@@ -61,3 +61,8 @@
 {% endblock %}
 
 {%- block search_loading %}{%- endblock search_loading %}
+{%- block search_facets %}
+  <invenio-search-facets
+    template="{{ url_for('static', filename='templates/zenodo_deposit/selectstatus.html') }}">
+  </invenio-search-facets>
+{%- endblock search_facets %}

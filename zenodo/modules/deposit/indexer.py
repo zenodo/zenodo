@@ -30,6 +30,12 @@ import copy
 
 from .api import ZenodoDeposit
 
+from invenio_indexer.api import RecordIndexer
+from invenio_pidstore.models import PersistentIdentifier
+
+from invenio_pidrelations.proxies import current_pidrelations
+from invenio_pidrelations.serializers.utils import serialize_relations
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.contrib.records import index_siblings
 
 
@@ -78,12 +84,30 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     json['filecount'] = len(files)
     json['size'] = sum([f.get('size', 0) for f in files])
 
+    recid = record.get('recid')
+    if recid:
+        pid = PersistentIdentifier.get('recid', recid)
+        pv = PIDVersioning(child=pid)
+        if pv.exists:
+            relations = serialize_relations(pid)
+            if pv.draft_child_deposit:
+                if pv.draft_child_deposit.pid_value \
+                    == record['_deposit']['id']:
+                    is_last = True
+                else:
+                    is_last = False
+                relations['version'][0]['is_last'] = is_last
+        else:
+            relations = {'version': [{'is_last': True, 'index': 0}, ]}
+        if relations:
+            json['relations'] = relations
+
 
 def index_versioned_record_siblings(sender, action=None, pid=None,
                                     deposit=None):
     """Send previous version of published record for indexing."""
     first_publish = (deposit.get('_deposit', {}).get('pid', {})
-                     .get('revision_id')) == 0
+                 .get('revision_id')) == 0
     if action == "publish" and first_publish:
         recid_pid, _ = deposit.fetch_published()
         print('sending for indexing siblings of', recid_pid)

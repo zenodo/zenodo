@@ -46,6 +46,7 @@ from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
+from invenio_pidrelations.contrib.records import index_siblings
 
 from .errors import MissingCommunityError, MissingFilesError, \
     OngoingMultipartUploadError
@@ -440,8 +441,15 @@ class ZenodoDeposit(Deposit):
         pid_recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
 
+        # TODO: might crash for legacy saved deposits
         versioning = PIDVersioning(child=pid_recid)
-        versioning.remove_draft_child()
+        if versioning.exists:
+            from zenodo.modules.deposit.indexer import index_siblings
+            draft_child = versioning.draft_child
+            siblings = versioning.children.all()
+            versioning.remove_draft_child()
+            index_siblings(draft_child, siblings=siblings,
+                           only_neighbors=True)
 
         if pid_recid.status == PIDStatus.RESERVED:
             db.session.delete(pid_recid)
@@ -461,6 +469,7 @@ class ZenodoDeposit(Deposit):
             mp_q.delete(synchronize_session='fetch')
         bucket.remove()
 
+
         return super(ZenodoDeposit, self).delete(*args, **kwargs)
 
 
@@ -471,7 +480,8 @@ class ZenodoDeposit(Deposit):
 
         # Check that there is not a newer draft version for this record
         pid, record = self.fetch_published()
-        if (not PIDVersioning(child=pid).draft_child and
+        pv = PIDVersioning(child=pid)
+        if (not pv.draft_child and
                 is_doi_locally_managed(record['doi'])):
             # Let's create the new version draft!
             with db.session.begin_nested():
@@ -494,6 +504,9 @@ class ZenodoDeposit(Deposit):
                 # Injecting owners is required in case of creating new
                 # version this outside of request context
                 deposit['_deposit']['owners'] = owners
+
+                pv = PIDVersioning(child=pid)
+                index_siblings(pv.draft_child, only_neighbors=True)
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data

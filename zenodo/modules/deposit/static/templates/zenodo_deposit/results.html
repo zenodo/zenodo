@@ -25,7 +25,11 @@
         <p class="list-group-item-text text-muted">
           <small>
             Created {{ record.created|date:'medium' }}, modified {{ record.updated|date:'medium' }}
+
           </small>
+        </p>
+        <p ng-if="vm.invenioSearchArgs.latest_version && record.metadata.relations.version[0].index > 0">
+           <span class="text-muted hidden-xs"><small><i>{{ record.metadata.relations.version[0].index }} more Version(s) exist for this upload</i></small></span>
         </p>
       </div>
       <div class="clearfix"></div>
