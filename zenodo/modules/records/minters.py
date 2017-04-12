@@ -113,6 +113,7 @@ def zenodo_concept_doi_minter(record_uuid, data):
             return PersistentIdentifier.create(
                 'doi',
                 conceptdoi,
+                pid_provider='datacite',
                 object_type='rec',
                 object_uuid=record_uuid,
                 status=PIDStatus.RESERVED,

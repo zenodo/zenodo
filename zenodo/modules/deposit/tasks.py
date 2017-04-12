@@ -30,7 +30,7 @@ from celery import shared_task
 from flask import current_app
 from invenio_db import db
 from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_pidstore.models import PIDStatus
+from invenio_pidstore.models import PIDStatus, PersistentIdentifier
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
 
@@ -68,10 +68,11 @@ def datacite_register(pid_value, record_uuid):
 
         # If this is the latest record version, update/register the Concept DOI
         # using the metadata of the record.
-        pv = PIDVersioning(child=record.pid)
+        recid = PersistentIdentifier.get('recid', str(record['recid']))
+        pv = PIDVersioning(child=recid)
         if pv.exists and pv.is_last_child:
-            conceptdoi = record['metadata'].get('conceptdoi')
-            conceptrecid = record['metadata'].get('conceptrecid')
+            conceptdoi = record.get('conceptdoi')
+            conceptrecid = record.get('conceptrecid')
             concept_dcp = DataCiteProvider.get(conceptdoi)
             url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
                 recid=conceptrecid)

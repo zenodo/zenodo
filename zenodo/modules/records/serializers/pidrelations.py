@@ -39,12 +39,14 @@ def serialize_related_identifiers(pid):
         children = pv.children.all()
 
         rec = ZenodoRecord.get_record(pid.get_assigned_object())
-        ri = {
-            'scheme': 'doi',
-            'relation': 'isPartOf',
-            'identifier': rec['conceptdoi']
-        }
-        related_identifiers.append(ri)
+        # External DOI records don't have Concept DOI
+        if 'conceptdoi' in rec:
+            ri = {
+                'scheme': 'doi',
+                'relation': 'isPartOf',
+                'identifier': rec['conceptdoi']
+            }
+            related_identifiers.append(ri)
 
         idx = children.index(pid)
         left = children[:idx]
