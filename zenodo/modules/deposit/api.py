@@ -437,11 +437,11 @@ class ZenodoDeposit(Deposit):
             raise PIDInvalidAction()
 
         # Delete reserved recid.
-        pid_recid = PersistentIdentifier.get(
+        recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
 
         # TODO: might crash for legacy saved deposits
-        versioning = PIDVersioning(child=pid_recid)
+        versioning = PIDVersioning(child=recid)
         if versioning.exists:
             from zenodo.modules.deposit.indexer import index_siblings
             draft_child = versioning.draft_child
@@ -450,8 +450,15 @@ class ZenodoDeposit(Deposit):
             index_siblings(draft_child, siblings=siblings,
                            only_neighbors=True)
 
-        if pid_recid.status == PIDStatus.RESERVED:
-            db.session.delete(pid_recid)
+
+        if recid.status == PIDStatus.RESERVED:
+            db.session.delete(recid)
+
+
+        concept_recid = PersistentIdentifier.get(
+            pid_type='recid', pid_value=self['conceptrecid'])
+        if concept_recid.status == PIDStatus.RESERVED:
+            db.session.delete(concept_recid)
 
         # Completely remove bucket
         q = RecordsBuckets.query.filter_by(record_id=self.id)
