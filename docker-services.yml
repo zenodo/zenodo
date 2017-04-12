@@ -1,0 +1,65 @@
+version: '2.1'
+services:
+  app:
+    build: .
+    image: zenodo:latest
+    environment:
+      - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
+      - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
+      - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
+      - "APP_CACHE_TYPE=redis"
+      - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
+      - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
+      - "APP_SECRET_KEY=CHANGE_ME"
+      - "APP_SESSION_COOKIE_SECURE=True"
+      - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
+      - "APP_WSGI_PROXIES=2"
+      - "FLASK_DEBUG=${FLASK_DEBUG:-on}"
+  lb:
+    build: ./docker/haproxy/
+    image: zenodo-lb:latest
+    restart: "always"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+  frontend:
+    build: ./docker/nginx/
+    image: zenodo-frontend:latest
+    restart: "always"
+    ports:
+      - "81:80"
+      - "444:443"
+  cache:
+    image: redis
+    restart: "always"
+    read_only: true
+    ports:
+      - "6379:6379"
+  db:
+    build: ./docker/postgres/
+    image: zenodo-postgres
+    command: postgres
+    restart: "always"
+    environment:
+      - "POSTGRES_PASSWORD=postgres"
+    ports:
+      - "5432:5432"
+  mq:
+    image: rabbitmq:3-management
+    restart: "always"
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+  es:
+    build: ./docker/es/
+    image: zenodo-es:2.3
+    restart: "always"
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+  flower:
+    image: mher/flower
+    command: --broker=amqp://guest:guest@mq:5672// --broker_api=http://guest:guest@mq:15672/api/
+    ports:
+      - "5555:5555"

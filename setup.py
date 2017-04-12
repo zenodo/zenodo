@@ -51,6 +51,7 @@ extras_require = {
     'docs': [
         'Sphinx>=1.4.2,<1.4.5',
     ],
+    # Database version
     'postgresql': [
         'invenio-db[postgresql,versioning]>=1.0.0b3',
     ],
@@ -59,6 +60,11 @@ extras_require = {
     ],
     'sqlite': [
         'invenio-db[versioning]>=1.0.0b3',
+    ],
+    # Elasticsearch version
+    'elasticsearch2': [
+        'elasticsearch>=2.0.0,<3.0.0',
+        'elasticsearch-dsl>=2.0.0,<3.0.0',
     ],
     'tests': tests_require,
 }
