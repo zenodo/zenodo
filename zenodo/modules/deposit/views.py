@@ -162,12 +162,14 @@ def newversion(pid=None, record=None, depid=None, deposit=None):
         return redirect(url_for('zenodo_deposit.newversion',
                                 pid_value=latest_pid.pid_value), code=307)
 
-    new_deposit = deposit.newversion()
+    deposit.newversion()
     db.session.commit()
 
+    new_version_deposit = PIDVersioning(child=pid).draft_child_deposit
+
     return redirect(url_for(
-        'invenio_deposit_ui.{0}'.format(new_deposit.pid.pid_type),
-        pid_value=new_deposit.pid.pid_value
+        'invenio_deposit_ui.{0}'.format(new_version_deposit.pid_type),
+        pid_value=new_version_deposit.pid_value
     ))
 
 
