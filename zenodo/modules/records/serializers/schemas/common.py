@@ -199,7 +199,7 @@ class IdentifierSchemaV1(Schema, StrictKeysMixin):
 
 
 class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
-    """Schema for a related identifier."""
+    """Schema for an alternate identifier."""
 
 
 class RelatedIdentifierSchemaV1(IdentifierSchemaV1):

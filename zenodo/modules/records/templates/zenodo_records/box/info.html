@@ -81,7 +81,7 @@
           </div>
         </div>
       </dd>
-    {% elif (record.doi|doi_locally_managed) %}
+    {% elif (record.doi|doi_locally_managed) and current_user|has_record_perm(record, 'update') %}
       <dt>{{_('Concept DOI')}}:</dt>
       <dd>
       <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
