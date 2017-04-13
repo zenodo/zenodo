@@ -81,16 +81,8 @@
           </div>
         </div>
       </dd>
-    {% elif (record.doi|doi_locally_managed) and current_user|has_record_perm(record, 'update') %}
-      <dt>{{_('Concept DOI')}}:</dt>
-      <dd>
-      <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
-          <button class="btn btn-success btn-xs" type="submit">Get the Concept DOI</button>
-        </form>
-      </dd>
     {%- endif %}
   {%- endif %}
-
   {%- if record.imprint and record.imprint.isbn %}
     <dt>{{_('ISBN')}}:</dt>
     <dd itemprop="isbn">{{ record.imprint.isbn }}</dd>

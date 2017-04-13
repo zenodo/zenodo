@@ -25,7 +25,20 @@
 <form action="{{ url_for('zenodo_deposit.edit', pid_value=pid.pid_value) }}" method="POST">
     <button class="btn btn-warning btn-block" type="submit" {{ 'disabled' if not record.doi or not record._deposit.id else ''}}><i class="fa fa-pencil-square-o"></i> Edit</button>
 </form>
-{%- endif %}
+
+{% if (record.doi|doi_locally_managed) %}
+  {% if record.conceptdoi %}
+  <form action="{{ url_for('zenodo_deposit.newversion', pid_value=pid.pid_value) }}" method="POST">
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if not record.doi or not record._deposit.id else ''}}>New Version</button>
+  </form>
+  {% else %}
+    <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
+      <button class="btn btn-success btn-block" type="submit">Change to versioned record</button>
+    </form>
+  {% endif %}
+{% endif %}
+{% endif %}
+
 {%- if current_user|has_record_perm(record, 'delete') %}
 <!-- Single button -->
 <div class="btn-group btn-block">
