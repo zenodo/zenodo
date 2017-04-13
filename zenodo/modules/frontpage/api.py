@@ -41,5 +41,5 @@ class FrontpageRecordsSearch(RecordsSearch):
             'query_string',
             query=('communities:zenodo '
                    'AND access_right:open '
-                   'AND latest_version:true')
+                   'AND relations.version.is_last:true')
         )
