@@ -25,12 +25,27 @@
 """PID Version relation schemas."""
 
 from invenio_pidrelations.serializers.schemas import RelationSchema
+from marshmallow import fields
 
 
 class VersionRelation(RelationSchema):
     """PID version relation schema."""
 
+    last_child = fields.Method('dump_last_child')
+    draft_child_deposit = fields.Method('dump_draft_child_deposit')
+
+    def dump_last_child(self, obj):
+        """Dump the last child."""
+        if obj.is_ordered:
+            return self._dump_relative(obj.last_child)
+
+    def dump_draft_child_deposit(self, obj):
+        """Dump the deposit of the draft child."""
+        if obj.draft_child_deposit:
+            return self._dump_relative(obj.draft_child_deposit)
+
     class Meta:
         """Meta fields of the schema."""
 
-        fields = ("parent", "next", "previous", "is_last", "index")
+        fields = ('parent', 'next', 'previous', 'is_last', 'index',
+                  'last_child', 'draft_child_deposit')
