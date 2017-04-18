@@ -384,7 +384,12 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     """Common record schema."""
 
     id = fields.Integer(attribute='pid.pid_value', dump_only=True)
+    conceptid = SanitizedUnicode(
+        attribute='metadata.conceptrecid', dump_only=True)
     doi = SanitizedUnicode(attribute='metadata.doi', dump_only=True)
+    conceptdoi = SanitizedUnicode(
+        attribute='metadata.conceptdoi', dump_only=True)
+
     links = fields.Method('dump_links', dump_only=True)
     created = fields.Str(dump_only=True)
 
