@@ -49,7 +49,6 @@ def zenodo_concept_recid_minter(record_uuid=None, data=None):
 
 def zenodo_deposit_minter(record_uuid, data):
     """Mint the DEPID, and reserve the Concept RECID and RECID PIDs."""
-    # All new versions will have conceptrecid already in metadata
     if 'conceptrecid' not in data:
         zenodo_concept_recid_minter(data=data)
 

@@ -42,6 +42,7 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.deposit.minters import zenodo_concept_recid_minter
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoRecord
 from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
@@ -203,8 +204,8 @@ class ZenodoDeposit(Deposit):
         if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
             return []
         comms = copy(current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'])
-        pid = PersistentIdentifier.get('recid', record['recid'])
-        pv = PIDVersioning(child=pid)
+        pid = PersistentIdentifier.get('recid', record['conceptrecid'])
+        pv = PIDVersioning(parent=pid)
         rec_grants = [ZenodoRecord.get_record(
             p.get_assigned_object()).get('grants') for p in pv.children]
         if self.get('grants') or any(rec_grants):
@@ -217,8 +218,8 @@ class ZenodoDeposit(Deposit):
         if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
             return []
         comms = []
-        pid = PersistentIdentifier.get('recid', record['recid'])
-        pv = PIDVersioning(child=pid)
+        pid = PersistentIdentifier.get('recid', record['conceptrecid'])
+        pv = PIDVersioning(parent=pid)
         rec_grants = [ZenodoRecord.get_record(
             p.get_assigned_object()).get('grants') for p in pv.children]
         if self.get('grants') or any(rec_grants):
@@ -287,11 +288,12 @@ class ZenodoDeposit(Deposit):
             self._get_new_communities(dep_comms, rec_comms, record)
 
         # Update Communities and OAISet information for all record versions
-        recid = PersistentIdentifier.get('recid', record['recid'])
-        pv = PIDVersioning(child=recid)
+        conceptrecid = PersistentIdentifier.get('recid',
+                                                record['conceptrecid'])
+        pv = PIDVersioning(parent=conceptrecid)
         for pid in pv.children:
-            if pid != recid:
-                rec = ZenodoRecord.get_record(pid.get_assigned_object())
+            rec = ZenodoRecord.get_record(pid.get_assigned_object())
+            if rec.id != record.id:
                 rec['communities'] = sorted(new_rec_comms)
                 if current_app.config['COMMUNITIES_OAI_ENABLED']:
                     rec = self._sync_oaisets_with_communities(rec)
@@ -338,8 +340,9 @@ class ZenodoDeposit(Deposit):
         """Publish new deposit with communities handling."""
         dep_comms = set(self.pop('communities', []))
         record = super(ZenodoDeposit, self)._publish_new(id_=id_)
-        recid = PersistentIdentifier.get('recid', record['recid'])
-        pv = PIDVersioning(child=recid)
+        conceptrecid = PersistentIdentifier.get('recid',
+                                                record['conceptrecid'])
+        pv = PIDVersioning(parent=conceptrecid)
         if pv.children.count() > 1:
             prev_recid = pv.children.all()[-2]
             rec_comms = set(ZenodoRecord.get_record(
@@ -399,13 +402,14 @@ class ZenodoDeposit(Deposit):
         ZenodoSIP.create(recid, record, create_sip_files=is_first_publishing,
                          user_id=user_id, agent=sip_agent)
 
+        # Update the concept recid redirection
         conceptrecid = PersistentIdentifier.get('recid',
             record['conceptrecid'])
-        pv = PIDVersioning(parent=conceptrecid, child=recid)
-        pv.update_redirect()
-        depid = pv.draft_child_deposit
-        if depid:
-            RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
+        if conceptrecid:
+            pv = PIDVersioning(parent=conceptrecid, child=recid)
+            pv.update_redirect()
+            if pv.draft_child_deposit:
+                RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
 
         return deposit
 
@@ -424,14 +428,21 @@ class ZenodoDeposit(Deposit):
 
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
 
-        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
-        recid = PersistentIdentifier.get('recid', str(data['recid']))
-        depid = PersistentIdentifier.get('depid', str(data['_deposit']['id']))
+        recid = PersistentIdentifier.get(
+            'recid', str(data['recid']))
+        conceptrecid = PersistentIdentifier.get(
+            'recid', str(data['conceptrecid']))
+        depid = PersistentIdentifier.get(
+            'depid', str(data['_deposit']['id']))
 
         PIDVersioning(parent=conceptrecid).insert_draft_child(child=recid)
         RecordDraft.link(recid, depid)
 
         return deposit
+
+    @classmethod
+    def create_without_versioning(cls, data, id_=None):
+        """Create a deposit without versioning information."""
 
     @preserve(result=False, fields=PRESERVE_FIELDS)
     def clear(self, *args, **kwargs):

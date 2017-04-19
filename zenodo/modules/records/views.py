@@ -304,10 +304,11 @@ def _can_curate(community, user, record, accepted=False):
 def community_curation(record, user):
     """Generate a list of pending and accepted communities with permissions.
 
-    Return a 2-tuple containing two lists, first for 'pending' and second
-    for 'accepted' communities. Each item in both of the list is another
-    2-tuple of (Community, bool), describing community itself,
-    and the permission (bool) to curate it.
+    Return a 4-tuple of lists (in order):
+     * 'pending' communities, which can be curated by given user
+     * 'accepted' communities, which can be curated by given user
+     * All 'pending' communities
+     * All 'accepted' communities
     """
     irs = ZenodoCommunity.get_irs(record).all()
     pending = [ir.community for ir in irs]

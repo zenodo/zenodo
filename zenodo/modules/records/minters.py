@@ -80,7 +80,8 @@ def zenodo_record_minter(record_uuid, data):
     zenodo_doi_minter(record_uuid, data)
     oaiid_minter(record_uuid, data)
 
-    zenodo_concept_doi_minter(record_uuid, data)
+    if 'conceptdoi' not in data:
+        zenodo_concept_doi_minter(record_uuid, data)
     return recid
 
 

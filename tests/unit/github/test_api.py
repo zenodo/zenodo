@@ -94,6 +94,7 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
     zgh.release = dict(author=dict(id=1))
     zgh.metadata = deposit_metadata
     zgh.files = (('foobar.txt', None), )
+    zgh.model.repository.releases.count.return_value = 0
 
     datacite_task_mock = MagicMock()
     # We have to make the call to the task synchronous

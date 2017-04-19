@@ -32,10 +32,14 @@ from flask import current_app
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_github.api import GitHubRelease
+from invenio_github.models import Release, ReleaseStatus
 from invenio_github.utils import get_contributors, get_owner
 from invenio_indexer.api import RecordIndexer
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
 
 from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.records.api import ZenodoRecord
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
@@ -72,7 +76,27 @@ class ZenodoGitHubRelease(GitHubRelease):
         deposit = None
         try:
             db.session.begin_nested()
-            deposit = self.deposit_class.create(self.metadata, id_=id_)
+            if self.model.repository.releases.count() > 1:
+                last_release = self.model.repository.releases.filter_by(
+                    status=ReleaseStatus.PUBLISHED).order_by(
+                        Release.created.desc()).first()
+                last_recid = PersistentIdentifier.get(
+                    'recid', last_release.record['recid'])
+                pv = PIDVersioning(child=last_recid)
+                if pv.exists:
+                    last_record = ZenodoRecord.get_record(
+                        pv.last_child.get_assigned_object())
+                    deposit_metadata = dict(self.metadata)
+                    deposit_metadata['conceptrecid'] = \
+                        last_record['conceptrecid']
+                    deposit_metadata['conceptdoi'] = last_record['conceptdoi']
+
+                    deposit = self.deposit_class.create(
+                        deposit_metadata, id_=id_)
+
+            if not deposit:
+                deposit = self.deposit_class.create(self.metadata, id_=id_)
+
             deposit['_deposit']['created_by'] = self.event.user_id
             deposit['_deposit']['owners'] = [self.event.user_id]
 
@@ -82,7 +106,8 @@ class ZenodoGitHubRelease(GitHubRelease):
                 # Content-Length.
                 res = self.gh.api.session.head(url, allow_redirects=True)
                 # Now, download the file
-                res = self.gh.api.session.get(url, stream=True)
+                res = self.gh.api.session.get(url, stream=True,
+                                              allow_redirects=True)
                 if res.status_code != 200:
                     raise Exception(
                         "Could not retrieve archive from GitHub: {url}"
