@@ -39,13 +39,15 @@ def test_double_minting_depid_recid(db):
     dep_uuid = uuid4()
     data = dict()
     pid = zenodo_deposit_minter(dep_uuid, data)
-    # Assert values added to data
-    assert data['_deposit']['id'] == '1'
-    assert data['recid'] == 1
+    # Assert values added to data. Depid and recid have IDs starting from
+    # '2' since the conceptrecid is minted first
+    assert data['_deposit']['id'] == '2'
+    assert data['conceptrecid'] == '1'
+    assert data['recid'] == 2
     assert 'doi' not in data
     # Assert pid values
     assert pid.pid_type == 'depid'
-    assert pid.pid_value == '1'
+    assert pid.pid_value == '2'
     assert pid.status == PIDStatus.REGISTERED
     assert pid.object_uuid == dep_uuid
     # Assert reservation of recid.
@@ -57,11 +59,11 @@ def test_double_minting_depid_recid(db):
     rec_uuid = uuid4()
     pid = zenodo_record_minter(rec_uuid, data)
     assert pid.pid_type == 'recid'
-    assert pid.pid_value == '1'
+    assert pid.pid_value == '2'
     assert pid.status == PIDStatus.REGISTERED
     assert pid.object_uuid == rec_uuid
-    assert data['doi'] == '10.5072/zenodo.1'
-    assert data['_oai']['id'] == 'oai:zenodo.org:1'
+    assert data['doi'] == '10.5072/zenodo.2'
+    assert data['_oai']['id'] == 'oai:zenodo.org:2'
 
 
 @pytest.mark.parametrize('doi_in, doi_out', [
@@ -91,7 +93,7 @@ def test_invalid_doi(db, doi):
     dep_uuid = uuid4()
     data = dict(doi=doi)
     zenodo_deposit_minter(dep_uuid, data)
-    assert PersistentIdentifier.query.count() == 2
+    assert PersistentIdentifier.query.count() == 3
 
 
 def test_unpublished_deposit_and_pid_deletion(deposit):
