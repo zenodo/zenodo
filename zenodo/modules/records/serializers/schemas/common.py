@@ -33,7 +33,6 @@ import idutils
 import jsonref
 from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
@@ -401,7 +400,7 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     """Common record schema."""
 
     id = fields.Integer(attribute='pid.pid_value', dump_only=True)
-    conceptid = SanitizedUnicode(
+    conceptrecid = SanitizedUnicode(
         attribute='metadata.conceptrecid', dump_only=True)
     doi = SanitizedUnicode(attribute='metadata.doi', dump_only=True)
     conceptdoi = SanitizedUnicode(
