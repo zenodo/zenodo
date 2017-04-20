@@ -144,34 +144,3 @@ def test_title(val, expected):
     else:
         assert 'title' in errors
         assert 'title' not in data
-
-
-def test_relations(db, minimal_record_model):
-    """Test resource type."""
-
-    from invenio_pidstore.models import PersistentIdentifier
-    from invenio_pidrelations.models import PIDRelation
-
-    p1_par = PersistentIdentifier.create('recid', '123.par', object_type='rec',
-                                         status='R')
-    p1 = PersistentIdentifier.create('recid', '123', object_type='rec',
-                                     status='R')
-
-    # VERSION = resolve_relation_type_config('version').id
-    PIDRelation.create(p1_par, p1, 0, 0)  # TODO: resolve
-    from zenodo.modules.records.serializers import json_v1
-
-    expected = {
-        'version': [
-            {
-                'index': 0,
-                'is_last': True,
-                'next': None,
-                'parent': {'pid_type': 'recid', 'pid_value': '123.par'},
-                'previous': None
-            }
-        ]
-    }
-
-    ret = json_v1.transform_record(p1, minimal_record_model)
-    assert ret['metadata']['relations'] == expected
