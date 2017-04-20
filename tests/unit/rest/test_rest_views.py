@@ -160,7 +160,7 @@ def test_records_ui_export(app, db, full_record):
     """Test export pages."""
     r = Record.create(full_record)
     PersistentIdentifier.create(
-        'recid', '1', object_type='rec', object_uuid=r.id,
+        'recid', '12345', object_type='rec', object_uuid=r.id,
         status=PIDStatus.REGISTERED)
     db.session.commit()
 
@@ -168,7 +168,8 @@ def test_records_ui_export(app, db, full_record):
     with app.test_client() as client:
         for f, val in formats.items():
             res = client.get(url_for(
-                'invenio_records_ui.recid_export', pid_value='1', format=f))
+                'invenio_records_ui.recid_export', pid_value='12345',
+                format=f))
             assert res.status_code == 410 if val is None else 200
 
 

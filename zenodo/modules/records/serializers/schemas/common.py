@@ -258,12 +258,15 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     subjects = fields.Nested(SubjectSchemaV1, many=True)
     contributors = fields.List(fields.Nested(ContributorSchemaV1))
     references = fields.List(SanitizedUnicode(attribute='raw_reference'))
-    related_identifiers = fields.Method('dump_related_identifiers')
+    # related_identifiers = fields.Method('dump_related_identifiers')
+    related_identifiers = fields.Nested(
+        RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
 
     def dump_related_identifiers(self, obj):
         """Dump related identifiers."""
+        # TODO: logic should be called in pre_load
         rel_ids = obj.get('related_identifiers', [])
         if not is_deposit(obj):
             if 'relations' not in obj:

@@ -30,7 +30,7 @@ from celery import shared_task
 from flask import current_app
 from invenio_db import db
 from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_pidstore.models import PIDStatus, PersistentIdentifier
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
 

@@ -35,7 +35,7 @@ from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
 from invenio_deposit.utils import mark_as_action
 from invenio_files_rest.models import Bucket, MultipartObject, Part
-from invenio_pidrelations.contrib.records import index_siblings, RecordDraft
+from invenio_pidrelations.contrib.records import RecordDraft, index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
@@ -405,7 +405,7 @@ class ZenodoDeposit(Deposit):
         pv.update_redirect()
         depid = pv.draft_child_deposit
         if depid:
-            RecordDraft.unlink(recid, depid)
+            RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
 
         return deposit
 
@@ -528,8 +528,20 @@ class ZenodoDeposit(Deposit):
                 # version this outside of request context
                 deposit['_deposit']['owners'] = owners
 
-                pv = PIDVersioning(child=pid)
-                index_siblings(pv.draft_child, only_neighbors=True)
+                ###
+                conceptrecid = PersistentIdentifier.get(
+                    'recid', data['conceptrecid'])
+                recid = PersistentIdentifier.get(
+                    'recid', str(data['recid']))
+                depid = PersistentIdentifier.get(
+                    'depid', str(data['_deposit']['id']))
+                PIDVersioning(parent=conceptrecid).insert_draft_child(
+                    child=recid)
+                RecordDraft.link(recid, depid)
+
+                # TODO: draft_child is not available at this point
+                # pv = PIDVersioning(child=pid)
+                # index_siblings(pv.draft_child, only_neighbors=True)
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data

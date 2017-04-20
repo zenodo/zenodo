@@ -38,6 +38,13 @@ import sphinx.environment
 # Do not warn on external images.
 suppress_warnings = ['image.nonlocal_uri']
 
+# Ignore certain warn as error messages
+nitpick_ignore = [
+    ('py:class', 'ZenodoFileObject'),
+    ('py:class', 'ZenodoFilesIterator'),
+    ('py:class', 'ZenodoRecord')
+]
+
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.

@@ -63,13 +63,10 @@ def zenodo_record_minter(record_uuid, data):
     """Zenodo record minter.
 
     Mint, or register if previously minted, the Concept RECID and RECID.
-    Mint the Concept DOI and DOI."""
-
-    if 'conceptrecid' in data:
-        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
-        conceptrecid.register()
-    else:
-        conceptrecid = zenodo_concept_recid_minter(record_uuid, data)
+    Mint the Concept DOI and DOI.
+    """
+    if 'conceptrecid' not in data:
+        zenodo_concept_recid_minter(record_uuid, data)
 
     if 'recid' in data:
         recid = PersistentIdentifier.get('recid', data['recid'])
