@@ -102,10 +102,12 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
                new=datacite_task_mock):
         zgh.publish()
 
-    # assert datacite_task_mock.delay.call_count == 1
-    assert datacite_mock().metadata_post.call_count == 1
-    datacite_mock().doi_post.assert_called_once_with(
+    # datacite should be called twice - for regular DOI and Concept DOI
+    assert datacite_mock().metadata_post.call_count == 2
+    datacite_mock().doi_post.assert_any_call(
         '10.5072/zenodo.1', 'https://zenodo.org/record/1')
+    datacite_mock().doi_post.assert_any_call(
+        '10.5072/zenodo.2', 'https://zenodo.org/record/2')
 
     expected_sip_agent = {
         'email': 'foo@baz.bar',
