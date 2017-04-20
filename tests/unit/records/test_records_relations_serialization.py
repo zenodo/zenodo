@@ -25,22 +25,18 @@ from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
 
-from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.deposit.resolvers import deposit_resolver
-from zenodo.modules.records.resolvers import record_resolver
 from zenodo.modules.records.serializers.pidrelations import \
     serialize_related_identifiers
 
 
 def test_serialization(app, db, deposit, deposit_file):
     """Test basic workflow using Deposit and Communities API."""
-
     deposit_v1 = publish_and_expunge(db, deposit)
     depid_v1_value = deposit_v1['_deposit']['id']
 
     recid_v1, record_v1 = deposit_v1.fetch_published()
-    recid_v1_value = recid_v1.pid_value
 
     deposit_v1.newversion()
     pv = PIDVersioning(child=recid_v1)
@@ -51,7 +47,6 @@ def test_serialization(app, db, deposit, deposit_file):
     # 1. Request for 'c1' and 'c2' through deposit v2
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
-    recid_v2_value = recid_v2.pid_value
     depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
     recid_v1, record_v1 = deposit_v1.fetch_published()
 
@@ -67,7 +62,7 @@ def test_serialization(app, db, deposit, deposit_file):
         {
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.3',
-            'relation': 'isNewVersionOf'
+            'relation': 'isPreviousVersionOf'
         }
     ]
     assert rids == expected_v1
@@ -82,7 +77,7 @@ def test_serialization(app, db, deposit, deposit_file):
         {
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.2',
-            'relation': 'isPreviousVersionOf'
+            'relation': 'isNewVersionOf'
         }
     ]
     assert rids == expected_v2

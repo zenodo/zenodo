@@ -32,8 +32,11 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus, \
     RecordIdentifier
 
 
-def zenodo_recid_concept_minter(record_uuid=None, data=None):
-    """Basic RecordIdentifier-based minter for parent PIDs."""
+def zenodo_concept_recid_minter(record_uuid=None, data=None):
+    """Mint the Concept RECID.
+
+    Reserves the Concept RECID for the record.
+    """
     parent_id = RecordIdentifier.next()
     conceptrecid = PersistentIdentifier.create(
         pid_type='recid',
@@ -45,13 +48,10 @@ def zenodo_recid_concept_minter(record_uuid=None, data=None):
 
 
 def zenodo_deposit_minter(record_uuid, data):
-    """Mint deposit identifier."""
-    # Reserve the record pid
+    """Mint the DEPID, and reserve the Concept RECID and RECID PIDs."""
+    # All new versions will have conceptrecid already in metadata
     if 'conceptrecid' not in data:
-        conceptrecid = zenodo_recid_concept_minter(data=data)
-    else:
-        conceptrecid = PersistentIdentifier.get(
-            pid_type='recid', pid_value=data['conceptrecid'])
+        zenodo_concept_recid_minter(data=data)
 
     recid = zenodo_reserved_record_minter(data=data)
 
@@ -70,9 +70,6 @@ def zenodo_deposit_minter(record_uuid, data):
             'status': 'draft',
         },
     })
-
-    PIDVersioning(parent=conceptrecid).insert_draft_child(child=recid)
-    RecordDraft.link(recid, depid)
 
     return depid
 

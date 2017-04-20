@@ -349,13 +349,19 @@ def minimal_deposit():
 
 
 @pytest.fixture()
-def minimal_record_model(minimal_record):
+def minimal_record_model(db, minimal_record):
     """Minimal record."""
     model = RecordMetadata()
     model.created = datetime.utcnow() - timedelta(days=1)
     model.updated = model.created + timedelta(days=1)
     model.version_id = 0
-    return Record(minimal_record, model=model)
+    rec = Record(minimal_record, model=model)
+
+    PersistentIdentifier.create(
+        'recid', '123', status=PIDStatus.REGISTERED, object_type='rec',
+        object_uuid=rec.id)
+    db.session.commit()
+    return rec
 
 
 @pytest.fixture()
@@ -555,7 +561,7 @@ def record_with_bucket(full_record, bucket, db):
     record = RecordFile.create(full_record)
     RecordsBuckets.create(bucket=bucket, record=record.model)
     pid = PersistentIdentifier.create(
-        pid_type='recid', pid_value=1, object_type='rec',
+        pid_type='recid', pid_value=12345, object_type='rec',
         object_uuid=record.id, status='R')
     db.session.commit()
     return pid, record

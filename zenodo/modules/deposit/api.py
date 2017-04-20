@@ -35,7 +35,7 @@ from invenio_db import db
 from invenio_deposit.api import Deposit, preserve
 from invenio_deposit.utils import mark_as_action
 from invenio_files_rest.models import Bucket, MultipartObject, Part
-from invenio_pidrelations.contrib.records import index_siblings
+from invenio_pidrelations.contrib.records import RecordDraft, index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
@@ -395,9 +395,18 @@ class ZenodoDeposit(Deposit):
         self.validate_publish()
         is_first_publishing = not self.is_published()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
-        pid, record = deposit.fetch_published()
-        ZenodoSIP.create(pid, record, create_sip_files=is_first_publishing,
+        recid, record = deposit.fetch_published()
+        ZenodoSIP.create(recid, record, create_sip_files=is_first_publishing,
                          user_id=user_id, agent=sip_agent)
+
+        conceptrecid = PersistentIdentifier.get('recid',
+            record['conceptrecid'])
+        pv = PIDVersioning(parent=conceptrecid, child=recid)
+        pv.update_redirect()
+        depid = pv.draft_child_deposit
+        if depid:
+            RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
+
         return deposit
 
     @classmethod
@@ -414,6 +423,14 @@ class ZenodoDeposit(Deposit):
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
 
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
+
+        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
+        recid = PersistentIdentifier.get('recid', str(data['recid']))
+        depid = PersistentIdentifier.get('depid', str(data['_deposit']['id']))
+
+        PIDVersioning(parent=conceptrecid).insert_draft_child(child=recid)
+        RecordDraft.link(recid, depid)
+
         return deposit
 
     @preserve(result=False, fields=PRESERVE_FIELDS)
@@ -511,8 +528,20 @@ class ZenodoDeposit(Deposit):
                 # version this outside of request context
                 deposit['_deposit']['owners'] = owners
 
-                pv = PIDVersioning(child=pid)
-                index_siblings(pv.draft_child, only_neighbors=True)
+                ###
+                conceptrecid = PersistentIdentifier.get(
+                    'recid', data['conceptrecid'])
+                recid = PersistentIdentifier.get(
+                    'recid', str(data['recid']))
+                depid = PersistentIdentifier.get(
+                    'depid', str(data['_deposit']['id']))
+                PIDVersioning(parent=conceptrecid).insert_draft_child(
+                    child=recid)
+                RecordDraft.link(recid, depid)
+
+                # TODO: draft_child is not available at this point
+                # pv = PIDVersioning(child=pid)
+                # index_siblings(pv.draft_child, only_neighbors=True)
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data
