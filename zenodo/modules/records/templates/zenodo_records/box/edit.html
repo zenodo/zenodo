@@ -21,22 +21,40 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+
+{% set edit_disabled = not (record.doi and record._deposit.id) %}
+
 {%- if current_user|has_record_perm(record, 'update') %}
 <form action="{{ url_for('zenodo_deposit.edit', pid_value=pid.pid_value) }}" method="POST">
-    <button class="btn btn-warning btn-block" type="submit" {{ 'disabled' if not record.doi or not record._deposit.id else ''}}><i class="fa fa-pencil-square-o"></i> Edit</button>
+  <button class="btn btn-warning btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}><i class="fa fa-pencil-square-o"></i> Edit</button>
 </form>
-
-{% if (record.doi|doi_locally_managed) %}
-  {% if record.conceptdoi %}
-  <form action="{{ url_for('zenodo_deposit.newversion', pid_value=pid.pid_value) }}" method="POST">
-      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if not record.doi or not record._deposit.id else ''}}>New Version</button>
-  </form>
-  {% else %}
-    <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
-      <button class="btn btn-success btn-block" type="submit">Change to versioned record</button>
-    </form>
-  {% endif %}
 {% endif %}
+
+{# Only local DOIs can be versioned  #}
+{% if record.doi|doi_locally_managed %}
+  {% set can_newversion = current_user|has_record_perm(record, 'newversion') %}
+  {% set newversion_disabled = edit_disabled or not can_newversion %}
+  {% set tooltip %}
+    {% if not can_newversion %}
+      style="pointer-events: none;" data-toggle="tooltip" title="{{_('Only the owner of the GitHub repository can modify the versioning of a record.')}}"
+    {% endif %}
+  {% endset %}
+
+  {# Already versioned record #}
+  {% if record.conceptdoi %}
+  <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
+    <span {{ tooltip }}>
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>New Version</button>
+    </span>
+  </form>
+  {# Non-versioned record #}
+  {% else %}
+  <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
+    <span {{ tooltip }}>
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>Change to versioned record</button>
+    </span>
+  </form>
+  {% endif %}
 {% endif %}
 
 {%- if current_user|has_record_perm(record, 'delete') %}

@@ -147,7 +147,7 @@ def edit(pid=None, record=None, depid=None, deposit=None):
     methods=['POST']
 )
 @login_required
-@pass_record('update')
+@pass_record('newversion')
 def newversion(pid=None, record=None, depid=None, deposit=None):
     """Create a new version of a record."""
     # If the record doesn't have a DOI, its deposit shouldn't be editable.
@@ -179,7 +179,7 @@ def newversion(pid=None, record=None, depid=None, deposit=None):
     methods=['POST']
 )
 @login_required
-@pass_record('update')
+@pass_record('newversion')
 def enableversioning(pid=None, record=None, depid=None, deposit=None):
     """Enable versioning for a record."""
     # If the record doesn't have a DOI, its deposit shouldn't be editable.
@@ -274,22 +274,6 @@ def current_datetime():
         'current_date': now.date(),
         'current_time': now.time(),
     }
-
-
-@blueprint.app_template_test()
-def latest_published_version(deposit):
-    """Test if the published version of the depid is the latest version."""
-    if deposit.is_published():
-        p, r = deposit.fetch_published()
-        return PIDVersioning(child=p).is_last_child()
-
-
-@blueprint.app_template_filter()
-def to_latest_published_version(deposit):
-    """Return latest publisehd version."""
-    if deposit.is_published():
-        p, r = deposit.fetch_published()
-        return PIDVersioning.get_last_child(p)
 
 
 @blueprint.app_template_filter('tolinksjs')
