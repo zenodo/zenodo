@@ -146,10 +146,18 @@
         <div align="center">
           <p>If you have an updated version of your files, you can create a new
             record version, with a completely new DOI.</p>
-          <button
-            class="btn btn-success"
-            ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
-            ng-click="recordsVM.actionHandler(['newversion', 'POST'], 'latest_draft_html')">New Version</button>
+          <div
+            class="tooltip-wrapper"
+            bs-tooltip
+            data-container="div"
+            data-title="{{recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions ? undefined : 'Only the owner of the GitHub repository can modify the versioning of a record.'}}"
+          >
+            <button
+              class="btn btn-success"
+              ng-disabled="!recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions"
+              ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
+              ng-click="recordsVM.actionHandler(['newversion', 'POST'], 'latest_draft_html')">New Version</button>
+          </div>
         </div>
       </td>
     </tr>
