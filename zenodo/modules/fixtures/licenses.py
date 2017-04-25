@@ -117,7 +117,10 @@ def matchlicenses(legacy_lic_filename, od_filename, destination):
 
 
 def update_legacy_meta(license):
-    """Update the Zenodo legacy terms for license metadata."""
+    """Update the Zenodo legacy terms for license metadata.
+
+    Updates the metadata in order to conform with opendefinition schema.
+    """
     l = dict(license)
     if 'od_conformance' not in l:
         l['od_conformance'] = 'approved' if l['is_okd_compliant'] \

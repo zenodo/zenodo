@@ -36,7 +36,7 @@ from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
 
-from zenodo.modules.deposit.minters import zenodo_recid_concept_minter
+from zenodo.modules.deposit.minters import zenodo_concept_recid_minter
 
 
 def doi_generator(recid, prefix=None):
@@ -60,7 +60,14 @@ def is_local_doi(doi):
 
 
 def zenodo_record_minter(record_uuid, data):
-    """Mint record identifier (and DOI)."""
+    """Zenodo record minter.
+
+    Mint, or register if previously minted, the Concept RECID and RECID.
+    Mint the Concept DOI and DOI.
+    """
+    if 'conceptrecid' not in data:
+        zenodo_concept_recid_minter(record_uuid, data)
+
     if 'recid' in data:
         recid = PersistentIdentifier.get('recid', data['recid'])
         recid.assign('rec', record_uuid)
@@ -73,15 +80,8 @@ def zenodo_record_minter(record_uuid, data):
     zenodo_doi_minter(record_uuid, data)
     oaiid_minter(record_uuid, data)
 
-    zenodo_concept_doi_minter(record_uuid, data)
-
-    # Update redirect and remove the record draft link
-    if 'conceptrecid' in data:
-        conceptrecid = PersistentIdentifier.get('recid', data['conceptrecid'])
-        PIDVersioning(parent=conceptrecid).update_redirect()
-    depid = data.pid
-    RecordDraft.unlink(recid, depid)
-
+    if 'conceptdoi' not in data:
+        zenodo_concept_doi_minter(record_uuid, data)
     return recid
 
 
@@ -145,7 +145,7 @@ def zenodo_mint_missing_concept_pids(record_uuid, record):
         pid_type='recid', pid_value=str(recid_val)).one_or_none()
 
     # Only mint Concept DOI for Zenodo DOIs
-    conceptrecid_pid = zenodo_recid_concept_minter(record_uuid, record)
+    conceptrecid_pid = zenodo_concept_recid_minter(record_uuid, record)
     # Register conceptrecid immediately since the record is published
     conceptrecid_pid.register()
     zenodo_concept_doi_minter(record_uuid, record)
