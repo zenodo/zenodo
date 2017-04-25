@@ -186,23 +186,17 @@
 
 {%- block page_body %}
 {%- set is_published = record.is_published and record.is_published() %}
+{%- set published_recid, _ = record.fetch_published() if is_published else (None, None) %}
+{%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
+{%- set has_versioning_permissions = is_published and (current_user is github_owner(published_recid) if (published_recid is github_versioned) else True) %}
+{% set deposit_template_params = {
+  'is_published': is_published or False,
+  'messages': config.DEPOSIT_UI_RESPONSE_MESSAGES,
+  'is_local_doi': is_local_doi or False,
+  'has_versioning_permissions': has_versioning_permissions or False,
+} %}
+
   <div class="container">
-
-
-    {#
-      {% if is_published %}
-        <form style="padding-bottom: 15px" action="{{ url_for('zenodo_deposit.newversion', pid_value=pid.pid_value) }}" method="POST">
-          <button type="submit" title="Create a new version for this record." class="btn btn-success"><i class="fa fa-plus fa-inverse"></i> Create New Version</button>
-        </form>
-      {% else %}
-        {%- set latest_record_pid = record | to_latest_published_version %}
-        {% if latest_record_pid %}
-          <form style="padding-bottom: 15px" action="{{ url_for('zenodo_deposit.edit', pid_value=latest_record_pid.pid_value) }}" method="POST">
-            <button type="submit" title="Edit the latest version of this record." class="btn btn-success"><i class="fa fa-forward fa-inverse"></i> Edit latest version</button>
-          </form>
-        {% endif %}
-      {% endif %}
-    #}
     <div id="invenio-records">
     <invenio-files-uploader
         method="PUT"
@@ -222,11 +216,11 @@
         initialization="{{ config.DEPOSIT_SEARCH_API }}"
         {%- endif %}
         extra-params='{"headers":{"Content-Type": "application/json"}}'
-        template-params='{"is_published": {{"true" if is_published else "false"}}, "messages": {{ config.DEPOSIT_UI_RESPONSE_MESSAGES | tojson }}, "is_local_doi": {{"true" if ("doi"in record and (record.doi|doi_locally_managed)) else "false"}} }'
+        template-params='{{ deposit_template_params | tojson }}'
         {% if community %}
         record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson}}'
         {% else %}
-        record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat()} | tojson}}'
+        record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat()} | tojson }}'
         {% endif %}
         form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
         schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}"
