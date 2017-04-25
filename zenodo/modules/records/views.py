@@ -34,14 +34,14 @@ import six
 from flask import Blueprint, current_app, render_template, request
 from flask_principal import ActionNeed
 from invenio_access.permissions import DynamicPermission
-from invenio_communities.models import Community, InclusionRequest
+from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
-from invenio_pidstore.models import PIDStatus
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.github.utils import is_github_owner, is_github_versioned
 from zenodo.modules.records.utils import is_doi_locally_managed
 
 from .models import AccessRight, ObjectType
@@ -259,6 +259,13 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
 def doi_locally_managed(pid):
     """Determine if DOI is managed locally."""
     return is_doi_locally_managed(pid)
+
+
+#
+# GitHub template filters
+#
+blueprint.add_app_template_test(is_github_versioned, name='github_versioned')
+blueprint.add_app_template_test(is_github_owner, name='github_owner')
 
 
 def records_ui_export(pid, record, template=None, **kwargs):
