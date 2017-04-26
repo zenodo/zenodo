@@ -38,6 +38,7 @@ from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_previewer.proxies import current_previewer
+from invenio_pidstore.models import PIDStatus
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
@@ -74,6 +75,16 @@ def is_embargoed(embargo_date, accessright=None):
     if embargo_date is not None:
         return AccessRight.is_embargoed(embargo_date)
     return False
+
+
+@blueprint.app_template_filter('pidstatus')
+def pidstatus_title(pid):
+    """Get access right.
+
+    Better than comparing record.access_right directly as access_right
+    may have not yet been updated after the embargo_date has passed.
+    """
+    return PIDStatus(pid.status).title
 
 
 @blueprint.app_template_filter()

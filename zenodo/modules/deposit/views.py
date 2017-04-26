@@ -50,7 +50,7 @@ from zenodo.modules.records.permissions import record_permission_factory
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
-from .tasks import datacite_inactivate
+from .tasks import datacite_inactivate, datacite_register
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -205,9 +205,18 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     """Delete a record."""
     # View disabled until properly implemented and tested.
     try:
-        doi = PersistentIdentifier.get_by_object('doi', 'rec', record.id)
+        doi = PersistentIdentifier.get('doi', record['doi'])
     except PIDDoesNotExistError:
         doi = None
+
+    try:
+        if 'conceptdoi' in record:
+            conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
+            conceptrecid = PersistentIdentifier.get('recid',
+                                                    record['conceptrecid'])
+    except PIDDoesNotExistError:
+        conceptdoi = None
+        conceptrecid = None
 
     form = RecordDeleteForm()
     form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
@@ -233,6 +242,12 @@ def delete(pid=None, record=None, depid=None, deposit=None):
         # Remove PIDs
         pid.delete()
         depid.delete()
+        pv = PIDVersioning(child=pid)
+        # Concept recid will not be deleted, but will redirect to the last
+        # version of the record.
+        if conceptrecid:
+            pv.remove_child(pid)
+
         # Remove record objects and record removal reason.
         record.clear()
 
@@ -248,6 +263,14 @@ def delete(pid=None, record=None, depid=None, deposit=None):
         deposit.delete()
         db.session.commit()
         datacite_inactivate.delay(doi.pid_value)
+        if conceptdoi:
+            if pv.children.count() > 0:
+                # Update last child (update also conceptdoi)
+                datacite_register.delay(
+                    pv.last_child.pid_value,
+                    str(pv.last_child.get_assigned_object()))
+            else:
+                datacite_inactivate.delay(conceptdoi.pid_value)
         flash(
             _('Record %(recid)s and associated objects successfully deleted.',
                 recid=pid.pid_value),
@@ -255,11 +278,12 @@ def delete(pid=None, record=None, depid=None, deposit=None):
         )
         return redirect(url_for('zenodo_frontpage.index'))
 
+    pids = [p for p in (pid, depid, doi, conceptrecid, conceptdoi) if p]
     return render_template(
         'zenodo_deposit/delete.html',
         form=form,
         pid=pid,
-        pids=[pid, depid, doi],
+        pids=pids,
         record=record,
         deposit=deposit,
     )
