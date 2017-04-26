@@ -31,7 +31,7 @@
 {% endif %}
 
 {# Only local DOIs can be versioned  #}
-{% if record.doi|doi_locally_managed %}
+{% if current_user.is_authenticated and record.doi|doi_locally_managed %}
   {% set can_newversion = current_user|has_record_perm(record, 'newversion') %}
   {% set newversion_disabled = edit_disabled or not can_newversion %}
   {% set tooltip %}
@@ -43,14 +43,14 @@
   {# Already versioned record #}
   {% if record.conceptdoi %}
   <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
-    <span {{ tooltip }}>
+    <span {{ tooltip|safe }}>
       <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>New Version</button>
     </span>
   </form>
   {# Non-versioned record #}
   {% else %}
   <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
-    <span {{ tooltip }}>
+    <span {{ tooltip|safe }}>
       <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>Change to versioned record</button>
     </span>
   </form>

@@ -37,7 +37,6 @@ from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
 from zenodo_accessrequests.models import SecretLink
 
-from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.github.utils import is_github_owner, is_github_versioned
 
 from .models import AccessRight
