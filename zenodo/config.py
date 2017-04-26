@@ -595,7 +595,7 @@ RECORDS_REST_ENDPOINTS = dict(
         search_index='records',
         record_class='zenodo.modules.records.api:ZenodoRecord',
         search_type=['record-v1.0.0'],
-        search_factory_imp='invenio_records_rest.query.es_search_factory',
+        search_factory_imp='zenodo.modules.records.query.search_factory',
         record_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers.legacyjson_v1_response'),
@@ -716,7 +716,6 @@ RECORDS_REST_FACETS = dict(
         filters=dict(
             communities=terms_filter('communities'),
             provisional_communities=terms_filter('provisional_communities'),
-            latest_version=terms_filter('relations.version.is_last'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
@@ -729,9 +728,6 @@ RECORDS_REST_FACETS = dict(
 )
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
-RECORDS_REST_FACETS['deposits']['filters'] = dict(
-    latest_version=terms_filter('relations.version.is_last'),
-)
 
 RECORDS_REST_ELASTICSEARCH_ERROR_HANDLERS = {
     'query_parsing_exception': (
