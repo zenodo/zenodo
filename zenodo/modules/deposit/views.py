@@ -119,7 +119,8 @@ def new():
 
 
 @blueprint.route(
-    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>',
+    '/record/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>',
     methods=['POST']
 )
 @login_required
@@ -142,7 +143,8 @@ def edit(pid=None, record=None, depid=None, deposit=None):
 
 
 @blueprint.route(
-    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>'
+    '/record/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
     '/newversion',
     methods=['POST']
 )
@@ -174,7 +176,8 @@ def newversion(pid=None, record=None, depid=None, deposit=None):
 
 
 @blueprint.route(
-    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>'
+    '/record/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
     '/enableversioning',
     methods=['POST']
 )
@@ -195,7 +198,8 @@ def enableversioning(pid=None, record=None, depid=None, deposit=None):
 
 @blueprint.route(
     '/record'
-    '/<pid(recid,record_class="invenio_records_files.api:Record"):pid_value>'
+    '/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
     '/admin/delete',
     methods=['GET', 'POST']
 )

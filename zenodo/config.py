@@ -590,10 +590,10 @@ RECORDS_REST_ENDPOINTS = dict(
         pid_fetcher='zenodo_record_fetcher',
         list_route='/records/',
         item_route='/records/<{0}:pid_value>'.format(
-            'pid(recid,record_class="invenio_records_files.api:Record")'
+            'pid(recid,record_class="zenodo.modules.records.api:ZenodoRecord")'
         ),
         search_index='records',
-        record_class='invenio_records_files.api:Record',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
         search_type=['record-v1.0.0'],
         search_factory_imp='invenio_records_rest.query.es_search_factory',
         record_serializers={

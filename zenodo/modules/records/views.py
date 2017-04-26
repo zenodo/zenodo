@@ -37,8 +37,8 @@ from invenio_access.permissions import DynamicPermission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
-from invenio_previewer.proxies import current_previewer
 from invenio_pidstore.models import PIDStatus
+from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
