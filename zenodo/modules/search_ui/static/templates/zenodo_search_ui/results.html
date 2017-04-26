@@ -29,7 +29,7 @@
         Uploaded on {{ record.created|date:'longDate' }}
       </small>
     </p>
-    <p ng-if="vm.invenioSearchArgs.latest_version && record.metadata.relations.version[0].index > 0">
+    <p ng-if="!vm.invenioSearchArgs.all_versions && record.metadata.relations.version[0].index > 0">
       <span class="text-muted hidden-xs"><small><i>{{ record.metadata.relations.version[0].index }} more Version(s) exist for this record</i></small></span>
     </p>
 

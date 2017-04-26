@@ -1,6 +1,7 @@
-{#
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -20,32 +21,27 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
 
-{% extends "invenio_search_ui/search.html" %}
+"""Configruation for Zenodo Records search."""
 
-{%- block search_loading %}{% endblock %}
+from __future__ import absolute_import, print_function
 
-{%- block javascript %}
-  {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-  {% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-  <script type="text/javascript">
-  require([
-    "node_modules/angular/angular",
-    "node_modules/angular-loading-bar/build/loading-bar",
-    "node_modules/invenio-search-js/dist/invenio-search-js",
-    "js/zenodo/module"
-    ], function() {
-      angular.element(document).ready(function() {
-        angular.bootstrap(document.getElementById("invenio-search"), [
-            'invenioSearch',
-            'zenodo',
-            'angular-loading-bar',
-            'mgcrea.ngStrap.tooltip',
-          ]
-        );
-      });
-    }
-  );
-  </script>
-{%- endblock javascript %}
+from elasticsearch_dsl import Q
+from flask import request
+from invenio_records_rest.query import es_search_factory as _es_search_factory
+
+
+def apply_version_filters(search, urlkwargs):
+    """Apply record version filters to search."""
+    if request and 'all_versions' in request.values:
+        urlkwargs.add('all_versions', None)
+    else:
+        search = search.filter(
+            Q('term', **{'relations.version.is_last': True}))
+    return (search, urlkwargs)
+
+
+def search_factory(self, search, query_parser=None):
+    """Search factory."""
+    search, urlkwargs = _es_search_factory(self, search)
+    return apply_version_filters(search, urlkwargs)
