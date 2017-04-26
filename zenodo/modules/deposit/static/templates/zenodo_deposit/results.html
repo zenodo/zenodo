@@ -28,7 +28,7 @@
 
           </small>
         </p>
-        <p ng-if="vm.invenioSearchArgs.latest_version && record.metadata.relations.version[0].index > 0">
+        <p ng-if="!vm.invenioSearchArgs.all_versions && record.metadata.relations.version[0].index > 0">
            <span class="text-muted hidden-xs"><small><i>{{ record.metadata.relations.version[0].index }} more Version(s) exist for this upload</i></small></span>
         </p>
       </div>
