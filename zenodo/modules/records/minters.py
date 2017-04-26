@@ -129,7 +129,7 @@ def zenodo_concept_doi_minter(record_uuid, data):
 
 
 def zenodo_mint_missing_concept_pids(record_uuid, record):
-    """Mint the missing PIDs and set up versioning for a Record."""
+    """Mint the Concept RECID and DOI and set up versioning for the Record."""
     doi_val = record.get('doi')
 
     conceptdoi_val = record.get('conceptdoi')
