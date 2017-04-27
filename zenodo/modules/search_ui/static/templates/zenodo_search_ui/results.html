@@ -13,6 +13,7 @@
           <span class="label label-{{record.metadata.access_right_category}} titlecase">{{ record.metadata.access_right }} Access</span>
       </span>
     </span>
+    <span class="label label-default" ng-if="record.conceptrecid">Version {{ record.metadata.relations.version[0].index + 1 }}{{ record.metadata.relations.version[0].is_last ? ' (latest)': '' }}</span>
 
     <h4><a target="_self" ng-href="/record/{{record.id}}">{{record.metadata.title}}</a></h4>
     <p>

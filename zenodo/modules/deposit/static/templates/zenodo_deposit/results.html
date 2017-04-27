@@ -19,6 +19,7 @@
             <span class="label label-{{record.metadata.access_right_category}} titlecase" ng-if="record.metadata.access_right">{{ record.metadata.access_right }} Access</span>
           </span>
         </span>
+        <span class="label label-default" ng-if="record.conceptrecid">Version {{ record.metadata.relations.version[0].index + 1 }}{{ record.metadata.relations.version[0].is_last ? ' (latest)': '' }}</span>
         <h5>
           {{ record.metadata.title || "Untitled" }}
         </h5>
