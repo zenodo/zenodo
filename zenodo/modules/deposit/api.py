@@ -411,6 +411,9 @@ class ZenodoDeposit(Deposit):
             if pv.draft_child_deposit:
                 RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
 
+            index_siblings(recid, neighbors_eager=True,
+                with_deposits=True)
+
         return deposit
 
     @classmethod
@@ -473,10 +476,10 @@ class ZenodoDeposit(Deposit):
         if versioning.exists:
             from zenodo.modules.deposit.indexer import index_siblings
             draft_child = versioning.draft_child
-            siblings = versioning.children.all()
+            children = versioning.children.all()
             versioning.remove_draft_child()
-            index_siblings(draft_child, siblings=siblings,
-                           only_neighbors=True)
+            index_siblings(draft_child, children=children,
+                           neighbors_eager=True)
 
 
         if recid.status == PIDStatus.RESERVED:
@@ -550,9 +553,9 @@ class ZenodoDeposit(Deposit):
                     child=recid)
                 RecordDraft.link(recid, depid)
 
-                # TODO: draft_child is not available at this point
-                # pv = PIDVersioning(child=pid)
-                # index_siblings(pv.draft_child, only_neighbors=True)
+                pv = PIDVersioning(child=pid)
+                index_siblings(pv.draft_child, neighbors_eager=True,
+                    with_deposits=True)
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data

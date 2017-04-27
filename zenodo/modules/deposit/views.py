@@ -272,7 +272,7 @@ def delete(pid=None, record=None, depid=None, deposit=None):
                 # Update last child (update also conceptdoi)
                 datacite_register.delay(
                     pv.last_child.pid_value,
-                    str(pv.last_child.get_assigned_object()))
+                    str(pv.last_child.object_uuid))
             else:
                 datacite_inactivate.delay(conceptdoi.pid_value)
         flash(
