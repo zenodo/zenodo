@@ -37,7 +37,7 @@ from invenio_access.permissions import DynamicPermission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
-from invenio_pidstore.models import PIDStatus
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
@@ -270,6 +270,15 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
 def doi_locally_managed(pid):
     """Determine if DOI is managed locally."""
     return is_doi_locally_managed(pid)
+
+
+@blueprint.app_template_filter()
+def pid_from_value(pid_value, pid_type='recid'):
+    """Determine if DOI is managed locally."""
+    try:
+        return PersistentIdentifier.get(pid_type=pid_type, pid_value=pid_value)
+    except Exception:
+        pass
 
 
 #
