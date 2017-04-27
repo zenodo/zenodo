@@ -188,15 +188,20 @@
 {%- set published_recid, published_record = record.fetch_published() if is_published else (None, None) %}
 {%- set pid_versioning = (record.conceptrecid|pid_from_value|to_versioning_api(child=False)) if record.conceptrecid else None %}
 {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
-{%- set is_new_version = pid and (pid_versioning and pid_versioning.draft_child_deposit and pid_versioning.draft_child_deposit == pid and pid_versioning.children.all()|length > 0) %}
+{%- set new_version_depid = pid_versioning and pid_versioning.draft_child_deposit %}
+{%- set has_new_version_deposit = new_version_depid and (pid_versioning.children.all()|length > 0) %}
+{%- set is_new_version = has_new_version_deposit and new_version_depid == pid  %}
 {%- set has_versioning_permissions = is_published and (current_user is github_owner(published_recid) if (published_recid is github_versioned) else True) %}
 
 {%- set deposit_template_params = {
-  'is_published': is_published or False,
   'messages': config.DEPOSIT_UI_RESPONSE_MESSAGES,
+  'conceptdoi': is_published and record.conceptdoi or None,
+  'is_published': is_published or False,
   'is_local_doi': is_local_doi or False,
   'is_new_version': is_new_version or False,
   'has_versioning_permissions': has_versioning_permissions or False,
+  'has_new_version_deposit': has_new_version_deposit or False,
+  'newversionmodal_template': url_for('static', filename='templates/zenodo_deposit/neweversionmodal.html')
 } %}
 
 
@@ -206,11 +211,27 @@
   {%- set draft_deposit_msg %}
     There is a new version of the upload being edited <a class="alert-link" href="{{draft_deposit_url}}">here</a>.
   {% endset %}
-  {%- set banner_messages = banner_messages|d([]) + [('info', draft_deposit_msg|safe)] %}
+  {%- set banner_messages = banner_messages|d([]) + [('warning', draft_deposit_msg|safe)] %}
 {% endif %}
 
 
 {%- block page_body %}
+<style>
+.modal-backdrop {
+  opacity: 0.5;
+}
+.modal.center .modal-dialog {
+  position:fixed;
+  top:40%;
+  left:50%;
+  min-width:320px;
+  max-width:630px;
+  width:50%;
+  -webkit-transform:translateX(-50%) translateY(-50%);
+  transform:translateX(-50%) translateY(-50%)
+}
+
+</style>
   <div class="container">
     <div id="invenio-records">
     <invenio-files-uploader

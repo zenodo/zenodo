@@ -156,7 +156,9 @@
               class="btn btn-success"
               ng-disabled="!recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions"
               ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
-              ng-click="recordsVM.actionHandler(['newversion', 'POST'], 'latest_draft_html')">New Version</button>
+              data-template-url="{{recordsVM.invenioRecordsArgs.templateParams.newversionmodal_template}}"
+              ng-click="recordsVM.invenioRecordsArgs.templateParams.has_new_version_deposit "
+              bs-modal>New Version</button>
           </div>
         </div>
       </td>
