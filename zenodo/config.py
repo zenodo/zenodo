@@ -100,7 +100,7 @@ PIDRELATIONS_RELATION_TYPES = [
                  'VersionRelation'),
     RelationType(1, 'record_draft', 'Record Draft',
                  'invenio_pidrelations.contrib.records:RecordDraft',
-                 'invenio_pidrelations.serializers.schemas.RelationSchema'),
+                 None),
 ]
 
 #: Enable the DataCite minding of DOIs after Deposit publishing
