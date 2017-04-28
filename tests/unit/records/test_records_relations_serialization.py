@@ -174,12 +174,13 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.1',
             'relation': 'isPartOf'
-        },
-        {
-            'scheme': 'doi',
-            'identifier': '10.5072/zenodo.3',
-            'relation': 'isPreviousVersionOf'
         }
+        # TODO: serialization of new version realtions is disabled
+        # {
+        #     'scheme': 'doi',
+        #     'identifier': '10.5072/zenodo.3',
+        #     'relation': 'isPreviousVersionOf'
+        # }
     ]
     assert rids == expected_v1
 
@@ -189,12 +190,13 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.1',
             'relation': 'isPartOf'
-        },
-        {
-            'scheme': 'doi',
-            'identifier': '10.5072/zenodo.2',
-            'relation': 'isNewVersionOf'
         }
+        # TODO: serialization of new version realtions is disabled
+        # {
+        #     'scheme': 'doi',
+        #     'identifier': '10.5072/zenodo.2',
+        #     'relation': 'isNewVersionOf'
+        # }
     ]
     assert rids == expected_v2
     parent_pid = PersistentIdentifier.get('recid', '1')
