@@ -227,28 +227,6 @@ class ZenodoDeposit(Deposit):
                 'ZENODO_COMMUNITIES_ADD_IF_GRANTS'])
         return comms
 
-    @staticmethod
-    def _autoadd_versioning_related_identifiers(record):
-        """Add versioning related identifiers."""
-        conceptdoi = record.get('conceptdoi')
-        if conceptdoi:
-            pv = PIDVersioning(child=record.pid)
-            siblings = pv.children.all()
-            pid_index = siblings.index(record.pid)
-            index_pids = siblings[(pid_index - 1):(pid_index + 2)]
-
-            related_identifiers = record.get('related_identifiers')
-            version_related_identifiers = [
-                {'identifier': conceptdoi, 'scheme': 'doi', 'relation': 'isPartOf'},
-                {'identifier': conceptdoi, 'scheme': 'doi', 'relation': 'isNewVersionOf'},
-                {'identifier': conceptdoi, 'scheme': 'doi', 'relation': 'isPreviousVersionOf'},
-            ]
-            for ri in version_related_identifiers:
-                if ri not in related_identifiers:
-                    related_identifiers.append(ri)
-            record['related_identifiers'] = related_identifiers
-        return record
-
     @contextmanager
     def _process_files(self, record_id, data):
         """Snapshot bucket and add files in record during first publishing."""
@@ -443,10 +421,6 @@ class ZenodoDeposit(Deposit):
 
         return deposit
 
-    @classmethod
-    def create_without_versioning(cls, data, id_=None):
-        """Create a deposit without versioning information."""
-
     @preserve(result=False, fields=PRESERVE_FIELDS)
     def clear(self, *args, **kwargs):
         """Clear only drafts."""
@@ -481,15 +455,14 @@ class ZenodoDeposit(Deposit):
             index_siblings(draft_child, children=children,
                            neighbors_eager=True)
 
-
         if recid.status == PIDStatus.RESERVED:
             db.session.delete(recid)
 
-
-        concept_recid = PersistentIdentifier.get(
-            pid_type='recid', pid_value=self['conceptrecid'])
-        if concept_recid.status == PIDStatus.RESERVED:
-            db.session.delete(concept_recid)
+        if 'conceptrecid' in self:
+            concept_recid = PersistentIdentifier.get(
+                pid_type='recid', pid_value=self['conceptrecid'])
+            if concept_recid.status == PIDStatus.RESERVED:
+                db.session.delete(concept_recid)
 
         # Completely remove bucket
         q = RecordsBuckets.query.filter_by(record_id=self.id)
