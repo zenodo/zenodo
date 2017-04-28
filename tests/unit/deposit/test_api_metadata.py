@@ -144,8 +144,10 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
     # Get serialization.
     data = get_json(client.get(links['self'], headers=headers), code=200)
     # - fix known differences.
+    # DOI and recid have 2 as control number, since Concept DOI/recid are
+    # registered first
     test_data['metadata'].update({
-        'prereserve_doi': {'doi': '10.5072/zenodo.1', 'recid': 1}
+        'prereserve_doi': {'doi': '10.5072/zenodo.2', 'recid': 2}
     })
     assert data['metadata'] == test_data['metadata']
 

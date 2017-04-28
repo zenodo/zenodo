@@ -26,15 +26,18 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import current_app, session
+from flask import current_app, request, session
 from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access import DynamicPermission
+from invenio_deposit.utils import extract_actions_from_class
 from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
 from invenio_records.api import Record
 from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
 from zenodo_accessrequests.models import SecretLink
+
+from zenodo.modules.github.utils import is_github_owner, is_github_versioned
 
 from .models import AccessRight
 from .utils import is_deposit, is_record
@@ -113,6 +116,25 @@ def deposit_read_permission_factory(record=None):
         return DepositPermission.create(record=record, action='read')
     else:
         return RecordPermission.create(record=record, action='read')
+
+
+def deposit_update_permission_factory(record=None):
+    """Deposit update permission factory.
+
+    Since Deposit API "actions" (eg. publish, discard, etc) are considered part
+    of the "update" action, request context (if present) has to be used in
+    order to figure out if this is an actual "update" or API action.
+    """
+    # TODO: The `need_record_permission` decorator of
+    # `invenio_deposit.views.rest.DepositActionResource.post` should be
+    # modified in order to be able to somehow provide a different permission
+    # factory for the various Deposit API actions and avoid hacking our way
+    # around to determine if it's an "action" or "update".
+    if request and request.endpoint == 'invenio_deposit_rest.depid_actions':
+        action = request.view_args.get('action')
+        if action in DepositPermission.protected_actions:
+            return DepositPermission.create(record=record, action=action)
+    return DepositPermission.create(record=record, action='update')
 
 
 def deposit_delete_permission_factory(record=None):
@@ -228,6 +250,8 @@ class RecordPermission(object):
     read_actions = ['read']
     read_files_actions = ['read-files']
     update_actions = ['update']
+    newversion_actions = ['newversion']
+    protected_actions = newversion_actions
     delete_actions = ['delete']
 
     def __init__(self, record, func, user):
@@ -251,6 +275,8 @@ class RecordPermission(object):
             return cls(record, has_read_files_permission, user)
         elif action in cls.update_actions:
             return cls(record, has_update_permission, user)
+        elif action in (cls.newversion_actions):
+            return cls(record, has_newversion_permission, user)
         elif action in cls.delete_actions:
             return cls(record, has_admin_permission, user)
         else:
@@ -314,6 +340,17 @@ def has_update_permission(user, record):
         return True
 
     return has_admin_permission(user, record)
+
+
+def has_newversion_permission(user, record):
+    """Check if the user has permission to create a newversion for a record."""
+    recid = record.fetch_published()[0] if is_deposit(record) else record.pid
+    # GitHub records are treated differently in terms of versioning permissions
+    if is_github_versioned(recid):
+        return is_github_owner(user, recid, sync=True)
+    else:
+        # Fallback to "update" permissions
+        return has_update_permission(user, record)
 
 
 def has_admin_permission(user, record):

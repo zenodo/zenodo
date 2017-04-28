@@ -34,14 +34,15 @@ import six
 from flask import Blueprint, current_app, render_template, request
 from flask_principal import ActionNeed
 from invenio_access.permissions import DynamicPermission
-from invenio_communities.models import Community, InclusionRequest
+from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
-from invenio_pidstore.models import PIDStatus
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.github.utils import is_github_owner, is_github_versioned
 from zenodo.modules.records.utils import is_doi_locally_managed
 
 from .models import AccessRight, ObjectType
@@ -74,6 +75,16 @@ def is_embargoed(embargo_date, accessright=None):
     if embargo_date is not None:
         return AccessRight.is_embargoed(embargo_date)
     return False
+
+
+@blueprint.app_template_filter('pidstatus')
+def pidstatus_title(pid):
+    """Get access right.
+
+    Better than comparing record.access_right directly as access_right
+    may have not yet been updated after the embargo_date has passed.
+    """
+    return PIDStatus(pid.status).title
 
 
 @blueprint.app_template_filter()
@@ -261,6 +272,22 @@ def doi_locally_managed(pid):
     return is_doi_locally_managed(pid)
 
 
+@blueprint.app_template_filter()
+def pid_from_value(pid_value, pid_type='recid'):
+    """Determine if DOI is managed locally."""
+    try:
+        return PersistentIdentifier.get(pid_type=pid_type, pid_value=pid_value)
+    except Exception:
+        pass
+
+
+#
+# GitHub template filters
+#
+blueprint.add_app_template_test(is_github_versioned, name='github_versioned')
+blueprint.add_app_template_test(is_github_owner, name='github_owner')
+
+
 def records_ui_export(pid, record, template=None, **kwargs):
     """Record serialization view.
 
@@ -304,10 +331,11 @@ def _can_curate(community, user, record, accepted=False):
 def community_curation(record, user):
     """Generate a list of pending and accepted communities with permissions.
 
-    Return a 2-tuple containing two lists, first for 'pending' and second
-    for 'accepted' communities. Each item in both of the list is another
-    2-tuple of (Community, bool), describing community itself,
-    and the permission (bool) to curate it.
+    Return a 4-tuple of lists (in order):
+     * 'pending' communities, which can be curated by given user
+     * 'accepted' communities, which can be curated by given user
+     * All 'pending' communities
+     * All 'accepted' communities
     """
     irs = ZenodoCommunity.get_irs(record).all()
     pending = [ir.community for ir in irs]

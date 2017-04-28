@@ -36,3 +36,14 @@
   </div>
 </form>
 {%- endblock navbar_search %}
+
+{# Banner alert through global variable `banner_messages` #}
+{%- block flashmessages %}
+{{super()}}
+{%- for category, msg in banner_messages|default([]) %}
+  {%- set category = 'info' if category not in ['info', 'danger', 'warning', 'success'] else category %}
+  <div class="alert alert-{{category}}">
+    <div class="container">{{ msg }}</div>
+  </div>
+{% endfor %}
+{% endblock %}

@@ -22,7 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{% set published_in = record|zenodo_related_links(all_pending_comms + pending_comms) %}
+{% set published_in = record|zenodo_related_links(all_pending_comms + all_accepted_comms) %}
 
 {% if published_in %}
 <div class="well metadata">

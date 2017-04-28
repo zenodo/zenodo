@@ -39,7 +39,7 @@ def today():
     return datetime.utcnow().date()
 
 
-def test_minimal(minimal_record, recid_pid):
+def test_minimal(db, minimal_record, recid_pid):
     """Test minimal."""
     minimal_record['doi'] = '10.1234/foo'
     obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
@@ -63,13 +63,13 @@ def test_minimal(minimal_record, recid_pid):
     }
 
 
-def test_identifier(minimal_record, recid_pid):
+def test_identifier(db, minimal_record, recid_pid):
     """Test identifier."""
     obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
     assert 'identifier' not in obj
 
 
-def test_creators(minimal_record, recid_pid):
+def test_creators(db, minimal_record, recid_pid):
     """Test creators."""
     minimal_record.update({
         'creators': [
@@ -88,7 +88,7 @@ def test_creators(minimal_record, recid_pid):
     ]
 
 
-def test_embargo_date(minimal_record, recid_pid):
+def test_embargo_date(db, minimal_record, recid_pid):
     """Test embargo date."""
     dt = (today() + timedelta(days=1)).isoformat()
     minimal_record.update({
@@ -102,7 +102,7 @@ def test_embargo_date(minimal_record, recid_pid):
     ]
 
 
-def test_subjects(minimal_record, recid_pid):
+def test_subjects(db, minimal_record, recid_pid):
     """Test subjects date."""
     minimal_record.update({
         'keywords': ['kw1'],
@@ -115,7 +115,7 @@ def test_subjects(minimal_record, recid_pid):
     ]
 
 
-def test_contributors(minimal_record, recid_pid):
+def test_contributors(db, minimal_record, recid_pid):
     """Test creators."""
     minimal_record.update({
         'contributors': [{
@@ -164,14 +164,14 @@ def test_contributors(minimal_record, recid_pid):
     ]
 
 
-def test_language(minimal_record, recid_pid):
+def test_language(db, minimal_record, recid_pid):
     """Test language."""
     minimal_record['language'] = 'eng'
     obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
     assert obj['language'] == 'eng'
 
 
-def test_resource_type(minimal_record, recid_pid):
+def test_resource_type(db, minimal_record, recid_pid):
     """Test language."""
     minimal_record['resource_type'] = {'type': 'poster'}
     obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
@@ -181,7 +181,7 @@ def test_resource_type(minimal_record, recid_pid):
     }
 
 
-def test_alt_ids(minimal_record, recid_pid):
+def test_alt_ids(db, minimal_record, recid_pid):
     """Test language."""
     minimal_record.update({
         'alternate_identifiers': [{
@@ -196,7 +196,7 @@ def test_alt_ids(minimal_record, recid_pid):
     }]
 
 
-def test_related_identifiers(minimal_record, recid_pid):
+def test_related_identifiers(db, minimal_record, recid_pid):
     """Test language."""
     tests = [
         ('handle', 'Handle'),
@@ -225,7 +225,7 @@ def test_related_identifiers(minimal_record, recid_pid):
         }]
 
 
-def test_rights(minimal_record, recid_pid):
+def test_rights(db, minimal_record, recid_pid):
     """Test language."""
     minimal_record.update({
         'license': {
@@ -245,7 +245,7 @@ def test_rights(minimal_record, recid_pid):
     }]
 
 
-def test_descriptions(minimal_record, recid_pid):
+def test_descriptions(db, minimal_record, recid_pid):
     """Test language."""
     minimal_record.update({
         'description': 'test',

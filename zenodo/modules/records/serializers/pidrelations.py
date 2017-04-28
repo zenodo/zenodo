@@ -36,36 +36,42 @@ def serialize_related_identifiers(pid):
     pv = PIDVersioning(child=pid)
     related_identifiers = []
     if pv.exists:
-        children = pv.children.all()
 
         rec = ZenodoRecord.get_record(pid.get_assigned_object())
-        ri = {
-            'scheme': 'doi',
-            'relation': 'isPartOf',
-            'identifier': rec['conceptdoi']
-        }
-        related_identifiers.append(ri)
-
-        idx = children.index(pid)
-        left = children[:idx]
-        right = children[idx + 1:]
-        for p in left:
-            rec = ZenodoRecord.get_record(p.get_assigned_object())
+        # External DOI records don't have Concept DOI
+        if 'conceptdoi' in rec:
             ri = {
                 'scheme': 'doi',
-                'relation': 'isNewVersionOf',
-                'identifier': rec['doi']
+                'relation': 'isPartOf',
+                'identifier': rec['conceptdoi']
             }
             related_identifiers.append(ri)
 
-        for p in right:
-            rec = ZenodoRecord.get_record(p.get_assigned_object())
-            ri = {
-                'scheme': 'doi',
-                'relation': 'isPreviousVersionOf',
-                'identifier': rec['doi']
-            }
-            related_identifiers.append(ri)
+        # TODO: We do not serialize previous/next versions to
+        # related identifiers because of the semantic-versioning cases
+        # (e.g. GitHub releases of minor versions)
+        #
+        # children = pv.children.all()
+        # idx = children.index(pid)
+        # left = children[:idx]
+        # right = children[idx + 1:]
+        # for p in left:
+        #     rec = ZenodoRecord.get_record(p.get_assigned_object())
+        #     ri = {
+        #         'scheme': 'doi',
+        #         'relation': 'isNewVersionOf',
+        #         'identifier': rec['doi']
+        #     }
+        #     related_identifiers.append(ri)
+
+        # for p in right:
+        #     rec = ZenodoRecord.get_record(p.get_assigned_object())
+        #     ri = {
+        #         'scheme': 'doi',
+        #         'relation': 'isPreviousVersionOf',
+        #         'identifier': rec['doi']
+        #     }
+        #     related_identifiers.append(ri)
     pv = PIDVersioning(parent=pid)
     if pv.exists:
         for p in pv.children:
