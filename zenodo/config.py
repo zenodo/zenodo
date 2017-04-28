@@ -679,6 +679,23 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=6,
         ),
+        version=dict(
+            fields=['-_score', 'conceptrecid', 'relations.version.index'],
+            title='Version',
+            default_order='desc',
+            order=7,
+        )
+    )
+)
+DEPOSIT_REST_SORT_OPTIONS['deposits'].update(
+    dict(
+        version=dict(
+            # FIXME: No `_score` in deposit search response...
+            fields=['conceptrecid', 'relations.version.index'],
+            title='Version',
+            default_order='desc',
+            order=7,
+        )
     )
 )
 RECORDS_REST_SORT_OPTIONS.update(OPENAIRE_REST_SORT_OPTIONS)
