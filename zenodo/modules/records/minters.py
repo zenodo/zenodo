@@ -128,15 +128,17 @@ def zenodo_concept_doi_minter(record_uuid, data):
             return conceptdoi_pid
 
 
-def zenodo_mint_missing_concept_pids(record_uuid, record):
-    """Mint the Concept RECID and DOI and set up versioning for the Record."""
-    doi_val = record.get('doi')
+def zenodo_non_versioned_concept_pids_minter(record_uuid, record):
+    """Mint the Concept RECID and DOI and set up versioning for the Record.
 
+    This minter turns a non-versioned Record into a versioned one.
+    """
     conceptdoi_val = record.get('conceptdoi')
     conceptrecid_val = record.get('conceptrecid')
     if conceptdoi_val or conceptrecid_val:
         raise ValueError("Record {0} already contains versioning "
                          "information.".format(record_uuid))
+    doi_val = record.get('doi')
     if not is_local_doi(doi_val):
         raise ValueError("Record {0} contains externally-managed DOI.".format(
             record_uuid))
