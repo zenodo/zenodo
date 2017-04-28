@@ -26,6 +26,6 @@
 pydocstyle zenodo tests docs && \
 isort -rc -c -df && \
 check-manifest --ignore ".travis-*,docs/_build*"
-# sphinx-build -qnNW docs docs/_build/html && \
-# py.test tests/unit/ && \
-# sphinx-build -qnNW -b doctest docs docs/_build/doctest
+sphinx-build -qnNW docs docs/_build/html && \
+py.test tests/unit/ && \
+sphinx-build -qnNW -b doctest docs docs/_build/doctest

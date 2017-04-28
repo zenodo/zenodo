@@ -42,6 +42,7 @@
       </div>
       {%- for r in records %}
         {%- set publication_date = r.publication_date|from_isodate -%}
+        {%- set record_version = (r.relations.version[0].index + 1) if r.conceptrecid else None -%}
         {%- set creation_date = r._created|from_isodatetime -%}
         {%- set embargo_date = r.embargo_date|from_isodate -%}
         {%- set object_type = r.resource_type|objecttype %}
@@ -57,7 +58,7 @@
               </span>
             {% endif %}
             <div class="pull-left">
-              <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}</span>
+              <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}{{ (' (v' ~ record_version ~ ')') if record_version else '' }}</span>
               {{ objecttype_label(object_type, lang=current_i18n.language) }}
               {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
             </div>
@@ -69,7 +70,7 @@
               {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}{% endtrans %}
             </small>
             {%- if r.relations.version[0].index > 0 %}
-              <p class="text-muted"><small><i>{{ r.relations.version[0].index }} more Version(s) exist for this record</i> </small></p>
+              <p class="text-muted"><a href="{{ url_for('invenio_search_ui.search', q=('conceptrecid:' ~ r.conceptrecid), all_versions=True, sort='-version') }}"><small><i>{{ r.relations.version[0].index }} more version(s) exist for this record</i> </small></a></p>
             {% endif %}
           </div>
         </div>

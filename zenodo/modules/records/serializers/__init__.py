@@ -29,8 +29,7 @@ from __future__ import absolute_import, print_function
 from dojson.contrib.to_marc21 import to_marc21
 from invenio_marc21.serializers.marcxml import MARCXMLSerializer
 from invenio_records_rest.serializers.citeproc import CiteprocSerializer
-from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
-    OAIDataCiteSerializer
+from invenio_records_rest.serializers.datacite import OAIDataCiteSerializer
 from invenio_records_rest.serializers.dc import DublinCoreSerializer
 from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
@@ -46,6 +45,8 @@ from .schemas.json import DepositSchemaV1, RecordSchemaV1
 from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
     LegacyRecordSchemaV1, DepositFormSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
+from zenodo.modules.records.serializers.datacite import \
+    ZenodoDataCite31Serializer
 
 # Serializers
 # ===========
@@ -71,7 +72,7 @@ marcxml_v1 = MARCXMLSerializer(
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializer
-datacite_v31 = DataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
+datacite_v31 = ZenodoDataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     v31=datacite_v31,

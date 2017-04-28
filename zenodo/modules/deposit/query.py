@@ -27,7 +27,9 @@
 
 from flask import abort
 from flask_security import current_user
-from invenio_records_rest.query import es_search_factory as _es_search_factory
+
+from zenodo.modules.records.query import \
+    search_factory as record_search_factory
 
 
 def search_factory(*args, **kwargs):
@@ -35,4 +37,4 @@ def search_factory(*args, **kwargs):
     if not current_user.is_authenticated:
         abort(401)
 
-    return _es_search_factory(*args, **kwargs)
+    return record_search_factory(*args, **kwargs)

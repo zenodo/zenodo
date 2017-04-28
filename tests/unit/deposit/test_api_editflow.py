@@ -94,7 +94,9 @@ def test_edit_flow(datacite_mock, api_client, db, es, location,
     record_id = data['record_id']
 
     assert PersistentIdentifier.query.filter_by(pid_type='depid').count() == 1
-    recid_pid = PersistentIdentifier.query.filter_by(pid_type='recid').one()
+    # There should be two 'recid' PIDs - Concept PID and version PID
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 2
+    recid_pid = PersistentIdentifier.get('recid', str(record_id))
     doi_pid = PersistentIdentifier.get(
         pid_type='doi', pid_value='10.5072/zenodo.1')
     assert doi_pid.status == PIDStatus.RESERVED
@@ -103,9 +105,14 @@ def test_edit_flow(datacite_mock, api_client, db, es, location,
     assert doi_pid.status == PIDStatus.REGISTERED
 
     # Make sure it was registered properly in datacite
-    assert datacite_mock().metadata_post.call_count == 1
-    datacite_mock().doi_post.assert_called_once_with(
+    # It should be called twice - for concept DOI and version DOI
+    assert datacite_mock().metadata_post.call_count == 2
+    # Concept DOI call
+    datacite_mock().doi_post.assert_any_call(
          '10.5072/zenodo.1', 'https://zenodo.org/record/1')
+    # Record DOI call
+    datacite_mock().doi_post.assert_any_call(
+         '10.5072/zenodo.2', 'https://zenodo.org/record/2')
 
     # Does record exists?
     current_search.flush_and_refresh(index='records')
@@ -296,7 +303,7 @@ def test_edit_doi(api_client, db, es, location, json_auth_headers,
     assert data['doi'] == '10.1234/bar'
 
     assert PersistentIdentifier.query.filter_by(pid_type='depid').count() == 1
-    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 1
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 2
     assert PersistentIdentifier.query.filter_by(pid_type='doi').count() == 2
     doi_exists = PersistentIdentifier.get(pid_type='doi',
                                           pid_value='10.1234/exists')
@@ -339,7 +346,7 @@ def test_edit_doi(api_client, db, es, location, json_auth_headers,
 
     # Make sure the PIDs are correct
     assert PersistentIdentifier.query.filter_by(pid_type='depid').count() == 1
-    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 1
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 2
     assert PersistentIdentifier.query.filter_by(pid_type='doi').count() == 2
     doi_exists = PersistentIdentifier.get(pid_type='doi',
                                           pid_value='10.1234/exists')
@@ -403,8 +410,9 @@ def test_noedit_doi(api_client, db, es, location, json_auth_headers,
 
     # Check if PIDs have been created (depid, recid, doi)
     PersistentIdentifier.query.filter_by(pid_type='depid').one()
-    PersistentIdentifier.query.filter_by(pid_type='recid').one()
-    doi_pid = PersistentIdentifier.query.filter_by(pid_type='doi').one()
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 2
+    assert PersistentIdentifier.query.filter_by(pid_type='doi').count() == 2
+    doi_pid = PersistentIdentifier.get('doi', data['doi'])
     assert doi_pid.status == PIDStatus.RESERVED
 
 
@@ -445,7 +453,9 @@ def test_delete_draft(api, api_client, db, es, location, json_auth_headers,
     links, data = create_deposit(
         client, headers, auth_headers, deposit_url, get_json, {})
 
-    recid = PersistentIdentifier.query.filter_by(pid_type='recid').one()
+    # Two 'recid' PIDs - Concept PID and Version PID
+    assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 2
+    recid = PersistentIdentifier.get('recid', str(data['record_id']))
     depid = PersistentIdentifier.query.filter_by(pid_type='depid').one()
     assert recid.status == PIDStatus.RESERVED
     assert depid.status == PIDStatus.REGISTERED
