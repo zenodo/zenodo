@@ -44,7 +44,7 @@
   {% if record.conceptdoi %}
   <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
     <span {{ tooltip|safe }}>
-      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>New Version</button>
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>New version</button>
     </span>
   </form>
   {# Non-versioned record #}
