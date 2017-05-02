@@ -46,9 +46,9 @@
   {% set latest_pid = pid_versioning.last_child %}
   {% set latest_version_url = url_for('invenio_records_ui.recid', pid_value=latest_pid.pid_value) %}
   {% set latest_version_msg %}
-    There are other versions of this record. You can find the latest version <a class="alert-link" href="{{latest_version_url}}">here</a>.
+    There is a <a class="alert-link" href="{{latest_version_url}}">newer version</a> of this record available.
   {% endset %}
-  {% set banner_messages = banner_messages|d([]) + [('info', latest_version_msg|safe)] %}
+  {% set banner_messages = banner_messages|d([]) + [('warning', latest_version_msg|safe)] %}
 {% endif %}
 
 
