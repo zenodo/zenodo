@@ -138,6 +138,9 @@ class ZenodoGitHubRelease(GitHubRelease):
             # Send Datacite DOI registration task
             recid_pid, record = deposit.fetch_published()
             datacite_register.delay(recid_pid.pid_value, str(record.id))
+
+            # Index the record
+            RecordIndexer().index_by_id(str(record.id))
         except Exception:
             db.session.rollback()
             # Remove deposit from index since it was not commited.
