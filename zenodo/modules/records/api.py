@@ -82,3 +82,11 @@ class ZenodoRecord(Record):
         """Return an instance of record PID."""
         pid = self.record_fetcher(self.id, self)
         return PersistentIdentifier.get(pid.pid_type, pid.pid_value)
+
+    @property
+    def depid(self):
+        """Return depid of the record."""
+        return PersistentIdentifier.get(
+            pid_type='depid',
+            pid_value=self.get('_deposit', {}).get('id')
+        )

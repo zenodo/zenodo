@@ -185,17 +185,15 @@
 {%- endblock javascript %}
 
 {%- set is_published = record.is_published and record.is_published() %}
-{%- set published_recid, published_record = record.fetch_published() if is_published else (None, None) %}
 {%- set pid_versioning = (record.conceptrecid|pid_from_value|to_versioning_api(child=False)) if record.conceptrecid else None %}
 {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
 {%- set new_version_depid = pid_versioning and pid_versioning.draft_child_deposit %}
 {%- set has_new_version_deposit = new_version_depid and (pid_versioning.children.all()|length > 0) %}
 {%- set is_new_version = has_new_version_deposit and new_version_depid == pid  %}
-{%- set has_versioning_permissions = is_published and (current_user is github_owner(published_recid) if (published_recid is github_versioned) else True) %}
+{%- set has_versioning_permissions = is_published and (current_user|has_record_perm(record, 'newversion')) %}
 
 {%- set deposit_template_params = {
   'messages': config.DEPOSIT_UI_RESPONSE_MESSAGES,
-  'conceptdoi': is_published and record.conceptdoi or None,
   'is_published': is_published or False,
   'is_local_doi': is_local_doi or False,
   'is_new_version': is_new_version or False,
@@ -210,9 +208,9 @@
   {%- set draft_deposit_url = url_for('invenio_deposit_ui.depid', pid_value=pid_versioning.draft_child_deposit.pid_value) %}
   {%- set draft_deposit_msg %}
     There is a new version of the upload being edited <a class="alert-link" href="{{draft_deposit_url}}">here</a>.
-  {% endset %}
+  {%- endset %}
   {%- set banner_messages = banner_messages|d([]) + [('warning', draft_deposit_msg|safe)] %}
-{% endif %}
+{%- endif %}
 
 
 {%- block page_body %}

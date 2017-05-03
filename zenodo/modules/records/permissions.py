@@ -30,7 +30,6 @@ from flask import current_app, request, session
 from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access import DynamicPermission
-from invenio_deposit.utils import extract_actions_from_class
 from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
 from invenio_records.api import Record
 from invenio_records_files.api import FileObject
@@ -344,10 +343,9 @@ def has_update_permission(user, record):
 
 def has_newversion_permission(user, record):
     """Check if the user has permission to create a newversion for a record."""
-    recid = record.fetch_published()[0] if is_deposit(record) else record.pid
     # GitHub records are treated differently in terms of versioning permissions
-    if is_github_versioned(recid):
-        return is_github_owner(user, recid, sync=True)
+    if is_github_versioned(record.pid):
+        return is_github_owner(user, record.pid, sync=True)
     else:
         # Fallback to "update" permissions
         return has_update_permission(user, record)

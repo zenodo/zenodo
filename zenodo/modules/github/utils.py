@@ -30,49 +30,62 @@ from invenio_db import db
 from invenio_github.api import GitHubAPI
 from invenio_github.models import Release
 from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
+
+from zenodo.modules.deposit.api import ZenodoDeposit
+from zenodo.modules.deposit.utils import fetch_depid
+from zenodo.modules.records.api import ZenodoRecord
 
 
-def get_github_release(recid):
-    """Get GitHub release from recid."""
-    return Release.query.filter_by(record_id=recid.object_uuid).one_or_none()
+def get_github_repository(pid):
+    """Get GitHub repository from depid."""
+    depid = fetch_depid(pid)
+    # First check if the passed depid is a GitHub release
+    release = (Release.query.filter_by(record_id=depid.object_uuid)
+               .one_or_none())
+    if release:
+        return release.repository
 
-
-def get_github_repository(recid):
-    """Get GitHub repository from recid."""
-    # First check if the passed recid is a GitHub release
-    recid_gh_release = get_github_release(recid)
-    if recid_gh_release:
-        return recid_gh_release.repository
-
-    # Check for its siblings then, in case it was a manual deposit
-    pv = PIDVersioning(child=recid)
+    deposit = ZenodoDeposit.get_record(depid.object_uuid)
+    concepterecid = deposit.get('conceptrecid')
+    if not concepterecid:
+        return None
+    parent = PersistentIdentifier.get(
+        pid_type='recid', pid_value=concepterecid)
+    pv = PIDVersioning(parent=parent)
     if pv.exists:
-        # TODO: Maybe a join query might be more efficient...
-        for r in pv.children:
-            gh_release = get_github_release(r)
-            if get_github_release(r):
-                return gh_release.repository
+        record_ids = [r.object_uuid for r in pv.children]
+        deposit_ids = (rec.depid.object_uuid
+                       for rec in ZenodoRecord.get_records(record_ids))
+        release = (Release.query
+                   .filter(Release.record_id.in_(deposit_ids))
+                   .first())
+        return release.repository if release else None
 
 
-def is_github_versioned(recid):
-    """Return true if the record is part of a GitHub repository versioning."""
-    pv = PIDVersioning(child=recid)
-    if pv.exists:
-        return any(get_github_release(r) for r in pv.children)
+def is_github_versioned(pid):
+    """Return true if the pid is part of a GitHub repository versioning."""
+    depid = fetch_depid(pid)
+    return get_github_repository(depid)
 
 
-def is_github_owner(user, recid, sync=False):
+def is_github_owner(user, pid, sync=False):
     """Return true if the user can create a new version for a GitHub record.
 
     :param user: User to check for ownership.
-    :param recid: Recid of a record.
+    :param pid: pid of a record.
     :param sync: Condition to sync the user's repository info from GitHub.
     """
+    depid = fetch_depid(pid)
     if sync:
-        with db.session.begin_nested():
-            gh = GitHubAPI(user_id=user.id)
-            if gh.check_sync():
-                gh.sync(hooks=False)
-        db.session.commit()
-    repo = get_github_repository(recid)
-    return repo.user == user
+        try:
+            with db.session.begin_nested():
+                gh = GitHubAPI(user_id=user.id)
+                if gh.check_sync():
+                    gh.sync(hooks=False)
+            db.session.commit()
+        except Exception:
+            # TODO: Log a warning?
+            pass
+    repo = get_github_repository(depid)
+    return repo.user == user if repo else False

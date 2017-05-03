@@ -30,6 +30,13 @@
 
   .pid-versions-dropdown {
 
+    // Dropdown Scrollbar
+    .dropdown-menu {
+      height: auto;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
     .dropdown-head {
       color: black;
       font-weight: 500;
