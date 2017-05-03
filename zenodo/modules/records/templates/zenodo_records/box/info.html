@@ -36,7 +36,8 @@
   {%- endif %}
 
   {%- if record.doi %}
-    {%- if record.conceptdoi %}
+    {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
+    {%- if record.conceptrecid and is_local_doi %}
     <dt>{{_('Record versions')}}:</dt>
     <dd>{{ pid_versions_dropdown(pid) }}</dd>
     {%- endif %}
@@ -80,6 +81,15 @@
             </div>
           </div>
         </div>
+      </dd>
+     {%- elif is_local_doi and current_user|has_record_perm(record, 'newversion') %}
+      <dt>{{_('Concept DOI')}}:</dt>
+      <dd itemprop="doi">
+        <form action="{{ url_for('zenodo_deposit.registerconceptdoi', pid_value=record.recid)}}" method="POST">
+          <span {{ tooltip|safe }}>
+            <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if newversion_disabled else ''}}>Get the Concept DOI</button>
+          </span>
+        </form>
       </dd>
     {%- endif %}
   {%- endif %}
