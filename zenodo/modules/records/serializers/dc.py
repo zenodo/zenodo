@@ -22,17 +22,17 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Marshmallow based DataCite serializer for records."""
+"""DoJSON based MARCXML serializer for records."""
 
 from __future__ import absolute_import, print_function
 
-from invenio_records_rest.serializers.datacite import DataCite31Serializer
+from invenio_records_rest.serializers.dc import DublinCoreSerializer
 
 from .pidrelations import preprocess_oai_record
 
 
-class ZenodoDataCite31Serializer(DataCite31Serializer):
-    """Marshmallow based DataCite serializer for records.
+class ZenodoDublinCoreSerializer(DublinCoreSerializer):
+    """Zenodo Dublin Core serializer for records.
 
     Note: This serializer is not suitable for serializing large number of
     records.
@@ -40,7 +40,7 @@ class ZenodoDataCite31Serializer(DataCite31Serializer):
 
     def preprocess_record(self, pid, record, links_factory=None):
         """Add related identifiers from PID relations."""
-        result = super(ZenodoDataCite31Serializer, self).preprocess_record(
+        result = super(ZenodoDublinCoreSerializer, self).preprocess_record(
             pid, record, links_factory=links_factory
         )
         result = preprocess_oai_record(pid, record, result)

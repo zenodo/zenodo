@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
 
 from zenodo.modules.records.api import ZenodoRecord
 
@@ -83,3 +84,22 @@ def serialize_related_identifiers(pid):
             }
             related_identifiers.append(ri)
     return related_identifiers
+
+
+def preprocess_oai_record(pid, record, result):
+    """Preprocess OAI record.
+
+    When serializing from OAI-PMH, the `pid` is not a `recid` and related
+    identifiers have to be added from PID relations.
+    """
+    recid = (pid if pid.pid_type == 'recid' else PersistentIdentifier.get(
+                pid_type='recid', pid_value=record.get('recid')))
+
+    # Serialize PID versioning as related identifiers
+    pv = PIDVersioning(child=recid)
+    if pv.exists:
+        rels = serialize_related_identifiers(recid)
+        if rels:
+            result['metadata'].setdefault(
+                'related_identifiers', []).extend(rels)
+    return result
