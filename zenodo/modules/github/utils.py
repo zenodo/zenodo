@@ -89,6 +89,7 @@ def is_github_owner(user, pid, sync=False):
                 db.session.commit()
         except Exception:
             # TODO: Log a warning?
+            # TODO: (In case GitHub is down, we still want to render the page)
             pass
     repo = get_github_repository(depid)
     return repo.user == user if repo else False

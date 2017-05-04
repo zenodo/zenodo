@@ -338,7 +338,7 @@ def community_curation(record, user):
      * All 'accepted' communities
     """
     irs = ZenodoCommunity.get_irs(record).all()
-    pending = [ir.community for ir in irs]
+    pending = list(set(ir.community for ir in irs))
     accepted = [Community.get(c) for c in record.get('communities', [])]
     # Additionally filter out community IDs that did not resolve (None)
     accepted = [c for c in accepted if c]
