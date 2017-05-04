@@ -79,11 +79,14 @@ def is_github_owner(user, pid, sync=False):
     depid = fetch_depid(pid)
     if sync:
         try:
+            commit = False
             with db.session.begin_nested():
                 gh = GitHubAPI(user_id=user.id)
-                if gh.check_sync():
+                if gh.account and gh.check_sync():
                     gh.sync(hooks=False)
-            db.session.commit()
+                    commit = True
+            if commit:
+                db.session.commit()
         except Exception:
             # TODO: Log a warning?
             pass
