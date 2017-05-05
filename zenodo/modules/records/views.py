@@ -154,7 +154,7 @@ def zenodo_related_links(record, communities):
 
     def match_rules(item):
         rs = []
-        for c in communities:
+        for c in set(communities):
             if c.id in current_app.config['ZENODO_RELATION_RULES']:
                 rules = current_app.config['ZENODO_RELATION_RULES'][c.id]
                 for r in rules:

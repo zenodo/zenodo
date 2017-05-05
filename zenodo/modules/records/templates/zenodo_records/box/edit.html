@@ -35,14 +35,14 @@
 {%- if record.doi|doi_locally_managed and current_user|has_record_perm(record, 'newversion') %}
   {# Already versioned record #}
   {%- if record.conceptdoi %}
-  <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
-    <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>New version</button>
-  </form>
-  {# Non-versioned record #}
-  {%- else %}
-  <form action="{{ url_for('zenodo_deposit.enableversioning', pid_value=record.recid)}}" method="POST">
-    <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>Change to versioned record</button>
-  </form>
+    <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>New version</button>
+    </form>
+  {# Non-versioned record but can be upgraded #}
+  {%- elif current_user|has_record_perm(record, 'newversion') %}
+    <form action="{{ url_for('zenodo_deposit.registerconceptdoi', pid_value=record.recid)}}" method="POST">
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>Upgrade to versioned record</button>
+    </form>
   {%- endif %}
 {%- endif %}
 {%- if current_user|has_record_perm(record, 'delete') %}
