@@ -42,6 +42,7 @@ from six import BytesIO
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.github.api import ZenodoGitHubRelease
 from zenodo.modules.github.utils import is_github_owner, is_github_versioned
+from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.minters import zenodo_record_minter
 from zenodo.modules.records.permissions import has_newversion_permission, \
@@ -138,29 +139,46 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
 def test_github_newversion_permissions(app, db, minimal_record, users, g_users,
                                        g_remoteaccounts):
     """Test new version creation permissions for GitHub records."""
+
     old_owner, new_owner = [User.query.get(u['id']) for u in g_users]
 
     # Create repository, and set owner to `old_owner`
     repo = Repository.create(
         name='foo/bar', github_id=8000, user_id=old_owner.id, hook=1234)
 
-    # Create first GitHub record (and concept recid)
+    # Create concpetrecid for the GitHub records
     conceptrecid = PersistentIdentifier.create(
         'recid', '100', status=PIDStatus.RESERVED)
-    recid1 = PersistentIdentifier.create(
-        'recid', '101', status=PIDStatus.RESERVED)
-    pv = PIDVersioning(parent=conceptrecid)
-    pv.insert_draft_child(recid1)
 
-    m1 = deepcopy(minimal_record)
-    m1['conceptrecid'] = conceptrecid.pid_value
-    m1['recid'] = int(recid1.pid_value)
-    m1['owners'] = [old_owner.id]
-    r1 = ZenodoRecord.create(m1)
-    zenodo_record_minter(r1.id, r1)
-    r1.commit()
+    def create_deposit_and_record(pid_value, owner):
+        """Utility function for creating records and deposits."""
+        recid = PersistentIdentifier.create(
+            'recid', pid_value, status=PIDStatus.RESERVED)
+        pv = PIDVersioning(parent=conceptrecid)
+        pv.insert_draft_child(recid)
 
-    rel1 = Release(release_id=111, repository_id=repo.id, record_id=r1.id,
+        depid = PersistentIdentifier.create(
+            'depid', pid_value, status=PIDStatus.REGISTERED)
+        deposit = ZenodoRecord.create({'_deposit': {'id': depid.pid_value},
+                                       'conceptrecid': conceptrecid.pid_value,
+                                       'recid': recid.pid_value})
+        deposit.commit()
+        depid.assign('rec', deposit.id)
+
+        record_metadata = deepcopy(minimal_record)
+        record_metadata['_deposit'] = {'id': depid.pid_value}
+        record_metadata['conceptrecid'] = conceptrecid.pid_value
+        record_metadata['recid'] = int(recid.pid_value)
+        record_metadata['owners'] = [owner.id]
+        record = ZenodoRecord.create(record_metadata)
+        zenodo_record_minter(record.id, record)
+        record.commit()
+
+        return (depid, deposit, recid, record)
+
+    # Create first GitHub record (by `old_owner`)
+    depid1, d1, recid1, r1 = create_deposit_and_record('101', old_owner)
+    rel1 = Release(release_id=111, repository_id=repo.id, record_id=d1.id,
                    status=ReleaseStatus.PUBLISHED)
     db.session.add(rel1)
     db.session.commit()
@@ -205,20 +223,8 @@ def test_github_newversion_permissions(app, db, minimal_record, users, g_users,
             assert has_newversion_permission(new_owner, r1)
 
     # Create second GitHub record (by `new_owner`)
-    recid2 = PersistentIdentifier.create(
-        'recid', '102', status=PIDStatus.RESERVED)
-    pv = PIDVersioning(parent=conceptrecid)
-    pv.insert_draft_child(recid2)
-
-    m2 = deepcopy(minimal_record)
-    m2['conceptrecid'] = conceptrecid.pid_value
-    m2['recid'] = int(recid2.pid_value)
-    m2['owners'] = [new_owner.id]
-    r2 = ZenodoRecord.create(m2)
-    zenodo_record_minter(r2.id, r2)
-    r2.commit()
-
-    rel2 = Release(release_id=222, repository_id=repo.id, record_id=r2.id,
+    depid2, d2, recid2, r2 = create_deposit_and_record('102', new_owner)
+    rel2 = Release(release_id=222, repository_id=repo.id, record_id=d2.id,
                    status=ReleaseStatus.PUBLISHED)
     db.session.add(rel2)
     db.session.commit()
@@ -243,18 +249,7 @@ def test_github_newversion_permissions(app, db, minimal_record, users, g_users,
             assert has_newversion_permission(new_owner, r2)
 
     # Create a manual record (by `new_owner`)
-    recid3 = PersistentIdentifier.create(
-        'recid', '103', status=PIDStatus.RESERVED)
-    pv = PIDVersioning(parent=conceptrecid)
-    pv.insert_draft_child(recid3)
-
-    m3 = deepcopy(minimal_record)
-    m3['conceptrecid'] = conceptrecid.pid_value
-    m3['recid'] = int(recid3.pid_value)
-    m3['owners'] = [new_owner.id]
-    r3 = ZenodoRecord.create(m3)
-    zenodo_record_minter(r3.id, r3)
-    r3.commit()
+    depid3, d3, recid3, r3 = create_deposit_and_record('103', new_owner)
     db.session.commit()
 
     with app.test_request_context():
