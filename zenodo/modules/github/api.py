@@ -40,6 +40,7 @@ from invenio_pidstore.models import PersistentIdentifier
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.api import ZenodoRecord
+from werkzeug.utils import cached_property
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
@@ -69,6 +70,12 @@ class ZenodoGitHubRelease(GitHubRelease):
     def repo_model(self):
         """Return repository model from relationship."""
         return self.model.repository
+
+    @cached_property
+    def recid(self):
+        """Get RECID object for the Release record."""
+        if self.record:
+            return PersistentIdentifier.get('recid', str(self.record['recid']))
 
     def publish(self):
         """Publish GitHub release as record."""
