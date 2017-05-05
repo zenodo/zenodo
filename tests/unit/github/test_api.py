@@ -42,7 +42,6 @@ from six import BytesIO
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.github.api import ZenodoGitHubRelease
 from zenodo.modules.github.utils import is_github_owner, is_github_versioned
-from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.minters import zenodo_record_minter
 from zenodo.modules.records.permissions import has_newversion_permission, \
@@ -214,13 +213,13 @@ def test_github_newversion_permissions(app, db, minimal_record, users, g_users,
             assert not is_github_owner(old_owner, recid1)
             # `old_owner` can edit his record of course
             assert has_update_permission(old_owner, r1)
-            assert not has_newversion_permission(old_owner, r1)
+            assert has_newversion_permission(old_owner, r1)
 
         with set_identity(new_owner):
             assert is_github_owner(new_owner, recid1)
             # `new_owner` can't edit the `old_owner`'s record
             assert not has_update_permission(new_owner, r1)
-            assert has_newversion_permission(new_owner, r1)
+            assert not has_newversion_permission(new_owner, r1)
 
     # Create second GitHub record (by `new_owner`)
     depid2, d2, recid2, r2 = create_deposit_and_record('102', new_owner)

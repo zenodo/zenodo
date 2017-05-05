@@ -31,13 +31,14 @@ from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access import DynamicPermission
 from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
 from zenodo_accessrequests.models import SecretLink
 
-from zenodo.modules.github.utils import is_github_owner, is_github_versioned
-
+from .api import ZenodoRecord
 from .models import AccessRight
 from .utils import is_deposit, is_record
 
@@ -343,12 +344,14 @@ def has_update_permission(user, record):
 
 def has_newversion_permission(user, record):
     """Check if the user has permission to create a newversion for a record."""
-    # GitHub records are treated differently in terms of versioning permissions
-    if is_github_versioned(record.pid):
-        return is_github_owner(user, record.pid, sync=True)
-    else:
-        # Fallback to "update" permissions
-        return has_update_permission(user, record)
+    # Only the owner of the latest version can create new versions
+    conceptrecid = record.get('conceptrecid')
+    if conceptrecid:
+        conceptrecid = PersistentIdentifier.get('recid', conceptrecid)
+        pv = PIDVersioning(parent=conceptrecid)
+        latest_record = ZenodoRecord.get_record(pv.last_child.object_uuid)
+        return has_update_permission(user, latest_record)
+    return has_update_permission(user, record)
 
 
 def has_admin_permission(user, record):

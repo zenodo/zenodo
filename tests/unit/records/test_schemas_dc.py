@@ -33,7 +33,7 @@ from invenio_records.api import Record
 from zenodo.modules.records.serializers import dc_v1
 
 
-def test_minimal(minimal_record, recid_pid):
+def test_minimal(app, db, minimal_record, recid_pid):
     """Test identifiers."""
     obj = dc_v1.transform_record(recid_pid, Record(minimal_record))
     assert obj == {
@@ -53,7 +53,7 @@ def test_minimal(minimal_record, recid_pid):
     }
 
 
-def test_identifiers(minimal_record, recid_pid):
+def test_identifiers(app, db, minimal_record, recid_pid):
     """"Test identifiers."""
     minimal_record['doi'] = '10.1234/foo'
     obj = dc_v1.transform_record(recid_pid, Record(minimal_record))
@@ -65,14 +65,14 @@ def test_identifiers(minimal_record, recid_pid):
     assert 'oai:zenodo.org:123' in obj['identifiers']
 
 
-def test_creators(minimal_record, recid_pid):
+def test_creators(app, db, minimal_record, recid_pid):
     """"Test identifiers."""
     minimal_record['creators'] = []
     obj = dc_v1.transform_record(recid_pid, Record(minimal_record))
     assert obj['creators'] == []
 
 
-def test_relations(minimal_record, recid_pid):
+def test_relations(app, db, minimal_record, recid_pid):
     """"Test relations."""
     minimal_record.update({
         'grants': [{
@@ -96,7 +96,7 @@ def test_relations(minimal_record, recid_pid):
     ]
 
 
-def test_rights(minimal_record, recid_pid):
+def test_rights(app, db, minimal_record, recid_pid):
     """Test rights."""
     minimal_record.update({
         'license': {'url': 'http://creativecommons.org/licenses/by/4.0/'}
@@ -105,7 +105,7 @@ def test_rights(minimal_record, recid_pid):
     assert 'http://creativecommons.org/licenses/by/4.0/' in obj['rights']
 
 
-def test_embargo_date(minimal_record, recid_pid):
+def test_embargo_date(app, db, minimal_record, recid_pid):
     """"Test embargo date."""
     dt = (datetime.utcnow().date() + timedelta(days=1)).isoformat()
     minimal_record.update({
@@ -117,7 +117,7 @@ def test_embargo_date(minimal_record, recid_pid):
     assert 'info:eu-repo/date/embargoEnd/{0}'.format(dt) in obj['dates']
 
 
-def test_publishers(minimal_record, recid_pid):
+def test_publishers(app, db, minimal_record, recid_pid):
     """Test publishers."""
     minimal_record.update({
         'part_of': {'publisher': 'Zenodo'},
@@ -132,7 +132,7 @@ def test_publishers(minimal_record, recid_pid):
     assert obj['publishers'] == ['Invenio']
 
 
-def test_contributors(minimal_record, recid_pid):
+def test_contributors(app, db, minimal_record, recid_pid):
     """"Test contributors."""
     minimal_record.update({
         'contributors': [{'name': 'Smith, John'}]
@@ -141,7 +141,7 @@ def test_contributors(minimal_record, recid_pid):
     assert obj['contributors'] == ['Smith, John']
 
 
-def test_types(minimal_record, recid_pid):
+def test_types(app, db, minimal_record, recid_pid):
     """"Test contributors."""
     minimal_record.update({
         'resource_type': {'type': 'publication', 'subtype': 'conferencepaper'}
@@ -150,7 +150,7 @@ def test_types(minimal_record, recid_pid):
     assert obj['types'] == ['info:eu-repo/semantics/conferencePaper']
 
 
-def test_sources(minimal_record, recid_pid):
+def test_sources(app, db, minimal_record, recid_pid):
     """"Test contributors."""
     minimal_record.update({
         'journal': {
@@ -172,7 +172,7 @@ def test_sources(minimal_record, recid_pid):
     assert obj['sources'] == ['CAP 1']
 
 
-def test_sources_meetings(minimal_record, recid_pid):
+def test_sources_meetings(app, db, minimal_record, recid_pid):
     """"Test contributors."""
     minimal_record['meetings'] = {
         'acronym': 'CAP',
