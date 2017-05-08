@@ -80,29 +80,29 @@ class ZenodoGitHubRelease(GitHubRelease):
     def publish(self):
         """Publish GitHub release as record."""
         id_ = uuid.uuid4()
-        deposit = None
+        deposit_metadata = dict(self.metadata)
         try:
             db.session.begin_nested()
-            if self.model.repository.releases.count() > 1:
-                last_release = self.model.repository.releases.filter_by(
-                    status=ReleaseStatus.PUBLISHED).order_by(
+            # TODO: Add filter on Published releases
+            previous_releases = self.model.repository.releases.filter_by(
+                status=ReleaseStatus.PUBLISHED)
+            versioning = None
+            stashed_draft_child = None
+            if previous_releases.count():
+                last_release = previous_releases.order_by(
                         Release.created.desc()).first()
                 last_recid = PersistentIdentifier.get(
                     'recid', last_release.record['recid'])
-                pv = PIDVersioning(child=last_recid)
-                if pv.exists:
-                    last_record = ZenodoRecord.get_record(
-                        pv.last_child.get_assigned_object())
-                    deposit_metadata = dict(self.metadata)
-                    deposit_metadata['conceptrecid'] = \
-                        last_record['conceptrecid']
-                    deposit_metadata['conceptdoi'] = last_record['conceptdoi']
+                versioning = PIDVersioning(child=last_recid)
+                last_record = ZenodoRecord.get_record(
+                    versioning.last_child.get_assigned_object())
+                deposit_metadata['conceptrecid'] = last_record['conceptrecid']
+                deposit_metadata['conceptdoi'] = last_record['conceptdoi']
+                if versioning.draft_child:
+                    stashed_draft_child = versioning.draft_child
+                    versioning.remove_draft_child()
 
-                    deposit = self.deposit_class.create(
-                        deposit_metadata, id_=id_)
-
-            if not deposit:
-                deposit = self.deposit_class.create(self.metadata, id_=id_)
+            deposit = self.deposit_class.create(deposit_metadata, id_=id_)
 
             deposit['_deposit']['created_by'] = self.event.user_id
             deposit['_deposit']['owners'] = [self.event.user_id]
@@ -140,6 +140,8 @@ class ZenodoGitHubRelease(GitHubRelease):
             }
             deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
             self.model.recordmetadata = deposit.model
+            if versioning and stashed_draft_child:
+                versioning.insert_draft_child(stashed_draft_child)
             db.session.commit()
 
             # Send Datacite DOI registration task
