@@ -37,10 +37,10 @@ from invenio_github.utils import get_contributors, get_owner
 from invenio_indexer.api import RecordIndexer
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
+from werkzeug.utils import cached_property
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.api import ZenodoRecord
-from werkzeug.utils import cached_property
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
@@ -81,6 +81,7 @@ class ZenodoGitHubRelease(GitHubRelease):
         """Publish GitHub release as record."""
         id_ = uuid.uuid4()
         deposit_metadata = dict(self.metadata)
+        deposit = None
         try:
             db.session.begin_nested()
             # TODO: Add filter on Published releases
