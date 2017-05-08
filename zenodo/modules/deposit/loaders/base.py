@@ -61,6 +61,14 @@ def marshmallow_loader(schema_class, **kwargs):
 
             _, record = request.view_args.get('pid_value').data
             context['recid'] = record['recid']
+
+            ''' If DOI field of a published record is left blank while
+                editing, add a (key,value) pair - doi,'' to metadata dict of
+                data.
+            '''
+            if record.is_published() and ('doi' not in data['metadata']):
+                data['metadata']['doi'] = ''
+
             if record.has_minted_doi():
                 context['required_doi'] = record['doi']
             elif not record.is_published():
