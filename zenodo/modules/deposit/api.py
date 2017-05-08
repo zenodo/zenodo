@@ -45,7 +45,8 @@ from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.minters import zenodo_concept_recid_minter
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoRecord
-from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
+from zenodo.modules.records.minters import doi_generator, is_local_doi, \
+    zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
 
@@ -525,6 +526,10 @@ class ZenodoDeposit(Deposit):
                 PIDVersioning(parent=conceptrecid).insert_draft_child(
                     child=recid)
                 RecordDraft.link(recid, depid)
+
+                # Pre-fill the Zenodo DOI to prevent the user from changing it
+                # to a custom DOI.
+                deposit['doi'] = doi_generator(recid.pid_value)
 
                 pv = PIDVersioning(child=pid)
                 index_siblings(pv.draft_child, neighbors_eager=True,
