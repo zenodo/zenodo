@@ -103,3 +103,8 @@ ZENODO_DOIID4RECID = {
 Wrong DOIs were minted for a short period in 2013 due to mistake in the legacy
 system.
 """
+
+
+RECORD_CONTACT_EMAIL_TITLE_TEMPLATE = 'zenodo_records/template/email_title.html'
+
+RECORD_CONTACT_EMAIL_BODY_TEMPLATE = 'zenodo_records/template/email_body.html'

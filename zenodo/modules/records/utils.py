@@ -57,3 +57,58 @@ def serialize_record(record, pid, serializer, module=None, **kwargs):
         module = module or 'zenodo.modules.records.serializers'
         serializer = import_string('.'.join((module, serializer)))
         return serializer.serialize(pid, record, **kwargs)
+
+
+def render_template_to_string(template, context):
+    """Render a template from the template folder with the given context.
+
+    Code based on
+    `<https://github.com/mitsuhiko/flask/blob/master/flask/templating.py>`_
+    :param template: the string template, or name of the template to be
+                     rendered, or an iterable with template names
+                     the first one existing will be rendered.
+    :param context: the variables that should be available in the
+                    context of the template.
+    :return: a string.
+    """
+    template = current_app.jinja_env.get_or_select_template(template)
+    return template.render(context)
+
+def format_request_email_title(context):
+    """Format the email message title for contact form notification.
+
+    :param context: Context parameters passed to formatter.
+    :type context: dict.
+    :returns: Email message title.
+    :rtype: str
+    """
+    template = current_app.config['RECORD_CONTACT_EMAIL_TITLE_TEMPLATE'],
+    return render_template_to_string(template, context)
+
+def format_request_email_body(context):
+    """Format the email message body for contact form notification.
+
+    :param context: Context parameters passed to formatter.
+    :type context: dict.
+    :returns: Email message body.
+    :rtype: str
+    """
+    template = current_app.config['RECORD_CONTACT_EMAIL_BODY_TEMPLATE'],
+    return render_template_to_string(template, context)
+
+def send_contact_email(context, sender, recipient):
+    """Signal for sending emails after contact form validated."""
+    msg_body = format_request_email_body(context)
+    msg_title = format_request_email_title(context)
+
+    mail = Mail(current_app)
+
+    msg = Message(
+        msg_title,
+        sender=sender,
+        recipients=recipient,
+        reply_to=sender,
+        body=msg_body
+    )
+
+    mail.send(msg)

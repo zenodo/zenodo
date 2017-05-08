@@ -44,6 +44,8 @@ from werkzeug.utils import import_string
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
+from .forms import contact_form_factory
+from .utils import send_contact_mail
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -53,6 +55,43 @@ blueprint = Blueprint(
     url_prefix='/search'
 )
 
+@blueprint.route(
+    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>/contact/',
+    methods=['POST']
+)
+def contact_owner(pid_value=None):
+    from pprint import pprint
+    """Render contact form."""
+    form_class = contact_form_factory()
+    form = form_class()
+
+    if current_user.is_authenticated:
+        form.email.data = current_user.email
+
+    """If form is validated send email to the admin."""
+    if form.validate_on_submit():
+        """Dictionary storing data to be sent."""
+        context = dict(
+            form=form,
+            current_user=current_user,
+        )
+
+        # How to implement recipient user email?
+        send_contact_email(context, form.email.data, "The recipient user")
+
+        flash(
+            _('Request sent successfully!'),
+            category='success'
+        )
+        return redirect('/record/'+pid_value)
+
+    return render_template(
+        'zenodo_records/box/contact.html',
+        form=form,
+        current_user=current_user,
+    )
+
+    
 
 #
 # Access right template filters and tests.
