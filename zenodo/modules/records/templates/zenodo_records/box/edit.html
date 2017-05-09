@@ -36,7 +36,7 @@
   {# Already versioned record #}
   {%- if record.conceptdoi %}
     <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
-      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>New version</button>
+      <button class="btn btn-success btn-block" type="submit" data-placement="left" data-toggle="tooltip" title="{{_('You should only create a new version if you want to update the files of this upload. Keep in mind that new versions get a new DOI.')}}" {{ 'disabled' if edit_disabled else ''}}>New version</button>
     </form>
   {# Non-versioned record but can be upgraded #}
   {%- elif current_user|has_record_perm(record, 'newversion') %}
