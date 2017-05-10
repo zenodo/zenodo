@@ -37,10 +37,6 @@
 
   {%- if record.doi %}
     {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
-    {%- if record.conceptdoi and is_local_doi %}
-    <dt>{{_('Record versions')}}:</dt>
-    <dd>{{ pid_versions_dropdown(pid) }}</dd>
-    {%- endif %}
     <dt>{{_('DOI')}}:</dt>
     <dd itemprop="doi">
       <span class="get-badge" data-toggle="toolt  ip" data-placement="bottom"
@@ -61,28 +57,6 @@
         </div>
       </div>
     </dd>
-    {%- if record.conceptdoi %}
-      <dt>{{_('Concept DOI')}}:</dt>
-      <dd itemprop="doi">
-        <span class="get-badge" data-toggle="tooltip" data-placement="bottom"
-              title="Get the Concept DOI badge!">
-          <img data-toggle="modal" data-target="[data-modal='{{ record.conceptdoi }}']"
-                src="{{ url_for('invenio_formatter_badges.badge', title='DOI', value=record.conceptdoi, ext='svg') }}" alt="{{ record.conceptdoi }}">
-          </img>
-        </span>
-        <div class="modal fade badge-modal" data-modal="{{ record.conceptdoi }}">
-          <div class="modal-dialog">
-            <div class="modal-content">
-              <div class="modal-body">
-                <h4>Zenodo DOI Badge</h4>
-                {% from "invenio_formatter/macros/badges.html" import badges_formats_list %}
-                {{ badges_formats_list(url_for('invenio_formatter_badges.badge', title='DOI', value=record.conceptdoi, ext='svg', _external=True, _scheme='https'), record.conceptdoi|pid_url(scheme='doi')) }}
-              </div>
-            </div>
-          </div>
-        </div>
-      </dd>
-    {%- endif %}
   {%- endif %}
   {%- if record.imprint and record.imprint.isbn %}
     <dt>{{_('ISBN')}}:</dt>
