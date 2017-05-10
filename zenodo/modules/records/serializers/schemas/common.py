@@ -513,9 +513,9 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                 if is_deposit(metadata):
                     draft_child_depid = version_info.get('draft_child_deposit')
                     if draft_child_depid:
-                        links['latest_draft'] = format_pid_link(
-                            current_app.config['DEPOSIT_RECORDS_API'],
-                            draft_child_depid['pid_value'])
+                        links['latest_draft'] = external_url_for(
+                            'invenio_deposit_rest.depid_item',
+                            pid_value=draft_child_depid['pid_value'])
                         links['latest_draft_html'] = format_pid_link(
                             current_app.config['DEPOSIT_UI_ENDPOINT'],
                             draft_child_depid['pid_value'])
