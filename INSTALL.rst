@@ -51,7 +51,7 @@ and some data fixtures:
 
     $ cd ~/src/zenodo
     $ docker-compose run --rm web bash /code/zenodo/scripts/init.sh
-    $ docker-compose run --rm statsd bash /init.sh
+    $ docker-compose run --rm web bash /code/zenodo/scripts/index.sh
 
 Next, load the demo records and index them:
 
@@ -70,9 +70,10 @@ Now visit the following URL in your browser:
 
 .. note::
 
-    If you're running docker on Linux or newer Mac OSX systems,
-    the ``<docker ip>`` is usually the localhost. For older Mac OSX and Windows
-    systems running docker through ``docker-machine``, you can find the IP with
+    If you're running docker on Linux or newer Mac OS X systems,
+    the ``<docker ip>`` is usually the localhost. For older Mac OS X and
+    Windows systems running docker through ``docker-machine``, you can find
+    the IP with
 
     .. code-block:: console
 
@@ -81,7 +82,6 @@ Now visit the following URL in your browser:
 You can use the following web interface to inspect Elasticsearch and RabbitMQ:
 
 - Elasticsearch: http://<docker ip>:9200/_plugin/hq/
-- Kibana: http://<docker ip>:5601/
 - RabbitMQ: http://<docker ip>:15672/ (guest/guest)
 - HAProxy: http://<docker ip>:8080/ (guest/guest)
 
@@ -93,11 +93,9 @@ Also the following ports are exposed on the Docker host:
 - ``444``: Nginx
 - ``5000``: Zenodo
 - ``5432``: PostgreSQL
-- ``5601``: Kibana
 - ``5672``: RabbitMQ
 - ``6379``: Redis
 - ``8080``: HAProxy stats
-- ``8125``: StatsD (UDP)
 - ``9200``: Elasticsearch
 - ``9300``: Elasticsearch
 - ``15672``: RabbitMQ management console

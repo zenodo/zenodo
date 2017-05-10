@@ -99,10 +99,11 @@
         {{ almetric_badge(record.doi, css_class='well') }}
       {%- endif %}
       {%- include "zenodo_records/box/publishedin.html" %}
+      {%- set resolved_record = record.replace_refs() %}
       <div class="well metadata">
-        {%- set resolved_record = record.replace_refs() %}
         {%- include "zenodo_records/box/info.html" %}
       </div>
+      {%- include "zenodo_records/box/versions.html" %}
       <div class="well">
         {%- include "zenodo_records/box/share.html" %}
       </div>
