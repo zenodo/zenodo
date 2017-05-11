@@ -86,17 +86,25 @@ def serialize_related_identifiers(pid):
     return related_identifiers
 
 
-def preprocess_oai_record(pid, record, result):
-    """Preprocess OAI record.
+def preprocess_related_identifiers(pid, record, result):
+    """Preprocess related identifiers for record serialization.
 
-    When serializing from OAI-PMH, the `pid` is not a `recid` and related
-    identifiers have to be added from PID relations.
+    Resolves the passed pid to the proper `recid` in order to add related
+    identifiers from PID relations.
     """
-    recid = (pid if pid.pid_type == 'recid' else PersistentIdentifier.get(
-                pid_type='recid', pid_value=record.get('recid')))
+    recid_value = record.get('recid')
+    if pid.pid_type == 'doi' and pid.pid_value == record.get('conceptdoi'):
+        recid_value = record.get('conceptrecid')
+        result['metadata']['doi'] = record.get('conceptdoi')
+    recid = (pid if pid.pid_value == recid_value else
+             PersistentIdentifier.get(pid_type='recid', pid_value=recid_value))
+
+    if recid.pid_value == record.get('conceptrecid'):
+        pv = PIDVersioning(parent=recid)
+    else:
+        pv = PIDVersioning(child=recid)
 
     # Serialize PID versioning as related identifiers
-    pv = PIDVersioning(child=recid)
     if pv.exists:
         rels = serialize_related_identifiers(recid)
         if rels:

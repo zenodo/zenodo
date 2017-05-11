@@ -36,8 +36,6 @@ from invenio_records_files.api import Record
 
 from zenodo.modules.records.minters import is_local_doi
 from zenodo.modules.records.serializers import datacite_v31
-from zenodo.modules.records.serializers.pidrelations import \
-    serialize_related_identifiers
 
 
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
@@ -77,15 +75,7 @@ def datacite_register(pid_value, record_uuid):
             url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
                 recid=conceptrecid)
 
-            # Update related identifiers
-            record_rel_ids = record.pop('related_identifiers', [])
-            parent_rel_ids = serialize_related_identifiers(pv.parent)
-            for version_ri in parent_rel_ids:
-                if version_ri not in record_rel_ids:
-                    record_rel_ids.append(version_ri)
-            record['related_identifiers'] = record_rel_ids
-
-            doc = datacite_v31.serialize(dcp.pid, record)
+            doc = datacite_v31.serialize(concept_dcp.pid, record)
             if concept_dcp.pid.status == PIDStatus.REGISTERED:
                 concept_dcp.update(url, doc)
             else:
@@ -110,3 +100,26 @@ def datacite_inactivate(pid_value):
         db.session.commit()
     except Exception as exc:
         datacite_inactivate.retry(exc=exc)
+
+
+# WITH recids AS (
+#     SELECT
+#         pidstore_pid.pid_value AS pid_value,
+#         pidstore_pid.object_uuid AS object_uuid
+#     FROM pidstore_pid
+#     WHERE pidstore_pid.pid_type = 'recid' AND pidstore_pid.status = 'K'
+# )
+
+# SELECT
+#     records_metadata.id AS records_metadata_id,
+#     records_metadata.json AS records_metadata_json,
+#     pidstore_pid.pid_type AS pidstore_pid_pid_type,
+#     pidstore_pid.pid_value AS pidstore_pid_pid_value,
+#     pidstore_pid.object_uuid AS pidstore_pid_object_uuid
+# FROM
+#     records_metadata
+#     JOIN pidstore_pid ON pidstore_pid.object_uuid = records_metadata.id
+#     JOIN recids ON records_metadata.json ->> 'recid' = recids.pid_value
+# WHERE
+#     pidstore_pid.pid_type = 'depid' AND
+#     records_metadata.json #>> '{_deposit,status}' = 'draft'

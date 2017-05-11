@@ -49,21 +49,20 @@ def test_datacite_register(dc_mock, app, db, es, minimal_record):
     ]
     conceptdoi_tags = [
         '<identifier identifierType="DOI">{conceptdoi}</identifier>',
-        ('<relatedIdentifier relatedIdentifierType="DOI" '
-         'relationType="HasPart">{doi}</relatedIdentifier>'),
-        ('<relatedIdentifier relatedIdentifierType="DOI" '
-         'relationType="IsPartOf">{conceptdoi}</relatedIdentifier>'),
     ]
+    has_part_tag = ('<relatedIdentifier relatedIdentifierType="DOI" '
+                    'relationType="HasPart">{doi}</relatedIdentifier>')
 
     # Assert calls and content
-    def assert_datacite_calls_and_content(record):
+    def assert_datacite_calls_and_content(record, doi_tags, conceptdoi_tags):
         """Datacite client calls assertion helper."""
+        # import wdb; wdb.set_trace()
         assert dc_mock().metadata_post.call_count == 2
         _, doi_args, _ = dc_mock().metadata_post.mock_calls[0]
         _, conceptdoi_args, _ = dc_mock().metadata_post.mock_calls[1]
-        assert all(t.format(**record) in doi_args[0] for t in doi_tags)
-        assert all(t.format(**record) in conceptdoi_args[0]
-                   for t in conceptdoi_tags)
+        assert all([t.format(**record) in doi_args[0] for t in doi_tags])
+        assert all([t.format(**record) in conceptdoi_args[0]
+                    for t in conceptdoi_tags])
 
         dc_mock().doi_post.call_count == 2
         dc_mock().doi_post.assert_any_call(
@@ -98,7 +97,9 @@ def test_datacite_register(dc_mock, app, db, es, minimal_record):
     db.session.commit()
 
     datacite_register(recid1.pid_value, str(r1.id))
-    assert_datacite_calls_and_content(r1)
+
+    conceptdoi_tags.append(has_part_tag.format(**r1))
+    assert_datacite_calls_and_content(r1, doi_tags, conceptdoi_tags)
 
     # Create a new version
     recid2, r2 = create_versioned_record('102', conceptrecid)
@@ -107,13 +108,8 @@ def test_datacite_register(dc_mock, app, db, es, minimal_record):
     dc_mock().reset_mock()
     datacite_register(recid2.pid_value, str(r2.id))
 
-    # Add the first record's DOI manually
-    conceptdoi_tags.append(
-        ('<relatedIdentifier relatedIdentifierType="DOI" '
-         'relationType="HasPart">{doi}</relatedIdentifier>'.format(**r1))
-    )
-
-    assert_datacite_calls_and_content(r1)
+    conceptdoi_tags.append(has_part_tag.format(**r2))
+    assert_datacite_calls_and_content(r2, doi_tags, conceptdoi_tags)
 
 
 @patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')

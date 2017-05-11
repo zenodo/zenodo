@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 from invenio_records_rest.serializers.datacite import DataCite31Serializer
 
-from .pidrelations import preprocess_oai_record
+from .pidrelations import preprocess_related_identifiers
 
 
 class ZenodoDataCite31Serializer(DataCite31Serializer):
@@ -43,5 +43,5 @@ class ZenodoDataCite31Serializer(DataCite31Serializer):
         result = super(ZenodoDataCite31Serializer, self).preprocess_record(
             pid, record, links_factory=links_factory
         )
-        result = preprocess_oai_record(pid, record, result)
+        result = preprocess_related_identifiers(pid, record, result)
         return result
