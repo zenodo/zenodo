@@ -46,7 +46,7 @@ from zenodo.modules.deposit.minters import zenodo_concept_recid_minter
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
-    zenodo_doi_updater
+    zenodo_concept_doi_minter, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
 
@@ -545,4 +545,19 @@ class ZenodoDeposit(Deposit):
                 deposit['_buckets'] = {'deposit': str(snapshot.id)}
                 RecordsBuckets.create(record=deposit.model, bucket=snapshot)
                 deposit.commit()
+        return self
+
+
+    @mark_as_action
+    def registerconceptdoi(self, pid=None):
+        """Register the conceptdoi for the deposit and record."""
+        pid, record = self.fetch_published()
+        zenodo_concept_doi_minter(record.id, record)
+        record.commit()
+        self['conceptdoi'] = record['conceptrecid']
+        self.commit()
+
+        if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
+            from zenodo.modules.deposit.tasks import datacite_register
+            datacite_register.delay(pid.pid_value, str(record.id))
         return self

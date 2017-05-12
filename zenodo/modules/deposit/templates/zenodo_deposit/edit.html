@@ -187,6 +187,7 @@
 {%- set is_published = record.is_published and record.is_published() %}
 {%- set pid_versioning = (record.conceptrecid|pid_from_value|to_versioning_api(child=False)) if record.conceptrecid else None %}
 {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
+{%- set has_conceptdoi = "conceptdoi" in record %}
 {%- set new_version_depid = pid_versioning and pid_versioning.draft_child_deposit %}
 {%- set has_new_version_deposit = new_version_depid and (pid_versioning.children.all()|length > 0) %}
 {%- set is_new_version = has_new_version_deposit and new_version_depid == pid  %}
@@ -196,10 +197,12 @@
   'messages': config.DEPOSIT_UI_RESPONSE_MESSAGES,
   'is_published': is_published or False,
   'is_local_doi': is_local_doi or False,
+  'has_conceptdoi': has_conceptdoi or False,
   'is_new_version': is_new_version or False,
   'has_versioning_permissions': has_versioning_permissions or False,
   'has_new_version_deposit': has_new_version_deposit or False,
-  'newversionmodal_template': url_for('static', filename='templates/zenodo_deposit/neweversionmodal.html')
+  'newversionmodal_template': url_for('static', filename='templates/zenodo_deposit/neweversionmodal.html'),
+  'upgradeversioningmodal_template': url_for('static', filename='templates/zenodo_deposit/upgradeversioningmodal.html')
 } %}
 
 

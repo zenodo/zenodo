@@ -250,7 +250,7 @@ class RecordPermission(object):
     read_actions = ['read']
     read_files_actions = ['read-files']
     update_actions = ['update']
-    newversion_actions = ['newversion']
+    newversion_actions = ['newversion', 'registerconceptdoi']
     protected_actions = newversion_actions
     delete_actions = ['delete']
 
