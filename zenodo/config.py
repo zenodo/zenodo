@@ -680,7 +680,11 @@ RECORDS_REST_SORT_OPTIONS = dict(
             order=6,
         ),
         version=dict(
-            fields=['-_score', 'conceptrecid', 'relations.version.index'],
+            # TODO: There are a lot of implications when sorting record results
+            # by versions and using the `_score`... Maybe there's some
+            # elaborate ES syntax/API (eg. `constant_score`) to get a better
+            # version-friendly sorted result.
+            fields=['conceptrecid', 'relations.version.index'],
             title='Version',
             default_order='desc',
             order=7,
