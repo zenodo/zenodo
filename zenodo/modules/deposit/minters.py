@@ -26,8 +26,6 @@
 
 from __future__ import absolute_import
 
-from invenio_pidrelations.contrib.records import RecordDraft
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus, \
     RecordIdentifier
 

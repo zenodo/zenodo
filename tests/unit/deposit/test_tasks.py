@@ -26,17 +26,18 @@
 
 from __future__ import absolute_import, print_function
 
-import datacite
-import pytest
-from invenio_pidstore.models import PersistentIdentifier, PIDStatus
-from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_records.api import Record
-from mock import patch
 from copy import deepcopy
 
+import datacite
+import pytest
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
+from invenio_records.api import Record
+from mock import patch
+
 from zenodo.modules.deposit.tasks import datacite_register
-from zenodo.modules.records.minters import zenodo_record_minter
 from zenodo.modules.records.api import ZenodoRecord
+from zenodo.modules.records.minters import zenodo_record_minter
 
 
 @patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
@@ -56,7 +57,6 @@ def test_datacite_register(dc_mock, app, db, es, minimal_record):
     # Assert calls and content
     def assert_datacite_calls_and_content(record, doi_tags, conceptdoi_tags):
         """Datacite client calls assertion helper."""
-        # import wdb; wdb.set_trace()
         assert dc_mock().metadata_post.call_count == 2
         _, doi_args, _ = dc_mock().metadata_post.mock_calls[0]
         _, conceptdoi_args, _ = dc_mock().metadata_post.mock_calls[1]

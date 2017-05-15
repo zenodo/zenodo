@@ -30,7 +30,6 @@ import idutils
 from flask import current_app
 from invenio_db import db
 from invenio_oaiserver.minters import oaiid_minter
-from invenio_pidrelations.contrib.records import RecordDraft
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
