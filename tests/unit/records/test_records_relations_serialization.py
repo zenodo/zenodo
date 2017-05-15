@@ -49,12 +49,11 @@ def test_relations_serialization(app, db, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "2"
                 },
-                "next": None,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
+                "count": 1
             }
         ]
     }
@@ -75,12 +74,11 @@ def test_relations_serialization(app, db, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "2"
                 },
-                "next": None,
+                "count": 1,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
             }
         ]
     }
@@ -107,15 +105,11 @@ def test_relations_serialization(app, db, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "3"
                 },
-                "next": {
-                    "pid_type": "recid",
-                    "pid_value": "3"
-                },
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
+                "count": 2
             }
         ]
     }
@@ -132,15 +126,11 @@ def test_relations_serialization(app, db, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "3"
                 },
-                "next": None,
+                "count": 2,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": {
-                    "pid_type": "recid",
-                    "pid_value": "2"
-                }
             }
         ]
     }

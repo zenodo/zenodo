@@ -102,12 +102,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "2"
                 },
-                "next": None,
+                "count": 1,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
             }
         ]
     }
@@ -149,12 +148,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "2"
                 },
-                "next": None,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
+                "count": 2  # For deposit, draft children are also counted
             }
         ]
     }
@@ -171,15 +169,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "2"
                 },
-                "next": None,
+                "count": 2,  # For deposit, draft children are also counted
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": {
-                    "pid_type": "recid",
-                    "pid_value": "2"
-                }
             }
         ]
     }
@@ -224,15 +218,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "3"
                 },
-                "next": {
-                    "pid_type": "recid",
-                    "pid_value": "3"
-                },
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
+                "count": 2
             }
         ]
     }
@@ -246,15 +236,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "3"
                 },
-                "next": None,
+                "count": 2,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": {
-                    "pid_type": "recid",
-                    "pid_value": "2"
-                }
             }
         ]
     }
@@ -271,15 +257,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "3"
                 },
-                "next": {
-                    'pid_type': 'recid',
-                    'pid_value': '3'
-                },
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": None
+                "count": 2
             }
         ]
     }
@@ -293,15 +275,11 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
                     "pid_type": "recid",
                     "pid_value": "3"
                 },
-                "next": None,
+                "count": 2,
                 "parent": {
                     "pid_type": "recid",
                     "pid_value": "1"
                 },
-                "previous": {
-                    "pid_type": "recid",
-                    "pid_value": "2"
-                }
             }
         ]
     }

@@ -29,8 +29,6 @@ from __future__ import absolute_import, print_function
 import json
 from datetime import datetime, timedelta
 
-from invenio_records.api import Record
-
 from zenodo.modules.records.serializers import datacite_v31
 
 
@@ -39,10 +37,10 @@ def today():
     return datetime.utcnow().date()
 
 
-def test_minimal(db, minimal_record, recid_pid):
+def test_minimal(db, minimal_record_model, recid_pid):
     """Test minimal."""
-    minimal_record['doi'] = '10.1234/foo'
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    minimal_record_model['doi'] = '10.1234/foo'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj == {
         'identifier': {'identifier': '10.1234/foo', 'identifierType': 'DOI'},
         'creators': [{'creatorName': 'Test', 'nameIdentifier': {}}],
@@ -63,21 +61,21 @@ def test_minimal(db, minimal_record, recid_pid):
     }
 
 
-def test_identifier(db, minimal_record, recid_pid):
+def test_identifier(db, minimal_record_model, recid_pid):
     """Test identifier."""
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert 'identifier' not in obj
 
 
-def test_creators(db, minimal_record, recid_pid):
+def test_creators(db, minimal_record_model, recid_pid):
     """Test creators."""
-    minimal_record.update({
+    minimal_record_model.update({
         'creators': [
             {'name': 'A', 'affiliation': 'AA', 'gnd': '1234'},
             {'name': 'B', 'affiliation': 'BA', 'orcid': '0000-0000-0000-0000',
              'gnd': '4321'},
         ]})
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['creators'] == [
         {'affiliation': 'AA', 'creatorName': 'A', 'nameIdentifier': {
             'nameIdentifier': '1234', 'nameIdentifierScheme': 'GND'}},
@@ -88,36 +86,36 @@ def test_creators(db, minimal_record, recid_pid):
     ]
 
 
-def test_embargo_date(db, minimal_record, recid_pid):
+def test_embargo_date(db, minimal_record_model, recid_pid):
     """Test embargo date."""
     dt = (today() + timedelta(days=1)).isoformat()
-    minimal_record.update({
+    minimal_record_model.update({
         'embargo_date': dt,
         'access_right': 'embargoed',
     })
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['dates'] == [
         {'dateType': 'Available', 'date': dt},
         {'dateType': 'Accepted', 'date': today().isoformat()},
     ]
 
 
-def test_subjects(db, minimal_record, recid_pid):
+def test_subjects(db, minimal_record_model, recid_pid):
     """Test subjects date."""
-    minimal_record.update({
+    minimal_record_model.update({
         'keywords': ['kw1'],
         'subjects': [{'term': 'test', 'identifier': 'id', 'scheme': 'loc'}],
     })
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['subjects'] == [
         {'subject': 'kw1'},
         {'subject': 'id', 'subjectScheme': 'loc'},
     ]
 
 
-def test_contributors(db, minimal_record, recid_pid):
+def test_contributors(db, minimal_record_model, recid_pid):
     """Test creators."""
-    minimal_record.update({
+    minimal_record_model.update({
         'contributors': [{
             'name': 'A',
             'affiliation': 'AA',
@@ -138,7 +136,7 @@ def test_contributors(db, minimal_record, recid_pid):
             },
         }],
     })
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['contributors'] == [
         {
             'affiliation': 'AA',
@@ -164,39 +162,39 @@ def test_contributors(db, minimal_record, recid_pid):
     ]
 
 
-def test_language(db, minimal_record, recid_pid):
+def test_language(db, minimal_record_model, recid_pid):
     """Test language."""
-    minimal_record['language'] = 'eng'
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    minimal_record_model['language'] = 'eng'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['language'] == 'eng'
 
 
-def test_resource_type(db, minimal_record, recid_pid):
+def test_resource_type(db, minimal_record_model, recid_pid):
     """Test language."""
-    minimal_record['resource_type'] = {'type': 'poster'}
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    minimal_record_model['resource_type'] = {'type': 'poster'}
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['resourceType'] == {
         'resourceTypeGeneral': 'Text',
         'resourceType': 'Poster',
     }
 
 
-def test_alt_ids(db, minimal_record, recid_pid):
+def test_alt_ids(db, minimal_record_model, recid_pid):
     """Test language."""
-    minimal_record.update({
+    minimal_record_model.update({
         'alternate_identifiers': [{
             'identifier': '10.1234/foo.bar',
             'scheme': 'doi'
         }],
     })
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['alternateIdentifiers'] == [{
         'alternateIdentifier': '10.1234/foo.bar',
         'alternateIdentifierType': 'doi',
     }]
 
 
-def test_related_identifiers(db, minimal_record, recid_pid):
+def test_related_identifiers(db, minimal_record_model, recid_pid):
     """Test language."""
     tests = [
         ('handle', 'Handle'),
@@ -206,7 +204,7 @@ def test_related_identifiers(db, minimal_record, recid_pid):
     ]
 
     for t, dc_t in tests:
-        minimal_record.update({
+        minimal_record_model.update({
             'related_identifiers': [{
                 'identifier': '1234',
                 'scheme': t,
@@ -217,7 +215,7 @@ def test_related_identifiers(db, minimal_record, recid_pid):
                 'relation': 'isCitedBy',
             }],
         })
-        obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+        obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
         assert obj['relatedIdentifiers'] == [{
             'relatedIdentifier': '1234',
             'relatedIdentifierType': dc_t,
@@ -225,9 +223,9 @@ def test_related_identifiers(db, minimal_record, recid_pid):
         }]
 
 
-def test_rights(db, minimal_record, recid_pid):
+def test_rights(db, minimal_record_model, recid_pid):
     """Test language."""
-    minimal_record.update({
+    minimal_record_model.update({
         'license': {
             'identifier': 'cc-by-sa',
             'license': 'Creative Commons Attribution Share-Alike',
@@ -235,7 +233,7 @@ def test_rights(db, minimal_record, recid_pid):
             'url': 'http://www.opendefinition.org/licenses/cc-by-sa'
         }
     })
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['rightsList'] == [{
         'rights': 'Open Access',
         'rightsURI': 'info:eu-repo/semantics/openAccess',
@@ -245,14 +243,14 @@ def test_rights(db, minimal_record, recid_pid):
     }]
 
 
-def test_descriptions(db, minimal_record, recid_pid):
+def test_descriptions(db, minimal_record_model, recid_pid):
     """Test language."""
-    minimal_record.update({
+    minimal_record_model.update({
         'description': 'test',
         'notes': 'again',
         'references': [{'raw_reference': 'A'}],
     })
-    obj = datacite_v31.transform_record(recid_pid, Record(minimal_record))
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['descriptions'] == [{
         'description': 'test',
         'descriptionType': 'Abstract',

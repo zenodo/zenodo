@@ -36,10 +36,6 @@ from zenodo.modules.records.serializers import marcxml_v1
 
 def test_full_record(app, db, full_record):
     """Test MARC21 serialization of full record."""
-    record = Record.create(full_record)
-    record.model.updated = datetime.utcnow()
-    assert record.validate() is None
-
     # Add embargo date and OAI-PMH set information.
     full_record['embargo_date'] = '0900-12-31'
     full_record['_oai'] = {
@@ -49,7 +45,12 @@ def test_full_record(app, db, full_record):
 
     # Create record and PID.
     record = Record.create(full_record)
-    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    pid = PersistentIdentifier.create(
+        pid_type='recid',
+        pid_value='12345',
+        object_type='rec',
+        object_uuid=record.id,
+    )
     assert record.validate() is None
 
     expected = {
@@ -277,7 +278,11 @@ def test_minimal_record(app, db, minimal_record):
     # Create record and pid.
     record = Record.create(minimal_record)
     record.model.updated = datetime.utcnow()
-    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    pid = PersistentIdentifier.create(
+            pid_type='recid',
+            pid_value='123',
+            object_type='rec',
+            object_uuid=record.id)
     assert record.validate() is None
 
     expected = {
