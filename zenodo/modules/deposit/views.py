@@ -41,7 +41,6 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
-from invenio_records_files.api import Record
 from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.records.minters import zenodo_concept_doi_minter
@@ -213,7 +212,7 @@ def registerconceptdoi(pid=None, record=None, depid=None, deposit=None):
     methods=['GET', 'POST']
 )
 @login_required
-@pass_record('delete', deposit_cls=Record)
+@pass_record('delete')
 def delete(pid=None, record=None, depid=None, deposit=None):
     """Delete a record."""
     # View disabled until properly implemented and tested.
@@ -245,24 +244,18 @@ def delete(pid=None, record=None, depid=None, deposit=None):
             pass
         # Remove buckets
         record_bucket = record.files.bucket
-        deposit_bucket = deposit.files.bucket
         RecordsBuckets.query.filter_by(record_id=record.id).delete()
-        RecordsBuckets.query.filter_by(record_id=deposit.id).delete()
         record_bucket.locked = False
         record_bucket.remove()
-        deposit_bucket.locked = False
-        deposit_bucket.remove()
-        # Remove PIDs
-        pid.delete()
-        depid.delete()
-        pv = PIDVersioning(child=pid)
-        # Concept recid will not be deleted, but will redirect to the last
-        # version of the record.
-        if conceptrecid:
-            pv.remove_child(pid)
 
-        # Remove record objects and record removal reason.
+        # Delete record PID and contents.
+        pid.delete()
         record.clear()
+
+        # NOTE: Concept recid will not be deleted, but will redirect to the
+        # last version of the record.
+        pv = PIDVersioning(child=pid)
+        pv.update_redirect()
 
         reason = form.reason.data or dict(
             current_app.config['ZENODO_REMOVAL_REASONS']
@@ -273,7 +266,9 @@ def delete(pid=None, record=None, depid=None, deposit=None):
             'removed_by': current_user.get_id(),
         })
         record.commit()
-        deposit.delete()
+
+        # Completely delete the deposit
+        deposit.delete(delete_published=True)
         db.session.commit()
         datacite_inactivate.delay(doi.pid_value)
         if conceptdoi:

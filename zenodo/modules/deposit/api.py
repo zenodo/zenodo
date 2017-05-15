@@ -32,7 +32,7 @@ from copy import copy
 from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
-from invenio_deposit.api import Deposit, preserve
+from invenio_deposit.api import Deposit, index, preserve
 from invenio_deposit.utils import mark_as_action
 from invenio_files_rest.models import Bucket, MultipartObject, Part
 from invenio_pidrelations.contrib.records import RecordDraft, index_siblings
@@ -42,7 +42,6 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.communities.api import ZenodoCommunity
-from zenodo.modules.deposit.minters import zenodo_concept_recid_minter
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
@@ -382,16 +381,15 @@ class ZenodoDeposit(Deposit):
                          user_id=user_id, agent=sip_agent)
 
         # Update the concept recid redirection
-        conceptrecid = PersistentIdentifier.get('recid',
-            record['conceptrecid'])
+        conceptrecid = PersistentIdentifier.get(
+            pid_type='recid', pid_value=record['conceptrecid'])
         if conceptrecid:
             pv = PIDVersioning(parent=conceptrecid, child=recid)
             pv.update_redirect()
             if pv.draft_child_deposit:
                 RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
 
-            index_siblings(recid, neighbors_eager=True,
-                with_deposits=True)
+            index_siblings(recid, neighbors_eager=True, with_deposits=True)
 
         return deposit
 
@@ -437,9 +435,16 @@ class ZenodoDeposit(Deposit):
         """Patch only drafts."""
         return super(ZenodoDeposit, self).patch(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        """Delete the deposit."""
-        if self['_deposit'].get('pid'):
+    @index(delete=True)
+    def delete(self, delete_published=False, *args, **kwargs):
+        """Delete the deposit.
+
+        :param delete_published: If True, even deposit of a published record
+            will be deleted (usually used by admin operations).
+        :type delete_published: bool
+        """
+        is_published = self['_deposit'].get('pid')
+        if is_published and not delete_published:
             raise PIDInvalidAction()
 
         # Delete reserved recid.
@@ -466,11 +471,10 @@ class ZenodoDeposit(Deposit):
                 db.session.delete(concept_recid)
 
         # Completely remove bucket
-        q = RecordsBuckets.query.filter_by(record_id=self.id)
-        bucket = q.one().bucket
+        bucket = self.files.bucket
         with db.session.begin_nested():
             # Remove Record-Bucket link
-            q.delete()
+            RecordsBuckets.query.filter_by(record_id=self.id).delete()
             mp_q = MultipartObject.query_by_bucket(bucket)
             # Remove multipart objects
             Part.query.filter(
@@ -478,10 +482,17 @@ class ZenodoDeposit(Deposit):
                     MultipartObject.upload_id).subquery())
             ).delete(synchronize_session='fetch')
             mp_q.delete(synchronize_session='fetch')
+        bucket.locked = False
         bucket.remove()
 
+        depid = kwargs.get('pid', self.pid)
+        if depid:
+            depid.delete()
 
-        return super(ZenodoDeposit, self).delete(*args, **kwargs)
+        # NOTE: We call the parent of Deposit, invenio_records.api.Record since
+        # we need to completely override eveything that the Deposit.delete
+        # method does.
+        return super(Deposit, self).delete(*args, **kwargs)
 
 
     @mark_as_action
@@ -533,7 +544,7 @@ class ZenodoDeposit(Deposit):
 
                 pv = PIDVersioning(child=pid)
                 index_siblings(pv.draft_child, neighbors_eager=True,
-                    with_deposits=True)
+                               with_deposits=True)
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data
