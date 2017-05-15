@@ -28,10 +28,8 @@ from __future__ import absolute_import, print_function
 
 import copy
 
-from invenio_indexer.api import RecordIndexer
 from invenio_pidrelations.contrib.records import index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_pidrelations.proxies import current_pidrelations
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
 
@@ -93,6 +91,7 @@ def indexer_receiver(sender, json=None, record=None, index=None,
                 is_last = (pv.draft_child_deposit.pid_value
                            == record['_deposit']['id'])
                 relations['version'][0]['is_last'] = is_last
+                relations['version'][0]['count'] += 1
         else:
             relations = {'version': [{'is_last': True, 'index': 0}, ]}
         if relations:
@@ -103,7 +102,7 @@ def index_versioned_record_siblings(sender, action=None, pid=None,
                                     deposit=None):
     """Send previous version of published record for indexing."""
     first_publish = (deposit.get('_deposit', {}).get('pid', {})
-                 .get('revision_id')) == 0
+                     .get('revision_id')) == 0
     if action == "publish" and first_publish:
         recid_pid, _ = deposit.fetch_published()
         print('sending for indexing siblings of', recid_pid)

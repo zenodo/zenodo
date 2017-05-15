@@ -31,8 +31,14 @@ from marshmallow import fields
 class VersionRelation(RelationSchema):
     """PID version relation schema."""
 
+    count = fields.Method('dump_count')
+
     last_child = fields.Method('dump_last_child')
     draft_child_deposit = fields.Method('dump_draft_child_deposit')
+
+    def dump_count(self, obj):
+        """Dump the number of children."""
+        return obj.children.count()
 
     def dump_last_child(self, obj):
         """Dump the last child."""
@@ -47,5 +53,5 @@ class VersionRelation(RelationSchema):
     class Meta:
         """Meta fields of the schema."""
 
-        fields = ('parent', 'next', 'previous', 'is_last', 'index',
-                  'last_child', 'draft_child_deposit')
+        fields = ('parent', 'is_last', 'index', 'last_child', 'count',
+                  'draft_child_deposit')
