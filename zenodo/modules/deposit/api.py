@@ -447,19 +447,23 @@ class ZenodoDeposit(Deposit):
         if is_published and not delete_published:
             raise PIDInvalidAction()
 
-        # Delete reserved recid.
+        # Delete the recid
         recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
 
-        # TODO: might crash for legacy saved deposits
         versioning = PIDVersioning(child=recid)
         if versioning.exists:
-            from zenodo.modules.deposit.indexer import index_siblings
-            draft_child = versioning.draft_child
-            children = versioning.children.all()
-            versioning.remove_draft_child()
-            index_siblings(draft_child, children=children,
-                           neighbors_eager=True)
+            if versioning.draft_child:
+                index_siblings(versioning.draft_child,
+                               children=versioning.children.all(),
+                               neighbors_eager=True,
+                               with_deposits=True)
+                versioning.remove_draft_child()
+            elif versioning.last_child:
+                index_siblings(versioning.last_child,
+                               children=versioning.children.all(),
+                               neighbors_eager=True,
+                               with_deposits=True)
 
         if recid.status == PIDStatus.RESERVED:
             db.session.delete(recid)
@@ -493,7 +497,6 @@ class ZenodoDeposit(Deposit):
         # we need to completely override eveything that the Deposit.delete
         # method does.
         return super(Deposit, self).delete(*args, **kwargs)
-
 
     @mark_as_action
     def newversion(self, pid=None):
