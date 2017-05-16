@@ -43,7 +43,6 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records_files.models import RecordsBuckets
 
-from zenodo.modules.records.minters import zenodo_concept_doi_minter
 from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
@@ -181,23 +180,14 @@ def newversion(pid=None, record=None, depid=None, deposit=None):
     methods=['POST']
 )
 @login_required
-@pass_record('newversion')
+@pass_record('registerconceptdoi')
 def registerconceptdoi(pid=None, record=None, depid=None, deposit=None):
     """Register the Concept DOI for the record."""
     # If the record doesn't have a DOI, its deposit shouldn't be editable.
     if 'conceptdoi' in record:
         abort(404)  # TODO: Abort with better code if record is versioned
 
-    # TODO: Should be more generic name, since it does more than that
-    zenodo_concept_doi_minter(record.id, record)
-    record.commit()
-
-    recid_pid = PersistentIdentifier.query.filter_by(
-        pid_type='recid', pid_value=str(record['recid'])).one_or_none()
-
-    if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
-        from zenodo.modules.deposit.tasks import datacite_register
-        datacite_register.delay(recid_pid.pid_value, str(record.id))
+    deposit.registerconceptdoi()
     db.session.commit()
 
     return redirect(url_for('invenio_records_ui.recid',
@@ -328,6 +318,7 @@ def to_links_js(pid, deposit=None):
         'edit': self_url + '/actions/edit',
         'publish': self_url + '/actions/publish',
         'newversion': self_url + '/actions/newversion',
+        'registerconceptdoi': self_url + '/actions/registerconceptdoi',
         'files': self_url + '/files',
     }
 
