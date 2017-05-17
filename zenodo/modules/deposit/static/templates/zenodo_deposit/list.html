@@ -143,40 +143,31 @@
     </tr>
     <tr class="ng-hide" ng-show="{{recordsVM.invenioRecordsArgs.templateParams.is_local_doi}}">
       <td colspan="3">
+        <!-- "Upgrade to versioned record" button -->
         <div align="center" class="ng-hide" ng-show="{{!recordsVM.invenioRecordsArgs.templateParams.has_conceptdoi}}">
           <p>You can upgrade this record to a versioned record. You will be able to create a new
             record version, with new files an a completely new DOI.</p>
-          <div
-            class="tooltip-wrapper"
-            bs-tooltip
-            data-container="div"
-            data-title="{{recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions ? undefined : 'Only the owner of the GitHub repository can modify the versioning of a record.'}}"
-          >
-            <button
-              class="btn btn-success"
-              ng-disabled="!recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions"
-              ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
-              data-template-url="{{recordsVM.invenioRecordsArgs.templateParams.upgradeversioningmodal_template}}"
-              ng-click="recordsVM.invenioRecordsArgs.templateParams.has_new_version_deposit "
-              bs-modal>Upgrade to versioned record</button>
-          </div>
+          <button
+            class="btn btn-success"
+            ng-show="recordsVM.invenioRecordsArgs.templateParams.is_published"
+            data-template-url="{{recordsVM.invenioRecordsArgs.templateParams.upgradeversioningmodal_template}}"
+            bs-modal>Upgrade to versioned record</button>
         </div>
-
+        <!-- "New version" button -->
         <div align="center" class="ng-hide" ng-show="{{recordsVM.invenioRecordsArgs.templateParams.has_conceptdoi}}">
           <p>If you have an updated version of your files, you can create a new
             record version, with a completely new DOI.</p>
           <div
             class="tooltip-wrapper"
-            bs-tooltip
             data-container="div"
-            data-title="{{recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions ? undefined : 'Only the owner of the GitHub repository can modify the versioning of a record.'}}"
+            data-title="{{recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions ? undefined : 'Only the owner of the latest version of this record can create new versions.'}}"
+            bs-tooltip
           >
             <button
               class="btn btn-success"
               ng-disabled="!recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions"
-              ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
+              ng-show="recordsVM.invenioRecordsArgs.templateParams.is_published"
               data-template-url="{{recordsVM.invenioRecordsArgs.templateParams.newversionmodal_template}}"
-              ng-click="recordsVM.invenioRecordsArgs.templateParams.has_new_version_deposit "
               bs-modal>New version</button>
           </div>
         </div>
