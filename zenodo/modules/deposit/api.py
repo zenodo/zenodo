@@ -456,12 +456,14 @@ class ZenodoDeposit(Deposit):
             if versioning.draft_child:
                 index_siblings(versioning.draft_child,
                                children=versioning.children.all(),
+                               include_pid=True,
                                neighbors_eager=True,
                                with_deposits=True)
                 versioning.remove_draft_child()
             elif versioning.last_child:
                 index_siblings(versioning.last_child,
                                children=versioning.children.all(),
+                               include_pid=True,
                                neighbors_eager=True,
                                with_deposits=True)
 
@@ -560,7 +562,6 @@ class ZenodoDeposit(Deposit):
                 RecordsBuckets.create(record=deposit.model, bucket=snapshot)
                 deposit.commit()
         return self
-
 
     @mark_as_action
     def registerconceptdoi(self, pid=None):

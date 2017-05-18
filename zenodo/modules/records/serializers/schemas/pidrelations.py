@@ -38,7 +38,6 @@ class VersionRelation(RelationSchema):
 
     def dump_count(self, obj):
         """Dump the number of children."""
-        # import ipdb; ipdb.set_trace()
         return obj.children.count()
 
     def dump_last_child(self, obj):

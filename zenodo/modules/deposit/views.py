@@ -223,13 +223,9 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     form = RecordDeleteForm()
     form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
     if form.validate_on_submit():
-        # Remove from index
+        # Remove record from index
         try:
             RecordIndexer().delete(record)
-        except NotFoundError:
-            pass
-        try:
-            RecordIndexer().delete(deposit)
         except NotFoundError:
             pass
         # Remove buckets
@@ -258,6 +254,7 @@ def delete(pid=None, record=None, depid=None, deposit=None):
         record.commit()
 
         # Completely delete the deposit
+        # Deposit will be removed from index
         deposit.delete(delete_published=True)
         db.session.commit()
         datacite_inactivate.delay(doi.pid_value)
