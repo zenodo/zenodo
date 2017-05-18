@@ -30,7 +30,6 @@ import idutils
 from flask import current_app
 from invenio_db import db
 from invenio_oaiserver.minters import oaiid_minter
-from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
@@ -125,38 +124,6 @@ def zenodo_concept_doi_minter(record_uuid, data):
                 overwrite=True,
             )
             return conceptdoi_pid
-
-
-def zenodo_non_versioned_concept_pids_minter(record_uuid, record):
-    """Mint the Concept RECID and DOI and set up versioning for the Record.
-
-    This minter turns a non-versioned Record into a versioned one.
-    """
-    conceptdoi_val = record.get('conceptdoi')
-    conceptrecid_val = record.get('conceptrecid')
-    if conceptdoi_val or conceptrecid_val:
-        raise ValueError("Record {0} already contains versioning "
-                         "information.".format(record_uuid))
-    doi_val = record.get('doi')
-    if not is_local_doi(doi_val):
-        raise ValueError("Record {0} contains externally-managed DOI.".format(
-            record_uuid))
-    recid_val = record.get('recid')
-    recid_pid = PersistentIdentifier.query.filter_by(
-        pid_type='recid', pid_value=str(recid_val)).one_or_none()
-
-    # Only mint Concept DOI for Zenodo DOIs
-    conceptrecid_pid = zenodo_concept_recid_minter(record_uuid, record)
-    # Register conceptrecid immediately since the record is published
-    conceptrecid_pid.register()
-    zenodo_concept_doi_minter(record_uuid, record)
-    record.commit()
-    PIDVersioning(parent=conceptrecid_pid).insert_child(recid_pid)
-    db.session.commit()
-
-    if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
-        from zenodo.modules.deposit.tasks import datacite_register
-        datacite_register.delay(recid_pid.pid_value, str(record.id))
 
 
 def zenodo_doi_minter(record_uuid, data):

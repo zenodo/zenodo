@@ -331,6 +331,11 @@ class ZenodoDeposit(Deposit):
         record = self._sync_communities(dep_comms, rec_comms, record)
         record.commit()
 
+        # Update the concept recid redirection
+        pv.update_redirect()
+        RecordDraft.unlink(record.pid, self.pid)
+        index_siblings(record.pid, neighbors_eager=True, with_deposits=True)
+
         return record
 
     def _publish_edited(self):
@@ -379,18 +384,6 @@ class ZenodoDeposit(Deposit):
         recid, record = deposit.fetch_published()
         ZenodoSIP.create(recid, record, create_sip_files=is_first_publishing,
                          user_id=user_id, agent=sip_agent)
-
-        # Update the concept recid redirection
-        conceptrecid = PersistentIdentifier.get(
-            pid_type='recid', pid_value=record['conceptrecid'])
-        if conceptrecid:
-            pv = PIDVersioning(parent=conceptrecid, child=recid)
-            pv.update_redirect()
-            if pv.draft_child_deposit:
-                RecordDraft.unlink(pv.draft_child, pv.draft_child_deposit)
-
-            index_siblings(recid, neighbors_eager=True, with_deposits=True)
-
         return deposit
 
     @classmethod
