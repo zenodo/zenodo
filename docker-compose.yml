@@ -43,6 +43,13 @@ services:
       - "/usr/local/lib/python3.5/site-packages"
       - "/usr/local/var/data"
       - ".:/code/zenodo"
+  # Monitoring
+  flower:
+    extends:
+      file: docker-services.yml
+      service: flower
+    links:
+      - mq
   # Base services
   cache:
     extends:
