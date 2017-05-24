@@ -15,8 +15,9 @@ For this guide you will need to install
 Docker installation is not necessary, although highly recommended.
 
 If you can't use docker you can run Zenodo and all of the required services
-directly in your system. Take a look at ``docker-compose.yml`` file to find out
-what is required and how the configuration looks like.
+directly in your system. Take a look at
+`docker-compose.yml <https://github.com/zenodo/zenodo/blob/master/docker-compose.yml/>`_
+file to find out what is required and how the configuration looks like.
 For development you will need to set-up an configure
 four services: PostgreSQL (``db``), Elasticsearch (``es``),
 Redis (``cache``) and RabbitMQ (``mq``).
@@ -189,7 +190,7 @@ As before, there is a script which does that (this time without sudo):
 Running services
 ~~~~~~~~~~~~~~~~
 
-To run Zenodo locally, you will need to have some services runninig on your
+To run Zenodo locally, you will need to have some services running on your
 machine.
 At minimum you must have PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ.
 You can either install all of those from your system package manager and run
@@ -210,7 +211,7 @@ To run only the essential services using docker, execute the following:
     $ cd ~/src/zenodo
     $ docker-compose up db es mq cache
 
-This should bring up four docker nodes with PostgreSQL (db) Elasticsearch (es),
+This should bring up four docker nodes with PostgreSQL (db), Elasticsearch (es),
 RabbitMQ (mq), and Redis (cache). Keep this shell session alive.
 
 Initialization
@@ -225,6 +226,23 @@ Create the database and Elasticsearch indices in a new shell session:
    $ cd ~/src/zenodo
    $ workon zenodo
    (zenodo)$ ./scripts/init.sh
+
+.. note::
+
+    Here we assume all four services (db, es, mq, cache) are bound to localhost
+    (see `zenodo/config.py <https://github.com/zenodo/zenodo/blob/master/zenodo/config.py/>`_).
+    If you fail to connect those services, it is likely
+    you are running docker through ``docker-machine`` and those services are
+    bound to other IP addresses. In this case, you can redirect localhost ports
+    to docker ports as follows.
+
+    ``ssh -L 6379:localhost:6379 -L 5432:localhost:5432 -L 9200:localhost:9200 -L 5672:localhost:5672 docker@$(docker-machine ip)``
+
+    The problem usually occurs among Mac and Windows users. A better solution
+    is to install the native apps `Docker for Mac <https://docs.docker.com/docker-for-mac/>`_
+    or `Docker for Windows <https://docs.docker.com/docker-for-windows/>`_
+    (available since Docker v1.12) if possible,
+    which binds docker to localhost by default.
 
 Demo records
 ~~~~~~~~~~~~
@@ -264,7 +282,7 @@ Finally, run the Zenodo application:
     (zenodo)$ zenodo run
 
 If you go to http://localhost:5000, you should see an instance of Zenodo,
-similar to the production instance at https://zenodo.org
+similar to the production instance at https://zenodo.org.
 
 .. note::
 
@@ -284,5 +302,5 @@ similar to the production instance at https://zenodo.org
 Badges
 ~~~~~~
 In order for the DOI badges to work you must have the Cairo SVG library and the
-DejaVu Sans font installed on your system . Please see `Invenio-Formatter
+DejaVu Sans font installed on your system. Please see `Invenio-Formatter
 <http://pythonhosted.org/invenio-formatter/installation.html>`_ for details.
