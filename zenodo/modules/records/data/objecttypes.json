@@ -123,7 +123,7 @@
   "datacite": {"general": "Software"},
   "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "http://schema.org/Code",
-  "csl": "dataset"
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
@@ -250,7 +250,7 @@
   "datacite": {"general": "Text", "type": "Report"},
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
-  "csl": "report"
+  "csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
