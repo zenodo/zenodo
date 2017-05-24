@@ -349,8 +349,10 @@ def has_newversion_permission(user, record):
     if conceptrecid:
         conceptrecid = PersistentIdentifier.get('recid', conceptrecid)
         pv = PIDVersioning(parent=conceptrecid)
-        latest_record = ZenodoRecord.get_record(pv.last_child.object_uuid)
-        return has_update_permission(user, latest_record)
+        latest_recid = pv.last_child
+        if latest_recid:
+            latest_record = ZenodoRecord.get_record(pv.last_child.object_uuid)
+            return has_update_permission(user, latest_record)
     return has_update_permission(user, record)
 
 

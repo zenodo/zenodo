@@ -496,7 +496,8 @@ class ZenodoDeposit(Deposit):
     @mark_as_action
     def newversion(self, pid=None):
         """Create a new version deposit."""
-        assert self.is_published()
+        if not self.is_published():
+            raise PIDInvalidAction()
 
         # Check that there is not a newer draft version for this record
         pid, record = self.fetch_published()

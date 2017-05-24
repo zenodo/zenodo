@@ -28,6 +28,8 @@ from __future__ import absolute_import, print_function
 
 import copy
 
+from flask import current_app
+
 from invenio_pidrelations.contrib.records import index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations
@@ -105,5 +107,5 @@ def index_versioned_record_siblings(sender, action=None, pid=None,
                      .get('revision_id')) == 0
     if action == "publish" and first_publish:
         recid_pid, _ = deposit.fetch_published()
-        print('sending for indexing siblings of', recid_pid)
+        current_app.logger.info('sending for indexing siblings of', recid_pid)
         index_siblings(recid_pid, neighbors_eager=True)

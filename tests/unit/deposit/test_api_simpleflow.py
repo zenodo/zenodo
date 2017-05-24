@@ -44,7 +44,7 @@ def get_json(response, code=None):
 
 
 def make_file_fixture(filename, text=None):
-    """Generate a PDF fixture."""
+    """Generate a file fixture."""
     content = text or filename.encode('utf8')
     return (BytesIO(content), filename)
 
@@ -312,3 +312,104 @@ def test_delete_deposits_users(api, api_client, db, users, deposit,
                 headers=json_headers
             )
             assert res.status_code == status
+
+
+@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
+def test_versioning_rest_flow(datacite_mock, api, api_client, db, es, location,
+                              users, write_token, license_record):
+    client = api_client
+    test_data = dict(
+        metadata=dict(
+            upload_type='presentation',
+            title='Test title',
+            creators=[
+                dict(name='Doe, John', affiliation='Atlantis'),
+                dict(name='Smith, Jane', affiliation='Atlantis')
+            ],
+            description='Test Description',
+            publication_date='2013-05-08',
+            access_right='open'
+        )
+    )
+
+    # Prepare headers
+    auth = write_token['auth_header']
+    headers = [
+        ('Content-Type', 'application/json'),
+        ('Accept', 'application/json')
+    ]
+    auth_headers = headers + auth
+
+    # Get deposit URL
+    with api.test_request_context():
+        deposit_url = url_for('invenio_deposit_rest.depid_list')
+
+    # Create deposit
+    response = client.post(
+        deposit_url, data=json.dumps(test_data), headers=auth_headers)
+    data = get_json(response, code=201)
+
+    links = data['links']
+
+    # Get deposition
+    current_search.flush_and_refresh(index='deposits')
+    response = client.get(links['self'], headers=auth)
+    data = get_json(response, code=200)
+    links = data['links']
+
+    # Upload a file
+    response = client.post(
+        links['files'],
+        data={
+            'file': make_file_fixture('test-1.txt'),
+            'name': 'test-1.txt',
+        },
+        headers=auth,
+    )
+    assert response.status_code == 201
+
+    # Cannot create new version for unpublished record
+    response = client.post(links['newversion'], headers=auth_headers)
+    assert response.status_code == 403
+
+    # Publish deposition
+    response = client.post(links['publish'], headers=auth_headers)
+    assert response.status_code == 202
+
+    # New version possible for published deposit
+    response = client.post(links['newversion'], headers=auth_headers)
+    assert response.status_code == 201
+
+    # Calling again new version is a no-op
+    response = client.post(links['newversion'], headers=auth_headers)
+    links = get_json(response, code=201)['links']
+    assert 'latest_draft' in links
+
+    # Get the new version deposit
+    current_search.flush_and_refresh(index='deposits')
+    response = client.get(links['latest_draft'], headers=auth)
+    data = get_json(response, code=200)
+    links = data['links']
+
+    # Deleting files allowed for new version
+    response = client.get(links['files'], headers=auth_headers)
+    data = get_json(response, code=200)
+    files_list = list(map(lambda x: {'id': x['id']}, data))
+    file_url = '{0}/{1}'.format(links['files'], files_list[0]['id'])
+    response = client.delete(file_url, headers=auth)
+    assert response.status_code == 204
+
+    # Adding files allowed for new version
+    response = client.post(
+        links['files'],
+        data={
+            'file': make_file_fixture('test-2.txt'),
+            'name': 'test-2.txt',
+        },
+        headers=auth,
+    )
+    assert response.status_code == 201
+
+    # Publish new verision
+    response = client.post(links['publish'], headers=auth_headers)
+    assert response.status_code == 202
