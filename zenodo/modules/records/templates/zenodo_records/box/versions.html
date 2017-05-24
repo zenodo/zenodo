@@ -14,7 +14,6 @@
           <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid_version.pid_value) }}">Version {{ current_version_index + 1 }}</a>
           <small class="text-muted">10.5281/zenodo.{{pid_version.pid_value}}</small>
         </td>
-        <td align="right"><small class="text-muted">{{pid.updated|dateformat(format='medium')}}</small></td>
       </tr>
     {%- endfor %}
     {%- if active_versions|length > 5 %}
@@ -25,7 +24,6 @@
             <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value) }}">Version {{ pid_version_index + 1 }}</a>
             <small class="text-muted">10.5281/zenodo.{{pid.pid_value}}</small>
           </td>
-          <td align="right"><small class="text-muted">{{pid.created|dateformat(format='medium')}}</small></td>
         </tr>
       {% endif %}
       {% set q = {"conceptrecid": record.conceptrecid}|make_query %}
