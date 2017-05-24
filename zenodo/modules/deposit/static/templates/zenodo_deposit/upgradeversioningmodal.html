@@ -1,0 +1,18 @@
+<div class="modal center" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" role="button" class="close" aria-label="Close" ng-click="$hide()"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title">Upgrade to versioned record</h1>
+      </div>
+      <div class="modal-body">
+        <p>This action will turn this record into a versioned record. This operation is not reversible.</p>
+        <p>A Concept DOI will be minted, which will refer to this and future versions of this record.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close">Close</button>
+        <button type="button" class="btn btn-success" ng-click="recordsVM.actionHandler(['registerconceptdoi', 'POST'], 'html') && $hide()" aria-label="Close">Upgrade to versioned record</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -32,10 +32,15 @@ from flask import current_app
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_github.api import GitHubRelease
+from invenio_github.models import Release, ReleaseStatus
 from invenio_github.utils import get_contributors, get_owner
 from invenio_indexer.api import RecordIndexer
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
+from werkzeug.utils import cached_property
 
 from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.records.api import ZenodoRecord
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
@@ -66,13 +71,40 @@ class ZenodoGitHubRelease(GitHubRelease):
         """Return repository model from relationship."""
         return self.model.repository
 
+    @cached_property
+    def recid(self):
+        """Get RECID object for the Release record."""
+        if self.record:
+            return PersistentIdentifier.get('recid', str(self.record['recid']))
+
     def publish(self):
         """Publish GitHub release as record."""
         id_ = uuid.uuid4()
+        deposit_metadata = dict(self.metadata)
         deposit = None
         try:
             db.session.begin_nested()
-            deposit = self.deposit_class.create(self.metadata, id_=id_)
+            # TODO: Add filter on Published releases
+            previous_releases = self.model.repository.releases.filter_by(
+                status=ReleaseStatus.PUBLISHED)
+            versioning = None
+            stashed_draft_child = None
+            if previous_releases.count():
+                last_release = previous_releases.order_by(
+                        Release.created.desc()).first()
+                last_recid = PersistentIdentifier.get(
+                    'recid', last_release.record['recid'])
+                versioning = PIDVersioning(child=last_recid)
+                last_record = ZenodoRecord.get_record(
+                    versioning.last_child.get_assigned_object())
+                deposit_metadata['conceptrecid'] = last_record['conceptrecid']
+                deposit_metadata['conceptdoi'] = last_record['conceptdoi']
+                if versioning.draft_child:
+                    stashed_draft_child = versioning.draft_child
+                    versioning.remove_draft_child()
+
+            deposit = self.deposit_class.create(deposit_metadata, id_=id_)
+
             deposit['_deposit']['created_by'] = self.event.user_id
             deposit['_deposit']['owners'] = [self.event.user_id]
 
@@ -82,7 +114,8 @@ class ZenodoGitHubRelease(GitHubRelease):
                 # Content-Length.
                 res = self.gh.api.session.head(url, allow_redirects=True)
                 # Now, download the file
-                res = self.gh.api.session.get(url, stream=True)
+                res = self.gh.api.session.get(url, stream=True,
+                                              allow_redirects=True)
                 if res.status_code != 200:
                     raise Exception(
                         "Could not retrieve archive from GitHub: {url}"
@@ -108,11 +141,16 @@ class ZenodoGitHubRelease(GitHubRelease):
             }
             deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
             self.model.recordmetadata = deposit.model
+            if versioning and stashed_draft_child:
+                versioning.insert_draft_child(stashed_draft_child)
             db.session.commit()
 
             # Send Datacite DOI registration task
             recid_pid, record = deposit.fetch_published()
             datacite_register.delay(recid_pid.pid_value, str(record.id))
+
+            # Index the record
+            RecordIndexer().index_by_id(str(record.id))
         except Exception:
             db.session.rollback()
             # Remove deposit from index since it was not commited.

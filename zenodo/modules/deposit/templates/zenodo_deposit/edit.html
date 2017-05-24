@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -184,66 +184,99 @@
   </script>
 {%- endblock javascript %}
 
-{%- block page_body %}
 {%- set is_published = record.is_published and record.is_published() %}
-  <div class="container">
-    <div id="invenio-records">
-    <invenio-files-uploader
-        method="PUT"
-        endpoint="{{config.DEPOSIT_FILES_API}}"
-        {%- if pid %}
-        action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
-        {%- else %}
-        initialization="{{ config.DEPOSIT_SEARCH_API }}"
-        {%- endif %}
-        files='{{record|tofilesjs|tojson}}'
-       >
-      <invenio-records
-        {%- if pid %}
-        initialization="{{ config.DEPOSIT_RECORDS_API.format(pid_value=pid.pid_value) }}"
-        links='{{pid|tolinksjs(record)|tojson}}'
-        {%- else %}
-        initialization="{{ config.DEPOSIT_SEARCH_API }}"
-        {%- endif %}
-        extra-params='{"headers":{"Content-Type": "application/json"}}'
-        template-params='{"is_published": {{"true" if is_published else "false"}}, "messages": {{ config.DEPOSIT_UI_RESPONSE_MESSAGES | tojson }} }'
-        {% if community %}
-        record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson}}'
-        {% else %}
-        record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat()} | tojson}}'
-        {% endif %}
-        form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
-        schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}"
+{%- set pid_versioning = (record.conceptrecid|pid_from_value|to_versioning_api(child=False)) if record.conceptrecid else None %}
+{%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
+{%- set has_conceptdoi = "conceptdoi" in record %}
+{%- set new_version_depid = pid_versioning and pid_versioning.draft_child_deposit %}
+{%- set has_new_version_deposit = new_version_depid and (pid_versioning.children.all()|length > 0) %}
+{%- set is_new_version = has_new_version_deposit and new_version_depid == pid  %}
+{%- set has_versioning_permissions = is_published and (current_user|has_record_perm(record, 'newversion')) %}
+
+{%- set deposit_template_params = {
+  'messages': config.DEPOSIT_UI_RESPONSE_MESSAGES,
+  'is_published': is_published or False,
+  'is_local_doi': is_local_doi or False,
+  'has_conceptdoi': has_conceptdoi or False,
+  'is_new_version': is_new_version or False,
+  'has_versioning_permissions': has_versioning_permissions or False,
+  'has_new_version_deposit': has_new_version_deposit or False,
+  'newversionmodal_template': url_for('static', filename='templates/zenodo_deposit/neweversionmodal.html'),
+  'upgradeversioningmodal_template': url_for('static', filename='templates/zenodo_deposit/upgradeversioningmodal.html')
+} %}
+
+
+{# Show banner alert if there's a new verion draft #}
+{%- if pid_versioning and pid_versioning.exists and pid_versioning.draft_child_deposit and pid_versioning.draft_child_deposit != pid %}
+  {%- set draft_deposit_url = url_for('invenio_deposit_ui.depid', pid_value=pid_versioning.draft_child_deposit.pid_value) %}
+  {%- set draft_deposit_msg %}
+    There is a new version of the upload being edited <a class="alert-link" href="{{draft_deposit_url}}">here</a>.
+  {%- endset %}
+  {%- set banner_messages = banner_messages|d([]) + [('warning', draft_deposit_msg|safe)] %}
+{%- endif %}
+
+
+{%- block page_body %}
+<div class="container">
+  <div id="invenio-records">
+  <invenio-files-uploader
+      method="PUT"
+      endpoint="{{config.DEPOSIT_FILES_API}}"
+      {%- if pid %}
+      action="{{ config.DEPOSIT_RECORDS_API|format(pid_value=pid.pid_value) }}"
+      {%- else %}
+      initialization="{{ config.DEPOSIT_SEARCH_API }}"
+      {%- endif %}
+      files='{{record|tofilesjs|tojson}}'
       >
-        <invenio-records-alert
-          template="{{ url_for('static', filename='templates/zenodo_deposit/alert.html') }}">
-        </invenio-records-alert>
-        <invenio-records-actions
-          template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
-        </invenio-records-actions>
-        {%- if is_published %}
-        <h1>Edit upload</h1>
-        {%- else %}
-        <h1>New upload</h1>
-        {%- endif %}
-        {%- if community %}
-        <h4 class="text-muted">{{community.title}}</h4>
-        {%- endif %}
-        <p class="text-muted"><small><strong>Instructions:</strong> (i) Upload minimum one file or fill-in required fields (marked with a <span class="field-required">red star</span> ). (ii) Press "Save" to save your upload for editing later. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
-        </p>
-        <invenio-files-list
-          template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FILESLIST) }}">
-        </invenio-files-list>
-        <invenio-records-form
-          form-templates='{{ config.DEPOSIT_FORM_TEMPLATES | tojson }}'
-          form-templates-base="{{ url_for('static', filename=config.DEPOSIT_FORM_TEMPLATES_BASE) }}"
-          template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FORM) }}">
-        </invenio-records-form>
-        <invenio-records-actions
-          template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
-        </invenio-records-actions>
-      </invenio-records>
-    </invenio-files-uploader>
-    </div>
+    <invenio-records
+      {%- if pid %}
+      initialization="{{ config.DEPOSIT_RECORDS_API.format(pid_value=pid.pid_value) }}"
+      links='{{pid|tolinksjs(record)|tojson}}'
+      {%- else %}
+      initialization="{{ config.DEPOSIT_SEARCH_API }}"
+      {%- endif %}
+      extra-params='{"headers":{"Content-Type": "application/json"}}'
+      template-params='{{ deposit_template_params | tojson }}'
+      {% if community %}
+      record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson}}'
+      {% else %}
+      record='{{ record | serialize_record(pid, "deposit_formjson_v1") or {"publication_date": current_date.isoformat()} | tojson }}'
+      {% endif %}
+      form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
+      schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}"
+    >
+      <invenio-records-alert
+        template="{{ url_for('static', filename='templates/zenodo_deposit/alert.html') }}">
+      </invenio-records-alert>
+      <invenio-records-actions
+        template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
+      </invenio-records-actions>
+      {%- if is_published %}
+      <h1>Edit upload</h1>
+      {%- elif is_new_version %}
+      <h1>New version</h1>
+      {%- else %}
+      <h1>New upload</h1>
+      {%- endif %}
+      {%- if community %}
+      <h4 class="text-muted">{{community.title}}</h4>
+      {%- endif %}
+      <p class="text-muted"><small><strong>Instructions:</strong> (i) Upload minimum one file or fill-in required fields (marked with a <span class="field-required">red star</span> ). (ii) Press "Save" to save your upload for editing later. (iii) When ready, press "Publish" to finalize and make your upload public.</small>
+      </p>
+      <invenio-files-list
+        template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FILESLIST) }}">
+      </invenio-files-list>
+      <invenio-records-form
+        form-templates='{{ config.DEPOSIT_FORM_TEMPLATES | tojson }}'
+        form-templates-base="{{ url_for('static', filename=config.DEPOSIT_FORM_TEMPLATES_BASE) }}"
+        template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_FORM) }}">
+      </invenio-records-form>
+      <invenio-records-actions
+        template="{{ url_for('static', filename=config.DEPOSIT_UI_JSTEMPLATE_ACTIONS) }}">
+      </invenio-records-actions>
+    </invenio-records>
+  </invenio-files-uploader>
   </div>
+</div>
 {%- endblock %}

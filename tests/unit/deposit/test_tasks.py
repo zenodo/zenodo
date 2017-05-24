@@ -26,33 +26,90 @@
 
 from __future__ import absolute_import, print_function
 
+from copy import deepcopy
+
 import datacite
 import pytest
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from mock import patch
 
 from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.minters import zenodo_record_minter
 
 
 @patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
 def test_datacite_register(dc_mock, app, db, es, minimal_record):
-    # Create a reserved recid
-    record = Record.create(minimal_record)
-    record_uuid = record.id
-    recid = record['recid']
-    recid_pid = PersistentIdentifier.create(
-        'recid', recid, status=PIDStatus.RESERVED)
 
-    # Mint the record
-    zenodo_record_minter(record_uuid, record)
-    record.commit()
+    doi_tags = [
+        '<identifier identifierType="DOI">{doi}</identifier>',
+        ('<relatedIdentifier relatedIdentifierType="DOI" '
+         'relationType="IsPartOf">{conceptdoi}</relatedIdentifier>'),
+    ]
+    conceptdoi_tags = [
+        '<identifier identifierType="DOI">{conceptdoi}</identifier>',
+    ]
+    has_part_tag = ('<relatedIdentifier relatedIdentifierType="DOI" '
+                    'relationType="HasPart">{doi}</relatedIdentifier>')
+
+    # Assert calls and content
+    def assert_datacite_calls_and_content(record, doi_tags, conceptdoi_tags):
+        """Datacite client calls assertion helper."""
+        assert dc_mock().metadata_post.call_count == 2
+        _, doi_args, _ = dc_mock().metadata_post.mock_calls[0]
+        _, conceptdoi_args, _ = dc_mock().metadata_post.mock_calls[1]
+        assert all([t.format(**record) in doi_args[0] for t in doi_tags])
+        assert all([t.format(**record) in conceptdoi_args[0]
+                    for t in conceptdoi_tags])
+
+        dc_mock().doi_post.call_count == 2
+        dc_mock().doi_post.assert_any_call(
+            record['doi'],
+            'https://zenodo.org/record/{}'.format(record['recid']))
+        dc_mock().doi_post.assert_any_call(
+            record['conceptdoi'],
+            'https://zenodo.org/record/{}'.format(record['conceptrecid']))
+
+    # Create conceptrecid for the records
+    conceptrecid = PersistentIdentifier.create(
+        'recid', '100', status=PIDStatus.RESERVED)
+
+    def create_versioned_record(recid_value, conceptrecid):
+        """Utility function for creating versioned records."""
+        recid = PersistentIdentifier.create(
+            'recid', recid_value, status=PIDStatus.RESERVED)
+        pv = PIDVersioning(parent=conceptrecid)
+        pv.insert_draft_child(recid)
+
+        record_metadata = deepcopy(minimal_record)
+        record_metadata['conceptrecid'] = conceptrecid.pid_value
+        record_metadata['recid'] = int(recid.pid_value)
+        record = ZenodoRecord.create(record_metadata)
+        zenodo_record_minter(record.id, record)
+        record.commit()
+
+        return recid, record
+
+    # Create a reserved recid
+    recid1, r1 = create_versioned_record('101', conceptrecid)
     db.session.commit()
 
-    datacite_register(recid_pid.pid_value, str(record_uuid))
-    dc_mock().doi_post.assert_called_once_with(
-        record['doi'], 'https://zenodo.org/record/{}'.format(recid))
+    datacite_register(recid1.pid_value, str(r1.id))
+
+    conceptdoi_tags.append(has_part_tag.format(**r1))
+    assert_datacite_calls_and_content(r1, doi_tags, conceptdoi_tags)
+
+    # Create a new version
+    recid2, r2 = create_versioned_record('102', conceptrecid)
+    db.session.commit()
+
+    dc_mock().reset_mock()
+    datacite_register(recid2.pid_value, str(r2.id))
+
+    conceptdoi_tags.append(has_part_tag.format(**r2))
+    assert_datacite_calls_and_content(r2, doi_tags, conceptdoi_tags)
 
 
 @patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')

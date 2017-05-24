@@ -27,8 +27,12 @@
 import uuid
 
 from flask import abort, request
+from invenio_pidstore.models import PersistentIdentifier
+from six import string_types
 from werkzeug.local import LocalProxy
 from werkzeug.routing import PathConverter
+
+from zenodo.modules.records.api import ZenodoRecord
 
 
 def file_id_to_key(value):
@@ -58,3 +62,30 @@ class FileKeyConverter(PathConverter):
     def to_python(self, value):
         """Lazily convert value from UUID to key if need be."""
         return LocalProxy(lambda: file_id_to_key(value))
+
+
+def get_all_deposit_siblings(deposit):
+    """Get all siblings of the deposit."""
+    from invenio_pidstore.models import PersistentIdentifier
+    from invenio_pidrelations.contrib.versioning import PIDVersioning
+    recid = deposit['recid']
+    rec_pid = PersistentIdentifier.get(pid_type='recid', pid_value=str(recid))
+    pv = PIDVersioning(child=rec_pid)
+    return [pid.get_assigned_object() for pid in pv.children]
+
+
+def fetch_depid(pid):
+    """Fetch depid from any pid."""
+    try:
+        if isinstance(pid, PersistentIdentifier):
+            if pid.pid_type == 'depid':
+                return pid
+            elif pid.pid_type == 'recid':
+                return ZenodoRecord.get_record(pid.object_uuid).depid
+        elif isinstance(pid, (string_types, int)):
+            return PersistentIdentifier.get('depid', pid_value=pid)
+        else:
+            raise Exception('"[{}] cannot be resolved to depid'.format(pid))
+    except Exception:
+        # FIXME: Handle or let it bubble
+        pass

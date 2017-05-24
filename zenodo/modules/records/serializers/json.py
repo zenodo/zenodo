@@ -28,8 +28,12 @@ from __future__ import absolute_import, print_function
 
 from flask import has_request_context
 from flask_security import current_user
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_records_files.api import Record
 from invenio_records_rest.serializers.json import JSONSerializer
+
+from zenodo.modules.records.serializers.pidrelations import \
+    serialize_related_identifiers
 
 from ..permissions import has_read_files_permission
 
@@ -51,6 +55,14 @@ class ZenodoJSONSerializer(JSONSerializer):
             if not has_request_context() or has_read_files_permission(
                     current_user, record):
                 result['files'] = record['_files']
+
+        # Serialize PID versioning as related identifiers
+        pv = PIDVersioning(child=pid)
+        if pv.exists:
+            rels = serialize_related_identifiers(pid)
+            if rels:
+                result['metadata'].setdefault(
+                    'related_identifiers', []).extend(rels)
         return result
 
     def dump(self, obj, context=None):

@@ -166,9 +166,30 @@
       "description": "Invenio record identifier (integer).",
       "type": "number"
     },
+    "conceptrecid": {
+      "description": "Invenio record identifier (integer).",
+      "type": "string"
+    },
     "doi": {
       "description": "Digital Object Identifier (DOI).",
       "type": "string"
+    },
+    "conceptdoi": {
+      "description": "Digital Object Identifier (DOI).",
+      "type": "string"
+    },
+    "relations": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "object",
+          "properties": {
+            "parent": {
+              "type": "string"
+            }
+          }
+        }
+      }
     },
     "resource_type": {
       "description": "Record resource type.",

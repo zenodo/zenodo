@@ -150,3 +150,93 @@ def test_bucket_create_publish(api_client, deposit, json_auth_headers,
     # Delete deposit not allowed
     res = client.delete(links['self'], headers=auth)
     assert res.status_code == 403
+
+
+def test_bucket_new_version(api_client, deposit, json_auth_headers,
+                            deposit_url, get_json, license_record,
+                            auth_headers, minimal_deposit):
+    """Test bucket features on record new version."""
+    client = api_client
+    headers = json_auth_headers
+    auth = auth_headers
+
+    # Create deposit
+    res = client.post(
+        deposit_url, data=json.dumps(minimal_deposit), headers=headers)
+    links = get_json(res, code=201)['links']
+    current_search.flush_and_refresh(index='deposits')
+
+    # Upload file
+    res = client.put(
+        links['bucket'] + '/test.txt',
+        input_stream=BytesIO(b'testfile'),
+        headers=auth,
+    )
+    assert res.status_code == 200
+
+    # Publish deposit
+    res = client.post(links['publish'], headers=auth)
+    data = get_json(res, code=202)
+
+    # Get record
+    res = client.get(data['links']['record'])
+    data = get_json(res, code=200)
+    rec_v1_bucket = data['links']['bucket']
+
+    # Get deposit
+    res = client.get(links['self'], headers=auth)
+    links = get_json(res, code=200)['links']
+    dep_v1_bucket = links['bucket']
+
+    # Create new version
+    res = client.post(links['newversion'], headers=auth)
+    data = get_json(res, code=201)
+
+    # Get new version deposit
+    res = client.get(data['links']['latest_draft'], headers=auth)
+    data = get_json(res, code=200)
+    dep_v2_publish = data['links']['publish']
+    dep_v2_bucket = data['links']['bucket']
+
+    # Assert that all the buckets are different
+    assert len(set([rec_v1_bucket, dep_v1_bucket, dep_v2_bucket])) == 3
+
+    # Get file from old version deposit bucket
+    res = client.get(dep_v1_bucket + '/test.txt', headers=auth)
+    dep_v1_file_data = res.get_data(as_text=True)
+
+    # Get file from old version record bucket
+    res = client.get(rec_v1_bucket + '/test.txt')
+    rec_v1_file_data = res.get_data(as_text=True)
+
+    # Get file from new version deposit bucket
+    res = client.get(dep_v2_bucket + '/test.txt', headers=auth)
+    dep_v2_file_data = res.get_data(as_text=True)
+
+    # Assert that the file is the same in the new version
+    assert rec_v1_file_data == dep_v1_file_data == dep_v2_file_data
+
+    # Record bucket is unlocked.
+    res = client.put(
+        dep_v2_bucket + '/newfile.txt',
+        input_stream=BytesIO(b'testfile2'),
+        headers=auth,
+    )
+    assert res.status_code == 200
+
+    # Deleting files in new version deposit bucket is allowed
+    res = client.delete(dep_v2_bucket + '/newfile.txt', headers=auth)
+    assert res.status_code == 204
+
+    # Publish new version deposit
+    res = client.post(dep_v2_publish, headers=auth)
+    data = get_json(res, code=202)
+
+    # Get record
+    res = client.get(data['links']['record'])
+    data = get_json(res, code=200)
+    rec_v2_bucket = data['links']['bucket']
+
+    # Assert that all the buckets are different
+    assert len(set(
+        [rec_v1_bucket, rec_v2_bucket, dep_v1_bucket, dep_v2_bucket])) == 4

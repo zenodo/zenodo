@@ -21,10 +21,29 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+
+{# Records with no DOI or deposit cannot be edited #}
+{%- set edit_disabled = not (record.doi and record._deposit.id) %}
+
 {%- if current_user|has_record_perm(record, 'update') %}
 <form action="{{ url_for('zenodo_deposit.edit', pid_value=pid.pid_value) }}" method="POST">
-    <button class="btn btn-warning btn-block" type="submit" {{ 'disabled' if not record.doi or not record._deposit.id else ''}}><i class="fa fa-pencil-square-o"></i> Edit</button>
+  <button class="btn btn-warning btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}><i class="fa fa-pencil-square-o"></i> Edit</button>
 </form>
+{%- endif %}
+
+{# Only local DOIs can be versioned  #}
+{%- if record.doi|doi_locally_managed and current_user|has_record_perm(record, 'newversion') %}
+  {# Already versioned record #}
+  {%- if record.conceptdoi %}
+    <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
+      <button class="btn btn-success btn-block" type="submit" data-placement="left" data-toggle="tooltip" title="{{_('You should only create a new version if you want to update the files of this upload. Keep in mind that new versions get a new DOI.')}}" {{ 'disabled' if edit_disabled else ''}}>New version</button>
+    </form>
+  {# Non-versioned record but can be upgraded #}
+  {%- elif current_user|has_record_perm(record, 'newversion') %}
+    <form action="{{ url_for('zenodo_deposit.registerconceptdoi', pid_value=record.recid)}}" method="POST">
+      <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>Upgrade to versioned record</button>
+    </form>
+  {%- endif %}
 {%- endif %}
 {%- if current_user|has_record_perm(record, 'delete') %}
 <!-- Single button -->

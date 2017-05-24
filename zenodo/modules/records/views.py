@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -34,12 +34,16 @@ import six
 from flask import Blueprint, current_app, render_template, request
 from flask_principal import ActionNeed
 from invenio_access.permissions import DynamicPermission
-from invenio_communities.models import Community, InclusionRequest
+from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
-from invenio_pidstore.models import PIDStatus
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
+
+from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.github.utils import is_github_owner, is_github_versioned
+from zenodo.modules.records.utils import is_doi_locally_managed
 
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
@@ -73,16 +77,6 @@ def is_embargoed(embargo_date, accessright=None):
     return False
 
 
-@blueprint.app_template_filter()
-def accessright_get(value, embargo_date=None):
-    """Get access right.
-
-    Better than comparing record.access_right directly as access_right
-    may have not yet been updated after the embargo_date has passed.
-    """
-    return AccessRight.get(value, embargo_date)
-
-
 @blueprint.app_template_filter('pidstatus')
 def pidstatus_title(pid):
     """Get access right.
@@ -91,6 +85,16 @@ def pidstatus_title(pid):
     may have not yet been updated after the embargo_date has passed.
     """
     return PIDStatus(pid.status).title
+
+
+@blueprint.app_template_filter()
+def accessright_get(value, embargo_date=None):
+    """Get access right.
+
+    Better than comparing record.access_right directly as access_right
+    may have not yet been updated after the embargo_date has passed.
+    """
+    return AccessRight.get(value, embargo_date)
 
 
 @blueprint.app_template_filter()
@@ -150,7 +154,7 @@ def zenodo_related_links(record, communities):
 
     def match_rules(item):
         rs = []
-        for c in communities:
+        for c in set(communities):
             if c.id in current_app.config['ZENODO_RELATION_RULES']:
                 rules = current_app.config['ZENODO_RELATION_RULES'][c.id]
                 for r in rules:
@@ -262,6 +266,28 @@ def pid_url(identifier, scheme=None, url_scheme='https'):
     return ''
 
 
+@blueprint.app_template_filter('doi_locally_managed')
+def doi_locally_managed(pid):
+    """Determine if DOI is managed locally."""
+    return is_doi_locally_managed(pid)
+
+
+@blueprint.app_template_filter()
+def pid_from_value(pid_value, pid_type='recid'):
+    """Determine if DOI is managed locally."""
+    try:
+        return PersistentIdentifier.get(pid_type=pid_type, pid_value=pid_value)
+    except Exception:
+        pass
+
+
+#
+# GitHub template filters
+#
+blueprint.add_app_template_test(is_github_versioned, name='github_versioned')
+blueprint.add_app_template_test(is_github_owner, name='github_owner')
+
+
 def records_ui_export(pid, record, template=None, **kwargs):
     """Record serialization view.
 
@@ -305,14 +331,14 @@ def _can_curate(community, user, record, accepted=False):
 def community_curation(record, user):
     """Generate a list of pending and accepted communities with permissions.
 
-    Return a 2-tuple containing two lists, first for 'pending' and second
-    for 'accepted' communities. Each item in both of the list is another
-    2-tuple of (Community, bool), describing community itself,
-    and the permission (bool) to curate it.
+    Return a 4-tuple of lists (in order):
+     * 'pending' communities, which can be curated by given user
+     * 'accepted' communities, which can be curated by given user
+     * All 'pending' communities
+     * All 'accepted' communities
     """
-    irs = InclusionRequest.query.filter_by(id_record=record.id).order_by(
-        InclusionRequest.id_community).all()
-    pending = [ir.community for ir in irs]
+    irs = ZenodoCommunity.get_irs(record).all()
+    pending = list(set(ir.community for ir in irs))
     accepted = [Community.get(c) for c in record.get('communities', [])]
     # Additionally filter out community IDs that did not resolve (None)
     accepted = [c for c in accepted if c]
@@ -325,7 +351,7 @@ def community_curation(record, user):
         global_perm = True
 
     if global_perm:
-        return (pending, pending, accepted, accepted)
+        return (pending, accepted, pending, accepted)
     else:
         return (
             [c for c in pending if _can_curate(c, user, record)],

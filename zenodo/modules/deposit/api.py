@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -28,20 +28,25 @@ from __future__ import absolute_import
 
 from contextlib import contextmanager
 from copy import copy
-from os.path import splitext
 
-from flask import current_app, request
+from flask import current_app
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
-from invenio_deposit.api import Deposit, preserve
-from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion, \
-    Part
+from invenio_deposit.api import Deposit, index, preserve
+from invenio_deposit.utils import mark_as_action
+from invenio_files_rest.models import Bucket, MultipartObject, Part
+from invenio_pidrelations.contrib.records import RecordDraft, index_siblings
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
-from invenio_records_files.api import FileObject, FilesIterator, _writable
 from invenio_records_files.models import RecordsBuckets
 
-from zenodo.modules.records.minters import is_local_doi, zenodo_doi_updater
+from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
+    ZenodoRecord
+from zenodo.modules.records.minters import doi_generator, is_local_doi, \
+    zenodo_concept_doi_minter, zenodo_doi_updater
+from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingCommunityError, MissingFilesError, \
@@ -55,40 +60,13 @@ PRESERVE_FIELDS = (
     '_files',
     '_internal',
     '_oai',
+    'relations',
     'owners',
     'recid',
+    'conceptrecid',
+    'conceptdoi',
 )
 """Fields which will not be overwritten on edit."""
-
-
-class ZenodoFileObject(FileObject):
-    """Zenodo file object."""
-
-    def dumps(self):
-        """Create a dump."""
-        super(ZenodoFileObject, self).dumps()
-        self.data.update({
-            # Remove dot from extension.
-            'type': splitext(self.data['key'])[1][1:].lower(),
-            'file_id': str(self.file_id),
-        })
-        return self.data
-
-
-class ZenodoFilesIterator(FilesIterator):
-    """Zenodo files iterator."""
-
-    @_writable
-    def __setitem__(self, key, stream):
-        """Add file inside a deposit."""
-        with db.session.begin_nested():
-            size = None
-            if request and request.files and request.files.get('file'):
-                size = request.files['file'].content_length or None
-            obj = ObjectVersion.create(
-                bucket=self.bucket, key=key, stream=stream, size=size)
-            self.filesmap[key] = self.file_cls(obj, {}).dumps()
-            self.flush()
 
 
 class ZenodoDeposit(Deposit):
@@ -97,6 +75,8 @@ class ZenodoDeposit(Deposit):
     file_cls = ZenodoFileObject
 
     files_iter_cls = ZenodoFilesIterator
+
+    published_record_class = ZenodoRecord
 
     deposit_fetcher = staticmethod(zenodo_deposit_fetcher)
 
@@ -126,27 +106,12 @@ class ZenodoDeposit(Deposit):
         :type record: `invenio_records.api.Record`
         """
         for comm_id in comms:
-            comm = Community.get(comm_id)
-            if not InclusionRequest.get(comm_id, record.id):
+            comm_api = ZenodoCommunity(comm_id)
+            # Check if InclusionRequest exists for any version already
+            pending_irs = comm_api.get_comm_irs(record)
+            if pending_irs.count() == 0 and not comm_api.has_record(record):
+                comm = Community.get(comm_id)
                 InclusionRequest.create(comm, record)
-
-    @staticmethod
-    def _remove_accepted_communities(comms, record):
-        """Remove accepted communities.
-
-        :param comms: Already accepted community IDs which no longer
-                      should have this record.
-        :type comms: list of str
-        :param record: Record corresponding to this deposit.
-        :type record: `invenio_records.api.Record`
-        :returns: modified 'record' argument
-        :rtype: `invenio_records.api.Record`
-        """
-        for comm_id in comms:
-            comm = Community.get(comm_id)
-            if comm.has_record(record):
-                comm.remove_record(record)  # Handles oai-sets internally
-        return record
 
     @staticmethod
     def _remove_obsolete_irs(comms, record):
@@ -158,7 +123,12 @@ class ZenodoDeposit(Deposit):
         :param record: Record corresponding to this deposit.
         :type record: `invenio_records.api.Record`
         """
-        InclusionRequest.get_by_record(record.id).filter(
+        pid = PersistentIdentifier.get('recid', record['recid'])
+        pv = PIDVersioning(child=pid)
+        sq = pv.children.with_entities(
+            PersistentIdentifier.object_uuid).subquery()
+        db.session.query(InclusionRequest).filter(
+            InclusionRequest.id_record.in_(sq),
             InclusionRequest.id_community.notin_(comms)).delete(
                 synchronize_session='fetch')
 
@@ -178,18 +148,19 @@ class ZenodoDeposit(Deposit):
         return data
 
     @staticmethod
-    def _autoadd_communities(comms, record):
-        """Add record to all communities ommiting the inclusion request.
+    def _get_synced_oaisets(rec_comms):
+        """Sync oaiset specs with communities in the record.
 
-        :param comms: Community IDs, to which the record should be added.
-        :type comms: list of str
-        :param record: Record corresponding to this deposit.
-        :type record: `invenio_records.api.Record`
+        This is necessary as not all communities modifications go through
+        Community.add_record/remove_record API, hence OAISet can be left
+        outdated.
         """
-        for comm_id in comms:
-            comm = Community.get(comm_id)
-            if not comm.has_record(record):
-                comm.add_record(record)  # Handles oai-sets internally
+        fmt = current_app.config['COMMUNITIES_OAI_FORMAT']
+        new_c_sets = [fmt.format(community_id=c) for c in rec_comms]
+        return new_c_sets
+
+        # TODO:
+        # record['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
 
     @staticmethod
     def _sync_oaisets_with_communities(record):
@@ -215,7 +186,7 @@ class ZenodoDeposit(Deposit):
             for s in additions:
                 oaiset = OAISet.query.filter_by(spec=s).one()
                 oaiset.add_record(record)
-            return record
+        return record
 
     def _filter_by_owned_communities(self, comms):
         """Filter the list of communities for auto accept.
@@ -228,22 +199,30 @@ class ZenodoDeposit(Deposit):
         return [c for c in comms if Community.get(c).id_user in
                 self['_deposit']['owners']]
 
-    def _get_auto_requested(self):
+    def _get_auto_requested(self, record):
         """Get communities which are to be auto-requested to each record."""
         if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
             return []
         comms = copy(current_app.config['ZENODO_COMMUNITIES_AUTO_REQUEST'])
-        if self.get('grants'):
+        pid = PersistentIdentifier.get('recid', record['conceptrecid'])
+        pv = PIDVersioning(parent=pid)
+        rec_grants = [ZenodoRecord.get_record(
+            p.get_assigned_object()).get('grants') for p in pv.children]
+        if self.get('grants') or any(rec_grants):
             comms.extend(
                 current_app.config['ZENODO_COMMUNITIES_REQUEST_IF_GRANTS'])
         return comms
 
-    def _get_auto_added(self):
+    def _get_auto_added(self, record):
         """Get communities which are to be auto added to each record."""
         if not current_app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']:
             return []
         comms = []
-        if self.get('grants'):
+        pid = PersistentIdentifier.get('recid', record['conceptrecid'])
+        pv = PIDVersioning(parent=pid)
+        rec_grants = [ZenodoRecord.get_record(
+            p.get_assigned_object()).get('grants') for p in pv.children]
+        if self.get('grants') or any(rec_grants):
             comms = copy(current_app.config[
                 'ZENODO_COMMUNITIES_ADD_IF_GRANTS'])
         return comms
@@ -264,71 +243,107 @@ class ZenodoDeposit(Deposit):
         else:
             yield data
 
-    def _publish_new(self, id_=None):
-        """Publish new deposit with communities handling."""
-        # pop the 'communities' entry so they aren't added to the Record
-        dep_comms = set(self.pop('communities', []))
-
-        # Communities for automatic acceptance
+    def _get_new_communities(self, dep_comms, rec_comms, record):
+        # New communities, which should be added automatically
         owned_comms = set(self._filter_by_owned_communities(dep_comms))
 
-        auto_added = set(self._get_auto_added())
+        # Communities which are to be added to every published record
+        auto_added = set(self._get_auto_added(record))
 
-        # Communities for which the InclusionRequest should be made
-        # Exclude owned ones and auto added ones
-        new_ir_comms = dep_comms - owned_comms - auto_added
+        new_rec_comms = (dep_comms & rec_comms) | owned_comms | auto_added
 
-        # Communities which are to be auto-requested to each published record
-        auto_request = set(self._get_auto_requested())
+        auto_requested = set(self._get_auto_requested(record))
 
-        # Add the owned communities to the record
-        self._autoadd_communities(owned_comms | auto_added, self)
+        # New communities, for which the InclusionRequests should be made
+        new_ir_comms = (dep_comms - new_rec_comms) | auto_requested
 
-        record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+        new_dep_comms = new_rec_comms | new_ir_comms
 
-        self._create_inclusion_requests(new_ir_comms | auto_request, record)
+        return new_dep_comms, new_rec_comms, new_ir_comms
 
-        # Push the communities back (if any) so they appear in deposit
-        self['communities'] = sorted(dep_comms | auto_added | auto_request)
-        self._sync_oaisets_with_communities(record)
-        if not self['communities']:  # No key rather than empty list
+    def _sync_communities(self, dep_comms, rec_comms, record):
+        new_dep_comms, new_rec_comms, new_ir_comms = \
+            self._get_new_communities(dep_comms, rec_comms, record)
+
+        # Update Communities and OAISet information for all record versions
+        conceptrecid = PersistentIdentifier.get('recid',
+                                                record['conceptrecid'])
+        pv = PIDVersioning(parent=conceptrecid)
+        for pid in pv.children:
+            rec = ZenodoRecord.get_record(pid.get_assigned_object())
+            if rec.id != record.id:
+                rec['communities'] = sorted(new_rec_comms)
+                if current_app.config['COMMUNITIES_OAI_ENABLED']:
+                    rec = self._sync_oaisets_with_communities(rec)
+                if not rec['communities']:
+                    del rec['communities']
+                rec.commit()
+                depid = PersistentIdentifier.get(
+                    'depid', rec['_deposit']['id'])
+                deposit = ZenodoDeposit.get_record(depid.get_assigned_object())
+                deposit['communities'] = sorted(new_dep_comms)
+                if not deposit['communities']:
+                    del deposit['communities']
+                deposit.commit()
+
+        # Update new version deposit
+        if pv.draft_child_deposit:
+            draft_dep = ZenodoDeposit.get_record(
+                pv.draft_child_deposit.get_assigned_object())
+            if draft_dep.id != self.id:
+                draft_dep['communities'] = sorted(new_dep_comms)
+                if not draft_dep['communities']:
+                    del draft_dep['communities']
+                draft_dep.commit()
+
+        record['communities'] = sorted(new_rec_comms)
+        if current_app.config['COMMUNITIES_OAI_ENABLED']:
+            record = self._sync_oaisets_with_communities(record)
+        if not record['communities']:
+            del record['communities']
+
+        self['communities'] = sorted(new_dep_comms)
+        if not self['communities']:
             del self['communities']
+
+        # Create Inclusion requests against this record
+        self._create_inclusion_requests(new_ir_comms, record)
+
+        # Remove obsolete InclusionRequests again the record and its versions
+        self._remove_obsolete_irs(new_ir_comms, record)
+
+        return record
+
+    def _publish_new(self, id_=None):
+        """Publish new deposit with communities handling."""
+        dep_comms = set(self.pop('communities', []))
+        record = super(ZenodoDeposit, self)._publish_new(id_=id_)
+        conceptrecid = PersistentIdentifier.get('recid',
+                                                record['conceptrecid'])
+        pv = PIDVersioning(parent=conceptrecid)
+        if pv.children.count() > 1:
+            prev_recid = pv.children.all()[-2]
+            rec_comms = set(ZenodoRecord.get_record(
+                prev_recid.get_assigned_object()).get('communities', []))
+        else:
+            rec_comms = set()
+
+        record = self._sync_communities(dep_comms, rec_comms, record)
+        record.commit()
+
+        # Update the concept recid redirection
+        pv.update_redirect()
+        RecordDraft.unlink(record.pid, self.pid)
+        index_siblings(record.pid, neighbors_eager=True, with_deposits=True)
+
         return record
 
     def _publish_edited(self):
         """Publish the edited deposit with communities merging."""
-        pid, record = self.fetch_published()
         dep_comms = set(self.get('communities', []))
+        pid, record = self.fetch_published()
         rec_comms = set(record.get('communities', []))
 
-        # Already accepted communities which should be removed
-        removals = rec_comms - dep_comms
-
-        # New communities by user
-        new_comms = dep_comms - rec_comms
-
-        # New communities, which should be added automatically
-        new_owned_comms = set(self._filter_by_owned_communities(new_comms))
-
-        # Communities which are to be added to every published record
-        auto_added = set(self._get_auto_added())
-
-        # New communities, for which the InclusionRequests should be made
-        new_ir_comms = new_comms - new_owned_comms - auto_added
-
-        # Communities which are to be auto-requested to each published record
-        auto_request = set(self._get_auto_requested()) - rec_comms
-
-        self._remove_accepted_communities(removals, record)
-
-        self._autoadd_communities(new_owned_comms | auto_added, record)
-        self._create_inclusion_requests(new_ir_comms | auto_request, record)
-
-        # Remove obsolete InclusionRequests
-        self._remove_obsolete_irs(dep_comms | auto_request, record)
-
-        # Communities, which should be in record after publishing:
-        new_rec_comms = (dep_comms & rec_comms) | new_owned_comms | auto_added
         edited_record = super(ZenodoDeposit, self)._publish_edited()
 
         # Preserve some of the previously published record fields
@@ -337,18 +352,10 @@ class ZenodoDeposit(Deposit):
             if k in record:
                 edited_record[k] = record[k]
 
-        # Add communities entry to deposit (self)
-        self['communities'] = sorted(set(self.get('communities', [])) |
-                                     auto_added | auto_request)
-        if not self['communities']:
-            del self['communities']
-
-        # Add communities entry to record
-        edited_record['communities'] = sorted(new_rec_comms)
-        edited_record = self._sync_oaisets_with_communities(edited_record)
-        if not edited_record['communities']:
-            del edited_record['communities']
         zenodo_doi_updater(edited_record.id, edited_record)
+
+        edited_record = self._sync_communities(dep_comms, rec_comms,
+                                               edited_record)
         return edited_record
 
     def validate_publish(self):
@@ -367,14 +374,15 @@ class ZenodoDeposit(Deposit):
             if missing:
                 raise MissingCommunityError(missing)
 
+    @mark_as_action
     def publish(self, pid=None, id_=None, user_id=None, sip_agent=None):
         """Publish the Zenodo deposit."""
         self['owners'] = self['_deposit']['owners']
         self.validate_publish()
         is_first_publishing = not self.is_published()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
-        pid, record = deposit.fetch_published()
-        ZenodoSIP.create(pid, record, create_sip_files=is_first_publishing,
+        recid, record = deposit.fetch_published()
+        ZenodoSIP.create(recid, record, create_sip_files=is_first_publishing,
                          user_id=user_id, agent=sip_agent)
         return deposit
 
@@ -390,7 +398,19 @@ class ZenodoDeposit(Deposit):
         )
         data['_buckets'] = {'deposit': str(bucket.id)}
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
+
         RecordsBuckets.create(record=deposit.model, bucket=bucket)
+
+        recid = PersistentIdentifier.get(
+            'recid', str(data['recid']))
+        conceptrecid = PersistentIdentifier.get(
+            'recid', str(data['conceptrecid']))
+        depid = PersistentIdentifier.get(
+            'depid', str(data['_deposit']['id']))
+
+        PIDVersioning(parent=conceptrecid).insert_draft_child(child=recid)
+        RecordDraft.link(recid, depid)
+
         return deposit
 
     @preserve(result=False, fields=PRESERVE_FIELDS)
@@ -408,24 +428,52 @@ class ZenodoDeposit(Deposit):
         """Patch only drafts."""
         return super(ZenodoDeposit, self).patch(*args, **kwargs)
 
-    def delete(self, *args, **kwargs):
-        """Delete the deposit."""
-        if self['_deposit'].get('pid'):
+    @index(delete=True)
+    def delete(self, delete_published=False, *args, **kwargs):
+        """Delete the deposit.
+
+        :param delete_published: If True, even deposit of a published record
+            will be deleted (usually used by admin operations).
+        :type delete_published: bool
+        """
+        is_published = self['_deposit'].get('pid')
+        if is_published and not delete_published:
             raise PIDInvalidAction()
 
-        # Delete reserved recid.
-        pid_recid = PersistentIdentifier.get(
+        # Delete the recid
+        recid = PersistentIdentifier.get(
             pid_type='recid', pid_value=self['recid'])
 
-        if pid_recid.status == PIDStatus.RESERVED:
-            db.session.delete(pid_recid)
+        versioning = PIDVersioning(child=recid)
+        if versioning.exists:
+            if versioning.draft_child:
+                index_siblings(versioning.draft_child,
+                               children=versioning.children.all(),
+                               include_pid=True,
+                               neighbors_eager=True,
+                               with_deposits=True)
+                versioning.remove_draft_child()
+            elif versioning.last_child:
+                index_siblings(versioning.last_child,
+                               children=versioning.children.all(),
+                               include_pid=True,
+                               neighbors_eager=True,
+                               with_deposits=True)
+
+        if recid.status == PIDStatus.RESERVED:
+            db.session.delete(recid)
+
+        if 'conceptrecid' in self:
+            concept_recid = PersistentIdentifier.get(
+                pid_type='recid', pid_value=self['conceptrecid'])
+            if concept_recid.status == PIDStatus.RESERVED:
+                db.session.delete(concept_recid)
 
         # Completely remove bucket
-        q = RecordsBuckets.query.filter_by(record_id=self.id)
-        bucket = q.one().bucket
+        bucket = self.files.bucket
         with db.session.begin_nested():
             # Remove Record-Bucket link
-            q.delete()
+            RecordsBuckets.query.filter_by(record_id=self.id).delete()
             mp_q = MultipartObject.query_by_bucket(bucket)
             # Remove multipart objects
             Part.query.filter(
@@ -433,6 +481,91 @@ class ZenodoDeposit(Deposit):
                     MultipartObject.upload_id).subquery())
             ).delete(synchronize_session='fetch')
             mp_q.delete(synchronize_session='fetch')
+        bucket.locked = False
         bucket.remove()
 
-        return super(ZenodoDeposit, self).delete(*args, **kwargs)
+        depid = kwargs.get('pid', self.pid)
+        if depid:
+            depid.delete()
+
+        # NOTE: We call the parent of Deposit, invenio_records.api.Record since
+        # we need to completely override eveything that the Deposit.delete
+        # method does.
+        return super(Deposit, self).delete(*args, **kwargs)
+
+    @mark_as_action
+    def newversion(self, pid=None):
+        """Create a new version deposit."""
+        assert self.is_published()
+
+        # Check that there is not a newer draft version for this record
+        pid, record = self.fetch_published()
+        pv = PIDVersioning(child=pid)
+        if (not pv.draft_child and
+                is_doi_locally_managed(record['doi'])):
+            # Let's create the new version draft!
+            with db.session.begin_nested():
+
+                # Get copy of the record
+                data = record.dumps()
+
+                owners = data['_deposit']['owners']
+
+                # TODO: Check other data that may need to be removed
+                keys_to_remove = (
+                    '_deposit', 'doi', '_oai', '_files', '_buckets', '$schema')
+                for k in keys_to_remove:
+                    data.pop(k, None)
+
+                # NOTE: We call the superclass `create()` method, because we
+                # don't want a new empty bucket, but an unlocked snapshot of
+                # the old record's bucket.
+                deposit = (super(ZenodoDeposit, self).create(data))
+                # Injecting owners is required in case of creating new
+                # version this outside of request context
+                deposit['_deposit']['owners'] = owners
+
+                ###
+                conceptrecid = PersistentIdentifier.get(
+                    'recid', data['conceptrecid'])
+                recid = PersistentIdentifier.get(
+                    'recid', str(data['recid']))
+                depid = PersistentIdentifier.get(
+                    'depid', str(data['_deposit']['id']))
+                PIDVersioning(parent=conceptrecid).insert_draft_child(
+                    child=recid)
+                RecordDraft.link(recid, depid)
+
+                # Pre-fill the Zenodo DOI to prevent the user from changing it
+                # to a custom DOI.
+                deposit['doi'] = doi_generator(recid.pid_value)
+
+                pv = PIDVersioning(child=pid)
+                index_siblings(pv.draft_child, neighbors_eager=True,
+                               with_deposits=True)
+
+                with db.session.begin_nested():
+                    # Create snapshot from the record's bucket and update data
+                    snapshot = record.files.bucket.snapshot(lock=False)
+                    snapshot.locked = False
+                # FIXME: `snapshot.id` might not be present because we need to
+                # commit first to the DB.
+                # db.session.commit()
+                deposit['_buckets'] = {'deposit': str(snapshot.id)}
+                RecordsBuckets.create(record=deposit.model, bucket=snapshot)
+                deposit.commit()
+        return self
+
+    @mark_as_action
+    def registerconceptdoi(self, pid=None):
+        """Register the conceptdoi for the deposit and record."""
+        pid, record = self.fetch_published()
+        zenodo_concept_doi_minter(record.id, record)
+        record.commit()
+        self['conceptdoi'] = record['conceptrecid']
+        self.commit()
+
+        if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
+            from zenodo.modules.deposit.tasks import datacite_register
+            datacite_register.delay(pid.pid_value, str(record.id))
+        return self

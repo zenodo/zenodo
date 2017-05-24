@@ -141,5 +141,37 @@
         <small class="text-muted">Note: File addition, removal or modification are not allowed after an upload has been published. This is because a Digital Object Identifier (DOI) is registered with <a href="http://www.datacite.org"><i class="fa fa-external-link"></i> DataCite</a> for each upload. If you've made a mistake please <a href="/contact">contact us</a>.</small>
       </td>
     </tr>
+    <tr class="ng-hide" ng-show="{{recordsVM.invenioRecordsArgs.templateParams.is_local_doi}}">
+      <td colspan="3">
+        <!-- "Upgrade to versioned record" button -->
+        <div align="center" class="ng-hide" ng-show="{{!recordsVM.invenioRecordsArgs.templateParams.has_conceptdoi}}">
+          <p>You can upgrade this record to a versioned record. You will be able to create a new
+            record version, with new files an a completely new DOI.</p>
+          <button
+            class="btn btn-success"
+            ng-show="recordsVM.invenioRecordsArgs.templateParams.is_published"
+            data-template-url="{{recordsVM.invenioRecordsArgs.templateParams.upgradeversioningmodal_template}}"
+            bs-modal>Upgrade to versioned record</button>
+        </div>
+        <!-- "New version" button -->
+        <div align="center" class="ng-hide" ng-show="{{recordsVM.invenioRecordsArgs.templateParams.has_conceptdoi}}">
+          <p>If you have an updated version of your files, you can create a new
+            record version, with a completely new DOI.</p>
+          <div
+            class="tooltip-wrapper"
+            data-container="div"
+            data-title="{{recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions ? undefined : 'Only the owner of the latest version of this record can create new versions.'}}"
+            bs-tooltip
+          >
+            <button
+              class="btn btn-success"
+              ng-disabled="!recordsVM.invenioRecordsArgs.templateParams.has_versioning_permissions"
+              ng-show="recordsVM.invenioRecordsArgs.templateParams.is_published"
+              data-template-url="{{recordsVM.invenioRecordsArgs.templateParams.newversionmodal_template}}"
+              bs-modal>New version</button>
+          </div>
+        </div>
+      </td>
+    </tr>
   </table>
 </div>

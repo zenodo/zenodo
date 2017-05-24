@@ -1,3 +1,10 @@
+<a class="btn btn-link version-toggle"
+  ng-class="{'active': vm.invenioSearchArgs.all_versions}"
+  ng-click="vm.invenioSearchArgs.all_versions = (vm.invenioSearchArgs.all_versions === undefined ? true : undefined)">
+  <span class="text-muted">
+    <i class="fa fa-code-fork fa-lg"></i>&nbsp; All versions
+  </span>
+</a>
 <div ng-init="tree=[];tree_more=[]" ng-repeat="(key, value) in vm.invenioSearchResults.aggregations track by $index">
   <div ng-if="value.buckets.length > 0" class="panel panel-default">
     <div class="panel-heading">
@@ -35,3 +42,4 @@
     </div>
   </div>
 </div>
+

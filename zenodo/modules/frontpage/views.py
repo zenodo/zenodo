@@ -26,7 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, render_template
+import os
+
+from flask import Blueprint, current_app, render_template, send_from_directory
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
 
@@ -65,6 +67,15 @@ def index():
     return render_template(
         'zenodo_frontpage/index.html',
         records=FrontpageRecordsSearch()[:10].sort('-_created').execute(),
+    )
+
+
+@blueprint.route('/favicon.ico')
+def favicon():
+    """Return the favicon."""
+    return send_from_directory(
+        os.path.join(current_app.root_path, 'static'),
+        'favicon.ico', mimetype='image/vnd.microsoft.icon'
     )
 
 

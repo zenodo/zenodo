@@ -28,9 +28,12 @@ from __future__ import absolute_import, print_function
 
 from flask import url_for
 from flask_babelex import lazy_gettext as _
+from invenio_pidrelations.serializers.utils import serialize_relations
 from marshmallow import Schema, ValidationError, fields, missing, \
     validates_schema
 from werkzeug.routing import BuildError
+
+from zenodo.modules.records.utils import is_deposit
 
 from . import common
 from ...models import AccessRight, ObjectType
@@ -227,6 +230,7 @@ class MetadataSchemaV1(common.CommonMetadataSchemaV1):
     imprint = fields.Nested(ImprintSchemaV1)
     part_of = fields.Nested(PartOfSchemaV1)
     thesis = fields.Nested(ThesisSchemaV1)
+    relations = fields.Method('dump_relations')
 
     def dump_access_right_category(self, obj):
         """Get access right category."""
@@ -234,6 +238,17 @@ class MetadataSchemaV1(common.CommonMetadataSchemaV1):
         if acc:
             return AccessRight.as_category(acc)
         return missing
+
+    def dump_relations(self, obj):
+        """Dump the relations to a dictionary."""
+        if 'relations' in obj:
+            return obj['relations']
+        if is_deposit(obj):
+            pid = self.context['pid']
+            return serialize_relations(pid)
+        else:
+            pid = self.context['pid']
+            return serialize_relations(pid)
 
 
 class RecordSchemaV1(common.CommonRecordSchemaV1):

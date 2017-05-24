@@ -61,7 +61,7 @@ def marshmallow_loader(schema_class, **kwargs):
 
             _, record = request.view_args.get('pid_value').data
             context['recid'] = record['recid']
-            if record.has_minted_doi():
+            if record.has_minted_doi() or record.get('conceptdoi'):
                 context['required_doi'] = record['doi']
             elif not record.is_published():
                 context['allowed_dois'] = [doi_generator(record['recid'])]

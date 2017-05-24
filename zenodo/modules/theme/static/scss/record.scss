@@ -28,6 +28,25 @@
 .well {
   word-wrap: break-word;
 
+  .pid-versions-dropdown {
+
+    // Dropdown Scrollbar
+    .dropdown-menu {
+      height: auto;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .dropdown-head {
+      color: black;
+      font-weight: 500;
+    }
+
+    .dropdown-item.current a {
+      font-weight: bold;
+    }
+  }
+
   dl {
     margin-bottom: 0;
   }

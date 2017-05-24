@@ -1,0 +1,18 @@
+<div class="modal center" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" role="button" class="close" aria-label="Close" ng-click="$hide()"><span aria-hidden="true">&times;</span></button>
+        <h1 class="modal-title">New version creation</h1>
+      </div>
+      <div class="modal-body">
+        <p>You should only create a new version if you want to update the files of this upload. Keep in mind that the new version will get a new DOI.</p>
+        <p>Creating a new version <strong>discards the deposit you are currently editing</strong>. If you do not want to modify any of the files in the record, you should edit and publish the current version instead.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close">Close</button>
+        <button type="button" class="btn btn-success" ng-click="recordsVM.actionHandler([['discard', 'POST'], ['newversion', 'POST']], 'latest_draft_html') && $hide()" aria-label="Close">Create new version</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from invenio_indexer.signals import before_record_index
+from invenio_pidrelations.contrib.versioning import versioning_blueprint
 
 from . import config
 from .indexer import indexer_receiver
@@ -52,6 +53,10 @@ class ZenodoRecords(object):
         app.register_blueprint(blueprint)
         # Add global record serializer template filter
         app.add_template_filter(serialize_record, 'serialize_record')
+
+        # Register versioning blueprint
+        app.register_blueprint(versioning_blueprint)
+
         before_record_index.connect(indexer_receiver, sender=app)
         app.extensions['zenodo-records'] = self
 

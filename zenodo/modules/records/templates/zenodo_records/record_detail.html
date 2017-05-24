@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -11,7 +11,7 @@
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
-#
+#L
 # You should have received a copy of the GNU General Public License
 # along with Zenodo; if not, write to the
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
@@ -29,15 +29,28 @@
 {%- from "zenodo_records/macros/altmetric.html" import almetric_badge -%}
 {%- from "zenodo_records/macros/authors.html" import authors, contributors -%}
 
+
 {%- set title = record.title + " | " + config.THEME_SITENAME -%}
 {%- set publication_date = record.publication_date|from_isodate -%}
 {%- set embargo_date = record.get('embargo_date', None)|from_isodate -%}
 {%- set object_type = record.resource_type|objecttype %}
+{%- set pid_versioning = pid | to_versioning_api -%}
 
 {%- block head %}
 {{super()}}
 {%- include "zenodo_records/meta.html" %}
 {%- endblock head %}
+
+{# Banner alert for not being at the latest version of a record #}
+{% if pid_versioning.exists and (not pid_versioning.is_last_child) %}
+  {% set latest_pid = pid_versioning.last_child %}
+  {% set latest_version_url = url_for('invenio_records_ui.recid', pid_value=latest_pid.pid_value) %}
+  {% set latest_version_msg %}
+    There is a <a class="alert-link" href="{{latest_version_url}}">newer version</a> of this record available.
+  {% endset %}
+  {% set banner_messages = banner_messages|d([]) + [('warning', latest_version_msg|safe)] %}
+{% endif %}
+
 
 {%- block page_body %}
 <div class="container record-detail">
@@ -76,7 +89,7 @@
     </div>
     <div class="col-sm-4 col-md-4 col-right">
       {%- include "zenodo_records/box/edit.html" %}
-      {%- set pending_comms, accepted_comms, all_pending_comms, all_comms = community_curation(record, current_user) %}
+      {%- set pending_comms, accepted_comms, all_pending_comms, all_accepted_comms = community_curation(record, current_user) %}
       {% if pending_comms or accepted_comms %}
       <div class="well metadata">
         {%- include "zenodo_records/box/curate.html" %}
@@ -86,10 +99,11 @@
         {{ almetric_badge(record.doi, css_class='well') }}
       {%- endif %}
       {%- include "zenodo_records/box/publishedin.html" %}
+      {%- set resolved_record = record.replace_refs() %}
       <div class="well metadata">
-        {%- set resolved_record = record.replace_refs() %}
         {%- include "zenodo_records/box/info.html" %}
       </div>
+      {%- include "zenodo_records/box/versions.html" %}
       <div class="well">
         {%- include "zenodo_records/box/share.html" %}
       </div>

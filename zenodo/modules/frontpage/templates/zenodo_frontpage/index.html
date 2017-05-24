@@ -42,6 +42,7 @@
       </div>
       {%- for r in records %}
         {%- set publication_date = r.publication_date|from_isodate -%}
+        {%- set record_version = (r.relations.version[0].index + 1) if r.conceptrecid else None -%}
         {%- set creation_date = r._created|from_isodatetime -%}
         {%- set embargo_date = r.embargo_date|from_isodate -%}
         {%- set object_type = r.resource_type|objecttype %}
@@ -57,7 +58,7 @@
               </span>
             {% endif %}
             <div class="pull-left">
-              <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}</span>
+              <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}{{ (' (v' ~ record_version ~ ')') if record_version else '' }}</span>
               {{ objecttype_label(object_type, lang=current_i18n.language) }}
               {{ accessright_label(r.access_right, embargo_date=embargo_date) }}
             </div>
@@ -66,8 +67,11 @@
             <p>{{ authors(r.creators) }}</p>
             <p class="hidden-xs"><a href="{{record_url}}">{{ r.description|striptags|truncate(300) }}</a></p>
             <small class="text-muted hidden-xs">
-              {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}.{% endtrans %}
+              {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}{% endtrans %}
             </small>
+            {%- if r.relations.version[0].count > 1 %}
+              <p class="text-muted"><a href="{{ url_for('invenio_search_ui.search', q=('conceptrecid:' ~ r.conceptrecid), all_versions=True, sort='-version') }}"><small><i>{{ r.relations.version[0].count - 1 }} more version(s) exist for this record</i> </small></a></p>
+            {% endif %}
           </div>
         </div>
         {%- if not loop.last %}
@@ -81,8 +85,7 @@
       <div class="well">
         <span class="pull-right"><i class="fa fa-flag fa-5x"></i></span>
         <h4>Join Zenodo at Google Summer of Code 2017!</h4>
-        <p>Are you a university student and a programmer? Help us make Open Science better!</p>
-        <p><a href="http://blog.zenodo.org/2017/3/60/gsoc/">More information</a>.</p>
+        <p>Are you a university student and a programmer? <a href="http://blog.zenodo.org/2017/03/10/google-summer-of-code-2017/">Join us</a> in making Open Science better!</p>
       </div>
       <div class="well">
         <span class="pull-right"><i class="fa fa-github fa-5x"></i></span>

@@ -51,6 +51,7 @@ extras_require = {
     'docs': [
         'Sphinx>=1.4.2,<1.4.5',
     ],
+    # Database version
     'postgresql': [
         'invenio-db[postgresql,versioning]>=1.0.0b3',
     ],
@@ -59,6 +60,11 @@ extras_require = {
     ],
     'sqlite': [
         'invenio-db[versioning]>=1.0.0b3',
+    ],
+    # Elasticsearch version
+    'elasticsearch2': [
+        'elasticsearch>=2.0.0,<3.0.0',
+        'elasticsearch-dsl>=2.0.0,<3.0.0',
     ],
     'tests': tests_require,
 }
@@ -100,13 +106,13 @@ install_requires = [
     'invenio-access>=1.0.0a11',
     'invenio-accounts>=1.0.0b1',
     'invenio-admin>=1.0.0a3',
-    'invenio-assets>=1.0.0b4',
+    'invenio-assets>=1.0.0b6',
     'invenio-base>=1.0.0a14',
     'invenio-celery>=1.0.0b1',
     'invenio-communities>=1.0.0a13',
     'invenio-config>=1.0.0b1',
     'invenio-csl-rest>=1.0.0a1',
-    'invenio-deposit>=1.0.0a7',
+    'invenio-deposit>=1.0.0a8',
     'invenio-files-rest>=1.0.0a14',
     'invenio-formatter>=1.0.0a2',
     'invenio-github>=1.0.0a10',
@@ -124,6 +130,7 @@ install_requires = [
     'invenio-opendefinition>=1.0.0a3',
     'invenio-pages>=1.0.0a3',
     'invenio-pidstore>=1.0.0b1',
+    'invenio-pidrelations>=1.0.0a3',
     'invenio-previewer>=1.0.0a10',
     'invenio-records>=1.0.0b1',
     'invenio-records-files>=1.0.0a8',
@@ -138,7 +145,7 @@ install_requires = [
     'invenio-webhooks>=1.0.0a4',
     'jsonref>=0.1',
     'jsonresolver>=0.2.1',
-    'marshmallow>=2.10.4',
+    'marshmallow>=2.13.5',
     'Pillow>=3.4.2',
     'python-slugify>=1.2.1',
     'raven<=5.1.0',
@@ -194,6 +201,7 @@ setup(
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
         ],
         'invenio_base.blueprints': [
+            'zenodo_communities = zenodo.modules.communities.views:blueprint',
             'zenodo_deposit = zenodo.modules.deposit.views:blueprint',
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
             'zenodo_redirector = zenodo.modules.redirector.views:blueprint',

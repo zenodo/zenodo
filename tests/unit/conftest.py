@@ -55,7 +55,7 @@ from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
 from invenio_oauthclient.models import RemoteAccount
-from invenio_pidstore.models import PersistentIdentifier
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
@@ -234,6 +234,7 @@ def communities(db, users):
         {'id': 'c2', 'user_id': users[1]['id']},
         {'id': 'c3', 'user_id': users[0]['id']},
         {'id': 'c4', 'user_id': users[0]['id']},
+        {'id': 'c5', 'user_id': users[1]['id']},
         {'id': 'zenodo', 'user_id': users[2]['id']},
         {'id': 'ecfunded', 'user_id': users[2]['id']},
         {'id': 'grants_comm', 'user_id': users[2]['id']},
@@ -348,13 +349,19 @@ def minimal_deposit():
 
 
 @pytest.fixture()
-def minimal_record_model(minimal_record):
+def minimal_record_model(db, minimal_record):
     """Minimal record."""
     model = RecordMetadata()
     model.created = datetime.utcnow() - timedelta(days=1)
     model.updated = model.created + timedelta(days=1)
     model.version_id = 0
-    return Record(minimal_record, model=model)
+    rec = Record(minimal_record, model=model)
+
+    PersistentIdentifier.create(
+        'recid', '123', status=PIDStatus.REGISTERED, object_type='rec',
+        object_uuid=rec.id)
+    db.session.commit()
+    return rec
 
 
 @pytest.fixture()
@@ -554,7 +561,7 @@ def record_with_bucket(full_record, bucket, db):
     record = RecordFile.create(full_record)
     RecordsBuckets.create(bucket=bucket, record=record.model)
     pid = PersistentIdentifier.create(
-        pid_type='recid', pid_value=1, object_type='rec',
+        pid_type='recid', pid_value=12345, object_type='rec',
         object_uuid=record.id, status='R')
     db.session.commit()
     return pid, record

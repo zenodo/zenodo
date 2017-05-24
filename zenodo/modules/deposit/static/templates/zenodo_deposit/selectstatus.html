@@ -1,0 +1,19 @@
+<span ng-init="tree=[];tree_more=[]">
+  <a class="btn btn-sm btn-link" href="#" ng-class="{'active': handler.status == 'draft'}" ng-click="handler.status=[];handleClick('status', 'draft')">
+    <span class="text-muted">
+      <i class="glyphicon glyphicon-open"></i> Drafts {{ (vm.invenioSearchResults.aggregations.status.buckets | filter:{key: 'draft'})[0].doc_count || '0' }}
+    </span>
+  </a>
+  <a class="btn btn-sm btn-link" href="#" ng-class="{'active': handler.status == 'published'}" ng-click="handler.status=[];handleClick('status', 'published')">
+    <span class="text-muted">
+      <i class="glyphicon glyphicon-saved"></i> Published {{ (vm.invenioSearchResults.aggregations.status.buckets | filter:{key: 'published'})[0].doc_count || '0' }}
+    </span>
+  </a>
+  <a class="btn btn-link version-toggle"
+    ng-class="{'active': vm.invenioSearchArgs.all_versions}"
+    ng-click="vm.invenioSearchArgs.all_versions = (vm.invenioSearchArgs.all_versions === undefined ? true : undefined)">
+    <span class="text-muted">
+      <i class="fa fa-code-fork fa-lg"></i>&nbsp; All versions
+    </span>
+  </a>
+</span>

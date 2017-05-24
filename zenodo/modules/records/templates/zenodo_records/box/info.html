@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -21,6 +21,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+{%- from "invenio_pidrelations/macros/pid_versions.html" import pid_versions_dropdown -%}
   <dl>
   {%- if record.publication_date %}
     <dt>{{_('Publication date')}}:</dt>
@@ -35,12 +36,13 @@
   {%- endif %}
 
   {%- if record.doi %}
+    {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
     <dt>{{_('DOI')}}:</dt>
     <dd itemprop="doi">
-      <span class="get-badge" data-toggle="tooltip" data-placement="bottom"
+      <span class="get-badge" data-toggle="toolt  ip" data-placement="bottom"
             title="Get the DOI badge!">
         <img data-toggle="modal" data-target="[data-modal='{{ record.doi }}']"
-             src="{{ url_for('invenio_formatter_badges.badge', title='DOI', value=record.doi, ext='svg') }}" alt="{{ record.doi }}">
+              src="{{ url_for('invenio_formatter_badges.badge', title='DOI', value=record.doi, ext='svg') }}" alt="{{ record.doi }}">
         </img>
       </span>
       <div class="modal fade badge-modal" data-modal="{{ record.doi }}">
@@ -56,7 +58,6 @@
       </div>
     </dd>
   {%- endif %}
-
   {%- if record.imprint and record.imprint.isbn %}
     <dt>{{_('ISBN')}}:</dt>
     <dd itemprop="isbn">{{ record.imprint.isbn }}</dd>
@@ -188,11 +189,11 @@
     </dd>
   {%- endif %}
 
-  {%- if all_comms %}
+  {%- if all_accepted_comms %}
     <dt>{{ _('Communities') }}:</dt>
     <dd>
       <ul class="list-unstyled">
-      {%- for c in all_comms %}
+      {%- for c in all_accepted_comms %}
         <li><a href="{{url_for('invenio_communities.detail', community_id=c.id)}}">{{c.title}}</a></li>
       {%- endfor %}
       </ul>

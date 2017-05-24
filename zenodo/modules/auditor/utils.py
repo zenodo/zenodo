@@ -71,7 +71,7 @@ def sickle_requests_get_mock():
     this we are making a function mock that makes a request using the
     `Flask.test_client`, and returns a mock containing the text response.
     """
-    def get(endpoint, params, timeout, auth):
+    def get(endpoint, params, **kwargs):
         """Mock `request.get` method."""
         with current_app.test_request_context():
             with current_app.test_client() as client:

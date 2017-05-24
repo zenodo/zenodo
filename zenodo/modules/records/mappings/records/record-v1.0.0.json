@@ -147,6 +147,33 @@
             }
           }
         },
+        "relations": {
+          "type": "object",
+          "properties": {
+            "version": {
+              "type": "object",
+              "properties": {
+                "parent": {
+                  "type": "object",
+                  "properties": {
+                    "pid_type": {
+                      "type": "string"
+                    },
+                    "pid_value": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "index": {
+                  "type": "integer"
+                },
+                "is_last": {
+                  "type": "boolean"
+                }
+              }
+            }
+          }
+        },
         "_deposit": {
           "type": "object",
           "properties": {

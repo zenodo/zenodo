@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -26,23 +26,28 @@
 
 from __future__ import absolute_import, print_function
 
+from functools import partial
+
 import arrow
 import idutils
 import jsonref
 from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
+from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, post_dump, \
-    post_load, pre_load, validate, validates, validates_schema
+    post_load, pre_dump, pre_load, validate, validates, validates_schema
 from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
 from zenodo.modules.records.models import AccessRight
+from zenodo.modules.records.serializers.pidrelations import \
+    serialize_related_identifiers
 
-from ...utils import is_deposit
+from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
 from ..fields import DateString, PersistentId, SanitizedHTML, SanitizedUnicode
 
@@ -53,6 +58,17 @@ def clean_empty(data, keys):
         if k in data and not data[k]:
             del data[k]
     return data
+
+
+def format_pid_link(url_template, pid_value):
+    """Format a pid url."""
+    return url_template.format(host=request.host,
+                               scheme=request.scheme,
+                               pid_value=pid_value)
+
+
+external_url_for = partial(url_for, _external=True)
+"""Helper for external url_for link generation."""
 
 
 class StrictKeysMixin(object):
@@ -196,7 +212,7 @@ class IdentifierSchemaV1(Schema, StrictKeysMixin):
 
 
 class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
-    """Schema for a related identifier."""
+    """Schema for an alternate identifier."""
 
 
 class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
@@ -241,7 +257,8 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     subjects = fields.Nested(SubjectSchemaV1, many=True)
     contributors = fields.List(fields.Nested(ContributorSchemaV1))
     references = fields.List(SanitizedUnicode(attribute='raw_reference'))
-    related_identifiers = fields.Nested(RelatedIdentifierSchemaV1, many=True)
+    related_identifiers = fields.Nested(
+        RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
 
@@ -371,65 +388,138 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
     """Common record schema."""
 
     id = fields.Integer(attribute='pid.pid_value', dump_only=True)
+    conceptrecid = SanitizedUnicode(
+        attribute='metadata.conceptrecid', dump_only=True)
     doi = SanitizedUnicode(attribute='metadata.doi', dump_only=True)
+    conceptdoi = SanitizedUnicode(
+        attribute='metadata.conceptdoi', dump_only=True)
+
     links = fields.Method('dump_links', dump_only=True)
     created = fields.Str(dump_only=True)
+
+    @pre_dump()
+    def predump_relations(self, obj):
+        """Add relations to the schema context."""
+        m = obj.get('metadata', {})
+        if 'relations' not in m:
+            pid = self.context['pid']
+            # For deposits serialize the record's relations
+            if is_deposit(m):
+                pid = PersistentIdentifier.get('recid', m['recid'])
+            m['relations'] = serialize_relations(pid)
+
+        # Remove some non-public fields
+        if is_record(m):
+            version_info = m['relations'].get('version', [])
+            if version_info:
+                version_info[0].pop('draft_child_deposit', None)
 
     def dump_links(self, obj):
         """Dump links."""
         links = obj.get('links', {})
+        if current_app:
+            links.update(self._dump_common_links(obj))
+
+        try:
+            if has_request_context():
+                m = obj.get('metadata', {})
+                if is_deposit(m):
+                    links.update(self._dump_deposit_links(obj))
+                else:
+                    links.update(self._dump_record_links(obj))
+        except BuildError:
+            pass
+        return links
+
+    def _dump_common_links(self, obj):
+        """Dump common links for deposits and records."""
+        links = {}
         m = obj.get('metadata', {})
 
         doi = m.get('doi')
-        if current_app and doi:
-            links['badge'] = "{base}/badge/doi/{value}.svg".format(
-                base=current_app.config.get('THEME_SITEURL'),
-                value=quote(doi),
-            )
+        if doi:
+            links['badge'] = \
+                "{base}/badge/doi/{value}.svg".format(
+                    base=current_app.config.get('THEME_SITEURL'),
+                    value=quote(doi))
             links['doi'] = idutils.to_url(doi, 'doi')
 
-        if has_request_context():
-            if is_deposit(m):
-                bucket_id = m.get('_buckets', {}).get('deposit')
-                recid = m.get('recid') if m.get('_deposit', {}).get('pid') \
-                    else None
-                api_key = 'record'
-                html_key = 'record_html'
-            else:
-                bucket_id = m.get('_buckets', {}).get('record')
-                recid = m.get('recid')
-                api_key = None
-                html_key = 'html'
+        conceptdoi = m.get('conceptdoi')
+        if conceptdoi:
+            links['conceptbadge'] = \
+                "{base}/badge/doi/{value}.svg".format(
+                    base=current_app.config.get('THEME_SITEURL'),
+                    value=quote(conceptdoi))
+            links['conceptdoi'] = idutils.to_url(conceptdoi, 'doi')
+        return links
 
-            if bucket_id:
-                try:
-                    links['bucket'] = url_for(
-                        'invenio_files_rest.bucket_api',
-                        bucket_id=bucket_id,
-                        _external=True,
-                    )
-                except BuildError:
-                    pass
+    def _dump_record_links(self, obj):
+        """Dump record-only links."""
+        links = {}
+        m = obj.get('metadata')
+        bucket_id = m.get('_buckets', {}).get('record')
+        recid = m.get('recid')
 
-            if recid:
-                try:
-                    if api_key:
-                        links[api_key] = url_for(
-                            'invenio_records_rest.recid_item',
-                            pid_value=recid,
-                            _external=True,
-                        )
-                    if html_key:
-                        links[html_key] = \
-                            current_app.config['RECORDS_UI_ENDPOINT'].format(
-                            host=request.host,
-                            scheme=request.scheme,
-                            pid_value=recid,
-                        )
-                except BuildError:
-                    pass
+        if bucket_id:
+            links['bucket'] = external_url_for(
+                'invenio_files_rest.bucket_api', bucket_id=bucket_id)
 
-            return links
+        links['html'] = format_pid_link(
+            current_app.config['RECORDS_UI_ENDPOINT'], recid)
+
+        # Generate relation links
+        links.update(self._dump_relation_links(m))
+        return links
+
+    def _dump_deposit_links(self, obj):
+        """Dump deposit-only links."""
+        links = {}
+        m = obj.get('metadata')
+        bucket_id = m.get('_buckets', {}).get('deposit')
+        recid = m.get('recid')
+        is_published = 'pid' in m.get('_deposit', {})
+
+        if bucket_id:
+            links['bucket'] = external_url_for(
+                'invenio_files_rest.bucket_api', bucket_id=bucket_id)
+
+        # Record links
+        if is_published:
+            links['record'] = external_url_for(
+                'invenio_records_rest.recid_item', pid_value=recid)
+            links['record_html'] = format_pid_link(
+                current_app.config['RECORDS_UI_ENDPOINT'], recid)
+
+        # Generate relation links
+        links.update(self._dump_relation_links(m))
+        return links
+
+    def _dump_relation_links(self, metadata):
+        """Dump PID relation links."""
+        links = {}
+        relations = metadata.get('relations')
+        if relations:
+            version_info = next(iter(relations.get('version', [])), None)
+            if version_info:
+                last_child = version_info.get('last_child')
+                if last_child:
+                    links['latest'] = external_url_for(
+                        'invenio_records_rest.recid_item',
+                        pid_value=last_child['pid_value'])
+                    links['latest_html'] = format_pid_link(
+                        current_app.config['RECORDS_UI_ENDPOINT'],
+                        last_child['pid_value'])
+
+                if is_deposit(metadata):
+                    draft_child_depid = version_info.get('draft_child_deposit')
+                    if draft_child_depid:
+                        links['latest_draft'] = external_url_for(
+                            'invenio_deposit_rest.depid_item',
+                            pid_value=draft_child_depid['pid_value'])
+                        links['latest_draft_html'] = format_pid_link(
+                            current_app.config['DEPOSIT_UI_ENDPOINT'],
+                            draft_child_depid['pid_value'])
+        return links
 
     @post_load(pass_many=False)
     def remove_envelope(self, data):

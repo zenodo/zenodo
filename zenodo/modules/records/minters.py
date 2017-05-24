@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -26,8 +26,6 @@
 
 from __future__ import absolute_import
 
-from datetime import datetime
-
 import idutils
 from flask import current_app
 from invenio_db import db
@@ -35,6 +33,8 @@ from invenio_oaiserver.minters import oaiid_minter
 from invenio_pidstore.errors import PIDValueError
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.recordid import RecordIdProvider
+
+from zenodo.modules.deposit.minters import zenodo_concept_recid_minter
 
 
 def doi_generator(recid, prefix=None):
@@ -58,7 +58,14 @@ def is_local_doi(doi):
 
 
 def zenodo_record_minter(record_uuid, data):
-    """Mint record identifier (and DOI)."""
+    """Zenodo record minter.
+
+    Mint, or register if previously minted, the Concept RECID and RECID.
+    Mint the Concept DOI and DOI.
+    """
+    if 'conceptrecid' not in data:
+        zenodo_concept_recid_minter(record_uuid, data)
+
     if 'recid' in data:
         recid = PersistentIdentifier.get('recid', data['recid'])
         recid.assign('rec', record_uuid)
@@ -71,7 +78,52 @@ def zenodo_record_minter(record_uuid, data):
     zenodo_doi_minter(record_uuid, data)
     oaiid_minter(record_uuid, data)
 
+    if 'conceptdoi' not in data:
+        zenodo_concept_doi_minter(record_uuid, data)
     return recid
+
+
+def zenodo_concept_doi_minter(record_uuid, data):
+    """Mint Concept DOI.
+
+    .. note::
+
+        Only Zenodo DOIs are allowed to have a Concept DOI and in general have
+        versioning applied.
+    """
+    doi = data.get('doi')
+    assert 'conceptrecid' in data
+
+    # Only mint Concept DOI for Zenodo DOIs
+    if is_local_doi(doi):
+        conceptdoi = data.get('conceptdoi')
+
+        # Create a DOI if no DOI was found.
+        if not conceptdoi:
+            conceptdoi = doi_generator(data['conceptrecid'])
+            data['conceptdoi'] = conceptdoi
+
+        conceptdoi_pid = (PersistentIdentifier.query
+                          .filter_by(pid_type='doi', pid_value=conceptdoi)
+                          .one_or_none())
+        # Create if not already minted from previous versions
+        if not conceptdoi_pid:
+            return PersistentIdentifier.create(
+                'doi',
+                conceptdoi,
+                pid_provider='datacite',
+                object_type='rec',
+                object_uuid=record_uuid,
+                status=PIDStatus.RESERVED,
+            )
+        else:
+            # Update to point to latest record
+            conceptdoi_pid.assign(
+                object_type='rec',
+                object_uuid=record_uuid,
+                overwrite=True,
+            )
+            return conceptdoi_pid
 
 
 def zenodo_doi_minter(record_uuid, data):

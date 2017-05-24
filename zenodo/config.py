@@ -58,13 +58,14 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
+from invenio_pidrelations.config import RelationType
 from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
-    deposit_read_permission_factory, record_create_permission_factory, \
-    record_update_permission_factory
+    deposit_read_permission_factory, deposit_update_permission_factory, \
+    record_create_permission_factory, record_update_permission_factory
 
 
 def _(x):
@@ -90,6 +91,17 @@ PIDSTORE_DATACITE_DOI_PREFIX = "10.5072"
 PIDSTORE_DATACITE_USERNAME = "CERN.ZENODO"
 #: DataCite MDS password.
 PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
+
+#: Zenodo PID relations
+PIDRELATIONS_RELATION_TYPES = [
+    RelationType(0, 'version', 'Version',
+                 'invenio_pidrelations.contrib.versioning:PIDVersioning',
+                 'zenodo.modules.records.serializers.schemas.pidrelations:'
+                 'VersionRelation'),
+    RelationType(1, 'record_draft', 'Record Draft',
+                 'invenio_pidrelations.contrib.records:RecordDraft',
+                 None),
+]
 
 #: Enable the DataCite minding of DOIs after Deposit publishing
 DEPOSIT_DATACITE_MINTING_ENABLED = False
@@ -416,7 +428,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
             write_scope.id),
         read_permission_factory_imp=deposit_read_permission_factory,
         update_permission_factory_imp=check_oauth2_scope(
-            lambda record: record_update_permission_factory(
+            lambda record: deposit_update_permission_factory(
                 record=record).can(),
             write_scope.id),
         delete_permission_factory_imp=check_oauth2_scope(
@@ -523,7 +535,7 @@ RECORDS_UI_ENDPOINTS = dict(
         pid_type='recid',
         route='/record/<pid_value>',
         template='zenodo_records/record_detail.html',
-        record_class='invenio_records_files.api:Record',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
     recid_export=dict(
         pid_type='recid',
@@ -531,19 +543,19 @@ RECORDS_UI_ENDPOINTS = dict(
             list(ZENODO_RECORDS_EXPORTFORMATS.keys()))),
         template='zenodo_records/record_export.html',
         view_imp='zenodo.modules.records.views.records_ui_export',
-        record_class='invenio_records_files.api:Record',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
     recid_preview=dict(
         pid_type='recid',
         route='/record/<pid_value>/preview/<path:filename>',
         view_imp='invenio_previewer.views.preview',
-        record_class='invenio_records_files.api:Record',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
     recid_files=dict(
         pid_type='recid',
         route='/record/<pid_value>/files/<path:filename>',
         view_imp='invenio_records_files.utils.file_download_ui',
-        record_class='invenio_records_files.api:Record',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
 )
 RECORDS_UI_ENDPOINTS.update(ACCESSREQUESTS_RECORDS_UI_ENDPOINTS)
@@ -578,12 +590,12 @@ RECORDS_REST_ENDPOINTS = dict(
         pid_fetcher='zenodo_record_fetcher',
         list_route='/records/',
         item_route='/records/<{0}:pid_value>'.format(
-            'pid(recid,record_class="invenio_records_files.api:Record")'
+            'pid(recid,record_class="zenodo.modules.records.api:ZenodoRecord")'
         ),
         search_index='records',
-        record_class='invenio_records_files.api:Record',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
         search_type=['record-v1.0.0'],
-        search_factory_imp='invenio_records_rest.query.es_search_factory',
+        search_factory_imp='zenodo.modules.records.query.search_factory',
         record_serializers={
             'application/json': (
                 'zenodo.modules.records.serializers.legacyjson_v1_response'),
@@ -667,6 +679,27 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=6,
         ),
+        version=dict(
+            # TODO: There are a lot of implications when sorting record results
+            # by versions and using the `_score`... Maybe there's some
+            # elaborate ES syntax/API (eg. `constant_score`) to get a better
+            # version-friendly sorted result.
+            fields=['conceptrecid', 'relations.version.index'],
+            title='Version',
+            default_order='desc',
+            order=7,
+        )
+    )
+)
+DEPOSIT_REST_SORT_OPTIONS['deposits'].update(
+    dict(
+        version=dict(
+            # FIXME: No `_score` in deposit search response...
+            fields=['conceptrecid', 'relations.version.index'],
+            title='Version',
+            default_order='desc',
+            order=7,
+        )
     )
 )
 RECORDS_REST_SORT_OPTIONS.update(OPENAIRE_REST_SORT_OPTIONS)

@@ -36,9 +36,21 @@ from zenodo.modules.records.serializers import marcxml_v1
 
 def test_full_record(app, db, full_record):
     """Test MARC21 serialization of full record."""
+    # Add embargo date and OAI-PMH set information.
+    full_record['embargo_date'] = '0900-12-31'
+    full_record['_oai'] = {
+        "id": "oai:zenodo.org:1",
+        "sets": ["user-zenodo", "user-ecfunded"]
+    }
+
+    # Create record and PID.
     record = Record.create(full_record)
-    record.model.updated = datetime.utcnow()
-    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    pid = PersistentIdentifier.create(
+        pid_type='recid',
+        pid_value='12345',
+        object_type='rec',
+        object_uuid=record.id,
+    )
     assert record.validate() is None
 
     expected = {
@@ -250,18 +262,6 @@ def test_full_record(app, db, full_record):
         },
     }
 
-    # Add embargo date and OAI-PMH set information.
-    full_record['embargo_date'] = '0900-12-31'
-    full_record['_oai'] = {
-        "id": "oai:zenodo.org:1",
-        "sets": ["user-zenodo", "user-ecfunded"]
-    }
-
-    # Create record and PID.
-    record = Record.create(full_record)
-    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
-    assert record.validate() is None
-
     # Dump MARC21 JSON structure and compare against expected JSON.
     preprocessed_record = marcxml_v1.preprocess_record(record=record, pid=pid)
     assert_dict(
@@ -270,7 +270,7 @@ def test_full_record(app, db, full_record):
     )
 
     # Assert that we can output MARCXML.
-    marcxml_v1.serialize(record=record, pid=pid)
+    assert marcxml_v1.serialize(record=record, pid=pid)
 
 
 def test_minimal_record(app, db, minimal_record):
@@ -278,7 +278,11 @@ def test_minimal_record(app, db, minimal_record):
     # Create record and pid.
     record = Record.create(minimal_record)
     record.model.updated = datetime.utcnow()
-    pid = PersistentIdentifier(pid_type='recid', pid_value='2')
+    pid = PersistentIdentifier.create(
+            pid_type='recid',
+            pid_value='123',
+            object_type='rec',
+            object_uuid=record.id)
     assert record.validate() is None
 
     expected = {

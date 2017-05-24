@@ -29,7 +29,8 @@ from __future__ import absolute_import
 from celery import shared_task
 from flask import current_app
 from invenio_db import db
-from invenio_pidstore.models import PIDStatus
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
 
@@ -40,10 +41,12 @@ from zenodo.modules.records.serializers import datacite_v31
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
              rate_limit='100/m')
 def datacite_register(pid_value, record_uuid):
-    """Mint the DOI with DataCite.
+    """Mint DOI and Concept DOI with DataCite.
 
     :param pid_value: Value of record PID, with pid_type='recid'.
     :type pid_value: str
+    :param record_uuid: Record Metadata UUID.
+    :type record_uuid: str
     """
     try:
         record = Record.get_record(record_uuid)
@@ -52,15 +55,32 @@ def datacite_register(pid_value, record_uuid):
             return
 
         dcp = DataCiteProvider.get(record['doi'])
+        doc = datacite_v31.serialize(dcp.pid, record)
 
         url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
             recid=pid_value)
-        doc = datacite_v31.serialize(dcp.pid, record)
-
         if dcp.pid.status == PIDStatus.REGISTERED:
             dcp.update(url, doc)
         else:
             dcp.register(url, doc)
+
+        # If this is the latest record version, update/register the Concept DOI
+        # using the metadata of the record.
+        recid = PersistentIdentifier.get('recid', str(record['recid']))
+        pv = PIDVersioning(child=recid)
+        if pv.exists and pv.is_last_child:
+            conceptdoi = record.get('conceptdoi')
+            conceptrecid = record.get('conceptrecid')
+            concept_dcp = DataCiteProvider.get(conceptdoi)
+            url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+                recid=conceptrecid)
+
+            doc = datacite_v31.serialize(concept_dcp.pid, record)
+            if concept_dcp.pid.status == PIDStatus.REGISTERED:
+                concept_dcp.update(url, doc)
+            else:
+                concept_dcp.register(url, doc)
+
         db.session.commit()
     except Exception as exc:
         datacite_register.retry(exc=exc)
@@ -80,3 +100,26 @@ def datacite_inactivate(pid_value):
         db.session.commit()
     except Exception as exc:
         datacite_inactivate.retry(exc=exc)
+
+
+# WITH recids AS (
+#     SELECT
+#         pidstore_pid.pid_value AS pid_value,
+#         pidstore_pid.object_uuid AS object_uuid
+#     FROM pidstore_pid
+#     WHERE pidstore_pid.pid_type = 'recid' AND pidstore_pid.status = 'K'
+# )
+
+# SELECT
+#     records_metadata.id AS records_metadata_id,
+#     records_metadata.json AS records_metadata_json,
+#     pidstore_pid.pid_type AS pidstore_pid_pid_type,
+#     pidstore_pid.pid_value AS pidstore_pid_pid_value,
+#     pidstore_pid.object_uuid AS pidstore_pid_object_uuid
+# FROM
+#     records_metadata
+#     JOIN pidstore_pid ON pidstore_pid.object_uuid = records_metadata.id
+#     JOIN recids ON records_metadata.json ->> 'recid' = recids.pid_value
+# WHERE
+#     pidstore_pid.pid_type = 'depid' AND
+#     records_metadata.json #>> '{_deposit,status}' = 'draft'

@@ -26,6 +26,14 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidrelations.proxies import current_pidrelations
+from invenio_pidrelations.serializers.utils import serialize_relations
+from invenio_pidstore.models import PersistentIdentifier
+
+from zenodo.modules.records.serializers.pidrelations import \
+    serialize_related_identifiers
+
 
 def indexer_receiver(sender, json=None, record=None, index=None,
                      **dummy_kwargs):
@@ -41,6 +49,23 @@ def indexer_receiver(sender, json=None, record=None, index=None,
         files = json.get('_files', [])
         json['filecount'] = len(files)
         json['size'] = sum([f.get('size', 0) for f in files])
+
+    pid = PersistentIdentifier.query.filter(
+        PersistentIdentifier.object_uuid == record.id,
+        PersistentIdentifier.pid_type == current_pidrelations.primary_pid_type,
+        ).one_or_none()
+    if pid:
+        pv = PIDVersioning(child=pid)
+        if pv.exists:
+            relations = serialize_relations(pid)
+        else:
+            relations = {'version': [{'is_last': True, 'index': 0}, ]}
+        if relations:
+            json['relations'] = relations
+
+        rels = serialize_related_identifiers(pid)
+        if rels:
+            json.setdefault('related_identifiers', []).extend(rels)
 
     # Remove internal data.
     if '_internal' in json:

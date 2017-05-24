@@ -33,6 +33,7 @@ zenodo index destroy --force --yes-i-know
 zenodo index queue init
 zenodo index init
 zenodo fixtures init
+zenodo opendefinition loadlicenses
 zenodo fixtures loadlicenses
 zenodo fixtures loadfp6funders
 zenodo fixtures loadfp6grants

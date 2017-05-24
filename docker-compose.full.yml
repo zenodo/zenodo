@@ -1,0 +1,83 @@
+version: '2.1'
+services:
+  # Frontend
+  lb:
+    extends:
+      file: docker-services.yml
+      service: lb
+    links:
+      - frontend
+  frontend:
+    extends:
+      file: docker-services.yml
+      service: frontend
+    links:
+      - web
+    volumes_from:
+      - static
+  # Application
+  web:
+    extends:
+      file: docker-services.yml
+      service: app
+    command: uwsgi /code/zenodo/docker/uwsgi/uwsgi.ini
+    ports:
+      - "5000:5000"
+    links:
+      - cache
+      - es
+      - mq
+      - db
+      - statsd
+    volumes_from:
+      - static
+  worker:
+    extends:
+      file: docker-services.yml
+      service: app
+    restart: "always"
+    command: "celery worker -A zenodo.celery --loglevel=INFO"
+    links:
+      - cache
+      - es
+      - mq
+      - db
+      - statsd
+    volumes_from:
+      - static
+  static:
+    extends:
+      file: docker-services.yml
+      service: app
+    restart: "no"
+    command: tail -f /var/log/*
+    user: zenodo
+    volumes:
+      - "/usr/local/var/instance/static"
+      - "/usr/local/lib/python3.5/site-packages"
+      - "/usr/local/var/data"
+      - ".:/code/zenodo"
+  # Monitoring
+  flower:
+    extends:
+      file: docker-services.yml
+      service: flower
+    links:
+      - mq
+  # Base services
+  cache:
+    extends:
+      file: docker-services.yml
+      service: cache
+  db:
+    extends:
+      file: docker-services.yml
+      service: db
+  mq:
+    extends:
+      file: docker-services.yml
+      service: mq
+  es:
+    extends:
+      file: docker-services.yml
+      service: es

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -37,10 +37,10 @@ from flask_security import current_user, login_required
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
-from invenio_records_files.api import Record
 from invenio_records_files.models import RecordsBuckets
 
 from zenodo.modules.records.permissions import record_permission_factory
@@ -48,7 +48,7 @@ from zenodo.modules.records.permissions import record_permission_factory
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
-from .tasks import datacite_inactivate
+from .tasks import datacite_inactivate, datacite_register
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -117,7 +117,8 @@ def new():
 
 
 @blueprint.route(
-    '/record/<pid(recid,record_class="invenio_records.api:Record"):pid_value>',
+    '/record/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>',
     methods=['POST']
 )
 @login_required
@@ -140,47 +141,107 @@ def edit(pid=None, record=None, depid=None, deposit=None):
 
 
 @blueprint.route(
+    '/record/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
+    '/newversion',
+    methods=['POST']
+)
+@login_required
+@pass_record('newversion')
+def newversion(pid=None, record=None, depid=None, deposit=None):
+    """Create a new version of a record."""
+    # If the record doesn't have a DOI, its deposit shouldn't be editable.
+    if 'doi' not in record:
+        abort(404)
+
+    # FIXME: Maybe this has to go inside the API (`ZenodoDeposit.newversion`)
+    # If this is not the latest version, get the latest and extend it
+    latest_pid = PIDVersioning(child=pid).last_child
+    if pid != latest_pid:
+        # We still want to do a POST, so we specify a 307 reidrect code
+        return redirect(url_for('zenodo_deposit.newversion',
+                                pid_value=latest_pid.pid_value), code=307)
+
+    deposit.newversion()
+    db.session.commit()
+
+    new_version_deposit = PIDVersioning(child=pid).draft_child_deposit
+
+    return redirect(url_for(
+        'invenio_deposit_ui.{0}'.format(new_version_deposit.pid_type),
+        pid_value=new_version_deposit.pid_value
+    ))
+
+
+@blueprint.route(
+    '/record/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
+    '/registerconceptdoi',
+    methods=['POST']
+)
+@login_required
+@pass_record('registerconceptdoi')
+def registerconceptdoi(pid=None, record=None, depid=None, deposit=None):
+    """Register the Concept DOI for the record."""
+    # If the record doesn't have a DOI, its deposit shouldn't be editable.
+    if 'conceptdoi' in record:
+        abort(404)  # TODO: Abort with better code if record is versioned
+
+    deposit.registerconceptdoi()
+    db.session.commit()
+
+    return redirect(url_for('invenio_records_ui.recid',
+                    pid_value=pid.pid_value))
+
+
+@blueprint.route(
     '/record'
-    '/<pid(recid,record_class="invenio_records_files.api:Record"):pid_value>'
+    '/<pid(recid,record_class='
+    '"zenodo.modules.records.api:ZenodoRecord"):pid_value>'
     '/admin/delete',
     methods=['GET', 'POST']
 )
 @login_required
-@pass_record('delete', deposit_cls=Record)
+@pass_record('delete')
 def delete(pid=None, record=None, depid=None, deposit=None):
     """Delete a record."""
     # View disabled until properly implemented and tested.
     try:
-        doi = PersistentIdentifier.get_by_object('doi', 'rec', record.id)
+        doi = PersistentIdentifier.get('doi', record['doi'])
     except PIDDoesNotExistError:
         doi = None
+
+    try:
+        if 'conceptdoi' in record:
+            conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
+            conceptrecid = PersistentIdentifier.get('recid',
+                                                    record['conceptrecid'])
+    except PIDDoesNotExistError:
+        conceptdoi = None
+        conceptrecid = None
 
     form = RecordDeleteForm()
     form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
     if form.validate_on_submit():
-        # Remove from index
+        # Remove record from index
         try:
             RecordIndexer().delete(record)
         except NotFoundError:
             pass
-        try:
-            RecordIndexer().delete(deposit)
-        except NotFoundError:
-            pass
         # Remove buckets
         record_bucket = record.files.bucket
-        deposit_bucket = deposit.files.bucket
         RecordsBuckets.query.filter_by(record_id=record.id).delete()
-        RecordsBuckets.query.filter_by(record_id=deposit.id).delete()
         record_bucket.locked = False
         record_bucket.remove()
-        deposit_bucket.locked = False
-        deposit_bucket.remove()
-        # Remove PIDs
+
+        # Delete record PID and contents.
         pid.delete()
-        depid.delete()
-        # Remove record objects and record removal reason.
         record.clear()
+
+        # NOTE: Concept recid will not be deleted, but will redirect to the
+        # last version of the record.
+        pv = PIDVersioning(child=pid)
+        pv.update_redirect()
 
         reason = form.reason.data or dict(
             current_app.config['ZENODO_REMOVAL_REASONS']
@@ -191,9 +252,20 @@ def delete(pid=None, record=None, depid=None, deposit=None):
             'removed_by': current_user.get_id(),
         })
         record.commit()
-        deposit.delete()
+
+        # Completely delete the deposit
+        # Deposit will be removed from index
+        deposit.delete(delete_published=True)
         db.session.commit()
         datacite_inactivate.delay(doi.pid_value)
+        if conceptdoi:
+            if pv.children.count() > 0:
+                # Update last child (update also conceptdoi)
+                datacite_register.delay(
+                    pv.last_child.pid_value,
+                    str(pv.last_child.object_uuid))
+            else:
+                datacite_inactivate.delay(conceptdoi.pid_value)
         flash(
             _('Record %(recid)s and associated objects successfully deleted.',
                 recid=pid.pid_value),
@@ -201,11 +273,12 @@ def delete(pid=None, record=None, depid=None, deposit=None):
         )
         return redirect(url_for('zenodo_frontpage.index'))
 
+    pids = [p for p in (pid, depid, doi, conceptrecid, conceptdoi) if p]
     return render_template(
         'zenodo_deposit/delete.html',
         form=form,
         pid=pid,
-        pids=[pid, depid, doi],
+        pids=pids,
         record=record,
         deposit=deposit,
     )
@@ -241,6 +314,8 @@ def to_links_js(pid, deposit=None):
         'discard': self_url + '/actions/discard',
         'edit': self_url + '/actions/edit',
         'publish': self_url + '/actions/publish',
+        'newversion': self_url + '/actions/newversion',
+        'registerconceptdoi': self_url + '/actions/registerconceptdoi',
         'files': self_url + '/files',
     }
 

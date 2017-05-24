@@ -33,7 +33,7 @@ from invenio_records.api import Record
 from zenodo.modules.records.serializers import csl_v1
 
 
-def test_minimal(app, minimal_record, recid_pid):
+def test_minimal(db, minimal_record, recid_pid):
     """Test minimal record."""
     obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
     d = datetime.utcnow().date()
@@ -51,7 +51,7 @@ def test_minimal(app, minimal_record, recid_pid):
     }
 
 
-def test_type(app, minimal_record, recid_pid):
+def test_type(db, minimal_record, recid_pid):
     """"Test type."""
     minimal_record.update({
         'resource_type': {'type': 'publication', 'subtype': 'thesis'}
@@ -72,7 +72,7 @@ def test_type(app, minimal_record, recid_pid):
     assert obj['type'] == 'graphic'
 
 
-def test_author(app, minimal_record, recid_pid):
+def test_author(db, minimal_record, recid_pid):
     """"Test author."""
     minimal_record['creators'] = []
     obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
@@ -91,7 +91,7 @@ def test_author(app, minimal_record, recid_pid):
     ]
 
 
-def test_identifiers(app, minimal_record, recid_pid):
+def test_identifiers(db, minimal_record, recid_pid):
     """"Test identifiers."""
     minimal_record['doi'] = '10.1234/foo'
     obj = csl_v1.transform_record(recid_pid, Record(minimal_record))
@@ -115,7 +115,7 @@ def test_identifiers(app, minimal_record, recid_pid):
     assert obj['ISSN'] == 'ISSN 0264-2875'
 
 
-def test_journal(app, minimal_record, recid_pid):
+def test_journal(db, minimal_record, recid_pid):
     """Test journal record."""
     minimal_record['journal'] = {
         'volume': '42',
@@ -130,7 +130,7 @@ def test_journal(app, minimal_record, recid_pid):
     assert obj['page'] == '10-20'
 
 
-def test_part_of(app, minimal_record, recid_pid):
+def test_part_of(db, minimal_record, recid_pid):
     """Test journal record."""
     minimal_record['part_of'] = {
         'title': 'Conference proceedings title',
@@ -147,7 +147,7 @@ def test_part_of(app, minimal_record, recid_pid):
     assert obj['publisher_place'] == 'Somewhere'
 
 
-def test_other(app, minimal_record, recid_pid):
+def test_other(db, minimal_record, recid_pid):
     """Test other fields."""
     minimal_record['language'] = 'en'
     minimal_record['notes'] = 'Test note'

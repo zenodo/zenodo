@@ -1,131 +1,69 @@
-lb:
-  build: ./docker/haproxy/
-  restart: "always"
-  ports:
-    - "80:80"
-    - "443:443"
-    - "8080:8080"
-  links:
-    - frontend
-frontend:
-  build: ./docker/nginx/
-  restart: "always"
-  ports:
-    - "81:80"
-    - "444:443"
-  links:
-    - web
-  volumes_from:
-    - static
-web:
-  build: .
-  restart: "always"
-  command: uwsgi /code/zenodo/docker/uwsgi/uwsgi.ini
-  # command: zenodo run -h 0.0.0.0 -p 5000
-  ports:
-    - "5000:5000"
-  environment:
-    - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
-    - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
-    - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
-    - "APP_CACHE_TYPE=redis"
-    - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
-    - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
-    - "APP_SECRET_KEY=CHANGE_ME"
-    - "APP_SECURE_SESSION_COOKIE=True"
-    - "APP_STATSD_HOST=statsd"
-    - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-    - "APP_WSGI_PROXIES=2"
-  links:
-    - cache
-    - es
-    - mq
-    - db
-    - statsd
-  volumes_from:
-    - static
-worker:
-  build: .
-  restart: "always"
-  command: "celery worker -A zenodo.celery --loglevel=INFO"
-  environment:
-    - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
-    - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
-    - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
-    - "APP_CACHE_TYPE=redis"
-    - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
-    - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
-    - "APP_SECRET_KEY=CHANGE_ME"
-    - "APP_SECURE_SESSION_COOKIE=True"
-    - "APP_STATSD_HOST=statsd"
-    - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-    - "APP_WSGI_PROXIES=2"
-  links:
-    - cache
-    - es
-    - mq
-    - db
-    - statsd
-  volumes_from:
-    - static
-# Kibana v4.5.0 is required for Elasticsearch v2.3.x, although this version is
-# not is not available on the Docker registry anymore (Elasticsearch has its own
-# registry nowadays. Investigation required to resolve what ES/Kibana versions
-# are required to run everything smoothly.
-# kibana:
-#   image: kibana:4.5.0
-#   ports:
-#     - "5601:5601"
-#   environment:
-#     - "ELASTICSEARCH_URL=http://es:9200"
-#   links:
-#     - es
-statsd:
-  build: ./docker/statsd/
-  restart: "always"
-  ports:
-    - "8125/udp:8125/udp"
-  environment:
-    - "ES_HOST=es"
-    - "ES_PORT=9200"
-  links:
-    - es
-cache:
-  image: redis
-  restart: "always"
-  read_only: true
-  ports:
-    - "6379:6379"
-db:
-  image: postgres
-  command: postgres
-  restart: "always"
-  environment:
-    - "POSTGRES_DB=zenodo"
-    - "POSTGRES_PASSWORD=zenodo"
-    - "POSTGRES_USER=zenodo"
-  ports:
-    - "5432:5432"
-  read_only: false
-mq:
-  image: rabbitmq:3-management
-  restart: "always"
-  ports:
-    - "15672:15672"
-    - "5672:5672"
-es:
-  build: ./docker/es/
-  restart: "always"
-  ports:
-    - "9200:9200"
-    - "9300:9300"
-static:
-  restart: "no"
-  build: .
-  command: tail -f /var/log/*
-  user: zenodo
-  volumes:
-    - "/usr/local/var/instance/static"
-    - "/usr/local/lib/python3.5/site-packages"
-    - "/usr/local/var/data"
-    - ".:/code/zenodo"
+version: '2.1'
+services:
+  # Application
+  web:
+    extends:
+      file: docker-services.yml
+      service: app
+    command: zenodo run -h 0.0.0.0 -p 5000
+    environment:
+      - "APP_SESSION_COOKIE_SECURE=False"
+      - "APP_STATSD_HOST="
+    ports:
+      - "5000:5000"
+    links:
+      - cache
+      - es
+      - mq
+      - db
+    volumes_from:
+      - static
+  worker:
+    extends:
+      file: docker-services.yml
+      service: app
+    restart: "always"
+    command: "celery worker -A zenodo.celery --loglevel=INFO"
+    links:
+      - cache
+      - es
+      - mq
+      - db
+    volumes_from:
+      - static
+  static:
+    extends:
+      file: docker-services.yml
+      service: app
+    restart: "no"
+    command: tail -f /var/log/faillog
+    user: zenodo
+    volumes:
+      - "/usr/local/var/instance/static"
+      - "/usr/local/lib/python3.5/site-packages"
+      - "/usr/local/var/data"
+      - ".:/code/zenodo"
+  # Monitoring
+  flower:
+    extends:
+      file: docker-services.yml
+      service: flower
+    links:
+      - mq
+  # Base services
+  cache:
+    extends:
+      file: docker-services.yml
+      service: cache
+  db:
+    extends:
+      file: docker-services.yml
+      service: db
+  mq:
+    extends:
+      file: docker-services.yml
+      service: mq
+  es:
+    extends:
+      file: docker-services.yml
+      service: es
