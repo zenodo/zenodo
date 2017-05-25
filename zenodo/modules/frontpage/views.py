@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, render_template
+from flask import Blueprint, current_app, flash, render_template
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
 
@@ -62,6 +62,11 @@ def init_menu():
 @cached(timeout=600, key_prefix='frontpage')
 def index():
     """Frontpage blueprint."""
+    msg = current_app.config.get('FRONTPAGE_MESSAGE')
+    if msg:
+        flash(msg, category=current_app.config.get(
+            'FRONTPAGE_MESSAGE_CATEGORY', 'info'))
+
     return render_template(
         'zenodo_frontpage/index.html',
         records=FrontpageRecordsSearch()[:10].sort('-_created').execute(),
