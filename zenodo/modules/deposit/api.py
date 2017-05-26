@@ -504,11 +504,12 @@ class ZenodoDeposit(Deposit):
         pv = PIDVersioning(child=pid)
         if (not pv.draft_child and
                 is_doi_locally_managed(record['doi'])):
-            # Let's create the new version draft!
             with db.session.begin_nested():
 
-                # Get copy of the record
-                data = record.dumps()
+                # Get copy of the latest record
+                latest_record = ZenodoRecord.get_record(
+                    pv.last_child.object_uuid)
+                data = latest_record.dumps()
 
                 owners = data['_deposit']['owners']
 
@@ -547,7 +548,7 @@ class ZenodoDeposit(Deposit):
 
                 with db.session.begin_nested():
                     # Create snapshot from the record's bucket and update data
-                    snapshot = record.files.bucket.snapshot(lock=False)
+                    snapshot = latest_record.files.bucket.snapshot(lock=False)
                     snapshot.locked = False
                 # FIXME: `snapshot.id` might not be present because we need to
                 # commit first to the DB.
