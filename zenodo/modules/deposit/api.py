@@ -446,14 +446,10 @@ class ZenodoDeposit(Deposit):
 
         versioning = PIDVersioning(child=recid)
         if versioning.exists:
-            if versioning.draft_child:
-                index_siblings(versioning.draft_child,
-                               children=versioning.children.all(),
-                               include_pid=True,
-                               neighbors_eager=True,
-                               with_deposits=True)
+            if versioning.draft_child and \
+                    self.pid == versioning.draft_child_deposit:
                 versioning.remove_draft_child()
-            elif versioning.last_child:
+            if versioning.last_child:
                 index_siblings(versioning.last_child,
                                children=versioning.children.all(),
                                include_pid=True,
