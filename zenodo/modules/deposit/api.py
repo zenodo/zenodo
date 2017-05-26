@@ -557,10 +557,13 @@ class ZenodoDeposit(Deposit):
     @mark_as_action
     def registerconceptdoi(self, pid=None):
         """Register the conceptdoi for the deposit and record."""
+        if not self.is_published() and is_doi_locally_managed(self['doi']):
+            raise PIDInvalidAction()
+
         pid, record = self.fetch_published()
         zenodo_concept_doi_minter(record.id, record)
         record.commit()
-        self['conceptdoi'] = record['conceptrecid']
+        self['conceptdoi'] = record['conceptdoi']
         self.commit()
 
         if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
