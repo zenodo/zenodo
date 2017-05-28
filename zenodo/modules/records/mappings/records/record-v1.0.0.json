@@ -124,6 +124,14 @@
         "recid": {
           "type": "long"
         },
+        "conceptrecid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "conceptdoi": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
         "doi": {
           "type": "string",
           "index": "not_analyzed"
@@ -160,9 +168,37 @@
                       "type": "string"
                     },
                     "pid_value": {
-                      "type": "string"
+                      "type": "string",
+                      "index": "not_analyzed"
                     }
                   }
+                },
+                "last_child": {
+                  "type": "object",
+                  "properties": {
+                    "pid_type": {
+                      "type": "string"
+                    },
+                    "pid_value": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                    }
+                  }
+                },
+                "draft_child_deposit": {
+                  "type": "object",
+                  "properties": {
+                    "pid_type": {
+                      "type": "string"
+                    },
+                    "pid_value": {
+                      "type": "string",
+                      "index": "not_analyzed"
+                    }
+                  }
+                },
+                "count": {
+                  "type": "integer"
                 },
                 "index": {
                   "type": "integer"
