@@ -783,19 +783,6 @@
       },
       "type": "array"
     },
-    "relations": {
-      "properties": {
-        "version": {
-          "properties": {
-            "parent": {
-              "type": "string"
-            }
-          },
-          "type": "object"
-        }
-      },
-      "type": "object"
-    },
     "resource_type": {
       "additionalProperties": false,
       "description": "Record resource type.",
