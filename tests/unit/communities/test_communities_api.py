@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 
 from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_communities.models import InclusionRequest
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.api import ZenodoDeposit
@@ -258,6 +259,44 @@ def test_communities_newversion_addition(
     assert deposit_v1.get('communities', []) == ['c1', 'c5', ]
     assert record_v2.get('communities', []) == ['c1', ]
     assert deposit_v2.get('communities', []) == ['c1', 'c5', ]
+
+
+def test_communities_newversion_while_ir_pending_bug(
+        app, db, users, communities, deposit, deposit_file):
+    """Make sure that pending IRs remain after a new version (bug)."""
+    deposit['communities'] = ['c1', 'c2']
+    deposit_v1 = publish_and_expunge(db, deposit)
+    recid_v1, record_v1 = deposit_v1.fetch_published()
+    depid_v1_value = deposit_v1['_deposit']['id']
+    recid_v1_value = recid_v1.pid_value
+
+    # Two inclusion requests are pending
+    assert InclusionRequest.query.count() == 2
+
+    # Accept one community
+    c1_api = ZenodoCommunity('c1')
+    c1_api.accept_record(record_v1, pid=recid_v1)
+
+    deposit_v1 = deposit_v1.newversion()
+    pv = PIDVersioning(child=recid_v1)
+    depid_v2 = pv.draft_child_deposit
+    depid_v2_value = depid_v2.pid_value
+
+    deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+
+    deposit_v2 = publish_and_expunge(db, deposit_v2)
+    recid_v2, record_v2 = deposit_v2.fetch_published()
+
+    depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
+    depid_v2, deposit_v2 = deposit_resolver.resolve(depid_v2_value)
+    recid_v1, record_v1 = record_resolver.resolve(recid_v1_value)
+    # Make sure there is still IR to community 'c2' after newversion
+    assert InclusionRequest.query.count() == 1
+    assert InclusionRequest.query.one().id_community == 'c2'
+    assert record_v1.get('communities', []) == ['c1', ]
+    assert deposit_v1.get('communities', []) == ['c1', 'c2', ]
+    assert record_v2.get('communities', []) == ['c1', ]
+    assert deposit_v2.get('communities', []) == ['c1', 'c2', ]
 
 
 def test_propagation_with_newversion_open(
