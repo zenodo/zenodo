@@ -303,8 +303,7 @@ def to_links_js(pid, deposit=None):
 
     self_url = current_app.config['DEPOSIT_RECORDS_API'].format(
         pid_value=pid.pid_value)
-
-    return {
+    links = {
         'self': self_url,
         'html': url_for(
             'invenio_deposit_ui.{}'.format(pid.pid_type),
@@ -318,6 +317,27 @@ def to_links_js(pid, deposit=None):
         'registerconceptdoi': self_url + '/actions/registerconceptdoi',
         'files': self_url + '/files',
     }
+
+    # Add versioning links
+    conceptrecid = deposit.get('conceptrecid')
+    if conceptrecid:
+        conceptrecid = PersistentIdentifier.get('recid', conceptrecid)
+        pv = PIDVersioning(parent=conceptrecid)
+        latest_record = pv.last_child
+        if latest_record:
+            links['latest'] = current_app.config['RECORDS_API'].format(
+                pid_value=latest_record.pid_value)
+            links['latest_html'] = url_for(
+                'invenio_records_ui.recid', pid_value=latest_record.pid_value)
+        draft_child_depid = pv.draft_child_deposit
+        if draft_child_depid:
+            links['latest_draft'] = (
+                current_app.config['DEPOSIT_RECORDS_API']
+                .format(pid_value=draft_child_depid.pid_value))
+            links['latest_draft_html'] = url_for(
+                'invenio_deposit_ui.{}'.format(draft_child_depid.pid_type),
+                pid_value=draft_child_depid.pid_value)
+    return links
 
 
 @blueprint.app_template_filter('tofilesjs')

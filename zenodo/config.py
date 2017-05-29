@@ -583,6 +583,7 @@ FILES_REST_OBJECT_KEY_MAX_LEN = 1000
 FILES_REST_FILE_URI_MAX_LEN = 1000
 
 #: Records REST API endpoints.
+RECORDS_API = '/api/records/{pid_value}'
 RECORDS_REST_ENDPOINTS = dict(
     recid=dict(
         pid_type='recid',

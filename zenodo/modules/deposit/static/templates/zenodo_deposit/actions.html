@@ -6,7 +6,7 @@
         ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
         ng-disabled="recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self"
         ng-attr-title="{{(recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self) && 'Record was not saved yet.' || 'Delete the deposit'}}"
-        ng-click="recordsVM.actionHandler(['self', 'DELETE'], '/deposit')">
+        ng-click="recordsVM.actionHandler(['self', 'DELETE'], recordsVM.invenioRecordsArgs.templateParams.is_new_version ? 'latest_html' : '/deposit')">
         <i class="fa fa-trash-o fa-inverse"></i> {{ recordsVM.invenioRecordsArgs.templateParams.is_new_version ? 'Discard version' : 'Delete' }}
       </button>
     </li>
