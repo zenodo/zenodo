@@ -69,7 +69,7 @@
             <small class="text-muted hidden-xs">
               {% trans user=userprofile, date=creation_date|dateformat('long') %}Uploaded on {{date}}{% endtrans %}
             </small>
-            {%- if r.relations.version[0].count > 1 %}
+            {%- if r.relations.version[0].count|d(1) > 1 %}
               <p class="text-muted"><a href="{{ url_for('invenio_search_ui.search', q=('conceptrecid:' ~ r.conceptrecid), all_versions=True, sort='-version') }}"><small><i>{{ r.relations.version[0].count - 1 }} more version(s) exist for this record</i> </small></a></p>
             {% endif %}
           </div>
