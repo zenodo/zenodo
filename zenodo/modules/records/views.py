@@ -48,6 +48,7 @@ from zenodo.modules.records.utils import is_doi_locally_managed
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
+from .api import ZenodoRecord
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -279,6 +280,15 @@ def pid_from_value(pid_value, pid_type='recid'):
         return PersistentIdentifier.get(pid_type=pid_type, pid_value=pid_value)
     except Exception:
         pass
+
+
+@blueprint.app_template_filter()
+def record_from_pid(recid):
+    """Get record from PID."""
+    try:
+        return ZenodoRecord.get_record(recid.object_uuid)
+    except Exception:
+        return {}
 
 
 #

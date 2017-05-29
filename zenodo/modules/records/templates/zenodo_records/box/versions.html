@@ -8,12 +8,14 @@
     <h4>{{_('Versions')}}</h4>
     <table class="table">
     {%- for pid_version in (active_versions|reverse|list)[:5] %}
+      {%- set version_record = pid_version|record_from_pid %}
       {%- set current_version_index = all_versions.index(pid_version) %}
       <tr {% if pid_version_index == all_versions.index(pid_version) %}class="info"{% endif %}>
         <td>
           <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid_version.pid_value) }}">Version {{ current_version_index + 1 }}</a>
-          <small class="text-muted">10.5281/zenodo.{{pid_version.pid_value}}</small>
+          <small class="text-muted">{{version_record.doi}}</small>
         </td>
+        <td align="right"><small class="text-muted">{{ version_record.publication_date|from_isodate|dateformat(format='medium')}}</small></td>
       </tr>
     {%- endfor %}
     {%- if active_versions|length > 5 %}
@@ -22,8 +24,9 @@
         <tr class="info">
           <td>
             <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value) }}">Version {{ pid_version_index + 1 }}</a>
-            <small class="text-muted">10.5281/zenodo.{{pid.pid_value}}</small>
+            <small class="text-muted">{{record.doi}}</small>
           </td>
+          <td align="right"><small class="text-muted">{{ record.publication_date|from_isodate|dateformat(format='medium')}}</small></td>
         </tr>
       {% endif %}
       {% set q = {"conceptrecid": record.conceptrecid}|make_query %}
