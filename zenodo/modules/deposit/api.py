@@ -513,7 +513,7 @@ class ZenodoDeposit(Deposit):
                     'depid', data['_deposit']['id'])
                 latest_deposit = ZenodoDeposit.get_record(
                     latest_depid.object_uuid)
-                last_communities = latest_deposit['communities']
+                last_communities = latest_deposit.get('communities', [])
 
                 owners = data['_deposit']['owners']
 
@@ -530,7 +530,8 @@ class ZenodoDeposit(Deposit):
                 # Injecting owners is required in case of creating new
                 # version this outside of request context
                 deposit['_deposit']['owners'] = owners
-                deposit['communities'] = last_communities
+                if last_communities:
+                    deposit['communities'] = last_communities
 
                 ###
                 conceptrecid = PersistentIdentifier.get(
