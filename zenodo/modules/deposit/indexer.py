@@ -29,7 +29,6 @@ from __future__ import absolute_import, print_function
 import copy
 
 from flask import current_app
-
 from invenio_pidrelations.contrib.records import index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations

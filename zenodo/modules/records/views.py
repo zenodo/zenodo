@@ -45,10 +45,10 @@ from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.github.utils import is_github_owner, is_github_versioned
 from zenodo.modules.records.utils import is_doi_locally_managed
 
+from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
-from .api import ZenodoRecord
 
 blueprint = Blueprint(
     'zenodo_records',
