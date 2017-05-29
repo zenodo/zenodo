@@ -507,6 +507,14 @@ class ZenodoDeposit(Deposit):
                     pv.last_child.object_uuid)
                 data = latest_record.dumps()
 
+                # Get the communities from the last deposit
+                # and push those to the new version
+                latest_depid = PersistentIdentifier.get(
+                    'depid', data['_deposit']['id'])
+                latest_deposit = ZenodoDeposit.get_record(
+                    latest_depid.object_uuid)
+                last_communities = latest_deposit['communities']
+
                 owners = data['_deposit']['owners']
 
                 # TODO: Check other data that may need to be removed
@@ -522,6 +530,7 @@ class ZenodoDeposit(Deposit):
                 # Injecting owners is required in case of creating new
                 # version this outside of request context
                 deposit['_deposit']['owners'] = owners
+                deposit['communities'] = last_communities
 
                 ###
                 conceptrecid = PersistentIdentifier.get(
