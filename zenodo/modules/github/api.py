@@ -40,6 +40,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from werkzeug.utils import cached_property
 
 from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.records.api import ZenodoRecord
 
 from ..deposit.loaders import legacyjson_v1_translator
@@ -96,8 +97,15 @@ class ZenodoGitHubRelease(GitHubRelease):
                     'recid', last_release.record['recid'])
                 versioning = PIDVersioning(child=last_recid)
                 last_record = ZenodoRecord.get_record(
-                    versioning.last_child.get_assigned_object())
+                    versioning.last_child.object_uuid)
                 deposit_metadata['conceptrecid'] = last_record['conceptrecid']
+                if 'conceptdoi' not in last_record:
+                    last_depid = PersistentIdentifier.get(
+                        'depid', last_record['_deposit']['id'])
+                    last_deposit = ZenodoDeposit.get_record(
+                        last_depid.object_uuid)
+                    last_deposit = last_deposit.registerconceptdoi()
+                    last_recid, last_record = last_deposit.fetch_published()
                 deposit_metadata['conceptdoi'] = last_record['conceptdoi']
                 if versioning.draft_child:
                     stashed_draft_child = versioning.draft_child
