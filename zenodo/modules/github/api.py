@@ -39,8 +39,8 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
 from werkzeug.utils import cached_property
 
-from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.deposit.api import ZenodoDeposit
+from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.api import ZenodoRecord
 
 from ..deposit.loaders import legacyjson_v1_translator

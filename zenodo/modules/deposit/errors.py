@@ -40,6 +40,16 @@ class MissingFilesError(RESTValidationError):
     ]
 
 
+class VersioningFilesError(RESTValidationError):
+    """Error when new version's files exist in one of the old versions."""
+
+    errors = [
+        FieldError(None, _(
+            "New version's files must differ from all previous versions."),
+            code=10)
+    ]
+
+
 class OngoingMultipartUploadError(RESTValidationError):
     """Error for when no files have been provided."""
 

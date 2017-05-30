@@ -24,6 +24,8 @@
 
 from __future__ import absolute_import, print_function
 
+from six import BytesIO, b
+
 from helpers import publish_and_expunge
 from invenio_deposit.api import Deposit
 from invenio_indexer.api import RecordIndexer
@@ -117,6 +119,7 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     pv = PIDVersioning(child=recid_v1)
     depid_v2 = pv.draft_child_deposit
     deposit_v2 = ZenodoDeposit.get_record(depid_v2.object_uuid)
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
 
     RecordIndexer().process_bulk_queue()

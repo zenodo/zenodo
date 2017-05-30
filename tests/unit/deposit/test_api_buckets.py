@@ -228,6 +228,19 @@ def test_bucket_new_version(api_client, deposit, json_auth_headers,
     res = client.delete(dep_v2_bucket + '/newfile.txt', headers=auth)
     assert res.status_code == 204
 
+    # Try to publish the new version
+    # Should fail (400), since the bucket contents is the same
+    res = client.post(dep_v2_publish, headers=auth)
+    data = get_json(res, code=400)
+
+    # Add another file, so that the bucket has a different content
+    res = client.put(
+        dep_v2_bucket + '/newfile2.txt',
+        input_stream=BytesIO(b'testfile3'),
+        headers=auth,
+    )
+    assert res.status_code == 200
+
     # Publish new version deposit
     res = client.post(dep_v2_publish, headers=auth)
     data = get_json(res, code=202)
@@ -240,3 +253,26 @@ def test_bucket_new_version(api_client, deposit, json_auth_headers,
     # Assert that all the buckets are different
     assert len(set(
         [rec_v1_bucket, rec_v2_bucket, dep_v1_bucket, dep_v2_bucket])) == 4
+
+    # Create another new version
+    res = client.post(links['newversion'], headers=auth)
+    data = get_json(res, code=201)
+
+    # Get new version deposit
+    res = client.get(data['links']['latest_draft'], headers=auth)
+    data = get_json(res, code=200)
+
+    dep_v3_bucket = data['links']['bucket']
+    dep_v3_publish = data['links']['publish']
+
+    # Try to publish the new version without changes (should fail as before)
+    res = client.post(dep_v3_publish, headers=auth)
+    data = get_json(res, code=400)
+
+    # Deleting the file from v2 should be possible, but publishing should
+    # also fail since the contents will be the same as the very first version.
+    res = client.delete(dep_v3_bucket + '/newfile2.txt', headers=auth)
+    assert res.status_code == 204
+
+    res = client.post(dep_v3_publish, headers=auth)
+    data = get_json(res, code=400)

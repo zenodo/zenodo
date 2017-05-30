@@ -21,6 +21,8 @@
 
 from __future__ import absolute_import, print_function
 
+from six import BytesIO, b
+
 from helpers import publish_and_expunge
 from invenio_communities.models import InclusionRequest
 from invenio_pidrelations.contrib.versioning import PIDVersioning
@@ -43,6 +45,7 @@ def test_basic_api(app, db, communities, deposit, deposit_file):
     pv = PIDVersioning(child=recid_v1)
     depid_v2 = pv.draft_child_deposit
     deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     deposit_v2 = deposit_v2.edit()
     # 1. Request for 'c1' and 'c2' through deposit v2
@@ -101,6 +104,7 @@ def test_autoadd(app, db, users, communities, deposit, deposit_file,
     depid_v2 = pv.draft_child_deposit
     depid_v2_value = depid_v2.pid_value
     deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     deposit_v2 = deposit_v2.edit()
     # 1. Request for 'c1' and 'c3' (owned by user) through deposit v2
@@ -210,6 +214,7 @@ def test_autoadd_explicit_newversion(
 
     deposit_v2['communities'] = ['ecfunded', 'grants_comm', 'zenodo']
     deposit_v2['grants'] = [{'title': 'SomeGrant'}, ]
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
 
@@ -249,6 +254,7 @@ def test_communities_newversion_addition(
     # Remove 'c2' and request for 'c5'. Make sure that communities from
     # previous record version are preserved/removed properly
     deposit_v2['communities'] = ['c1', 'c5']
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
 
@@ -284,6 +290,7 @@ def test_communities_newversion_while_ir_pending_bug(
 
     deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
 
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
 
@@ -328,6 +335,7 @@ def test_propagation_with_newversion_open(
 
     depid_v2, deposit_v2 = deposit_resolver.resolve(depid_v2_value)
     assert deposit_v2['communities'] == ['c1', 'c2']
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
 

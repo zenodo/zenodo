@@ -21,6 +21,8 @@
 
 from __future__ import absolute_import, print_function
 
+from six import BytesIO, b
+
 from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations
@@ -88,6 +90,7 @@ def test_relations_serialization(app, db, deposit, deposit_file):
     pv = PIDVersioning(child=recid_v1)
     depid_v2 = pv.draft_child_deposit
     deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
     depid_v1, deposit_v1 = deposit_resolver.resolve(depid_v1_value)
@@ -148,6 +151,7 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
     pv = PIDVersioning(child=recid_v1)
     depid_v2 = pv.draft_child_deposit
     deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+    deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     deposit_v2 = deposit_v2.edit()
     # 1. Request for 'c1' and 'c2' through deposit v2

@@ -50,7 +50,7 @@ from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingCommunityError, MissingFilesError, \
-    OngoingMultipartUploadError
+    OngoingMultipartUploadError, VersioningFilesError
 from .fetchers import zenodo_deposit_fetcher
 from .minters import zenodo_deposit_minter
 
@@ -322,6 +322,14 @@ class ZenodoDeposit(Deposit):
                                                 record['conceptrecid'])
         pv = PIDVersioning(parent=conceptrecid)
         if pv.children.count() > 1:
+            files_set = set(f.get_version().file.checksum for f in self.files)
+            for prev_recid in pv.children.all()[:-1]:
+                rec = ZenodoRecord.get_record(prev_recid.object_uuid)
+                prev_files_set = set(f.get_version().file.checksum for f in
+                                     rec.files)
+                if files_set == prev_files_set:
+                    raise VersioningFilesError()
+
             prev_recid = pv.children.all()[-2]
             rec_comms = set(ZenodoRecord.get_record(
                 prev_recid.get_assigned_object()).get('communities', []))
