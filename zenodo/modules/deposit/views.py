@@ -211,13 +211,18 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     except PIDDoesNotExistError:
         doi = None
 
-    try:
-        if 'conceptdoi' in record:
-            conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
-            conceptrecid = PersistentIdentifier.get('recid',
-                                                    record['conceptrecid'])
-    except PIDDoesNotExistError:
+    pids = [pid, depid, doi]
+    if 'conceptdoi' in record:
+        conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
+        pids.append(conceptdoi)
+    else:
         conceptdoi = None
+
+    if 'conceptrecid' in record:
+        conceptrecid = PersistentIdentifier.get('recid',
+                                                record['conceptrecid'])
+        pids.append(conceptrecid)
+    else:
         conceptrecid = None
 
     form = RecordDeleteForm()
@@ -272,8 +277,6 @@ def delete(pid=None, record=None, depid=None, deposit=None):
             category='success'
         )
         return redirect(url_for('zenodo_frontpage.index'))
-
-    pids = [p for p in (pid, depid, doi, conceptrecid, conceptdoi) if p]
     return render_template(
         'zenodo_deposit/delete.html',
         form=form,
