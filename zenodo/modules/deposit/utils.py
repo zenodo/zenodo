@@ -26,12 +26,21 @@
 
 import uuid
 
-from flask import abort, request
+from elasticsearch.exceptions import NotFoundError
+from flask import abort, current_app, request
+from invenio_accounts.models import User
+from invenio_db import db
+from invenio_indexer.api import RecordIndexer
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
-from six import string_types
+from invenio_records_files.models import RecordsBuckets
+from six import string_types, text_type
 from werkzeug.local import LocalProxy
 from werkzeug.routing import PathConverter
 
+from zenodo.modules.deposit.resolvers import deposit_resolver
+from zenodo.modules.deposit.tasks import datacite_inactivate, datacite_register
 from zenodo.modules.records.api import ZenodoRecord
 
 
@@ -89,3 +98,92 @@ def fetch_depid(pid):
     except Exception:
         # FIXME: Handle or let it bubble
         pass
+
+
+def delete_record(record_uuid, reason, user):
+    """Delete the record and it's PIDs.
+
+    :param record_uuid: UUID of the record to be removed.
+    :param reason: Reason for removal. Either one of: 'spam', 'uploader',
+        'takedown' (see 'ZENODO_REMOVAL_REASONS' variable in config),
+        otherwise using it as a verbatim "Reason" string.
+    :param user: ID or email of the Zenodo user (admin)
+        responsible for the removal.
+    """
+    if isinstance(user, text_type):
+        user_id = User.query.filter_by(email=user).one().id
+    elif isinstance(user, int):
+        user_id = User.query.get(user).id
+    else:
+        raise TypeError("User cannot be determined from argument: {0}".format(
+            user))
+
+    record = ZenodoRecord.get_record(record_uuid)
+
+    # Remove the record from versioning and delete the recid
+    recid = PersistentIdentifier.get('recid', record['recid'])
+    pv = PIDVersioning(child=recid)
+    pv.remove_child(recid)
+    pv.update_redirect()
+    recid.delete()
+
+    # Remove the record from index
+    try:
+        RecordIndexer().delete(record)
+    except NotFoundError:
+        pass
+
+    # Remove buckets
+    record_bucket = record.files.bucket
+    RecordsBuckets.query.filter_by(record_id=record.id).delete()
+    record_bucket.locked = False
+    record_bucket.remove()
+
+    removal_reasons = dict(current_app.config['ZENODO_REMOVAL_REASONS'])
+    if reason in removal_reasons:
+        reason = removal_reasons[reason]
+
+    depid, deposit = deposit_resolver.resolve(record['_deposit']['id'])
+
+    try:
+        doi = PersistentIdentifier.get('doi', record['doi'])
+    except PIDDoesNotExistError:
+        doi = None
+
+    if pv.children.count() == 0:
+        conceptrecid = PersistentIdentifier.get('recid',
+                                                record['conceptrecid'])
+        conceptrecid.delete()
+        new_last_child = None
+    else:
+        new_last_child = (pv.last_child.pid_value,
+                          str(pv.last_child.object_uuid))
+
+    if 'conceptdoi' in record:
+        conceptdoi_value = record['conceptdoi']
+    else:
+        conceptdoi_value = None
+
+    # Completely delete the deposit
+    # Deposit will be removed from index
+    deposit.delete(delete_published=True)
+
+    # Clear the record and put the deletion information
+    record.clear()
+    record.update({
+        'removal_reason': reason,
+        'removed_by': user_id,
+    })
+    record.commit()
+
+    db.session.commit()
+
+    # After successful DB commit, sync the DOIs with DataCite
+    datacite_inactivate.delay(doi.pid_value)
+    if conceptdoi_value:
+        if new_last_child:
+            # Update last child (updates also conceptdoi)
+            pid_value, rec_uuid = new_last_child
+            datacite_register.delay(pid_value, rec_uuid)
+        else:
+            datacite_inactivate.delay(conceptdoi_value)

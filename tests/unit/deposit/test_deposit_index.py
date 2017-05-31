@@ -24,8 +24,6 @@
 
 from __future__ import absolute_import, print_function
 
-from six import BytesIO, b
-
 from helpers import publish_and_expunge
 from invenio_deposit.api import Deposit
 from invenio_indexer.api import RecordIndexer
@@ -33,6 +31,7 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
+from six import BytesIO, b
 
 from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.deposit.resolvers import deposit_resolver

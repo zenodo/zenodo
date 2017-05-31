@@ -21,12 +21,11 @@
 
 from __future__ import absolute_import, print_function
 
-from six import BytesIO, b
-
 from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
+from six import BytesIO, b
 
 from zenodo.modules.deposit.api import ZenodoDeposit
 from zenodo.modules.deposit.resolvers import deposit_resolver

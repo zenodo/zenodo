@@ -21,11 +21,10 @@
 
 from __future__ import absolute_import, print_function
 
-from six import BytesIO, b
-
 from helpers import publish_and_expunge
 from invenio_communities.models import InclusionRequest
 from invenio_pidrelations.contrib.versioning import PIDVersioning
+from six import BytesIO, b
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.api import ZenodoDeposit

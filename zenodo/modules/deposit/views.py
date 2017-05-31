@@ -49,6 +49,7 @@ from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
 from .tasks import datacite_inactivate, datacite_register
+from zenodo.modules.deposit.utils import delete_record
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -228,49 +229,10 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     form = RecordDeleteForm()
     form.standard_reason.choices = current_app.config['ZENODO_REMOVAL_REASONS']
     if form.validate_on_submit():
-        # Remove record from index
-        try:
-            RecordIndexer().delete(record)
-        except NotFoundError:
-            pass
-        # Remove buckets
-        record_bucket = record.files.bucket
-        RecordsBuckets.query.filter_by(record_id=record.id).delete()
-        record_bucket.locked = False
-        record_bucket.remove()
-
-        # Delete record PID and contents.
-        pid.delete()
-        record.clear()
-
-        # NOTE: Concept recid will not be deleted, but will redirect to the
-        # last version of the record.
-        pv = PIDVersioning(child=pid)
-        pv.update_redirect()
-
         reason = form.reason.data or dict(
             current_app.config['ZENODO_REMOVAL_REASONS']
         )[form.standard_reason.data]
-
-        record.update({
-            'removal_reason': reason,
-            'removed_by': current_user.get_id(),
-        })
-        record.commit()
-
-        # Completely delete the deposit
-        # Deposit will be removed from index
-        deposit.delete(delete_published=True)
-        db.session.commit()
-        datacite_inactivate.delay(doi.pid_value)
-        if conceptdoi:
-            if pv.children.count() > 0:
-                # Update last child (update also conceptdoi)
-                datacite_register.delay(
-                    pv.last_child.pid_value,
-                    str(pv.last_child.object_uuid))
-            else:
-                datacite_inactivate.delay(conceptdoi.pid_value)
+        delete_record(record.id, reason, int(current_user.get_id()))
         flash(
             _('Record %(recid)s and associated objects successfully deleted.',
                 recid=pid.pid_value),
