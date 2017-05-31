@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -47,6 +47,7 @@ from zenodo.modules.records.serializers.datacite import \
     ZenodoDataCite31Serializer
 from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
 from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
+from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
 
 # Serializers
 # ===========
@@ -84,6 +85,8 @@ dc_v1 = ZenodoDublinCoreSerializer(DublinCoreV1, replace_refs=True)
 csl_v1 = JSONSerializer(RecordSchemaCSLJSON, replace_refs=True)
 #: CSL Citation Formatter serializer
 citeproc_v1 = CiteprocSerializer(csl_v1)
+#: OpenAIRE JSON serializer
+openaire_json_v1 = JSONSerializer(RecordSchemaOpenAIREJSON, replace_refs=True)
 
 
 # Records-REST serializers
@@ -106,6 +109,9 @@ csl_v1_response = record_responsify(
     csl_v1, 'application/vnd.citationstyles.csl+json')
 #: CSL Citation Formatter serializer for individual records.
 citeproc_v1_response = record_responsify(citeproc_v1, 'text/x-bibliography')
+#: OpenAIRE JSON serializer for individual records.
+openaire_json_v1_response = record_responsify(openaire_json_v1,
+                                              'application/x-openaire+json')
 
 
 #: JSON record serializer for search results.
