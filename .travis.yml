@@ -47,6 +47,10 @@ cache:
     - $HOME/.cache/pip
     - $HOME/.nvm
 
+branches:
+  except:
+    - /^deploy-.*$/
+
 services:
   - postgresql
   - redis
