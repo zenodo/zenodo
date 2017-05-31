@@ -275,6 +275,12 @@ ORCID_APP_CREDENTIALS = dict(
 OPENAIRE_SCHEMAS_HOST = 'zenodo.org'
 #: Hostname for OpenAIRE's grant resolver.
 OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
+#: ID prefix for OpenAIRE publications.
+OPENAIRE_ID_PREFIX_PUBLICATION = 'od______2659'
+#: ID prefix for OpenAIRE datasets.
+OPENAIRE_ID_PREFIX_DATASET = 'r37b0ad08687'
+#: ID prefix for OpenAIRE datasets.
+OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
 
 # OpenDefinition
 # ==============
