@@ -22,12 +22,20 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{% set published_in = record|zenodo_related_links(all_pending_comms + all_accepted_comms) %}
+{%- set published_in = record|zenodo_related_links(all_pending_comms + all_accepted_comms) %}
+{%- set is_openaire = record|is_openaire_publication %}
 
-{% if published_in %}
+{%- if published_in or is_openaire %}
 <div class="well metadata">
-{% for item in published_in %}
-<small class="text-muted">{{item.text}}</small>
-<a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>{% endfor %}
+  {%- for item in published_in %}
+    <small class="text-muted">{{item.text}}</small>
+    <a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>
+  {%- endfor %}
+  {%- if is_openaire %}
+    <small class="text-muted">{{_('Available in')}}</small>
+    <a href="{{record|openaire_link}}">
+      <img src="{{ url_for('static', filename='img/openaire-horizontal.png') }}" class="img-thumbnail" width="100%" />
+    </a>
+  {%- endif %}
 </div>
-{% endif %}
+{%- endif %}
