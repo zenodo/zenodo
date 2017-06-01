@@ -34,7 +34,7 @@ from marshmallow import Schema, fields, missing
 from zenodo.modules.records.models import ObjectType
 from zenodo.modules.records.serializers.fields import DateString
 
-OpenAIREType = namedtuple('OpenAIREType', ('type', 'resource_type'))
+from .helpers import openaire_original_id, openaire_type
 
 
 class RecordSchemaOpenAIREJSON(Schema):
@@ -60,42 +60,48 @@ class RecordSchemaOpenAIREJSON(Schema):
     embargoEndDate = DateString(attribute='metadata.embargo_date')
 
     publisher = fields.Method('get_publisher')
-    collectedFromId = fields.Method('get_openaire_id', required=True)
-    hostedById = fields.Method('get_openaire_id')
+    collectedFromId = fields.Method('get_datasource_id', required=True)
+    hostedById = fields.Method('get_datasource_id')
 
     linksToProjects = fields.Method('get_links_to_projects')
     pids = fields.Method('get_pids')
 
-    def _resolve_openaire_type(self, obj):
-        # TODO: Move to utils.py?
-        metadata = obj.get('metadata')
-        obj_type = ObjectType.get_by_dict(metadata.get('resource_type'))
-        if obj_type['internal_id'] == 'dataset':
-            return OpenAIREType('dataset', '0021')
-        else:
-            return OpenAIREType('publication', '0001')
+    def _openaire_type(self, obj):
+        return ObjectType.get_by_dict(
+            obj.get('metadata', {}).get('resource_type')
+        ).get('openaire')
 
     def get_original_id(self, obj):
         """Get Original Id."""
-        openaire_type = self._resolve_openaire_type(obj)
-        if openaire_type.type == 'publication':
-            return obj.get('metadata', {}).get('_oai', {}).get('id')
-        if openaire_type.type == 'dataset':
-            return obj.get('metadata', {}).get('doi')
+        oatype = self._openaire_type(obj)
+        if oatype:
+            return openaire_original_id(
+                obj.get('metadata', {}),
+                oatype['type']
+            )[1]
+        return missing
 
     def get_type(self, obj):
         """Get record type."""
-        return self._resolve_openaire_type(obj).type
+        oatype = self._openaire_type(obj)
+        if oatype:
+            return oatype['type']
+        return missing
 
     def get_resource_type(self, obj):
         """Get resource type."""
-        return self._resolve_openaire_type(obj).resource_type
+        oatype = self._openaire_type(obj)
+        if oatype:
+            return oatype['resourceType']
+        return missing
 
-    def get_openaire_id(self, obj):
+    def get_datasource_id(self, obj):
         """Get OpenAIRE Zenodo ID."""
-        # TODO: Move to utils.py?
-        openaire_type = self._resolve_openaire_type(obj).type
-        return current_app.config['OPENAIRE_ZENODO_IDS'].get(openaire_type)
+        oatype = self._openaire_type(obj)
+        if oatype:
+            return current_app.config['OPENAIRE_ZENODO_IDS'].get(
+                oatype['type'])
+        return missing
 
     # Mapped from: http://api.openaire.eu/vocabularies/dnet:access_modes
     LICENSE_MAPPING = {
@@ -134,7 +140,6 @@ class RecordSchemaOpenAIREJSON(Schema):
 
     def get_url(self, obj):
         """Get record URL."""
-        # TODO: Zenodo or DOI URL? ("zenodo.org/..." or "doi.org/...")
         return current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
             recid=obj['metadata']['recid'])
 

@@ -30,6 +30,8 @@ import hashlib
 
 from flask import current_app
 
+from zenodo.modules.records.models import ObjectType
+
 
 class _OAType(object):
     """OpenAIRE types."""
@@ -40,8 +42,9 @@ class _OAType(object):
 
 def is_openaire_publication(record):
     """Determine if record is a publication for OpenAIRE."""
-    types = ['publication', 'presentation', 'poster']
-    if record.get('resource_type', {}).get('type') not in types:
+    oatype = ObjectType.get_by_dict(record.get('resource_type')).get(
+        'openaire', {})
+    if not oatype or oatype['type'] != _OAType.publication:
         return False
 
     # Has grants, is part of ecfunded community or is open access.
@@ -53,9 +56,9 @@ def is_openaire_publication(record):
 
 def is_openaire_dataset(record):
     """Determine if record is a dataset for OpenAIRE."""
-    if record.get('resource_type', {}).get('type') == 'dataset':
-        return True
-    return False
+    oatype = ObjectType.get_by_dict(record.get('resource_type')).get(
+        'openaire', {})
+    return oatype and oatype['type'] == _OAType.dataset
 
 
 def openaire_type(record):
@@ -74,25 +77,28 @@ def openaire_id(record):
 
 def _openaire_id(record, oatype):
     """Compute the OpenAIRE identifier."""
-    prefix = None
-    value = None
-    if oatype == _OAType.publication:
-        # Hard-coded prefix from OpenAIRE.
-        prefix = current_app.config['OPENAIRE_ID_PREFIX_PUBLICATION']
-        value = record.get('_oai', {}).get('id')
-    elif oatype == _OAType.dataset:
-        # Hard-coded prefix from OpenAIRE.
-        prefix = current_app.config['OPENAIRE_ID_PREFIX_DATASET']
-        value = record.get('doi')
+    prefix, identifier = openaire_original_id(record, oatype)
 
-    if not value or not prefix:
+    if not identifier or not prefix:
         return None
 
     m = hashlib.md5()
-    m.update(value.encode('utf8'))
+    m.update(identifier.encode('utf8'))
 
     return '{}::{}'.format(prefix, m.hexdigest())
 
+
+def openaire_original_id(record, oatype):
+    """Original original identifier."""
+    prefix = current_app.config['OPENAIRE_NAMESPACE_PREFIXES'].get(oatype)
+
+    value = None
+    if oatype == _OAType.publication:
+        value = record.get('_oai', {}).get('id')
+    elif oatype == _OAType.dataset:
+        value = record.get('doi')
+
+    return prefix, value
 
 def openaire_link(record):
     """Compute an OpenAIRE link."""

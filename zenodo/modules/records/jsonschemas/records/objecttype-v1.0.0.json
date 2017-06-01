@@ -57,6 +57,21 @@
     "eurepo": {
       "type": "string"
     },
+    "openaire": {
+      "type": "object",
+      "properties": {
+        "resourceType": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "required": [
+          "resourceType",
+          "type"
+        ]
+      }
+    },
     "parent": {
       "type": "object"
     },

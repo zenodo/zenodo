@@ -25,6 +25,10 @@
     {"$ref": "http://zenodo.org/objecttypes/publication/workingpaper"},
     {"$ref": "http://zenodo.org/objecttypes/publication/other"}
   ],
+  "openaire": {
+    "resourceType": "0001",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -40,6 +44,10 @@
   "datacite": {"general": "Text", "type": "Poster"},
   "eurepo": "info:eu-repo/semantics/conferencePoster",
   "schema.org": "http://schema.org/CreativeWork",
+  "openaire": {
+    "resourceType": "0004",
+    "type": "publication"
+  },
   "csl": "graphic"
 },
 {
@@ -55,6 +63,10 @@
   "datacite": {"general": "Text", "type": "Presentation"},
   "eurepo": "info:eu-repo/semantics/lecture",
   "schema.org": "http://schema.org/CreativeWork",
+  "openaire": {
+    "resourceType": "0010",
+    "type": "publication"
+  },
   "csl": "speech"
 },
 {
@@ -70,6 +82,10 @@
   "datacite": {"general": "Dataset"},
   "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "http://schema.org/Dataset",
+  "openaire": {
+    "resourceType": "0021",
+    "type": "dataset"
+  },
   "csl": "dataset"
 },
 {
@@ -154,6 +170,10 @@
   "datacite": {"general": "Text", "type": "Book"},
   "eurepo": "info:eu-repo/semantics/book",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0002",
+    "type": "publication"
+  },
   "csl": "book"
 },
 {
@@ -170,6 +190,10 @@
   "datacite": {"general": "Text", "type": "Book section"},
   "eurepo": "info:eu-repo/semantics/bookPart",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0013",
+    "type": "publication"
+  },
   "csl": "chapter"
 },
 {
@@ -186,6 +210,10 @@
   "datacite": {"general": "Text", "type": "Conference paper"},
   "eurepo": "info:eu-repo/semantics/conferencePaper",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0004",
+    "type": "publication"
+  },
   "csl": "paper-conference"
 },
 {
@@ -202,6 +230,10 @@
   "datacite": {"general": "Text", "type": "Journal article"},
   "eurepo": "info:eu-repo/semantics/article",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0001",
+    "type": "publication"
+  },
   "csl": "article-journal"
 },
 {
@@ -218,6 +250,10 @@
   "eurepo": "info:eu-repo/semantics/patent",
   "schema.org": "http://schema.org/CreativeWork",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0019",
+    "type": "publication"
+  },
   "csl": "patent"
 },
 {
@@ -234,6 +270,10 @@
   "datacite": {"general": "Text", "type": "Preprint"},
   "eurepo": "info:eu-repo/semantics/preprint",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0016",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -250,6 +290,10 @@
   "datacite": {"general": "Text", "type": "Report"},
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0017",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -266,6 +310,10 @@
   "datacite": {"general": "Text", "type": "Software documentation"},
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0032",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -282,6 +330,10 @@
   "datacite": {"general": "Text", "type": "Thesis"},
   "eurepo": "info:eu-repo/semantics/doctoralThesis",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0007",
+    "type": "publication"
+  },
   "csl": "thesis"
 },
 {
@@ -298,6 +350,10 @@
   "datacite": {"general": "Text", "type": "Technical note"},
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0020",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -314,6 +370,10 @@
   "datacite": {"general": "Text", "type": "Working paper"},
   "eurepo": "info:eu-repo/semantics/workingPaper",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0016",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -330,6 +390,10 @@
   "datacite": {"general": "Text", "type": "Proposal"},
   "eurepo": "info:eu-repo/semantics/researchProposal",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0020",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
@@ -346,6 +410,10 @@
   "datacite": {"general": "Text", "type": "Project deliverable"},
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0017",
+    "type": "publication"
+  },
   "csl": "report"
 },
 {
@@ -362,6 +430,10 @@
   "datacite": {"general": "Text", "type": "Project milestone"},
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0017",
+    "type": "publication"
+  },
   "csl": "report"
 },
 {
@@ -378,6 +450,10 @@
   "datacite": {"general": "Text", "type": "Other"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "http://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0020",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
