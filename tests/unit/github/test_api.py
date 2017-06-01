@@ -26,26 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
-from contextlib import contextmanager
-from copy import deepcopy
-
 import pytest
-from flask import current_app
-from invenio_accounts.models import User
-from invenio_github.models import Release, ReleaseStatus, Repository
-from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_sipstore.models import SIP
 from mock import MagicMock, Mock, patch
 from six import BytesIO
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.github.api import ZenodoGitHubRelease
-from zenodo.modules.github.utils import is_github_owner, is_github_versioned
-from zenodo.modules.records.api import ZenodoRecord
-from zenodo.modules.records.minters import zenodo_record_minter
-from zenodo.modules.records.permissions import has_newversion_permission, \
-    has_update_permission
 
 creators_params = (
     (dict(),
@@ -132,132 +119,3 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
     }
     gh_sip = SIP.query.one()
     assert gh_sip.agent == expected_sip_agent
-
-
-@patch('invenio_github.api.GitHubAPI.check_sync', new=lambda *_, **__: False)
-def test_github_newversion_permissions(app, db, minimal_record, users, g_users,
-                                       g_remoteaccounts):
-    """Test new version creation permissions for GitHub records."""
-
-    old_owner, new_owner = [User.query.get(u['id']) for u in g_users]
-
-    # Create repository, and set owner to `old_owner`
-    repo = Repository.create(
-        name='foo/bar', github_id=8000, user_id=old_owner.id, hook=1234)
-
-    # Create concpetrecid for the GitHub records
-    conceptrecid = PersistentIdentifier.create(
-        'recid', '100', status=PIDStatus.RESERVED)
-
-    def create_deposit_and_record(pid_value, owner):
-        """Utility function for creating records and deposits."""
-        recid = PersistentIdentifier.create(
-            'recid', pid_value, status=PIDStatus.RESERVED)
-        pv = PIDVersioning(parent=conceptrecid)
-        pv.insert_draft_child(recid)
-
-        depid = PersistentIdentifier.create(
-            'depid', pid_value, status=PIDStatus.REGISTERED)
-        deposit = ZenodoRecord.create({'_deposit': {'id': depid.pid_value},
-                                       'conceptrecid': conceptrecid.pid_value,
-                                       'recid': recid.pid_value})
-        deposit.commit()
-        depid.assign('rec', deposit.id)
-
-        record_metadata = deepcopy(minimal_record)
-        record_metadata['_deposit'] = {'id': depid.pid_value}
-        record_metadata['conceptrecid'] = conceptrecid.pid_value
-        record_metadata['recid'] = int(recid.pid_value)
-        record_metadata['owners'] = [owner.id]
-        record = ZenodoRecord.create(record_metadata)
-        zenodo_record_minter(record.id, record)
-        record.commit()
-
-        return (depid, deposit, recid, record)
-
-    # Create first GitHub record (by `old_owner`)
-    depid1, d1, recid1, r1 = create_deposit_and_record('101', old_owner)
-    rel1 = Release(release_id=111, repository_id=repo.id, record_id=d1.id,
-                   status=ReleaseStatus.PUBLISHED)
-    db.session.add(rel1)
-    db.session.commit()
-
-    assert is_github_versioned(recid1)
-
-    @contextmanager
-    def set_identity(user):
-        from flask_principal import AnonymousIdentity, Identity
-        principal = current_app.extensions['security'].principal
-        principal.set_identity(Identity(user))
-        yield
-        principal.set_identity(AnonymousIdentity())
-
-    with app.test_request_context():
-        with set_identity(old_owner):
-            assert is_github_owner(old_owner, recid1)
-            assert has_update_permission(old_owner, r1)
-            assert has_newversion_permission(old_owner, r1)
-
-        with set_identity(new_owner):
-            assert not is_github_owner(new_owner, recid1)
-            assert not has_update_permission(new_owner, r1)
-            assert not has_newversion_permission(new_owner, r1)
-
-    # Change the repository owner
-    repo.user_id = new_owner.id
-    db.session.add(repo)
-    db.session.commit()
-
-    with app.test_request_context():
-        with set_identity(old_owner):
-            assert not is_github_owner(old_owner, recid1)
-            # `old_owner` can edit his record of course
-            assert has_update_permission(old_owner, r1)
-            assert has_newversion_permission(old_owner, r1)
-
-        with set_identity(new_owner):
-            assert is_github_owner(new_owner, recid1)
-            # `new_owner` can't edit the `old_owner`'s record
-            assert not has_update_permission(new_owner, r1)
-            assert not has_newversion_permission(new_owner, r1)
-
-    # Create second GitHub record (by `new_owner`)
-    depid2, d2, recid2, r2 = create_deposit_and_record('102', new_owner)
-    rel2 = Release(release_id=222, repository_id=repo.id, record_id=d2.id,
-                   status=ReleaseStatus.PUBLISHED)
-    db.session.add(rel2)
-    db.session.commit()
-
-    with app.test_request_context():
-        with set_identity(old_owner):
-            assert not is_github_owner(old_owner, recid1)
-            assert not is_github_owner(old_owner, recid2)
-            assert has_update_permission(old_owner, r1)
-            # `old_owner` can't edit the `new_owner`'s record
-            assert not has_update_permission(old_owner, r2)
-            assert not has_newversion_permission(old_owner, r1)
-            assert not has_newversion_permission(old_owner, r2)
-
-        with set_identity(new_owner):
-            assert is_github_owner(new_owner, recid1)
-            assert is_github_owner(new_owner, recid2)
-            assert not has_update_permission(new_owner, r1)
-            # `new_owner` can edit his newly released record
-            assert has_update_permission(new_owner, r2)
-            assert has_newversion_permission(new_owner, r1)
-            assert has_newversion_permission(new_owner, r2)
-
-    # Create a manual record (by `new_owner`)
-    depid3, d3, recid3, r3 = create_deposit_and_record('103', new_owner)
-    db.session.commit()
-
-    with app.test_request_context():
-        with set_identity(old_owner):
-            assert not is_github_owner(old_owner, recid3)
-            assert not has_update_permission(old_owner, r3)
-            assert not has_newversion_permission(old_owner, r3)
-
-        with set_identity(new_owner):
-            assert is_github_owner(new_owner, recid3)
-            assert has_update_permission(new_owner, r3)
-            assert has_newversion_permission(new_owner, r3)
