@@ -93,6 +93,7 @@ def test_grants(app, db, minimal_oai_record, recid_pid):
     minimal_oai_record['grants'] = [
         {
             'acronym': 'WorkAble',
+            'title': 'Making Capabilities/Design Work',
             'identifiers': {
                 'eurepo': 'info:eu-repo/grantAgreement/EC/FP7/244909/'
             },
@@ -103,7 +104,8 @@ def test_grants(app, db, minimal_oai_record, recid_pid):
     obj = openaire_json_v1.transform_record(
         recid_pid, Record(minimal_oai_record))
     assert obj['linksToProjects'] == [
-        'info:eu-repo/grantAgreement/EC/FP7/244909///WorkAble'
+        'info:eu-repo/grantAgreement/EC/FP7/244909/'
+        '/Making Capabilities%2FDesign Work/WorkAble'
     ]
 
 
