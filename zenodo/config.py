@@ -275,20 +275,20 @@ ORCID_APP_CREDENTIALS = dict(
 OPENAIRE_SCHEMAS_HOST = 'zenodo.org'
 #: Hostname for OpenAIRE's grant resolver.
 OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
-#: OpenAIRE Zenodo IDs
+#: OpenAIRE data source IDs for Zenodo.
 OPENAIRE_ZENODO_IDS = {
     'publication': 'opendoar____::2659',
     'dataset': 're3data_____::r3d100010468',
 }
-#: OpenAIRE Zenodo namespace prefixes
+#: OpenAIRE ID namespace prefixes for Zenodo.
 OPENAIRE_NAMESPACE_PREFIXES = {
     'publication': 'od______2659',
     'dataset': 'r37b0ad08687',
 }
 #: OpenAIRE API endpoint.
-OPENAIRE_API_URL = 'https://beta.services.openaire.eu/is/mvc'
-# TODO: Check if we are to use Dev or Beta endpoint...
-# OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc'
+OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc'
+#: URL to OpenAIRE portal.
+OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
 
 # OpenDefinition
 # ==============
