@@ -38,6 +38,10 @@ def minimal_oai_record(minimal_record):
     minimal_record['_oai'] = {
         'id': 'oai:zenodo.org:{}'.format(minimal_record['recid'])
     }
+    minimal_record['resource_type'] = {
+        'type': 'publication',
+        'subtype': 'article'
+    }
     return minimal_record
 
 
@@ -80,7 +84,7 @@ def test_resource_types(app, db, minimal_oai_record, recid_pid):
     assert obj['originalId'] == 'oai:zenodo.org:123'
     assert obj['collectedFromId'] == 'opendoar____::2659'
     assert obj['hostedById'] == 'opendoar____::2659'
-    assert obj['resourceType'] == '0001'
+    assert obj['resourceType'] == '0004'
     assert obj['type'] == 'publication'
 
 
@@ -107,15 +111,15 @@ def test_pids(app, db, minimal_oai_record, recid_pid):
     """"Test PIDs."""
     obj = openaire_json_v1.transform_record(
         recid_pid, Record(minimal_oai_record))
-    assert sorted(obj['pids']) == \
-        sorted([{'value': 'oai:zenodo.org:123', 'type': 'oai'}])
+    assert obj['pids'] == \
+        [{'value': 'oai:zenodo.org:123', 'type': 'oai'}]
 
     minimal_oai_record['doi'] = '10.1234/foo'
     obj = openaire_json_v1.transform_record(
         recid_pid, Record(minimal_oai_record))
-    assert sorted(obj['pids']) == \
-        sorted([{'value': 'oai:zenodo.org:123', 'type': 'oai'},
-                {'value': '10.1234/foo', 'type': 'doi'}])
+    assert obj['pids'] == \
+        [{'value': 'oai:zenodo.org:123', 'type': 'oai'},
+         {'value': '10.1234/foo', 'type': 'doi'}]
 
 
 def test_publisher(app, db, minimal_oai_record, recid_pid):
