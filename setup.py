@@ -204,6 +204,7 @@ setup(
             'zenodo_communities = zenodo.modules.communities.views:blueprint',
             'zenodo_deposit = zenodo.modules.deposit.views:blueprint',
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
+            'zenodo_openaire = zenodo.modules.openaire.views:blueprint',
             'zenodo_redirector = zenodo.modules.redirector.views:blueprint',
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
