@@ -112,7 +112,7 @@ invenio-csl-rest==1.0.0a1
 invenio-db==1.0.0b3
 invenio-deposit==1.0.0a8
 invenio-files-rest==1.0.0a14.post2
-invenio-formatter==1.0.0a2
+invenio-formatter==1.0.0b2
 invenio-github==1.0.0a10
 invenio-i18n==1.0.0b1
 invenio-indexer==1.0.0a8
