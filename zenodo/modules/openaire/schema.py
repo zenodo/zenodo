@@ -26,15 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
-from collections import namedtuple
-
 from flask import current_app
 from marshmallow import Schema, fields, missing
 
 from zenodo.modules.records.models import ObjectType
 from zenodo.modules.records.serializers.fields import DateString
 
-from .helpers import openaire_original_id, openaire_type
+from .helpers import openaire_original_id
 
 
 class RecordSchemaOpenAIREJSON(Schema):
@@ -123,11 +121,12 @@ class RecordSchemaOpenAIREJSON(Schema):
         grants = metadata.get('grants', [])
         links = []
         for grant in grants:
-            # Add grant acronynm to the link:
-            #   [info:eu-repo/grantAgreement/EC/FP6/027819/] + [//ICEA]
-            eurepo = grant.get('identifiers', {}).get('eurepo')
-            links.append('{eurepo}//{acronym}'.format(
-                eurepo=eurepo, acronym=grant.get('acronym', '')))
+            eurepo = grant.get('identifiers', {}).get('eurepo', '')
+            if eurepo:
+                links.append('{eurepo}/{title}/{acronym}'.format(
+                    eurepo=eurepo,
+                    title=grant.get('title', '').replace('/', '%2F'),
+                    acronym=grant.get('acronym', '')))
         return links or missing
 
     def get_pids(self, obj):

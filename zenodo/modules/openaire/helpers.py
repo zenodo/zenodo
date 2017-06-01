@@ -100,6 +100,7 @@ def openaire_original_id(record, oatype):
 
     return prefix, value
 
+
 def openaire_link(record):
     """Compute an OpenAIRE link."""
     oatype = openaire_type(record)
