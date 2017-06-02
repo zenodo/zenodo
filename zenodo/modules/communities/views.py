@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, abort, current_app, jsonify, request
 from flask_login import login_required
 from invenio_communities.views.ui import pass_community, permission_required
 from invenio_db import db
@@ -79,7 +79,8 @@ def curate(community):
     elif action == "remove":
         api.remove_record(record, pid=pid)
 
-    if community.id == 'ecfunded':
+    if community.id == 'ecfunded' and \
+            current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED']:
         if action == 'accept':
             openaire_direct_index.delay(record_uuid=str(record.id))
         elif action in ('reject', 'remove'):
