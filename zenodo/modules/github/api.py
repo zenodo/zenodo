@@ -148,13 +148,13 @@ class ZenodoGitHubRelease(GitHubRelease):
                 'email': self.gh.account.user.email,
             }
             deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
-            self.model.recordmetadata = deposit.model
+            recid_pid, record = deposit.fetch_published()
+            self.model.recordmetadata = record.model
             if versioning and stashed_draft_child:
                 versioning.insert_draft_child(stashed_draft_child)
             db.session.commit()
 
             # Send Datacite DOI registration task
-            recid_pid, record = deposit.fetch_published()
             datacite_register.delay(recid_pid.pid_value, str(record.id))
 
             # Index the record
