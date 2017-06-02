@@ -32,7 +32,7 @@ from marshmallow import Schema, fields, missing
 from zenodo.modules.records.models import ObjectType
 from zenodo.modules.records.serializers.fields import DateString
 
-from .helpers import openaire_original_id
+from .helpers import openaire_datasource_id, openaire_original_id
 
 
 class RecordSchemaOpenAIREJSON(Schema):
@@ -94,12 +94,8 @@ class RecordSchemaOpenAIREJSON(Schema):
         return missing
 
     def get_datasource_id(self, obj):
-        """Get OpenAIRE Zenodo ID."""
-        oatype = self._openaire_type(obj)
-        if oatype:
-            return current_app.config['OPENAIRE_ZENODO_IDS'].get(
-                oatype['type'])
-        return missing
+        """Get OpenAIRE datasouce identifier."""
+        return openaire_datasource_id(obj.get('metadata')) or missing
 
     # Mapped from: http://api.openaire.eu/vocabularies/dnet:access_modes
     LICENSE_MAPPING = {

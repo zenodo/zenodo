@@ -88,6 +88,11 @@ def _openaire_id(record, oatype):
     return '{}::{}'.format(prefix, m.hexdigest())
 
 
+def openaire_datasource_id(record):
+    """Get OpenAIRE datasource identifier."""
+    return current_app.config['OPENAIRE_ZENODO_IDS'].get(openaire_type(record))
+
+
 def openaire_original_id(record, oatype):
     """Original original identifier."""
     prefix = current_app.config['OPENAIRE_NAMESPACE_PREFIXES'].get(oatype)
