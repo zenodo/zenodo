@@ -50,9 +50,10 @@ class DublinCoreV1(Schema):
 
     def get_identifiers(self, obj):
         """Get identifiers."""
-        items = [obj['metadata'].get('doi', u'')]
+        items = []
         items.append(u'https://zenodo.org/record/{0}'.format(
             obj['metadata']['recid']))
+        items.append(obj['metadata'].get('doi', u''))
         oai = obj['metadata'].get('_oai', {}).get('id')
         if oai:
             items.append(oai)
