@@ -41,6 +41,9 @@ from werkzeug.routing import PathConverter
 
 from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.deposit.tasks import datacite_inactivate, datacite_register
+from zenodo.modules.openaire.helpers import openaire_datasource_id, \
+    openaire_original_id, openaire_type
+from zenodo.modules.openaire.tasks import openaire_delete
 from zenodo.modules.records.api import ZenodoRecord
 
 
@@ -150,6 +153,14 @@ def delete_record(record_uuid, reason, user):
     except PIDDoesNotExistError:
         doi = None
 
+    # Record OpenAIRE info
+    try:
+        original_id = openaire_original_id(record, openaire_type(record))[1]
+        datasource_id = openaire_datasource_id(record)
+    except PIDDoesNotExistError:
+        original_id = None
+        datasource_id = None
+
     if pv.children.count() == 0:
         conceptrecid = PersistentIdentifier.get('recid',
                                                 record['conceptrecid'])
@@ -187,3 +198,8 @@ def delete_record(record_uuid, reason, user):
             datacite_register.delay(pid_value, rec_uuid)
         else:
             datacite_inactivate.delay(conceptdoi_value)
+
+    # Also delete from OpenAIRE index
+    if original_id and datasource_id:
+        openaire_delete.delay(original_id=original_id,
+                              datasource_id=datasource_id)

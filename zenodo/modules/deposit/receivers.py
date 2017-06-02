@@ -29,12 +29,22 @@ from __future__ import absolute_import, print_function
 from flask import current_app
 
 from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.openaire.tasks import openaire_direct_index
 
 
 def datacite_register_after_publish(sender, action=None, pid=None,
                                     deposit=None):
     """Mind DOI with DataCite after the deposit has been published."""
-    if action == "publish" and \
+    if action == 'publish' and \
             current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
         recid_pid, record = deposit.fetch_published()
         datacite_register.delay(recid_pid.pid_value, str(record.id))
+
+
+def openaire_direct_index_after_publish(sender, action=None, pid=None,
+                                        deposit=None):
+    """Send published record for direct indexing at OpenAIRE."""
+    if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED']:
+        _, record = deposit.fetch_published()
+        if action in 'publish':
+            openaire_direct_index.delay(record_uuid=str(record.id))
