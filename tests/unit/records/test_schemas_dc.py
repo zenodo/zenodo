@@ -37,7 +37,7 @@ def test_minimal(app, db, minimal_record_model, recid_pid):
     assert obj == {
         'sources': [],
         'contributors': [],
-        'identifiers': ['', 'https://zenodo.org/record/123'],
+        'identifiers': ['https://zenodo.org/record/123', ''],
         'subjects': [],
         'languages': [''],
         'dates': [datetime.utcnow().date().isoformat()],
@@ -56,7 +56,7 @@ def test_identifiers(app, db, minimal_record_model, recid_pid):
     minimal_record_model['doi'] = '10.1234/foo'
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert obj['identifiers'] == \
-        ['10.1234/foo', 'https://zenodo.org/record/123']
+        ['https://zenodo.org/record/123', '10.1234/foo']
 
     minimal_record_model['_oai'] = {'id': 'oai:zenodo.org:123'}
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
