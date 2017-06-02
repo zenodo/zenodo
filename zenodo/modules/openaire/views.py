@@ -26,13 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-import copy
-from operator import itemgetter
-
-import idutils
-import six
-from flask import Blueprint, current_app, render_template, request
-from flask_principal import ActionNeed
+from flask import Blueprint
 
 from .helpers import is_openaire_dataset, is_openaire_publication, \
     openaire_link
@@ -52,7 +46,7 @@ def is_publication(record):
 @blueprint.app_template_filter('is_openaire_dataset')
 def is_dataset(record):
     """Test if record is an OpenAIRE dataset."""
-    return is_openaire_publication(record)
+    return is_openaire_dataset(record)
 
 
 @blueprint.app_template_filter('openaire_link')
