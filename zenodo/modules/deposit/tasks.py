@@ -100,26 +100,3 @@ def datacite_inactivate(pid_value):
         db.session.commit()
     except Exception as exc:
         datacite_inactivate.retry(exc=exc)
-
-
-# WITH recids AS (
-#     SELECT
-#         pidstore_pid.pid_value AS pid_value,
-#         pidstore_pid.object_uuid AS object_uuid
-#     FROM pidstore_pid
-#     WHERE pidstore_pid.pid_type = 'recid' AND pidstore_pid.status = 'K'
-# )
-
-# SELECT
-#     records_metadata.id AS records_metadata_id,
-#     records_metadata.json AS records_metadata_json,
-#     pidstore_pid.pid_type AS pidstore_pid_pid_type,
-#     pidstore_pid.pid_value AS pidstore_pid_pid_value,
-#     pidstore_pid.object_uuid AS pidstore_pid_object_uuid
-# FROM
-#     records_metadata
-#     JOIN pidstore_pid ON pidstore_pid.object_uuid = records_metadata.id
-#     JOIN recids ON records_metadata.json ->> 'recid' = recids.pid_value
-# WHERE
-#     pidstore_pid.pid_type = 'depid' AND
-#     records_metadata.json #>> '{_deposit,status}' = 'draft'
