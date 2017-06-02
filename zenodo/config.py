@@ -287,8 +287,14 @@ OPENAIRE_NAMESPACE_PREFIXES = {
 }
 #: OpenAIRE API endpoint.
 OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc'
+#: OpenAIRE API endpoint username.
+OPENAIRE_API_USERNAME = None
+#: OpenAIRE API endpoint password.
+OPENAIRE_API_PASSWORD = None
 #: URL to OpenAIRE portal.
 OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
+#: Enable sending published records for direct indexing at OpenAIRE.
+OPENAIRE_DIRECT_INDEXING_ENABLED = False
 
 # OpenDefinition
 # ==============
