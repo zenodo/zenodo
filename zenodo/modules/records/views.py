@@ -42,7 +42,6 @@ from invenio_previewer.proxies import current_previewer
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
-from zenodo.modules.github.utils import is_github_owner, is_github_versioned
 from zenodo.modules.records.utils import is_doi_locally_managed
 
 from .api import ZenodoRecord
@@ -289,13 +288,6 @@ def record_from_pid(recid):
         return ZenodoRecord.get_record(recid.object_uuid)
     except Exception:
         return {}
-
-
-#
-# GitHub template filters
-#
-blueprint.add_app_template_test(is_github_versioned, name='github_versioned')
-blueprint.add_app_template_test(is_github_owner, name='github_owner')
 
 
 def records_ui_export(pid, record, template=None, **kwargs):
