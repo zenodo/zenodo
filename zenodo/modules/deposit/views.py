@@ -43,13 +43,13 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records_files.models import RecordsBuckets
 
+from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
 from .tasks import datacite_inactivate, datacite_register
-from zenodo.modules.deposit.utils import delete_record
 
 blueprint = Blueprint(
     'zenodo_deposit',
