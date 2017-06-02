@@ -112,8 +112,8 @@ invenio-csl-rest==1.0.0a1
 invenio-db==1.0.0b3
 invenio-deposit==1.0.0a8
 invenio-files-rest==1.0.0a14.post2
-invenio-formatter==1.0.0b2
-invenio-github==1.0.0a10
+invenio-formatter==1.0.0b3
+invenio-github==1.0.0a11
 invenio-i18n==1.0.0b1
 invenio-indexer==1.0.0a8
 invenio-jsonschemas==1.0.0a3
@@ -121,7 +121,7 @@ invenio-logging==1.0.0a3
 invenio-mail==1.0.0a5
 invenio-marc21==1.0.0a3
 invenio-oaiserver==1.0.0a12
-invenio-oauth2server==1.0.0a14
+invenio-oauth2server==1.0.0a15
 invenio-oauthclient==1.0.0a12
 invenio-openaire==1.0.0a7
 invenio-opendefinition==1.0.0a3
