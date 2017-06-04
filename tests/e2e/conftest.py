@@ -38,14 +38,18 @@ from invenio_db import db as db_
 from invenio_search import current_search, current_search_client
 from selenium import webdriver
 from sqlalchemy_utils.functions import create_database, database_exists
-
+from invenio_accounts.testutils import create_test_user
+from invenio_admin.permissions import action_admin_access
+from invenio_access.models import ActionUsers
+from invenio_deposit.permissions import \
+        action_admin_access as deposit_admin_access
 from zenodo.factory import create_app
 
 
-@pytest.yield_fixture(scope='session', autouse=True)
-def base_app(request):
+@pytest.yield_fixture(scope='session')
+def app():
     """Flask application fixture."""
-    app = create_app(
+    _app = create_app(
         # CELERY_ALWAYS_EAGER=True,
         # CELERY_CACHE_BACKEND="memory",
         # CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
@@ -59,12 +63,12 @@ def base_app(request):
         TESTING=True,
     )
 
-    with app.app_context():
-        yield app
+    with _app.app_context():
+        yield _app
 
 
-@pytest.yield_fixture(scope='session')
-def es(base_app):
+@pytest.yield_fixture()
+def es(app):
     """Provide elasticsearch access."""
     try:
         list(current_search.create())
@@ -76,8 +80,8 @@ def es(base_app):
     list(current_search.delete(ignore=[404]))
 
 
-@pytest.yield_fixture(scope='session')
-def db(base_app):
+@pytest.yield_fixture()
+def db(app):
     """Setup database."""
     if not database_exists(str(db_.engine.url)):
         create_database(str(db_.engine.url))
@@ -85,12 +89,6 @@ def db(base_app):
     yield db_
     db_.session.remove()
     db_.drop_all()
-
-
-@pytest.yield_fixture(scope='session', autouse=True)
-def app(base_app, es, db):
-    """Application with ES and DB."""
-    yield base_app
 
 
 def pytest_generate_tests(metafunc):
@@ -121,3 +119,25 @@ def env_browser(request):
 
     # Quit the webdriver instance
     browser.quit()
+
+@pytest.fixture()
+def users(db):
+    """Create users."""
+    user1 = create_test_user(email='info@zenodo.org', password='tester')
+    user2 = create_test_user(email='test@zenodo.org', password='tester2')
+    user_admin = create_test_user(email='admin@zenodo.org',
+                                  password='admin')
+
+    with db.session.begin_nested():
+        # set admin permissions
+        db.session.add(ActionUsers(action=action_admin_access.value,
+                                   user=user_admin))
+        db.session.add(ActionUsers(action=deposit_admin_access.value,
+                                   user=user_admin))
+    db.session.commit()
+
+    return [
+        {'email': user1.email, 'id': user1.id},
+        {'email': user2.email, 'id': user2.id},
+        {'email': user_admin.email, 'id': user_admin.id}
+    ]

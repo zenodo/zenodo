@@ -26,10 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import url_for
+import flask
+from six.moves.urllib.request import urlopen
 
 
 def test_frontpage(live_server, env_browser):
     """Test retrieval of frontpage."""
-    env_browser.get(
-        url_for('zenodo_frontpage.index', _external=True))
+    url = flask.url_for('zenodo_frontpage.index', _external=True)
+    response = urlopen(url)
+    assert response
+    assert response.code == 200
