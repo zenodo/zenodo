@@ -126,12 +126,13 @@ Elasticsearch, Redis and RabbitMQ:
     $ docker-compose up db es cache mq
 
 Keep the docker-compose session above alive and in a separate shell, create a
-new Python virtual environment using virtualenvwrapper
-(`virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/>`_),
-in which we will install Zenodo code and its dependencies:
+new Python virtual environment using virtualenvwrapper,in which we will install Zenodo code and its dependencies:
 
 .. code-block:: console
-
+    $ pip install virtualenvwrapper
+    $ export WORKON_HOME=~/Envs
+    $ mkdir -p $WORKON_HOME
+    $ source /usr/local/bin/virtualenvwrapper.sh
     $ mkvirtualenv zenodo
     (zenodo)$
 
