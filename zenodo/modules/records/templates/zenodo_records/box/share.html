@@ -36,6 +36,7 @@
   <h4>{{_('Cite as')}}</h4>
   <div id='invenio-csl'>
     {% set citation_result = record|citation(pid, style='apa') %}
+    {% set citation_result = citation_result.replace("'", "\\'").replace('"', '\\"') %}
     <invenio-csl
       {%- if citation_result %}
         ng-init="vm.citationResult = '{{citation_result}}'"
