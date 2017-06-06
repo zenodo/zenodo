@@ -72,6 +72,8 @@ def _(x):
     """Identity function for string extraction."""
     return x
 
+# : Default docker host address
+ZENODO_DOCKER_HOST = os.environ.get("ZENODO_DOCKER_HOST", "localhost")
 #: Email address for support.
 SUPPORT_EMAIL = "info@zenodo.org"
 MAIL_SUPPRESS_SEND = True
@@ -132,9 +134,9 @@ I18N_LANGUAGES = []
 # Celery
 # ======
 #: Default broker (RabbitMQ on locahost).
-BROKER_URL = "amqp://guest:guest@localhost:5672//"
+BROKER_URL = "amqp://guest:guest@{}:5672//".format(ZENODO_DOCKER_HOST)
 #: Default Celery result backend.
-CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
+CELERY_RESULT_BACKEND = "redis://{}:6379/1".format(ZENODO_DOCKER_HOST)
 #: Accepted content types for Celery.
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 #: Beat schedule
@@ -158,7 +160,7 @@ CELERYBEAT_SCHEDULE = {
 #: Cache key prefix
 CACHE_KEY_PREFIX = "cache::"
 #: Host
-CACHE_REDIS_HOST = "localhost"
+CACHE_REDIS_HOST = "{}".format(ZENODO_DOCKER_HOST)
 #: Port
 CACHE_REDIS_PORT = 6379
 #: DB
@@ -169,7 +171,7 @@ CACHE_REDIS_URL = "redis://{0}:{1}/{2}".format(
 #: Default cache type.
 CACHE_TYPE = "redis"
 #: Default cache URL for sessions.
-ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
+ACCOUNTS_SESSION_REDIS_URL = "redis://{}:6379/2".format(ZENODO_DOCKER_HOST)
 #: Cache for storing access restrictions
 ACCESS_CACHE = 'zenodo.modules.cache:current_cache'
 
@@ -894,6 +896,10 @@ SECURITY_DEPRECATED_PASSWORD_SCHEMES = [
 
 # Search
 # ======
+#: Default ElasticSearch host
+SEARCH_ELASTIC_HOSTS = [
+    {"host": ZENODO_DOCKER_HOST}
+]
 #: Default API endpoint for search UI.
 SEARCH_UI_SEARCH_API = "/api/records/"
 #: Accept header fro search-js
@@ -967,9 +973,9 @@ USERPROFILES_EXTEND_SECURITY_FORMS = True
 # Database
 # ========
 #: Default database host.
-SQLALCHEMY_DATABASE_URI = os.environ.get(
+SQALCHEMY_DATABASE_URI = os.environ.get(
     "SQLALCHEMY_DATABASE_URI",
-    "postgresql+psycopg2://zenodo:zenodo@localhost/zenodo")
+    "postgresql+psycopg2://zenodo:zenodo@{}/zenodo").format(ZENODO_DOCKER_HOST)
 #: Do not print SQL queries to console.
 SQLALCHEMY_ECHO = False
 #: Track modifications to objects.
