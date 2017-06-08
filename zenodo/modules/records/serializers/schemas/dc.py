@@ -132,8 +132,8 @@ class DublinCoreV1(Schema):
 
     def get_types(self, obj):
         """Get types."""
-        return [
-            ObjectType.get_by_dict(obj['metadata']['resource_type'])['eurepo']]
+        t = ObjectType.get_by_dict(obj['metadata']['resource_type'])
+        return [t['eurepo'], t['internal_id']]
 
     def get_sources(self, obj):
         """Get sources."""

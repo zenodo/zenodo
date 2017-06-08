@@ -46,7 +46,10 @@ def test_minimal(app, db, minimal_record_model, recid_pid):
         'rights': ['info:eu-repo/semantics/openAccess'],
         'publishers': [],
         'descriptions': ['My description'],
-        'types': ['info:eu-repo/semantics/other'],
+        'types': [
+            'info:eu-repo/semantics/other',
+            'software',
+        ],
         'relations': []
     }
 
@@ -145,7 +148,10 @@ def test_types(app, db, minimal_record_model, recid_pid):
         'resource_type': {'type': 'publication', 'subtype': 'conferencepaper'}
     })
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
-    assert obj['types'] == ['info:eu-repo/semantics/conferencePaper']
+    assert obj['types'] == [
+        'info:eu-repo/semantics/conferencePaper',
+        'publication-conferencepaper'
+    ]
 
 
 def test_sources(app, db, minimal_record_model, recid_pid):
