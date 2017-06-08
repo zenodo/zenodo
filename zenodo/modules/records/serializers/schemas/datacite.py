@@ -131,7 +131,6 @@ class DataCiteSchemaV1(Schema):
         lambda o: str(arrow.get(o['metadata']['publication_date']).year))
     subjects = fields.Method('get_subjects')
     contributors = fields.Method('get_contributors')
-    # TODO: Contributors
     dates = fields.Method('get_dates')
     language = fields.Str(attribute='metadata.language')
     resourceType = fields.Method('get_type')
@@ -175,24 +174,24 @@ class DataCiteSchemaV1(Schema):
 
     def get_rights(self, obj):
         """Get rights."""
-        # eu-repo
-        eurepo = 'info:eu-repo/semantics/{}Access'.format(
-            obj['metadata']['access_right'])
-
-        items = [
-            {'rightsURI': eurepo,
-             'rights': '{0} access'.format(
-                 obj['metadata']['access_right']).title()}
-        ]
+        items = []
 
         # license
         license_url = obj['metadata'].get('license', {}).get('url')
-        license_text = obj['metadata'].get('license', {}).get('license')
+        license_text = obj['metadata'].get('license', {}).get('title')
         if license_url and license_text:
             items.append({
                 'rightsURI': license_url,
                 'rights': license_text,
             })
+
+        # info:eu-repo
+        items.append({
+            'rightsURI': 'info:eu-repo/semantics/{}Access'.format(
+                obj['metadata']['access_right']),
+            'rights': '{0} access'.format(
+                obj['metadata']['access_right']).title()
+        })
         return items
 
     def get_type(self, obj):

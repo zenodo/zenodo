@@ -52,6 +52,10 @@ def test_minimal(db, minimal_record_model, recid_pid):
         'contributors': [],
         'resourceType': {
             'resourceType': None, 'resourceTypeGeneral': 'Software'},
+        'alternateIdentifiers': [{
+            'alternateIdentifier': 'http://localhost/record/123',
+            'alternateIdentifierType': 'url',
+        }],
         'relatedIdentifiers': [],
         'rightsList': [
             {'rights': 'Open Access',
@@ -191,6 +195,9 @@ def test_alt_ids(db, minimal_record_model, recid_pid):
     assert obj['alternateIdentifiers'] == [{
         'alternateIdentifier': '10.1234/foo.bar',
         'alternateIdentifierType': 'doi',
+    }, {
+        'alternateIdentifier': 'http://localhost/record/123',
+        'alternateIdentifierType': 'url',
     }]
 
 
@@ -228,18 +235,18 @@ def test_rights(db, minimal_record_model, recid_pid):
     minimal_record_model.update({
         'license': {
             'identifier': 'cc-by-sa',
-            'license': 'Creative Commons Attribution Share-Alike',
+            'title': 'Creative Commons Attribution Share-Alike',
             'source': 'opendefinition.org',
             'url': 'http://www.opendefinition.org/licenses/cc-by-sa'
         }
     })
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['rightsList'] == [{
-        'rights': 'Open Access',
-        'rightsURI': 'info:eu-repo/semantics/openAccess',
-    }, {
         'rights': 'Creative Commons Attribution Share-Alike',
         'rightsURI': 'http://www.opendefinition.org/licenses/cc-by-sa',
+    }, {
+        'rights': 'Open Access',
+        'rightsURI': 'info:eu-repo/semantics/openAccess',
     }]
 
 
