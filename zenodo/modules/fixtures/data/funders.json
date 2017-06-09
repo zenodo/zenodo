@@ -2,6 +2,25 @@
   {
     "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
     "acronyms": [
+      "NHMRC"
+    ],
+    "country": "AU",
+    "doi": "10.13039/501100000925",
+    "identifiers": {
+      "oaf": "nhmrc_______::NHMRC"
+    },
+    "name": "National Health and Medical Research Council",
+    "parent": {
+      "$ref": "http://dx.doi.org/10.13039/501100003921"
+    },
+    "remote_created": "2011-07-12T19:54:57.000000",
+    "remote_modified": "2015-01-05T10:12:10.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
       "EC"
     ],
     "country": "BE",
@@ -14,6 +33,125 @@
     "remote_created": "2011-06-08T16:00:03.000000",
     "remote_modified": "2015-10-28T13:27:02.000000",
     "subtype": "federal",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "ARC"
+    ],
+    "country": "AU",
+    "doi": "10.13039/501100000923",
+    "identifiers": {
+      "oaf": "arc_________::ARC"
+    },
+    "name": "Australian Research Council",
+    "parent": {
+      "$ref": "http://dx.doi.org/10.13039/501100000934"
+    },
+    "remote_created": "2011-07-11T10:52:15.000000",
+    "remote_modified": "2015-06-12T08:24:28.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "FCT"
+    ],
+    "country": "PT",
+    "doi": "10.13039/501100001871",
+    "identifiers": {
+      "oaf": "fct_________::FCT"
+    },
+    "name": "Funda\u00e7\u00e3o para a Ci\u00eancia e a Tecnologia",
+    "parent": {
+      "$ref": "http://dx.doi.org/10.13039/501100003381"
+    },
+    "remote_created": "2011-10-11T09:06:59.000000",
+    "remote_modified": "2015-07-08T10:09:16.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [],
+    "country": "GB",
+    "doi": "10.13039/100004440",
+    "identifiers": {
+      "oaf": "wt__________::WT"
+    },
+    "name": "Wellcome Trust",
+    "parent": {},
+    "remote_created": "2009-07-06T18:53:11.000000",
+    "remote_modified": "2015-06-22T15:39:16.000000",
+    "subtype": "international",
+    "type": "pri"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "NSF"
+    ],
+    "country": "US",
+    "doi": "10.13039/100000001",
+    "identifiers": {
+      "oaf": "nsf_________::NSF"
+    },
+    "name": "National Science Foundation",
+    "parent": {},
+    "remote_created": "2009-07-06T18:53:11.000000",
+    "remote_modified": "2015-06-12T09:13:48.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [],
+    "country": "RS",
+    "doi": "10.13039/501100004564",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Ministarstvo Prosvete, Nauke i Tehnolo\u0161kog Razvoja",
+    "parent": {},
+    "remote_created": "2014-06-23T15:49:44.000000",
+    "remote_modified": "2015-02-11T16:18:03.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "NWO"
+    ],
+    "country": "NL",
+    "doi": "10.13039/501100003246",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek",
+    "parent": {},
+    "remote_created": "2014-02-04T09:49:51.000000",
+    "remote_modified": "2015-06-12T08:43:34.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "MZOS"
+    ],
+    "country": "HR",
+    "doi": "10.13039/501100006588",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Ministarstvo Znanosti, Obrazovanja i Sporta",
+    "parent": {},
+    "remote_created": "2015-04-06T18:00:51.000000",
+    "remote_modified": "2015-10-28T13:41:07.000000",
+    "subtype": "federal/national government",
     "type": "gov"
   }
 ]
