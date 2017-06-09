@@ -123,7 +123,7 @@ invenio-marc21==1.0.0a3
 invenio-oaiserver==1.0.0a12
 invenio-oauth2server==1.0.0a15
 invenio-oauthclient==1.0.0a12
-invenio-openaire==1.0.0a7
+invenio-openaire==1.0.0a8
 invenio-opendefinition==1.0.0a3
 invenio-pages==1.0.0a3
 invenio-pidstore==1.0.0b1
