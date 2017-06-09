@@ -31,13 +31,11 @@
     <small class="text-muted">{{item.text}}</small>
     <a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>
   {%- endfor %}
-  {#
   {%- if is_openaire %}
     <small class="text-muted">{{_('Available in')}}</small>
     <a href="{{record|openaire_link}}">
       <img src="{{ url_for('static', filename='img/openaire-horizontal-old.png') }}" class="img-thumbnail" width="100%" />
     </a>
   {%- endif %}
-  #}
 </div>
 {%- endif %}
