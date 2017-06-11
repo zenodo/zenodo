@@ -48,6 +48,7 @@
       </th>
       <th>Size</th>
       <th class="text-center">Progress</th>
+      <th class="text-center">Extract</th>
       <th class="text-center">Delete</th>
     </tr>
     <tr class="sel-file" ng-repeat="f in filesVM.files | filter:fileSearch | orderBy:'key'">
@@ -63,13 +64,21 @@
         <span ng-show="f.errored" class="text-danger">Error</span>
         <span ng-show="f.completed" class="text-success"><i class="fa fa-check"></i></span>
       </td>
-      <td ng-show="f" class="text-center"><a href="#" ng-click="filesVM.remove(f)"><i class="fa fa-trash-o"></a></td>
+      <td class="text-center">
+        <button
+          class="btn btn-xs btn-default form-button {{ form.fieldHtmlClass }}"
+          ng-click="extractMetadata(f)"
+          extract-button
+        >
+        <i class="fa fa-magic" aria-hidden="true"></a></td>
+      </td>
+      <td ng-show="f" class"text-center"><a href="#" ng-click="filesVM.remove(f)"><i class="fa fa-trash-o"></a></td>
     </tr>
     <tr ng-show="(filesVM.files | filter:fileSearch).length == 0">
-      <td colspan="4" class="text-center text-muted"> No results.</td>
+      <td colspan="5" class="text-center text-muted"> No results.</td>
     </tr>
     <tr class="warning">
-      <td colspan="4">
+      <td colspan="5">
         <small class="text-muted">Note: File addition, removal or modification are not allowed after you have published your upload. This is because a Digital Object Identifier (DOI) is registered with <a href="http://www.datacite.org"><i class="fa fa-external-link"></i> DataCite</a> for each upload.</small>
       </td>
     </tr>

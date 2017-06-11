@@ -31,7 +31,7 @@ from functools import wraps
 
 from elasticsearch.exceptions import NotFoundError
 from flask import Blueprint, abort, current_app, flash, redirect, \
-    render_template, request, url_for
+    render_template, request, url_for, jsonify
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
 from invenio_communities.models import Community
@@ -50,6 +50,7 @@ from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
 from .tasks import datacite_inactivate, datacite_register
+from .extractor import zenodo_metadata_extractor
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -259,6 +260,18 @@ def current_datetime():
         'current_time': now.time(),
     }
 
+@blueprint.route(
+    '/record/extractmetadata/<key>/<version_id>',
+    methods=['POST']
+)
+def extractmetadata(key=None, version_id=None):
+    """Extract metadata for a given file
+
+    NOTE:
+    It should probably go to `invenio-files-rest` module or
+    an independent module `invenio-extractmetadata-rest` module.
+    """
+    return jsonify(zenodo_metadata_extractor(key, version_id))
 
 @blueprint.app_template_filter('tolinksjs')
 def to_links_js(pid, deposit=None):
@@ -329,6 +342,12 @@ def to_files_js(deposit):
                         key=f.key,
                         version_id=f.version_id,
                     )),
+                'extractmetadata': (
+                    u'/record' +
+                    u'/extractmetadata/{key}/{version_id}'.format(
+                        key=f.key,
+                        version_id=f.version_id,
+                    ))
             }
         })
 
