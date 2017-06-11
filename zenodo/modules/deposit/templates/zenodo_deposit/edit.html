@@ -48,16 +48,60 @@
         openAIREProvider.setCommunitiesMapping({{current_openaire.inverse_openaire_community_map|tojson}});
       }]);
 
-      angular.bootstrap(
-        document.getElementById('invenio-records'), [
-          'invenioRecords', 'schemaForm', 'mgcrea.ngStrap',
-          'mgcrea.ngStrap.modal', 'pascalprecht.translate', 'ui.sortable',
-          'ui.select', 'mgcrea.ngStrap.select', 'mgcrea.ngStrap.datepicker',
-          'mgcrea.ngStrap.helpers.dateParser', 'mgcrea.ngStrap.tooltip',
-          'invenioFiles'
-        ]
-      );
-    });
+      angular.module('invenioRecords.directives')
+        .directive('extractButton',['$rootScope', 'InvenioRecordsAPI', function($rootScope, InvenioRecordsAPI) {
+
+          function link($scope, elem, attrs, vm) {
+            $scope.extractMetadata = function(f) {
+                var url = f.links.extractmetadata;
+                $rootScope.$broadcast('invenio.records.loading.start');
+
+                // NOTE: the url is in the form /<key>/<version_id> contains the `key` and the
+                //  `version_id`.  I guess we can just pass them to the extract metadata endpoint.
+                // and the metadata endpoint can access the file.
+                //
+                // Question: what is the correct way to get the (binary) content of a file?
+                InvenioRecordsAPI.request({
+                  method: 'POST',
+                  url: url,
+                  data: {},
+                  headers: {}
+                }).then(function success(resp) {
+                  console.log(resp.data)
+                  vm.invenioRecordsModel.title = resp.data.title
+                  vm.invenioRecordsModel.description= resp.data.description
+                  $rootScope.$broadcast(
+                    'invenio.records.endpoints.updated', resp.data);
+                }, function error(resp) {
+                  $rootScope.$broadcast('invenio.records.alert', {
+                    type: 'danger',
+                    data: resp.data,
+                  });
+                })
+                .finally(function() {
+                  $rootScope.$broadcast('invenio.records.loading.stop');
+                });
+            };
+          }
+
+          return {
+            scope: false,
+            restrict: 'A',
+            require: '^invenioRecords',
+            link: link,
+          };
+        }]);
+
+        angular.bootstrap(
+          document.getElementById('invenio-records'), [
+            'invenioRecords', 'schemaForm', 'mgcrea.ngStrap',
+            'mgcrea.ngStrap.modal', 'pascalprecht.translate', 'ui.sortable',
+            'ui.select', 'mgcrea.ngStrap.select', 'mgcrea.ngStrap.datepicker',
+            'mgcrea.ngStrap.helpers.dateParser', 'mgcrea.ngStrap.tooltip',
+            'invenioFiles'
+          ]
+        );
+      });
   </script>
 {%- endblock javascript %}
 

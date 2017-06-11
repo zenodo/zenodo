@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, abort, current_app, flash, redirect, \
+from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
     render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
@@ -47,6 +47,7 @@ from zenodo.modules.openaire import current_openaire
 from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
+from .extractor import zenodo_metadata_extractor
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
 
@@ -256,6 +257,18 @@ def current_datetime():
         'current_time': now.time(),
     }
 
+@blueprint.route(
+    '/record/extractmetadata/<key>/<version_id>',
+    methods=['POST']
+)
+def extractmetadata(key=None, version_id=None):
+    """Extract metadata for a given file
+
+    NOTE:
+    It should probably go to `invenio-files-rest` module or
+    an independent module `invenio-extractmetadata-rest` module.
+    """
+    return jsonify(zenodo_metadata_extractor(key, version_id))
 
 @blueprint.app_context_processor
 def current_openaire_ctx():
@@ -332,6 +345,12 @@ def to_files_js(deposit):
                         key=f.key,
                         version_id=f.version_id,
                     )),
+                'extractmetadata': (
+                    u'/record' +
+                    u'/extractmetadata/{key}/{version_id}'.format(
+                        key=f.key,
+                        version_id=f.version_id,
+                    ))
             }
         })
 
