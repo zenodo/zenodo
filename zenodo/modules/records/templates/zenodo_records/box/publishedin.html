@@ -32,7 +32,7 @@
     <a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>
   {%- endfor %}
   {%- if is_openaire %}
-    <small class="text-muted">{{_('Available in')}}</small>
+    <small class="text-muted">{{_('Indexed in')}}</small>
     <a href="{{record|openaire_link}}">
       <img src="{{ url_for('static', filename='img/openaire-horizontal-old.png') }}" class="img-thumbnail" width="100%" />
     </a>

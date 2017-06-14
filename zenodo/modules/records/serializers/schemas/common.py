@@ -39,7 +39,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
-from six.moves.urllib.parse import quote
+from six.moves.urllib.parse import quote, urlparse
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
@@ -62,9 +62,19 @@ def clean_empty(data, keys):
 
 def format_pid_link(url_template, pid_value):
     """Format a pid url."""
-    return url_template.format(host=request.host,
-                               scheme=request.scheme,
-                               pid_value=pid_value)
+    if request:
+        return url_template.format(
+            host=request.host,
+            scheme=request.scheme,
+            pid_value=pid_value,
+        )
+    else:
+        r = urlparse(current_app.config['THEME_SITEURL'])
+        return url_template.format(
+            host=r.netloc,
+            scheme=r.scheme,
+            pid_value=pid_value,
+        )
 
 
 external_url_for = partial(url_for, _external=True)
