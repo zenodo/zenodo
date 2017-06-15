@@ -178,7 +178,7 @@ def zenodo_related_links(record, communities):
 @blueprint.app_template_filter('zenodo_community_branding_links')
 def zenodo_community_branding_links(record):
     """Get logos for branded communities."""
-    comms = record.get('communities')
+    comms = record.get('communities', [])
     branded = current_app.config['ZENODO_COMMUNITY_BRANDING']
     ret = []
     for comm in comms:
