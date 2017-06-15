@@ -369,7 +369,7 @@
           {
             "type": "uiselect",
             "key": "license",
-            "description": "Required. The selected license applies to all of your files displayed in the top of the form. If you want to upload some files under a different license, please do so in two separate uploads. If you think a license is missing from the list, please inform us at <a href='mailto:info@zenodo.org'>info@zenodo.org</a>",
+            "description": "Required. Selected license applies to all of your files displayed on the top of the form. If you want to upload some of your files under different licenses, please do so in separate uploads. If you cannot find the license you're looking for, include a relevant LICENSE file in your record and choose one of the 'Other' licenses available ('Other (Open)', 'Other (Attribution)', etc.). The supported open licenses in the list are harvested from <a href='http://opendefinition.org'>opendefinition.org</a>. If you think that an open license is missing from the list, please <a href='https://zenodo.org/support'>contact us</a>.",
             "fa_cls": "fa-certificate",
             "placeholder": "Start typing a license name...",
             "required": true,
