@@ -22,11 +22,18 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
+{%- set communities_in = record|zenodo_community_branding_links %}
 {%- set published_in = record|zenodo_related_links(all_pending_comms + all_accepted_comms) %}
 {%- set is_openaire = record|is_openaire_publication or record|is_openaire_dataset %}
 
-{%- if published_in or is_openaire %}
+{%- if communities_in or published_in or is_openaire %}
 <div class="well metadata">
+  {% if communities_in %}
+    <small class="text-muted">{{_('Part of')}}</small>
+    {%- for comm_id, comm_img in communities_in %}
+      <a href="{{url_for('invenio_communities.about', community_id=comm_id)}}"><img src="{{ comm_img }}" class="img-thumbnail" width="100%" /></a>
+    {% endfor %}
+  {% endif %}
   {%- for item in published_in %}
     <small class="text-muted">{{item.text}}</small>
     <a href="{{item.link}}"><img src="{{ url_for('static', filename=item.image) }}" class="img-thumbnail" width="100%" /></a>

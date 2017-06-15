@@ -68,6 +68,11 @@ ZENODO_RELATION_RULES = {
         }],
 }
 
+ZENODO_COMMUNITY_BRANDING = [
+    'biosyslit',
+    'lory',
+]
+
 ZENODO_RELATION_TYPES = [
     ('isCitedBy', _('Cited by')),
     ('cites', _('Cites')),
