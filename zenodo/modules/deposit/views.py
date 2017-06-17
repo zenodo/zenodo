@@ -261,17 +261,16 @@ def current_datetime():
     }
 
 @blueprint.route(
-    '/record/extractmetadata/<key>/<version_id>',
+    '/record/extractmetadata/<version_id>',
     methods=['POST']
 )
-def extractmetadata(key=None, version_id=None):
+def extractmetadata(version_id=None):
     """Extract metadata for a given file
 
-    NOTE:
-    It should probably go to `invenio-files-rest` module or
-    an independent module `invenio-extractmetadata-rest` module.
+    TODO:
+    move to an independent module `invenio-extractmetadata-rest` module.
     """
-    return jsonify(zenodo_metadata_extractor(key, version_id))
+    return jsonify(zenodo_metadata_extractor(version_id))
 
 @blueprint.app_template_filter('tolinksjs')
 def to_links_js(pid, deposit=None):
@@ -339,12 +338,6 @@ def to_files_js(deposit):
                     current_app.config['DEPOSIT_FILES_API'] +
                     u'/{bucket}/{key}?versionId={version_id}'.format(
                         bucket=f.bucket_id,
-                        key=f.key,
-                        version_id=f.version_id,
-                    )),
-                'extractmetadata': (
-                    u'/record' +
-                    u'/extractmetadata/{key}/{version_id}'.format(
                         key=f.key,
                         version_id=f.version_id,
                     ))

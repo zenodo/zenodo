@@ -27,10 +27,10 @@
 from __future__ import absolute_import
 
 
-def zenodo_metadata_extractor(key, version_id):
+def zenodo_metadata_extractor(version_id):
     metadata = {
-       "title": key,
-       "description": "Some description",
+       "title": "<Title>",
+       "description": "version_id = {}".format(version_id),
        "version_id": version_id
     }
     return metadata

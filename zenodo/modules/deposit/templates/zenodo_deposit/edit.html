@@ -140,13 +140,9 @@
 
           function link($scope, elem, attrs, vm) {
             $scope.extractMetadata = function(f) {
-                var url = f.links.extractmetadata;
+                var url = `/record/extractmetadata/${ f.version_id }`
                 $rootScope.$broadcast('invenio.records.loading.start');
 
-                // NOTE: the url is in the form /<key>/<version_id> contains the `key` and the
-                //  `version_id`.  I guess we can just pass them to the extract metadata endpoint.
-                // and the metadata endpoint can access the file.
-                //
                 // Question: what is the correct way to get the (binary) content of a file?
                 InvenioRecordsAPI.request({
                   method: 'POST',
