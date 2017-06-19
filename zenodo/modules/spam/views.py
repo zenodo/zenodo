@@ -33,7 +33,7 @@ from flask_principal import ActionNeed
 from invenio_accounts.models import User
 from flask import flash, redirect, render_template, url_for
 from invenio_db import db
-from invenio_communities.errors import CommunitiesError
+from invenio_accounts.admin import _datastore
 from invenio_communities.models import Community
 
 from invenio_access.permissions import DynamicPermission
@@ -80,14 +80,13 @@ def delete(user_id):
 
         if deleteform.remove_all_communities.data:
             for c in communities:
-                c.description = '--SPAM--' + c.description
-                try:
+                if not c.deleted_at:
+                    if not c.description.startswith('--SPAM--'):
+                        c.description = '--SPAM--' + c.description
                     c.delete()
-                except CommunitiesError:
-                    pass
             db.session.commit()
         if deleteform.deactivate_user.data:
-            user.active = False
+            _datastore.deactivate_user(user)
             db.session.commit()
         # delete_record function commits the session internally
         # for each deleted record
