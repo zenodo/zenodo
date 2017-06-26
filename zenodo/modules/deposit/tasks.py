@@ -68,8 +68,8 @@ def datacite_register(pid_value, record_uuid):
         # using the metadata of the record.
         recid = PersistentIdentifier.get('recid', str(record['recid']))
         pv = PIDVersioning(child=recid)
-        if pv.exists and pv.is_last_child:
-            conceptdoi = record.get('conceptdoi')
+        conceptdoi = record.get('conceptdoi')
+        if conceptdoi and pv.exists and pv.is_last_child:
             conceptrecid = record.get('conceptrecid')
             concept_dcp = DataCiteProvider.get(conceptdoi)
             url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
