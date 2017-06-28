@@ -34,6 +34,7 @@ from flask import Blueprint, abort, current_app, flash, redirect, \
     render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
+from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
@@ -212,6 +213,8 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     except PIDDoesNotExistError:
         doi = None
 
+    owners = User.query.filter(User.id.in_(record.get('owners', []))).all()
+
     pids = [pid, depid, doi]
     if 'conceptdoi' in record:
         conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
@@ -242,6 +245,7 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     return render_template(
         'zenodo_deposit/delete.html',
         form=form,
+        owners=owners,
         pid=pid,
         pids=pids,
         record=record,
