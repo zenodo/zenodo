@@ -237,6 +237,8 @@ setup(
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
             'zenodo_openaire = zenodo.modules.openaire.views:blueprint',
             'zenodo_support = zenodo.modules.support.views:blueprint',
+            'zenodo_pages = zenodo.modules.pages.views:blueprint',
+            'zenodo_profiles = zenodo.modules.profiles.views:blueprint',
             'zenodo_redirector = zenodo.modules.redirector.views:blueprint',
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
