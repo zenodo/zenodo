@@ -22,18 +22,16 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-from: {{ form.name.data }} <{{ form.email.data }}>
+from: {{ info.name }} <{{ info.email }}>
 
-{% if current_user.is_authenticated %}
-  USER ID: {{ current_user.id }}
-{% endif %}
+USER ID: {{ user_id }}
 
-{% if form.include_os_browser.data %}
-  os: {{ form.os.data }}
-  browser: {{ form.browser.data }}
-  version: {{ form.version.data }}
-{% else %}
-  Operating System, Browser and Version is not allowed to be included.
-{% endif %}
+{%- if info.include_os_browser %}
+Operating System: {{ uap.os }}
+Browser: {{ uap.browser }}
+Device: {{ uap.device }}
+{%- else %}
+User-Agent info not included.
+{%- endif %}
 
-{{ form.description.data }}
+{{ info.description }}
