@@ -22,8 +22,8 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{# Records with no DOI or deposit cannot be edited #}
-{%- set edit_disabled = not (record.doi and record._deposit.id) %}
+{# Records with neither DOI or deposit cannot be edited #}
+{%- set edit_disabled = not (record.doi and (record._deposit and record._deposit.id)) %}
 
 {%- if current_user|has_record_perm(record, 'update') %}
 <form action="{{ url_for('zenodo_deposit.edit', pid_value=pid.pid_value) }}" method="POST">
@@ -31,8 +31,8 @@
 </form>
 {%- endif %}
 
-{# Only local DOIs can be versioned  #}
-{%- if record.doi|doi_locally_managed and current_user|has_record_perm(record, 'newversion') %}
+{# Only local DOIs can be versioned #}
+{%- if record.doi and record.doi|doi_locally_managed and current_user|has_record_perm(record, 'newversion') %}
   {# Already versioned record #}
   {%- if record.conceptdoi %}
     <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
