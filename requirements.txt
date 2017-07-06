@@ -27,6 +27,8 @@
 
 # Requirements not on PyPI
 -e git+https://github.com/zenodo/zenodo-migrator.git#egg=zenodo-migrator
+-e git+https://github.com/inspirehep/invenio-grobid.git#egg=invenio-grobid
+-e git+https://github.com/xiaom/invenio-files-processor.git#egg=invenio-files-processor
 
 # PyPI requirements
 alembic==0.9.9
