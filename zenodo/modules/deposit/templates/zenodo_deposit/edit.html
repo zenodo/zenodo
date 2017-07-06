@@ -140,10 +140,14 @@
 
           function link($scope, elem, attrs, vm) {
             $scope.extractMetadata = function(f) {
-                var url = `/record/extractmetadata/${ f.version_id }`
-                $rootScope.$broadcast('invenio.records.loading.start');
+              // TODO: identify filetype
+              var filetype = 'pdf'
+              // TODO: we may need to avoid ES6 Template Literal in production to support
+              // legacy browsers.
+              // see https://caniuse.com/#feat=template-literals
+              $rootScope.$broadcast('invenio.records.loading.start');
 
-                // Question: what is the correct way to get the (binary) content of a file?
+              // Question: what is the correct way to get the (binary) content of a file?
                 InvenioRecordsAPI.request({
                   method: 'POST',
                   url: url,
@@ -153,6 +157,8 @@
                   console.log(resp.data)
                   vm.invenioRecordsModel.title = resp.data.title
                   vm.invenioRecordsModel.description= resp.data.description
+                  vm.invenioRecordsModel.creators = resp.data.creators
+                  vm.invenioRecordsModel.keywords = resp.data.keywords
                   $rootScope.$broadcast(
                     'invenio.records.endpoints.updated', resp.data);
                 }, function error(resp) {
