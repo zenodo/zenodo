@@ -112,7 +112,7 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
 
     expected_sip_agent = {
         'email': 'foo@baz.bar',
-        '$schema': 'http://zenodo.org/schemas/sipstore/'
+        '$schema': 'https://zenodo.org/schemas/sipstore/'
                    'agent-githubclient-v1.0.0.json',
         'user_id': 1,
         'github_id': 1,
