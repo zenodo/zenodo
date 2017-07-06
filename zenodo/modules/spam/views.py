@@ -27,22 +27,22 @@
 from __future__ import absolute_import, print_function
 
 from itertools import islice
-from flask import Blueprint, abort, request
+
+from elasticsearch_dsl import Q
+from flask import Blueprint, abort, flash, redirect, render_template, \
+    request, url_for
 from flask_login import login_required
 from flask_principal import ActionNeed
-from invenio_accounts.models import User
-from flask import flash, redirect, render_template, url_for
-from invenio_db import db
-from invenio_accounts.admin import _datastore
-from invenio_communities.models import Community
-
-from invenio_access.permissions import DynamicPermission
-
-from zenodo.modules.spam.forms import DeleteSpamForm
-from zenodo.modules.deposit.utils import delete_record
 from flask_security import current_user
+from invenio_access.permissions import DynamicPermission
+from invenio_accounts.admin import _datastore
+from invenio_accounts.models import User
+from invenio_communities.models import Community
+from invenio_db import db
 from invenio_search.api import RecordsSearch
-from elasticsearch_dsl import Q
+
+from zenodo.modules.deposit.utils import delete_record
+from zenodo.modules.spam.forms import DeleteSpamForm
 
 blueprint = Blueprint(
     'zenodo_spam',

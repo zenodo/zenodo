@@ -27,7 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import click
-from flask_cli import with_appcontext
+from flask.cli import with_appcontext
 
 from .tasks import audit_oai, audit_records
 

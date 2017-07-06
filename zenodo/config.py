@@ -172,6 +172,8 @@ CACHE_TYPE = "redis"
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 #: Cache for storing access restrictions
 ACCESS_CACHE = 'zenodo.modules.cache:current_cache'
+#: Disable JSON Web Tokens
+ACCOUNTS_JWT_ENABLE=False
 
 # CSL Citation Formatter
 # ======================

@@ -68,7 +68,8 @@ def test_basic_workflow(app, db, users, deposit):
 def test_programmatic_publish(app, db, deposit, deposit_file):
     """Test publishing by without request.
 
-    Might never happen, but at least shouldn't crash the system."""
+    Might never happen, but at least shouldn't crash the system.
+    """
     deposit = deposit.publish()
     pid, record = deposit.fetch_published()
     sip = SIP.query.one()
@@ -79,7 +80,7 @@ def test_programmatic_publish(app, db, deposit, deposit_file):
     assert sip.record_sips[0].pid_id == pid.id
     assert len(sip.agent) == 1  # Just the '$schema' key in agent info
     assert sip.agent['$schema'] == \
-        'http://zenodo.org/schemas/sipstore/agent-webclient-v1.0.0.json'
+        'https://zenodo.org/schemas/sipstore/agent-webclient-v1.0.0.json'
 
 
 def test_anonymous_request(app, db, deposit):
