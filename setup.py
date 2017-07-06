@@ -109,7 +109,7 @@ install_requires = [
     'invenio-assets>=1.0.0b6',
     'invenio-base>=1.0.0a14',
     'invenio-celery>=1.0.0b1',
-    'invenio-communities>=1.0.0a14',
+    'invenio-communities>=1.0.0a15',
     'invenio-config>=1.0.0b1',
     'invenio-csl-rest>=1.0.0a1',
     'invenio-deposit>=1.0.0a8',
@@ -210,6 +210,7 @@ setup(
             'zenodo_redirector = zenodo.modules.redirector.views:blueprint',
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
+            'zenodo_spam = zenodo.modules.spam.views:blueprint',
         ],
         'invenio_base.api_blueprints': [
             'zenodo_rest = zenodo.modules.rest.views:blueprint',

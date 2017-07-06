@@ -1,0 +1,156 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends config.RECORDS_UI_BASE_TEMPLATE %}
+
+{% from "invenio_userprofiles/settings/_macros.html" import render_field %}
+
+{%- block page_body %}
+<div class="container record-admin">
+  <div class="row">
+    <div class="col-xs-12" align="center">
+      <div class="progress">
+        <div class="progress-bar progress-bar-danger progress-bar-striped" role="progressbar" style="width: 100%">
+          <strong>Danger Zone</strong>
+      </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Delete spam content</h1>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="panel panel-default">
+        <div class="panel-heading">User</div>
+        <div class="panel-body">
+          <ul class="list-group">
+            <li class="list-group-item">
+              <strong>ID:</strong> {{user.id}}
+            </li>
+            <li class="list-group-item">
+              <strong>Email:</strong> {{user.email}}
+            </li>
+            <li class="list-group-item">
+              <strong>Active?:</strong> {{user.active}}
+            </li>
+            <li class="list-group-item">
+              <strong>Last login:</strong> {{user.last_login_at}}
+            </li>
+
+            <li class="list-group-item">
+              <strong>Current login:</strong> {{user.current_login_at}}
+            </li>
+
+            <li class="list-group-item">
+              <strong>Last login IP:</strong> {{user.last_login_ip}}
+            </li>
+
+            <li class="list-group-item">
+              <strong>Current login IP:</strong> {{user.current_login_ip}}
+            </li>
+
+            <li class="list-group-item">
+              <strong>Login count:</strong> {{user.login_count}}
+            </li>
+          </ul>
+        </div>
+
+        <div class="panel-heading">Communities</div>
+        <div class="panel-body">
+          User has <strong>{{ communities.count() }}</strong> communities.
+          <table class="table table-bordered">
+            <tr>
+              <th>ID</th>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Deleted when?</th>
+            </tr>
+            {%- for c in communities %}
+            <tr>
+              <td><a href="{{url_for('invenio_communities.detail', community_id=c.id)}}">{{c.id}}</a></td>
+              <td>{{c.title[:50]}}</td>
+              <td>{{c.description[:100]}}</td>
+              <td>{{c.deleted_at}}</td>
+            </tr>
+            {%- endfor %}
+          </table>
+        </div>
+
+        <div class="panel-heading">Records</div>
+        <div class="panel-body">
+          User has <strong>{{ rec_count }}</strong> records indexed in elasticsearch.
+
+          <a href="{{ url_for('invenio_search_ui.search', q='owners: ' + (user.id|string)) }}"><strong>Full record search result</strong></a>
+
+          <h5>Records sample:</h5>
+          <table class="table table-bordered">
+            <tr>
+              <th>RECID</th>
+              <th>DOI</th>
+              <th>Title</th>
+              <th>Description</th>
+            </tr>
+            {%- for rec in records %}
+            <tr>
+              <td><a href="{{url_for('invenio_records_ui.recid', pid_value=rec['recid'])}}">{{rec['recid']}}</a></td>
+              <td>{{rec['doi']}}</td>
+              <td>{{rec['title']}}</td>
+              <td>{{rec['description'][:100]}}</td>
+            </tr>
+            {%- endfor %}
+          </table>
+        </div>
+      </div>
+
+      <div class="panel panel-danger">
+        <div class="panel-heading">Delete options</div>
+        <div class="panel-body">
+        <form action="" method="POST">
+
+          {{ form.csrf_token }}
+          <div class="row">
+            <div class="col-md-4">
+              {{ render_field(form.remove_all_communities) }}
+            </div>
+            <div class="col-md-4">
+              {{ render_field(form.remove_all_records) }}
+            </div>
+            <div class="col-md-4">
+              {{ render_field(form.deactivate_user) }}
+            </div>
+          </div>
+          <button class="btn btn-block btn-danger" type="submit">
+            <i class="fa fa-trash"></i>
+            Permanently delete objects
+          </button>
+        </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endblock page_body %}
