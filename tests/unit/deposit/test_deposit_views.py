@@ -35,7 +35,6 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier as PID
 from invenio_pidstore.models import PIDStatus
 from invenio_records.api import Record
-from mock import patch
 from six import BytesIO, b
 
 from zenodo.modules.deposit.api import ZenodoDeposit
@@ -117,9 +116,10 @@ def test_tombstone(app, app_client, deposit, deposit_file, users):
     assert app_client.get(delete_url).status_code == 410
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_record_delete(dc_mock, app, db, users, deposit, deposit_file):
+def test_record_delete(mocker, app, db, users, deposit, deposit_file):
     """Delete the record with a single version."""
+    dc_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     deposit = publish_and_expunge(db, deposit)
     recid, record = deposit.fetch_published()
     # Stash a copy of record metadata for later
@@ -149,9 +149,10 @@ def test_record_delete(dc_mock, app, db, users, deposit, deposit_file):
     assert record['removal_reason'] == 'Spam record, removed by Zenodo staff.'
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_record_delete_v1(dc_mock, app, db, users, deposit, deposit_file):
+def test_record_delete_v1(mocker, app, db, users, deposit, deposit_file):
     """Delete a record with multiple versions."""
+    dc_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     deposit_v1 = publish_and_expunge(db, deposit)
     recid_v1, record_v1 = deposit.fetch_published()
     recid_v1_value = recid_v1.pid_value
@@ -206,9 +207,10 @@ def test_record_delete_v1(dc_mock, app, db, users, deposit, deposit_file):
     assert record['removal_reason'] == 'Spam record, removed by Zenodo staff.'
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_record_delete_v2(dc_mock, app, db, users, deposit, deposit_file):
+def test_record_delete_v2(mocker, app, db, users, deposit, deposit_file):
     """Delete a record (only last version) with multiple versions."""
+    dc_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     deposit_v1 = publish_and_expunge(db, deposit)
     recid_v1, record_v1 = deposit.fetch_published()
     recid_v1_value = recid_v1.pid_value
@@ -265,9 +267,10 @@ def test_record_delete_v2(dc_mock, app, db, users, deposit, deposit_file):
     assert record['removal_reason'] == 'Spam record, removed by Zenodo staff.'
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_record_delete_legacy(dc_mock, app, db, users, deposit, deposit_file):
+def test_record_delete_legacy(mocker, app, db, users, deposit, deposit_file):
     """Delete the non-versioned record."""
+    dc_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     deposit = publish_and_expunge(db, deposit)
     recid, record = deposit.fetch_published()
 

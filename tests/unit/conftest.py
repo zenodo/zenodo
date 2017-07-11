@@ -39,6 +39,7 @@ from click.testing import CliRunner
 from elasticsearch.exceptions import RequestError
 from flask import url_for
 from flask.cli import ScriptInfo
+from flask_celeryext import create_celery_app
 from flask_security import login_user
 from helpers import bearer_auth
 from invenio_access.models import ActionUsers
@@ -94,8 +95,17 @@ def env_config(instance_path):
     return os.environ
 
 
+@pytest.yield_fixture(scope='session')
+def tmp_db_path():
+    """Temporary database path."""
+    os_path = tempfile.mkstemp(prefix='zenodo_test_', suffix='.db')[1]
+    path = 'sqlite:///' + os_path
+    yield path
+    os.remove(os_path)
+
+
 @pytest.fixture(scope='session')
-def default_config():
+def default_config(tmp_db_path):
     """Default configuration."""
     return dict(
         CFG_SITE_NAME="testserver",
@@ -112,7 +122,7 @@ def default_config():
         ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
-            'SQLALCHEMY_DATABASE_URI', 'sqlite:///test.db'),
+            'SQLALCHEMY_DATABASE_URI', tmp_db_path),
         TESTING=True,
         WTF_CSRF_ENABLED=False,
     )
@@ -122,12 +132,27 @@ def default_config():
 def app(env_config, default_config):
     """Flask application fixture."""
     app = create_app(**default_config)
+    # FIXME: Needs fixing flask_celeryext,
+    # which once creates the first celery app, the flask_app that is set
+    # is never released from the global state, even if you create a new
+    # celery application. We need to unset the "flask_app" manually.
+    from celery import current_app as cca
+    cca = cca._get_current_object()
+    delattr(cca, "flask_app")
+    celery_app = create_celery_app(app)
+    celery_app.set_current()
 
     with app.app_context():
         yield app
 
 
-@pytest.yield_fixture()
+@pytest.fixture()
+def api(app):
+    """Flask application fixture."""
+    return app.wsgi_app.mounts['/api']
+
+
+@pytest.yield_fixture
 def communities_autoadd_enabled(app):
     """Temporarily enable auto-adding and auto-requesting of communities."""
     app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = True
@@ -135,33 +160,27 @@ def communities_autoadd_enabled(app):
     app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = False
 
 
-@pytest.yield_fixture(scope='session')
-def api(app):
-    """Flask application fixture."""
-    yield app.wsgi_app.mounts['/api']
-
-
-@pytest.yield_fixture()
+@pytest.yield_fixture
 def app_client(app):
     """Flask test client for UI app."""
     with app.test_client() as client:
         yield client
 
 
-@pytest.yield_fixture()
+@pytest.yield_fixture
 def api_client(api):
     """Flask test client for API app."""
     with api.test_client() as client:
         yield client
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture
 def script_info(app):
     """Ensure that the database schema is created."""
-    yield ScriptInfo(create_app=lambda info: app)
+    return ScriptInfo(create_app=lambda info: app)
 
 
-@pytest.yield_fixture()
+@pytest.yield_fixture
 def db(app):
     """Setup database."""
     if not database_exists(str(db_.engine.url)):
@@ -172,7 +191,7 @@ def db(app):
     db_.drop_all()
 
 
-@pytest.yield_fixture()
+@pytest.yield_fixture
 def location(db):
     """File system location."""
     tmppath = tempfile.mkdtemp()
@@ -190,7 +209,7 @@ def location(db):
     shutil.rmtree(tmppath)
 
 
-@pytest.yield_fixture()
+@pytest.yield_fixture
 def es(app):
     """Provide elasticsearch access."""
     try:
@@ -203,7 +222,7 @@ def es(app):
     list(current_search.delete(ignore=[404]))
 
 
-@pytest.fixture()
+@pytest.fixture
 def users(app, db):
     """Create users."""
     user1 = create_test_user(email='info@zenodo.org', password='tester')
@@ -226,7 +245,7 @@ def users(app, db):
     ]
 
 
-@pytest.fixture()
+@pytest.fixture
 def communities(db, users):
     """Create communities."""
     comm_data = [
@@ -245,7 +264,7 @@ def communities(db, users):
     return comm_data
 
 
-@pytest.fixture()
+@pytest.fixture
 def oaisets(db, communities):
     """Create custom OAISet objects.
 
@@ -269,7 +288,7 @@ def oaisets(db, communities):
     return oaisets_data
 
 
-@pytest.fixture()
+@pytest.fixture
 def oauth2_client(app, db, users):
     """Create client."""
     with db.session.begin_nested():
@@ -289,7 +308,7 @@ def oauth2_client(app, db, users):
     return client_.client_id
 
 
-@pytest.fixture()
+@pytest.fixture
 def write_token(app, db, oauth2_client, users):
     """Create token."""
     with db.session.begin_nested():
@@ -313,7 +332,7 @@ def write_token(app, db, oauth2_client, users):
     )
 
 
-@pytest.fixture()
+@pytest.fixture
 def minimal_record():
     """Minimal record."""
     return {
@@ -330,7 +349,7 @@ def minimal_record():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def minimal_deposit():
     """Minimal deposit."""
     return {
@@ -348,7 +367,7 @@ def minimal_deposit():
     }
 
 
-@pytest.fixture()
+@pytest.fixture
 def minimal_record_model(db, minimal_record):
     """Minimal record."""
     model = RecordMetadata()
@@ -364,7 +383,7 @@ def minimal_record_model(db, minimal_record):
     return rec
 
 
-@pytest.fixture()
+@pytest.fixture
 def recid_pid():
     """PID for minimal record."""
     return PersistentIdentifier(
@@ -372,7 +391,7 @@ def recid_pid():
         object_uuid=uuid4())
 
 
-@pytest.fixture()
+@pytest.fixture
 def oaiid_pid():
     """PID for OAI id."""
     return PersistentIdentifier(
@@ -380,7 +399,7 @@ def oaiid_pid():
         object_type='rec', object_uuid=uuid4())
 
 
-@pytest.fixture()
+@pytest.fixture
 def bucket(db, location):
     """File system location."""
     b1 = Bucket.create()
@@ -388,7 +407,7 @@ def bucket(db, location):
     return b1
 
 
-@pytest.yield_fixture()
+@pytest.fixture
 def test_object(db, bucket):
     """File system location."""
     data_bytes = b('test object')
@@ -398,10 +417,10 @@ def test_object(db, bucket):
     )
     db.session.commit()
 
-    yield obj
+    return obj
 
 
-@pytest.fixture()
+@pytest.fixture
 def depid_pid():
     """PID for minimal record."""
     return PersistentIdentifier(
@@ -409,7 +428,7 @@ def depid_pid():
         object_uuid=uuid4())
 
 
-@pytest.fixture()
+@pytest.fixture
 def full_record():
     """Full record fixture."""
     record = dict(
@@ -555,7 +574,7 @@ def full_record():
     return record
 
 
-@pytest.fixture()
+@pytest.fixture
 def record_with_bucket(full_record, bucket, db):
     """Create a bucket."""
     record = RecordFile.create(full_record)
@@ -567,7 +586,7 @@ def record_with_bucket(full_record, bucket, db):
     return pid, record
 
 
-@pytest.fixture()
+@pytest.fixture
 def record_with_files_creation(db, record_with_bucket):
     """Creation of a full record with files in database."""
     pid, record = record_with_bucket
@@ -581,7 +600,7 @@ def record_with_files_creation(db, record_with_bucket):
     return pid, record, record_url
 
 
-@pytest.yield_fixture()
+@pytest.fixture
 def bibtex_records(app, db, full_record):
     """Create some records for bibtex serializer."""
     test_bad_record = dict(recid='12345')
@@ -596,10 +615,10 @@ def bibtex_records(app, db, full_record):
     record_bad = Bibtex(r_bad)
     record_empty = Bibtex({})
 
-    yield (record_good, record_bad, record_empty, r_good)
+    return (record_good, record_bad, record_empty, r_good)
 
 
-@pytest.fixture()
+@pytest.fixture
 def funder_record(db):
     """Create a funder record."""
     funder = Record.create(dict(
@@ -614,7 +633,7 @@ def funder_record(db):
     return funder
 
 
-@pytest.fixture()
+@pytest.fixture
 def grant_record(db, funder_record):
     """Create a grant record."""
     grant = Record.create(dict(
@@ -635,7 +654,7 @@ def grant_record(db, funder_record):
     return grant
 
 
-@pytest.fixture()
+@pytest.fixture
 def license_record(db):
     """Create a license record."""
     license = Record.create({
@@ -676,7 +695,7 @@ def license_record(db):
     return license
 
 
-@pytest.fixture()
+@pytest.fixture
 def deposit_metadata():
     """Raw metadata of deposit."""
     data = dict(
@@ -693,7 +712,7 @@ def deposit_metadata():
     return data
 
 
-@pytest.fixture()
+@pytest.fixture
 def deposit(app, es, users, location, deposit_metadata):
     """New deposit with files."""
     with app.test_request_context():
@@ -707,7 +726,7 @@ def deposit(app, es, users, location, deposit_metadata):
     return deposit
 
 
-@pytest.fixture()
+@pytest.fixture
 def deposit_file(deposit, db):
     """Deposit files."""
     deposit.files['test.txt'] = BytesIO(b'test')
@@ -715,21 +734,21 @@ def deposit_file(deposit, db):
     return deposit.files
 
 
-@pytest.fixture()
+@pytest.fixture
 def deposit_url(api):
     """Deposit API URL."""
     with api.test_request_context():
         return url_for('invenio_deposit_rest.depid_list')
 
 
-@pytest.fixture()
+@pytest.fixture
 def json_headers():
     """JSON headers."""
     return [('Content-Type', 'application/json'),
             ('Accept', 'application/json')]
 
 
-@pytest.fixture()
+@pytest.fixture
 def json_auth_headers(json_headers, write_token):
     """Authentication headers (with a valid oauth2 token).
 
@@ -738,7 +757,7 @@ def json_auth_headers(json_headers, write_token):
     return bearer_auth(json_headers, write_token)
 
 
-@pytest.fixture()
+@pytest.fixture
 def auth_headers(write_token):
     """Authentication headers (with a valid oauth2 token).
 
@@ -747,7 +766,7 @@ def auth_headers(write_token):
     return bearer_auth([], write_token)
 
 
-@pytest.fixture()
+@pytest.fixture
 def get_json():
     """Function for extracting json from response."""
     def inner(response, code=None):
@@ -759,7 +778,7 @@ def get_json():
     return inner
 
 
-@pytest.yield_fixture()
+@pytest.yield_fixture
 def legacyjson_v1():
     """Function for extracting json from response."""
     from zenodo.modules.records.serializers import legacyjson_v1 as serializer
@@ -768,7 +787,7 @@ def legacyjson_v1():
     serializer.replace_refs = True
 
 
-@pytest.fixture()
+@pytest.fixture
 def resolver():
     """Get a record resolver."""
     return Resolver(
@@ -836,7 +855,7 @@ def oaiset_update_records(minimal_record, db, es):
 #
 # GitHub-specific conftest
 #
-@pytest.yield_fixture
+@pytest.fixture
 def cli_run(app):
     """Fixture for CLI runner function.
 

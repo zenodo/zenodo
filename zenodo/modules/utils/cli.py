@@ -37,8 +37,8 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 
-from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.deposit.resolvers import deposit_resolver
+from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \

@@ -152,13 +152,14 @@ class ZenodoGitHubRelease(GitHubRelease):
             self.model.recordmetadata = record.model
             if versioning and stashed_draft_child:
                 versioning.insert_draft_child(stashed_draft_child)
+            record_id = str(record.id)
             db.session.commit()
 
             # Send Datacite DOI registration task
-            datacite_register.delay(recid_pid.pid_value, str(record.id))
+            datacite_register.delay(recid_pid.pid_value, record_id)
 
             # Index the record
-            RecordIndexer().index_by_id(str(record.id))
+            RecordIndexer().index_by_id(record_id)
         except Exception:
             db.session.rollback()
             # Remove deposit from index since it was not commited.
