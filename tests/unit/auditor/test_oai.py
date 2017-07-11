@@ -33,7 +33,7 @@ from invenio_communities.models import Community
 from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.models import OAISet
 from invenio_search import current_search
-from mock import MagicMock, patch
+from mock import MagicMock
 
 from zenodo.modules.auditor.oai import OAIAudit, OAICorrespondenceCheck, \
     OAISetResultCheck
@@ -116,8 +116,8 @@ oai_set_result_count_params = (
 
 @pytest.mark.parametrize(('oai_sources', 'issues'),
                          oai_set_result_count_params)
-def test_oai_set_result_count(audit_records, db, es, communities, oai_sources,
-                              issues):
+def test_oai_set_result_count(mocker, audit_records, db, es, communities,
+                              oai_sources, issues):
     db_records, es_records, oai2d_records = oai_sources
 
     for recid in db_records:
@@ -140,15 +140,16 @@ def test_oai_set_result_count(audit_records, db, es, communities, oai_sources,
     # this behavior and report it as an issue.
     oai2d_ids_mock = MagicMock()
     oai2d_ids_mock.return_value = set(oai2d_records)
-    with patch('zenodo.modules.auditor.oai.OAISetResultCheck'
-               '._oai2d_endpoint_identifiers', new=oai2d_ids_mock):
-        audit = OAIAudit('testAudit', logging.getLogger('auditorTesting'), [])
-        check = OAISetResultCheck(audit, Community.get('c1'))
-        check.perform()
-        audit.clear_db_oai_set_cache()
+    oai2d_ids_mock = mocker.patch(
+        'zenodo.modules.auditor.oai.OAISetResultCheck'
+        '._oai2d_endpoint_identifiers', new=oai2d_ids_mock)
+    audit = OAIAudit('testAudit', logging.getLogger('auditorTesting'), [])
+    check = OAISetResultCheck(audit, Community.get('c1'))
+    check.perform()
+    audit.clear_db_oai_set_cache()
 
-        result_issues = check.issues.get('missing_ids', {})
-        db_issues, es_issues, api_issues = issues
-        assert set(result_issues.get('db', [])) == set(db_issues)
-        assert set(result_issues.get('es', [])) == set(es_issues)
-        assert set(result_issues.get('api', [])) == set(api_issues)
+    result_issues = check.issues.get('missing_ids', {})
+    db_issues, es_issues, api_issues = issues
+    assert set(result_issues.get('db', [])) == set(db_issues)
+    assert set(result_issues.get('es', [])) == set(es_issues)
+    assert set(result_issues.get('api', [])) == set(api_issues)

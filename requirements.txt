@@ -94,7 +94,6 @@ Flask-WTF==0.14.2
 fs==0.5.4
 ftfy==4.4.3
 funcsigs==1.0.2
-functools32==3.2.3.post2
 future==0.16.0
 github3.py==1.0.0a4
 html5lib==0.999999999
@@ -146,8 +145,6 @@ invenio-sipstore==1.0.0a3
 invenio-theme==1.0.0b2
 invenio-userprofiles==1.0.0a10
 invenio-webhooks==1.0.0a4
-ipaddr==2.1.11
-ipaddress==1.0.18
 ipython==5.4.1
 ipython-genutils==0.2.0
 isbnid-fork==0.5.2
@@ -205,7 +202,9 @@ pytest==3.1.3
 pytest-cache==1.0
 pytest-cov==2.5.1
 pytest-flask==0.10.0
+pytest-mock==1.6.0
 pytest-pep8==1.0.6
+pytest-random-order==0.5.4
 python-dateutil==2.6.0
 python-editor==1.0.3
 python-slugify==1.2.4

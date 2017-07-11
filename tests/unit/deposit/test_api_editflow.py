@@ -32,17 +32,17 @@ from flask import url_for
 from invenio_communities.models import Community
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_search import current_search
-from mock import patch
 from six import BytesIO
 
 from zenodo.modules.deposit.tasks import datacite_register
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_edit_flow(datacite_mock, api_client, db, es, location,
+def test_edit_flow(mocker, api_client, db, es, location,
                    json_auth_headers, deposit_url, get_json, auth_headers,
                    json_headers, license_record, communities, resolver):
     """Test simple flow using REST API."""
+    datacite_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     headers = json_auth_headers
     client = api_client
 
