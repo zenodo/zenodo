@@ -24,7 +24,7 @@ from __future__ import absolute_import, print_function
 import json
 
 from flask_security import login_user
-from invenio_sipstore.models import SIP, RecordSIP, SIPFile
+from invenio_sipstore.models import SIP, RecordSIP, SIPFile, SIPMetadata
 from six import BytesIO
 
 
@@ -38,6 +38,7 @@ def test_basic_workflow(app, db, users, deposit):
         deposit = deposit.publish()
         # Should create one SIP, one RecordSIP and two SIPFiles
         assert SIP.query.count() == 1
+        assert SIPMetadata.query.count() == 1
         assert RecordSIP.query.count() == 1
         assert SIPFile.query.count() == 2
         sip = SIP.query.one()
@@ -57,6 +58,7 @@ def test_basic_workflow(app, db, users, deposit):
 
         assert SIP.query.count() == 2
         assert RecordSIP.query.count() == 2
+        assert SIPMetadata.query.count() == 2
         assert SIPFile.query.count() == 2
 
         # Fetch the last RecordSIP and make sure, that
@@ -74,8 +76,11 @@ def test_programmatic_publish(app, db, deposit, deposit_file):
     pid, record = deposit.fetch_published()
     sip = SIP.query.one()
     assert not sip.user_id
-    assert sip.content == json.dumps(record.dumps())
-    assert sip.sip_format == 'json'
+    assert sip.sip_metadata[0].content == json.dumps(record.dumps())
+    assert sip.sip_metadata[0].type.format == 'json'
+    assert sip.sip_metadata[0].type.name == 'test-json'
+    assert sip.sip_metadata[0].type.schema == \
+        'https://zenodo.org/schemas/records/record-v1.0.0.json'
     assert len(sip.record_sips) == 1
     assert sip.record_sips[0].pid_id == pid.id
     assert len(sip.agent) == 1  # Just the '$schema' key in agent info

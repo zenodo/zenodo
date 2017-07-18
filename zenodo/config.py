@@ -484,6 +484,9 @@ MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MiB
 #: Default JSON schema for the SIP agent
 SIPSTORE_DEFAULT_AGENT_JSONSCHEMA = 'sipstore/agent-webclient-v1.0.0.json'
 
+# Default SIP agent factory
+SIPSTORE_AGENT_FACTORY = 'invenio_sipstore.api.SIP._build_agent_info'
+
 #: Enable the agent JSON schema
 SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
 
