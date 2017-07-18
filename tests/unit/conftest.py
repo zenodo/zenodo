@@ -69,6 +69,7 @@ from sqlalchemy_utils.functions import create_database, database_exists
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
+from zenodo.modules.fixtures.records import loadsipmetadatatypes
 from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.serializers.bibtex import Bibtex
@@ -713,7 +714,26 @@ def deposit_metadata():
 
 
 @pytest.fixture
-def deposit(app, es, users, location, deposit_metadata):
+def sip_metadata_types(db):
+    """Create the SIP Metadata types."""
+    loadsipmetadatatypes([
+        {
+            'title': 'Test Zenodo Record JSON v1.0.0',
+            'name': 'test-json',
+            'format': 'json',
+            'schema': 'https://zenodo.org/schemas/records/record-v1.0.0.json'
+        },
+        {
+            "title": "Test BagIt Archiver metadata",
+            "name": "bagit",
+            "format": "json",
+            "schema": "https://zenodo.org/schemas/sipstore/bagit-v1.0.0.json"
+        }
+    ])
+
+
+@pytest.fixture
+def deposit(app, es, users, location, deposit_metadata, sip_metadata_types):
     """New deposit with files."""
     with app.test_request_context():
         datastore = app.extensions['security'].datastore

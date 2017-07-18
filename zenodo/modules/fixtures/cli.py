@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -40,7 +40,7 @@ from .grants import loadfp6funders, loadfp6grants
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .pages import loadpages
-from .records import loaddemorecords
+from .records import loaddemorecords, loadsipmetadatatypes
 
 
 @click.group()
@@ -115,6 +115,19 @@ def loaddemorecords_cli():
     click.echo("     zenodo migration recordsrun")
     click.echo("     zenodo migration reindex recid")
     click.echo("     zenodo index run -d -c 4")
+
+
+@fixtures.command('loadsipmetadatatypes')
+@with_appcontext
+def loadsipmetadatatypes_cli():
+    """Load SIP metadata types."""
+    click.secho('Loading SIP metadata types...', fg='blue')
+    src = join(dirname(__file__), 'data/sipmetadatatypes.json')
+    with open(src, 'r') as fp:
+        data = json.load(fp)
+    with click.progressbar(data) as types:
+        loadsipmetadatatypes(types)
+    click.secho('SIP metadata types loaded!', fg='green')
 
 
 @fixtures.command('loaddemofiles')
