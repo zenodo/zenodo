@@ -231,6 +231,14 @@ class ZenodoDeposit(Deposit):
     def _process_files(self, record_id, data):
         """Snapshot bucket and add files in record during first publishing."""
         if self.files:
+            file_uuids = []
+            for f in self.files:
+                fs, path = f.file.storage()._get_fs()
+                if not fs.exists(path):
+                    file_uuids.append(str(f.file.id))
+            if file_uuids:
+                raise Exception('One of more files were not written to'
+                                ' the storage: {}.'.format(file_uuids))
             assert not self.files.bucket.locked
             self.files.bucket.locked = True
             snapshot = self.files.bucket.snapshot(lock=True)
