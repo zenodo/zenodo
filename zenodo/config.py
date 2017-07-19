@@ -151,6 +151,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
         'schedule': timedelta(hours=2),
     },
+    'openaire-grants-harvester': {
+        'task': 'invenio_openaire.tasks.harvest_all_openaire_projects',
+        'schedule': crontab(day_of_week=1, hour=2, minute=0),
+    },
 }
 
 # Cache
