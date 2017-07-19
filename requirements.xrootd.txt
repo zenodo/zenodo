@@ -26,4 +26,4 @@
 -r requirements.txt
 
 invenio-xrootd==1.0.0a4
-xrootdpyfs==0.1.3
+xrootdpyfs==0.1.5
