@@ -369,7 +369,7 @@ def minimal_deposit():
 
 
 @pytest.fixture
-def minimal_record_model(db, minimal_record):
+def minimal_record_model(db, minimal_record, sip_metadata_types):
     """Minimal record."""
     model = RecordMetadata()
     model.created = datetime.utcnow() - timedelta(days=1)
@@ -576,7 +576,7 @@ def full_record():
 
 
 @pytest.fixture
-def record_with_bucket(full_record, bucket, db):
+def record_with_bucket(db, full_record, bucket, sip_metadata_types):
     """Create a bucket."""
     record = RecordFile.create(full_record)
     RecordsBuckets.create(bucket=bucket, record=record.model)
@@ -656,7 +656,7 @@ def grant_record(db, funder_record):
 
 
 @pytest.fixture
-def license_record(db):
+def license_record(db, sip_metadata_types):
     """Create a license record."""
     license = Record.create({
         "$schema": "https://zenodo.org/schemas/licenses/license-v1.0.0.json",

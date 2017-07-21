@@ -105,7 +105,7 @@ imagesize==0.7.1
 infinity==1.4
 intervals==0.8.0
 invenio-access==1.0.0a12
-invenio-accounts==1.0.0b4
+invenio-accounts==1.0.0b5
 invenio-admin==1.0.0b2
 invenio-assets==1.0.0b6
 invenio-base==1.0.0a14

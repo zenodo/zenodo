@@ -71,7 +71,7 @@ def test_github_creators_metadata(mocker, defaults, contribs, owner, output):
 
 
 def test_github_publish(mocker, db, users, location,
-                        deposit_metadata):
+                        deposit_metadata, sip_metadata_types):
     """Test basic GitHub payload."""
     datacite_mock = mocker.patch(
         'invenio_pidstore.providers.datacite.DataCiteMDSClient')
