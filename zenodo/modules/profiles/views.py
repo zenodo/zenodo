@@ -26,10 +26,23 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, flash, redirect, render_template
+import hashlib
+import urllib
+
+from flask import abort, Blueprint, current_app, flash, redirect, \
+    render_template, request
 from flask_babelex import lazy_gettext as _
+from flask_login import current_user, login_required
+from flask_security.confirmable import send_confirmation_instructions
+from invenio_accounts.models import User
+from invenio_db import db
+from invenio_oauthclient.models import UserIdentity
+from invenio_userprofiles.api import current_userprofile
 
 from .forms import ContactOwnerForm
+from .models import Profile
+from .utils import send_support_email
+
 
 blueprint = Blueprint(
     'zenodo_profiles',
@@ -43,40 +56,27 @@ blueprint = Blueprint(
     '/profile/<int:owner_id>/search',
     methods=['GET']
 )
-def profile_search(owner_id):
+@blueprint.route(
+    '/profile/<orcid:orcid_id>/search',
+    methods=['GET']
+)
+def profile_search(owner_id=None, orcid_id=None):
     """Render profile search page."""
-    user = {
-        'id': '1161',
-        'name': 'Aman Jain',
-        'affiliation': 'BVCOE, Paschim Vihar',
-        'description': 'I am enthusiast coder and web developer with an urge '
-        'to create something new and useful. Looking to contribute in good '
-        'opensource projects. GSoCer with Zenodo.',
-        'image':
-        'https://avatars3.githubusercontent.com/u/13117482?v=3&amp;s=460',
-        'location': 'Delhi, India',
-        'website': 'http://jainaman224.me',
-        'orcid_account': 'http://orcid.org/0000-0001-9619-2956',
-        'github_account': 'http://github.com/jainaman224',
-        'organization': [
-            {
-                'name': 'Zenodo',
-                'link': 'https://zenodo.org/communities/zenodo/'
-            },
-            {
-                'name': 'Biodiversity Literature Repository',
-                'link': 'https://zenodo.org/communities/biosyslit'
-            },
-            {
-                'name': 'European Commission Funded Research (OpenAIRE)',
-                'link': 'https://zenodo.org/communities/ecfunded/'
-            },
-            {
-                'name': 'Human Brain Project',
-                'link': 'https://zenodo.org/communities/hbp/'
-            }
-        ]
-    }
+    if orcid_id:
+        orcid = UserIdentity.query.get((orcid_id, 'orcid'))
+        if orcid:
+            user = User.query.get(orcid.id_user)
+        if not (orcid and user and user.researcher_profile
+           and user.researcher_profile.show_profile):
+            return render_template(
+                'zenodo_profiles/orcid_search.html',
+                orcid_id=orcid_id
+            )
+    if owner_id:
+        user = User.query.get(owner_id)
+    if not (user and user.researcher_profile and user.profile
+            and user.researcher_profile.show_profile):
+        abort(404)
     return render_template(
         'zenodo_profiles/search.html',
         user=user
@@ -87,43 +87,41 @@ def profile_search(owner_id):
     '/profile/<int:owner_id>',
     methods=['GET']
 )
-def profile(owner_id):
+@blueprint.route(
+    '/profile/<orcid:orcid_id>',
+    methods=['GET']
+)
+def profile(owner_id=None, orcid_id=None):
     """Render profile page."""
-    user = {
-        'id': '1161',
-        'name': 'Aman Jain',
-        'affiliation': 'BVCOE, Paschim Vihar',
-        'description': 'I am enthusiast coder and web developer with an urge '
-        'to create something new and useful. Looking to contribute in good '
-        'opensource projects. GSoCer with Zenodo.',
-        'image':
-        'https://avatars3.githubusercontent.com/u/13117482?v=3&amp;s=460',
-        'location': 'Delhi, India',
-        'website': 'http://jainaman224.me',
-        'orcid_account': 'http://orcid.org/0000-0001-9619-2956',
-        'github_account': 'http://github.com/jainaman224',
-        'organization': [
-            {
-                'name': 'Zenodo',
-                'link': 'https://zenodo.org/communities/zenodo/'
-            },
-            {
-                'name': 'Biodiversity Literature Repository',
-                'link': 'https://zenodo.org/communities/biosyslit'
-            },
-            {
-                'name': 'European Commission Funded Research (OpenAIRE)',
-                'link': 'https://zenodo.org/communities/ecfunded/'
-            },
-            {
-                'name': 'Human Brain Project',
-                'link': 'https://zenodo.org/communities/hbp/'
-            }
-        ]
-    }
+    if orcid_id:
+        orcid = UserIdentity.query.get((orcid_id, 'orcid'))
+        if orcid:
+            user = User.query.get(orcid.id_user)
+        if not (orcid and user and user.researcher_profile
+           and user.researcher_profile.show_profile):
+            return render_template(
+                'zenodo_profiles/orcid_profile.html',
+                orcid_id=orcid_id
+            )
+
+    if owner_id:
+        user = User.query.get(owner_id)
+    if not (user and user.researcher_profile and user.profile
+            and user.researcher_profile.show_profile):
+        abort(404)
+
+    email = user.email
+    default = "https://ideaclicks.in/userimages/default_user.jpg"
+    size = 400
+
+    gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(
+        email.lower()).hexdigest() + "?"
+    gravatar_url += urllib.urlencode({'d': default, 's': str(size)})
+
     return render_template(
         'zenodo_profiles/profile.html',
-        user=user
+        user=user,
+        profile_pic_url=gravatar_url
     )
 
 
@@ -131,50 +129,79 @@ def profile(owner_id):
     '/profile/<int:owner_id>/contact',
     methods=['GET', 'POST']
 )
+@login_required
 def profile_contact(owner_id):
     """Render contact owner form."""
     form = ContactOwnerForm()
+    user = User.query.get(owner_id)
     if form.validate_on_submit():
+        context = dict(
+            current_user=current_user,
+            user=user,
+            content=form.data
+        )
+        send_support_email(context)
         flash(
             _('Request sent successfully.'),
             category='success'
         )
         return redirect('/')
 
-    user = {
-        'id': '1161',
-        'name': 'Aman Jain',
-        'affiliation': 'BVCOE, Paschim Vihar',
-        'description': 'I am enthusiast coder and web developer with an urge '
-        'to create something new and useful. Looking to contribute in good '
-        'opensource projects. GSoCer with Zenodo.',
-        'image':
-        'https://avatars3.githubusercontent.com/u/13117482?v=3&amp;s=460',
-        'location': 'Delhi, India',
-        'website': 'http://jainaman224.me',
-        'orcid_account': 'http://orcid.org/0000-0001-9619-2956',
-        'github_account': 'http://github.com/jainaman224',
-        'organization': [
-            {
-                'name': 'Zenodo',
-                'link': 'https://zenodo.org/communities/zenodo/'
-            },
-            {
-                'name': 'Biodiversity Literature Repository',
-                'link': 'https://zenodo.org/communities/biosyslit'
-            },
-            {
-                'name': 'European Commission Funded Research (OpenAIRE)',
-                'link': 'https://zenodo.org/communities/ecfunded/'
-            },
-            {
-                'name': 'Human Brain Project',
-                'link': 'https://zenodo.org/communities/hbp/'
-            }
-        ]
-    }
+    if not (user and user.researcher_profile and user.profile
+            and user.researcher_profile.show_profile
+            and user.researcher_profile.allow_contact_owner):
+        abort(404)
+
     return render_template(
         'zenodo_profiles/contact.html',
         user=user,
         form=form
     )
+
+
+def handle_profile_form(form):
+    """Handle profile update form."""
+    form.process(formdata=request.form)
+
+    if form.validate_on_submit():
+        email_changed = False
+        with db.session.begin_nested():
+            # Update profile.
+            current_userprofile.username = form.username.data
+            current_userprofile.full_name = form.full_name.data
+            db.session.add(current_userprofile)
+
+            # Update researcher profile.
+            researcher_profile = Profile.get_by_userid(
+                current_user.researcher_profile.user_id
+            )
+
+            researcher_profile.show_profile = form.show_profile.data
+            if form.show_profile.data:
+                researcher_profile.bio = form.bio.data
+                researcher_profile.affiliation = form.affiliation.data
+                researcher_profile.location = form.location.data
+                researcher_profile.website = form.website.data
+                researcher_profile.allow_contact_owner = \
+                    form.allow_contact_owner.data
+            db.session.add(researcher_profile)
+
+            # Update email
+            if current_app.config['USERPROFILES_EMAIL_ENABLED'] and \
+               form.email.data != current_user.email:
+                current_user.email = form.email.data
+                current_user.confirmed_at = None
+                db.session.add(current_user)
+                email_changed = True
+        db.session.commit()
+
+        if email_changed:
+            send_confirmation_instructions(current_user)
+            # NOTE: Flash message after successful update of profile.
+            flash(_('Profile was updated. We have sent a verification '
+                    'email to %(email)s. Please check it.',
+                    email=current_user.email),
+                  category='success')
+        else:
+            # NOTE: Flash message after successful update of profile.
+            flash(_('Profile was updated.'), category='success')

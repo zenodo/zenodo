@@ -25,47 +25,69 @@
 {% extends "zenodo_theme/page.html" %}
 
 {%- block page_body %}
+{%- set global_vars = {'orcid_id': ''} %}
 <div class="container">
   <div class="row">
     <div class="col-sm-3 col-xs-12" id="profile" style="margin-bottom:20px">
-      {%- if user.image %}
-      <img alt="Profile Picture" class="img-responsive img-rounded center-block"
-        src="{{ user.image }}"
+      <br />
+      {%- if profile_pic_url %}
+      <img height="400px" width="400px"
+        alt="Profile Picture" class="img-responsive img-rounded center-block"
+        src="{{ profile_pic_url }}"
         alt="Profile Picture" />
       {%- endif %}
 
       <div>
-        <h1 style="line-height:0.8"><strong>{{ user.name }}</strong><small><br />{{ user.affiliation }}</small></h1>
+        <h1 style="line-height:0.8">
+          <strong>
+            {%- if user.profile.full_name %}
+            {{ user.profile.full_name }}
+            {%- else %}
+            {{ user.profile.username }}
+            {%- endif %}
+          </strong>
+          {%- if user.profile.full_name %}
+          <small><br />{{ user.profile.username }}</small>
+          {%- endif %}
+          {%- if user.researcher_profile.affiliation %}
+          <small><br />{{ user.researcher_profile.affiliation }}</small>
+          {%- endif %}
+        </h1>
       </div>
-
-      {%- if user.orcid_account or user.github_account %}
+      {%- if user.remote_accounts %}
+      {%- for account in user.remote_accounts %}
+      <br />
       <div>
-          {%- if user.orcid_account %}
+          {%- if account.client_id == config.ORCID_APP_CREDENTIALS.consumer_key %}
           <div style="margin-bottom: 4px">
             <img width="26px" style="vertical-align:middle; margin-left: 5px" src="{{ url_for('static', filename='img/orcid.png') }}" alt="Orcid" />
-            <a class="no_hover" href="{{ user.orcid_account }}">
-              <span style="margin-left: 3px;font-size: 16px">0000-0001-9619-2956</span>
+            <a class="no_hover" href="https://orcid.org/{{ account.extra_data.get('orcid') }}">
+              <span style="margin-left: 3px;font-size: 16px">{{ account.extra_data.get('orcid') }}</span>
             </a>
           </div>
+          {% if global_vars.update({'orcid_id': account.extra_data.get('orcid')}) %}{% endif %}
           {%- endif %}
 
-          {%- if user.github_account %}
+          {%- if account.client_id == config.GITHUB_APP_CREDENTIALS.consumer_key %}
           <div>
             <i style="vertical-align:middle" class="fa fa-github fa-2x fa-fw" aria-hidden="true"></i>
-            <a class="no_hover" href="{{ user.github_account }}">
-              <span style="font-size: 16px">jainaman224</span>
+            <a class="no_hover" href="https://github.com/{{ account.extra_data.get('login') }}">
+              <span style="font-size: 16px">{{ account.extra_data.get('login') }}</span>
             </a>
           </div>
           {%- endif %}
       </div>
+      {%- endfor %}
       {%- endif %}
 
-      {%- if not current_user.is_authenticated %}
-      <div style="margin-top:18px">
-        <a class="no_hover" href="/profile/1161/contact">
-          <button type="button" class="btn btn-default btn-lg btn-block">Contact</button>
-        </a>
-      </div>
+      {%- if current_user.id != user.id %}
+        {%- if user.researcher_profile.allow_contact_owner %}
+        <div style="margin-top:18px">
+          <a class="no_hover" href="/profile/{{ user.id }}/contact">
+            <button type="button" class="btn btn-default btn-lg btn-block">Contact</button>
+          </a>
+        </div>
+        {%- endif %}
       {%- else %}
       <div style="margin-top:18px">
         <a class="no_hover" href="/account/settings/profile">
@@ -74,39 +96,43 @@
       </div>
       {%- endif %}
 
-      {%- if user.description %}
+      {%- if user.researcher_profile.bio %}
       <div>
-        <h3><small>{{ user.description }}</small></h3>
+        <h3><small>{{ user.researcher_profile.bio }}</small></h3>
       </div>
       {%- endif %}
 
-      {%- if user.location or user.website %}
+      {%- if user.researcher_profile.location or user.researcher_profile.website %}
       <hr />
       <div style="font-size:17px">
-        {%- if user.location %}
+        {%- if user.researcher_profile.location %}
         <div>
           <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
-          <span>{{ user.location }}</span>
+          <span>{{ user.researcher_profile.location }}</span>
         </div>
         {%- endif %}
 
-        {%- if user.website %}
+        {%- if user.researcher_profile.website %}
         <div>
           <span class="fa fa-link fa-fw" aria-hidden="true"></span>
-          <span><a href="{{ user.website }}">{{ user.website }}</a></span>
+          <span>
+            <a href="{{ user.researcher_profile.website }}">
+              {{ user.researcher_profile.website }}
+            </a>
+          </span>
         </div>
         {%- endif %}
       </div>
       {%- endif %}
 
-      {%- if user.organization %}
+      {%- if user.communities %}
       <hr />
       <div>
         <h4 style="font-size:22px; margin-bottom:0"><strong>Communities</strong></h4>
         <ul style="padding: 18px">
-          {%- for org in user.organization %}
+          {%- for org in user.communities %}
           <li><h3 style="margin:0">
-            <small><a href="{{ org.link }}">{{ org.name }}</a></small>
+            <small><a href="/communities/{{ org.id }}">{{ org.title }}</a></small>
           </h3></li>
           {%- endfor %}
         </ul>
@@ -115,41 +141,24 @@
     </div>
 
     <div class="col-sm-9 col-xs-12" id="invenio-search">
+      <div class="col-xs-12">
+        <h1>Popular Uploads</h1>
+      </div>
+      <br />
       <invenio-search
-       search-endpoint="https://zenodo.org/api/records"
-       search-hidden-params='{"page":1, "size": 10, "q": "owners:{{user.id}}", "sort": "mostrecent"}'
+       search-endpoint="/api/records"
+       search-hidden-params='{"page":1, "size": 10,
+        "q": "owners:{{user.id}}{%- if global_vars.get('orcid_id') %} || creators.orcid:{{ global_vars.get('orcid_id') }}{% endif %}",
+        "sort": "mostrecent"}'
        search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
       >
-      {{super()}}
+        {{super()}}
+        <invenio-search-results
+          class="list-group"
+          template="{{ url_for('static', filename='templates/zenodo_profiles/results.html') }}">
+        </invenio-search-results>
       </invenio-search>
-
-      <ul class="nav nav-tabs nav-justified" id="myTabs" style="font-size:22px">
-        <li role="presentation" class="active"><a href="#overview">Overview</a></li>
-        <li role="presentation"><a href="#publications">Publications</a></li>
-      </ul>
-
-      <div class="tab-content">
-        <div class="tab-pane fade active in" role="tabpanel" id="overview">
-          <h2>Popular Uploads</h2>
-          <br />
-          <invenio-search-results
-            class="list-group"
-            template="{{ url_for('static', filename='templates/zenodo_profiles/results.html') }}">
-          </invenio-search-results>
-        </div>
-
-        <div class="tab-pane fade" role="tabpanel" id="publications">
-          <h2>Recent Uploads</h2>
-          <br />
-
-          <invenio-search-results
-            class="list-group"
-            template="{{ url_for('static', filename='templates/zenodo_search_ui/results.html') }}">
-          </invenio-search-results>
-
-          <p class="text-center"><a class="btn btn-default" href="/profile/1161/search">More</a></p>
-        </div>
-      </div>
+      <p class="text-center"><a class="btn btn-default" href="/profile/{{ user.id }}/search">More</a></p>
     </div>
   </div>
 </div>
@@ -158,6 +167,13 @@
 @media screen and (max-width: 768px) {
   #profile {
     text-align: center;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  #profile {
+    position: sticky;
+    top: 30px;
   }
 }
 
@@ -188,10 +204,5 @@
       });
     }
   );
-
-  $('#myTabs a').click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
 </script>
 {% endblock javascript %}

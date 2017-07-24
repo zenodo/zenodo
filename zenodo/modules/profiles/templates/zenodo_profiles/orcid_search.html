@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-#
+{#-
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -21,12 +20,25 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
 
-"""Zenodo Profiles."""
+{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
 
-from __future__ import absolute_import, print_function
+{% set search_hidden_params = {"q": "creators.orcid:" + orcid_id|string } %}
 
-from .ext import ZenodoProfiles
-from .models import Profile
+{%- block page_header %}
+{% set search_input_placeholder = "Search " + orcid_id %}
+{% include "invenio_search_ui/header.html" %}
+{%- endblock page_header %}
 
-__all__ = ('ZenodoProfiles', 'Profile')
+{% block page_body %}
+<div class="profile" id="invenio-search">
+  <invenio-search
+   search-endpoint="/api/records"
+   search-hidden-params='{"page":1, "size": 10, "q": "creators.orcid:{{ orcid_id }}"}'
+   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
+  >
+  {{super()}}
+  </invenio-search>
+</div>
+{% endblock page_body %}

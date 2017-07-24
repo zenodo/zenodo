@@ -185,11 +185,16 @@ setup(
         'console_scripts': [
             'zenodo = zenodo.cli:cli',
         ],
+        'invenio_admin.views': [
+            'zenodo_profiles_view = '
+            'zenodo.modules.profiles.admin:researcher_profile_adminview',
+        ],
         'invenio_base.apps': [
             'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
             'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_pages = zenodo.modules.pages.ext:ZenodoPages',
+            'zenodo_profiles = zenodo.modules.profiles.ext:ZenodoProfiles',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
@@ -214,6 +219,9 @@ setup(
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
             'zenodo_spam = zenodo.modules.spam.views:blueprint',
+        ],
+        'invenio_base.converters': [
+            'orcid = zenodo.modules.profiles.utils:OrcidConverter',
         ],
         'invenio_base.api_blueprints': [
             'zenodo_rest = zenodo.modules.rest.views:blueprint',

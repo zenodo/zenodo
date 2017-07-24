@@ -26,10 +26,14 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import current_app
 from flask_babelex import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import Recaptcha, RecaptchaField
-from wtforms import StringField, SubmitField, TextAreaField
+from invenio_userprofiles.forms import EmailProfileForm, ProfileForm
+from wtforms import BooleanField, StringField, SubmitField, \
+    TextAreaField
 from wtforms.validators import DataRequired
 
 
@@ -41,7 +45,7 @@ def strip_filter(text):
 class ContactOwnerForm(FlaskForm):
     """Form for contact owner form."""
 
-    field_sets = ['name', 'email', 'subject', 'body', 'recaptcha']
+    field_sets = ['name', 'subject', 'body', 'recaptcha']
 
     #
     # Methods
@@ -58,13 +62,6 @@ class ContactOwnerForm(FlaskForm):
     #
     name = StringField(
         _('Name'),
-        description=_('Required.'),
-        filters=[strip_filter],
-        validators=[DataRequired()],
-    )
-
-    email = StringField(
-        _('Email'),
         description=_('Required.'),
         filters=[strip_filter],
         validators=[DataRequired()],
@@ -89,3 +86,111 @@ class ContactOwnerForm(FlaskForm):
     recaptcha = RecaptchaField(validators=[
         Recaptcha(message=_("Please complete the reCAPTCHA."))
     ])
+
+
+class ResearcherProfileForm(FlaskForm):
+    """Form for Profiles class."""
+
+    bio = TextAreaField(
+        _('Short Bio'),
+        description=_('Optional'),
+        filters=[strip_filter]
+    )
+
+    affiliation = StringField(
+        _('Affiliation'),
+        description=_('Optional'),
+        filters=[strip_filter]
+    )
+
+    location = StringField(
+        _('Location'),
+        description=_('Optional'),
+        filters=[strip_filter]
+    )
+
+    website = StringField(
+        _('Website'),
+        description=_('Optional'),
+        filters=[strip_filter]
+    )
+
+    show_profile = BooleanField(
+        _('Show Profile')
+    )
+
+    allow_contact_owner = BooleanField(
+        _('Allow other users to contact'),
+    )
+
+
+class EmailResearcherForm(EmailProfileForm, ResearcherProfileForm):
+    """."""
+
+    field_sets = ['csrf_token', 'username', 'full_name', 'email',
+                  'email_repeat', 'show_profile', 'bio', 'affiliation',
+                  'location', 'website', 'allow_contact_owner']
+
+    #
+    # Methods
+    #
+    def get_field_by_name(self, name):
+        """Return field by name."""
+        try:
+            return self._fields[name]
+        except KeyError:
+            return None
+
+
+class ResearcherForm(ProfileForm, ResearcherProfileForm):
+    """."""
+
+    field_sets = [
+        'csrf_token', 'username', 'full_name', 'show_profile', 'bio',
+        'affiliation', 'location', 'website',  'allow_contact_owner']
+
+    #
+    # Methods
+    #
+    def get_field_by_name(self, name):
+        """Return field by name."""
+        try:
+            return self._fields[name]
+        except KeyError:
+            return None
+
+
+def profile_form_factory():
+    """Create a profile page form."""
+    if current_app.config['USERPROFILES_EMAIL_ENABLED']:
+        return EmailResearcherForm(
+            formdata=None,
+            username=current_user.profile.username,
+            full_name=current_user.profile.full_name,
+            email=current_user.email,
+            email_repeat=current_user.email,
+            bio=current_user.researcher_profile.bio,
+            affiliation=current_user.researcher_profile.affiliation,
+            location=current_user.researcher_profile.location,
+            website=current_user.researcher_profile.website,
+            show_profile=current_user.researcher_profile.show_profile,
+            allow_contact_owner=(
+                current_user.researcher_profile.allow_contact_owner
+            ),
+            prefix='profile'
+        )
+    else:
+        return ResearcherForm(
+            formdata=None,
+            username=current_user.profile.username,
+            full_name=current_user.profile.full_name,
+            bio=current_user.researcher_profile.bio,
+            affiliation=current_user.researcher_profile.affiliation,
+            location=current_user.researcher_profile.location,
+            website=current_user.researcher_profile.website,
+            show_profile=current_user.researcher_profile.show_profile,
+            allow_contact_owner=(
+                current_user.researcher_profile.allow_contact_owner
+            ),
+            prefix='profile'
+        )
