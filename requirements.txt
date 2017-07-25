@@ -91,7 +91,7 @@ Flask-OAuthlib==0.9.4
 Flask-Principal==0.4.0
 Flask-Security-Fork==2.0.1
 Flask-SQLAlchemy==2.2
-Flask-WTF==0.14.2
+Flask-WTF==0.13.1
 fs==0.5.4
 ftfy==4.4.3
 funcsigs==1.0.2

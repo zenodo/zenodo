@@ -80,15 +80,6 @@ def create_wsgi_statsd_factory(mounts_factories):
     def create_wsgi(app, **kwargs):
         application = wsgi_factory(app, **kwargs)
 
-        # Remove X-Forwarded-For headers because Flask-Security doesn't know
-        # how to deal with them properly. Note REMOTE_ADDR has already been
-        # set correctly at this point by the ``wsgi_proxyfix`` factory.
-        if app.config.get('WSGI_PROXIES'):
-            application = HeaderRewriterFix(
-                application,
-                remove_headers=['X-Forwarded-For']
-            )
-
         host = app.config.get('STATSD_HOST')
         port = app.config.get('STATSD_PORT', 8125)
         prefix = app.config.get('STATSD_PREFIX')
