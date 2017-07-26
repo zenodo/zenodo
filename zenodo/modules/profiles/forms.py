@@ -32,8 +32,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from flask_wtf.recaptcha import Recaptcha, RecaptchaField
 from invenio_userprofiles.forms import EmailProfileForm, ProfileForm
-from wtforms import BooleanField, StringField, SubmitField, \
-    TextAreaField
+from wtforms import BooleanField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
 

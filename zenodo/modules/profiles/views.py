@@ -27,9 +27,8 @@
 from __future__ import absolute_import, print_function
 
 import hashlib
-import urllib
 
-from flask import abort, Blueprint, current_app, flash, redirect, \
+from flask import Blueprint, abort, current_app, flash, redirect, \
     render_template, request
 from flask_babelex import lazy_gettext as _
 from flask_login import current_user, login_required
@@ -38,11 +37,11 @@ from invenio_accounts.models import User
 from invenio_db import db
 from invenio_oauthclient.models import UserIdentity
 from invenio_userprofiles.api import current_userprofile
+from six.moves import urllib
 
 from .forms import ContactOwnerForm
 from .models import Profile
 from .utils import send_support_email
-
 
 blueprint = Blueprint(
     'zenodo_profiles',
@@ -62,7 +61,7 @@ blueprint = Blueprint(
 )
 def profile_search(owner_id=None, orcid_id=None):
     """Render profile search page."""
-    if orcid_id:
+    if orcid_id is not None:
         orcid = UserIdentity.query.get((orcid_id, 'orcid'))
         if orcid:
             user = User.query.get(orcid.id_user)
@@ -72,7 +71,7 @@ def profile_search(owner_id=None, orcid_id=None):
                 'zenodo_profiles/orcid_search.html',
                 orcid_id=orcid_id
             )
-    if owner_id:
+    if owner_id is not None:
         user = User.query.get(owner_id)
     if not (user and user.researcher_profile and user.profile
             and user.researcher_profile.show_profile):
@@ -93,7 +92,7 @@ def profile_search(owner_id=None, orcid_id=None):
 )
 def profile(owner_id=None, orcid_id=None):
     """Render profile page."""
-    if orcid_id:
+    if orcid_id is not None:
         orcid = UserIdentity.query.get((orcid_id, 'orcid'))
         if orcid:
             user = User.query.get(orcid.id_user)
@@ -104,7 +103,7 @@ def profile(owner_id=None, orcid_id=None):
                 orcid_id=orcid_id
             )
 
-    if owner_id:
+    if owner_id is not None:
         user = User.query.get(owner_id)
     if not (user and user.researcher_profile and user.profile
             and user.researcher_profile.show_profile):
@@ -114,9 +113,9 @@ def profile(owner_id=None, orcid_id=None):
     default = "https://ideaclicks.in/userimages/default_user.jpg"
     size = 400
 
-    gravatar_url = "https://www.gravatar.com/avatar/" + hashlib.md5(
-        email.lower()).hexdigest() + "?"
-    gravatar_url += urllib.urlencode({'d': default, 's': str(size)})
+    gravatar_url = 'https://www.gravatar.com/avatar/' + hashlib.md5(
+        email.lower().encode('utf-8')).hexdigest() + '?'
+    gravatar_url += urllib.parse.urlencode({'d': default, 's': str(size)})
 
     return render_template(
         'zenodo_profiles/profile.html',

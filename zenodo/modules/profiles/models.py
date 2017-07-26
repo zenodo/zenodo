@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 from invenio_accounts.models import User
 from invenio_db import db
-from sqlalchemy import event
+from sqlalchemy import event, ForeignKeyConstraint, PrimaryKeyConstraint
 
 
 class Profile(db.Model):
@@ -39,11 +39,7 @@ class Profile(db.Model):
 
     __tablename__ = 'zenodo_profiles_profiles'
 
-    user_id = db.Column(
-        db.Integer,
-        db.ForeignKey(User.id),
-        primary_key=True
-    )
+    user_id = db.Column(db.Integer)
     """Foreign key to user."""
 
     researcher_profile = db.relationship(
@@ -64,11 +60,17 @@ class Profile(db.Model):
     website = db.Column(db.String(255))
     """Website or external link of user."""
 
-    show_profile = db.Column(db.Boolean)
+    show_profile = db.Column(db.Boolean(name='show_profile'))
     """Permission field to show profile."""
 
-    allow_contact_owner = db.Column(db.Boolean)
+    allow_contact_owner = db.Column(db.Boolean(name='allow_contact_owner'))
     """Permission field to allow other user to contact the user."""
+
+    __table_args__ = (
+        PrimaryKeyConstraint('user_id', name='pk_zenodo_profiles_profiles'),
+        ForeignKeyConstraint(['user_id'], ['accounts_user.id'],
+                             name='fk_zenodo_profiles_profiles_user_id'),
+    )
 
     @classmethod
     def get_by_userid(cls, user_id):

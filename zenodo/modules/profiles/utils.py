@@ -102,7 +102,7 @@ class OrcidConverter(BaseConverter):
 
     def to_python(self, value):
         """."""
-        result = re.match('[0]{4}-[0]{3}[1-3]-[0-9X]{4}-[0-9X]{4}', value)
+        result = re.match('[0-9X]{4}-[0-9X]{4}-[0-9X]{4}-[0-9X]{4}', value)
         if result:
             return value
         else:
