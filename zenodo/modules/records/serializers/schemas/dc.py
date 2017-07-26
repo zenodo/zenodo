@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+import lxml.html
+
 from marshmallow import Schema, fields
 
 from ...models import ObjectType
@@ -110,7 +112,7 @@ class DublinCoreV1(Schema):
 
     def get_descriptions(self, obj):
         """Get descriptions."""
-        return [obj['metadata']['description']]
+        return [lxml.html.document_fromstring(obj['metadata']['description']).text_content().replace(u"\xa0", u" ")]
 
     def get_subjects(self, obj):
         """Get subjects."""
