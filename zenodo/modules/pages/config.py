@@ -47,12 +47,20 @@ PAGES_ISSUE_CATEGORIES = [
         'key': 'file-modification',
         'title': 'File modification',
         'description': (
-            'All requests related to updating files in already published record(s). This includes file addition, removal or update of the files. '
-            'Please consult our <a href="http://help.zenodo.org/#general">FAQ</a> to get familiar with the file update conditions.<br />'
+            'All requests related to updating files in already published '
+            'record(s). This includes file addition, removal or update of the '
+            'files. '
+            'Please consult our <a href="http://help.zenodo.org/#general">FAQ'
+            '</a> to get familiar with the file update conditions.<br />'
             '<ol>'
-            '<li>Please provide a justification for the file change in the description below.</li>'
-            '<li>List the record(s) which you intend to update by the record URL, and specify which files need to be updated.</li>'
-            '<li>Upload the new files here or provide a publicly-accessible URL(s) with the files, in the description below.</li>'
+            '<li>Please provide a justification for the file change in the '
+            'description below.</li>'
+            '<li>List the record(s) which you intend to update by the record '
+            'URL, and specify which files need to be updated.</li>'
+            '<li>Upload the new files here or provide a publicly-accessible '
+            'URL(s) with the files, in the description below.</li>'
+            '<li>Mention any use of the record(s) DOI in, e.g.: refer to the '
+            'papers or social media posts.</li>'
             '</ol>'
         ),
         'recipients': ['info@zenodo.org'],

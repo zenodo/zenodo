@@ -84,10 +84,9 @@ def support():
             recipients = categories[form.issue_category.data]['recipients']
             send_support_email(context, recipients)
             flash(
-                _('Request sent successfully, '
-                  'You should receive a confirmation email within 20 minutes '
-                  '- if this does not happen you should retry or send us an '
-                  'email directly to info@zenodo.org.'),
+                _('Request sent successfully. '
+                  'Our team will reply to you message as soon as possible.'
+                  ),
                 category='success'
             )
             return redirect(url_for('zenodo_frontpage.index'))
