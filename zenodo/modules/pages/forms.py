@@ -81,7 +81,7 @@ class ContactForm(FlaskForm):
     )
 
     issue_category = SelectField(
-        _('Category for Issue'),
+        _('Category'),
         description=_('Required.'),
         coerce=str,
         validators=[DataRequired()],
@@ -94,7 +94,7 @@ class ContactForm(FlaskForm):
     )
 
     include_os_browser = BooleanField(
-        _('Include browser and operating system information'),
+        _('Browser & OS'),
         default="checked",
     )
 

@@ -22,16 +22,14 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-from: {{ info.name }} <{{ info.email }}>
-
-USER ID: {{ user_id }}
+From: {{ info.name }} <{{ info.email }}> {% if user_id %}({{user_id}}){% endif %}
 
 {%- if info.include_os_browser %}
 Operating System: {{ uap.os }}
 Browser: {{ uap.browser }}
 Device: {{ uap.device }}
 {%- else %}
-User-Agent info not included.
+User's browser information not included.
 {%- endif %}
 
 {{ info.description }}

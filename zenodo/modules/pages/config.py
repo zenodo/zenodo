@@ -42,24 +42,67 @@ PAGES_EMAIL_BODY_TEMPLATE = 'zenodo_pages/email_body.html'
 PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
 
 #: Issue category for contact form.
-PAGES_ISSUE_CATEGORY = [
-    ('tech-support',
-     'Technical Support',
-     'Please describe the error you are getting, include any error messages '
-     'or screenshots (through file upload or links) which might be relevant.'),
-    ('file-upload',
-     'File upload request',
-     'Please include the updated file (through file upload or publicly '
-     'accessible links), and specify which record and file you want to '
-     'replace. Consult our <a href="http://help.zenodo.org/#general">FAQ</a> '
-     'for updating files of already published records.'),
-    ('others',
-     'Others',
-     'Specify the issue.'),
+PAGES_ISSUE_CATEGORIES = [
+    {
+        'key': 'file-modification',
+        'title': 'File modification',
+        'description': (
+            'Please include the updated file (through file upload or publicly '
+            'accessible links), and specify which record and file you want to '
+            'replace. Consult our '
+            '<a href="http://help.zenodo.org/#general">FAQ</a> for updating '
+            'files of already published records.'),
+        'recipients': ['info@zenodo.org'],
+    },
+    {
+        'key': 'upload-quota',
+        'title': 'File upload quota increase',
+        'description': (
+            'Please describe your use case and include a link to the Zenodo '
+            'upload form.'),
+        'recipients': ['info@zenodo.org'],
+    },
+    {
+        'key': 'record-inactivation',
+        'title': 'Record inactivation',
+        'description': (
+            'Provide the Zenodo record and reasons for its inactivation.'),
+        'recipients': ['info@zenodo.org'],
+    },
+    {
+        'key': 'openaire',
+        'title': 'OpenAIRE',
+        'description': 'Describe your OpenAIRE-related issue.',
+        'recipients': ['info@zenodo.org'],
+    },
+    {
+        'key': 'partnership',
+        'title': 'Partnership, outreach and media',
+        'description': (
+            'If you are a journal or organization interested in some form of '
+            'parternship with Zenodo, please describe your use cases.'),
+        'recipients': ['info@zenodo.org'],
+    },
+    {
+        'key': 'tech-support',
+        'title': 'Security issue, bug or spam content report',
+        'description': (
+            'Please describe the error you are getting, include any error '
+            'messages or screenshots (through file upload or links) which '
+            'might be relevant.'),
+        'recipients': ['info@zenodo.org'],
+    },
+    {
+        'key': 'other',
+        'title': 'Other',
+        'description': (
+            'Ask about anything regarding Zenodo and its operations.'),
+        'recipients': ['info@zenodo.org'],
+    },
 ]
 
 #: Email address of sender.
 PAGES_SENDER_EMAIL = 'info@zenodo.org'
 
 #: Email address for support.
-PAGES_SUPPORT_EMAIL = ['info@zenodo.org', ]
+PAGES_SUPPORT_EMAIL = ['info@zenodo.org']

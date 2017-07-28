@@ -23,278 +23,181 @@
 -#}
 
 {% extends "zenodo_theme/page.html" %}
+{%- from "zenodo_pages/macros.html" import render_form_field, render_form_input, render_form_label %}
 
 {%- block page_body %}
-<div class="container" id="contact_page">
+{%- set user = current_user.is_authenticated and current_user %}
+<div id="contact-page" class="container" >
   <div class="row">
-    <div class="col-md-1 col-xs-0"></div>
-    <div class="col-md-10 col-xs-12">
-      <h2 class="header-form">Get help with Zenodo</h2>
-      <hr />
+    <div class="col-md-10">
       <div class="panel-body">
-        <form action="" method="POST" enctype="multipart/form-data">
-          {%- if not current_user.is_authenticated %}
-          <div class="alert alert-info login-email" role="alert">
-            It is recommended to <b>login</b> first.
-          </div>
-          {%- else %}
-          <div class="alert alert-info login-email" role="alert">
-            Zenodo staff will get back to you by your Zenodo email:
-            <b>{{ form.email.data }}</b>.
-          </div>
-          {%- endif %}
-
+        <h2 class="header-form">Contact us</h2>
+        <p>Before making a request, you can have a look at our <a href="http://help.zenodo.org">FAQ</a> and <a href="http://about.zenodo.org">other resources</a> for more detailed information about the operation, features and goals of Zenodo.</p>
+        {%- if not user %}
+          <p>It is recommended to <a href="{{url_for_security('login')}}">login</a>, in order to retrieve automatically your contact information. first.</p>
+        {%- endif %}
+        <form method="POST" enctype="multipart/form-data" role="form">
           {{ form.csrf_token }}
           <div class="contact">
-          {%- for form_field in form.field_sets %}
-          {%- set field = form.get_field_by_name(form_field) %}
-          {%- if form_field == 'include_os_browser' %}
-          <div class="row">
-            <div class="col-md-12">
-              <div class="col-md-2"></div>
-              <div class="col-md-10">
-                <input id="include_os_browser" name="include_os_browser"
-                  type="checkbox" value="y" checked> Send the
-                  browser and system information.
-                <div id="information">
-                  {%- if uap.os %}
-                  <div class="col-md-3"><b>Operating system</b></div>
-                  <div class="col-md-9">{{ uap.os }}</div>
-                  {%- endif %}
-
-                  {%- if uap.browser %}
-                  <div class="col-md-3"><b>Browser</b></div>
-                  <div class="col-md-9">{{ uap.browser }}</div>
-                  {%- endif %}
-
-                  {%- if uap.device and uap.device != 'Other' %}
-                  <div class="col-md-3"><b>Device</b></div>
-                  <div class="col-md-9">{{ uap.device }}</div>
-                  {%- endif %}
-                </div> <!-- #information -->
-              </div> <!-- .col-md-10 -->
-            </div> <!-- .col-md-12 -->
-          </div> <!-- .row -->
-          <br />
-          {%- elif (form_field != 'email' or not current_user.is_authenticated) %}
-          {%- if form_field != 'email' and
-            (form_field != 'subject' or not current_user.is_authenticated) and
-            (form_field != 'issue_category' or current_user.is_authenticated) %}
-          <div class="row">
-          {%- endif %}
-            {%- if form_field == 'name' or form_field == 'email' or form_field == 'subject'
-              or (form_field == 'issue_category' and not current_user.is_authenticated) %}
-            <div class="col-md-6">
-            {%- else %}
-            <div class="col-md-12">
-            {%- endif %}
-              <div class="form-group field-{{ field.name }}{% if field.errors %} has-error{% endif %}">
-                {%- if form_field == 'name' or form_field == 'email' or form_field == 'subject' or
-                  (form_field == 'issue_category' and not current_user.is_authenticated) %}
-                <label class="control-label{{' required' if field.required else ''}} col-md-4"
-                  for="{{field.label.field_id}}">
-                {%- else %}
-                <label class="control-label{{' required' if field.required else ''}} col-md-2"
-                  for="{{field.label.field_id}}">
-                {%- endif %}
-                {{ field.label.text }}
-                </label>
-                {%- if form_field == 'name' or form_field == 'email' or form_field == 'subject' or
-                  (form_field == 'issue_category' and not current_user.is_authenticated) %}
-                <div class="col-md-8">
-                {%- else %}
-                <div class="col-md-10">
-                {%- endif %}
-                  {%- if form_field == 'attachments' %}
-                  <div class="panel panel-default deposit-panel" align="center">
-                    <h3>Drag files anywhere or click <a href="" id="upload" onclick="return false">here</a> to upload</h3>
-                  {%- endif %}
-
-                  {%- set extras = dict(autofocus="") if autofocus else dict() %}
-                  {{field(class_="form-control", placeholder=placeholder, **extras)}}
-
-                  {%- if icon %}
-                  <i class="{{icon}} form-control-feedback" aria-hidden="true" ></i>
-                  {%- endif %}
-
-                  {%- if field.description %}
-                  <p class="text-muted field-desc">
-                    <small>{{field.description|urlize}}</small>
-                  </p>
-                  {%- endif %}
-
-                  <span class="text-danger help-inline" id="error-{{ field.name }}">
-                    {%- if field.errors %}
-                    {%- for error in field.errors %}
-                      {{ error }}
-                      {%- if not loop.last %}
-                        <br />
-                      {%- endif %}
-                    {%- endfor %}
-                    {%- endif %}
-                  </span>
-                  {%- if form_field == 'recaptcha' %}
-                  <br />
-                  {%- endif %}
-
-                  {%- if form_field == 'issue_category' %}
-                  <ul class="nav nav-tabs" id="myTab">
-                    {%- for each in content %}
-                    <li class="{%- if loop.index == 1 %} active in{%- endif %}">
-                      <a href="#{{ each }}">{{ each }}</a>
-                    </li>
-                    {%- endfor %}
-                  </ul>
-                  {%- endif %}
-
-                  {%- if form_field == 'issue_category' and current_user.is_authenticated %}
-                  <div class="tab-content content-tab">
-                    {%- for each in content %}
-                    <div class="tab-pane fade{%- if loop.index == 1 %} active in{%- endif %}"
-                      id="{{ each }}">
-                      {{ content[each][0]|safe }}
-                    </div>
-                    {%- endfor %}
-                  </div>
-                  {%- elif form_field == 'attachments' %}
-                  <p id="upload_info"></p>
-                  </div>
-                  {%- endif %}
-                </div>
-              </div> <!-- .form-group -->
+            <div class="row">
+              {{ render_form_field(form.name, input_extras={'disabled': True} if form.name.data else {}) }}
             </div>
-          {%- if form_field != 'name' and (form_field != 'subject' or current_user.is_authenticated) %}
-          </div> <!-- .row -->
-          {%- endif %}
-          {%- if form_field == 'issue_category' and not current_user.is_authenticated %}
-          <div class="row">
-            <div class="col-md-12">
+            <div class="row">
+              {{ render_form_field(form.email, input_extras={'disabled': True} if form.email.data else {}) }}
+            </div>
+            <div class="row">
+              {{ render_form_field(form.issue_category) }}
+            </div>
+            <div class="row">
               <div class="col-md-2"></div>
               <div class="col-md-10">
+                <ul id="categories-tab" class="nav nav-tabs">
+                  {%- for category in categories.values() %}
+                    <li class="{%- if loop.index == 1 %} active in{%- endif %}">
+                      <a name="{{ category.key }}" href="#{{ category.key }}"></a>
+                    </li>
+                  {%- endfor %}
+                </ul>
                 <div class="tab-content content-tab">
-                  {%- for each in content %}
-                  <div class="tab-pane fade{%- if loop.index == 1 %} active in{%- endif %}" id="{{ each }}">
-                    {{ content[each][0]|safe }}
+                  {%- for category in categories.values() %}
+                  <div id="{{ category.key }}" class="tab-pane fade {%- if loop.index == 1 %} active in {%- endif %}">
+                    {{ category.description|safe }}
                   </div>
                   {%- endfor %}
                 </div>
               </div>
             </div>
-          </div> <!-- .row -->
-          {%- endif %}
-          {%- endif %}
-          {%- endfor %}
-          </div>
-          <div class="row">
-            <div class="col-md-4"></div>
-            <div class="col-md-4">
-              <button class="btn btn-block btn-success" id="form_button" type="submit">
-                Send Request
-              </button>
+
+            <div class="row">
+              {{ render_form_field(form.subject, input_size=10) }}
             </div>
-            <div class="col-md-4"></div>
-          </div> <!-- .row -->
-        </form>
-      </div> <!-- .panel-body -->
-    </div> <!-- .col-md-10 -->
-    <div class="col-md-1 col-xs-0"></div>
-  </div> <!-- .row -->
-</div> <!-- .container -->
+            <div class="row">
+              {{ render_form_field(form.description, input_size=10) }}
+            </div>
+            <div class="row">
+              <div class="col-md-2"></div>
+              <div class="col-md-10">
+                <div class="panel panel-default upload-panel" align="center">
+                  <h3 class="upload-header">Drag files anywhere or click <a class="upload-button">here</a> to upload</h3>
+                  <p class="upload-info"></p>
+                </div>
+                {{ render_form_input(form.attachments, size=None, extras={'style': 'display:none'}) }}
+              </div>
+            </div>
+            <div class="row">
+              {{ render_form_label(form.include_os_browser) }}
+              <div class="col-md-10">
+                <p>{%- if uap.os %}<strong>Operating System:</strong> {{ uap.os }} - {% endif %}{%- if uap.browser %}<strong>Browser:</strong> {{ uap.browser }} {% endif %}{%- if uap.device and uap.device != 'Other' %}- <strong>Device:</strong> {{ uap.device }} {%- endif %}</p>
+                <label class="checkbox-inline" for="{{form.include_os_browser.label.field_id}}">
+                  {{ render_form_input(form.include_os_browser, size=None, extras={'class_':''}) }}
+                  <p>Include this information to assist us with narrowing down the cause of your problem.</p>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4"></div>
+              <div class="col-md-4">
+                {% if not user %}{{ render_form_input(form.recaptcha, size=None) }}{% endif %}
+                <br>
+                <button class="btn btn-block btn-success" type="submit">Send request</button>
+              </div>
+              <div class="col-md-4"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 {%- endblock page_body %}
 
 {%- block javascript %}
-{% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+{{super()}}
 
 <script type="text/javascript">
-  var content = {{ content|safe }};
-  $('#myTab').hide();
+
+var MAX_FILE_SIZE = {{ max_file_size|tojson }};
+
+$(function () {
+  $('#categories-tab').hide();
   $('#issue_category').on('change', function(e){
-    $('#myTab li a').eq(content[$(this).val()]).tab('show');
+    $('#categories-tab li a[name="'+ $(this).val() + '"]').tab('show');
   });
 
-  display_size = function (bytes) {
+  function format_size(bytes) {
     if (bytes == 0) {return '0.00 B';}
     var e = Math.floor(Math.log(bytes) / Math.log(1000));
     return (bytes / Math.pow(1000, e)).toFixed(2) + ' ' + ' KMGTP'.charAt(e) + 'B';
   };
 
-  // Display uploaded files and it's size.
   // Throws error if size is greater than max attachment size.
-  (function(window) {
-    function triggerCallback(e, callback) {
-      if(!callback || typeof callback !== 'function') {
-        return;
-      }
-      var files;
-      if(e.dataTransfer) {
-        files = e.dataTransfer.files;
-      } else if(e.target) {
-        files = e.target.files;
-      }
-      callback.call(null, files);
+  function triggerCallback(e, callback) {
+    var files;
+    if(e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if(e.target) {
+      files = e.target.files;
     }
+    callback.call(null, files);
+  }
 
-    function makeDroppable(ele, ele1, callback) {
-      var input = document.getElementById('attachments');
-      input.style.display = 'none';
+  // Setup file upload droparea
+  function initFileDroparea(droparea, button, callback) {
+    var attachments = document.getElementById('attachments');
+    attachments.style.display = 'none';
 
-      input.addEventListener('change', function(e) {
-        triggerCallback(e, callback);
-      });
-
-      ele.addEventListener('dragover', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-
-      ele.addEventListener('dragleave', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-
-      ele.addEventListener('drop', function(e) {
-        e.preventDefault();
-        e.stopPropagation();
-        triggerCallback(e, callback);
-      });
-
-      ele1.addEventListener('click', function() {
-        input.value = null;
-        input.click();
-      });
-    }
-    window.makeDroppable = makeDroppable;
-  })(this);
-  (function(window) {
-    makeDroppable(window.document.querySelector('html'),
-                  window.document.querySelector('#upload'),
-                  function(files) {
-      var numFiles = files.length;
-      var string = '';
-      if(numFiles == 0)
-        return ;
-      string = '<strong>' + numFiles + ' file(s) selected.</strong>';
-      var totalSize = 0;
-      for(var i=0;i<numFiles;i++){
-        totalSize += files[i].size;
-        string += '<br /><small>' + files[i].name + ' &nbsp&nbsp ' +
-        display_size(files[i].size) + '</small>';
-      }
-
-      document.getElementById('upload_info').innerHTML = string;
-
-      if(totalSize > {{ max_file_size }}){
-        $('.field-attachments').addClass('has-error');
-        document.getElementById('error-attachments').innerHTML =
-        'File size exceeded. Please add URLs to the files or make a smaller selection.';
-        $('button#form_button').prop('disabled', true);
-      }
-      else{
-        $('.field-attachments').removeClass('has-error');
-        document.getElementById('error-attachments').innerHTML = '';
-        $('button#form_button').prop('disabled', false);
-      }
+    attachments.addEventListener('change', function(e) {
+      triggerCallback(e, callback);
     });
-  })(this);
+
+    droparea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    droparea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    droparea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      triggerCallback(e, callback);
+    });
+
+    button.addEventListener('click', function() {
+      attachments.value = null;
+      attachments.click();
+    });
+  }
+
+  function checkFilesSize(files) {
+    if(files.length == 0) return;
+    var filesInfo = '<strong>' + files.length + ' file(s) selected.</strong>';
+    var totalSize = 0;
+    for(var i = 0; i < files.length; i++){
+      totalSize += files[i].size;
+      filesInfo += '<br/><small>' + files[i].name + ' &nbsp&nbsp ' +
+      format_size(files[i].size) + '</small>';
+    }
+
+    $('.upload-info').get(0).innerHTML = filesInfo;
+
+    if(totalSize > MAX_FILE_SIZE) {
+      $('.field-attachments').addClass('has-error');
+      $('#error-attachments').get(0).innerHTML =
+        'File size exceeded. Please add URLs to the files or make a smaller selection.';
+      $('button#form_button').prop('disabled', true);
+    } else {
+      $('.field-attachments').removeClass('has-error');
+      $('#error-attachments').get(0).innerHTML = '';
+      $('button#form_button').prop('disabled', false);
+    }
+  }
+
+  initFileDroparea(window.document.querySelector('html'),
+                   window.document.querySelector('a.upload-button'), checkFilesSize);
+});
 </script>
 {% endblock javascript %}

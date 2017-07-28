@@ -59,37 +59,45 @@
   }
 }
 
-#contact_page {
+#contact-page {
 
-  #information {
-    margin-top: 5px;
+  .alert-info a {
+    text-decoration: none;
   }
 
-  .login-email {
-    margin-top: -20px;
+  .form-group {
+    margin-bottom: 0px;
+
+    .control-label {
+      margin-top: 7px;
+    }
+    .has-error span.help-inline {
+      margin-bottom: 10px;
+    }
   }
 
-  .header-form {
-    margin: 0;
-  }
-
-  textarea#description {
+  textarea[name="description"] {
     height: 110px;
   }
 
   .content-tab {
     margin-bottom: 10px;
+    min-height: 40px;
   }
 
-  .contact {
-    margin-right: 3%;
-    margin-left: 1%;
+  .upload-panel {
 
-    .row {
-      div {
-        padding-left: 0;
-        padding-right: 0;
-      }
+    margin-bottom: 0px;
+
+    .upload-header {
+      margin-bottom: 20px;
+    }
+
+    a.upload-button {
+      text-decoration: none;
+      cursor: pointer;
     }
   }
+
+
 }
