@@ -26,13 +26,14 @@
 
 from __future__ import absolute_import, print_function
 
+from collections import OrderedDict
+
 from flask import Blueprint, current_app, flash, redirect, render_template, \
     request, url_for
 from flask_babelex import lazy_gettext as _
 from flask_security import current_user
 from jinja2.filters import do_filesizeformat
 from wtforms.validators import Length
-from collections import OrderedDict
 
 from .forms import ContactForm
 from .utils import check_attachment_size, send_support_email, \

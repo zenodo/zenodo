@@ -34,7 +34,7 @@
         <h2 class="header-form">Contact us</h2>
         <p>Before making a request, you can have a look at our <a href="http://help.zenodo.org">FAQ</a> and <a href="http://about.zenodo.org">other resources</a> for more detailed information about the operation, features and goals of Zenodo.</p>
         {%- if not user %}
-          <p>It is recommended to <a href="{{url_for_security('login')}}">login</a>, in order to retrieve automatically your contact information. first.</p>
+        <p>It is recommended to <a href="{{url_for_security('login')}}">login</a> before sending a request, so we can automatically fill-in your contact information. It is especially important for quicker resolution of all technical issues and requests concerning your Zenodo account.</p>
         {%- endif %}
         <form method="POST" enctype="multipart/form-data" role="form">
           {{ form.csrf_token }}

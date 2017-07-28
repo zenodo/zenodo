@@ -27,7 +27,6 @@
 from __future__ import absolute_import, print_function
 
 import lxml.html
-
 from marshmallow import Schema, fields
 
 from ...models import ObjectType
