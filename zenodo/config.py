@@ -151,6 +151,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
         'schedule': timedelta(hours=2),
     },
+    'session-cleaner': {
+        'task': 'invenio_accounts.tasks.clean_session_table',
+        'schedule': timedelta(hours=24),
+    }
 }
 
 # Cache

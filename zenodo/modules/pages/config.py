@@ -50,7 +50,7 @@ This is an automated confirmation of your request, please do not reply to this\
  email.
 
 Zenodo Support
-<a href="https://zenodo.org">https://zenodo.org</a>
+https://zenodo.org
 """
 
 #: Support confirmation email title.

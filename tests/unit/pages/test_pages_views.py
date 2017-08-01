@@ -83,7 +83,7 @@ def test_send_support_email(app, db, es, users):
                 'to get back to you as soon as possible.\nThis is an '
                 'automated confirmation of your request, please do not reply '
                 'to this email.\n\nZenodo Support\n'
-                '<a href="https://zenodo.org">https://zenodo.org</a>\n'
+                'https://zenodo.org\n'
             )
 
             form = MultiDict(dict(
