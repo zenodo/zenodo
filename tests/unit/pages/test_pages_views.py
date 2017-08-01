@@ -67,12 +67,23 @@ def test_send_support_email(app, db, es, users):
                 data=form
             )
             assert b('has-error') not in res.data
-            assert len(outbox) == 1
+            assert len(outbox) == 2
             sent_msg = outbox[0]
             assert sent_msg.sender == 'Aman <abcxyz@gmail.com>'
             assert sent_msg.subject == '[tech-support]: hello'
             assert sent_msg.reply_to == 'abcxyz@gmail.com'
             assert 'Aman <abcxyz@gmail.com>' in sent_msg.body
+
+            sent_msg = outbox[1]
+            assert sent_msg.sender == 'info@zenodo.org'
+            assert sent_msg.subject == 'Zenodo support confirmation'
+            assert sent_msg.body == (
+                'Thank you for contacting Zenodo support.'
+                '\n\nWe have received your message, and we will do our best '
+                'to get back to you\nas soon as possible. This is an '
+                'automated confirmation - please do not\nreply to this email.'
+                '\n\nZenodo Support Team\n'
+            )
 
             form = MultiDict(dict(
                 name='Foo',
@@ -91,8 +102,8 @@ def test_send_support_email(app, db, es, users):
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
-            assert len(outbox) == 2
-            sent_msg = outbox[1]
+            assert len(outbox) == 4
+            sent_msg = outbox[2]
             file1 = sent_msg.attachments[0]
             assert file1.filename == 'file2.txt'
             assert file1.data == b('My other file contents')
@@ -117,8 +128,8 @@ def test_send_support_email(app, db, es, users):
                 url_for('zenodo_pages.support'),
                 data=form
             )
-            assert len(outbox) == 3
-            sent_msg = outbox[2]
+            assert len(outbox) == 6
+            sent_msg = outbox[4]
             assert 'From: Foo <test@zenodo.org> (2)' in sent_msg.body
 
             test_file = BytesIO(b('My file contents'))
@@ -129,8 +140,8 @@ def test_send_support_email(app, db, es, users):
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
-            assert len(outbox) == 4
-            sent_msg = outbox[3]
+            assert len(outbox) == 8
+            sent_msg = outbox[6]
             file1 = sent_msg.attachments[0]
             assert file1.filename == 'file1.txt'
             assert file1.data == b('My file contents')
@@ -151,8 +162,8 @@ def test_send_support_email(app, db, es, users):
                 content_type='multipart/form-data',
                 follow_redirects=True
             )
-            assert len(outbox) == 5
-            sent_msg = outbox[4]
+            assert len(outbox) == 10
+            sent_msg = outbox[8]
             file1 = sent_msg.attachments[0]
             assert file1.filename == 'file2.txt'
             assert file1.data == b('My other file contents')

@@ -97,6 +97,15 @@ def check_attachment_size(attachments):
     return True
 
 
+def format_user_email(context):
+    """Format the user's email as 'First Last <email>' or 'email'."""
+    if 'name' in context.get('info', {}):
+        email = '{name} <{email}>'.format(**context['info'])
+    else:
+        email = context['info']['email']
+    return email
+
+
 def send_support_email(context, recipients=None):
     """Signal for sending emails after contact form validated.
 
@@ -105,10 +114,7 @@ def send_support_email(context, recipients=None):
     msg_body = format_request_email_body(context)
     msg_title = format_request_email_title(context)
 
-    if 'name' in context.get('info', {}):
-        sender = '{name} <{email}>'.format(**context['info'])
-    else:
-        sender = context['info']['email']
+    sender = format_user_email(context)
 
     msg = Message(
         msg_title,
@@ -125,6 +131,20 @@ def send_support_email(context, recipients=None):
                        'application/octet-stream',
                        upload.read())
 
+    current_app.extensions['mail'].send(msg)
+
+
+def send_confirmation_email(context):
+    """Sending support confirmation email."""
+    recipient = format_user_email(context)
+    title = current_app.config['PAGES_EMAIL_CONFIRM_TITLE']
+    body = current_app.config['PAGES_EMAIL_CONFIRM_BODY']
+    msg = Message(
+        title,
+        body=body,
+        sender=current_app.config['PAGES_SENDER_EMAIL'],
+        recipients=[recipient, ],
+    )
     current_app.extensions['mail'].send(msg)
 
 

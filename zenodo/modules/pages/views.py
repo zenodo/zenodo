@@ -36,8 +36,8 @@ from jinja2.filters import do_filesizeformat
 from wtforms.validators import Length
 
 from .forms import ContactForm
-from .utils import check_attachment_size, send_support_email, \
-    user_agent_information
+from .utils import check_attachment_size, send_confirmation_email, \
+    send_support_email, user_agent_information
 
 blueprint = Blueprint(
     'zenodo_pages',
@@ -83,10 +83,12 @@ def support():
             context = dict(user_id=user_id, info=form.data, uap=uap)
             recipients = categories[form.issue_category.data]['recipients']
             send_support_email(context, recipients)
+            send_confirmation_email(context)
             flash(
-                _('Request sent successfully. '
-                  'Our team will reply to you message as soon as possible.'
-                  ),
+                _('Request sent successfully, '
+                  'You should receive a confirmation email within several '
+                  'minutes - if this does not happen you should retry or send '
+                  'us an email directly to info@zenodo.org.'),
                 category='success'
             )
             return redirect(url_for('zenodo_frontpage.index'))

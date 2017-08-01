@@ -41,6 +41,21 @@ PAGES_EMAIL_BODY_TEMPLATE = 'zenodo_pages/email_body.html'
 #: Email title template.
 PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
 
+#: Support confirmation email body.
+PAGES_EMAIL_CONFIRM_BODY = """Thank you for contacting Zenodo support.
+
+We have received your message, and we will do our best to get back to you
+as soon as possible. This is an automated confirmation - please do not
+reply to this email.
+
+Zenodo Support Team
+"""
+
+#: Support confirmation email title.
+PAGES_EMAIL_CONFIRM_TITLE = 'Zenodo support confirmation'
+
+'zenodo_pages/email_confirm_title.html'
+
 #: Issue category for contact form.
 PAGES_ISSUE_CATEGORIES = [
     {
