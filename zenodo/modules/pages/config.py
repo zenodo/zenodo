@@ -44,15 +44,17 @@ PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
 #: Support confirmation email body.
 PAGES_EMAIL_CONFIRM_BODY = """Thank you for contacting Zenodo support.
 
-We have received your message, and we will do our best to get back to you
-as soon as possible. This is an automated confirmation - please do not
-reply to this email.
+We have received your message, and we will do our best to get back to you as \
+soon as possible.
+This is an automated confirmation of your request, please do not reply to this\
+ email.
 
-Zenodo Support Team
+Zenodo Support
+<a href="https://zenodo.org">https://zenodo.org</a>
 """
 
 #: Support confirmation email title.
-PAGES_EMAIL_CONFIRM_TITLE = 'Zenodo support confirmation'
+PAGES_EMAIL_CONFIRM_TITLE = 'Zenodo Support'
 
 'zenodo_pages/email_confirm_title.html'
 
@@ -163,6 +165,9 @@ PAGES_ISSUE_CATEGORIES = [
 
 #: Email address of sender.
 PAGES_SENDER_EMAIL = 'info@zenodo.org'
+
+#: Name of the sender
+PAGES_SENDER_NAME = 'Zenodo'
 
 #: Email address for support.
 PAGES_SUPPORT_EMAIL = ['info@zenodo.org']

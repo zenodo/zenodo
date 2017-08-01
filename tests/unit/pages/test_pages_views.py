@@ -75,14 +75,15 @@ def test_send_support_email(app, db, es, users):
             assert 'Aman <abcxyz@gmail.com>' in sent_msg.body
 
             sent_msg = outbox[1]
-            assert sent_msg.sender == 'info@zenodo.org'
-            assert sent_msg.subject == 'Zenodo support confirmation'
+            assert sent_msg.sender == 'Zenodo <info@zenodo.org>'
+            assert sent_msg.subject == 'Zenodo Support'
             assert sent_msg.body == (
                 'Thank you for contacting Zenodo support.'
                 '\n\nWe have received your message, and we will do our best '
-                'to get back to you\nas soon as possible. This is an '
-                'automated confirmation - please do not\nreply to this email.'
-                '\n\nZenodo Support Team\n'
+                'to get back to you as soon as possible.\nThis is an '
+                'automated confirmation of your request, please do not reply '
+                'to this email.\n\nZenodo Support\n'
+                '<a href="https://zenodo.org">https://zenodo.org</a>\n'
             )
 
             form = MultiDict(dict(

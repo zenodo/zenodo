@@ -97,13 +97,19 @@ def check_attachment_size(attachments):
     return True
 
 
-def format_user_email(context):
-    """Format the user's email as 'First Last <email>' or 'email'."""
-    if 'name' in context.get('info', {}):
-        email = '{name} <{email}>'.format(**context['info'])
-    else:
-        email = context['info']['email']
+def format_user_email(email, name):
+    """Format the user's email as 'Full Name <email>' or 'email'."""
+    if name:
+        email = '{name} <{email}>'.format(name=name, email=email)
     return email
+
+
+def format_user_email_ctx(context):
+    """Format the user's email from form context."""
+    return format_user_email(
+        context.get('info', {}).get('email'),
+        context.get('info', {}).get('name', None)
+    )
 
 
 def send_support_email(context, recipients=None):
@@ -114,7 +120,7 @@ def send_support_email(context, recipients=None):
     msg_body = format_request_email_body(context)
     msg_title = format_request_email_title(context)
 
-    sender = format_user_email(context)
+    sender = format_user_email_ctx(context)
 
     msg = Message(
         msg_title,
@@ -136,13 +142,17 @@ def send_support_email(context, recipients=None):
 
 def send_confirmation_email(context):
     """Sending support confirmation email."""
-    recipient = format_user_email(context)
+    recipient = format_user_email_ctx(context)
+    sender = format_user_email(
+        current_app.config['PAGES_SENDER_EMAIL'],
+        current_app.config['PAGES_SENDER_NAME']
+    )
     title = current_app.config['PAGES_EMAIL_CONFIRM_TITLE']
     body = current_app.config['PAGES_EMAIL_CONFIRM_BODY']
     msg = Message(
         title,
         body=body,
-        sender=current_app.config['PAGES_SENDER_EMAIL'],
+        sender=sender,
         recipients=[recipient, ],
     )
     current_app.extensions['mail'].send(msg)
