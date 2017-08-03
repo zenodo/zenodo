@@ -373,10 +373,6 @@ def default_view_method(pid, record, template=None):
         getter=ZenodoDeposit.get_record,
     ).resolve(depid.pid_value)
 
-    # If the record doesn't have a DOI, its deposit shouldn't be editable.
-    if 'doi' not in record:
-        abort(404)
-
     # Put deposit in edit mode if not already.
     if deposit['_deposit']['status'] != 'draft':
         deposit = deposit.edit()
