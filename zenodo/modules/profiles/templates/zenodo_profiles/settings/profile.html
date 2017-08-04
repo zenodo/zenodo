@@ -1,0 +1,95 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends config.USERPROFILES_SETTINGS_TEMPLATE %}
+
+{% from "invenio_userprofiles/settings/_macros.html" import render_field, form_errors %}
+
+{% set panel_title = _("Profile") %}
+{% set panel_icon = "fa fa-user" %}
+
+{%- block settings_form %}
+{%- if security.confirmable and not current_user.confirmed_at %}
+<form method="POST" role="form">
+{{ verification_form.csrf_token }}
+<div class="alert alert-warning">
+  {{ _("You have not yet verified your email address.") }} {{ verification_form.send_verification_email(class_="btn btn-default btn-xs") }}
+</div>
+<input type="hidden" name="submit" value="verification" />
+</form>
+{%- endif %}
+{%- set form = profile_form %}
+<form method="POST" name="profile_form">
+{%- for form_field in form.field_sets %}
+{%- set field = form.get_field_by_name(form_field) %}
+{%- if form_field == 'username' %}
+<h2>Basic Information</h2>
+{%- endif %}
+{%- if form_field == 'show_profile' %}
+<hr />
+<h2>Researcher Profile</h2>
+<div class="form-group">
+  <input id="{{ field.name }}" name="{{ field.name }}" type="checkbox"
+    {%- if field.data %}checked{%- endif %} />
+    {{ field.label.text }}
+</div>
+<div id="researcher_profile">
+{%- elif field.widget.input_type == 'hidden' %}
+{{ field() }}
+{%- elif form_field == 'allow_contact_owner' %}
+<div class="form-group">
+  <input id="{{ field.name }}" name="{{ field.name }}" type="checkbox" value="y"
+    {%- if field.data %}checked{%- endif %} /> {{ field.label.text }}
+</div>
+{%- else %}
+{{ render_field(field, autofocus=True, placeholder=field.label.text) }}
+{%- endif %}
+{%- endfor %}
+</div>
+<br />
+<div class="form-actions">
+  <a href="." class="btn btn-default"><i class="fa fa-times"></i> {{ _('Cancel') }}</a>
+  <button type="submit" name="submit" value="profile" class="btn btn-primary"><i class="fa fa-check"></i> {{ _('Update profile') }}</button>
+</div>
+</form>
+{%- endblock settings_form %}
+
+{%- block javascript %}
+{% include "zenodo_theme/javascript.html" %}
+<script>
+  $(toggle_profile_fields);
+  $('#profile-show_profile').change(toggle_profile_fields);
+  researcher_profile_fields = ['profile-bio', 'profile-affiliation',
+    'profile-location', 'profile-website', 'profile-allow_contact_owner']
+  function toggle_profile_fields(){
+    if($('#profile-show_profile').is(':checked')) {
+      for(field of researcher_profile_fields)
+        document.getElementById(field).removeAttribute("disabled");
+    } else {
+      for(field of researcher_profile_fields)
+        document.getElementById(field).setAttribute("disabled", true);
+    }
+  };
+</script>
+{%- endblock javascript %}

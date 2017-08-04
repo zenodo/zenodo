@@ -1,0 +1,280 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_theme/page.html" %}
+
+{%- block page_body %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-xs-12" id="profile" style="margin-bottom:20px">
+      <br />
+      <img height="400px" width="400px"
+        alt="Profile Picture" class="img-responsive img-rounded center-block"
+        src="https://members.orcid.org/sites/default/files/vector_iD_icon.svg"
+        alt="Profile Picture" />
+      <div id="orcid_profile">
+        <div id="researcher_name">
+          <h1 style="line-height:0.8">
+            <strong></strong>
+            <small id="researcher_affiliation"></small>
+          </h1>
+        </div>
+        <div id="researcher_orcid" style="margin-bottom: 4px">
+          <img width="26px" style="vertical-align:middle; margin-left: 5px" src="{{ url_for('static', filename='img/orcid.png') }}" alt="Orcid" />
+          <a class="no_hover" href="https://orcid.org/{{orcid_id}}"><span style="margin-left: 3px;font-size: 16px">{{ orcid_id }}</span></a>
+        </div>
+        <div id="researcher_bio"><h3><small></small></h3></div>
+        <div id="researcher_address">
+          <hr />
+          <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
+          <span class="content"></span>
+        </div>
+      </div>
+      <div class="loader">
+      </div>
+      <br />
+    </div>
+
+    <div class="col-sm-9 col-xs-12" id="invenio-search">
+      <div class="col-xs-12">
+        <h1>Popular Uploads</h1>
+      </div>
+      <br />
+      <invenio-search
+       search-endpoint="/api/records"
+       search-hidden-params='{"page":1, "size": 10,"q": "creators.orcid:{{orcid_id}}", "sort": "mostrecent"}'
+       search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
+      >
+        {{super()}}
+        <invenio-search-results
+          class="list-group"
+          template="{{ url_for('static', filename='templates/zenodo_profiles/results.html') }}">
+        </invenio-search-results>
+      </invenio-search>
+      <p class="text-center"><a class="btn btn-default" href="/profile/{{ orcid_id }}/search">More</a></p>
+    </div>
+  </div>
+</div>
+
+<style>
+@media screen and (max-width: 768px) {
+  #profile {
+    text-align: center;
+  }
+}
+
+@media screen and (min-width: 768px) {
+  #profile {
+    position: sticky;
+    top: 30px;
+  }
+}
+
+.no_hover:hover {
+  text-decoration: none;
+}
+
+.loader {
+  margin: auto;
+  margin-top: 20px;
+  border: 8px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 8px solid #3498db;
+  width: 80px;
+  height: 80px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+</style>
+{%- endblock page_body %}
+
+{%- block javascript %}
+{% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+{% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+<script>
+require([
+  "node_modules/angular/angular",
+  "node_modules/angular-loading-bar/build/loading-bar",
+  "node_modules/invenio-search-js/dist/invenio-search-js",
+  "js/zenodo/module"
+  ], function() {
+    angular.element(document).ready(function() {
+      angular.bootstrap(document.getElementById("invenio-search"), [
+          'invenioSearch',
+          'zenodo',
+          'angular-loading-bar',
+          'mgcrea.ngStrap.tooltip',
+        ]
+      );
+    });
+  }
+);
+
+$('#orcid_profile, #researcher_name, #researcher_orcid, #researcher_bio, #researcher_address, #researcher_affiliation').hide();
+
+$.ajax({
+  url: 'https://pub.orcid.org/v2.1/{{orcid_id}}/activities',
+  headers: {'Accept': 'application/json'},
+  contentType: 'application/json',
+  dataType: 'json',
+  success: function(result){
+    var year = 0;
+    var month = 0;
+    var day = 0;
+    var affiliation = '';
+    var city = '';
+
+    function check(each){
+      if(each.hasOwnProperty('start-date') && each['start-date']
+       && each['start-date'].hasOwnProperty('year')
+       && each['start-date']['year']
+       && each['start-date']['year'].hasOwnProperty('value')
+       && each['start-date']['year']['value']){
+       if(parseInt(each['start-date']['year']['value']) > year){
+         assign(each);
+       }
+       else if((parseInt(each['start-date']['year']['value'])==year)
+         && each['start-date'].hasOwnProperty('month')
+         && each['start-date']['month']
+         && each['start-date']['month'].hasOwnProperty('value')
+         && each['start-date']['month']['value']){
+         if(parseInt(each['start-date']['month']['value']) > month){
+           assign(each);
+         }
+         else if((parseInt(each['start-date']['year']['value']) == month)
+           && each['start-date'].hasOwnProperty('day')
+           && each['start-date']['day']
+           && each['start-date']['day'].hasOwnProperty('value')
+           && each['start-date']['day']['value']
+           && (parseInt(each['start-date']['day']['value']) > day)){
+             assign(each);
+         }
+       }
+     }
+    }
+
+    function assign(each){
+      if(each.hasOwnProperty('organization') && each['organization']){
+        if(each['organization'].hasOwnProperty('name')
+          && each['organization']['name']){
+          affiliation = each['organization']['name'];
+        }
+        if(each['organization'].hasOwnProperty('address')
+          && each['organization']['address']){
+          if(each['organization']['address'].hasOwnProperty('city')
+            && each['organization']['address']['city']){
+            city = each['organization']['address']['city'];
+          }
+          if(each['organization']['address'].hasOwnProperty('region')
+            && each['organization']['address']['region']){
+            city += ', ' + each['organization']['address']['region'];
+          }
+        }
+      }
+
+      if(each.hasOwnProperty('start-date') && each['start-date']){
+        if(each['start-date'].hasOwnProperty('year')
+          && each['start-date']['year']
+          && each['start-date']['year'].hasOwnProperty('value')
+          && each['start-date']['year']['value']){
+          year = parseInt(each['start-date']['year']['value']);
+        }
+        if(each['start-date'].hasOwnProperty('month')
+          && each['start-date']['month']
+          && each['start-date']['month'].hasOwnProperty('value')
+          && each['start-date']['month']['value']){
+          month = parseInt(each['start-date']['month']['value']);
+        }
+        if(each['start-date'].hasOwnProperty('day')
+          && each['start-date']['day']
+          && each['start-date']['day'].hasOwnProperty('value')
+          && each['start-date']['day']['value']){
+          day = parseInt(each['start-date']['day']['value']);
+        }
+      }
+    }
+
+    if(result.hasOwnProperty('educations')
+       && result['educations']
+       && result['educations'].hasOwnProperty('education-summary')
+       && result['educations']['education-summary'].length){
+       for(each of result['educations']['education-summary']){
+         check(each);
+      }
+    }
+
+    if(result.hasOwnProperty('employments')
+       && result['employments']
+       && result['employments'].hasOwnProperty('employment-summary')
+       && result['employments']['employment-summary'].length){
+       for(each of result['employments']['employment-summary']){
+         check(each);
+       }
+    }
+    if(affiliation){
+      $('#researcher_affiliation').text(affiliation);
+      $('#researcher_affiliation').show();
+    }
+    if(city){
+      $('#researcher_address .content').text(city);
+      $('#researcher_address').show();
+    }
+  },
+  error: function(error){}
+});
+$.ajax({
+  url: 'https://pub.orcid.org/v2.1/{{orcid_id}}/person',
+  headers: {'Accept': 'application/json'},
+  contentType: 'application/json',
+  dataType: 'json',
+  success: function(result){
+    if(result.hasOwnProperty('name') && result['name'].hasOwnProperty('given-names')
+      && result['name']['given-names'].hasOwnProperty('value')
+      && result['name'].hasOwnProperty('family-name')
+      && result['name']['family-name'].hasOwnProperty('value')
+      && result['name']['given-names']['value']
+      && result['name']['family-name']['value']){
+      $('#researcher_name h1 strong').text(result['name']['given-names']['value'] + ' ' + result['name']['family-name']['value']);
+      $('#researcher_name').show();
+    }
+    $('#researcher_orcid').show();
+    if(result.hasOwnProperty('biography') && result['biography'].hasOwnProperty('content')
+      && result['biography']['content']){
+      $('#researcher_bio h3 small').text(result['biography']['content'].substring(0, 130));
+      $('#researcher_bio').show();
+    }
+    $('#orcid_profile').show();
+    $('.loader').hide();
+  },
+  error: function(error){
+    $('#orcid_profile').removeClass('loader').html('<b>Error</b>');
+  }
+});
+</script>
+{%- endblock javascript %}

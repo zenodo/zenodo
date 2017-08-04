@@ -974,6 +974,14 @@ REQUIREJS_CONFIG = "js/zenodo-build.js"
 # ============
 #: Extend account registration form with user profiles fields.
 USERPROFILES_EXTEND_SECURITY_FORMS = True
+#: Path to profile form factory.
+USERPROFILES_PROFILE_FORM_FACTORY = \
+    'zenodo.modules.profiles.forms:profile_form_factory'
+#: Path to Profile template.
+USERPROFILES_PROFILE_TEMPLATE = 'zenodo_profiles/settings/profile.html'
+#: Path to handle profile form.
+USERPROFILES_HANDLE_PROFILE_FORM = \
+    'zenodo.modules.profiles.views:handle_profile_form'
 
 # Database
 # ========

@@ -22,11 +22,27 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo Profiles."""
+"""Profiles for Zenodo."""
 
 from __future__ import absolute_import, print_function
 
-from .ext import ZenodoProfiles
-from .models import Profile
+from . import config
 
-__all__ = ('ZenodoProfiles', 'Profile')
+
+class ZenodoProfiles(object):
+    """Zenodo Profile Page."""
+
+    def __init__(self, app=None):
+        """Extension initialization."""
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """Flask application initialization."""
+        self.init_config(app)
+
+    def init_config(self, app):
+        """Flask application initialization."""
+        for k in dir(config):
+            if k.startswith("PROFILES_"):
+                app.config.setdefault(k, getattr(config, k))

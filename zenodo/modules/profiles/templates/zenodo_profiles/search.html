@@ -26,20 +26,27 @@
 
 {%- from "zenodo_profiles/macros.html" import owner_header %}
 
-{% set search_hidden_params = {"q": "owners:1161"} %}
+{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
 
 {%- block page_header %}
-{% set search_input_placeholder = "Search User" %}
+{% set search_input_placeholder = "Search " + user.profile.username %}
 {% include "invenio_search_ui/header.html" %}
 {%- endblock page_header %}
 
 {% block page_body %}
-{# :TODO: Make it work using super #}
-<div class="communities" id="invenio-search">
+{%- set global_vars = {'orcid_id': ''} %}
+{%- if user.remote_accounts %}
+{%- for account in user.remote_accounts %}
+  {%- if account.client_id == config.ORCID_APP_CREDENTIALS.consumer_key %}
+    {% if global_vars.update({'orcid_id': account.extra_data.get('orcid')}) %}{% endif %}
+  {%- endif %}
+{%- endfor %}
+{%- endif %}
+<div class="profile" id="invenio-search">
   {{ owner_header(user) }}
   <invenio-search
-   search-endpoint="https://zenodo.org/api/records"
-   search-hidden-params='{"page":1, "size": 10, "q": "owners:1161"}'
+   search-endpoint="/api/records"
+   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if global_vars.get('orcid_id') %} || creators.orcid:{{ global_vars.get('orcid_id') }}{% endif %}"}'
    search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
   >
   {{super()}}

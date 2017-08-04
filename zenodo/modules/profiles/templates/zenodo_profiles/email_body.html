@@ -1,5 +1,4 @@
-# -*- coding: utf-8 -*-
-#
+{#
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -21,12 +20,8 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
 
-"""Zenodo Profiles."""
+from: {{ content.name }} <{{ current_user.email }}>
 
-from __future__ import absolute_import, print_function
-
-from .ext import ZenodoProfiles
-from .models import Profile
-
-__all__ = ('ZenodoProfiles', 'Profile')
+{{ content.body }}

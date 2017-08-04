@@ -22,11 +22,44 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo Profiles."""
+"""Admin views for Zenodo Profiles."""
 
-from __future__ import absolute_import, print_function
+from flask_admin.contrib.sqla import ModelView
 
-from .ext import ZenodoProfiles
 from .models import Profile
 
-__all__ = ('ZenodoProfiles', 'Profile')
+
+def _(x):
+    """Identity."""
+    return x
+
+
+class ProfileView(ModelView):
+    """Profiles view."""
+
+    can_view_details = True
+    can_delete = False
+
+    column_list = (
+        'user_id',
+        'bio',
+        'affiliation',
+        'location',
+        'website',
+        'show_profile',
+        'allow_contact_owner'
+    )
+
+    form_columns = \
+        column_searchable_list = \
+        column_filters = \
+        column_details_list = \
+        columns_sortable_list = \
+        column_list
+
+
+researcher_profile_adminview = {
+    'model': Profile,
+    'modelview': ProfileView,
+    'category': _('User Management'),
+}
