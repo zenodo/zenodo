@@ -1,0 +1,55 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
+
+{%- from "zenodo_profiles/macros.html" import owner_header %}
+
+{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
+
+{%- block page_header %}
+{% set search_input_placeholder = "Search " + user.profile.username %}
+{% include "invenio_search_ui/header.html" %}
+{%- endblock page_header %}
+
+{% block page_body %}
+{%- set global_vars = {'orcid_id': ''} %}
+{%- if user.remote_accounts %}
+{%- for account in user.remote_accounts %}
+  {%- if account.client_id == config.ORCID_APP_CREDENTIALS.consumer_key %}
+    {% if global_vars.update({'orcid_id': account.extra_data.get('orcid')}) %}{% endif %}
+  {%- endif %}
+{%- endfor %}
+{%- endif %}
+<div class="profile" id="invenio-search">
+  {{ owner_header(user) }}
+  <invenio-search
+   search-endpoint="/api/records"
+   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if global_vars.get('orcid_id') %} || creators.orcid:{{ global_vars.get('orcid_id') }}{% endif %}"}'
+   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
+  >
+  {{super()}}
+  </invenio-search>
+</div>
+{% endblock page_body %}
