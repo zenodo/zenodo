@@ -270,6 +270,7 @@
               "isVariantFormOf",
               "isOrignialFormOf",
               "isIdenticalTo",
+              "isAlternateIdentifier",
               "isReviewedBy",
               "reviews",
               "isDerivedFrom",

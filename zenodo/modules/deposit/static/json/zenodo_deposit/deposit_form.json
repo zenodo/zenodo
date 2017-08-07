@@ -577,6 +577,10 @@
               {
                 "value": "isIdenticalTo",
                 "name": "is identical to this upload"
+              },
+              {
+                "value": "isAlternateIdentifier",
+                "name": "is an alternate identifier of this upload"
               }
             ]
           }
