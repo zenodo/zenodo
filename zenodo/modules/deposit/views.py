@@ -34,6 +34,7 @@ from flask import Blueprint, abort, current_app, flash, redirect, \
     render_template, request, url_for, jsonify
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
+from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
@@ -42,6 +43,7 @@ from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
 from invenio_records_files.models import RecordsBuckets
+from invenio_records_ui.signals import record_viewed
 
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.records.permissions import record_permission_factory
@@ -131,11 +133,6 @@ def edit(pid=None, record=None, depid=None, deposit=None):
     if 'doi' not in record:
         abort(404)
 
-    # Put deposit in edit mode if not already.
-    if deposit['_deposit']['status'] != 'draft':
-        deposit = deposit.edit()
-        db.session.commit()
-
     return redirect(url_for(
         'invenio_deposit_ui.{0}'.format(depid.pid_type),
         pid_value=depid.pid_value
@@ -213,6 +210,8 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     except PIDDoesNotExistError:
         doi = None
 
+    owners = User.query.filter(User.id.in_(record.get('owners', []))).all()
+
     pids = [pid, depid, doi]
     if 'conceptdoi' in record:
         conceptdoi = PersistentIdentifier.get('doi', record['conceptdoi'])
@@ -243,6 +242,7 @@ def delete(pid=None, record=None, depid=None, deposit=None):
     return render_template(
         'zenodo_deposit/delete.html',
         form=form,
+        owners=owners,
         pid=pid,
         pids=pids,
         record=record,
@@ -364,3 +364,39 @@ def to_files_js(deposit):
         })
 
     return res
+
+def default_view_method(pid, record, template=None):
+    """Default view method for updating record.
+
+    Sends ``record_viewed`` signal and renders template.
+
+    :param pid: PID object.
+    :param record: Record object.
+    :param template: Template to render.
+    """
+    # Fetch deposit id from record and resolve deposit record and pid.
+    depid = zenodo_deposit_fetcher(None, record)
+    if not depid:
+        abort(404)
+
+    depid, deposit = Resolver(
+        pid_type=depid.pid_type,
+        object_type='rec',
+        getter=ZenodoDeposit.get_record,
+    ).resolve(depid.pid_value)
+
+    # Put deposit in edit mode if not already.
+    if deposit['_deposit']['status'] != 'draft':
+        deposit = deposit.edit()
+        db.session.commit()
+
+    record_viewed.send(
+        current_app._get_current_object(),
+        pid=pid,
+        record=record,
+    )
+    return render_template(
+        template,
+        pid=pid,
+        record=record,
+    )

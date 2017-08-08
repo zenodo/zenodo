@@ -114,10 +114,9 @@ def repo_list(user, sync, with_all, skip_email):
     either an email or user ID.
 
     Examples:
-
       github list foo@bar.baz
-
       github list 12345 --sync --all
+
     """
     user = resolve_user(user)
     gha = GitHubAPI(user_id=user.id)
@@ -164,7 +163,6 @@ def assign(user, repos, skip_email, yes_i_know):
     repository names or a repository GitHub IDs.
 
     Examples:
-
         Assign repository 'foobar-org/repo-name' to user 'user1@foo.org':
 
       github assign user1@foo.org foobar-org/repo-name
@@ -172,6 +170,7 @@ def assign(user, repos, skip_email, yes_i_know):
         Assign three GitHub repositories to user with ID 999:
 
       github assign 999 15001500 baz-org/somerepo 12001200
+
     """
     user = resolve_user(user)
     repos = resolve_repos(repos)
@@ -204,10 +203,10 @@ def sync(user, hooks, async_hooks, skip_email):
     USER can be either an email or user ID.
 
     Examples:
-
       github sync foo@bar.baz
 
       github sync 999
+
     """
     user = resolve_user(user)
     gh_api = GitHubAPI(user_id=user.id)
@@ -233,10 +232,10 @@ def createhook(user, repo, skip_email, yes_i_know):
     (e.g. `some-organization/some-repository`) or its GitHub ID.
 
     Examples:
-
       github createhook abc@foo.bar foobar-org/foobar-repo
 
       github createhook 12345 55555
+
     """
     user = resolve_user(user)
     repo = resolve_repo(repo)
@@ -273,10 +272,10 @@ def removehook(repo, user, skip_email, yes_i_know):
     Option '--user' can be either an email or a user ID.
 
     Examples:
-
       github removehook foobar-org/foobar-repo
 
       github removehook 55555 -u foo@bar.baz
+
     """
     repo = resolve_repo(repo)
     if not repo.user and not user:

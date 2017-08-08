@@ -39,7 +39,7 @@ from .helpers import is_openaire_dataset, is_openaire_publication, \
 
 
 def _openaire_request_factory(headers=None, auth=None):
-    """OpenAIRE API request factory."""
+    """Request factory for OpenAIRE API."""
     ses = requests.Session()
     ses.headers.update(headers or {'Content-type': 'application/json',
                                    'Accept': 'application/json'})

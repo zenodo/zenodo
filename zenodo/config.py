@@ -151,6 +151,10 @@ CELERYBEAT_SCHEDULE = {
         'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
         'schedule': timedelta(hours=2),
     },
+    'session-cleaner': {
+        'task': 'invenio_accounts.tasks.clean_session_table',
+        'schedule': timedelta(hours=24),
+    }
 }
 
 # Cache
@@ -172,6 +176,8 @@ CACHE_TYPE = "redis"
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 #: Cache for storing access restrictions
 ACCESS_CACHE = 'zenodo.modules.cache:current_cache'
+#: Disable JSON Web Tokens
+ACCOUNTS_JWT_ENABLE=False
 
 # CSL Citation Formatter
 # ======================
@@ -465,6 +471,7 @@ DEPOSIT_RECORDS_UI_ENDPOINTS = {
         'route': '/deposit/<pid_value>',
         'template': 'zenodo_deposit/edit.html',
         'record_class': 'zenodo.modules.deposit.api:ZenodoDeposit',
+        'view_imp': 'zenodo.modules.deposit.views.default_view_method',
     },
 }
 
@@ -481,6 +488,9 @@ MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MiB
 # ========
 #: Default JSON schema for the SIP agent
 SIPSTORE_DEFAULT_AGENT_JSONSCHEMA = 'sipstore/agent-webclient-v1.0.0.json'
+
+# Default SIP agent factory
+SIPSTORE_AGENT_FACTORY = 'invenio_sipstore.api.SIP._build_agent_info'
 
 #: Enable the agent JSON schema
 SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
@@ -944,9 +954,10 @@ THEME_GOOGLE_SITE_VERIFICATION = [
 #: Piwik site id.
 THEME_PIWIK_ID = None
 
-THEME_MATHJAX_CDN = \
-    '//cdn.mathjax.org/mathjax/latest/MathJax.js' \
+THEME_MATHJAX_CDN = (
+    '//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js'
     '?config=TeX-AMS-MML_HTMLorMML'
+)
 
 #: Base template for entire site.
 BASE_TEMPLATE = "zenodo_theme/page.html"

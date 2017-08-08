@@ -98,6 +98,12 @@
     }
 }
 
+#files span.filename {
+    width: 33em;
+    word-wrap: break-word;
+    display: block
+}
+
 .record-elem {
     h4 {
         a {

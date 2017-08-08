@@ -12,7 +12,7 @@
   }
   .jumbotron{
     background-color: transparent;
-    padding-bottom: 0px;
+    padding-bottom: 0;
   }
   .introducing p {
     line-height: 28px;
@@ -57,4 +57,47 @@
       }
     }
   }
+}
+
+#contact-page {
+
+  .alert-info a {
+    text-decoration: none;
+  }
+
+  .form-group {
+    margin-bottom: 0px;
+
+    .control-label {
+      margin-top: 7px;
+    }
+    .has-error span.help-inline {
+      margin-bottom: 10px;
+    }
+  }
+
+  textarea[name="description"] {
+    height: 110px;
+  }
+
+  .content-tab {
+    margin-bottom: 10px;
+    min-height: 40px;
+  }
+
+  .upload-panel {
+
+    margin-bottom: 0px;
+
+    .upload-header {
+      margin-bottom: 20px;
+    }
+
+    a.upload-button {
+      text-decoration: none;
+      cursor: pointer;
+    }
+  }
+
+
 }

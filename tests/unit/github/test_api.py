@@ -28,10 +28,9 @@ from __future__ import absolute_import, print_function
 
 import pytest
 from invenio_sipstore.models import SIP
-from mock import MagicMock, Mock, patch
+from mock import MagicMock, Mock
 from six import BytesIO
 
-from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.github.api import ZenodoGitHubRelease
 
 creators_params = (
@@ -51,12 +50,13 @@ creators_params = (
 
 
 @pytest.mark.parametrize('defaults,contribs,owner,output', creators_params)
-@patch('zenodo.modules.github.api.get_owner')
-@patch('zenodo.modules.github.api.get_contributors')
-@patch('zenodo.modules.github.api.legacyjson_v1_translator')
-def test_github_creators_metadata(m_ljv1t, m_get_contributors, m_get_owner,
-                                  defaults, contribs, owner, output):
+def test_github_creators_metadata(mocker, defaults, contribs, owner, output):
     """Test 'creators' metadata fetching from GitHub."""
+    m_ljv1t = mocker.patch(
+        'zenodo.modules.github.api.legacyjson_v1_translator')
+    m_get_contributors = mocker.patch(
+        'zenodo.modules.github.api.get_contributors')
+    m_get_owner = mocker.patch('zenodo.modules.github.api.get_owner')
     m_get_contributors.return_value = contribs
     m_get_owner.return_value = owner
     release = MagicMock()
@@ -70,11 +70,12 @@ def test_github_creators_metadata(m_ljv1t, m_get_contributors, m_get_owner,
     m_ljv1t.assert_called_with({'metadata': {'creators': output}})
 
 
-@patch('zenodo.modules.github.api.ZenodoGitHubRelease.metadata')
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_github_publish(datacite_mock, zgh_meta, db, users, location,
-                        deposit_metadata):
+def test_github_publish(mocker, db, users, location,
+                        deposit_metadata, sip_metadata_types):
     """Test basic GitHub payload."""
+    datacite_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
+    mocker.patch('zenodo.modules.github.api.ZenodoGitHubRelease.metadata')
     data = b'foobar'
     resp = Mock()
     resp.headers = {'Content-Length': len(data)}
@@ -96,12 +97,7 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
     zgh.files = (('foobar.txt', None), )
     zgh.model.repository.releases.filter_by().count.return_value = 0
 
-    datacite_task_mock = MagicMock()
-    # We have to make the call to the task synchronous
-    datacite_task_mock.delay = datacite_register.apply
-    with patch('zenodo.modules.deposit.tasks.datacite_register',
-               new=datacite_task_mock):
-        zgh.publish()
+    zgh.publish()
 
     # datacite should be called twice - for regular DOI and Concept DOI
     assert datacite_mock().metadata_post.call_count == 2
@@ -112,7 +108,7 @@ def test_github_publish(datacite_mock, zgh_meta, db, users, location,
 
     expected_sip_agent = {
         'email': 'foo@baz.bar',
-        '$schema': 'http://zenodo.org/schemas/sipstore/'
+        '$schema': 'https://zenodo.org/schemas/sipstore/'
                    'agent-githubclient-v1.0.0.json',
         'user_id': 1,
         'github_id': 1,

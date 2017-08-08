@@ -57,7 +57,7 @@ def test_redirection_community(app_client, db):
     check_redirection(response, url_redirection)
 
 
-def test_redirection_community_search(app_client):
+def test_redirection_community_search(app_client, db):
     """Check the redirection using a direct translation."""
     url_redirection = url_for('invenio_communities.search', community_id=1,
                               _external=True)
@@ -73,7 +73,7 @@ def test_redirection_community_search(app_client):
     check_redirection(response, url_redirection)
 
 
-def test_redirection_communities_provisional_user(app_client):
+def test_redirection_communities_provisional_user(app_client, db):
     """Check the redirection using a direct translation."""
     url_redirection = url_for('invenio_communities.curate', community_id=1,
                               _external=True)
@@ -89,7 +89,7 @@ def test_redirection_communities_provisional_user(app_client):
     check_redirection(response, url_redirection)
 
 
-def test_redirection_communities_about(app_client):
+def test_redirection_communities_about(app_client, db):
     """Check the redirection using a direct translation."""
     url_redirection = url_for('invenio_communities.about', community_id=1,
                               _external=True)
@@ -98,7 +98,7 @@ def test_redirection_communities_about(app_client):
     check_redirection(response, url_redirection)
 
 
-def test_redirection_collections_type(app_client):
+def test_redirection_collections_type(app_client, db):
     """Check the redirection using a direct translation."""
     # Type
     url_redirection = url_for('invenio_search_ui.search', type='video',
@@ -113,7 +113,7 @@ def test_redirection_collections_type(app_client):
     check_redirection(response, url_redirection)
 
 
-def test_redirection_collections_search(app_client):
+def test_redirection_collections_search(app_client, db):
     """Check the redirection using a direct translation."""
     # Type
     url_redirection = url_for('invenio_search_ui.search', type='video',
@@ -135,7 +135,7 @@ def test_redirection_collections_search(app_client):
     check_redirection(response, url_redirection)
 
 
-def test_redirection_search_behaviour(app_client):
+def test_redirection_search_behaviour(app_client, db):
     """Check the behaviour of url_for using invenio_search_ui.index."""
     # Empty url
     response = app_client.get(url_for('invenio_search_ui.search'))

@@ -32,7 +32,6 @@ import pytest
 from flask import url_for
 from helpers import login_user_via_session
 from invenio_search import current_search
-from mock import patch
 from six import BytesIO
 
 
@@ -49,10 +48,10 @@ def make_file_fixture(filename, text=None):
     return (BytesIO(content), filename)
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_simple_rest_flow(datacite_mock, api, api_client, db, es,
+def test_simple_rest_flow(mocker, api, api_client, db, es,
                           location, users, write_token, license_record):
     """Test simple flow using REST API."""
+    mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
     # Setting var this way doesn't work
     client = api_client
     test_data = dict(
@@ -314,9 +313,9 @@ def test_delete_deposits_users(api, api_client, db, users, deposit,
             assert res.status_code == status
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_versioning_rest_flow(datacite_mock, api, api_client, db, es, location,
+def test_versioning_rest_flow(mocker, api, api_client, db, es, location,
                               users, write_token, license_record):
+    mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
     client = api_client
     test_data = dict(
         metadata=dict(

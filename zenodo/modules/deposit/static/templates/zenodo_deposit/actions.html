@@ -32,6 +32,18 @@
     <li>
       <button
         class="btn btn-primary"
+        data-toggle="modal"
+        data-target="#warningModal"
+        ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
+        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
+        ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' || 'Publish the record'}}">
+        <i class="fa fa-check"></i> Publish
+      </button>
+    </li>
+    <li>
+      <button
+        class="btn btn-primary"
+        ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
         ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
         ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' || 'Publish the record'}}"
         ng-click="recordsVM.actionHandler(['publish', 'POST'], 'record_html')">
@@ -39,4 +51,35 @@
       </button>
     </li>
   </ul>
+</div>
+
+<div class="modal fade" id="warningModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">Warning</h4>
+      </div>
+      <div class="modal-body">
+        <strong>Once the record is published you will no longer be able to change the files in this upload.</strong>
+        <br />
+        This is because a Digital Object Identifier (DOI) will be registered immediately after publishing.
+        You will still be able to update the record's metadata later.
+        <br />
+        <br />
+        If you only want to create a test upload, please do so on <a href="https://sandbox.zenodo.org">Zenodo Sandbox</a>.
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button
+          class="btn btn-primary"
+          data-dismiss="modal"
+          ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
+          ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' || 'Publish the record'}}"
+          ng-click="recordsVM.actionHandler(['publish', 'POST'], 'record_html')">
+          <i class="fa fa-check"></i> I understand
+        </button>
+      </div>
+    </div>
+  </div>
 </div>

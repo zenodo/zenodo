@@ -33,16 +33,15 @@ import pytest
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
-from mock import patch
 
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.minters import zenodo_record_minter
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_datacite_register(dc_mock, app, db, es, minimal_record):
-
+def test_datacite_register(mocker, app, db, es, minimal_record):
+    dc_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     doi_tags = [
         '<identifier identifierType="DOI">{doi}</identifier>',
         ('<relatedIdentifier relatedIdentifierType="DOI" '
@@ -112,9 +111,10 @@ def test_datacite_register(dc_mock, app, db, es, minimal_record):
     assert_datacite_calls_and_content(r2, doi_tags, conceptdoi_tags)
 
 
-@patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
-def test_datacite_register_fail(dc_mock, app, db, es, minimal_record):
+def test_datacite_register_fail(mocker, app, db, es, minimal_record):
     # Make the datacite API unavailable
+    dc_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     dc_mock().metadata_post.side_effect = datacite.errors.HttpError()
 
     # Create a reserved recid

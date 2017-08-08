@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -26,10 +26,20 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_db import db
 from invenio_migrator.tasks.records import import_record
+from invenio_sipstore.models import SIPMetadataType
 
 
 def loaddemorecords(records):
     """Load demo records."""
     for item in records:
         import_record.delay(item, source_type='json'),
+
+
+def loadsipmetadatatypes(types):
+    """Load SIP metadata types."""
+    with db.session.begin_nested():
+        for type in types:
+            db.session.add(SIPMetadataType(**type))
+    db.session.commit()

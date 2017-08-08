@@ -37,6 +37,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 
+from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
@@ -68,7 +69,7 @@ def datecite_register(recid, eager):
 @click.option('--replace-existing', '-f', is_flag=True, default=False)
 @with_appcontext
 def add_file(recid, fp, replace_existing):
-    """Add a new file to a publishd record."""
+    """Add a new file to a published record."""
     pid, record = record_resolver.resolve(recid)
     bucket = record.files.bucket
     key = os.path.basename(fp.name)
@@ -136,7 +137,7 @@ def add_file(recid, fp, replace_existing):
 @click.argument('key', type=str)
 @with_appcontext
 def remove_file(recid, key=None, index=None):
-    """Remove a file from a publishd record."""
+    """Remove a file from a published record."""
     pid, record = record_resolver.resolve(recid)
     bucket = record.files.bucket
     obj = ObjectVersion.get(bucket, key)
@@ -184,7 +185,7 @@ def remove_file(recid, key=None, index=None):
 @click.argument('new_key', type=str)
 @with_appcontext
 def rename_file(recid, key, new_key):
-    """Remove a file from a publishd record."""
+    """Remove a file from a published record."""
     pid, record = record_resolver.resolve(recid)
     bucket = record.files.bucket
 
@@ -215,6 +216,73 @@ def rename_file(recid, key, new_key):
         click.echo(click.style(u'File renamed successfully.', fg='green'))
     else:
         click.echo(click.style(u'Aborted file rename.', fg='green'))
+
+
+@utils.command('attach_file')
+@click.option('--file-id', type=str)
+@click.option('--pid-type1', type=str)
+@click.option('--pid-value1', type=str)
+@click.option('--key1', type=str)
+@click.option('--pid-type2', type=str)
+@click.option('--pid-value2', type=str)
+@click.option('--key2', type=str)
+@with_appcontext
+def attach_file(file_id, pid_type1, pid_value1, key1, pid_type2, pid_value2,
+                key2):
+    """Attach a file to a record or deposit.
+
+    You must provide the information which will determine the first file, i.e.:
+    either 'file-id' OR 'pid-type1', 'pid-value1' and 'key1'.
+    Additionally you need to specify the information on the target
+    record/deposit, i.e.: 'pid-type2', 'pid-value2' and 'key2'.
+    """
+    assert ((file_id or (pid_type1 and pid_value1 and key1))
+            and (pid_type2 and pid_value2 and key2))
+
+    msg = u"PID type must be 'recid' or 'depid'."
+    if pid_type1:
+        assert pid_type1 in ('recid', 'depid', ), msg
+    assert pid_type2 in ('recid', 'depid', ), msg
+
+    if not file_id:
+        resolver = record_resolver if pid_type1 == 'recid' \
+            else deposit_resolver
+        pid1, record1 = resolver.resolve(pid_value1)
+        bucket1 = record1.files.bucket
+
+        obj1 = ObjectVersion.get(bucket1, key1)
+        if obj1 is None:
+            click.echo(click.style(u'File with key "{key}" not found.'.format(
+                key=key1), fg='red'))
+            return
+        file_id = obj1.file.id
+
+    resolver = record_resolver if pid_type2 == 'recid' else deposit_resolver
+    pid2, record2 = resolver.resolve(pid_value2)
+    bucket2 = record2.files.bucket
+
+    obj2 = ObjectVersion.get(bucket2, key2)
+    if obj2 is not None:
+        click.echo(click.style(u'File with key "{key}" already exists on'
+                               u' bucket {bucket}.'.format(
+                                   key=key2, bucket=bucket2.id), fg='red'))
+        return
+
+    if click.confirm(u'Attaching file "{file_id}" to bucket {bucket2}'
+                     u' as "{key2}". Continue?'.format(
+                         file_id=file_id, key2=key2,
+                         bucket2=bucket2.id)):
+        record2.files.bucket.locked = False
+
+        ObjectVersion.create(bucket2, key2, _file_id=file_id)
+        if pid_type2 == 'recid':
+            record2.files.bucket.locked = True
+        record2.files.flush()
+        record2.commit()
+        db.session.commit()
+        click.echo(click.style(u'File attached successfully.', fg='green'))
+    else:
+        click.echo(click.style(u'Aborted file attaching.', fg='green'))
 
 
 @utils.command('list_files')

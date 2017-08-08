@@ -1,0 +1,203 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_theme/page.html" %}
+{%- from "zenodo_pages/macros.html" import render_form_field, render_form_input, render_form_label %}
+
+{%- block page_body %}
+{%- set user = current_user.is_authenticated and current_user %}
+<div id="contact-page" class="container" >
+  <div class="row">
+    <div class="col-md-10">
+      <div class="panel-body">
+        <h2 class="header-form">Contact us</h2>
+        <p>Before making a request, you can have a look at our <a href="http://help.zenodo.org">FAQ</a> and <a href="http://about.zenodo.org">other resources</a> for more detailed information about the operation, features and goals of Zenodo.</p>
+        {%- if not user %}
+        <p>It is recommended to <a href="{{url_for_security('login')}}">login</a> before sending a request, so we can automatically fill-in your contact information. It is especially important for quicker resolution of all technical issues and requests concerning your Zenodo account.</p>
+        {%- endif %}
+        <form method="POST" enctype="multipart/form-data" role="form">
+          {{ form.csrf_token }}
+          <div class="contact">
+            <div class="row">
+              {{ render_form_field(form.name, input_extras={'disabled': True} if form.name.data else {}) }}
+            </div>
+            <div class="row">
+              {{ render_form_field(form.email, input_extras={'disabled': True} if form.email.data else {}) }}
+            </div>
+            <div class="row">
+              {{ render_form_field(form.issue_category) }}
+            </div>
+            <div class="row">
+              <div class="col-md-2"></div>
+              <div class="col-md-10">
+                <ul id="categories-tab" class="nav nav-tabs">
+                  {%- for category in categories.values() %}
+                    <li class="{%- if loop.index == 1 %} active in{%- endif %}">
+                      <a name="{{ category.key }}" href="#{{ category.key }}"></a>
+                    </li>
+                  {%- endfor %}
+                </ul>
+                <div class="tab-content content-tab">
+                  {%- for category in categories.values() %}
+                  <div id="{{ category.key }}" class="tab-pane fade {%- if loop.index == 1 %} active in {%- endif %}">
+                    {{ category.description|safe }}
+                  </div>
+                  {%- endfor %}
+                </div>
+              </div>
+            </div>
+
+            <div class="row">
+              {{ render_form_field(form.subject, input_size=10) }}
+            </div>
+            <div class="row">
+              {{ render_form_field(form.description, input_size=10) }}
+            </div>
+            <div class="row">
+              <div class="col-md-2"></div>
+              <div class="col-md-10">
+                <div class="panel panel-default upload-panel" align="center">
+                  <h3 class="upload-header">Drag files anywhere or click <a class="upload-button">here</a> to upload</h3>
+                  <p class="upload-info"></p>
+                </div>
+                {{ render_form_input(form.attachments, size=None, extras={'style': 'display:none'}) }}
+              </div>
+            </div>
+            <div class="row">
+              {{ render_form_label(form.include_os_browser) }}
+              <div class="col-md-10">
+                <p>{%- if uap.os %}<strong>Operating System:</strong> {{ uap.os }} - {% endif %}{%- if uap.browser %}<strong>Browser:</strong> {{ uap.browser }} {% endif %}{%- if uap.device and uap.device != 'Other' %}- <strong>Device:</strong> {{ uap.device }} {%- endif %}</p>
+                <label class="checkbox-inline" for="{{form.include_os_browser.label.field_id}}">
+                  {{ render_form_input(form.include_os_browser, size=None, extras={'class_':''}) }}
+                  <p>Include this information to assist us with narrowing down the cause of your problem.</p>
+                </label>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4"></div>
+              <div class="col-md-4">
+                {% if not user %}{{ render_form_input(form.recaptcha, size=None) }}{% endif %}
+                <br>
+                <button class="btn btn-block btn-success" type="submit">Send request</button>
+              </div>
+              <div class="col-md-4"></div>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{%- endblock page_body %}
+
+{%- block javascript %}
+{{super()}}
+
+<script type="text/javascript">
+
+var MAX_FILE_SIZE = {{ max_file_size|tojson }};
+
+$(function () {
+  $('#categories-tab').hide();
+  $('#issue_category').on('change', function(e){
+    $('#categories-tab li a[name="'+ $(this).val() + '"]').tab('show');
+  });
+
+  function format_size(bytes) {
+    if (bytes == 0) {return '0.00 B';}
+    var e = Math.floor(Math.log(bytes) / Math.log(1000));
+    return (bytes / Math.pow(1000, e)).toFixed(2) + ' ' + ' KMGTP'.charAt(e) + 'B';
+  };
+
+  // Throws error if size is greater than max attachment size.
+  function triggerCallback(e, callback) {
+    var files;
+    if(e.dataTransfer) {
+      files = e.dataTransfer.files;
+    } else if(e.target) {
+      files = e.target.files;
+    }
+    callback.call(null, files);
+  }
+
+  // Setup file upload droparea
+  function initFileDroparea(droparea, button, callback) {
+    var attachments = document.getElementById('attachments');
+    attachments.style.display = 'none';
+
+    attachments.addEventListener('change', function(e) {
+      triggerCallback(e, callback);
+    });
+
+    droparea.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    droparea.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    droparea.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      triggerCallback(e, callback);
+    });
+
+    button.addEventListener('click', function() {
+      attachments.value = null;
+      attachments.click();
+    });
+  }
+
+  function checkFilesSize(files) {
+    if(files.length == 0) return;
+    var filesInfo = '<strong>' + files.length + ' file(s) selected.</strong>';
+    var totalSize = 0;
+    for(var i = 0; i < files.length; i++){
+      totalSize += files[i].size;
+      filesInfo += '<br/><small>' + files[i].name + ' &nbsp&nbsp ' +
+      format_size(files[i].size) + '</small>';
+    }
+
+    $('.upload-info').get(0).innerHTML = filesInfo;
+
+    if(totalSize > MAX_FILE_SIZE) {
+      $('.field-attachments').addClass('has-error');
+      $('#error-attachments').get(0).innerHTML =
+        'File size exceeded. Please add URLs to the files or make a smaller selection.';
+      $('button#form_button').prop('disabled', true);
+    } else {
+      $('.field-attachments').removeClass('has-error');
+      $('#error-attachments').get(0).innerHTML = '';
+      $('button#form_button').prop('disabled', false);
+    }
+  }
+
+  initFileDroparea(window.document.querySelector('html'),
+                   window.document.querySelector('a.upload-button'), checkFilesSize);
+});
+</script>
+{% endblock javascript %}

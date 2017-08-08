@@ -1,0 +1,57 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+
+{%- macro render_form_label(field, size=2, show=True) %}
+{%- if size %}<div class="col-md-{{ size }}">{%- endif %}
+{% if show %}
+  <label class="control-label" for="{{field.label.field_id}}">{{ field.label.text }}</label>
+{% endif %}
+{%- if size %}</div>{%- endif %}
+{%- endmacro %}
+
+{%- macro render_form_input(field, size=4, extras={}) %}
+{%- if size %}<div class="col-md-{{ size }}">{%- endif %}
+{% set _extras = {'class_': 'form-control'} %}
+{% set _ = _extras.update(extras) %}
+{{field(**_extras)}}
+{%- if field.description %}
+  <p class="text-muted field-desc"><small>{{field.description|safe}}</small></p>
+{%- endif %}
+<span id="error-{{ field.name }}" class="text-danger help-inline">
+{%- for error in field.errors %}
+  {{ error }}
+  {%- if not loop.last %}<br/>{%- endif %}
+{%- endfor %}
+</span>
+{%- if size %}</div>{%- endif %}
+
+{%- endmacro %}
+
+{%- macro render_form_field(field, label_size=2, input_size=4, input_extras={}, label=True) %}
+<div class="form-group field-{{ field.name }}{% if field.errors %} has-error {% endif %}">
+  {{ render_form_label(field, label_size, label) }}
+  {{ render_form_input(field, input_size, input_extras) }}
+</div>
+{%- endmacro %}

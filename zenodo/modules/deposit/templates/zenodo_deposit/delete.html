@@ -51,6 +51,27 @@
       <div class="panel panel-default">
         <div class="panel-heading">Record and associated objects</div>
         <ul class="list-group">
+          {% if owners %}
+            <li class="list-group-item">
+              <h5>Owners</h5>
+              <table class="table table-bordered">
+                <tr>
+                  <th>User ID</th>
+                  <th>Email</th>
+                  <th>Username</th>
+                  <th>Full Name</th>
+                </tr>
+                {%- for owner in owners %}
+                <tr>
+                  <td>{{owner.id}}</td>
+                  <td>{{owner.email}}</td>
+                  <td>{{owner.profile and owner.profile.username}}</td>
+                  <td>{{owner.profile and owner.profile.full_name}}</td>
+                </tr>
+                {%- endfor %}
+              </table>
+            </li>
+          {% endif %}
           <li class="list-group-item">
             <h5>UUID</h5>
             {{record.id}}, revision {{record.revision_id}} (created: {{record.created}}, updated: {{record.updated}})

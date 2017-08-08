@@ -188,3 +188,12 @@ def test_sources_meetings(app, db, minimal_record_model, recid_pid):
     }
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert obj['sources'] == ['CAP, Communicating, Cape Town, March, 2010']
+
+
+def test_description(app, db, minimal_record_model, recid_pid):
+    """Test description."""
+    minimal_record_model['description'] = \
+        "<p><b>Foo&nbsp;Bar</b></p><em><p>&nbsp;Foo&amp;Bar</p></em> &apos;" \
+        "This&apos;&nbsp;is&nbsp;<i>&lt;it&gt;<i>"
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['descriptions'] == ["Foo Bar Foo&Bar 'This' is <it>"]

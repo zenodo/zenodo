@@ -139,9 +139,17 @@ class Bibtex(object):
     def _format_entry(self, name, req, opt, ign):
         out = "@" + name + "{"
         out += self._get_citation_key() + ",\n"
-        out += self._fetch_fields(req, opt, ign)
+        out += self._clean_input(self._fetch_fields(req, opt, ign))
         out += "}"
         return out
+
+    def _clean_input(self,input):
+        unsupported_char = ['&']
+        chars = list(input)
+        for index, char in enumerate(chars):
+            if char in unsupported_char:
+                chars[index] = "\\" + chars[index]
+        return ''.join(chars)
 
     def _format_article(self):
         """Format article entry type.

@@ -40,6 +40,7 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.models import RecordsBuckets
+from invenio_sipstore.api import RecordSIP
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
@@ -47,7 +48,6 @@ from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
     zenodo_concept_doi_minter, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed
-from zenodo.modules.sipstore.api import ZenodoSIP
 
 from .errors import MissingCommunityError, MissingFilesError, \
     OngoingMultipartUploadError, VersioningFilesError
@@ -231,6 +231,14 @@ class ZenodoDeposit(Deposit):
     def _process_files(self, record_id, data):
         """Snapshot bucket and add files in record during first publishing."""
         if self.files:
+            file_uuids = []
+            for f in self.files:
+                fs, path = f.file.storage()._get_fs()
+                if not fs.exists(path):
+                    file_uuids.append(str(f.file.id))
+            if file_uuids:
+                raise Exception('One of more files were not written to'
+                                ' the storage: {}.'.format(file_uuids))
             assert not self.files.bucket.locked
             self.files.bucket.locked = True
             snapshot = self.files.bucket.snapshot(lock=True)
@@ -390,8 +398,11 @@ class ZenodoDeposit(Deposit):
         is_first_publishing = not self.is_published()
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         recid, record = deposit.fetch_published()
-        ZenodoSIP.create(recid, record, create_sip_files=is_first_publishing,
-                         user_id=user_id, agent=sip_agent)
+        RecordSIP.create(
+            recid, record, archivable=True,
+            create_sip_files=is_first_publishing, user_id=user_id,
+            agent=sip_agent)
+        # FIXME: Launch archiving task here! (or whatever we come up with)
         return deposit
 
     @classmethod

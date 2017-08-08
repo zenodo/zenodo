@@ -1,0 +1,20 @@
+[
+  {
+    "title": "Zenodo Record JSON v1.0.0",
+    "name": "json",
+    "format": "json",
+    "schema": "https://zenodo.org/schemas/records/record-v1.0.0.json"
+  },
+  {
+    "title": "Zenodo Record MARC21 XML",
+    "name": "marcxml",
+    "format": "xml",
+    "schema": "https://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd"
+  },
+  {
+    "title": "BagIt Archiver metadata",
+    "name": "bagit",
+    "format": "json",
+    "schema": "https://zenodo.org/schemas/sipstore/bagit-v1.0.0.json"
+  }
+]
