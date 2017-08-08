@@ -65,13 +65,37 @@
         <span ng-show="f.completed" class="text-success"><i class="fa fa-check"></i></span>
       </td>
       <td class="text-center">
+        <div ng-controller="metadataCtl">
         <button
           ng-show="f.completed"
           class="btn btn-xs btn-default form-button {{ form.fieldHtmlClass }}"
           ng-click="extractMetadata(f)"
+          data-toggle="modal"
+          data-target="#metadataModel"
           extract-button
         >
+       <!--"-->
         <i ng-show="f.completed" class="fa fa-magic" aria-hidden="true"></a></td>
+        <div class="modal center" id="metadataModel" tabindex="-1" role="dialog" aria-hidden="true">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h1 class="modal-title">Metadata</h1>
+              </div>
+              <div class="modal-body">
+                <pre> {{ recordMetadata | json }} </pre>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close" data-dismiss="modal">Close</button>
+                <!--NOTES: I try to use ng-disabled="!recordMetada.ready" here. But it does work as what I expected. -->
+                <button type="button" class="btn btn-success" ng-model="recordMetadata" ng-click="applyMetadata();$hide()" data-dismiss="modal" aria-label="Apply" apply-button>Apply</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        </div>
+
       </td>
       <td ng-show="f" class="text-center"><a href="#" ng-click="filesVM.remove(f)"><i class="fa fa-trash-o"></a></td>
     </tr>
