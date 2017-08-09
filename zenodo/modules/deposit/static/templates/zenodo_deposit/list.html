@@ -80,15 +80,34 @@
           <div class="modal-dialog">
             <div class="modal-content">
               <div class="modal-header">
-                <h1 class="modal-title">Metadata</h1>
+                <h1 class="modal-title">Extracted metadata</h1>
+                <small class="text-muted">
+                Apply any of the extracted metadata by clicking the corresponding "Apply extracted" button. The value will overwrite the current value on the form.
+                </small>
               </div>
-              <div class="modal-body">
-                <pre> {{ recordMetadata | json }} </pre>
+              <div class="modal-body" style="overflow-y:auto; height:600px">
+                <div ng-hide="recordMetadata.ready">
+                  <center><strong>Extracting...</strong></center>
+                </div>
+                <div ng-show="recordMetadata.ready">
+                  <div ng-repeat="item in recordMetadata.metafields">
+                    <i class="fa {{item.fa_cls}}"></i> <strong>{{ item.title }}</strong>
+                    <button type="button" class="btn btn-xs btn-success" ng-model="recordMetadata" ng-click="applyMetadata(item)" aria-label="Apply extracted" ng-disabled="item.applied" apply-button>Apply extracted</button>
+                    <ul class="list-group">
+                      <li class="list-group-item list-group-item-warning">
+                        <strong>Current:</strong><br />
+                        {{ recordsVM.invenioRecordsModel[item.key]}}
+                      </li>
+                      <li class="list-group-item list-group-item-success">
+                        <strong>Extracted:</strong><br /> {{ item.data }}
+                      </li>
+                    </ul>
+                  </div>
+                </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close" data-dismiss="modal">Close</button>
                 <!--NOTES: I try to use ng-disabled="!recordMetada.ready" here. But it does work as what I expected. -->
-                <button type="button" class="btn btn-success" ng-model="recordMetadata" ng-click="applyMetadata();$hide()" data-dismiss="modal" aria-label="Apply" apply-button>Apply</button>
               </div>
             </div>
           </div>
