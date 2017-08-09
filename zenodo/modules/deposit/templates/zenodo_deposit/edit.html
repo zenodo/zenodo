@@ -154,6 +154,7 @@
               var url = `/filesprocessor/${ processor_name }/${ f.version_id }`
               $rootScope.$broadcast('invenio.records.loading.start');
 
+              $scope.recordMetadata.ready = false
               InvenioRecordsAPI.request({
                 method: 'POST',
                 url: url,
@@ -161,13 +162,37 @@
                 headers: {}
               }).then(function success(resp) {
                 console.log(resp.data)
-                $scope.recordMetadata.title = resp.data.title
-                $scope.recordMetadata.description= resp.data.description
-                $scope.recordMetadata.creators = resp.data.creators
-                $scope.recordMetadata.keywords = resp.data.keywords
                 $scope.recordMetadata.ready = true
-                $rootScope.$broadcast(
-                  'invenio.records.endpoints.updated', resp.data);
+                $scope.recordMetadata.metafields = [
+                  {
+                    "title": "Title",
+                    "fa_cls": "fa-book",
+                    "key": "title",
+                    "applied": false,
+                    "data": resp.data.title
+                  },
+                  {
+                    "title": "Description",
+                    "fa_cls": "fa-pencil",
+                    "key": "description",
+                    "applied": false,
+                    "data": resp.data.description
+                  },
+                  {
+                    "title": "Creators",
+                    "fa_cls": "fa-user",
+                    "key": "creators",
+                    "applied": false,
+                    "data": resp.data.creators
+                  },
+                  {
+                    "title": "Keywords",
+                    "fa_cls": "fa-tags",
+                    "key": "keywords",
+                    "applied": false,
+                    "data": resp.data.keywords
+                  }
+                ]
               }, function error(resp) {
                 $rootScope.$broadcast('invenio.records.alert', {
                   type: 'danger',
@@ -192,11 +217,9 @@
         .directive('applyButton',['$rootScope', 'InvenioRecordsAPI', function($rootScope, InvenioRecordsAPI) {
 
           function link($scope, elem, attrs, vm) {
-            $scope.applyMetadata = function(f) {
-              vm.invenioRecordsModel.title = $scope.recordMetadata.title
-              vm.invenioRecordsModel.description= $scope.recordMetadata.description
-              vm.invenioRecordsModel.creators = $scope.recordMetadata.creators
-              vm.invenioRecordsModel.keywords = $scope.recordMetadata.keywords
+            $scope.applyMetadata = function(item) {
+              vm.invenioRecordsModel[item.key] = item.data
+              item.applied=true
             };
           }
           return {
