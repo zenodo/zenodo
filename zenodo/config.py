@@ -137,6 +137,10 @@ BROKER_URL = "amqp://guest:guest@localhost:5672//"
 CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 #: Accepted content types for Celery.
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
+#: Custom task routing
+CELERY_ROUTES = {
+    'invenio_files_rest.tasks.verify_checksum': {'queue': 'low'},
+}
 #: Beat schedule
 CELERYBEAT_SCHEDULE = {
     'embargo-updater': {
@@ -154,8 +158,14 @@ CELERYBEAT_SCHEDULE = {
     'session-cleaner': {
         'task': 'invenio_accounts.tasks.clean_session_table',
         'schedule': timedelta(hours=24),
+    },
+    'file-checks': {
+        'task': 'invenio_files_rest.tasks.schedule_checksum_verification',
+        'schedule': timedelta(hours=1),
+        'kwargs': {'max_count': 0}
     }
 }
+
 
 # Cache
 # =========
@@ -611,6 +621,15 @@ FILES_REST_OBJECT_KEY_MAX_LEN = 1000
 
 #: Max URI length
 FILES_REST_FILE_URI_MAX_LEN = 1000
+
+#: Query for files to have their checksums verified
+FILES_REST_CHECKSUM_VERIFICATION_FILES_QUERY = \
+    'zenodo.modules.utils.files.checksum_verification_files_query'
+
+#: URI prefixes of files their checksums should be verified
+FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES = [
+    # 'root://eospublic'
+]
 
 #: Records REST API endpoints.
 RECORDS_API = '/api/records/{pid_value}'
