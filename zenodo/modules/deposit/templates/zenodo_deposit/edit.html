@@ -168,6 +168,7 @@
                     "title": "Title",
                     "fa_cls": "fa-book",
                     "key": "title",
+                    "sequence": false,
                     "applied": false,
                     "data": resp.data.title
                   },
@@ -176,12 +177,14 @@
                     "fa_cls": "fa-pencil",
                     "key": "description",
                     "applied": false,
+                    "sequence": false,
                     "data": resp.data.description
                   },
                   {
                     "title": "Creators",
                     "fa_cls": "fa-user",
                     "key": "creators",
+                    "sequence": true,
                     "applied": false,
                     "data": resp.data.creators
                   },
@@ -189,6 +192,7 @@
                     "title": "Keywords",
                     "fa_cls": "fa-tags",
                     "key": "keywords",
+                    "sequence": true,
                     "applied": false,
                     "data": resp.data.keywords
                   }
@@ -220,6 +224,15 @@
             $scope.applyMetadata = function(item) {
               vm.invenioRecordsModel[item.key] = item.data
               item.applied=true
+            };
+
+            $scope.appendMetadata = function(key, entry) {
+              if(vm.invenioRecordsModel[key][0] &&
+              Object.keys(vm.invenioRecordsModel[key][0]).length){
+                vm.invenioRecordsModel[key].push(entry)
+              }else{
+                vm.invenioRecordsModel[key]=[entry]
+              }
             };
           }
           return {
