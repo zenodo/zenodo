@@ -74,7 +74,6 @@
           data-target="#metadataModel"
           extract-button
         >
-       <!--"-->
         <i ng-show="f.completed" class="fa fa-magic" aria-hidden="true"></a></td>
         <div class="modal center" id="metadataModel" tabindex="-1" role="dialog" aria-hidden="true">
           <div class="modal-dialog">
@@ -90,24 +89,31 @@
                   <center><strong>Extracting...</strong></center>
                 </div>
                 <div ng-show="recordMetadata.ready">
-                  <div ng-repeat="item in recordMetadata.metafields">
+                  <div ng-repeat="item in recordMetadata.metafields" ng-show="item.data != null">
                     <i class="fa {{item.fa_cls}}"></i> <strong>{{ item.title }}</strong>
                     <button type="button" class="btn btn-xs btn-success" ng-model="recordMetadata" ng-click="applyMetadata(item)" aria-label="Apply extracted" ng-disabled="item.applied" apply-button>Apply extracted</button>
                     <ul class="list-group">
                       <li class="list-group-item list-group-item-warning">
                         <strong>Current:</strong><br />
-                        {{ recordsVM.invenioRecordsModel[item.key]}}
+                        {{ recordsVM.invenioRecordsModel[item.key] }}
                       </li>
                       <li class="list-group-item list-group-item-success">
-                        <strong>Extracted:</strong><br /> {{ item.data }}
-                      </li>
-                    </ul>
+                        <strong>Extracted:</strong><br/>
+                        <div ng-if="!item.sequence">
+                          {{ item.data }}
+                        </div>
+                        <div ng-if="item.sequence">
+                            <div ng-repeat="entry in item.data">
+                              {{ entry }}
+                              <button type="button" class="btn btn-xs btn-success"
+                              ng-model="recordMetadata" ng-click="appendMetadata(item.key, entry)" aria-label="Add" apply-button>Add</button>
+                            </div>
+                        </div>
                   </div>
                 </div>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-default" ng-click="$hide()" aria-label="Close" data-dismiss="modal">Close</button>
-                <!--NOTES: I try to use ng-disabled="!recordMetada.ready" here. But it does work as what I expected. -->
               </div>
             </div>
           </div>
