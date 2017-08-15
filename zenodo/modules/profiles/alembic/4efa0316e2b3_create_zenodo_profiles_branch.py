@@ -1,4 +1,5 @@
-{#-
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -20,28 +21,24 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
 
-{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
+"""Create Zenodo profiles branch."""
 
-{%- from "zenodo_profiles/macros.html" import owner_header %}
+import sqlalchemy as sa
+from alembic import op
 
-{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
+# revision identifiers, used by Alembic.
+revision = '4efa0316e2b3'
+down_revision = None
+branch_labels = (u'zenodo_profiles',)
+depends_on = 'c25ef2c50ffa'
 
-{%- block page_header %}
-{% set search_input_placeholder = "Search " + user.profile.username %}
-{% include "invenio_search_ui/header.html" %}
-{%- endblock page_header %}
 
-{% block page_body %}
-<div class="profile" id="invenio-search">
-  {{ owner_header(user) }}
-  <invenio-search
-   search-endpoint="/api/records"
-   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if orcid_id %} || creators.orcid:{{ orcid_id }}{% endif %}"}'
-   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
-  >
-  {{super()}}
-  </invenio-search>
-</div> <!-- .profile -->
-{% endblock page_body %}
+def upgrade():
+    """Upgrade database."""
+    pass
+
+
+def downgrade():
+    """Downgrade database."""
+    pass

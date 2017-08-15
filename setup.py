@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016, 2017, 2018 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -203,8 +203,9 @@ setup(
         ],
         'invenio_admin.views': [(
             'zenodo_update_datacite ='
-            'zenodo.modules.records.admin:updatedatacite_adminview'
-        )
+            'zenodo.modules.records.admin:updatedatacite_adminview'),
+            'zenodo_profiles_view = '
+            'zenodo.modules.profiles.admin:researcher_profile_adminview',
         ],
         'invenio_base.apps': [
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
@@ -214,6 +215,7 @@ setup(
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_sitemap = zenodo.modules.sitemap.ext:ZenodoSitemap',
             'zenodo_support = zenodo.modules.support.ext:ZenodoSupport',
+            'zenodo_profiles = zenodo.modules.profiles.ext:ZenodoProfiles',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_jsonschemas = '
@@ -237,7 +239,6 @@ setup(
             'zenodo_frontpage = zenodo.modules.frontpage.views:blueprint',
             'zenodo_openaire = zenodo.modules.openaire.views:blueprint',
             'zenodo_support = zenodo.modules.support.views:blueprint',
-            'zenodo_pages = zenodo.modules.pages.views:blueprint',
             'zenodo_profiles = zenodo.modules.profiles.views:blueprint',
             'zenodo_redirector = zenodo.modules.redirector.views:blueprint',
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
@@ -245,12 +246,18 @@ setup(
             'zenodo_spam = zenodo.modules.spam.views:blueprint',
             'zenodo_sitemap = zenodo.modules.sitemap.views:blueprint',
         ],
+        'invenio_base.converters': [
+            'orcid = zenodo.modules.profiles.utils:OrcidConverter',
+        ],
         'invenio_base.api_blueprints': [
             'zenodo_rest = zenodo.modules.rest.views:blueprint',
             'zenodo_deposit = zenodo.modules.deposit.views_rest:blueprint',
         ],
         'invenio_base.api_converters': [
             'file_key = zenodo.modules.deposit.utils:FileKeyConverter',
+        ],
+        'invenio_db.alembic': [
+            'zenodo_profiles = zenodo.modules.profiles:alembic',
         ],
         'invenio_i18n.translations': [
             'messages = zenodo',

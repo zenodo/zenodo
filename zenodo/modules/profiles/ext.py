@@ -1,4 +1,5 @@
-{#-
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -20,28 +21,28 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
 
-{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
+"""Profiles for Zenodo."""
 
-{%- from "zenodo_profiles/macros.html" import owner_header %}
+from __future__ import absolute_import, print_function
 
-{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
+from zenodo.modules.profiles import config
 
-{%- block page_header %}
-{% set search_input_placeholder = "Search " + user.profile.username %}
-{% include "invenio_search_ui/header.html" %}
-{%- endblock page_header %}
 
-{% block page_body %}
-<div class="profile" id="invenio-search">
-  {{ owner_header(user) }}
-  <invenio-search
-   search-endpoint="/api/records"
-   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if orcid_id %} || creators.orcid:{{ orcid_id }}{% endif %}"}'
-   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
-  >
-  {{super()}}
-  </invenio-search>
-</div> <!-- .profile -->
-{% endblock page_body %}
+class ZenodoProfiles(object):
+    """Zenodo Profile Page."""
+
+    def __init__(self, app=None):
+        """Extension initialization."""
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """Flask application initialization."""
+        self.init_config(app)
+
+    def init_config(self, app):
+        """Flask application initialization."""
+        for k in dir(config):
+            if k.startswith("ZENODO_PROFILES_"):
+                app.config.setdefault(k, getattr(config, k))

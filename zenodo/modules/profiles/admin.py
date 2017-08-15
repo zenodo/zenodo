@@ -1,4 +1,5 @@
-{#-
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -20,28 +21,45 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
 
-{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
+"""Admin views for Zenodo Profiles."""
 
-{%- from "zenodo_profiles/macros.html" import owner_header %}
+from flask_admin.contrib.sqla import ModelView
 
-{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
+from zenodo.modules.profiles.models import Profile
 
-{%- block page_header %}
-{% set search_input_placeholder = "Search " + user.profile.username %}
-{% include "invenio_search_ui/header.html" %}
-{%- endblock page_header %}
 
-{% block page_body %}
-<div class="profile" id="invenio-search">
-  {{ owner_header(user) }}
-  <invenio-search
-   search-endpoint="/api/records"
-   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if orcid_id %} || creators.orcid:{{ orcid_id }}{% endif %}"}'
-   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
-  >
-  {{super()}}
-  </invenio-search>
-</div> <!-- .profile -->
-{% endblock page_body %}
+def _(x):
+    """Identity."""
+    return x
+
+
+class ProfileView(ModelView):
+    """Profiles view."""
+
+    can_view_details = True
+    can_delete = False
+
+    column_list = (
+        'user_id',
+        'bio',
+        'affiliation',
+        'location',
+        'website',
+        'show_profile',
+        'allow_contact_owner'
+    )
+
+    form_columns = \
+        column_searchable_list = \
+        column_filters = \
+        column_details_list = \
+        columns_sortable_list = \
+        column_list
+
+
+researcher_profile_adminview = {
+    'model': Profile,
+    'modelview': ProfileView,
+    'category': _('User Management'),
+}

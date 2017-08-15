@@ -28,16 +28,18 @@
     <div class="row">
       <div class="col-md-12">
         <h1 style="line-height:0.8">
-          {%- if link %}
-          <a href="/profile/{{owner.id}}"><strong>{{ owner.name }}</strong></a>
+          {%- if link and owner.profile.full_name %}
+          <a href="/profile/{{owner.id}}"><strong>{{ owner.profile.full_name }}</strong></a>
           <br />
-          <small>{{ owner.affiliation }}</small>
+            {%- if owner.researcher_profile.affiliation %}
+            <small>{{ owner.researcher_profile.affiliation }}</small>
+            {%- endif %}
           {%- else %}
-          {{ owner.username }}
+          {{ owner.profile.username }}
           {%- endif %}
         </h1>
-      </div>
-    </div>
-  </div>
-</div>
+      </div> <!-- .col-md-12 -->
+    </div> <!-- .row -->
+  </div> <!-- .container -->
+</div> <!-- .header -->
 {% endmacro %}

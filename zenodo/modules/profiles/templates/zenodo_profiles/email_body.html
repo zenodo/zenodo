@@ -1,4 +1,4 @@
-{#-
+{#
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -22,26 +22,6 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
+from: {{ content.name }} <{{ current_user.email }}>
 
-{%- from "zenodo_profiles/macros.html" import owner_header %}
-
-{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
-
-{%- block page_header %}
-{% set search_input_placeholder = "Search " + user.profile.username %}
-{% include "invenio_search_ui/header.html" %}
-{%- endblock page_header %}
-
-{% block page_body %}
-<div class="profile" id="invenio-search">
-  {{ owner_header(user) }}
-  <invenio-search
-   search-endpoint="/api/records"
-   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if orcid_id %} || creators.orcid:{{ orcid_id }}{% endif %}"}'
-   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
-  >
-  {{super()}}
-  </invenio-search>
-</div> <!-- .profile -->
-{% endblock page_body %}
+{{ content.body }}

@@ -22,176 +22,99 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{% extends "zenodo_theme/page.html" %}
+{% extends "zenodo_profiles/base_profile.html" %}
 
-{%- block page_body %}
-<div class="container">
-  <div class="row">
-    <div class="col-sm-3 col-xs-12" id="profile" style="margin-bottom:20px">
-      {%- if user.image %}
-      <img alt="Profile Picture" class="img-responsive img-rounded center-block"
-        src="{{ user.image }}"
-        alt="Profile Picture" />
-      {%- endif %}
-
-      <div>
-        <h1 style="line-height:0.8"><strong>{{ user.name }}</strong><small><br />{{ user.affiliation }}</small></h1>
-      </div>
-
-      {%- if user.orcid_account or user.github_account %}
-      <div>
-          {%- if user.orcid_account %}
-          <div style="margin-bottom: 4px">
-            <img width="26px" style="vertical-align:middle; margin-left: 5px" src="{{ url_for('static', filename='img/orcid.png') }}" alt="Orcid" />
-            <a class="no_hover" href="{{ user.orcid_account }}">
-              <span style="margin-left: 3px;font-size: 16px">0000-0001-9619-2956</span>
-            </a>
-          </div>
-          {%- endif %}
-
-          {%- if user.github_account %}
-          <div>
-            <i style="vertical-align:middle" class="fa fa-github fa-2x fa-fw" aria-hidden="true"></i>
-            <a class="no_hover" href="{{ user.github_account }}">
-              <span style="font-size: 16px">jainaman224</span>
-            </a>
-          </div>
-          {%- endif %}
-      </div>
-      {%- endif %}
-
-      {%- if not current_user.is_authenticated %}
-      <div style="margin-top:18px">
-        <a class="no_hover" href="/profile/1161/contact">
-          <button type="button" class="btn btn-default btn-lg btn-block">Contact</button>
-        </a>
-      </div>
+{%- block researcher_profile %}
+<div>
+  <h1 style="line-height:0.8">
+    <strong>
+      {%- if user.profile.full_name %}
+      {{ user.profile.full_name }}
       {%- else %}
-      <div style="margin-top:18px">
-        <a class="no_hover" href="/account/settings/profile">
-          <button type="button" class="btn btn-default">Edit Profile</button>
-        </a>
-      </div>
+      {{ user.profile.username }}
       {%- endif %}
-
-      {%- if user.description %}
-      <div>
-        <h3><small>{{ user.description }}</small></h3>
-      </div>
-      {%- endif %}
-
-      {%- if user.location or user.website %}
-      <hr />
-      <div style="font-size:17px">
-        {%- if user.location %}
-        <div>
-          <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
-          <span>{{ user.location }}</span>
-        </div>
-        {%- endif %}
-
-        {%- if user.website %}
-        <div>
-          <span class="fa fa-link fa-fw" aria-hidden="true"></span>
-          <span><a href="{{ user.website }}">{{ user.website }}</a></span>
-        </div>
-        {%- endif %}
-      </div>
-      {%- endif %}
-
-      {%- if user.organization %}
-      <hr />
-      <div>
-        <h4 style="font-size:22px; margin-bottom:0"><strong>Communities</strong></h4>
-        <ul style="padding: 18px">
-          {%- for org in user.organization %}
-          <li><h3 style="margin:0">
-            <small><a href="{{ org.link }}">{{ org.name }}</a></small>
-          </h3></li>
-          {%- endfor %}
-        </ul>
-      </div>
-      {%- endif %}
-    </div>
-
-    <div class="col-sm-9 col-xs-12" id="invenio-search">
-      <invenio-search
-       search-endpoint="https://zenodo.org/api/records"
-       search-hidden-params='{"page":1, "size": 10, "q": "owners:{{user.id}}", "sort": "mostrecent"}'
-       search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
-      >
-      {{super()}}
-      </invenio-search>
-
-      <ul class="nav nav-tabs nav-justified" id="myTabs" style="font-size:22px">
-        <li role="presentation" class="active"><a href="#overview">Overview</a></li>
-        <li role="presentation"><a href="#publications">Publications</a></li>
-      </ul>
-
-      <div class="tab-content">
-        <div class="tab-pane fade active in" role="tabpanel" id="overview">
-          <h2>Popular Uploads</h2>
-          <br />
-          <invenio-search-results
-            class="list-group"
-            template="{{ url_for('static', filename='templates/zenodo_profiles/results.html') }}">
-          </invenio-search-results>
-        </div>
-
-        <div class="tab-pane fade" role="tabpanel" id="publications">
-          <h2>Recent Uploads</h2>
-          <br />
-
-          <invenio-search-results
-            class="list-group"
-            template="{{ url_for('static', filename='templates/zenodo_search_ui/results.html') }}">
-          </invenio-search-results>
-
-          <p class="text-center"><a class="btn btn-default" href="/profile/1161/search">More</a></p>
-        </div>
-      </div>
-    </div>
-  </div>
+    </strong>
+    {%- if user.profile.full_name %}
+    <small><br />{{ user.profile.username }}</small>
+    {%- endif %}
+    {%- if user.researcher_profile.affiliation %}
+    <small><br />{{ user.researcher_profile.affiliation }}</small>
+    {%- endif %}
+  </h1>
 </div>
+{%- if user.remote_accounts %}
+{%- for account in user.remote_accounts %}
+<br />
+<div>
+    {%- if account.client_id == config.ORCID_APP_CREDENTIALS.consumer_key %}
+    <div style="margin-bottom: 4px">
+      <img width="26px" style="vertical-align:middle; margin-left: 5px" src="{{ url_for('static', filename='img/orcid.png') }}" alt="Orcid" />
+      <a class="no_hover" href="https://orcid.org/{{ account.extra_data.get('orcid') }}">
+        <span style="margin-left: 3px;font-size: 16px">{{ account.extra_data.get('orcid') }}</span>
+      </a>
+    </div>
+    {%- endif %}
 
-<style>
-@media screen and (max-width: 768px) {
-  #profile {
-    text-align: center;
-  }
-}
+    {%- if account.client_id == config.GITHUB_APP_CREDENTIALS.consumer_key %}
+    <div>
+      <i style="vertical-align:middle" class="fa fa-github fa-2x fa-fw" aria-hidden="true"></i>
+      <a class="no_hover" href="https://github.com/{{ account.extra_data.get('login') }}">
+        <span style="font-size: 16px">{{ account.extra_data.get('login') }}</span>
+      </a>
+    </div>
+    {%- endif %}
+</div>
+{%- endfor %}
+{%- endif %}
 
-.no_hover:hover {
-  text-decoration: none;
-}
-</style>
-{% endblock page_body %}
+{%- if current_user.id != user.id and user.researcher_profile.allow_contact_owner %}
+  <div style="margin-top:18px">
+    <a class="no_hover" href="/profile/{{ user.id }}/contact">
+      <button type="button" class="btn btn-default btn-lg btn-block">Contact</button>
+    </a>
+  </div>
+{%- endif %}
 
-{%- block javascript %}
-{% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-{% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
-<script type="text/javascript">
-  require([
-    "node_modules/angular/angular",
-    "node_modules/angular-loading-bar/build/loading-bar",
-    "node_modules/invenio-search-js/dist/invenio-search-js",
-    "js/zenodo/module"
-    ], function() {
-      angular.element(document).ready(function() {
-        angular.bootstrap(document.getElementById("invenio-search"), [
-            'invenioSearch',
-            'zenodo',
-            'angular-loading-bar',
-            'mgcrea.ngStrap.tooltip',
-          ]
-        );
-      });
-    }
-  );
+{%- if user.researcher_profile.bio %}
+<div>
+  <h3><small>{{ user.researcher_profile.bio }}</small></h3>
+</div>
+{%- endif %}
 
-  $('#myTabs a').click(function (e) {
-    e.preventDefault();
-    $(this).tab('show');
-  });
-</script>
-{% endblock javascript %}
+{%- if user.researcher_profile.location or user.researcher_profile.website %}
+<hr />
+<div style="font-size:17px">
+  {%- if user.researcher_profile.location %}
+  <div>
+    <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
+    <span>{{ user.researcher_profile.location }}</span>
+  </div>
+  {%- endif %}
+
+  {%- if user.researcher_profile.website %}
+  <div>
+    <span class="fa fa-link fa-fw" aria-hidden="true"></span>
+    <span>
+      <a href="{{ user.researcher_profile.website }}">
+        {{ user.researcher_profile.website }}
+      </a>
+    </span>
+  </div>
+  {%- endif %}
+</div>
+{%- endif %}
+
+{%- if user.communities %}
+<hr />
+<div>
+  <h4 style="font-size:22px; margin-bottom:0"><strong>Communities</strong></h4>
+  <ul style="padding: 18px">
+    {%- for org in user.communities %}
+    <li><h3 style="margin:0">
+      <small><a href="/communities/{{ org.id }}">{{ org.title }}</a></small>
+    </h3></li>
+    {%- endfor %}
+  </ul>
+</div>
+{%- endif %}
+{% endblock researcher_profile %}

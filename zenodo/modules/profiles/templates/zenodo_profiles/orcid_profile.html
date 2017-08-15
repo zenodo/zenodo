@@ -1,0 +1,169 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_profiles/base_profile.html" %}
+
+{%- block researcher_profile %}
+<div id="orcid_profile">
+  <div id="researcher_name">
+    <h1 style="line-height:0.8">
+      <strong></strong>
+      <br />
+      <small id="researcher_affiliation"></small>
+    </h1>
+  </div>
+  <div id="researcher_orcid" style="margin-bottom: 4px">
+    <img width="26px" style="vertical-align:middle; margin-left: 5px"
+      src="{{ url_for('static', filename='img/orcid.png') }}" alt="Orcid" />
+    <a class="no_hover" href="https://orcid.org/{{orcid_id}}">
+      <span style="margin-left: 3px;font-size: 16px">{{ orcid_id }}</span>
+    </a>
+  </div>
+  <div id="researcher_bio"><h3><small></small></h3></div>
+  <div id="researcher_address">
+    <hr />
+    <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
+    <span class="content"></span>
+  </div>
+</div>
+
+<div class="loader"></div>
+<div class="loader-text" style="text-align: center; font-size: 20px">Loading...</div>
+<br />
+{%- endblock researcher_profile %}
+
+{%- block javascript %}
+{% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+{% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.4/lodash.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/md5.js"></script>
+<script>
+$('#orcid_profile, #researcher_name, #researcher_orcid, #researcher_bio, #researcher_address, #researcher_affiliation').hide();
+
+$.ajax({
+  url: 'https://pub.orcid.org/v2.1/{{orcid_id}}/activities',
+  headers: {'Accept': 'application/json'},
+  contentType: 'application/json',
+  dataType: 'json',
+  success: function(result){
+    var year = 0;
+    var month = 0;
+    var day = 0;
+    var affiliation = '';
+    var city = '';
+
+    function check(organization){
+      if(parseInt(_.get(organization, 'start-date.year.value')) > year){
+        assign(organization);
+      }
+      else if(parseInt(_.get(organization, 'start-date.year.value'))==year){
+        if(parseInt(_.get(organization, 'start-date.month.value')) > month){
+          assign(organization);
+        }
+        else if((parseInt(_.get(organization, 'start-date.month.value')) == month)
+          && (parseInt(_.get(organization, 'start-date.day.value')) > day)){
+          assign(organization);
+        }
+      }
+    }
+
+    function assign(organization){
+      if(_.get(organization, 'organization.name')){
+          affiliation = _.get(organization, 'organization.name');
+      }
+      if(_.get(organization, 'organization.address.city')){
+            city = _.get(organization, 'organization.address.city');
+      }
+      if(_.get(organization, 'organization.address.region')){
+            city += ', ' + _.get(organization, 'organization.address.region');
+      }
+
+      if(_.get(organization, 'start-date.year.value')){
+          year = parseInt(_.get(organization, 'start-date.year.value'));
+      }
+      if(_.get(organization, 'start-date.month.value')){
+        month = parseInt(_.get(organization, 'start-date.month.value'));
+      }
+      if(_.get(organization, 'start-date.day.value')){
+          day = parseInt(_.get(organization, 'start-date.day.value'));
+      }
+    }
+
+    if(_.map(result, 'educations.education-summary').length){
+       for(university of result['educations']['education-summary']){
+         check(university);
+      }
+    }
+
+    if(_.map(result, 'employments.employment-summary').length){
+       for(organization of result['employments']['employment-summary']){
+         check(organization);
+       }
+    }
+
+    if(affiliation){
+      $('#researcher_affiliation').text(affiliation);
+      $('#researcher_affiliation').show();
+    }
+    if(city){
+      $('#researcher_address .content').text(city);
+      $('#researcher_address').show();
+    }
+  },
+  error: function(error){}
+});
+
+$.ajax({
+  url: 'https://pub.orcid.org/v2.1/{{orcid_id}}/person',
+  headers: {'Accept': 'application/json'},
+  contentType: 'application/json',
+  dataType: 'json',
+  success: function(result){
+    if(_.get(result, 'name.given-names.value') && _.get(result, 'name.family-name.value')){
+      $('#researcher_name h1 strong').text(
+        _.get(result, 'name.given-names.value') + ' ' + _.get(result, 'name.family-name.value'));
+      $('#researcher_name').show();
+    }
+    $('#researcher_orcid').show();
+    if(_.get(result, 'biography.content')){
+      $('#researcher_bio h3 small').text(
+        _.get(result, 'biography.content').substring(0, 130));
+      $('#researcher_bio').show();
+    }
+    $('#orcid_profile').show();
+    $('.loader, .loader-text').hide();
+    if(_.get(result, 'emails.email.0.email')){
+      $('#researcher_image').attr("src",
+        'http://www.gravatar.com/avatar/' + CryptoJS.MD5(_.get(result, 'emails.email.0.email').toLowerCase()) + '?size=220');
+    }
+  },
+  error: function(error){
+    $('.loader, .loader-text').hide();
+    $('#orcid_profile').html(
+      '<div style="text-align: center; font-size: 20px"><b>Error</b></div>');
+    $('#orcid_profile').show();
+  }
+});
+</script>
+{%- endblock javascript %}
