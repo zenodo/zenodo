@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -42,8 +42,9 @@ from flask.cli import ScriptInfo
 from flask_celeryext import create_celery_app
 from flask_security import login_user
 from fs.opener import opener
-from helpers import bearer_auth
+from helpers import bearer_auth, publish_and_expunge
 from invenio_access.models import ActionUsers
+from invenio_accounts.models import User
 from invenio_accounts.testutils import create_test_user
 from invenio_admin.permissions import action_admin_access
 from invenio_communities.models import Community
@@ -56,7 +57,7 @@ from invenio_github.models import Repository
 from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
-from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.models import RemoteAccount, UserIdentity
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
@@ -1001,3 +1002,50 @@ def g_tester_id(app, db):
     )
     db.session.commit()
     return tester.id
+
+
+@pytest.fixture
+def orcid_user(app, db, users):
+    """Fixture that add orcid to user."""
+    with db.session.begin_nested():
+        remote_account1 = RemoteAccount(
+            user_id=users[1]['id'],
+            client_id=app.config.get(
+                'ORCID_APP_CREDENTIALS').get('consumer_key'),
+            extra_data={"orcid": "X123-4567-890X-1234"})
+        db.session.add(remote_account1)
+        user_identity1 = UserIdentity(
+            id_user=users[1]['id'],
+            id='X123-4567-890X-1234',
+            method='orcid'
+        )
+        db.session.add(user_identity1)
+
+        remote_account2 = RemoteAccount(
+            user_id=users[2]['id'],
+            client_id=app.config.get(
+                'ORCID_APP_CREDENTIALS').get('consumer_key'),
+            extra_data={"orcid": "0000-0002-1694-233X"})
+        db.session.add(remote_account2)
+        user_identity2 = UserIdentity(
+            id_user=users[2]['id'],
+            id='0000-0002-1694-233X',
+            method='orcid'
+        )
+        db.session.add(user_identity2)
+    db.session.commit()
+
+
+@pytest.fixture
+def record_indexer(db, es, deposit, deposit_file):
+    """Fixture that add record for searching."""
+    deposit_index_name = 'deposits-records-record-v1.0.0'
+    records_index_name = 'records-record-v1.0.0'
+    deposit['creators'][0]['orcid'] = '0000-0002-1694-233X'
+    deposit_v1 = publish_and_expunge(db, deposit)
+    recid_v1, record_v1 = deposit_v1.fetch_published()
+
+    RecordIndexer().index_by_id(str(record_v1.id))
+    RecordIndexer().process_bulk_queue()
+    current_search.flush_and_refresh(index=deposit_index_name)
+    current_search.flush_and_refresh(index=records_index_name)

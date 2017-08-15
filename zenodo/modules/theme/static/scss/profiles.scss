@@ -1,0 +1,51 @@
+#researcher-contact {
+  .g-recaptcha div {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  textarea#body {
+    height: 100px !important;
+  }
+
+  #error-recaptcha {
+    display: table;
+    margin: 0 auto;
+  }
+}
+
+#researcher-profile {
+  @media screen and (max-width: 768px) {
+    #profile {
+      text-align: center;
+    }
+  }
+
+  @media screen and (min-width: 768px) {
+    #profile {
+      position: sticky;
+      top: 30px;
+    }
+  }
+
+  .no_hover:hover {
+    text-decoration: none;
+  }
+
+  .loader {
+    margin: auto;
+    margin-top: 20px;
+    border: 8px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 8px solid #3498db;
+    width: 80px;
+    height: 80px;
+    -webkit-animation: spin 2s linear infinite;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+}

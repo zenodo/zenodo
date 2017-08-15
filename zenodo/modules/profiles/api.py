@@ -1,4 +1,5 @@
-{#-
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
 # Copyright (C) 2017 CERN.
 #
@@ -20,28 +21,32 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
 
-{% extends config.SEARCH_UI_SEARCH_TEMPLATE %}
+"""Profile records."""
 
-{%- from "zenodo_profiles/macros.html" import owner_header %}
+from __future__ import absolute_import, print_function
 
-{% set search_hidden_params = {"q": "owners:" + user.id|string } %}
+from elasticsearch_dsl.query import Q
+from invenio_search.api import RecordsSearch
 
-{%- block page_header %}
-{% set search_input_placeholder = "Search " + user.profile.username %}
-{% include "invenio_search_ui/header.html" %}
-{%- endblock page_header %}
 
-{% block page_body %}
-<div class="profile" id="invenio-search">
-  {{ owner_header(user) }}
-  <invenio-search
-   search-endpoint="/api/records"
-   search-hidden-params='{"page":1, "size": 10, "q": "owners:{{ user.id }}{%- if orcid_id %} || creators.orcid:{{ orcid_id }}{% endif %}"}'
-   search-headers='{"Accept": "{{ config.SEARCH_UI_SEARCH_MIMETYPE|default('application/json')}}"}'
-  >
-  {{super()}}
-  </invenio-search>
-</div> <!-- .profile -->
-{% endblock page_body %}
+class ResearcherRecordsSearch(RecordsSearch):
+    """Search class for records that goes on the profile page."""
+
+    class Meta(object):
+        """Default index and filter for profile page search."""
+
+        index = 'records'
+
+    def __init__(self, user_id=None, orcid_id=None, **kwargs):
+        """Constructor function."""
+        args = []
+        if user_id:
+            args.append(Q('term', **{'owners': user_id}))
+        if orcid_id:
+            args.append(Q('term', **{'creators.orcid': orcid_id}))
+
+        self.Meta.default_filter = Q('bool', must=[
+            Q('bool', should=args),
+            Q('term', **{'relations.version.is_last': True})])
+        super(ResearcherRecordsSearch, self).__init__(**kwargs)
