@@ -26,7 +26,6 @@
 
 from __future__ import absolute_import, print_function
 
-from .factory import create_app
+from invenio_app.wsgi import application
 
-application = create_app()
-"""Default WSGI application."""
+__all__ = ('application', )

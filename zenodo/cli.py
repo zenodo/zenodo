@@ -26,15 +26,6 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_base.app import create_cli
+from invenio_app.cli import cli
 
-from .factory import create_app
-from .modules.auditor.cli import audit
-from .modules.github.cli import github
-from .modules.utils.cli import utils
-
-cli = create_cli(create_app=create_app)
-cli.add_command(audit)
-cli.add_command(github)
-cli.add_command(utils)
-"""Zenodo Click CLI."""
+__all__ = ('cli', )

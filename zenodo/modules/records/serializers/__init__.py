@@ -76,7 +76,7 @@ bibtex_v1 = BibTeXSerializer()
 datacite_v31 = ZenodoDataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
-    v31=datacite_v31,
+    serializer=datacite_v31,
     datacentre='CERN.ZENODO',
 )
 #: Dublin Core serializer

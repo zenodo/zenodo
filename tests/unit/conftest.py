@@ -90,7 +90,7 @@ def instance_path():
 def env_config(instance_path):
     """Default instance path."""
     os.environ.update(
-        APP_INSTANCE_PATH=os.environ.get(
+        INVENIO_INSTANCE_PATH=os.environ.get(
             'INSTANCE_PATH', instance_path),
     )
 

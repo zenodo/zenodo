@@ -125,7 +125,7 @@ def loaddemorecords_cli():
     click.echo("     celery worker -A zenodo.celery -l INFO")
     click.echo("2. After tasks have been processed start reindexing:")
     click.echo("     zenodo migration recordsrun")
-    click.echo("     zenodo migration reindex recid")
+    click.echo("     zenodo index reindex -t recid")
     click.echo("     zenodo index run -d -c 4")
 
 

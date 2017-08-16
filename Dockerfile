@@ -38,8 +38,8 @@ RUN /tmp/setup-npm.sh
 #
 
 # Create instance/static folder
-ENV APP_INSTANCE_PATH /usr/local/var/instance
-RUN mkdir -p ${APP_INSTANCE_PATH}
+ENV INVENIO_INSTANCE_PATH /usr/local/var/instance
+RUN mkdir -p ${INVENIO_INSTANCE_PATH}
 WORKDIR /tmp
 
 # Copy and install requirements. Faster build utilizing the Docker cache.
@@ -58,14 +58,14 @@ RUN pip install -e .[postgresql,elasticsearch2,all] \
 
 # Install npm dependencies and build assets.
 RUN zenodo npm --pinned-file /code/zenodo/package.pinned.json \
-    && cd ${APP_INSTANCE_PATH}/static \
+    && cd ${INVENIO_INSTANCE_PATH}/static \
     && npm install \
     && cd /code/zenodo \
     && zenodo collect -v \
     && zenodo assets build
 
 RUN adduser --uid 1000 --disabled-password --gecos '' zenodo \
-    && chown -R zenodo:zenodo /code ${APP_INSTANCE_PATH}
+    && chown -R zenodo:zenodo /code ${INVENIO_INSTANCE_PATH}
 
 RUN mkdir -p /usr/local/var/data && \
     chown zenodo:zenodo /usr/local/var/data -R && \

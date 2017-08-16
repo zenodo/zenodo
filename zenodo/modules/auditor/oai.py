@@ -31,6 +31,7 @@ from itertools import chain
 import sqlalchemy as sa
 from elasticsearch_dsl import Q
 from flask import current_app
+from invenio_cache import current_cache
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_oaiserver.models import OAISet
@@ -40,8 +41,6 @@ from invenio_search import RecordsSearch
 from mock import patch
 from sickle import Sickle
 from sqlalchemy import cast
-
-from zenodo.modules.cache.proxies import current_cache
 
 from .api import Audit, Check
 from .utils import sickle_requests_get_mock

@@ -185,29 +185,30 @@ setup(
     platforms='any',
     entry_points={
         'console_scripts': [
-            'zenodo = zenodo.cli:cli',
+            'zenodo = invenio_app.cli:cli',
+        ],
+        'flask.commands': [
+            'audit = zenodo.modules.auditor.cli:audit',
+            'github = zenodo.modules.github.cli:github',
+            'utils = zenodo.modules.utils.cli:utils',
         ],
         'invenio_base.apps': [
             'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
-            'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
             'zenodo_communities = '
             'zenodo.modules.communities.ext:ZenodoCommunities',
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_support = zenodo.modules.support.ext:ZenodoSupport',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
-            'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
             'zenodo_jsonschemas = '
             'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
         ],
         'invenio_base.api_apps': [
-            'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
             'zenodo_communities = '
             'zenodo.modules.communities.ext:ZenodoCommunities',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
-            'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
         ],
         'invenio_base.blueprints': [
             'zenodo_communities = zenodo.modules.communities.views:blueprint',
@@ -235,6 +236,9 @@ setup(
             'zenodo_records = zenodo.modules.records.tasks',
             'zenodo_utils = zenodo.modules.utils.tasks',
             'zenodo_sipstore = zenodo.modules.sipstore.tasks',
+        ],
+        'invenio_config.module': [
+            'zenodo = zenodo.config',
         ],
         'invenio_pidstore.minters': [
             'zenodo_record_minter '

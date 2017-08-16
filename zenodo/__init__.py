@@ -373,6 +373,17 @@ The ``--setspec`` option should be one of the following:
 
 from __future__ import absolute_import, print_function
 
+from invenio_app.factory import create_app, create_ui
+from invenio_base.signals import app_created
+
 from .version import __version__
+
+
+def disable_strict_slashes(sender, app=None, **kwargs):
+    """Disable strict slashes on URL map."""
+    app.url_map.strict_slashes = False  # Legacy support
+
+app_created.connect(disable_strict_slashes, sender=create_app)
+app_created.connect(disable_strict_slashes, sender=create_ui)
 
 __all__ = ('__version__', )

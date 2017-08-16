@@ -48,6 +48,7 @@ import os
 from datetime import timedelta
 
 from celery.schedules import crontab
+from invenio_app.config import APP_DEFAULT_SECURE_HEADERS
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
 from invenio_deposit.scopes import write_scope
@@ -75,6 +76,14 @@ def _(x):
 #: Email address for support.
 SUPPORT_EMAIL = "info@zenodo.org"
 MAIL_SUPPRESS_SEND = True
+
+# Application
+# ===========
+#: Disable Content Security Policy headers.
+APP_DEFAULT_SECURE_HEADERS['content_security_policy'] = {}
+# Allow us to run the development server without enabling debug.
+APP_DEFAULT_SECURE_HEADERS['force_https'] = False
+APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
 # DataCite
 # ========
@@ -138,14 +147,14 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 #: Accepted content types for Celery.
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 #: Custom task routing
-CELERY_ROUTES = {
+CELERY_TASK_ROUTES = {
     'invenio_files_rest.tasks.verify_checksum': {'queue': 'low'},
     'zenodo.modules.sipstore.tasks.archive_sip': {'queue': 'low'},
     'zenodo_migrator.tasks.migrate_concept_recid_sips': {'queue': 'low'},
     'invenio_openaire.tasks.register_grant': {'queue': 'low'},
 }
 #: Beat schedule
-CELERYBEAT_SCHEDULE = {
+CELERY_BEAT_SCHEDULE = {
     'embargo-updater': {
         'task': 'zenodo.modules.records.tasks.update_expired_embargos',
         'schedule': crontab(minute=2, hour=0),
@@ -193,7 +202,6 @@ CELERYBEAT_SCHEDULE = {
     },
 }
 
-
 # Cache
 # =========
 #: Cache key prefix
@@ -212,9 +220,9 @@ CACHE_TYPE = "redis"
 #: Default cache URL for sessions.
 ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 #: Cache for storing access restrictions
-ACCESS_CACHE = 'zenodo.modules.cache:current_cache'
+ACCESS_CACHE = 'invenio_cache:current_cache'
 #: Disable JSON Web Tokens
-ACCOUNTS_JWT_ENABLE=False
+ACCOUNTS_JWT_ENABLE = False
 
 # CSL Citation Formatter
 # ======================

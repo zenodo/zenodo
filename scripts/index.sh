@@ -24,9 +24,9 @@
 
 zenodo index destroy --force --yes-i-know
 zenodo index init --force
-zenodo migration reindex -t od_lic
-zenodo migration reindex -t frdoi
-zenodo migration reindex -t grant
-zenodo migration reindex -t recid
-zenodo migration reindex -t depid
+zenodo index reindex -t od_lic
+zenodo index reindex -t frdoi
+zenodo index reindex -t grant
+zenodo index reindex -t recid
+zenodo index reindex -t depid
 zenodo index run -c 4 -d

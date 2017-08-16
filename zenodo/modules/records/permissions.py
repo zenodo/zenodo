@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 from flask import current_app, request, session
 from flask_principal import ActionNeed
 from flask_security import current_user
-from invenio_access import DynamicPermission
+from invenio_access import Permission
 from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
@@ -77,7 +77,7 @@ def files_permission_factory(obj, action=None):
             elif is_deposit(record):
                 return DepositFilesPermission.create(record, action)
 
-    return DynamicPermission(ActionNeed('admin-access'))
+    return Permission(ActionNeed('admin-access'))
 
 
 def record_permission_factory(record=None, action=None):
@@ -160,7 +160,7 @@ class CommunityBucketPermission(object):
         if self.action == 'object-read':
             return True
         else:
-            return DynamicPermission(ActionNeed('admin-access')).can()
+            return Permission(ActionNeed('admin-access')).can()
 
 
 class DepositFilesPermission(object):
@@ -359,5 +359,5 @@ def has_newversion_permission(user, record):
 def has_admin_permission(user, record):
     """Check if user has admin access to record."""
     # Allow administrators
-    if DynamicPermission(ActionNeed('admin-access')):
+    if Permission(ActionNeed('admin-access')):
         return True

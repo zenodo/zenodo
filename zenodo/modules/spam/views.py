@@ -34,7 +34,7 @@ from flask import Blueprint, abort, flash, redirect, render_template, \
 from flask_login import login_required
 from flask_principal import ActionNeed
 from flask_security import current_user
-from invenio_access.permissions import DynamicPermission
+from invenio_access.permissions import Permission
 from invenio_accounts.admin import _datastore
 from invenio_accounts.models import User
 from invenio_communities.models import Community
@@ -57,7 +57,7 @@ blueprint = Blueprint(
 def delete(user_id):
     """Delete spam."""
     # Only admin can access this view
-    if not DynamicPermission(ActionNeed('admin-access')).can():
+    if not Permission(ActionNeed('admin-access')).can():
         abort(403)
 
     user = User.query.get(user_id)

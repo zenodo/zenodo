@@ -33,7 +33,7 @@ import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
 from flask_principal import ActionNeed
-from invenio_access.permissions import DynamicPermission
+from invenio_access.permissions import Permission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
@@ -364,7 +364,7 @@ def community_curation(record, user):
     global_perm = None
     if user.is_anonymous:
         global_perm = False
-    elif DynamicPermission(ActionNeed('admin-access')).can():
+    elif Permission(ActionNeed('admin-access')).can():
         global_perm = True
 
     if global_perm:

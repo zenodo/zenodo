@@ -60,7 +60,7 @@ Next, load the demo records and index them:
 
     $ docker-compose run --rm web zenodo fixtures loaddemorecords
     $ docker-compose run --rm web zenodo migration recordsrun
-    $ docker-compose run --rm web zenodo migration reindex -t recid
+    $ docker-compose run --rm web zenodo index reindex -t recid
     $ docker-compose run --rm web zenodo index run -d
 
 Now visit the following URL in your browser:
@@ -305,7 +305,7 @@ Launch the data loading scripts in a separate shell:
    (zenodo)$ zenodo openaire loadgrants --setspec=H2020Projects
    (zenodo)$ zenodo fixtures loaddemorecords
    (zenodo)$ zenodo migration recordsrun
-   (zenodo)$ zenodo migration reindex -t recid
+   (zenodo)$ zenodo index reindex -t recid
    (zenodo)$ zenodo index run -d
 
 Finally, run the Zenodo application:

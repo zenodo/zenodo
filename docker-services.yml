@@ -4,16 +4,16 @@ services:
     build: .
     image: zenodo:latest
     environment:
-      - "APP_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
-      - "APP_BROKER_URL=amqp://guest:guest@mq:5672//"
-      - "APP_CACHE_REDIS_URL=redis://cache:6379/0"
-      - "APP_CACHE_TYPE=redis"
-      - "APP_CELERY_RESULT_BACKEND=redis://cache:6379/2"
-      - "APP_SEARCH_ELASTIC_HOSTS=['es:9200']"
-      - "APP_SECRET_KEY=CHANGE_ME"
-      - "APP_SESSION_COOKIE_SECURE=True"
-      - "APP_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
-      - "APP_WSGI_PROXIES=2"
+      - "INVENIO_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
+      - "INVENIO_BROKER_URL=amqp://guest:guest@mq:5672//"
+      - "INVENIO_CACHE_REDIS_URL=redis://cache:6379/0"
+      - "INVENIO_CACHE_TYPE=redis"
+      - "INVENIO_CELERY_RESULT_BACKEND=redis://cache:6379/2"
+      - "INVENIO_SEARCH_ELASTIC_HOSTS=['es:9200']"
+      - "INVENIO_SECRET_KEY=CHANGE_ME"
+      - "INVENIO_SESSION_COOKIE_SECURE=True"
+      - "INVENIO_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
+      - "INVENIO_WSGI_PROXIES=2"
       - "FLASK_DEBUG=${FLASK_DEBUG:-on}"
   lb:
     build: ./docker/haproxy/
