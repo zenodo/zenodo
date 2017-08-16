@@ -98,10 +98,11 @@
     }
 }
 
-#files span.filename {
-    width: 33em;
+#files a.filename {
+    word-break: break-all;
     word-wrap: break-word;
-    display: block
+    overflow-wrap: break-word;
+    display: block;
 }
 
 .record-elem {

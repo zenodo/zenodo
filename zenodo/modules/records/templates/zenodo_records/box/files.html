@@ -55,12 +55,10 @@
     <tbody>
     {%- for file in files|sort(attribute='key') -%}
     {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key) %}
-      <tr class="">
+      <tr>
         <td>
-          <span class="filename">
-            <a class="forcewrap" href="{{file_url}}">{{ file.key }}</a>
-          </span>
-          <small class="text-muted">{{file.checksum}} <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip data-placement="top" title="{{_('This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity.')}}"></i></small>
+          <a class="filename" href="{{file_url}}">{{ file.key }}</a>
+          <br/><small class="text-muted nowrap">{{file.checksum}} <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip data-placement="top" title="{{_('This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity.')}}"></i></small>
         </td>
         <td class="nowrap">{{ file.size|filesizeformat }}</td>
         <td class="nowrap"><span class="pull-right">{% if file.type is previewable %}<button class="btn preview-link btn-xs btn-default" data-filename="{{file.key}}"><i class="fa fa-eye"></i> {{_("Preview")}}</button> {% endif %}<a class="btn btn-xs btn-default" href="{{file_url}}"><i class="fa fa-download"></i> {{_("Download")}}</a></span></td>
