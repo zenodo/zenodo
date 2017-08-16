@@ -35,7 +35,7 @@ from invenio_communities.utils import initialize_communities_bucket
 from sqlalchemy.orm.exc import NoResultFound
 
 from .communities import loadcommunities
-from .files import loaddemofiles, loadlocation
+from .files import loaddemofiles, loadlocations
 from .grants import loadfp6funders, loadfp6grants
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
@@ -53,7 +53,7 @@ def fixtures():
 def init():
     """Load basic data."""
     loadpages()
-    loadlocation()
+    loadlocations()
     loadoaisets()
     initialize_communities_bucket()
 
@@ -67,12 +67,13 @@ def loadpages_cli(force):
     click.secho('Created pages', fg='green')
 
 
-@fixtures.command('loadlocation')
+@fixtures.command('loadlocations')
 @with_appcontext
-def loadlocation_cli():
+def loadlocations_cli():
     """Load data store location."""
-    loc = loadlocation()
-    click.secho('Created location {0}'.format(loc.uri), fg='green')
+    locs = loadlocations()
+    click.secho('Created location(s): {0}'.format(
+        [loc.uri for loc in locs]), fg='green')
 
 
 @fixtures.command('loadoaisets')

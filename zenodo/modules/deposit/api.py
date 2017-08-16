@@ -41,6 +41,9 @@ from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.models import RecordsBuckets
 from invenio_sipstore.api import RecordSIP
+from invenio_sipstore.archivers import BagItArchiver
+from invenio_sipstore.models import SIP as SIPModel
+from invenio_sipstore.models import RecordSIP as RecordSIPModel
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
@@ -396,13 +399,39 @@ class ZenodoDeposit(Deposit):
         self['owners'] = self['_deposit']['owners']
         self.validate_publish()
         is_first_publishing = not self.is_published()
+
         deposit = super(ZenodoDeposit, self).publish(pid, id_)
         recid, record = deposit.fetch_published()
-        RecordSIP.create(
+
+        pv = PIDVersioning(child=recid)
+        is_new_version = pv.children.count() > 1
+        # a) Fetch the last SIP from the previous version if it's a new version
+        # b) Fetch the previous SIP if publishing the metadata edit
+        if is_new_version or (not is_first_publishing):
+            if is_new_version:
+                sip_recid = pv.children.all()[-2]
+            else:  # (not is_first_publishing)
+                sip_recid = recid
+            # Get the last SIP of the relevant recid, i.e.: either last
+            # version or the current one
+            sip_patch_of = (
+                db.session.query(SIPModel)
+                .join(RecordSIPModel, RecordSIPModel.sip_id == SIPModel.id)
+                .filter(RecordSIPModel.pid_id == sip_recid.id)
+                .order_by(SIPModel.created.desc())
+                .first()
+            )
+        else:
+            sip_patch_of = None
+
+        recordsip = RecordSIP.create(
             recid, record, archivable=True,
             create_sip_files=is_first_publishing, user_id=user_id,
             agent=sip_agent)
-        # FIXME: Launch archiving task here! (or whatever we come up with)
+        archiver = BagItArchiver(
+            recordsip.sip, include_all_previous=(not is_first_publishing),
+            patch_of=sip_patch_of)
+        archiver.save_bagit_metadata()
         return deposit
 
     @classmethod

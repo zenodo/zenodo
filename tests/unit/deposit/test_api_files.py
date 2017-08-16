@@ -50,7 +50,7 @@ def get_data(**kwargs):
     return test_data
 
 
-def test_missing_files(api_client, json_auth_headers, deposit_url, location,
+def test_missing_files(api_client, json_auth_headers, deposit_url, locations,
                        es, get_json, license_record):
     """Test data validation - no files added."""
     client = api_client

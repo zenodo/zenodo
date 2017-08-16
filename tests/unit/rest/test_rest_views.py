@@ -30,11 +30,8 @@ import json
 from datetime import datetime, timedelta
 
 from flask import render_template_string, url_for
-from helpers import login_user_via_session
-from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
-from invenio_search import current_search
 
 from zenodo.modules.records.views import zenodo_related_links
 
@@ -92,6 +89,7 @@ def test_objecttype(app):
 
 def test_local_doi(app):
     """Test template test."""
+    orig = app.config['ZENODO_LOCAL_DOI_PREFIXES']
     app.config['ZENODO_LOCAL_DOI_PREFIXES'] = ['10.123', '10.5281']
     assert render_template_string(
         "{{ '10.123/foo' is local_doi }}") == "True"
@@ -99,6 +97,7 @@ def test_local_doi(app):
         "{{ '10.1234/foo' is local_doi }}") == "False"
     assert render_template_string(
         "{{ '10.5281/foo' is local_doi }}") == "True"
+    app.config['ZENODO_LOCAL_DOI_PREFIXES'] = orig
 
 
 def test_relation_title(app):

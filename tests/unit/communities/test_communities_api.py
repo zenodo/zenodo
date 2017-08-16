@@ -43,7 +43,7 @@ def test_basic_api(app, db, communities, deposit, deposit_file):
     deposit_v1.newversion()
     pv = PIDVersioning(child=recid_v1)
     depid_v2 = pv.draft_child_deposit
-    deposit_v2 = ZenodoDeposit.get_record(depid_v2.get_assigned_object())
+    deposit_v2 = ZenodoDeposit.get_record(depid_v2.object_uuid)
     deposit_v2.files['file.txt'] = BytesIO(b('file1'))
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     deposit_v2 = deposit_v2.edit()

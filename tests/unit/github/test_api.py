@@ -70,7 +70,7 @@ def test_github_creators_metadata(mocker, defaults, contribs, owner, output):
     m_ljv1t.assert_called_with({'metadata': {'creators': output}})
 
 
-def test_github_publish(mocker, db, users, location,
+def test_github_publish(mocker, db, users, locations,
                         deposit_metadata, sip_metadata_types):
     """Test basic GitHub payload."""
     datacite_mock = mocker.patch(

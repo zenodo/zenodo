@@ -51,3 +51,7 @@ class ZenodoFixtures(object):
             'FIXTURES_FILES_LOCATION',
             join(sys.prefix, 'var/instance/data')
         )
+        config.setdefault(
+            'FIXTURES_ARCHIVE_LOCATION',
+            join(sys.prefix, 'var/instance/archive')
+        )

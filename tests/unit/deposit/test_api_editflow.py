@@ -37,7 +37,7 @@ from six import BytesIO
 from zenodo.modules.deposit.tasks import datacite_register
 
 
-def test_edit_flow(mocker, api_client, db, es, location,
+def test_edit_flow(mocker, api_client, db, es, locations,
                    json_auth_headers, deposit_url, get_json, auth_headers,
                    json_headers, license_record, communities, resolver):
     """Test simple flow using REST API."""
@@ -267,7 +267,7 @@ def create_deposit(client, headers, auth_headers, deposit_url, get_json,
     return links, data
 
 
-def test_edit_doi(api_client, db, es, location, json_auth_headers,
+def test_edit_doi(api_client, db, es, locations, json_auth_headers,
                   deposit_url, get_json, auth_headers, json_headers,
                   license_record, communities, resolver):
     """Test editing of external DOI."""
@@ -358,7 +358,7 @@ def test_edit_doi(api_client, db, es, location, json_auth_headers,
     assert doi_external.status == PIDStatus.RESERVED
 
 
-def test_noedit_doi(api_client, db, es, location, json_auth_headers,
+def test_noedit_doi(api_client, db, es, locations, json_auth_headers,
                     deposit_url, get_json, auth_headers, json_headers,
                     license_record, communities, resolver):
     """Test editing of external DOI."""
@@ -416,7 +416,7 @@ def test_noedit_doi(api_client, db, es, location, json_auth_headers,
     assert doi_pid.status == PIDStatus.RESERVED
 
 
-def test_publish_empty(api_client, db, es, location, json_auth_headers,
+def test_publish_empty(api_client, db, es, locations, json_auth_headers,
                        deposit_url, get_json, auth_headers, json_headers,
                        license_record, communities, resolver):
     """Test if it is possible to circumvent metadata validation."""
@@ -444,7 +444,7 @@ def test_publish_empty(api_client, db, es, location, json_auth_headers,
     data = get_json(response, code=400)
 
 
-def test_delete_draft(api, api_client, db, es, location, json_auth_headers,
+def test_delete_draft(api, api_client, db, es, locations, json_auth_headers,
                       auth_headers, deposit_url, get_json, license_record):
     """Test deleting of Deposit draft using REST API."""
     # Setting var this way doesn't work

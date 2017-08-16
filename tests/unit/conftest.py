@@ -41,6 +41,7 @@ from flask import url_for
 from flask.cli import ScriptInfo
 from flask_celeryext import create_celery_app
 from flask_security import login_user
+from fs.opener import opener
 from helpers import bearer_auth
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
@@ -63,6 +64,7 @@ from invenio_records.models import RecordMetadata
 from invenio_records_files.api import Record as RecordFile
 from invenio_records_files.api import RecordsBuckets
 from invenio_search import current_search, current_search_client
+from invenio_sipstore import current_sipstore
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
 
@@ -193,21 +195,40 @@ def db(app):
 
 
 @pytest.yield_fixture
-def location(db):
-    """File system location."""
+def locations(db):
+    """File system locations."""
     tmppath = tempfile.mkdtemp()
+    arch_tmppath = tempfile.mkdtemp()
 
     loc = Location(
         name='testloc',
         uri=tmppath,
         default=True
     )
+
+    arch_loc = Location(
+        name='archive',
+        uri=arch_tmppath,
+        default=False
+    )
     db.session.add(loc)
+    db.session.add(arch_loc)
     db.session.commit()
 
-    yield loc
+    yield {'testloc': tmppath, 'archive': arch_tmppath}
 
     shutil.rmtree(tmppath)
+    shutil.rmtree(arch_tmppath)
+    # Delete the cached property value since the tmp archive changes
+    current_sipstore.__dict__.pop('archive_location', None)
+
+
+@pytest.fixture
+def archive_fs(locations):
+    """File system for the archive location."""
+    archive_path = locations['archive']
+    fs = opener.opendir(archive_path, writeable=False, create_dir=True)
+    return fs
 
 
 @pytest.yield_fixture
@@ -401,7 +422,7 @@ def oaiid_pid():
 
 
 @pytest.fixture
-def bucket(db, location):
+def bucket(db, locations):
     """File system location."""
     b1 = Bucket.create()
     db.session.commit()
@@ -719,7 +740,7 @@ def sip_metadata_types(db):
     loadsipmetadatatypes([
         {
             'title': 'Test Zenodo Record JSON v1.0.0',
-            'name': 'test-json',
+            'name': 'json',
             'format': 'json',
             'schema': 'https://zenodo.org/schemas/records/record-v1.0.0.json'
         },
@@ -733,7 +754,7 @@ def sip_metadata_types(db):
 
 
 @pytest.fixture
-def deposit(app, es, users, location, deposit_metadata, sip_metadata_types):
+def deposit(app, es, users, locations, deposit_metadata, sip_metadata_types):
     """New deposit with files."""
     with app.test_request_context():
         datastore = app.extensions['security'].datastore

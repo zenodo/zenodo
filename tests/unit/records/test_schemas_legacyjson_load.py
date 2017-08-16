@@ -715,7 +715,7 @@ def test_communities_invalid(comms):
 
 
 def test_legacyjson_to_record_translation(app, db, es, grant_record,
-                                          license_record, location):
+                                          license_record, locations):
     """Test the translator legacy_zenodo and zenodo_legacy."""
     test_data = dict(
         metadata=dict(
@@ -807,7 +807,7 @@ invalid_unicode_chars_params = (
 
 @pytest.mark.parametrize('unicode_char', invalid_unicode_chars_params)
 def test_invalid_unicode_characters(app, db, es, grant_record, license_record,
-                                    location, unicode_char):
+                                    locations, unicode_char):
     assert (legacyjson.LegacyMetadataSchemaV1(strict=True).load(
             d(description=u'Invalid character: [{}]'.format(unicode_char)))
             .data['description'] == u'Invalid character: []')

@@ -38,7 +38,7 @@ def test_basic_workflow(app, db, users, deposit):
         deposit = deposit.publish()
         # Should create one SIP, one RecordSIP and two SIPFiles
         assert SIP.query.count() == 1
-        assert SIPMetadata.query.count() == 1
+        assert SIPMetadata.query.count() == 2  # BagIt + JSON metadata
         assert RecordSIP.query.count() == 1
         assert SIPFile.query.count() == 2
         sip = SIP.query.one()
@@ -58,7 +58,7 @@ def test_basic_workflow(app, db, users, deposit):
 
         assert SIP.query.count() == 2
         assert RecordSIP.query.count() == 2
-        assert SIPMetadata.query.count() == 2
+        assert SIPMetadata.query.count() == 4  # BagIt + JSON per publishing
         assert SIPFile.query.count() == 2
 
         # Fetch the last RecordSIP and make sure, that
@@ -78,7 +78,7 @@ def test_programmatic_publish(app, db, deposit, deposit_file):
     assert not sip.user_id
     assert sip.sip_metadata[0].content == json.dumps(record.dumps())
     assert sip.sip_metadata[0].type.format == 'json'
-    assert sip.sip_metadata[0].type.name == 'test-json'
+    assert sip.sip_metadata[0].type.name == 'json'
     assert sip.sip_metadata[0].type.schema == \
         'https://zenodo.org/schemas/records/record-v1.0.0.json'
     assert len(sip.record_sips) == 1

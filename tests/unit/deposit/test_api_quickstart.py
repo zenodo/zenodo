@@ -33,7 +33,7 @@ from invenio_search import current_search
 from six import BytesIO
 
 
-def test_zenodo_quickstart_workflow(api, db, es, location, write_token,
+def test_zenodo_quickstart_workflow(api, db, es, locations, write_token,
                                     json_auth_headers, license_record):
     """Test zenodo quickstart workflow."""
     with api.test_request_context():

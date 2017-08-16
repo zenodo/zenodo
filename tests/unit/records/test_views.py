@@ -92,6 +92,7 @@ def test_objecttype(app):
 
 def test_local_doi(app):
     """Test template test."""
+    orig = app.config['ZENODO_LOCAL_DOI_PREFIXES']
     app.config['ZENODO_LOCAL_DOI_PREFIXES'] = ['10.123', '10.5281']
     assert render_template_string(
         "{{ '10.123/foo' is local_doi }}") == "True"
@@ -99,6 +100,8 @@ def test_local_doi(app):
         "{{ '10.1234/foo' is local_doi }}") == "False"
     assert render_template_string(
         "{{ '10.5281/foo' is local_doi }}") == "True"
+
+    app.config['ZENODO_LOCAL_DOI_PREFIXES'] = orig
 
 
 def test_relation_title(app):

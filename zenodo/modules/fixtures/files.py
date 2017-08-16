@@ -35,16 +35,25 @@ from invenio_db import db
 from invenio_files_rest.models import FileInstance, Location, ObjectVersion
 
 
-def loadlocation(force=False):
-    """Load default file store location."""
+def loadlocations(force=False):
+    """Load default file store and archive location."""
     try:
-        uri = current_app.config['FIXTURES_FILES_LOCATION']
-        if uri.startswith('/') and not exists(uri):
-            makedirs(uri)
-        loc = Location(name='default', uri=uri, default=True, )
-        db.session.add(loc)
+        locs = []
+        uris = [
+            ('default', True, current_app.config['FIXTURES_FILES_LOCATION'], ),
+            ('archive', False,
+             current_app.config['FIXTURES_ARCHIVE_LOCATION'], )
+        ]
+        for name, default, uri in uris:
+            if uri.startswith('/') and not exists(uri):
+                makedirs(uri)
+            if not Location.query.filter_by(name=name).count():
+                loc = Location(name=name, uri=uri, default=default)
+                db.session.add(loc)
+                locs.append(loc)
+
         db.session.commit()
-        return loc
+        return locs
     except Exception:
         db.session.rollback()
         raise

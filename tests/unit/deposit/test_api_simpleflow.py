@@ -49,7 +49,7 @@ def make_file_fixture(filename, text=None):
 
 
 def test_simple_rest_flow(mocker, api, api_client, db, es,
-                          location, users, write_token, license_record):
+                          locations, users, write_token, license_record):
     """Test simple flow using REST API."""
     mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
     # Setting var this way doesn't work
@@ -174,7 +174,7 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
     assert response.status_code == 403
 
 
-def test_simple_delete(api_client, db, es, location, json_auth_headers,
+def test_simple_delete(api_client, db, es, locations, json_auth_headers,
                        auth_headers, deposit_url):
     """Deletion."""
     client = api_client
@@ -313,7 +313,7 @@ def test_delete_deposits_users(api, api_client, db, users, deposit,
             assert res.status_code == status
 
 
-def test_versioning_rest_flow(mocker, api, api_client, db, es, location,
+def test_versioning_rest_flow(mocker, api, api_client, db, es, locations,
                               users, write_token, license_record):
     mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
     client = api_client
