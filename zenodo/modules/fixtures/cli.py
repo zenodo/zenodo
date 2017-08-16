@@ -39,7 +39,6 @@ from .files import loaddemofiles, loadlocation
 from .grants import loadfp6funders, loadfp6grants
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
-from .pages import loadpages
 from .records import loaddemorecords, loadsipmetadatatypes
 
 
@@ -52,19 +51,9 @@ def fixtures():
 @with_appcontext
 def init():
     """Load basic data."""
-    loadpages()
     loadlocation()
     loadoaisets()
     initialize_communities_bucket()
-
-
-@fixtures.command('loadpages')
-@click.option('--force', '-f', is_flag=True, default=False)
-@with_appcontext
-def loadpages_cli(force):
-    """Load pages."""
-    loadpages(force=force)
-    click.secho('Created pages', fg='green')
 
 
 @fixtures.command('loadlocation')
