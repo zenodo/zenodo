@@ -31,7 +31,9 @@ import json
 import pytest
 from flask import url_for
 from helpers import login_user_via_session
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_search import current_search
+from invenio_sipstore.models import RecordSIP
 from six import BytesIO
 
 
@@ -52,6 +54,13 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
                           locations, users, write_token, license_record):
     """Test simple flow using REST API."""
     mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
+
+    # Stash the configuration and enable writing
+    orig = api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED']
+    api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = True
+
+    archive_task_mock = mocker.patch(
+        'zenodo.modules.deposit.receivers.archive_sip')
     # Setting var this way doesn't work
     client = api_client
     test_data = dict(
@@ -110,10 +119,13 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
         )
         assert response.status_code == 201, i
 
+    assert not archive_task_mock.delay.called
+
     # Publish deposition
     # Enable datacite minting
     response = client.post(links['publish'], headers=auth_headers)
     record_id = get_json(response, code=202)['record_id']
+    recid_pid = PersistentIdentifier.get('recid', str(record_id))
 
     # Check that same id is being used for both deposit and record.
     assert deposit_id == record_id
@@ -122,6 +134,10 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
     current_search.flush_and_refresh(index='records')
     response = client.get(
         url_for('invenio_records_rest.recid_item', pid_value=record_id))
+
+    # Was SIP writing task executed?
+    sip = RecordSIP.query.filter_by(pid_id=recid_pid.id).one().sip
+    archive_task_mock.delay.assert_called_with(str(sip.id))
 
     # Second request will return forbidden since it's already published
     response = client.post(links['publish'], headers=auth_headers)
@@ -172,6 +188,9 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
         headers=auth_headers,
     )
     assert response.status_code == 403
+
+    # Change the config back
+    api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = orig
 
 
 def test_simple_delete(api_client, db, es, locations, json_auth_headers,
@@ -316,6 +335,12 @@ def test_delete_deposits_users(api, api_client, db, users, deposit,
 def test_versioning_rest_flow(mocker, api, api_client, db, es, locations,
                               users, write_token, license_record):
     mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
+
+    # Stash the configuration and enable SIP writing to disk
+    orig = api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED']
+    api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = True
+    archive_task_mock = mocker.patch(
+        'zenodo.modules.deposit.receivers.archive_sip')
     client = api_client
     test_data = dict(
         metadata=dict(
@@ -371,9 +396,19 @@ def test_versioning_rest_flow(mocker, api, api_client, db, es, locations,
     response = client.post(links['newversion'], headers=auth_headers)
     assert response.status_code == 403
 
+    assert not archive_task_mock.delay.called
+
     # Publish deposition
     response = client.post(links['publish'], headers=auth_headers)
     assert response.status_code == 202
+
+    data = get_json(response, code=202)
+    record_id = data['record_id']
+    recid_pid = PersistentIdentifier.get('recid', str(record_id))
+
+    # Was SIP writing task executed?
+    sip = RecordSIP.query.filter_by(pid_id=recid_pid.id).one().sip
+    archive_task_mock.delay.assert_called_with(str(sip.id))
 
     # New version possible for published deposit
     response = client.post(links['newversion'], headers=auth_headers)
@@ -412,3 +447,14 @@ def test_versioning_rest_flow(mocker, api, api_client, db, es, locations,
     # Publish new verision
     response = client.post(links['publish'], headers=auth_headers)
     assert response.status_code == 202
+
+    data = get_json(response, code=202)
+    record_id = data['record_id']
+    recid_pid = PersistentIdentifier.get('recid', str(record_id))
+
+    # Was SIP writing task executed?
+    sip = RecordSIP.query.filter_by(pid_id=recid_pid.id).one().sip
+    archive_task_mock.delay.assert_called_with(str(sip.id))
+
+    # Change the config back
+    api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = orig

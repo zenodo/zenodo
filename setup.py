@@ -227,6 +227,7 @@ setup(
             'zenodo_auditor = zenodo.modules.auditor.tasks',
             'zenodo_records = zenodo.modules.records.tasks',
             'zenodo_utils = zenodo.modules.utils.tasks',
+            'zenodo_sipstore = zenodo.modules.sipstore.tasks',
         ],
         'invenio_pidstore.minters': [
             'zenodo_record_minter '

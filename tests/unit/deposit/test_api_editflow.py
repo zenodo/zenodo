@@ -32,17 +32,25 @@ from flask import url_for
 from invenio_communities.models import Community
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_search import current_search
+from invenio_sipstore.models import RecordSIP
 from six import BytesIO
 
 from zenodo.modules.deposit.tasks import datacite_register
 
 
-def test_edit_flow(mocker, api_client, db, es, locations,
+def test_edit_flow(mocker, api, api_client, db, es, locations,
                    json_auth_headers, deposit_url, get_json, auth_headers,
-                   json_headers, license_record, communities, resolver):
+                   json_headers, license_record, communities, resolver,):
     """Test simple flow using REST API."""
+
+    # Stash the configuration and enable SIP writing to disk
+    orig = api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED']
+    api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = True
+
     datacite_mock = mocker.patch(
         'invenio_pidstore.providers.datacite.DataCiteMDSClient')
+    archive_task_mock = mocker.patch(
+        'zenodo.modules.deposit.receivers.archive_sip')
     headers = json_auth_headers
     client = api_client
 
@@ -88,6 +96,8 @@ def test_edit_flow(mocker, api_client, db, es, locations,
         links['self'], data=json.dumps(newdata), headers=headers
     ), code=200)
 
+    assert not archive_task_mock.delay.called
+
     # Publish deposition
     response = client.post(links['publish'], headers=auth_headers)
     data = get_json(response, code=202)
@@ -116,6 +126,10 @@ def test_edit_flow(mocker, api_client, db, es, locations,
 
     # Does record exists?
     current_search.flush_and_refresh(index='records')
+
+    # Was SIP writing task executed?
+    sip = RecordSIP.query.filter_by(pid_id=recid_pid.id).one().sip
+    archive_task_mock.delay.assert_called_with(str(sip.id))
 
     preedit_data = get_json(client.get(
         url_for('invenio_records_rest.recid_item', pid_value=record_id),
@@ -212,6 +226,11 @@ def test_edit_flow(mocker, api_client, db, es, locations,
         {'identifier': 'c1'},
     ]
 
+    # Was the second SIP sent for archiving?
+    sip2 = RecordSIP.query.filter_by(pid_id=recid_pid.id).order_by(
+        RecordSIP.created.desc()).first().sip
+    archive_task_mock.delay.assert_called_with(str(sip2.id))
+
     # Edit
     data = get_json(client.post(links['edit'], headers=auth_headers), code=201)
 
@@ -230,6 +249,9 @@ def test_edit_flow(mocker, api_client, db, es, locations,
     # Get and assert metadata
     data = get_json(client.get(links['self'], headers=auth_headers), code=200)
     assert data['title'] == postedit_data['title']
+
+    # Change the config back
+    api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = orig
 
 
 def create_deposit(client, headers, auth_headers, deposit_url, get_json,

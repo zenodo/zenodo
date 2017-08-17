@@ -123,6 +123,7 @@ def default_config(tmp_db_path):
         ZENODO_COMMUNITIES_AUTO_REQUEST=['zenodo', ],
         ZENODO_COMMUNITIES_ADD_IF_GRANTS=['grants_comm', ],
         ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],
+        SIPSTORE_ARCHIVER_WRITING_ENABLED=False,
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', tmp_db_path),

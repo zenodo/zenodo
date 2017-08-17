@@ -48,6 +48,9 @@ def get_m_item(meta, path):
 
 def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     """Test ZenodoSIP archiving."""
+    # Stash the configuration and enable writing
+    orig = app.config['SIPSTORE_ARCHIVER_WRITING_ENABLED']
+    app.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = True
     deposit.files['test2.txt'] = BytesIO(b'test-two')
     deposit_v1 = publish_and_expunge(db, deposit)
     recid_v1, record_v1 = deposit_v1.fetch_published()
