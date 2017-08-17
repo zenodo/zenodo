@@ -147,7 +147,7 @@
 
           function link($scope, elem, attrs, vm) {
             $scope.extractMetadata = function(f) {
-              var processor_name = 'pdf_grobid'
+              var processor_name = 'pdfmetadata'
               // TODO: we may need to avoid ES6 Template Literal in production to support
               // legacy browsers.
               // see https://caniuse.com/#feat=template-literals
@@ -158,7 +158,13 @@
               InvenioRecordsAPI.request({
                 method: 'POST',
                 url: url,
-                data: {},
+                data: {
+                  'grobid': true,
+                  'openaire': {
+                    'datacitations': true,
+                    'classification': true
+                  }
+                },
                 headers: {}
               }).then(function success(resp) {
                 console.log(resp.data)
@@ -195,6 +201,22 @@
                     "sequence": true,
                     "applied": false,
                     "data": resp.data.keywords
+                  },
+                  {
+                    "title": "Grants",
+                    "fa_cls": "fa-money",
+                    "key": "grants",
+                    "sequence": true,
+                    "applied": false,
+                    "data": resp.data.project_info.funding_info
+                  },
+                  {
+                    "title": "Additional notes",
+                    "fa_cls": "fa-pencil",
+                    "key": "notes",
+                    "sequence": false,
+                    "applied": false,
+                    "data": JSON.stringify(resp.data.project_info)
                   }
                 ]
               }, function error(resp) {
