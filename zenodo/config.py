@@ -141,6 +141,7 @@ CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 CELERY_ROUTES = {
     'invenio_files_rest.tasks.verify_checksum': {'queue': 'low'},
     'zenodo.modules.sipstore.tasks.archive_sip': {'queue': 'low'},
+    'zenodo_migrator.tasks.migrate_concept_recid_sips': {'queue': 'low'},
 }
 #: Beat schedule
 CELERYBEAT_SCHEDULE = {

@@ -147,9 +147,9 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     archiver3 = BagItArchiver(sip3)
 
     # Each archiver subpath follows: '<recid>/r/<revision_id>'
-    assert archiver1._get_archive_subpath() == '2/r/0'
-    assert archiver2._get_archive_subpath() == '2/r/1'
-    assert archiver3._get_archive_subpath() == '3/r/0'
+    assert archiver1.get_archive_subpath() == '2/r/0'
+    assert archiver2.get_archive_subpath() == '2/r/1'
+    assert archiver3.get_archive_subpath() == '3/r/0'
 
     # As a test, write the SIPs in reverse chronological order
     assert not sip1.archived
@@ -162,7 +162,7 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     assert sip2.archived
     assert sip3.archived
 
-    fs1 = archive_fs.opendir(archiver1._get_archive_subpath())
+    fs1 = archive_fs.opendir(archiver1.get_archive_subpath())
     assert set(fs1.listdir()) == set(['tagmanifest-md5.txt', 'bagit.txt',
                                       'manifest-md5.txt', 'bag-info.txt',
                                       'data'])
@@ -171,7 +171,7 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     assert fs1.listdir('data/metadata') == ['record-json.json', ]
     assert set(fs1.listdir('data/files')) == set([s1_file1_fn, s1_file2_fn])
 
-    fs2 = archive_fs.opendir(archiver2._get_archive_subpath())
+    fs2 = archive_fs.opendir(archiver2.get_archive_subpath())
     assert set(fs2.listdir()) == set(['tagmanifest-md5.txt', 'bagit.txt',
                                       'manifest-md5.txt', 'bag-info.txt',
                                       'data', 'fetch.txt'])
@@ -184,13 +184,13 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     with fs2.open('fetch.txt') as fp:
         cnt = fp.read().splitlines()
     # Fetched files should correctly fetch the files from the first archive
-    base_uri = archiver1._get_archive_base_uri()
+    base_uri = archiver1.get_archive_base_uri()
     assert set(cnt) == set([
         '{base}/2/r/0/{fn} 4 {fn}'.format(fn=s1_file1_fp, base=base_uri),
         '{base}/2/r/0/{fn} 8 {fn}'.format(fn=s1_file2_fp, base=base_uri),
     ])
 
-    fs3 = archive_fs.opendir(archiver3._get_archive_subpath())
+    fs3 = archive_fs.opendir(archiver3.get_archive_subpath())
     assert set(fs3.listdir()) == set(['tagmanifest-md5.txt', 'bagit.txt',
                                       'manifest-md5.txt', 'bag-info.txt',
                                       'data', 'fetch.txt'])
@@ -204,7 +204,7 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     # Since 'file.txt' was removed in third SIP, we should only fetch the
     # 'test2.txt', also from the first archive, since that's where this
     # file resides physically.
-    base_uri = archiver1._get_archive_base_uri()
+    base_uri = archiver1.get_archive_base_uri()
     assert set(cnt) == set([
         '{base}/2/r/0/{fn} 8 {fn}'.format(fn=s3_file2_fp, base=base_uri),
     ])
