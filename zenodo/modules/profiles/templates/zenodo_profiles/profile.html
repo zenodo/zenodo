@@ -1,0 +1,120 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_profiles/base_profile.html" %}
+
+{%- block researcher_profile %}
+<div>
+  <h1 style="line-height:0.8">
+    <strong>
+      {%- if user.profile.full_name %}
+      {{ user.profile.full_name }}
+      {%- else %}
+      {{ user.profile.username }}
+      {%- endif %}
+    </strong>
+    {%- if user.profile.full_name %}
+    <small><br />{{ user.profile.username }}</small>
+    {%- endif %}
+    {%- if user.researcher_profile.affiliation %}
+    <small><br />{{ user.researcher_profile.affiliation }}</small>
+    {%- endif %}
+  </h1>
+</div>
+{%- if user.remote_accounts %}
+{%- for account in user.remote_accounts %}
+<br />
+<div>
+    {%- if account.client_id == config.ORCID_APP_CREDENTIALS.consumer_key %}
+    <div style="margin-bottom: 4px">
+      <img width="26px" style="vertical-align:middle; margin-left: 5px" src="{{ url_for('static', filename='img/orcid.png') }}" alt="Orcid" />
+      <a class="no_hover" href="https://orcid.org/{{ account.extra_data.get('orcid') }}">
+        <span style="margin-left: 3px;font-size: 16px">{{ account.extra_data.get('orcid') }}</span>
+      </a>
+    </div>
+    {%- endif %}
+
+    {%- if account.client_id == config.GITHUB_APP_CREDENTIALS.consumer_key %}
+    <div>
+      <i style="vertical-align:middle" class="fa fa-github fa-2x fa-fw" aria-hidden="true"></i>
+      <a class="no_hover" href="https://github.com/{{ account.extra_data.get('login') }}">
+        <span style="font-size: 16px">{{ account.extra_data.get('login') }}</span>
+      </a>
+    </div>
+    {%- endif %}
+</div>
+{%- endfor %}
+{%- endif %}
+
+{%- if current_user.id != user.id and user.researcher_profile.allow_contact_owner %}
+  <div style="margin-top:18px">
+    <a class="no_hover" href="/profile/{{ user.id }}/contact">
+      <button type="button" class="btn btn-default btn-lg btn-block">Contact</button>
+    </a>
+  </div>
+{%- endif %}
+
+{%- if user.researcher_profile.bio %}
+<div>
+  <h3><small>{{ user.researcher_profile.bio }}</small></h3>
+</div>
+{%- endif %}
+
+{%- if user.researcher_profile.location or user.researcher_profile.website %}
+<hr />
+<div style="font-size:17px">
+  {%- if user.researcher_profile.location %}
+  <div>
+    <span class="fa fa-map-marker fa-fw" aria-hidden="true"></span>
+    <span>{{ user.researcher_profile.location }}</span>
+  </div>
+  {%- endif %}
+
+  {%- if user.researcher_profile.website %}
+  <div>
+    <span class="fa fa-link fa-fw" aria-hidden="true"></span>
+    <span>
+      <a href="{{ user.researcher_profile.website }}">
+        {{ user.researcher_profile.website }}
+      </a>
+    </span>
+  </div>
+  {%- endif %}
+</div>
+{%- endif %}
+
+{%- if user.communities %}
+<hr />
+<div>
+  <h4 style="font-size:22px; margin-bottom:0"><strong>Communities</strong></h4>
+  <ul style="padding: 18px">
+    {%- for org in user.communities %}
+    <li><h3 style="margin:0">
+      <small><a href="/communities/{{ org.id }}">{{ org.title }}</a></small>
+    </h3></li>
+    {%- endfor %}
+  </ul>
+</div>
+{%- endif %}
+{% endblock researcher_profile %}

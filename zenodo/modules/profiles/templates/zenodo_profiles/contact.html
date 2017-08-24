@@ -1,0 +1,92 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_theme/page.html" %}
+
+{% block page_body %}
+<div class="container">
+  <div class="row">
+    <div class="col-md-2 col-xs-0"></div>
+    <div class="col-md-8 col-xs-12">
+      <h2 class="header-form">
+        Contact
+        {%- if user.profile.full_name %}
+          {{ user.profile.full_name }}
+        {%- else %}
+          {{ user.profile.username }}
+        {%- endif %}
+      </h2>
+      <hr />
+      <div class="panel-body" id="researcher-contact">
+        <div class="alert alert-info login-email" role="alert">
+          Zenodo will send email on behalf of <b>{{ current_user.email }}</b>.
+        </div>
+        <form action="" method="POST">
+          {{ form.csrf_token }}
+
+          {%- for form_field in form.field_sets %}
+          {%- set field = form.get_field_by_name(form_field) %}
+          <div class="row">
+          <div class="col-sm-12 col-xs-12">
+          <div class="form-group {% if icon %} has-feedback{% endif %}{% if field.errors %} has-error{% endif %}">
+            {{ field.label }}
+            {%- set extras = dict(autofocus="") if autofocus else dict() %}
+            {{field(class_="form-control", placeholder=placeholder, **extras)}}
+            {%- if icon %}
+            <i class="{{icon}} form-control-feedback" aria-hidden="true" ></i>
+            {%- endif %}
+            {%- if field.description %}
+            <span class="help-block"><small>{{ field.description }}</small></span>
+            {%- endif %}
+            <span class="text-danger help-inline" id="error-{{ field.name }}">
+              {%- if field.errors %}
+              {%- for error in field.errors %}
+                {{ error }}
+                {%- if not loop.last %}
+                  <br />
+                {%- endif %}
+              {%- endfor %}
+              {%- endif %}
+            </span>
+          </div>
+          </div>
+          </div>
+          <div class="clearfix"></div>
+          {%- endfor %}
+          <div class="row">
+            <div class="col-md-4"></div>
+            <div class="col-md-4">
+              <button class="btn btn-block btn-success" id="form_button" type="submit">
+                Send Request
+              </button>
+            </div>
+            <div class="col-md-4"></div>
+          </div> <!-- .row -->
+        </form>
+      </div> <!-- .panel-body -->
+    </div> <!-- .col-md-10 -->
+    <div class="col-md-2 col-xs-0"></div>
+  </div> <!-- .row -->
+</div> <!-- .container -->
+{% endblock page_body %}

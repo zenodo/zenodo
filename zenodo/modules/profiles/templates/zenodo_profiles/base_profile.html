@@ -1,0 +1,98 @@
+{#-
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends "zenodo_theme/page.html" %}
+
+{%- from "zenodo_records/macros/accessright.html" import accessright_label -%}
+{%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
+
+{%- block page_body %}
+<div class="container">
+  <div class="row" id="researcher-profile">
+    <div class="col-sm-3 col-xs-12" id="profile" style="margin-bottom:20px">
+      <br />
+      {%- if profile_pic_url %}
+      <img id="researcher_image" alt="Profile Picture" class="img-responsive img-rounded center-block"
+        src="{{ profile_pic_url }}" />
+      {%- endif %}
+
+      {%- block researcher_profile %}
+      {%- endblock researcher_profile %}
+    </div>
+
+    <div class="col-sm-9 col-xs-12">
+      <h1>Uploads</h1>
+      {%- for record in records %}
+        {%- set publication_date = record.publication_date|from_isodate -%}
+        {%- set record_version = (record.relations.version[0].index + 1) if record.conceptrecid else None -%}
+        {%- set embargo_date = record.embargo_date|from_isodate -%}
+        {%- set object_type = record.resource_type|objecttype %}
+        {%- set record_url = url_for('invenio_records_ui.recid', pid_value=record['recid']) %}
+        {%- if loop.index is not divisibleby 2 %}
+        <div class="row record-elem">
+        {%- endif %}
+          <div class="col-xs-12 col-md-6">
+            {%- if record.doi %}
+              <span class="pull-right hidden-xs">
+                  <br /><div class="altmetric-embed altmetric-hidden" data-badge-type="donut"
+                          data-badge-popover="left" data-hide-no-mentions="true" data-doi="{{record.doi}}"></div>
+              </span>
+            {% endif %}
+            <div class="pull-left">
+              <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}" style="margin-right:4px">
+                {{ publication_date|dateformat(format='long') }}{{ (' (v' ~ record_version ~ ')') if record_version else '' }}
+              </span>
+              {{ objecttype_label(object_type, lang=current_i18n.language) }}
+              {{ accessright_label(record.access_right, embargo_date=embargo_date) }}
+            </div> <!-- .pull-left -->
+            <br />
+            <h4><a href="{{ record_url }}">{{ record.title|striptags|truncate(80) }}</a></h4>
+            <p class="hidden-xs"><a href="{{record_url}}">{{ record.description|striptags|truncate(150) }}</a></p>
+            <hr class="hidden-xs" />
+          </div> <!-- .col-xs-12 .col-md-6 -->
+        {%- if (loop.index is divisibleby 2) or loop.last %}
+      </div> <!-- .row .record-elem -->
+        <div class="clearfix"></div>
+        {%- endif %}
+      {%- endfor %}
+      {%- if not records %}
+        <br />
+        <h2 style="text-align: center">This user has no records</h2>
+      {%- else %}
+      <p class="text-center">
+        <a class="btn btn-default"
+          href="{%- if user %}
+                  {{ url_for('zenodo_profiles.profile_search', owner_id=user.id) }}
+                {%- else %}
+                  {{ url_for('zenodo_profiles.profile_search', orcid_id=orcid_id) }}
+                {%- endif %}"
+        >
+          More
+        </a>
+      </p>
+      {%- endif %}
+    </div>
+  </div> <!-- .row -->
+</div> <!-- .container -->
+{% endblock page_body %}
