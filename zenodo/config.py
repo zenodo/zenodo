@@ -164,8 +164,20 @@ CELERYBEAT_SCHEDULE = {
     'file-checks': {
         'task': 'invenio_files_rest.tasks.schedule_checksum_verification',
         'schedule': timedelta(hours=1),
-        'kwargs': {'max_count': 0}
-    }
+        'kwargs': {'max_count': 0},
+    },
+    'hard-file-checks': {
+        'task': 'invenio_files_rest.tasks.schedule_checksum_verification',
+        'schedule': timedelta(hours=1),
+        'kwargs': {
+            # Manually check and calculate checksums of files biannually
+            'frequency': {'days': 180},
+            # Split batches based on total files size
+            'max_size': 0,
+            # Actual checksum calculation, instead of relying on a EOS query
+            'checksum_kwargs': {'use_default_impl': True},
+        },
+    },
 }
 
 
