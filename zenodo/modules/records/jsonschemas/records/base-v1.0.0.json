@@ -396,6 +396,10 @@
         }
       }
     },
+    "version": {
+      "description": "Record version tag.",
+      "type": "string"
+    },
     "meeting": {
       "description": "Associated meeting.",
       "type": "object",
