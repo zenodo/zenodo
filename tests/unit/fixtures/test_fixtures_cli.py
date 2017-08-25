@@ -28,8 +28,10 @@ from __future__ import absolute_import, print_function
 
 from click.testing import CliRunner
 from invenio_pages.models import Page
+from invenio_records.models import RecordMetadata
 
-from zenodo.modules.fixtures.cli import loadpages_cli
+from zenodo.modules.fixtures.cli import loadfp6grants_cli, loadfunders_cli, \
+    loadpages_cli
 
 
 def test_loadpages(script_info, db):
@@ -53,3 +55,16 @@ def test_loadpages(script_info, db):
         assert p.title
         assert p.url
         assert p.template_name
+
+
+def test_loadfunders_and_fp6grants(script_info, db):
+    """Test loading of funders fixture and FP6 grants."""
+    assert not RecordMetadata.query.count()
+    runner = CliRunner()
+    res = runner.invoke(loadfunders_cli, [], obj=script_info)
+    assert res.exit_code == 0
+    assert RecordMetadata.query.count() == 9  # 9 supported funders
+
+    res = runner.invoke(loadfp6grants_cli, [], obj=script_info)
+    assert res.exit_code == 0
+    assert RecordMetadata.query.count() == 11  # 2 FP6 grants

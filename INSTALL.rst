@@ -267,9 +267,9 @@ Launch the data loading scripts in a separate shell:
    $ workon zenodo
    (zenodo)$ zenodo opendefinition loadlicenses
    (zenodo)$ zenodo fixtures loadlicenses
-   (zenodo)$ zenodo openaire loadfunders \
-    --source=$HOME/src/invenio-openaire/invenio_openaire/data/fundref_registry.rdf
+   (zenodo)$ zenodo fixtures loadfunders
    (zenodo)$ zenodo openaire loadgrants --setspec=FP7Projects
+   (zenodo)$ zenodo openaire loadgrants --setspec=H2020Projects
    (zenodo)$ zenodo fixtures loaddemorecords
    (zenodo)$ zenodo migration recordsrun
    (zenodo)$ zenodo migration reindex -t recid

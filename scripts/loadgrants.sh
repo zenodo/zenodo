@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+zenodo fixtures loadfunders
 zenodo fixtures loadfp6grants
-zenodo openaire loadfunders --source ~/src/invenio-openaire/invenio_openaire/data/fundref_registry.rdf
 zenodo openaire loadgrants --setspec=FP7Projects
 zenodo openaire loadgrants --setspec=H2020Projects

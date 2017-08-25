@@ -33,8 +33,8 @@ from invenio_records.api import Record
 from .utils import read_json
 
 
-def loadfp6funders(force=False):
-    """Load FP6 funder fixtures."""
+def loadfunders(force=False):
+    """Load funders fixture."""
     data = read_json('data/funders.json')
     try:
         for f in data:
@@ -44,7 +44,6 @@ def loadfp6funders(force=False):
     except Exception:
         db.session.rollback()
         raise
-
 
 
 def loadfp6grants(force=False):

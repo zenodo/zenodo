@@ -27,7 +27,7 @@ zenodo index queue init
 zenodo index init
 zenodo fixtures init
 zenodo fixtures loadlicenses
-zenodo fixtures loadfp6funders
+zenodo fixtures loadfunders
 zenodo fixtures loadfp6grants
 zenodo fixtures loadsipmetadatatypes
 zenodo users create info@zenodo.org -a --password=123456

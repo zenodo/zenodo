@@ -36,7 +36,7 @@ from sqlalchemy.orm.exc import NoResultFound
 
 from .communities import loadcommunities
 from .files import loaddemofiles, loadlocations
-from .grants import loadfp6funders, loadfp6grants
+from .grants import loadfp6grants, loadfunders
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .pages import loadpages
@@ -91,11 +91,11 @@ def loadfp6grants_cli():
     loadfp6grants()
 
 
-@fixtures.command('loadfp6funders')
+@fixtures.command('loadfunders')
 @with_appcontext
-def loadfp6funders_cli():
-    """Load one-off funders."""
-    loadfp6funders()
+def loadfunders_cli():
+    """Load the supported funders."""
+    loadfunders()
 
 
 @fixtures.command('loaddemorecords')
