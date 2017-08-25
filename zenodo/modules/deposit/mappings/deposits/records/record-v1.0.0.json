@@ -26,6 +26,9 @@
             "title": {
               "type": "string"
             },
+            "version": {
+              "type": "string"
+            },
             "acronym": {
               "type": "string"
             },
