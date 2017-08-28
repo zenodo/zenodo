@@ -130,7 +130,6 @@ install_requires = [
     'invenio-oauthclient[github]>=1.0.0a13',
     'invenio-openaire>=1.0.0a8',
     'invenio-opendefinition>=1.0.0a4',
-    'invenio-pages>=1.0.0a3',
     'invenio-pidrelations>=1.0.0a3',
     'invenio-pidstore>=1.0.0b1',
     'invenio-previewer>=1.0.0a10',
