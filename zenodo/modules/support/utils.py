@@ -56,7 +56,7 @@ def format_request_email_title(context):
     :returns: Email message title.
     :rtype: str
     """
-    template = current_app.config['PAGES_EMAIL_TITLE_TEMPLATE']
+    template = current_app.config['SUPPORT_EMAIL_TITLE_TEMPLATE']
     return render_template_to_string(template, context)
 
 
@@ -68,7 +68,7 @@ def format_request_email_body(context):
     :returns: Email message body.
     :rtype: str
     """
-    template = current_app.config['PAGES_EMAIL_BODY_TEMPLATE']
+    template = current_app.config['SUPPORT_EMAIL_BODY_TEMPLATE']
     return render_template_to_string(template, context)
 
 
@@ -83,12 +83,12 @@ def check_attachment_size(attachments):
         return False
     if request.content_length:
         file_size = int(request.content_length)
-        if file_size > current_app.config['PAGES_ATTACHMENT_MAX_SIZE']:
+        if file_size > current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE']:
             return False
     else:
         size = 0
         for upload in attachments:
-            upload.seek(current_app.config['PAGES_ATTACHMENT_MAX_SIZE'] -
+            upload.seek(current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'] -
                         size)
             if upload.read(1) == '':
                 return False
@@ -125,7 +125,7 @@ def send_support_email(context, recipients=None):
     msg = Message(
         msg_title,
         sender=sender,
-        recipients=recipients or current_app.config['PAGES_SUPPORT_EMAIL'],
+        recipients=recipients or current_app.config['SUPPORT_SUPPORT_EMAIL'],
         reply_to=context.get('info', {}).get('email'),
         body=msg_body
     )
@@ -144,11 +144,11 @@ def send_confirmation_email(context):
     """Sending support confirmation email."""
     recipient = format_user_email_ctx(context)
     sender = format_user_email(
-        current_app.config['PAGES_SENDER_EMAIL'],
-        current_app.config['PAGES_SENDER_NAME']
+        current_app.config['SUPPORT_SENDER_EMAIL'],
+        current_app.config['SUPPORT_SENDER_NAME']
     )
-    title = current_app.config['PAGES_EMAIL_CONFIRM_TITLE']
-    body = current_app.config['PAGES_EMAIL_CONFIRM_BODY']
+    title = current_app.config['SUPPORT_EMAIL_CONFIRM_TITLE']
+    body = current_app.config['SUPPORT_EMAIL_CONFIRM_BODY']
     msg = Message(
         title,
         body=body,

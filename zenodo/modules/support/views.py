@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo Pages."""
+"""Zenodo Support."""
 
 from __future__ import absolute_import, print_function
 
@@ -40,7 +40,7 @@ from .utils import check_attachment_size, send_confirmation_email, \
     send_support_email, user_agent_information
 
 blueprint = Blueprint(
-    'zenodo_pages',
+    'zenodo_support',
     __name__,
     template_folder='templates',
 )
@@ -63,15 +63,15 @@ def support():
 
     # Load form choices and validation from config
     categories = OrderedDict(
-        (c['key'], c) for c in current_app.config['PAGES_ISSUE_CATEGORIES'])
+        (c['key'], c) for c in current_app.config['SUPPORT_ISSUE_CATEGORIES'])
     form.issue_category.choices = \
         [(c['key'], c['title']) for c in categories.values()]
     form.description.validators.append(Length(
-        min=current_app.config['PAGES_DESCRIPTION_MIN_LENGTH'],
-        max=current_app.config['PAGES_DESCRIPTION_MAX_LENGTH'],
+        min=current_app.config['SUPPORT_DESCRIPTION_MIN_LENGTH'],
+        max=current_app.config['SUPPORT_DESCRIPTION_MAX_LENGTH'],
     ))
     form.attachments.description = 'Optional. Max attachments size: ' + \
-        do_filesizeformat(current_app.config['PAGES_ATTACHMENT_MAX_SIZE'])
+        do_filesizeformat(current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'])
 
     if form.validate_on_submit():
         attachments = request.files.getlist("attachments")
@@ -93,9 +93,9 @@ def support():
             )
             return redirect(url_for('zenodo_frontpage.index'))
     return render_template(
-        'zenodo_pages/contact_form.html',
+        'zenodo_support/contact_form.html',
         uap=uap,
         form=form,
         categories=categories,
-        max_file_size=current_app.config['PAGES_ATTACHMENT_MAX_SIZE'],
+        max_file_size=current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'],
     )

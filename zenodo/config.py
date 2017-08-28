@@ -353,22 +353,6 @@ OPENDEFINITION_JSONRESOLVER_HOST = 'dx.zenodo.org'
 #: Hostname for JSON Schemas.
 JSONSCHEMAS_HOST = 'zenodo.org'
 
-# Pages
-# =====
-#: Allowed configuration variables to use in page templates.
-PAGES_WHITELIST_CONFIG_KEYS = [
-    'PIDSTORE_DATACITE_DOI_PREFIX',
-    'DEPOSIT_CONTRIBUTOR_TYPES',
-    'FRONTPAGE_ENDPOINT',
-    'SUPPORT_EMAIL',
-    'THEME_SITENAME',
-]
-PAGES_TEMPLATES = [
-    ('invenio_pages/default.html', 'Default'),
-    ('invenio_pages/dynamic.html', 'Default dynamic'),
-    ('zenodo_theme/full_page.html', 'Default full page'),
-]
-
 # Deposit
 # =======
 #: PID minter used during record creation.

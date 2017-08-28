@@ -22,27 +22,27 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Pages."""
+"""Configuration for Zenodo Support."""
 
 from __future__ import absolute_import, print_function
 
 #: Maximum size of attachment in contact form.
-PAGES_ATTACHMENT_MAX_SIZE = 1000 * 1000 * 10  # 10 MB
+SUPPORT_ATTACHMENT_MAX_SIZE = 1000 * 1000 * 10  # 10 MB
 
 #: Description maximum length.
-PAGES_DESCRIPTION_MAX_LENGTH = 1000
+SUPPORT_DESCRIPTION_MAX_LENGTH = 1000
 
 #: Description minimum length.
-PAGES_DESCRIPTION_MIN_LENGTH = 20
+SUPPORT_DESCRIPTION_MIN_LENGTH = 20
 
 #: Email body template.
-PAGES_EMAIL_BODY_TEMPLATE = 'zenodo_pages/email_body.html'
+SUPPORT_EMAIL_BODY_TEMPLATE = 'zenodo_support/email_body.html'
 
 #: Email title template.
-PAGES_EMAIL_TITLE_TEMPLATE = 'zenodo_pages/email_title.html'
+SUPPORT_EMAIL_TITLE_TEMPLATE = 'zenodo_support/email_title.html'
 
 #: Support confirmation email body.
-PAGES_EMAIL_CONFIRM_BODY = """Thank you for contacting Zenodo support.
+SUPPORT_EMAIL_CONFIRM_BODY = """Thank you for contacting Zenodo support.
 
 We have received your message, and we will do our best to get back to you as \
 soon as possible.
@@ -54,12 +54,12 @@ https://zenodo.org
 """
 
 #: Support confirmation email title.
-PAGES_EMAIL_CONFIRM_TITLE = 'Zenodo Support'
+SUPPORT_EMAIL_CONFIRM_TITLE = 'Zenodo Support'
 
-'zenodo_pages/email_confirm_title.html'
+'zenodo_support/email_confirm_title.html'
 
 #: Issue category for contact form.
-PAGES_ISSUE_CATEGORIES = [
+SUPPORT_ISSUE_CATEGORIES = [
     {
         'key': 'file-modification',
         'title': 'File modification',
@@ -164,10 +164,10 @@ PAGES_ISSUE_CATEGORIES = [
 ]
 
 #: Email address of sender.
-PAGES_SENDER_EMAIL = 'info@zenodo.org'
+SUPPORT_SENDER_EMAIL = 'info@zenodo.org'
 
 #: Name of the sender
-PAGES_SENDER_NAME = 'Zenodo'
+SUPPORT_SENDER_NAME = 'Zenodo'
 
 #: Email address for support.
-PAGES_SUPPORT_EMAIL = ['info@zenodo.org']
+SUPPORT_SUPPORT_EMAIL = ['info@zenodo.org']

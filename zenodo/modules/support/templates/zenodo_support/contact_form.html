@@ -23,7 +23,7 @@
 -#}
 
 {% extends "zenodo_theme/page.html" %}
-{%- from "zenodo_pages/macros.html" import render_form_field, render_form_input, render_form_label %}
+{%- from "zenodo_support/macros.html" import render_form_field, render_form_input, render_form_label %}
 
 {%- block page_body %}
 {%- set user = current_user.is_authenticated and current_user %}

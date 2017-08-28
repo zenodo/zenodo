@@ -20,7 +20,7 @@
 # granted to it by virtue of its status as an Intergovernmental Organization
 # or submit itself to any jurisdiction.
 
-"""Unit tests Pages Utils."""
+"""Unit tests support utils."""
 
 from __future__ import absolute_import, print_function
 
@@ -34,17 +34,17 @@ def test_send_support_email(app, db, es, users):
     """Test mail sending."""
     with app.extensions['mail'].record_messages() as outbox:
         with app.test_client() as client:
-            res = client.get(url_for('zenodo_pages.support'))
+            res = client.get(url_for('zenodo_support.support'))
             assert res.status_code == 200
 
             res = client.get(
-                url_for('zenodo_pages.support')
+                url_for('zenodo_support.support')
             )
             assert b('recaptcha') in res.data
             assert res.status_code == 200
 
             res = client.post(
-                url_for('zenodo_pages.support'),
+                url_for('zenodo_support.support'),
                 data=dict()
             )
             assert res.status_code == 200
@@ -63,7 +63,7 @@ def test_send_support_email(app, db, es, users):
             ))
 
             res = client.post(
-                url_for('zenodo_pages.support'),
+                url_for('zenodo_support.support'),
                 data=form
             )
             assert b('has-error') not in res.data
@@ -98,7 +98,7 @@ def test_send_support_email(app, db, es, users):
             form.add('attachments', (test_file, 'file2.txt'))
             form.add('attachments', (test_file2, 'test3.txt'))
             res = client.post(
-                url_for('zenodo_pages.support'),
+                url_for('zenodo_support.support'),
                 data=form,
                 content_type='multipart/form-data',
                 follow_redirects=True
@@ -114,7 +114,7 @@ def test_send_support_email(app, db, es, users):
 
             login_user_via_session(client, email=users[1]['email'])
             res = client.get(
-                url_for('zenodo_pages.support')
+                url_for('zenodo_support.support')
             )
             assert b('test@zenodo.org') in res.data
             assert b('recaptcha') not in res.data
@@ -126,7 +126,7 @@ def test_send_support_email(app, db, es, users):
                 description='Please help us! Troubleshoot our problem.'
             ))
             res = client.post(
-                url_for('zenodo_pages.support'),
+                url_for('zenodo_support.support'),
                 data=form
             )
             assert len(outbox) == 6
@@ -136,7 +136,7 @@ def test_send_support_email(app, db, es, users):
             test_file = BytesIO(b('My file contents'))
             form.add('attachments', (test_file, 'file1.txt'))
             res = client.post(
-                url_for('zenodo_pages.support'),
+                url_for('zenodo_support.support'),
                 data=form,
                 content_type='multipart/form-data',
                 follow_redirects=True
@@ -158,7 +158,7 @@ def test_send_support_email(app, db, es, users):
             form.add('attachments', (test_file, 'file2.txt'))
             form.add('attachments', (test_file2, 'test3.txt'))
             res = client.post(
-                url_for('zenodo_pages.support'),
+                url_for('zenodo_support.support'),
                 data=form,
                 content_type='multipart/form-data',
                 follow_redirects=True
