@@ -51,6 +51,50 @@ def test_minimal(db, minimal_record, recid_pid):
     }
 
 
+def test_full(db, full_record, recid_pid):
+    """Test minimal record."""
+    obj = csl_v1.transform_record(recid_pid, Record(full_record))
+    assert obj == {
+        "publisher_place": "Staszkowka",
+        "type": "book",
+        "author": [
+            {
+                "given": "John",
+                "family": "Doe"
+            },
+            {
+                "given": "Jane",
+                "family": "Doe"
+            },
+            {
+                "given": "John",
+                "family": "Smith"
+            },
+            {
+                "given": "Jack",
+                "family": "Nowak"
+            }
+        ],
+        "title": "Test title",
+        "ISBN": "978-0201633610",
+        "issue": "2",
+        "language": "en",
+        "volume": "20",
+        "publisher": "Jol",
+        "version": "1.2.5",
+        "note": "notes",
+        "issued": {
+            "date-parts": [[2014, 2, 27]]
+        },
+        "abstract": "Test Description",
+        "DOI": "10.1234/foo.bar",
+        "page": "20",
+        "container_title": "Bam",
+        "id": "123",
+        "ISSN": "2011ApJS..192...18K"
+    }
+
+
 def test_type(db, minimal_record, recid_pid):
     """"Test type."""
     minimal_record.update({

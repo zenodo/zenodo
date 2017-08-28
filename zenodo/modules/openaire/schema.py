@@ -53,6 +53,7 @@ class RecordSchemaOpenAIREJSON(Schema):
     type = fields.Method('get_type')
     resourceType = fields.Method('get_resource_type', required=True)
     language = fields.Str(attribute='metadata.language')
+    version = fields.Str(attribute='metadata.version')
 
     licenseCode = fields.Method('get_license_code', required=True)
     embargoEndDate = DateString(attribute='metadata.embargo_date')

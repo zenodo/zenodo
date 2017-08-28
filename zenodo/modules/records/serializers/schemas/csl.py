@@ -65,6 +65,7 @@ class RecordSchemaCSLJSON(Schema):
                          attribute='metadata.creators')
     issued = fields.Method('get_issue_date')
     language = fields.Str(attribute='metadata.language')
+    version = fields.Str(attribute='metadata.version')
     note = fields.Str(attribute='metadata.notes')
 
     DOI = fields.Str(attribute='metadata.doi')
