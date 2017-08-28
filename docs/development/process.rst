@@ -193,3 +193,61 @@ If an upgraded package causes issues, and the problem cannot easily be fixed,
 it should be moved from ``requirements.txt`` into
 ``requirements.pinned.txt`` so it is clear which packages can easily be
 updated and which cannot.
+
+Expanding Zenodo metadata checklist
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Here you will find a short checklist/guide on how to add a new field to the metadata model, and what are the related
+files and models (ES mappings, UI deposit form), that need to be taken into consideration when such a change is made.
+
+1. Update the **Record** JSONSchema and ES mapping
+
+    a) Modify the Record JSONSchema files:
+
+        - Base JSONSchema - `records/jsonschemas/records/base-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/base-v1.0.0.json>`_
+        - Files JSONSchema - `records/jsonschemas/records/file_src-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file_src-v1.0.0.json>`_
+        - RecordsFiles JSONSchema - `records/jsonschemas/records/records-files-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/records-files-v1.0.0.json>`_
+
+    b) **DO NOT** modify the following JSONSchemas by hand, as they need to be compiled from the sources (see point *a.* above):
+
+        - Compile `records/jsonschemas/records/file-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file-v1.0.0.json>`_ by running ``zenodo jsonschemas compilefile``. **Optional - this step is necessary only if you modified the Files JSONSchema or RecordsFiles JSONSchema**.
+        - Compile `records/jsonschemas/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compilerecord``
+        - Compile `deposit/jsonschemas/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/jsonschemas/deposits/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compiledeposit``
+
+    c) Update ES mappings
+
+        - Record ES mapping - `records/mappings/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/mappings/records/record-v1.0.0.json>`_
+        - Deposit ES mapping - `deposit/mappings/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/mappings/deposits/records/record-v1.0.0.json>`_
+
+2. Update Deposit and Record REST API (JSON serialisers/deserialisers)
+
+    - Common - `records/serializers/schemas/common.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/common.py>`_
+    - Deposit/Legacy - `records/serializers/schemas/legacyjson.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/legacyjson.py>`_
+    - New - `records/serializers/schemas/json.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/json.py>`_
+
+3. Add to UI form (need to decide exactly where on how it should be displayed)
+
+    - Deposit Form JSONSchema - `deposit/static/json/zenodo_deposit/deposit_form.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/static/json/zenodo_deposit/deposit_form.json>`_
+    - Check if there are any Angular templates/directives: `deposit/static/templates/zenodo_deposit <https://github.com/zenodo/zenodo/tree/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/static/templates/zenodo_deposit>`_ modifications required to implement the functionality of the new fields on the deposit form page
+
+4. Serialization format updates
+
+    - DataCite - `records/serializers/schemas/datacite.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/datacite.py>`_
+
+        - `DataCite Metadata Schema v3.1 <https://schema.datacite.org/meta/kernel-3.1/>`_
+
+    - OpenAIRE JSON- `openaire/schema.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/openaire/schema.py>`_
+
+        - `OpenAIRE Schema <https://www.openaire.eu/schema/1.0/oaf-result-1.0.xsd>`_
+
+    - DublinCore - `records/serializers/schemas/dc.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/dc.py>`_
+
+        - `DCMI Metadata Terms <http://dublincore.org/documents/dcmi-terms/>`_
+
+    - CSL - `records/serializers/schemas/csl.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/csl.py>`_
+        - `CSL Terms <http://docs.citationstyles.org/en/stable/specification.html#appendix-ii-terms>`_
+    - BibTex - `records/serializers/bibtex.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/bibtex.py>`_
+        - `BibTeX documentation <http://ctan.math.washington.edu/tex-archive/biblio/bibtex/base/btxdoc.pdf>`_
+    - MARC21 - `records/serializers/schemas/marc21.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/marc21.py>`_
+
+5. Update `deposit REST API documentation <https://github.com/zenodo/developers.zenodo.org/blob/31497bdc1b0eb23f2a61c5858cddddc9a4955ae7/source/includes/resources/deposit/_representation.md>`_

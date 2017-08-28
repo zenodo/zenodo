@@ -45,6 +45,19 @@ def minimal_oai_record(minimal_record):
     return minimal_record
 
 
+@pytest.fixture()
+def full_oai_record(full_record):
+    """Minimal OAI record."""
+    full_record['_oai'] = {
+        'id': 'oai:zenodo.org:{}'.format(full_record['recid'])
+    }
+    full_record['resource_type'] = {
+        'type': 'publication',
+        'subtype': 'article'
+    }
+    return full_record
+
+
 def test_minimal(app, db, minimal_oai_record, recid_pid):
     """Test minimal record."""
     obj = openaire_json_v1.transform_record(
@@ -61,6 +74,29 @@ def test_minimal(app, db, minimal_oai_record, recid_pid):
         'pids': [{'type': 'oai', 'value': 'oai:zenodo.org:123'}],
         'hostedById': 'opendoar____::2659',
         'collectedFromId': 'opendoar____::2659',
+    }
+
+
+def test_full(app, db, full_oai_record, recid_pid):
+    """Test minimal record."""
+    obj = openaire_json_v1.transform_record(
+        recid_pid, Record(full_oai_record))
+    assert obj == {
+        'authors': ['Doe, John', 'Doe, Jane', 'Smith, John', 'Nowak, Jack'],
+        'collectedFromId': 'opendoar____::2659',
+        'description': 'Test Description',
+        'hostedById': 'opendoar____::2659',
+        'language': 'en',
+        'licenseCode': 'OPEN',
+        'originalId': 'oai:zenodo.org:12345',
+        'pids': [{'type': 'oai', 'value': 'oai:zenodo.org:12345'},
+                 {'type': 'doi', 'value': '10.1234/foo.bar'}],
+        'publisher': 'Jol',
+        'resourceType': '0001',
+        'title': 'Test title',
+        'type': 'publication',
+        'url': 'https://zenodo.org/record/12345',
+        'version': '1.2.5'
     }
 
 
