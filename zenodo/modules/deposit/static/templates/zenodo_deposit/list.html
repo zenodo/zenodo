@@ -68,6 +68,8 @@
         <div ng-controller="metadataCtl">
         <button
           ng-show="f.completed"
+          ng-disabled="!f.key.endsWith('.pdf')"
+          title="Only support PDF metadata extraction for now."
           class="btn btn-xs btn-default form-button {{ form.fieldHtmlClass }}"
           ng-click="extractMetadata(f)"
           data-toggle="modal"
