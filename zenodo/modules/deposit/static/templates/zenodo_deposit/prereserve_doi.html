@@ -4,7 +4,7 @@
       class="tooltip-wrapper"
       bs-tooltip
       data-container="div"
-      data-title="{{model.doi && model.doi != model.prereserve_doi.doi ? 'Clear the DOI field above to Pre-reserve a Zenodo DOI.' : 'Pre-reserve a Digital Object Identifier for your upload. This allows you to know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until you submit your upload.'}}"
+      data-title="{{model.doi && model.doi != model.prereserve_doi.doi ? 'Clear the DOI field above to reserve a Zenodo DOI.' : 'Reserve a Digital Object Identifier for your upload. This allows you to know the DOI before you submit your upload, and can thus include it in e.g. publications. The DOI is not finally registered until you submit your upload.'}}"
       data-placement="right"
       ng-class="{'disabled': model.doi}"
     >
@@ -15,7 +15,7 @@
         ng-disabled="model.doi && model.doi != model.prereserve_doi.doi"
         prereserve-button
       >
-        <i class="fa fa-barcode"></i> Pre-reserve DOI
+        <i class="fa fa-barcode"></i> Reserve DOI
       </button>
     </div>
     <span
