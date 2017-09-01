@@ -25,7 +25,7 @@
 from __future__ import absolute_import, print_function
 
 from zenodo.modules.jsonschemas.compilers import compile_deposit_jsonschema, \
-    compile_file_jsonschema, compile_record_jsonschema
+    compile_record_jsonschema
 from zenodo.modules.jsonschemas.utils import resolve_schema_path
 
 
@@ -37,12 +37,10 @@ def test_compile_schemas(app):
     'source' jsonschemas.
     """
     config_vars = [
-        app.config['ZENODO_JSONSCHEMAS_FILE_SCHEMA'],
         app.config['ZENODO_JSONSCHEMAS_RECORD_SCHEMA'],
         app.config['ZENODO_JSONSCHEMAS_DEPOSIT_SCHEMA'],
     ]
     compile_funcs = [
-        compile_file_jsonschema,
         compile_record_jsonschema,
         compile_deposit_jsonschema,
     ]

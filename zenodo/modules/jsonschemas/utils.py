@@ -99,6 +99,7 @@ def save_jsonschema(schema, path):
     """Save jsonschema to disk path."""
     with open(path, 'w') as fp:
         json.dump(schema, fp, indent=2, sort_keys=True)
+        fp.write('\n')
 
 
 def merge_dicts(first, second):

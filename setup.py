@@ -44,8 +44,7 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest-random-order>=0.5.4',
     'pytest>=3.1.3',
-    # 2.53.0 introduced a Python 3 compatibility issue. Wait for it to be fixed
-    'selenium>=2.48.0,<2.53.0',
+    'selenium>=3.5.0,<3.6.0',
     'six>=1.10.0',
 ]
 

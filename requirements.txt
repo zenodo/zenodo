@@ -215,7 +215,7 @@ redis==2.10.5
 requests==2.18.1
 requests-oauthlib==0.8.0
 scandir==1.5
-selenium==2.52.0
+selenium==3.5.0
 Sickle==0.6.1
 simplegeneric==0.8.1
 simplejson==3.11.1

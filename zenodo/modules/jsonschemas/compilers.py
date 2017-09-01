@@ -82,19 +82,3 @@ def compile_record_jsonschema(schema_path):
     compiled = _compile_common(compiled)
     del compiled['description']  # Description inherited from deposit
     return compiled
-
-
-def compile_file_jsonschema(schema_path):
-    """Compile file jsonschema."""
-    compiled = resolve_schema_path(schema_path)
-    # We need to iter 'allOf' manually because jsonresolver
-    # will not preserve ordering of subschema keys
-    file_url = compiled['properties']['_files']['items']['allOf'][0]['$ref']
-    file_base = resolve_schema_url(file_url)
-    file_extra = compiled['properties']['_files']['items']['allOf'][1]
-    file_items = merge_dicts(file_base, file_extra)
-    del file_items['$schema']
-    del file_items['title']
-    del compiled['properties']['_files']['items']['allOf']
-    compiled['properties']['_files']['items'] = file_items
-    return compiled

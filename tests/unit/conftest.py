@@ -61,7 +61,6 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.resolver import Resolver
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
-from invenio_records_files.api import Record as RecordFile
 from invenio_records_files.api import RecordsBuckets
 from invenio_search import current_search, current_search_client
 from invenio_sipstore import current_sipstore
@@ -397,7 +396,7 @@ def minimal_record_model(db, minimal_record, sip_metadata_types):
     model.created = datetime.utcnow() - timedelta(days=1)
     model.updated = model.created + timedelta(days=1)
     model.version_id = 0
-    rec = Record(minimal_record, model=model)
+    rec = ZenodoRecord(minimal_record, model=model)
 
     PersistentIdentifier.create(
         'recid', '123', status=PIDStatus.REGISTERED, object_type='rec',
@@ -586,6 +585,7 @@ def full_record():
             {
                 'bucket': '22222222-2222-2222-2222-222222222222',
                 'version_id': '11111111-1111-1111-1111-111111111111',
+                'file_id': '22222222-3333-4444-5555-666666666666',
                 'checksum': 'md5:11111111111111111111111111111111',
                 'key': 'test',
                 'size': 4,
@@ -600,7 +600,7 @@ def full_record():
 @pytest.fixture
 def record_with_bucket(db, full_record, bucket, sip_metadata_types):
     """Create a bucket."""
-    record = RecordFile.create(full_record)
+    record = ZenodoRecord.create(full_record)
     RecordsBuckets.create(bucket=bucket, record=record.model)
     pid = PersistentIdentifier.create(
         pid_type='recid', pid_value=12345, object_type='rec',
@@ -628,9 +628,9 @@ def bibtex_records(app, db, full_record):
     """Create some records for bibtex serializer."""
     test_bad_record = dict(recid='12345')
 
-    r_good = Record.create(
+    r_good = ZenodoRecord.create(
         full_record, UUID("24029cb9-f0f8-4b72-94a7-bdf746f9d075"))
-    r_bad = Record.create(
+    r_bad = ZenodoRecord.create(
         test_bad_record, UUID("0281c22c-266a-499b-8446-e12eff2f79b8"))
     db.session.commit()
 
@@ -833,7 +833,7 @@ def legacyjson_v1():
 def resolver():
     """Get a record resolver."""
     return Resolver(
-        pid_type='recid', object_type='rec', getter=Record.get_record)
+        pid_type='recid', object_type='rec', getter=ZenodoRecord.get_record)
 
 
 @pytest.fixture

@@ -3,29 +3,37 @@
   "id": "http://zenodo.org/schemas/records/file-v1.0.0.json",
   "properties": {
     "_buckets": {
+      "type": "object",
       "properties": {
         "deposit": {
-          "description": "Deposit bucket ID.",
+          "description": "UUID of the deposit bucket.",
           "type": "string"
         },
         "record": {
-          "description": "Record bucket ID.",
+          "description": "UUID of the record bucket.",
           "type": "string"
         }
-      },
-      "type": "object"
+      }
     },
     "_files": {
+      "description": "List of files attached to the record.",
       "items": {
-        "description": "Describe information needed for files in records.",
+        "description": "Describes the information of a single file in the record.",
         "properties": {
           "bucket": {
+            "description": "UUID of the bucket to which this file is assigned.",
             "type": "string"
           },
           "checksum": {
+            "description": "Checksum the file. Starts with '<algorithm>:' prefix, e.g.: 'md5:1234abcd...'",
+            "type": "string"
+          },
+          "file_id": {
+            "description": "UUID of the FileInstance object.",
             "type": "string"
           },
           "key": {
+            "description": "Key (filename) of the file.",
             "type": "string"
           },
           "previewer": {
@@ -33,6 +41,7 @@
             "type": "string"
           },
           "size": {
+            "description": "Size of the file in bytes.",
             "type": "integer"
           },
           "type": {
@@ -40,9 +49,20 @@
             "type": "string"
           },
           "version_id": {
+            "description": "UUID of the ObjectVersion object.",
             "type": "string"
           }
         },
+        "required": [
+          "bucket",
+          "checksum",
+          "file_id",
+          "key",
+          "size",
+          "type",
+          "version_id"
+        ],
+        "title": "File schema.",
         "type": "object"
       },
       "type": "array"

@@ -32,8 +32,7 @@ import click
 from flask import current_app
 from flask.cli import with_appcontext
 
-from .compilers import compile_deposit_jsonschema, compile_file_jsonschema, \
-    compile_record_jsonschema
+from .compilers import compile_deposit_jsonschema, compile_record_jsonschema
 from .utils import get_abs_schema_path, save_jsonschema
 
 
@@ -95,14 +94,3 @@ def compile_deposit_cli(output_file, default_file):
     """Compile Zenodo deposit jsonschema."""
     compile_common_cli(output_file, default_file, compile_deposit_jsonschema,
                        current_app.config['ZENODO_JSONSCHEMAS_DEPOSIT_SCHEMA'])
-
-
-@jsonschemas.command('compilefile')
-@click.option('--output_file', '-f', type=click.Path(exists=False,
-              dir_okay=False))
-@click.option('--default_file', '-d', is_flag=True, default=False)
-@with_appcontext
-def compile_file_cli(output_file, default_file):
-    """Compile Zenodo records file jsonschema."""
-    compile_common_cli(output_file, default_file, compile_file_jsonschema,
-                       current_app.config['ZENODO_JSONSCHEMAS_FILE_SCHEMA'])

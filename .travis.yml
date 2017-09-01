@@ -28,6 +28,7 @@ addons:
     packages:
       - nodejs
       - libfreetype6-dev
+  firefox: "55.0"
 
 notifications:
   email: false
@@ -80,6 +81,7 @@ before_install:
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-prod-requirements.txt"
   - "requirements-builder --level=pypi setup.py > .travis-latest-requirements.txt"
+  - "if [ ${E2E} == 'yes' ]; then wget https://github.com/mozilla/geckodriver/releases/download/v0.18.0/geckodriver-v0.18.0-linux64.tar.gz; mkdir geckodriver; tar -xzf geckodriver-v0.18.0-linux64.tar.gz -C geckodriver; export PATH=$PATH:$PWD/geckodriver; fi"
 
 install:
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt --pre"
