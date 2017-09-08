@@ -203,7 +203,7 @@
 
   {%- if resolved_record.license %}
     <dt>{{_('License (for files)')}}:</dt>
-    <dd><a href="{{resolved_record.license.url}}"><i class="fa fa-external-link"></i> {{resolved_record.license.title}}</a></dd>
+    <dd><a rel="license" href="{{resolved_record.license.url}}"><i class="fa fa-external-link"></i> {{resolved_record.license.title}}</a></dd>
   {%- endif %}
 
   {%- set userprofile = record.owner.id|userprofile if record.owner and record.owner.id else None %}
