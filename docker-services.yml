@@ -43,6 +43,7 @@ services:
     restart: "always"
     environment:
       - "POSTGRES_PASSWORD=postgres"
+      - "POSTGRES_USER=admin"
     ports:
       - "5432:5432"
   mq:

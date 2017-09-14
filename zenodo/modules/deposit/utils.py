@@ -200,6 +200,7 @@ def delete_record(record_uuid, reason, user):
             datacite_inactivate.delay(conceptdoi_value)
 
     # Also delete from OpenAIRE index
-    if original_id and datasource_id:
+    if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED'] and original_id \
+            and datasource_id:
         openaire_delete.delay(original_id=original_id,
                               datasource_id=datasource_id)
