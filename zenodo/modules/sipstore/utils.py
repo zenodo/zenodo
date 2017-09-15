@@ -24,25 +24,24 @@
 
 """Utilities for SIPStore module."""
 
-import json
-
+import arrow
 from invenio_sipstore.archivers.utils import chunks
-from invenio_sipstore.models import SIPMetadata, SIPMetadataType
 
 
-def generate_bag_path(recid, revision):
+def generate_bag_path(recid, iso_timestamp):
     """Generates a path for the BagIt.
 
     Splits the recid string into chunks of size 3, e.g.:
-    recid='12345', revision='5' -> ['123', '45', 'r', '5']
+    generate_bag_path('12345', '2017-09-15T11:44:24.590537+00:00') ==
+        ['123', '45', 'r', '2017-09-15T11:44:24.590537+00:00']
 
     :param recid: recid value
     :type recid: str
-    :param revision: revision of the record
-    :type revision: str
+    :param iso_timestamp: ISO-8601 formatted creation date (UTC) of the SIP.
+    :type iso_timestamp: str
     """
     recid_chunks = list(chunks(recid, 3))
-    return recid_chunks + ['r', revision, ]
+    return recid_chunks + ['r', iso_timestamp, ]
 
 
 def archive_directory_builder(sip):
@@ -52,15 +51,9 @@ def archive_directory_builder(sip):
     :type SIP: invenio_sipstore.models.SIP
     :return: list of str
     """
-    jsonmeta = SIPMetadata.query.get(
-        (sip.id, SIPMetadataType.get_from_name('json').id))
-    if jsonmeta is not None:
-        data = json.loads(jsonmeta.content)
-        revision = str(data['_deposit']['pid']['revision_id'])
-    else:
-        revision = "0"
+    iso_timestamp = arrow.get(sip.model.created).isoformat()
     recid = sip.model.record_sips[0].pid.pid_value
-    return generate_bag_path(recid, revision)
+    return generate_bag_path(recid, iso_timestamp)
 
 
 def sipmetadata_name_formatter(sipmetadata):

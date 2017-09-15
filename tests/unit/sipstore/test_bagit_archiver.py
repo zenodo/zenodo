@@ -23,6 +23,7 @@ from __future__ import absolute_import, print_function
 
 import json
 
+import arrow
 from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
@@ -146,10 +147,13 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     archiver2 = BagItArchiver(sip2)
     archiver3 = BagItArchiver(sip3)
 
-    # Each archiver subpath follows: '<recid>/r/<revision_id>'
-    assert archiver1.get_archive_subpath() == '2/r/0'
-    assert archiver2.get_archive_subpath() == '2/r/1'
-    assert archiver3.get_archive_subpath() == '3/r/0'
+    # Each archiver subpath follows: '<recid>/r/<ISO-8601-SIP-timestamp>'
+    sip1_ts = arrow.get(sip1.model.created).isoformat()
+    sip2_ts = arrow.get(sip2.model.created).isoformat()
+    sip3_ts = arrow.get(sip3.model.created).isoformat()
+    assert archiver1.get_archive_subpath() == '2/r/{0}'.format(sip1_ts)
+    assert archiver2.get_archive_subpath() == '2/r/{0}'.format(sip2_ts)
+    assert archiver3.get_archive_subpath() == '3/r/{0}'.format(sip3_ts)
 
     # As a test, write the SIPs in reverse chronological order
     assert not sip1.archived
@@ -186,8 +190,10 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     # Fetched files should correctly fetch the files from the first archive
     base_uri = archiver1.get_archive_base_uri()
     assert set(cnt) == set([
-        '{base}/2/r/0/{fn} 4 {fn}'.format(fn=s1_file1_fp, base=base_uri),
-        '{base}/2/r/0/{fn} 8 {fn}'.format(fn=s1_file2_fp, base=base_uri),
+        '{base}/2/r/{s1ts}/{fn} 4 {fn}'.format(fn=s1_file1_fp, base=base_uri,
+                                               s1ts=sip1_ts),
+        '{base}/2/r/{s1ts}/{fn} 8 {fn}'.format(fn=s1_file2_fp, base=base_uri,
+                                               s1ts=sip1_ts),
     ])
 
     fs3 = archive_fs.opendir(archiver3.get_archive_subpath())
@@ -206,8 +212,10 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     # file resides physically.
     base_uri = archiver1.get_archive_base_uri()
     assert set(cnt) == set([
-        '{base}/2/r/0/{fn} 8 {fn}'.format(fn=s3_file2_fp, base=base_uri),
+        '{base}/2/r/{s1ts}/{fn} 8 {fn}'.format(fn=s3_file2_fp, base=base_uri,
+                                               s1ts=sip1_ts),
     ])
+    app.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = orig
 
 
 def test_bag_path_generator():
