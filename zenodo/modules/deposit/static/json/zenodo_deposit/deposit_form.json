@@ -466,19 +466,19 @@
             "description": "",
             "items": [
               {
-                "type": "uiselect",
+                "type": "grantselect",
                 "key": "grants[].id",
+                "htmlClass": "grant-select",
                 "notitle": true,
                 "placeholder": "Start typing a grant number, name or abbreviation...",
                 "options": {
-                  "asyncCallback": "autocompleteSuggest",
+                  "asyncCallback": "autocompleteGrants",
                   "url": "/api/grants/_suggest",
                   "urlParameters": {
                     "text": "value",
                     "funder": "'10.13039/501100000780'",
                     "size": 15
                   },
-                  "processQuery": "query.split('::').pop()",
                   "map": {
                     "resultSource": "text.0.options",
                     "valueSource": "payload.legacy_id",
@@ -486,8 +486,48 @@
                     "valueProperty": "value",
                     "nameProperty": "text"
                   }
-                }
+                },
+                "default_funder": "10.13039/501100000780",
+                "funders_map": [
+                  {
+                    "value": "10.13039/501100000780",
+                    "name": "European Commission FP7"
+                  },
+                  {
+                    "value": "10.13039/100000001",
+                    "name": "National Science Foundation"
+                  },
+                  {
+                    "value": "10.13039/100004440",
+                    "name": "Wellcome Trust"
+                  },
+                  {
+                    "value": "10.13039/501100000923",
+                    "name": "Australian Research Council"
+                  },
+                  {
+                    "value": "10.13039/501100000925",
+                    "name": "National Health and Medical Research Council"
+                  },
+                  {
+                    "value": "10.13039/501100001871",
+                    "name": "Funda\u00e7\u00e3o para a Ci\u00eancia e a Tecnologia"
+                  },
+                  {
+                    "value": "10.13039/501100004564",
+                    "name": "Ministarstvo Prosvete, Nauke i Tehnolo\u0161kog Razvoja"
+                  },
+                  {
+                    "value": "10.13039/501100003246",
+                    "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek"
+                  },
+                  {
+                    "value": "10.13039/501100006588",
+                    "name": "Ministarstvo Znanosti, Obrazovanja i Sporta"
+                  }
+                ]
               }
+
             ]
           }
         ]
