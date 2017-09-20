@@ -119,7 +119,7 @@ class RecordSchemaOpenAIREJSON(Schema):
         for grant in grants:
             eurepo = grant.get('identifiers', {}).get('eurepo', '')
             if eurepo:
-                links.append('{eurepo}/{title}/{acronym}'.format(
+                links.append(u'{eurepo}/{title}/{acronym}'.format(
                     eurepo=eurepo,
                     title=grant.get('title', '').replace('/', '%2F'),
                     acronym=grant.get('acronym', '')))
