@@ -482,7 +482,7 @@
                   "map": {
                     "resultSource": "text.0.options",
                     "valueSource": "payload.legacy_id",
-                    "nameSource": "text",
+                    "nameSource": "payload",
                     "valueProperty": "value",
                     "nameProperty": "text"
                   }
