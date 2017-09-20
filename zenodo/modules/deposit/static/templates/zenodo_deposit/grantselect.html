@@ -1,0 +1,61 @@
+<div
+  class="form-group schema-form-uiselect {{form.htmlClass}}"
+  ng-controller="invenioDynamicSelectController"
+  ng-class="{'has-error': hasError(), 'has-feedback': form.feedback !== false}"
+  ng-init="insideModel = $$value$$; funder = {value: ($$value$$ && ($$value$$.indexOf('::') !== -1) ? $$value$$.split('::').shift() : form.default_funder )}">
+<label
+  class="control-label col-sm-3"
+  for="{{ form.key.slice(-1)[0] }}"
+  ng-class="{'sr-only': !showTitle(), 'field-required': form.required}"
+  ng-show="showTitle()">
+  <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>&nbsp;{{ form.title }}
+</label>
+
+<!-- Funder selector -->
+<div class="form-funder-select col-sm-6">
+  <ui-select
+    ng-model="$parent.funder"
+    on-select="$parent.insideModel = undefined; select_model.selected = null">
+    <ui-select-match placeholder="Select a funder...">{{ (form.funders_map | filter:{value: $select.selected.value})[0].name }}</ui-select-match>
+    <ui-select-choices repeat="item in form.funders_map">
+      <div ng-bind-html="item.name | highlight: $select.search"></div>
+    </ui-select-choices>
+  </ui-select>
+</div>
+
+<!-- Grant selector -->
+<div class="form-grant-select col-sm-6">
+  <ui-select
+    class="{{form.options.uiClass}}"
+    theme="bootstrap"
+    ng-model="select_model.selected"
+    ng-if="!(form.options.tagging||false)"
+    ng-disabled="form.disabled"
+    on-select="$$value$$=$item.value">
+    <ui-select-match placeholder="{{form.placeholder || form.schema.placeholder || ('placeholders.select' | translate)}}">
+      {{select_model.selected.name}}
+    </ui-select-match>
+    <ui-select-choices
+      refresh="populateTitleMap(form, $select.search)"
+      refresh-delay="form.options.refreshDelay"
+      group-by="form.options.groupBy"
+      repeat="item in form.titleMap | notIn:modelArray:form.options.map.valueProperty:form.key.slice(-1)[0] | limitTo:(form.options.maxResultDisplay || 6)">
+      <div ng-bind-html="item.name | highlight: $select.search"></div>
+    </ui-select-choices>
+  </ui-select>
+
+  <input
+    type="hidden"
+    name="{{form.key.slice(-1)[0]}}"
+    toggle-single-model
+    sf-changed="form"
+    ng-model="insideModel"
+    schema-validate="form"/>
+  <span
+    id="{{form.key.slice(-1)[0] + 'Status'}}"
+    class="form-control-feedback"
+    ng-if="form.feedback !== false"
+    ng-class="evalInScope(form.feedback) || {'glyphicon': true, 'glyphicon-ok': hasSuccess(), 'glyphicon-remove': hasError() }"></span>
+  <div class="help-block" sf-message="form.description"></div>
+</div>
+</div>
