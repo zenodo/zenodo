@@ -214,6 +214,25 @@
           font-weight: normal;
         }
     }
+
+    .form-grant-select {
+        .funder-field {
+            width: 40%;
+        }
+        .grant-field {
+            width: 60%;
+
+            .grant-choice-body {
+                padding-top: 8px;
+            }
+        }
+        .ui-select-choices {
+            max-height: 350px;
+            .ui-select-choices-row > a {
+                white-space: normal;
+            }
+        }
+    }
 }
 
 .modal-backdrop {

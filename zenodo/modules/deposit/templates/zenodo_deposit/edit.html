@@ -84,8 +84,17 @@
           };
           return $delegate;
         });
-
       }]);
+
+      app.filter('formatGrant', function() {
+        return function (grant) {
+          if (!grant) {
+            return '';
+          }
+          var result = (grant.acronym && grant.acronym + ' ') || '';
+          return result + '(' + grant.code + ') - ' + grant.title;
+        }
+      });
 
       app.filter('fieldtitle', function(){
         return function(fieldname, schemaform) {
