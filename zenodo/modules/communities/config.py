@@ -26,6 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
+ZENODO_COMMUNITIES_NOTIFY_DISABLED = ['zenodo', ]
+"""Communities with disabled email notification on requests."""
+
 ZENODO_COMMUNITIES_AUTO_ENABLED = True
 """Automatically add and request to communities upon publishing."""
 

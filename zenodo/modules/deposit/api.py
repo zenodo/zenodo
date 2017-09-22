@@ -114,7 +114,10 @@ class ZenodoDeposit(Deposit):
             pending_irs = comm_api.get_comm_irs(record)
             if pending_irs.count() == 0 and not comm_api.has_record(record):
                 comm = Community.get(comm_id)
-                InclusionRequest.create(comm, record)
+
+                notify = comm_id not in \
+                    current_app.config['ZENODO_COMMUNITIES_NOTIFY_DISABLED']
+                InclusionRequest.create(comm, record, notify=notify)
 
     @staticmethod
     def _remove_obsolete_irs(comms, record):

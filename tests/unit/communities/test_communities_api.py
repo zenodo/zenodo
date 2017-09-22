@@ -89,9 +89,11 @@ def test_basic_api(app, db, communities, deposit, deposit_file):
     assert record_v2.get('communities', []) == []
 
 
-def test_autoadd(app, db, users, communities, deposit, deposit_file,
-                 communities_autoadd_enabled):
+def test_autoadd(mocker, app, db, users, communities, deposit, deposit_file,
+                 communities_autoadd_enabled, communities_mail_enabled):
     """Test basic workflow using Deposit and Communities API."""
+    email_mock = mocker.patch(
+        'invenio_communities.receivers.send_community_request_email')
     deposit_v1 = publish_and_expunge(db, deposit)
     depid_v1_value = deposit_v1['_deposit']['id']
 
@@ -121,6 +123,10 @@ def test_autoadd(app, db, users, communities, deposit, deposit_file,
                                                  'grants_comm', 'zenodo']
     assert deposit_v2.get('communities', []) == ['c1', 'c2', 'c3', 'ecfunded',
                                                  'grants_comm', 'zenodo']
+    # 'c3' and 'grants_comm' were automatically added (no mail sent),
+    # while 'c1', 'c2', and 'ecfunded' and 'zenodo' are requested for,
+    # however, for 'c2' and 'zenodo', notifications have been disabled
+    assert email_mock.call_count == 2
 
     c1_api = ZenodoCommunity('c1')
     c2_api = ZenodoCommunity('c2')

@@ -120,6 +120,7 @@ def default_config(tmp_db_path):
         DEPOSIT_DATACITE_MINTING_ENABLED=False,
         ZENODO_COMMUNITIES_AUTO_ENABLED=False,
         ZENODO_COMMUNITIES_AUTO_REQUEST=['zenodo', ],
+        ZENODO_COMMUNITIES_NOTIFY_DISABLED=['zenodo', 'c2'],
         ZENODO_COMMUNITIES_ADD_IF_GRANTS=['grants_comm', ],
         ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],
         SIPSTORE_ARCHIVER_WRITING_ENABLED=False,
@@ -158,9 +159,19 @@ def api(app):
 @pytest.yield_fixture
 def communities_autoadd_enabled(app):
     """Temporarily enable auto-adding and auto-requesting of communities."""
+    orig = app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']
     app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = True
     yield app.config['ZENODO_COMMUNITIES_AUTO_ENABLED']
-    app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = False
+    app.config['ZENODO_COMMUNITIES_AUTO_ENABLED'] = orig
+
+
+@pytest.yield_fixture
+def communities_mail_enabled(app):
+    """Temporarily enable auto-adding and auto-requesting of communities."""
+    orig = app.config['COMMUNITIES_MAIL_ENABLED']
+    app.config['COMMUNITIES_MAIL_ENABLED'] = True
+    yield
+    app.config['COMMUNITIES_MAIL_ENABLED'] = orig
 
 
 @pytest.yield_fixture
