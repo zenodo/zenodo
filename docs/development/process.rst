@@ -204,15 +204,15 @@ files and models (ES mappings, UI deposit form), that need to be taken into cons
 
     a) Modify the Record JSONSchema files:
 
-        - Base JSONSchema - `records/jsonschemas/records/base-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/base-v1.0.0.json>`_
         - Files JSONSchema - `records/jsonschemas/records/file_src-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file_src-v1.0.0.json>`_
-        - RecordsFiles JSONSchema - `records/jsonschemas/records/records-files-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/records-files-v1.0.0.json>`_
+        - Base JSONSchema (subschema of Record and Deposit) - `records/jsonschemas/records/base-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/base-v1.0.0.json>`_
 
-    b) **DO NOT** modify the following JSONSchemas by hand, as they need to be compiled from the sources (see point *a.* above):
+    b) **DO NOT** modify the following JSONSchemas by hand, as they need to be compiled from the sources (see point *a* above):
 
-        - Compile `records/jsonschemas/records/file-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file-v1.0.0.json>`_ by running ``zenodo jsonschemas compilefile``. **Optional - this step is necessary only if you modified the Files JSONSchema or RecordsFiles JSONSchema**.
-        - Compile `records/jsonschemas/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compilerecord``
-        - Compile `deposit/jsonschemas/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/jsonschemas/deposits/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compiledeposit``
+        - Compile `records/jsonschemas/records/file-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file-v1.0.0.json>`_ by running ``zenodo jsonschemas compilefile -d``.
+          **Optional - this step is necessary only if you modified the Files JSONSchema**.
+        - Compile `records/jsonschemas/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compilerecord -d``
+        - Compile `deposit/jsonschemas/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/jsonschemas/deposits/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compiledeposit -d``
 
     c) Update ES mappings
 

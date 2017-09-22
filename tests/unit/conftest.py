@@ -486,7 +486,7 @@ def full_record():
              },
         ],
         notes='notes',
-        language='en',
+        language='eng',
         version='1.2.5',
         access_right='open',
         # embargo_date

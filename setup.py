@@ -147,6 +147,7 @@ install_requires = [
     'jsonresolver>=0.2.1',
     'marshmallow==2.13.4',
     'Pillow>=4.2.0',
+    'pycountry>=17.5.14',
     'python-slugify>=1.2.4',
     'raven<=5.1.0',
     'sickle>=0.6.1',
@@ -214,6 +215,7 @@ setup(
         ],
         'invenio_base.api_blueprints': [
             'zenodo_rest = zenodo.modules.rest.views:blueprint',
+            'zenodo_deposit = zenodo.modules.deposit.views_rest:blueprint',
         ],
         'invenio_base.api_converters': [
             'file_key = zenodo.modules.deposit.utils:FileKeyConverter',

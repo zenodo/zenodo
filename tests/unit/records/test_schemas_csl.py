@@ -78,7 +78,7 @@ def test_full(db, full_record, recid_pid):
         "title": "Test title",
         "ISBN": "978-0201633610",
         "issue": "2",
-        "language": "en",
+        "language": "eng",
         "volume": "20",
         "publisher": "Jol",
         "version": "1.2.5",

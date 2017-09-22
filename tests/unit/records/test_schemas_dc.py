@@ -73,6 +73,13 @@ def test_creators(app, db, minimal_record_model, recid_pid):
     assert obj['creators'] == []
 
 
+def test_languages(app, db, minimal_record_model, recid_pid):
+    """"Test identifiers."""
+    minimal_record_model['language'] = 'eng'
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['languages'] == ['eng', ]
+
+
 def test_relations(app, db, minimal_record_model, recid_pid):
     """"Test relations."""
     minimal_record_model.update({

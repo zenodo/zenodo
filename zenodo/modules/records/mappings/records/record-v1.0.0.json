@@ -29,6 +29,9 @@
             "version": {
               "type": "string"
             },
+            "language": {
+              "type": "string"
+            },
             "acronym": {
               "type": "string"
             },

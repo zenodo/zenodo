@@ -631,7 +631,7 @@
       "type": "array"
     },
     "language": {
-      "description": "ISO 639-1 or IETF BCP 47 language code.",
+      "description": "ISO 639-3 language code.",
       "type": "string"
     },
     "license": {
