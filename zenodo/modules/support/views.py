@@ -49,6 +49,9 @@ blueprint = Blueprint(
 @blueprint.route('/support', methods=['GET', 'POST'])
 def support():
     """Render contact form."""
+    # TODO: Enable form
+    return redirect('http://about.zenodo.org/contact/')
+
     form = ContactForm()
     if current_user.is_authenticated:
         user_id = current_user.id
