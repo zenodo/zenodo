@@ -117,6 +117,18 @@ def test_valid_publication_date(val, expected):
     assert data['publication_date'] == val if expected is None else expected
 
 
+def test_language():
+    """Test resource type."""
+    msv1 = MetadataSchemaV1(partial=['language'])
+    data, errors = msv1.load(dict(language='eng'))
+    assert data['language'] == 'eng'
+    assert 'language' not in errors
+    data, errors = msv1.load(dict(language='English'))
+    assert 'language' in errors
+    data, errors = msv1.load(dict())
+    assert 'language' not in errors
+
+
 @pytest.mark.parametrize('val', [
     '2016-02-32',
     ' invalid',

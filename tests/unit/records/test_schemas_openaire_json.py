@@ -86,7 +86,7 @@ def test_full(app, db, full_oai_record, recid_pid):
         'collectedFromId': 'opendoar____::2659',
         'description': 'Test Description',
         'hostedById': 'opendoar____::2659',
-        'language': 'en',
+        'language': 'eng',
         'licenseCode': 'OPEN',
         'originalId': 'oai:zenodo.org:12345',
         'pids': [{'type': 'oai', 'value': 'oai:zenodo.org:12345'},
