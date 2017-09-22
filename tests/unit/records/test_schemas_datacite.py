@@ -331,9 +331,22 @@ def test_contributors(db, minimal_record_model, recid_pid):
 
 def test_language(db, minimal_record_model, recid_pid):
     """Test language."""
+    assert 'language' not in minimal_record_model
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert 'language' not in obj
+
     minimal_record_model['language'] = 'eng'
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
-    assert obj['language'] == 'eng'
+    assert obj['language'] == 'en'  # DataCite supports ISO 639-1 (2-letter)
+
+    minimal_record_model['language'] = 'twa'  # No ISO 639-1 code
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert 'language' not in obj
+
+    # This should never happen, but in case of dirty data
+    minimal_record_model['language'] = 'Esperanto'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert 'language' not in obj
 
 
 def test_resource_type(db, minimal_record_model, recid_pid):

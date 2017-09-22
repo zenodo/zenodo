@@ -31,6 +31,7 @@ from functools import partial
 import arrow
 import idutils
 import jsonref
+import pycountry
 from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
 from invenio_pidrelations.serializers.utils import serialize_relations
@@ -255,6 +256,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     keywords = fields.List(SanitizedUnicode())
     notes = SanitizedUnicode()
     version = SanitizedUnicode()
+    language = SanitizedUnicode()
     access_right = fields.Str(validate=validate.OneOf(
         choices=[
             AccessRight.OPEN,
@@ -272,6 +274,16 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
+
+    @validates('language')
+    def validate_language(self, value):
+        """Validate that language is ISO 639-3 value."""
+        try:
+            pycountry.languages.get(alpha_3=value)
+        except KeyError:
+            raise ValidationError(_('Language must be a lower-cased 3-letter ISO 639-3 string.'),
+                field_name=['language']
+            )
 
     @validates('embargo_date')
     def validate_embargo_date(self, value):

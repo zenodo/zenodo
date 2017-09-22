@@ -24,8 +24,10 @@
 
 """Utilities for Zenodo deposit."""
 
+import itertools
 import uuid
 
+import pycountry
 from elasticsearch.exceptions import NotFoundError
 from flask import abort, current_app, request
 from invenio_accounts.models import User
@@ -204,3 +206,31 @@ def delete_record(record_uuid, reason, user):
             and datasource_id:
         openaire_delete.delay(original_id=original_id,
                               datasource_id=datasource_id)
+
+
+def suggest_language(q, limit=5):
+    """Get language suggestions based on query q from a fixed dictionary.
+
+    :param q: Query string to look for (e.g. 'Polish', 'ger', 'english')
+    :type q: str
+    :param limit: limit the result to 'limit' items
+    :type limit: int
+    :return: list of pycountry.db.Language
+    """
+    q = q.lower().strip()
+    lut = None
+    langs = []
+    # If query is 2 or 3 char long, lookup for the ISO code
+    if 2 <= len(q) <= 3:
+        try:
+            lut = pycountry.languages.lookup(q)
+        except LookupError:
+            pass
+    # For queries longer than 2 characters, search by name
+    if len(q) > 2:
+        langs = list(itertools.islice(
+            (l for l in pycountry.languages if q in l.name.lower()), limit))
+    # Include the ISO-fetched language (if available) on first position
+    if lut:
+        langs = ([lut, ] + [l for l in langs if l != lut])[:limit]
+    return langs
