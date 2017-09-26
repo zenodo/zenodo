@@ -37,7 +37,9 @@ class PersistentId(SanitizedUnicode):
     """Special DOI field."""
 
     default_error_messages = {
-        'invalid_scheme': _('Not a valid {scheme} identifier.'),
+        'invalid_scheme': 'Not a valid {scheme} identifier.',
+        # TODO: Translation on format strings sounds tricky...
+        # 'invalid_scheme': _('Not a valid {scheme} identifier.'),
         'invalid_pid': _('Not a valid persistent identifier.'),
     }
 
