@@ -220,6 +220,14 @@
             "placeholder": "Affiliation",
             "description": "",
             "notitle": true
+          },
+          {
+            "type": "text",
+            "key": "creators[].orcid",
+            "fieldHtmlClass": "orcid-field",
+            "placeholder": "ORCID (eg. 0000-0002-1825-0097)",
+            "description": "Optional.",
+            "notitle": true
           }
         ]
       },
