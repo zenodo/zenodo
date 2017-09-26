@@ -29,7 +29,8 @@ from __future__ import absolute_import, print_function
 import json
 
 import arrow
-from marshmallow import Schema, fields
+import pycountry
+from marshmallow import Schema, fields, post_dump
 
 from ...models import ObjectType
 
@@ -132,7 +133,8 @@ class DataCiteSchemaV1(Schema):
     subjects = fields.Method('get_subjects')
     contributors = fields.Method('get_contributors')
     dates = fields.Method('get_dates')
-    language = fields.Str(attribute='metadata.language')
+    language = fields.Method('get_language')
+    version = fields.Str(attribute='metadata.version')
     resourceType = fields.Method('get_type')
     alternateIdentifiers = fields.List(
         fields.Nested(AlternateIdentifierSchema),
@@ -141,6 +143,27 @@ class DataCiteSchemaV1(Schema):
     relatedIdentifiers = fields.Method('get_related_identifiers')
     rightsList = fields.Method('get_rights')
     descriptions = fields.Method('get_descriptions')
+
+    @post_dump
+    def cleanup(self, data):
+        """Clean the data."""
+        # Remove the language if Alpha-2 code was not found
+        if 'language' in data and data['language'] is None:
+            del data['language']
+        return data
+
+    def get_language(self, obj):
+        """Export language to the Alpha-2 code (if available)."""
+        lang = obj['metadata'].get('language', None)
+        if lang:
+            try:
+                l = pycountry.languages.get(alpha_3=lang)
+            except KeyError:
+                return None
+            if not hasattr(l, 'alpha_2'):
+                return None
+            return l.alpha_2
+        return None
 
     def get_descriptions(self, obj):
         """."""

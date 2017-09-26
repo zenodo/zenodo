@@ -65,6 +65,169 @@ def test_minimal(db, minimal_record_model, recid_pid):
     }
 
 
+def test_full(db, record_with_bucket, recid_pid):
+    """Test full record metadata."""
+    _, full_record_model = record_with_bucket
+    full_record_model['doi'] = '10.1234/foo'
+    obj = datacite_v31.transform_record(recid_pid, full_record_model)
+    assert obj == {
+        "alternateIdentifiers": [
+            {
+                "alternateIdentifier": "urn:lsid:ubio.org:namebank:11815",
+                "alternateIdentifierType": "lsid"
+            },
+            {
+                "alternateIdentifier": "2011ApJS..192...18K",
+                "alternateIdentifierType": "issn"
+            },
+            {
+                "alternateIdentifier": "10.1234/alternate.doi",
+                "alternateIdentifierType": "doi"
+            },
+            {
+                "alternateIdentifier": "http://localhost/record/123",
+                "alternateIdentifierType": "url"
+            }
+        ],
+        "contributors": [
+            {
+                "affiliation": "CERN",
+                "contributorName": "Smith, Other",
+                "contributorType": "Other",
+                "nameIdentifier": {
+                    "nameIdentifier": "0000-0002-1825-0097",
+                    "nameIdentifierScheme": "ORCID",
+                    "schemeURI": "http://orcid.org/"
+                }
+            },
+            {
+                "affiliation": "",
+                "contributorName": "Hansen, Viggo",
+                "contributorType": "Other",
+                "nameIdentifier": {}
+            },
+            {
+                "affiliation": "CERN",
+                "contributorName": "Kowalski, Manager",
+                "contributorType": "DataManager",
+                "nameIdentifier": {}
+            }
+        ],
+        "creators": [
+            {
+                "affiliation": "CERN",
+                "creatorName": "Doe, John",
+                "nameIdentifier": {
+                    "nameIdentifier": "0000-0002-1694-233X",
+                    "nameIdentifierScheme": "ORCID",
+                    "schemeURI": "http://orcid.org/"
+                }
+            },
+            {
+                "affiliation": "CERN",
+                "creatorName": "Doe, Jane",
+                "nameIdentifier": {
+                    "nameIdentifier": "0000-0002-1825-0097",
+                    "nameIdentifierScheme": "ORCID",
+                    "schemeURI": "http://orcid.org/"
+                }
+            },
+            {
+                "affiliation": "CERN",
+                "creatorName": "Smith, John",
+                "nameIdentifier": {}
+            },
+            {
+                "affiliation": "CERN",
+                "creatorName": "Nowak, Jack",
+                "nameIdentifier": {
+                    "nameIdentifier": "170118215",
+                    "nameIdentifierScheme": "GND"
+                }
+            }
+        ],
+        "dates": [
+            {
+                "date": "2014-02-27",
+                "dateType": "Issued"
+            }
+        ],
+        "descriptions": [
+            {
+                "description": "Test Description",
+                "descriptionType": "Abstract"
+            },
+            {
+                "description": "notes",
+                "descriptionType": "Other"
+            },
+            {
+                "description": (
+                    "{\"references\": [\"Doe, John et al (2012). "
+                    "Some title. Zenodo. 10.5281/zenodo.12\", \"Smith, "
+                    "Jane et al (2012). Some title. Zenodo. "
+                    "10.5281/zenodo.34\"]}"
+                ),
+                "descriptionType": "Other"
+            }
+        ],
+        "identifier": {
+            "identifier": "10.1234/foo",
+            "identifierType": "DOI"
+        },
+        "language": "en",
+        "publicationYear": "2014",
+        "publisher": "Zenodo",
+        "relatedIdentifiers": [
+            {
+                "relatedIdentifier": "10.1234/foo.bar",
+                "relatedIdentifierType": "DOI",
+                "relationType": "Cites"
+            },
+            {
+                "relatedIdentifier": "1234.4321",
+                "relatedIdentifierType": "arXiv",
+                "relationType": "Cites"
+            }
+        ],
+        "resourceType": {
+            "resourceType": "Book",
+            "resourceTypeGeneral": "Text"
+        },
+        "rightsList": [
+            {
+                "rights": "Creative Commons",
+                "rightsURI": "http://zenodo.org"
+            },
+            {
+                "rights": "Open Access",
+                "rightsURI": "info:eu-repo/semantics/openAccess"
+            }
+        ],
+        "subjects": [
+            {
+                "subject": "kw1"
+            },
+            {
+                "subject": "kw2"
+            },
+            {
+                "subject": "kw3"
+            },
+            {
+                "subject": "http://id.loc.gov/authorities/subjects/sh85009003",
+                "subjectScheme": "url"
+            }
+        ],
+        "titles": [
+            {
+                "title": "Test Title"
+            }
+        ],
+        "version": "1.2.5"
+    }
+
+
 def test_identifier(db, minimal_record_model, recid_pid):
     """Test identifier."""
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
@@ -168,9 +331,22 @@ def test_contributors(db, minimal_record_model, recid_pid):
 
 def test_language(db, minimal_record_model, recid_pid):
     """Test language."""
+    assert 'language' not in minimal_record_model
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert 'language' not in obj
+
     minimal_record_model['language'] = 'eng'
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
-    assert obj['language'] == 'eng'
+    assert obj['language'] == 'en'  # DataCite supports ISO 639-1 (2-letter)
+
+    minimal_record_model['language'] = 'twa'  # No ISO 639-1 code
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert 'language' not in obj
+
+    # This should never happen, but in case of dirty data
+    minimal_record_model['language'] = 'Esperanto'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert 'language' not in obj
 
 
 def test_resource_type(db, minimal_record_model, recid_pid):

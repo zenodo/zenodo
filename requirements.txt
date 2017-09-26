@@ -193,6 +193,7 @@ psycopg2==2.7.1
 ptyprocess==0.5.2
 py==1.4.34
 pyasn1==0.2.3
+pycountry==17.5.14
 pycparser==2.18
 pydocstyle==2.0.0
 Pygments==2.2.0
