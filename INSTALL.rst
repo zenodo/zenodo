@@ -167,21 +167,54 @@ Media assets
 
 Next, we need to build the assets for the Zenodo application.
 
-To compile Zenodo assets you will need some NPM pacakges and asset building
-tools: NodeJS, SASS, CleanCSS, UglifyJS and RequireJS.
-The easiest way is to install them system-wide, and in the specific versions we
-have pinned. You can do that by executing:
+To compile Zenodo assets we will need to install:
+
+* NodeJS **7.4** and NPM **4.0.5**
+
+* Asset-building dependencies: SASS **3.8.0**, CleanCSS **3.4.19**, UglifyJS **2.7.3** and RequireJS **2.2.0**
+
+If you system packages provide NodeJS and NPM in the versions listed above, you
+can install the asset tools system-wide (with ``sudo``), by executing:
 
 .. code-block:: console
 
    (zenodo)$ sudo ./scripts/setup-npm.sh
 
 Take a look in the script above to see which commands are being run.
-Since those pacakges are installed with ``-g`` flag (system-wide),
-you will need to run the command above with ``sudo``.
+Use of ``sudo`` is required because of the ``-g`` flag for global installation.
 
-Afterwards you need to download and build the media assets for Zenodo.
-As before, there is a script which does that (this time without sudo):
+Alternatively, you can install NodeJS, NPM and other dependencies using
+NVM (node version manager), which is similar to Python's virtualenv.
+
+To do that, you need to first install NVM from
+`https://github.com/creationix/nvm <https://github.com/creationix/nvm/>`_
+or from your OS-specific package repository:
+
+* NVM on `Arch Linux AUR <https://aur.archlinux.org/packages/nvm/>`_
+
+* Brew on OS X: ``brew install nvm``
+
+Note: If you install NVM from system packages, you still need to source it
+in your ``.bashrc`` or ``.zshrc``. Refer to NVM repository for more details.
+
+Once NVM is installed, set it to use NodeJS in version 7.4:
+
+.. code-block:: console
+
+   (zenodo)$ nvm use 7.4
+   Now using node v7.4.0 (npm v4.0.5)
+
+As before, install the npm requirements, this time without ``sudo``:
+
+.. code-block:: console
+
+   (zenodo)$ ./scripts/setup-npm.sh
+
+the packages will be installed in your local user's NVM environment.
+
+After you've installed the NPM packages system-wide or with NVM, you can
+finally download and build the media assets for Zenodo. There is a script
+which does that:
 
 .. code-block:: console
 
