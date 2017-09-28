@@ -38,7 +38,9 @@ def test_loadfunders_and_fp6grants(script_info, db):
     runner = CliRunner()
     res = runner.invoke(loadfunders_cli, [], obj=script_info)
     assert res.exit_code == 0
-    assert RecordMetadata.query.count() == 9  # 9 supported funders
+    # We support 9 funders, but 3 parent funders are also required to properly
+    # index the funder records.
+    assert RecordMetadata.query.count() == 12
 
     res = runner.invoke(loadfp6grants_cli, [], obj=script_info)
     assert res.exit_code == 0
