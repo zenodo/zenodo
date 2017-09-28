@@ -153,5 +153,50 @@
     "remote_modified": "2015-10-28T13:41:07.000000",
     "subtype": "federal/national government",
     "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [],
+    "country": "PT",
+    "doi": "10.13039/501100003381",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Minist\u00e9rio da Educa\u00e7\u00e3o e Ci\u00eancia",
+    "parent": {},
+    "remote_created": "2014-03-06T18:21:41.000000",
+    "remote_modified": "2015-10-28T13:26:53.000000",
+    "subtype": "government non-federal",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [],
+    "country": "AU",
+    "doi": "10.13039/501100000934",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Department of Industry, Innovation, Science, Research and Tertiary Education, Australian Government",
+    "parent": {},
+    "remote_created": "2011-07-11T10:33:24.000000",
+    "remote_modified": "2015-06-12T08:24:24.000000",
+    "subtype": "federal",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [],
+    "country": "AU",
+    "doi": "10.13039/501100003921",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Department of Health, Australian Government",
+    "parent": {},
+    "remote_created": "2014-04-24T13:24:55.000000",
+    "remote_modified": "2015-10-28T13:34:53.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
   }
 ]

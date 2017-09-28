@@ -32,14 +32,18 @@ from os.path import dirname, join
 import click
 from flask.cli import with_appcontext
 from invenio_communities.utils import initialize_communities_bucket
+from invenio_db import db
+from invenio_openaire.minters import funder_minter, grant_minter
+from invenio_pidstore.models import PersistentIdentifier
+from invenio_records.api import Record
 from sqlalchemy.orm.exc import NoResultFound
 
 from .communities import loadcommunities
 from .files import loaddemofiles, loadlocations
-from .grants import loadfp6grants, loadfunders
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .records import loaddemorecords, loadsipmetadatatypes
+from .utils import read_json
 
 
 @click.group()
@@ -77,14 +81,32 @@ def loadoaisets_cli():
 @with_appcontext
 def loadfp6grants_cli():
     """Load one-off grants."""
-    loadfp6grants()
+    data = read_json('data/grants.json')
+    loaded = 0
+    for g in data:
+        if not PersistentIdentifier.query.filter_by(
+                pid_type='grant', pid_value=g['internal_id']).count():
+            r = Record.create(g)
+            grant_minter(r.id, r)
+            db.session.commit()
+            loaded += 1
+    click.echo("Loaded {0} new grants out of {1}.".format(loaded, len(data)))
 
 
 @fixtures.command('loadfunders')
 @with_appcontext
 def loadfunders_cli():
     """Load the supported funders."""
-    loadfunders()
+    data = read_json('data/funders.json')
+    loaded = 0
+    for f in data:
+        if not PersistentIdentifier.query.filter_by(
+                pid_type='frdoi', pid_value=f['doi']).count():
+            r = Record.create(f)
+            funder_minter(r.id, r)
+            db.session.commit()
+            loaded += 1
+    click.echo("Loaded {0} new funders out of {1}.".format(loaded, len(data)))
 
 
 @fixtures.command('loaddemorecords')
