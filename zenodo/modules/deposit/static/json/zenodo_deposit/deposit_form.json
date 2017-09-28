@@ -266,7 +266,7 @@
       {
         "type": "text",
         "key": "version",
-        "title": "Version tag",
+        "title": "Version",
         "description": "Optional. Mostly relevant for software and dataset uploads. Any string will be accepted, but semantically-versioned tag is recommended.<br />See <a href='http://semver.org'><i class='fa fa-external-link'></i> semver.org</a> for more information on semantic versioning.",
         "fa_cls": "fa-tags",
         "required": false
@@ -275,7 +275,7 @@
         "type": "uiselect",
         "key": "language",
         "title": "Language",
-        "description": "Language of the record. Start by typing the language common name in English, or its ISO 639 code (two or three letters).<br />See <a href='https://www.loc.gov/standards/iso639-2/php/code_list.php'><i class='fa fa-external-link'></i> ISO 639 language codes list</a> for more information.",
+        "description": "Optional. Primary language of the record. Start by typing the language's common name in English, or its ISO 639 code (two or three-letter code).<br />See <a href='https://www.loc.gov/standards/iso639-2/php/code_list.php'><i class='fa fa-external-link'></i> ISO 639 language codes list</a> for more information.",
         "fieldhint": "recommended",
         "placeholder": "e.g.: 'eng', 'fr' or 'Polish'",
         "fa_cls": "fa-globe",
@@ -493,7 +493,7 @@
         "key": "grants",
         "title": "Grants",
         "fa_cls": "fa-money",
-        "description": "Optional. European Commission FP7 and Horizon 2020 grants only. For general funding acknowledgements, please use the <i>Additional Notes</i> field.<br>Note: a human Zenodo curator will need to validate your upload - you may experience a delay before it is available in OpenAIRE.",
+        "description": "Optional. OpenAIRE-supported projects only. For other funding acknowledgements, please use the <i>Additional Notes</i> field.<br>Note: a human Zenodo curator will need to validate your upload - you may experience a delay before it is available in OpenAIRE.",
         "sortOptions": {
           "disabled": true
         },
@@ -530,40 +530,40 @@
                 "default_funder": "10.13039/501100000780",
                 "funders_map": [
                   {
-                    "value": "10.13039/501100000780",
-                    "name": "European Commission"
-                  },
-                  {
-                    "value": "10.13039/100000001",
-                    "name": "National Science Foundation"
-                  },
-                  {
-                    "value": "10.13039/100004440",
-                    "name": "Wellcome Trust"
-                  },
-                  {
                     "value": "10.13039/501100000923",
-                    "name": "Australian Research Council"
+                    "name": "Australian Research Council (AU)"
                   },
                   {
-                    "value": "10.13039/501100000925",
-                    "name": "National Health and Medical Research Council"
+                    "value": "10.13039/501100000780",
+                    "name": "European Commission (EU)"
                   },
                   {
                     "value": "10.13039/501100001871",
-                    "name": "Funda\u00e7\u00e3o para a Ci\u00eancia e a Tecnologia"
+                    "name": "Funda\u00e7\u00e3o para a Ci\u00eancia e a Tecnologia (PT)"
                   },
                   {
                     "value": "10.13039/501100004564",
-                    "name": "Ministarstvo Prosvete, Nauke i Tehnolo\u0161kog Razvoja"
-                  },
-                  {
-                    "value": "10.13039/501100003246",
-                    "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek"
+                    "name": "Ministarstvo Prosvete, Nauke i Tehnolo\u0161kog Razvoja (RS)"
                   },
                   {
                     "value": "10.13039/501100006588",
-                    "name": "Ministarstvo Znanosti, Obrazovanja i Sporta"
+                    "name": "Ministarstvo Znanosti, Obrazovanja i Sporta (HR)"
+                  },
+                  {
+                    "value": "10.13039/501100000925",
+                    "name": "National Health and Medical Research Council (AU)"
+                  },
+                  {
+                    "value": "10.13039/100000001",
+                    "name": "National Science Foundation (US)"
+                  },
+                  {
+                    "value": "10.13039/501100003246",
+                    "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NL)"
+                  },
+                  {
+                    "value": "10.13039/100004440",
+                    "name": "Wellcome Trust (GB)"
                   }
                 ]
               }
