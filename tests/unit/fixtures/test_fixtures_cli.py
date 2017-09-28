@@ -44,4 +44,4 @@ def test_loadfunders_and_fp6grants(script_info, db):
 
     res = runner.invoke(loadfp6grants_cli, [], obj=script_info)
     assert res.exit_code == 0
-    assert RecordMetadata.query.count() == 11  # 2 FP6 grants
+    assert RecordMetadata.query.count() == 14  # + 2 FP6 grants
