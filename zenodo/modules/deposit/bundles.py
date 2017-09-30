@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2017 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,23 +22,33 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-if [ -d "$VIRTUAL_ENV/var/instance/data" ]; then
-    rm -Rf $VIRTUAL_ENV/var/instance/data
-fi
+"""Bundles for Zenodo deposit form."""
 
-zenodo db destroy --yes-i-know
-zenodo db init
-zenodo db create
-zenodo index destroy --force --yes-i-know
-zenodo index queue init
-zenodo index init
-zenodo fixtures init
-zenodo opendefinition loadlicenses
-zenodo fixtures loadlicenses
-zenodo fixtures loadfunders
-zenodo fixtures loadfp6grants
-zenodo fixtures loadsipmetadatatypes
-zenodo users create info@zenodo.org -a --password=123456
-zenodo access allow admin-access user info@zenodo.org
-zenodo access allow deposit-admin-access user info@zenodo.org
-zenodo fixtures loadcommunities info@zenodo.org
+from flask_assets import Bundle
+from invenio_assets import NpmBundle
+from invenio_deposit.bundles import js_dependecies_autocomplete, \
+    js_dependecies_schema_form, js_dependecies_uploader, \
+    js_dependencies_ckeditor, js_dependencies_jquery, \
+    js_dependencies_ui_sortable, js_main
+
+js_zenodo_deposit = Bundle(
+    'js/zenodo_deposit/filters.js',
+    'js/zenodo_deposit/directives.js',
+    'js/zenodo_deposit/controllers.js',
+    depends=(
+        'js/zenodo_deposit/*.js',
+    ),
+)
+
+js_deposit = NpmBundle(
+    js_dependencies_jquery,
+    js_main,
+    js_dependecies_uploader,
+    js_dependecies_schema_form,
+    js_dependecies_autocomplete,
+    js_dependencies_ui_sortable,
+    js_dependencies_ckeditor,
+    js_zenodo_deposit,
+    filters='uglifyjs',
+    output='gen/zenodo.deposit.%(version)s.js',
+)

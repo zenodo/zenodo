@@ -242,6 +242,7 @@ setup(
             '= zenodo.modules.records.fetchers:zenodo_doi_fetcher',
         ],
         'invenio_assets.bundles': [
+            'zenodo_deposit_js = zenodo.modules.deposit.bundles:js_deposit',
             'zenodo_theme_css = zenodo.modules.theme.bundles:css',
             'zenodo_theme_js = zenodo.modules.theme.bundles:js',
             'zenodo_search_js = zenodo.modules.theme.bundles:search_js',
