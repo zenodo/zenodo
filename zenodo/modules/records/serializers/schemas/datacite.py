@@ -134,7 +134,7 @@ class DataCiteSchemaV1(Schema):
     contributors = fields.Method('get_contributors')
     dates = fields.Method('get_dates')
     language = fields.Method('get_language')
-    version = fields.Str(attribute='metadata.version')
+    # version = fields.Str(attribute='metadata.version')
     resourceType = fields.Method('get_type')
     alternateIdentifiers = fields.List(
         fields.Nested(AlternateIdentifierSchema),

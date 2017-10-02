@@ -498,7 +498,7 @@ def full_record():
         ],
         notes='notes',
         language='eng',
-        version='1.2.5',
+        # version='1.2.5',
         access_right='open',
         # embargo_date
         # access_conditions

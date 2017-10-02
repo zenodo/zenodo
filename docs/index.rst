@@ -32,7 +32,8 @@ to run your own digital repository on the web.
 Developers's Guide
 ------------------
 
-This part of the documentation will show you how to get started in running Zenodo locally.
+This part of the documentation will show you how to get started in using
+Invenio-Base.
 
 .. toctree::
    :maxdepth: 2
