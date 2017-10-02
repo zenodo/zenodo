@@ -255,7 +255,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         required=True, validate=validate.Length(min=3))
     keywords = fields.List(SanitizedUnicode())
     notes = SanitizedUnicode()
-    version = SanitizedUnicode()
+    # version = SanitizedUnicode()
     language = SanitizedUnicode()
     access_right = fields.Str(validate=validate.OneOf(
         choices=[

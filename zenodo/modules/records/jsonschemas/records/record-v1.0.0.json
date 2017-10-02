@@ -917,10 +917,6 @@
     "title": {
       "description": "Record title.",
       "type": "string"
-    },
-    "version": {
-      "description": "Record version tag.",
-      "type": "string"
     }
   },
   "required": [

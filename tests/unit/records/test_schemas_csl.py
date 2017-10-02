@@ -81,7 +81,7 @@ def test_full(db, full_record, recid_pid):
         "language": "eng",
         "volume": "20",
         "publisher": "Jol",
-        "version": "1.2.5",
+        # "version": "1.2.5",
         "note": "notes",
         "issued": {
             "date-parts": [[2014, 2, 27]]
