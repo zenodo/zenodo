@@ -596,7 +596,7 @@
             "key": "related_identifiers[].relation",
             "description": "",
             "notitle": true,
-            "placeholder": "e.g. isPartOf",
+            "placeholder": "e.g. cites this upload",
             "titleMap": [
               {
                 "value": "isCitedBy",
@@ -693,9 +693,17 @@
             "notitle": true
           },
           {
+            "type": "text",
+            "key": "contributors[].orcid",
+            "fieldHtmlClass": "orcid-field",
+            "placeholder": "ORCID (eg. 0000-0002-1825-0097)",
+            "description": "Optional.",
+            "notitle": true
+          },
+          {
             "type": "select",
             "key": "contributors[].type",
-            "placeholder": "Contact person",
+            "placeholder": "eg. Editor",
             "notitle": true,
             "titleMap": [
               {
@@ -929,6 +937,14 @@
             "notitle": true,
             "description": "",
             "placeholder": "Affiliation"
+          },
+          {
+            "type": "text",
+            "key": "thesis_supervisors[].orcid",
+            "fieldHtmlClass": "orcid-field",
+            "placeholder": "ORCID (eg. 0000-0002-1825-0097)",
+            "description": "Optional.",
+            "notitle": true
           }
         ]
       }
