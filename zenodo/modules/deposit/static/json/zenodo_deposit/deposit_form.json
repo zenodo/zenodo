@@ -175,7 +175,7 @@
         "type": "template",
         "key": "publication_date",
         "title": "Publication date",
-        "placeholder": "eg. 2013-05-08",
+        "placeholder": "e.g.: 2013-05-08",
         "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
         "format": "yyyy-MM-dd",
         "description": "Required. Format: YYYY-MM-DD. In case your upload was already published elsewhere, please use the date of first publication.",
@@ -210,7 +210,7 @@
           {
             "type": "text",
             "key": "creators[].name",
-            "placeholder": "Family Name, Given names",
+            "placeholder": "Family name, given names",
             "description": "",
             "notitle": true
           },
@@ -225,7 +225,7 @@
             "type": "text",
             "key": "creators[].orcid",
             "fieldHtmlClass": "orcid-field",
-            "placeholder": "ORCID (eg. 0000-0002-1825-0097)",
+            "placeholder": "ORCID (e.g.: 0000-0002-1825-0097)",
             "description": "Optional.",
             "notitle": true
           }
@@ -364,7 +364,7 @@
         "key": "embargo_date",
         "title": "Embargo date",
         "description": "Required only for Embargoed Access uploads. Format: YYYY-MM-DD. The date your upload will be made publicly available in case it is under an embargo period from your publisher.",
-        "placeholder": "eg. 2016-04-22",
+        "placeholder": "e.g.: 2016-04-22",
         "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
         "format": "yyyy-MM-dd",
         "fa_cls": "fa-calendar",
@@ -682,7 +682,7 @@
         "items": [
           {
             "key": "contributors[].name",
-            "placeholder": "Family Name, Given names",
+            "placeholder": "Family name, given names",
             "description": "",
             "notitle": true
           },
@@ -696,14 +696,14 @@
             "type": "text",
             "key": "contributors[].orcid",
             "fieldHtmlClass": "orcid-field",
-            "placeholder": "ORCID (eg. 0000-0002-1825-0097)",
+            "placeholder": "ORCID (e.g.: 0000-0002-1825-0097)",
             "description": "Optional.",
             "notitle": true
           },
           {
             "type": "select",
             "key": "contributors[].type",
-            "placeholder": "eg. Editor",
+            "placeholder": "e.g.: Editor",
             "notitle": true,
             "titleMap": [
               {
@@ -779,7 +779,7 @@
                 "type": "text",
                 "key": "references[]",
                 "notitle": true,
-                "placeholder": "eg. Cranmer, Kyle et al. (2014). Decouple software associated to arXiv:1401.0080."
+                "placeholder": "e.g.: Cranmer, Kyle et al. (2014). Decouple software associated to arXiv:1401.0080."
               }
             ]
           }
@@ -930,7 +930,7 @@
             "key": "thesis_supervisors[].name",
             "notitle": true,
             "description": "",
-            "placeholder": "Family Name, Given names"
+            "placeholder": "Family name, given names"
           },
           {
             "key": "thesis_supervisors[].affiliation",
@@ -942,7 +942,7 @@
             "type": "text",
             "key": "thesis_supervisors[].orcid",
             "fieldHtmlClass": "orcid-field",
-            "placeholder": "ORCID (eg. 0000-0002-1825-0097)",
+            "placeholder": "ORCID (e.g.: 0000-0002-1825-0097)",
             "description": "Optional.",
             "notitle": true
           }
