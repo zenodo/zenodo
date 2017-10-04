@@ -187,6 +187,8 @@ setup(
         'invenio_base.apps': [
             'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
             'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
+            'zenodo_communities = '
+            'zenodo.modules.communities.ext:ZenodoCommunities',
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
             'zenodo_support = zenodo.modules.support.ext:ZenodoSupport',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
@@ -198,6 +200,8 @@ setup(
         ],
         'invenio_base.api_apps': [
             'zenodo_cache = zenodo.modules.cache.ext:ZenodoCache',
+            'zenodo_communities = '
+            'zenodo.modules.communities.ext:ZenodoCommunities',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
