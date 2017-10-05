@@ -24,6 +24,8 @@
 
 """Utilities for SIPStore module."""
 
+from __future__ import absolute_import, unicode_literals
+
 import arrow
 from invenio_sipstore.archivers.utils import chunks
 

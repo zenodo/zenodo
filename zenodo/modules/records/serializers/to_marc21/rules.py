@@ -24,7 +24,7 @@
 
 """MARC21 rules."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 from dojson import utils
 from dojson.contrib.to_marc21 import to_marc21

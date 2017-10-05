@@ -22,7 +22,9 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-from __future__ import absolute_import, print_function
+"""Test records permissions."""
+
+from __future__ import absolute_import, print_function, unicode_literals
 
 import pytest
 from flask import url_for

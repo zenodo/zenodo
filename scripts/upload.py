@@ -24,7 +24,7 @@
 
 """Simple script to make an upload via the REST API."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 import json
 from time import sleep

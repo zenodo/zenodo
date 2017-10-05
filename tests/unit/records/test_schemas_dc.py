@@ -24,7 +24,7 @@
 
 """Zenodo Dublin Core mapping test."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 from datetime import datetime, timedelta
 

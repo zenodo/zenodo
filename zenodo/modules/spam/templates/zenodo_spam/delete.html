@@ -104,7 +104,7 @@
         <div class="panel-body">
           User has <strong>{{ rec_count }}</strong> records indexed in elasticsearch.
 
-          <a href="{{ url_for('invenio_search_ui.search', q='owners: ' + (user.id|string)) }}"><strong>Full record search result</strong></a>
+          <a href="{{ url_for('invenio_search_ui.search', q=('owners:' + (user.id|string))) }}"><strong>Full record search result</strong></a>
 
           <h5>Records sample:</h5>
           <table class="table table-bordered">

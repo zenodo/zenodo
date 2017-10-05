@@ -24,6 +24,8 @@
 
 """Zenodo legacy JSON schema."""
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import six
 from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
