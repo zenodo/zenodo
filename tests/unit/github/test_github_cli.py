@@ -25,7 +25,7 @@
 
 """Test CLI for GitHub."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 import pytest
 from invenio_github.api import GitHubAPI

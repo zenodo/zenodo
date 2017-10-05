@@ -24,7 +24,7 @@
 
 """MARCXML translation index."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 from dateutil.parser import parse
 from flask import current_app

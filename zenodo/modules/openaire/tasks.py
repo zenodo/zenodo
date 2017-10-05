@@ -24,7 +24,7 @@
 
 """Celery tasks for OpenAIRE."""
 
-from __future__ import absolute_import
+from __future__ import absolute_import, print_function, unicode_literals
 
 import requests
 from celery import shared_task

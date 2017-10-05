@@ -24,7 +24,7 @@
 
 """Record minters."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import, print_function, unicode_literals
 
 from zenodo.modules.records.minters import doi_generator
 

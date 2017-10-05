@@ -22,6 +22,8 @@
 
 """Unit tests BibTex formatter."""
 
+from __future__ import absolute_import, print_function, unicode_literals
+
 import pytest
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
