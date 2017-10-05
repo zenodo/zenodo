@@ -26,23 +26,6 @@
 
 from __future__ import absolute_import, print_function
 
-from flask_babelex import gettext
-from speaklater import make_lazy_gettext
-
-_ = make_lazy_gettext(lambda: gettext)
-
-ZENODO_COMMUNITIES_AUTO_ENABLED = True
-"""Automatically add and request to communities upon publishing."""
-
-ZENODO_COMMUNITIES_AUTO_REQUEST = ['zenodo', ]
-"""Communities which are to be auto-requested upon first publishing."""
-
-ZENODO_COMMUNITIES_REQUEST_IF_GRANTS = ['ecfunded', ]
-"""Communities which are to be auto-requested if record has grants."""
-
-ZENODO_COMMUNITIES_ADD_IF_GRANTS = []
-"""Communities which are to be auto-added if record has grants."""
-
 ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
 """Maximum quota per bucket."""
 

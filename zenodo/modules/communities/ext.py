@@ -41,6 +41,8 @@ class ZenodoCommunities(object):
         """Flask application initialization."""
         self.init_config(app)
 
+        app.extensions['zenodo-communities'] = self
+
     @staticmethod
     def init_config(app):
         """Initialize configuration."""
