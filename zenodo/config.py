@@ -165,16 +165,28 @@ CELERYBEAT_SCHEDULE = {
     'file-checks': {
         'task': 'invenio_files_rest.tasks.schedule_checksum_verification',
         'schedule': timedelta(hours=1),
-        'kwargs': {'max_count': 0},
+        'kwargs': {
+            'batch_interval': {'hours': 1},
+            'max_count': 0,
+            # Query taking into account only files with URI prefixes defined by
+            # the FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES config variable
+            'files_query':
+                'zenodo.modules.utils.files.checksum_verification_files_query',
+        },
     },
     'hard-file-checks': {
         'task': 'invenio_files_rest.tasks.schedule_checksum_verification',
         'schedule': timedelta(hours=1),
         'kwargs': {
+            'batch_interval': {'hours': 1},
             # Manually check and calculate checksums of files biannually
             'frequency': {'days': 180},
             # Split batches based on total files size
             'max_size': 0,
+            # Query taking into account only files with URI prefixes defined by
+            # the FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES config variable
+            'files_query':
+                'zenodo.modules.utils.files.checksum_verification_files_query',
             # Actual checksum calculation, instead of relying on a EOS query
             'checksum_kwargs': {'use_default_impl': True},
         },
@@ -647,10 +659,6 @@ FILES_REST_OBJECT_KEY_MAX_LEN = 1000
 
 #: Max URI length
 FILES_REST_FILE_URI_MAX_LEN = 1000
-
-#: Query for files to have their checksums verified
-FILES_REST_CHECKSUM_VERIFICATION_FILES_QUERY = \
-    'zenodo.modules.utils.files.checksum_verification_files_query'
 
 #: URI prefixes of files their checksums should be verified
 FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES = [
