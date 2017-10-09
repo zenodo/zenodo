@@ -279,6 +279,9 @@ setup(
             'records = zenodo.modules.records.mappings',
             'deposits = zenodo.modules.deposit.mappings',
         ],
+        'invenio_webhooks.receivers': [
+            'ads = zenodo.modules.webhooks.receivers:ADSReceiver',
+        ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
         ],
