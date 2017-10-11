@@ -30,11 +30,14 @@ from __future__ import absolute_import, print_function, unicode_literals
 ZENODO_WEBHOOKS_SUBSCRIBERS = [
     {
         'id': 'ads',
-        'event': 'record*',
+        'event': 'relation_*',
         # Use something like https://hookb.in for debuggin
-        'url': 'https://httpbin.org/status/202',
+        'url': 'https://httpbin.org/status/200',
         'content_type': 'application/json',
         'secret': 'ads',
     }
 ]
 """Statically loaded webhook subscribers."""
+
+ZENODO_WEBHOOKS_DEBUG_RECEIVER_URL = None
+"""Debug URL where all Webhook events will be sent to."""

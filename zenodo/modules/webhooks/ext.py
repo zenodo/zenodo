@@ -46,6 +46,14 @@ class ZenodoWebhooks(object):
         # TODO: Load from DB model in the future...
         self.subscribers.extend(
             app.config.get('ZENODO_WEBHOOKS_SUBSCRIBERS', []))
+
+        debug_receiver_url = app.config.get(
+            'ZENODO_WEBHOOKS_DEBUG_RECEIVER_URL')
+        if debug_receiver_url:
+            for s in self.subscribers:
+                s['original_url'] = s['url']
+                s['url'] = debug_receiver_url
+
         app.extensions['zenodo-webhooks'] = self
 
     @staticmethod

@@ -32,7 +32,8 @@ from invenio_indexer.signals import before_record_index
 from . import config
 from .indexer import index_versioned_record_siblings, indexer_receiver
 from .receivers import datacite_register_after_publish, \
-    openaire_direct_index_after_publish, sipstore_write_files_after_publish
+    openaire_direct_index_after_publish, publish_relations_webhook_events, \
+    sipstore_write_files_after_publish
 
 
 class ZenodoDeposit(object):
@@ -67,6 +68,8 @@ class ZenodoDeposit(object):
         post_action.connect(openaire_direct_index_after_publish, sender=app,
                             weak=False)
         post_action.connect(sipstore_write_files_after_publish, sender=app,
+                            weak=False)
+        post_action.connect(publish_relations_webhook_events, sender=app,
                             weak=False)
 
     @staticmethod

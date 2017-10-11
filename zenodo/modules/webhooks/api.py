@@ -75,8 +75,7 @@ class Event:
             'source': self.source,
         }
 
-    @property
-    def request_headers(self):
+    def request_headers(self, subscriber):
         """Return headers for an event request."""
         # NOTE: Inspired from:
         # - GitHub: https://developer.github.com/webhooks/#delivery-headers
@@ -85,6 +84,7 @@ class Event:
             'X-Zenodo-Event': self.event_type,
             # TODO: Include HMAC signature of the body
             # 'X-Hub-Signature': sign(body),
+            'X-Zenodo-Subscriber': subscriber['id'],
             'X-Zenodo-Delivery': str(self.event_id),
         }
 
@@ -98,13 +98,12 @@ class Event:
         res = requests.post(
             subscriber['url'],
             json=self.request_body,
-            headers=self.request_headers)
+            headers=self.request_headers(subscriber))
         if not res.ok:
-            print(
-                u'Failed sending {} to {}'.format(self, subscriber['id']))
             raise Exception(
-                'Webhook delivery bad response {}'.format(res.text))
-        print(
+                u'Webhook delivery for {} to {} failed: {}'
+                .format(self, subscriber['id'], res.text))
+        current_app.logger.info(
             u'Successfully sent {} to {}'.format(self, subscriber['id']))
 
     def __repr__(self):

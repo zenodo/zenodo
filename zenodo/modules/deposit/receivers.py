@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio.
+# This file is part of Zenodo.
 # Copyright (C) 2016 CERN.
 #
-# Invenio is free software; you can redistribute it
+# Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of the
 # License, or (at your option) any later version.
 #
-# Invenio is distributed in the hope that it will be
+# Zenodo is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the
+# along with Zenodo; if not, write to the
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307, USA.
 #
@@ -32,6 +32,7 @@ from invenio_sipstore.models import RecordSIP
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.openaire.tasks import openaire_direct_index
 from zenodo.modules.sipstore.tasks import archive_sip
+from zenodo.modules.webhooks.tasks import generate_events
 
 
 def datacite_register_after_publish(sender, action=None, pid=None,
@@ -65,3 +66,16 @@ def sipstore_write_files_after_publish(sender, action=None, pid=None,
             .first().sip
         )
         archive_sip.delay(str(sip.id))
+
+
+def publish_relations_webhook_events(sender, action=None, pid=None,
+                                     deposit=None):
+    """Publish webhook events for updated relations."""
+    if action == 'publish' and \
+            current_app.config['ZENODO_RECORD_PUBLISH_WEBHOOKS_ENABLED']:
+        _, record = deposit.fetch_published()
+        generate_events.delay(
+            'zenodo.modules.deposit.events.generate_record_publish_events',
+            generator_kwargs={'record_id': str(record.id)},
+            source='Zenodo',
+        )

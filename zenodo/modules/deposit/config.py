@@ -31,3 +31,6 @@ ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
 
 ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
 """Maximum file size accepted."""
+
+ZENODO_RECORD_PUBLISH_WEBHOOKS_ENABLED = True
+"""Publish webhooks on record publication."""
