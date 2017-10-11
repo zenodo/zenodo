@@ -22,9 +22,19 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo webhooks module."""
+"""Configuration for Zenodo webhooks."""
 
-from .ext import ZenodoWebhooks
-from .proxies import current_zenodo_webhooks
+from __future__ import absolute_import, print_function, unicode_literals
 
-__all__ = ('ZenodoWebhooks', 'current_zenodo_webhooks',)
+
+ZENODO_WEBHOOKS_SUBSCRIBERS = [
+    {
+        'id': 'ads',
+        'event': 'record*',
+        # Use something like https://hookb.in for debuggin
+        'url': 'https://httpbin.org/status/202',
+        'content_type': 'application/json',
+        'secret': 'ads',
+    }
+]
+"""Statically loaded webhook subscribers."""

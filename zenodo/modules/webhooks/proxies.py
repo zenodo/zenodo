@@ -22,9 +22,12 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo webhooks module."""
+"""Zenodo webhooks proxies."""
 
-from .ext import ZenodoWebhooks
-from .proxies import current_zenodo_webhooks
+from __future__ import absolute_import, print_function
 
-__all__ = ('ZenodoWebhooks', 'current_zenodo_webhooks',)
+from flask import current_app
+from werkzeug.local import LocalProxy
+
+current_zenodo_webhooks = LocalProxy(
+    lambda: current_app.extensions['zenodo-webhooks'])

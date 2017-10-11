@@ -210,6 +210,7 @@ setup(
             'zenodo_jsonschemas = '
             'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',
             'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
+            'zenodo_webhooks = zenodo.modules.webhooks.ext:ZenodoWebhooks',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '
@@ -217,6 +218,8 @@ setup(
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
+            'zenodo_webhooks = zenodo.modules.webhooks.ext:ZenodoWebhooks',
+            'zenodo_xrootd = zenodo.modules.xrootd.ext:ZenodoXRootD',
         ],
         'invenio_base.blueprints': [
             'zenodo_communities = zenodo.modules.communities.views:blueprint',
@@ -246,6 +249,7 @@ setup(
             'zenodo_utils = zenodo.modules.utils.tasks',
             'zenodo_sipstore = zenodo.modules.sipstore.tasks',
             'zenodo_sitemap = zenodo.modules.sitemap.tasks',
+            'zenodo_webhooks = zenodo.modules.webhooks.tasks',
         ],
         'invenio_config.module': [
             'zenodo = zenodo.config',

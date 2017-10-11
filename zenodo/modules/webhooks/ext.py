@@ -24,7 +24,33 @@
 
 """Zenodo webhooks module."""
 
-from .ext import ZenodoWebhooks
-from .proxies import current_zenodo_webhooks
+from __future__ import absolute_import, print_function
 
-__all__ = ('ZenodoWebhooks', 'current_zenodo_webhooks',)
+
+from . import config
+
+
+class ZenodoWebhooks(object):
+    """Zenodo Webhooks extension."""
+
+    def __init__(self, app=None):
+        """Extension initialization."""
+        self.subscribers = []
+        if app:
+            self.init_app(app)
+
+    def init_app(self, app):
+        """Flask application initialization."""
+        self.init_config(app)
+
+        # TODO: Load from DB model in the future...
+        self.subscribers.extend(
+            app.config.get('ZENODO_WEBHOOKS_SUBSCRIBERS', []))
+        app.extensions['zenodo-webhooks'] = self
+
+    @staticmethod
+    def init_config(app):
+        """Initialize configuration."""
+        for k in dir(config):
+            if k.startswith('ZENODO_WEBHOOKS_'):
+                app.config.setdefault(k, getattr(config, k))
