@@ -27,10 +27,12 @@
 from collections import defaultdict
 
 from dictdiffer import diff
+from flask import current_app
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import ObjectType
-from zenodo.modules.records.serializers import json_v1
+from zenodo.modules.records.serializers.schemas.common import format_pid_link
 
 RELATION_TO_SCHOLIX = {
     'isCitedBy': 'IsReferencedBy',
@@ -42,45 +44,7 @@ RELATION_TO_SCHOLIX = {
 }
 
 
-IGNORED_RECORD_KEYS = ['_deposit']
-
-
-def _mock_record_relation_event_payload(record):
-    return {
-        'action': 'added',
-        'link_provider': {'name': 'Zenodo'},
-        'relationship_type': {
-            'scholix_relationship': 'References',
-            'original_relationship_name': 'cites',
-            'original_relationship_schema': 'DataCite',
-        },
-        'license_url': 'https://creativecommons.org/publicdomain/zero/1.0/',
-        'source': {
-            'identifier': {
-                'id': record.get('doi'),
-                'id_schema': 'DOI',
-                'id_url': 'https://doi.org',
-            },
-            'type': {
-                'name': 'literature',
-                'sub_type': 'publication-article',
-                # FIXME: This?
-                'sub_type_schema':
-                    'https://zenodo.org/schemas/records/record-v1.0.0.json#'
-                    '/resource_type/subtype',
-            },
-            'publisher': {'name': 'Zenodo'},
-            'publication_date': record.get('publication_date'),
-        },
-        # corner.py v2.0.0
-        'target': {
-            'identifier': {
-                'id': '10.5281/zenodo.53155',
-                'id_schema': 'DOI',
-                'id_url': 'https://doi.org',
-            },
-        },
-    }
+IGNORED_RECORD_KEYS = ['_deposit', '_internal', '_files', '_oai']
 
 
 def format_identifer(identifier, scheme):
@@ -96,9 +60,10 @@ def rel_ids_set(record):
     return {(ri['identifier'], ri['scheme'], ri['relation']) for ri in rel_ids}
 
 
-def format_record_relation_event(source, identifier, scheme, relation):
-    return {
-        'link_provider': {'name': 'Zenodo'},
+def format_record_relation_event(source, identifier, scheme, relation,
+                                 publication_date=None):
+    relation = {
+        'relation_provider': {'name': 'Zenodo'},
         'relationship_type': {
             'scholix_relationship':
                 RELATION_TO_SCHOLIX.get(relation, 'IsRelatedTo'),
@@ -109,12 +74,16 @@ def format_record_relation_event(source, identifier, scheme, relation):
         'source': source,
         'target': {'identifier': format_identifer(identifier, scheme)},
     }
+    if publication_date:
+        relation['relation_publication_date'] = publication_date
+    return relation
 
 
-def extract_record_relation_events(record):
-    events = defaultdict(list)
-    source = {
-        'identifier': format_identifer(record.get('doi'), 'doi'),
+def format_source_object(record, identifier=None, scheme=None):
+    return {
+        'identifier': format_identifer(
+            identifier or record.get('doi'),
+            scheme or 'doi'),
         'type': {
             'name': (
                 'literature' if record['resource_type']['type'] != 'dataset'
@@ -129,25 +98,45 @@ def extract_record_relation_events(record):
         'publication_date': record.get('publication_date'),
     }
 
+
+def extract_record_relation_events(recid, record, old_record=None):
+    events = defaultdict(list)
+    source = format_source_object(record)
+
     # If first publication, just add everything
     # TODO: Also include versioning info (conceptdoi, etc)?
     rel_ids = rel_ids_set(record)
-    if len(record.revisions) == 1:
+    if not old_record:
         for identifier, scheme, relation in rel_ids:
             events['relation_created'].append(format_record_relation_event(
                 source, identifier, scheme, relation))
+
+        # Also add isIdenticalTo for the Zenodo URL
+        record_url = format_pid_link(
+            current_app.config['RECORDS_UI_ENDPOINT'], recid.pid_value)
+        events['relation_created'].append(format_record_relation_event(
+            source, record_url, 'url', 'isIdenticalTo'))
+
+        # Version relations
+        pv = PIDVersioning(child=recid)
+        if pv.exists:
+            events['relation_created'].append(format_record_relation_event(
+                source, record['conceptdoi'], 'doi', 'isPartOf'))
+            # children = pv.children.all()
+            # if len(children) > 1:
+            #     idx = children.index(objid) if objid in children else len(children)
+            #     events['relation_created'].append()
         return events
 
     # Start diffing
-    old_rel_ids = rel_ids_set(record.revisions[-2])
+    old_rel_ids = rel_ids_set(old_record)
 
-    # First deletions
+    # First deletions...
     removed_rel_ids = old_rel_ids - rel_ids
     for identifier, scheme, relation in removed_rel_ids:
         events['relation_deleted'].append(format_record_relation_event(
             source, identifier, scheme, relation))
-
-    # Then removals
+    # ...then removals
     added_rel_ids = rel_ids - old_rel_ids
     for identifier, scheme, relation in added_rel_ids:
         events['relation_created'].append(format_record_relation_event(
@@ -155,33 +144,58 @@ def extract_record_relation_events(record):
     return events
 
 
-def extract_record_event(record):
+def extract_record_events(recid, record, old_record=None):
     """Extract record events from a record."""
     events = {}
 
     # Exit early if there are no changes
-    if len(record.revisions) > 1:
-        record_changes = diff(
-            record, record.revisions[-2], ignore=IGNORED_RECORD_KEYS)
+    if old_record:
+        record_changes = diff(record, old_record, ignore=IGNORED_RECORD_KEYS)
         if not list(record_changes):
             return events
 
-    first_publish = (record.get('_deposit', {}).get('pid', {})
-                     .get('revision_id')) == 0
-    # TODO: Define payload for create/update/delete
-    event_type = 'record_{}'.format('created' if first_publish else 'updated')
-    return {event_type: [{
-        'pid': {'pid_value': record.get('doi'), 'pid_type': 'doi'},
-        'metadata': json_v1.transform_record(record.pid, record)
-    }]}
+    event_type = 'object_{}'.format('updated' if old_record else 'created')
+    events = {
+        event_type: [
+            {
+                'object_publication_date': record.get('publication_date'),
+                'object_provider': {'name': 'Zenodo'},
+                'object': format_source_object(record),
+                'metadata': {
+                    'title': record.get('title'),
+                    'creators': record.get('creators'),
+                },
+                'metadata_schema': 'Zenodo',
+                'metadata_schema_url':
+                    'https://zenodo.org/schemas/records/record-v1.0.0.json',
+            }
+        ]
+    }
+    # If the record is versioned and it's the first publication of it
+    if 'conceptdoi' in record and not old_record:
+        events[event_type].append({
+            'object_publication_date': record.get('publication_date'),
+            'object_provider': {'name': 'Zenodo'},
+            'object': format_source_object(
+                record, identifier=record.get('conceptdoi')),
+        })
+    return events
 
 
-def generate_record_publish_events(record_id):
+def generate_record_publish_events(record_id, revision, old_revision=None):
     """Generate all relevant events for record publishing."""
     record = ZenodoRecord.get_record(record_id)
+    recid = record.pid
+    # NOTE: Calling `record.revisions[revision].replace_refs()` doesn't work
+    current_revision = ZenodoRecord(record.revisions[revision].model.json)
+    previous_revision = (
+        ZenodoRecord(record.revisions[old_revision].model.json)
+        if old_revision else None)
 
-    events = {}
+    events = defaultdict(list)
     # NOTE: These functions return a Dict[str:event_type -> List[dict]]
-    events.update(extract_record_event(record))
-    events.update(extract_record_relation_events(record))
+    events.update(extract_record_events(
+        recid, current_revision, previous_revision))
+    events.update(extract_record_relation_events(
+        recid, current_revision, previous_revision))
     return events

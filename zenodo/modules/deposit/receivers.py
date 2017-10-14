@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+import time
+
 from flask import current_app
 from invenio_sipstore.models import RecordSIP
 
@@ -76,6 +78,13 @@ def publish_relations_webhook_events(sender, action=None, pid=None,
         _, record = deposit.fetch_published()
         generate_events.delay(
             'zenodo.modules.deposit.events.generate_record_publish_events',
-            generator_kwargs={'record_id': str(record.id)},
+            generator_kwargs={
+                'record_id': str(record.id),
+                'revision': (record.revision_id - 1),
+                'old_revision':
+                    ((record.revision_id - 2)
+                     if len(record.revisions) > 1 else None),
+            },
             source='Zenodo',
+            timestamp=time.time(),
         )

@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import time
 import uuid
 
 from flask import current_app
@@ -40,6 +41,9 @@ from invenio_pidstore.models import PersistentIdentifier
 from werkzeug.utils import cached_property
 
 from zenodo.modules.deposit.api import ZenodoDeposit
+from zenodo.modules.deposit.events import dispatch_events, \
+    format_record_relation_event, format_source_object, \
+    generate_record_publish_events
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.api import ZenodoRecord
 
@@ -157,6 +161,14 @@ class ZenodoGitHubRelease(GitHubRelease):
 
             # Send Datacite DOI registration task
             datacite_register.delay(recid_pid.pid_value, record_id)
+
+            events = generate_record_publish_events(record, record.revision_id)
+            source = format_source_object(record)
+            github_url = next(self.related_identifiers)['identifier']
+            events['relation_created'].append(format_record_relation_event(
+                source, github_url, 'url', 'isIdenticalTo'))
+            dispatch_events(
+                events, timestamp=time.time(), source='Zenodo.System')
 
             # Index the record
             RecordIndexer().index_by_id(record_id)

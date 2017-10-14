@@ -32,16 +32,18 @@ from werkzeug.utils import import_string
 from .api import Event
 
 
+def dispatch_events(events, **kwargs):
+    for event_type, payload in events.items():
+        publish_event.delay(event_type, payload=payload, **kwargs)
+
+
 # FIXME: Refactor this to use some Event generator registry...
 @shared_task(ignore_result=True)
 def generate_events(generator_import_path, generator_kwargs, **kwargs):
     """Generates webhook events."""
     event_generator = import_string(generator_import_path)
     events = event_generator(**generator_kwargs)
-    for event_type, event_type_payloads in events.items():
-        for event_payload in event_type_payloads:
-            publish_event.delay(
-                event_type, payload=event_payload, **kwargs)
+    dispatch_events(events, **kwargs)
 
 
 @shared_task(ignore_result=True)

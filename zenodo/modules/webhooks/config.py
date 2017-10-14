@@ -30,8 +30,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 ZENODO_WEBHOOKS_SUBSCRIBERS = [
     {
         'id': 'ads',
-        'event': 'relation_*',
-        # Use something like https://hookb.in for debuggin
+        # Regex
+        'event': '.*',
+        # Use something like https://hookb.in for debugging
         'url': 'https://httpbin.org/status/200',
         'content_type': 'application/json',
         'secret': 'ads',

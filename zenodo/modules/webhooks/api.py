@@ -69,8 +69,9 @@ class Event:
         """Return body for an event request."""
         return {
             'id': str(self.event_id),
-            'time': self.timestamp,
             'event_type': self.event_type,
+            'time': str(self.timestamp),
+            'creator': 'Zenodo',
             'payload': self.payload,
             'source': self.source,
         }
