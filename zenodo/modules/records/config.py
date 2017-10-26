@@ -84,6 +84,8 @@ ZENODO_RELATION_TYPES = [
     ('isPreviousVersionOf', _('New versions')),
     ('isPartOf', _('Part of')),
     ('hasPart', _('Has part')),
+    ('isDocumentedBy', _('Documented by')),
+    ('documents', _('Documents')),
     ('compiles', _('Compiles')),
     ('isCompiledBy', _('Compiled by')),
     ('isIdenticalTo', _('Identical to')),

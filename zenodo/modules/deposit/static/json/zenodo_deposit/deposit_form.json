@@ -639,6 +639,14 @@
                 "name": "is part of this upload"
               },
               {
+                "value": "isDocumentedBy",
+                "name": "documents this upload"
+              },
+              {
+                "value": "documents",
+                "name": "is documented by this upload"
+              },
+              {
                 "value": "compiles",
                 "name": "is compiled/create by this upload"
               },
