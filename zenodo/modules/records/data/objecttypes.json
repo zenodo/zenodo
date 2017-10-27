@@ -158,6 +158,21 @@
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "other",
+  "id": "http://zenodo.org/objecttypes/other#",
+  "title": {
+    "en": "Other"
+  },
+  "title_plural": {
+    "en": "Other"
+  },
+  "datacite": {"general": "Other"},
+  "eurepo": "info:eu-repo/semantics/other",
+  "schema.org": "http://schema.org/CreativeWork",
+  "csl": "article"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
   "internal_id": "publication-book",
   "id": "http://zenodo.org/objecttypes/publication/book#",
   "title": {

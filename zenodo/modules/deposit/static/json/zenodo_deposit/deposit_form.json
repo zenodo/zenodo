@@ -49,6 +49,11 @@
             "value": "lesson",
             "name": "Lesson",
             "fa_cls": "fa-graduation-cap"
+          },
+          {
+            "value": "other",
+            "name": "Other",
+            "fa_cls": "fa-asterisk"
           }
         ]
       },

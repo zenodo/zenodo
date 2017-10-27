@@ -61,6 +61,8 @@ ZENODO_TYPE_SUBTYPE_LEGACY = {
     'software': ('software', None),
 
     'lessons': ('lesson', None),
+
+    'other': ('other', None),
 }
 
 
