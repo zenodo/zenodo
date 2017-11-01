@@ -10,9 +10,10 @@
     {%- for pid_version in (active_versions|reverse|list)[:5] %}
       {%- set version_record = pid_version|record_from_pid %}
       {%- set current_version_index = all_versions.index(pid_version) %}
+      {%- set version_label = version_record.version or (current_version_index + 1) %}
       <tr {% if pid_version_index == all_versions.index(pid_version) %}class="info"{% endif %}>
         <td>
-          <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid_version.pid_value) }}">Version {{ current_version_index + 1 }}</a>
+          <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid_version.pid_value) }}">Version {{ version_label }} </a>
           <small class="text-muted">{{version_record.doi}}</small>
         </td>
         <td align="right"><small class="text-muted">{{ version_record.publication_date|from_isodate|dateformat(format='medium')}}</small></td>

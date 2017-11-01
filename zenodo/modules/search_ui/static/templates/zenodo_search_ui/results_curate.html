@@ -8,7 +8,7 @@
       </span>
     </div>
     <span class="label label-info" bs-tooltip data-container="div" data-title="Publication date">{{ record.metadata.
-    publication_date|date:'longDate' }}{{ record.conceptrecid ? ' (v' + (record.metadata.relations.version[0].index + 1) + ')' : '' }}</span>
+    publication_date|date:'longDate' }}{{ record.conceptrecid ? ' (' + (record.metadata.version || ('v' + (record.metadata.relations.version[0].index + 1))) + ')' : '' }}</span>
     <span class="label label-default">{{ record.metadata.resource_type.title }}</span>
     <span ng-switch on="record.metadata.access_right">
       <span ng-switch-when="embargoed">

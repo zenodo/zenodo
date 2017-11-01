@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="pull-left">
-        <span class="label label-info" data-container="div" bs-tooltip data-title="Publication date" ng-if="record.metadata.publication_date">{{ record.metadata.publication_date|date:'longDate' }}{{ record.conceptrecid ? ' (v' + (record.metadata.relations.version[0].index + 1) + ')' : '' }}</span>
+        <span class="label label-info" data-container="div" bs-tooltip data-title="Publication date" ng-if="record.metadata.publication_date">{{ record.metadata.publication_date|date:'longDate' }}{{ record.conceptrecid ? ' (' + (record.metadata.version || ('v' + (record.metadata.relations.version[0].index + 1))) + ')' : '' }}</span>
         <span class="label label-default" ng-if="record.metadata.resource_type">{{ record.metadata.resource_type.title }}</span>
         <span ng-switch on="record.metadata.access_right">
           <span ng-switch-when="embargoed">
