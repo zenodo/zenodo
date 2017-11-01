@@ -169,6 +169,10 @@
   "datacite": {"general": "Other"},
   "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "http://schema.org/CreativeWork",
+  "openaire": {
+    "resourceType": "0020",
+    "type": "publication"
+  },
   "csl": "article"
 },
 {
