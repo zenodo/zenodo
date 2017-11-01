@@ -269,6 +269,14 @@
         ]
       },
       {
+        "type": "text",
+        "key": "version",
+        "title": "Version",
+        "description": "Optional. Mostly relevant for software and dataset uploads. Any string will be accepted, but semantically-versioned tag is recommended.<br />See <a href='http://semver.org'><i class='fa fa-external-link'></i> semver.org</a> for more information on semantic versioning.",
+        "fa_cls": "fa-tags",
+        "required": false
+      },
+      {
         "type": "uiselect",
         "key": "language",
         "title": "Language",
