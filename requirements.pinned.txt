@@ -22,5 +22,3 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-# 0.14 have changed CSRF validation.
-Flask-WTF==0.13.1
