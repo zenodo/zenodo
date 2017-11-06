@@ -96,6 +96,10 @@ class RecordSchemaMARC21(Schema):
         lambda o: dict(name_of_granting_institution=o[
             'metadata'].get('thesis', {}).get('university')))
 
+    language_code = fields.Function(
+        lambda o: dict(language_code_of_text_sound_track_or_separate_title=\
+                       o['metadata'].get('language')))
+
     # Custom
     # ======
 

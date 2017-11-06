@@ -226,9 +226,10 @@ def test_full_record(app, db, full_record):
             'title': 'Bam',
             'year': '2014',
         },
-        # missing files
-        # missing language
         u'embargo_date': '0900-12-31',
+        u'language_code': {
+            'language_code_of_text_sound_track_or_separate_title': 'eng',
+        },
         u'_oai': {
             u'sets': [u'user-zenodo', u'user-ecfunded'],
             u'id': u'oai:zenodo.org:1'

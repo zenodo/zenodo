@@ -99,7 +99,7 @@ def reverse_oai(dummy_self, key, value):
 
 @to_marc21.over('856', '^conference_url$')
 @utils.filter_values
-def reverse_conkerence_url(dummy_self, key, value):
+def reverse_conference_url(dummy_self, key, value):
     """Reverse - Meeting."""
     return {
         'y': 'Conference website',
@@ -123,7 +123,12 @@ def reverse_files(dummy_self, key, value):
     }
 
 
-# @to_marc21.over('foobar', '^foobar$')
-# def to_leader_field(dummy_self, key, value):
-#     """Reverse - Files."""
-#     return value
+@to_marc21.over('041', '^language$')
+@utils.filter_values
+def reverse_language(dummy_self, dummy_key, value):
+    """Reverse - language code."""
+    return {
+        'a': value,
+        '$ind1': '_',
+        '$ind2': '_',
+    }
