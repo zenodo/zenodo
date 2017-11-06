@@ -42,7 +42,7 @@
       </div>
       {%- for r in records %}
         {%- set publication_date = r.publication_date|from_isodate -%}
-        {%- set record_version = (r.relations.version[0].index + 1) if r.conceptrecid else None -%}
+        {%- set record_version = (r.version or (r.relations.version[0].index + 1)) if r.conceptrecid else None -%}
         {%- set creation_date = r._created|from_isodatetime -%}
         {%- set embargo_date = r.embargo_date|from_isodate -%}
         {%- set object_type = r.resource_type|objecttype %}
