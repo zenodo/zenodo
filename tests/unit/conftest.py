@@ -36,6 +36,7 @@ from uuid import UUID, uuid4
 
 import pytest
 from click.testing import CliRunner
+from celery.messaging import establish_connection
 from elasticsearch.exceptions import RequestError
 from flask import url_for
 from flask.cli import ScriptInfo
@@ -154,6 +155,16 @@ def app(env_config, default_config):
 def api(app):
     """Flask application fixture."""
     return app.wsgi_app.mounts['/api']
+
+
+@pytest.yield_fixture(scope='session')
+def indexer_queue(app):
+    """Bluk indexer celery queue."""
+    queue = app.config['INDEXER_MQ_QUEUE']
+    with establish_connection() as conn:
+        q = queue(conn)
+        yield q.declare()
+        q.delete()
 
 
 @pytest.yield_fixture

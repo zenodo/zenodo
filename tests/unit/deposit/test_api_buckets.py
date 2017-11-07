@@ -154,7 +154,7 @@ def test_bucket_create_publish(api_client, deposit, json_auth_headers,
 
 def test_bucket_new_version(api_client, deposit, json_auth_headers,
                             deposit_url, get_json, license_record,
-                            auth_headers, minimal_deposit):
+                            auth_headers, minimal_deposit, indexer_queue):
     """Test bucket features on record new version."""
     client = api_client
     headers = json_auth_headers
