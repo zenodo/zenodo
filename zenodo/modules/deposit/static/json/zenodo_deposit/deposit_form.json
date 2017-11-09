@@ -272,7 +272,7 @@
         "type": "text",
         "key": "version",
         "title": "Version",
-        "description": "Optional. Mostly relevant for software and dataset uploads. Any string will be accepted, but semantically-versioned tag is recommended.<br />See <a href='http://semver.org'><i class='fa fa-external-link'></i> semver.org</a> for more information on semantic versioning.",
+        "description": "Optional. Mostly relevant for software and dataset uploads. Any string will be accepted, but semantically-versioned tag is recommended.<br />See <a target='_blank' rel='noopener noreferrer' href='http://semver.org'><i class='fa fa-external-link'></i> semver.org</a> for more information on semantic versioning.",
         "fa_cls": "fa-tags",
         "required": false
       },
@@ -280,7 +280,7 @@
         "type": "uiselect",
         "key": "language",
         "title": "Language",
-        "description": "Optional. Primary language of the record. Start by typing the language's common name in English, or its ISO 639 code (two or three-letter code).<br />See <a href='https://www.loc.gov/standards/iso639-2/php/code_list.php'><i class='fa fa-external-link'></i> ISO 639 language codes list</a> for more information.",
+        "description": "Optional. Primary language of the record. Start by typing the language's common name in English, or its ISO 639 code (two or three-letter code).<br />See <a target='_blank' rel='noopener noreferrer' href='https://www.loc.gov/standards/iso639-2/php/code_list.php'><i class='fa fa-external-link'></i> ISO 639 language codes list</a> for more information.",
         "fieldhint": "recommended",
         "placeholder": "e.g.: 'eng', 'fr' or 'Polish'",
         "fa_cls": "fa-globe",
@@ -414,7 +414,7 @@
           {
             "type": "uiselect",
             "key": "license",
-            "description": "Required. Selected license applies to all of your files displayed on the top of the form. If you want to upload some of your files under different licenses, please do so in separate uploads. If you cannot find the license you're looking for, include a relevant LICENSE file in your record and choose one of the 'Other' licenses available ('Other (Open)', 'Other (Attribution)', etc.). The supported open licenses in the list are harvested from <a href='http://opendefinition.org'><i class='fa fa-external-link'></i> opendefinition.org</a>. If you think that an open license is missing from the list, please <a href='https://zenodo.org/support'>contact us</a>.",
+            "description": "Required. Selected license applies to all of your files displayed on the top of the form. If you want to upload some of your files under different licenses, please do so in separate uploads. If you cannot find the license you're looking for, include a relevant LICENSE file in your record and choose one of the 'Other' licenses available ('Other (Open)', 'Other (Attribution)', etc.). The supported open licenses in the list are harvested from <a target='_blank' rel='noopener noreferrer' href='http://opendefinition.org'><i class='fa fa-external-link'></i> opendefinition.org</a>. If you think that an open license is missing from the list, please <a target='_blank' rel='noopener noreferrer' href='https://zenodo.org/support'>contact us</a>.",
             "fa_cls": "fa-certificate",
             "placeholder": "Start typing a license name...",
             "required": true,
@@ -441,7 +441,7 @@
   {
     "type": "fieldset",
     "title": "Communities",
-    "description": "Any user can create a community collection on Zenodo (<a href='http://zenodo.org/communities/'>browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
+    "description": "Any user can create a community collection on Zenodo (<a target='_blank' rel='noopener noreferrer' href='http://zenodo.org/communities/'>browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
     "fieldhint": "recommended",
     "items": [
       {
@@ -490,7 +490,7 @@
   {
     "type": "fieldset",
     "title": "Funding",
-    "description": "Zenodo is integrated into reporting lines for research funded by the European Commission via <a href='http://www.openaire.eu'><i class='fa fa-external-link'></i> OpenAIRE</a>. Specify grants which have funded your research, and we will let your funding agency know!",
+    "description": "Zenodo is integrated into reporting lines for research funded by the European Commission via <a target='_blank' rel='noopener noreferrer' href='http://www.openaire.eu'><i class='fa fa-external-link'></i> OpenAIRE</a>. Specify grants which have funded your research, and we will let your funding agency know!",
     "fieldhint": "recommended",
     "items": [
       {
@@ -866,7 +866,7 @@
       {
         "key": "conference_url",
         "title": "Website",
-        "description": "Optional. e.g. <a href='http://zenodo.org'>http://zenodo.org</a>"
+        "description": "Optional. e.g. <a target='_blank' rel='noopener noreferrer' href='http://zenodo.org'>http://zenodo.org</a>"
       },
       {
         "key": "conference_session",
