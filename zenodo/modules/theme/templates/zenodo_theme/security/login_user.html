@@ -27,7 +27,7 @@
 {%- block form_outer %}
   <div class="social-signup">
     <a href="{{url_for('invenio_oauthclient.login', remote_app='github', next=(request.args.get('next') or request.referrer))}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> {{_('Log in with GitHub')}}</a>
-    <a href="{{url_for('invenio_oauthclient.login', remote_app='orcid', next=(request.args.get('next') or request.referrer)))}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.svg')}}" height="18px"> {{_('Log in with ORCID')}}</a>
+    <a href="{{url_for('invenio_oauthclient.login', remote_app='orcid', next=(request.args.get('next') or request.referrer))}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.svg')}}" height="18px"> {{_('Log in with ORCID')}}</a>
     <h3 align="center">&mdash; OR &mdash;</h3>
   </div>
   {{ super () }}

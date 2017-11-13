@@ -63,7 +63,6 @@
       <form action="{%- block signup_form_endpoint %}{{ url_for_security('register') }}{% endblock %}" method="POST" name="register_user_form">
       {{form_errors(form)}}
       {{ form.csrf_token()}}
-      {{ form.profile.csrf_token()}}
       {{ render_field(form.email, autofocus=True, errormsg=False) }}
       {{ render_field(form.profile.username, errormsg=False) }}
       {%- if form.password %}
