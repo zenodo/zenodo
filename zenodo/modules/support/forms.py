@@ -26,13 +26,17 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import current_app
 from flask_babelex import lazy_gettext as _
-from flask_wtf import FlaskForm
+from flask_security import current_user
+from flask_wtf import FlaskForm, Recaptcha, RecaptchaField
 from flask_wtf.file import FileField
-from flask_wtf.recaptcha import Recaptcha, RecaptchaField
+from jinja2.filters import do_filesizeformat
 from wtforms import BooleanField, SelectField, StringField, SubmitField, \
     TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import DataRequired, Length
+
+from .proxies import current_support_categories
 
 
 def strip_filter(text):
@@ -105,6 +109,35 @@ class ContactForm(FlaskForm):
         render_kw={'multiple': True},
     )
 
+
+class RecaptchaContactForm(ContactForm):
+    """Recaptcha-enabled form."""
     recaptcha = RecaptchaField(validators=[
         Recaptcha(message=_("Please complete the reCAPTCHA."))
     ])
+
+
+def contact_form_factory():
+    """Return configured contact form."""
+    if current_app.config.get('RECAPTCHA_PUBLIC_KEY') and \
+            current_app.config.get('RECAPTCHA_PRIVATE_KEY') and \
+            not current_user.is_authenticated:
+        form = RecaptchaContactForm()
+    else:
+        form = ContactForm()
+
+    if current_user.is_authenticated:
+        form.email.data = current_user.email
+        form.name.data = form.name.data or (current_user.profile.full_name
+                                            if current_user.profile else None)
+
+    # Load form choices and validation from config
+    form.issue_category.choices = \
+        [(c['key'], c['title']) for c in current_support_categories.values()]
+    form.description.validators.append(Length(
+        min=current_app.config['SUPPORT_DESCRIPTION_MIN_LENGTH'],
+        max=current_app.config['SUPPORT_DESCRIPTION_MAX_LENGTH'],
+    ))
+    form.attachments.description = 'Optional. Max attachments size: ' + \
+        do_filesizeformat(current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'])
+    return form

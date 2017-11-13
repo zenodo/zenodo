@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Utils for Zenodo Pages."""
+"""Utils for Zenodo support module."""
 
 from __future__ import absolute_import, print_function, unicode_literals
 
@@ -30,56 +30,18 @@ from flask import current_app, request
 from flask_mail import Message
 from ua_parser import user_agent_parser
 
+from .proxies import current_support_categories
+
 
 def render_template_to_string(template, context):
-    """Render a template from the template folder with the given context.
-
-    Code based on
-    `<https://github.com/mitsuhiko/flask/blob/master/flask/templating.py>`_
-    :param template: the string template, or name of the template to be
-                     rendered, or an iterable with template names
-                     the first one existing will be rendered.
-    :param context: the variables that should be available in the
-                    context of the template.
-    :returns: A template string.
-    :rtype: str
-    """
+    """Render a Jinja template with the given context."""
     template = current_app.jinja_env.get_or_select_template(template)
     return template.render(context)
 
 
-def format_request_email_title(context):
-    """Format the email message title for contact form notification.
-
-    :param context: Context parameters passed to formatter.
-    :type context: dict.
-    :returns: Email message title.
-    :rtype: str
-    """
-    template = current_app.config['SUPPORT_EMAIL_TITLE_TEMPLATE']
-    return render_template_to_string(template, context)
-
-
-def format_request_email_body(context):
-    """Format the email message body for contact form notification.
-
-    :param context: Context parameters passed to formatter.
-    :type context: dict.
-    :returns: Email message body.
-    :rtype: str
-    """
-    template = current_app.config['SUPPORT_EMAIL_BODY_TEMPLATE']
-    return render_template_to_string(template, context)
-
-
-def check_attachment_size(attachments):
-    """Function to check size of attachment within limits.
-
-    :param attachments: Attachments files.
-    :returns: True if the attachments size is acceptable.
-    :rtype: bool
-    """
-    if len(attachments) == 0:
+def check_attachment_size(attachment_files):
+    """Function to check size of attachment within limits."""
+    if len(attachment_files) == 0:
         return False
     if request.content_length:
         file_size = int(request.content_length)
@@ -87,13 +49,11 @@ def check_attachment_size(attachments):
             return False
     else:
         size = 0
-        for upload in attachments:
-            upload.seek(current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'] -
-                        size)
-            if upload.read(1) == '':
+        for f in attachment_files:
+            f.seek(current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'] - size)
+            if f.read(1) == '':
                 return False
-
-            size += len(upload)
+            size += len(f)
     return True
 
 
@@ -101,7 +61,8 @@ def format_user_email(email, name):
     """Format the user's email as 'Full Name <email>' or 'email'."""
     if name:
         email = '{name} <{email}>'.format(name=name, email=email)
-    return email
+    # Remove commas (',') since they mess with the "TO" email field
+    return email.replace(',', '')
 
 
 def format_user_email_ctx(context):
@@ -112,20 +73,27 @@ def format_user_email_ctx(context):
     )
 
 
-def send_support_email(context, recipients=None):
-    """Signal for sending emails after contact form validated.
+def get_support_email_recipients(context):
+    """Return recipients for the support email."""
+    issue_category = context.get('info', {}).get('issue_category')
+    category_config = current_support_categories.get(issue_category, {})
+    return category_config.get(
+        'recipients', current_app.config['SUPPORT_SUPPORT_EMAIL'])
 
-    :param context: Dictionary with email information.
-    """
-    msg_body = format_request_email_body(context)
-    msg_title = format_request_email_title(context)
 
+def send_support_email(context):
+    """Signal for sending emails after contact form validated."""
+    msg_body = render_template_to_string(
+        current_app.config['SUPPORT_EMAIL_BODY_TEMPLATE'], context)
+    msg_title = render_template_to_string(
+        current_app.config['SUPPORT_EMAIL_TITLE_TEMPLATE'], context)
     sender = format_user_email_ctx(context)
+    recipients = get_support_email_recipients(context)
 
     msg = Message(
         msg_title,
         sender=sender,
-        recipients=recipients or current_app.config['SUPPORT_SUPPORT_EMAIL'],
+        recipients=recipients,
         reply_to=context.get('info', {}).get('email'),
         body=msg_body
     )
@@ -183,14 +151,8 @@ def user_agent_information():
     :rtype: dict
     """
     uap = user_agent_parser.Parse(str(request.user_agent))
-
-    # Operating System and it's version.
     os = format_uap_info(uap.get('os'))
-
-    # Browser and it's version.
     browser = format_uap_info(uap.get('user_agent'))
-
-    # Device, it's model and brand.
     device = ' '.join(
         [v for v in (
             uap.get('device').get('family'),

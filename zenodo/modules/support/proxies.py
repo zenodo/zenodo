@@ -22,39 +22,13 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Support and contact module for Zenodo."""
+"""Proxies for Zenodo support module."""
 
 from __future__ import absolute_import, print_function
 
-from collections import OrderedDict
+from flask import current_app
+from werkzeug.local import LocalProxy
 
-from werkzeug.utils import cached_property
-
-from . import config
-
-
-class ZenodoSupport(object):
-    """Zenodo support form."""
-
-    @cached_property
-    def categories(self):
-        """Return support issue categories."""
-        return OrderedDict(
-            (c['key'], c) for c in self.app.config['SUPPORT_ISSUE_CATEGORIES'])
-
-    def __init__(self, app=None):
-        """Extension initialization."""
-        if app:
-            self.init_app(app)
-
-    def init_app(self, app):
-        """Flask application initialization."""
-        self.app = app
-        self.init_config(app)
-        app.extensions['zenodo-support'] = self
-
-    def init_config(self, app):
-        """Flask application initialization."""
-        for k in dir(config):
-            if k.startswith("SUPPORT_"):
-                app.config.setdefault(k, getattr(config, k))
+current_support_categories = LocalProxy(
+    lambda: current_app.extensions['zenodo-support'].categories)
+"""Proxy to current support issue categories."""
