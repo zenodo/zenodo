@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from contextlib import contextmanager
 from copy import deepcopy
 
 from flask import current_app
@@ -63,3 +64,15 @@ def publish_and_expunge(db, deposit):
     db.session.expunge_all()
     deposit = Deposit.get_record(dep_uuid)
     return deposit
+
+
+@contextmanager
+def recaptcha_enabled(app):
+    """Temporarily enable recaptcha."""
+    orig_public_key = app.config.get('RECAPTCHA_PUBLIC_KEY')
+    orig_private_key = app.config.get('RECAPTCHA_PRIVATE_KEY')
+    app.config['RECAPTCHA_PUBLIC_KEY'] = 'test-key'
+    app.config['RECAPTCHA_PRIVATE_KEY'] = 'test-key'
+    yield
+    app.config['RECAPTCHA_PUBLIC_KEY'] = orig_public_key
+    app.config['RECAPTCHA_PRIVATE_KEY'] = orig_private_key

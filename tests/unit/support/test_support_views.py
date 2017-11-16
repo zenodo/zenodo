@@ -25,7 +25,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import url_for
-from helpers import login_user_via_session
+from helpers import login_user_via_session, recaptcha_enabled
 from six import BytesIO, b
 from werkzeug import MultiDict
 
@@ -37,11 +37,12 @@ def test_send_support_email(app, db, es, users):
             res = client.get(url_for('zenodo_support.support'))
             assert res.status_code == 200
 
-            res = client.get(
-                url_for('zenodo_support.support')
-            )
-            assert b('recaptcha') in res.data
-            assert res.status_code == 200
+            with recaptcha_enabled(app):
+                res = client.get(
+                    url_for('zenodo_support.support')
+                )
+                assert b('recaptcha') in res.data
+                assert res.status_code == 200
 
             res = client.post(
                 url_for('zenodo_support.support'),
@@ -113,11 +114,13 @@ def test_send_support_email(app, db, es, users):
             assert file2.data == b('Another My other file contents')
 
             login_user_via_session(client, email=users[1]['email'])
-            res = client.get(
-                url_for('zenodo_support.support')
-            )
-            assert b('test@zenodo.org') in res.data
-            assert b('recaptcha') not in res.data
+
+            with recaptcha_enabled(app):
+                res = client.get(
+                    url_for('zenodo_support.support')
+                )
+                assert b('test@zenodo.org') in res.data
+                assert b('recaptcha') not in res.data
 
             form = MultiDict(dict(
                 name='Foo',
