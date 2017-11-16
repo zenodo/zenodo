@@ -112,6 +112,7 @@ class ContactForm(FlaskForm):
 
 class RecaptchaContactForm(ContactForm):
     """Recaptcha-enabled form."""
+
     recaptcha = RecaptchaField(validators=[
         Recaptcha(message=_("Please complete the reCAPTCHA."))
     ])

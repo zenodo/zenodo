@@ -36,7 +36,7 @@
         {%- if not user %}
         <p>It is recommended to <a href="{{url_for_security('login')}}">login</a> before sending a request, so we can automatically fill-in your contact information. It is especially important for quicker resolution of all technical issues and requests concerning your Zenodo account.</p>
         {%- endif %}
-        <form method="POST" enctype="multipart/form-data" role="form">
+        <form id="contact-form" method="POST" enctype="multipart/form-data" role="form">
           {{ form.csrf_token }}
           <div class="contact">
             <div class="row">
@@ -97,7 +97,7 @@
             <div class="row">
               <div class="col-md-4"></div>
               <div class="col-md-4">
-                {% if not user %}{{ render_form_input(form.recaptcha, size=None) }}{% endif %}
+                {% if not user and form.recaptcha %}{{ render_form_input(form.recaptcha, size=None) }}{% endif %}
                 <br>
                 <button class="btn btn-block btn-success" type="submit">Send request</button>
               </div>
@@ -116,88 +116,120 @@
 
 <script type="text/javascript">
 
-var MAX_FILE_SIZE = {{ max_file_size|tojson }};
+var MAX_FILE_SIZE = {{ config.SUPPORT_ATTACHMENT_MAX_SIZE|tojson }};
+var DESCRIPTION_MIN_LENGTH = {{ config.SUPPORT_DESCRIPTION_MIN_LENGTH|tojson }};
+var DESCRIPTION_MAX_LENGTH = {{ config.SUPPORT_DESCRIPTION_MAX_LENGTH|tojson }};
+
+function formatFileSize(bytes) {
+  if (bytes == 0) {return '0.00 B';}
+  var e = Math.floor(Math.log(bytes) / Math.log(1000));
+  return (bytes / Math.pow(1000, e)).toFixed(2) + ' ' + ' KMGTP'.charAt(e) + 'B';
+};
+
+function getFiles(e) {
+  if (e.target && e.target.files) {
+    return e.target.files;
+  } else if (e.originalEvent && e.originalEvent.dataTransfer) {
+    return e.originalEvent.dataTransfer.files;
+  }
+}
+
+// Shows an error if size is greater than max attachment size.
+function handleFileSelection(event) {
+  var files = getFiles(event);
+  if(files.length == 0) return;
+  var filesInfo = '<strong>' + files.length + ' file(s) selected.</strong>';
+  var totalSize = 0;
+  for(var i = 0; i < files.length; i++){
+    totalSize += files[i].size;
+    filesInfo += '<br/><small>' + files[i].name + ' &nbsp&nbsp ' +
+    formatFileSize(files[i].size) + '</small>';
+  }
+
+  $('.upload-info').get(0).innerHTML = filesInfo;
+
+  if(totalSize > MAX_FILE_SIZE) {
+    $('.field-attachments').addClass('has-error');
+    $('#error-attachments').get(0).innerHTML =
+      'File size exceeded. Please add URLs to the files or make a smaller selection.';
+    $('button#form_button').prop('disabled', true);
+
+  } else {
+    $('.field-attachments').removeClass('has-error');
+    $('#error-attachments').get(0).innerHTML = '';
+    $('button#form_button').prop('disabled', false);
+  }
+}
+
+// Setup file upload droparea
+function initFileDroparea(droparea, button) {
+  function noop(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+
+  droparea.on({
+    dragenter: noop,
+    dragover: noop,
+    dragleave: noop,
+    drop: function(e) {
+      noop(e);
+      handleFileSelection(e);
+    },
+  });
+
+  var attachments = $('#attachments');
+  attachments.change(handleFileSelection);
+  button.click(function() {
+    attachments.value = null;
+    attachments.trigger('click');
+  });
+}
+
+function validateForm() {
+  var isValid = true;
+  var fields = ['name', 'email', 'issue_category', 'subject', 'description'];
+  var errorMessages = fields.reduce(function(acc, key) { acc[key] = []; return acc }, {} );
+
+  var required = ['name', 'email', 'issue_category', 'subject'];
+  required.forEach(function(fieldName) {
+    var field = $('#contact-form :input#' + fieldName);
+    if (!$.trim(field.val()).length) {
+      errorMessages[fieldName].push('This field is required.');
+      isValid = false;
+    }
+  });
+
+  var description = $('#contact-form :input#description').val()
+  if (description.length < DESCRIPTION_MIN_LENGTH ||
+      description.length > DESCRIPTION_MAX_LENGTH) {
+    errorMessages.description.push(
+      'Field must be between 20 and 1000 characters long.');
+    isValid = false;
+  }
+
+  $.each(errorMessages, function(fieldName, errors) {
+    var field = $('#contact-form :input#' + fieldName);
+    if (errors.length) {
+      $('span#error-' + fieldName).text(errors.join('<br>'));
+      field.closest('div.form-group').addClass('has-error');
+    } else {
+      $('span#error-' + fieldName).text('');
+      field.closest('div.form-group').removeClass('has-error');
+    }
+  });
+
+  return isValid;
+}
 
 $(function () {
+  // Setup issue category descriptions
   $('#categories-tab').hide();
   $('#issue_category').on('change', function(e){
     $('#categories-tab li a[name="'+ $(this).val() + '"]').tab('show');
   });
-
-  function format_size(bytes) {
-    if (bytes == 0) {return '0.00 B';}
-    var e = Math.floor(Math.log(bytes) / Math.log(1000));
-    return (bytes / Math.pow(1000, e)).toFixed(2) + ' ' + ' KMGTP'.charAt(e) + 'B';
-  };
-
-  // Throws error if size is greater than max attachment size.
-  function triggerCallback(e, callback) {
-    var files;
-    if(e.dataTransfer) {
-      files = e.dataTransfer.files;
-    } else if(e.target) {
-      files = e.target.files;
-    }
-    callback.call(null, files);
-  }
-
-  // Setup file upload droparea
-  function initFileDroparea(droparea, button, callback) {
-    var attachments = document.getElementById('attachments');
-    attachments.style.display = 'none';
-
-    attachments.addEventListener('change', function(e) {
-      triggerCallback(e, callback);
-    });
-
-    droparea.addEventListener('dragover', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-
-    droparea.addEventListener('dragleave', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-    });
-
-    droparea.addEventListener('drop', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      triggerCallback(e, callback);
-    });
-
-    button.addEventListener('click', function() {
-      attachments.value = null;
-      attachments.click();
-    });
-  }
-
-  function checkFilesSize(files) {
-    if(files.length == 0) return;
-    var filesInfo = '<strong>' + files.length + ' file(s) selected.</strong>';
-    var totalSize = 0;
-    for(var i = 0; i < files.length; i++){
-      totalSize += files[i].size;
-      filesInfo += '<br/><small>' + files[i].name + ' &nbsp&nbsp ' +
-      format_size(files[i].size) + '</small>';
-    }
-
-    $('.upload-info').get(0).innerHTML = filesInfo;
-
-    if(totalSize > MAX_FILE_SIZE) {
-      $('.field-attachments').addClass('has-error');
-      $('#error-attachments').get(0).innerHTML =
-        'File size exceeded. Please add URLs to the files or make a smaller selection.';
-      $('button#form_button').prop('disabled', true);
-    } else {
-      $('.field-attachments').removeClass('has-error');
-      $('#error-attachments').get(0).innerHTML = '';
-      $('button#form_button').prop('disabled', false);
-    }
-  }
-
-  initFileDroparea(window.document.querySelector('html'),
-                   window.document.querySelector('a.upload-button'), checkFilesSize);
+  initFileDroparea($('html'), $('a.upload-button'));
+  $('form#contact-form').submit(validateForm);
 });
 </script>
 {% endblock javascript %}

@@ -55,7 +55,11 @@ def support():
                                            'Please add URLs to the files '
                                            'or make a smaller selection.')
         else:
-            context = dict(user_id=current_user.id, info=form.data, uap=uap)
+            context = {
+                'user_id': current_user.get_id(),
+                'info': form.data,
+                'uap': uap
+            }
             send_support_email(context)
             send_confirmation_email(context)
             flash(
@@ -70,6 +74,5 @@ def support():
         'zenodo_support/contact_form.html',
         uap=uap,
         form=form,
-        categories=current_support_categories,
-        max_file_size=current_app.config['SUPPORT_ATTACHMENT_MAX_SIZE'],
+        categories=current_support_categories
     )
