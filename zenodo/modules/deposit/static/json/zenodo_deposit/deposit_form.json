@@ -539,12 +539,20 @@
                     "name": "Australian Research Council (AU)"
                   },
                   {
+                    "value": "10.13039/501100002428",
+                    "name": "Austrian Science Fund (AT)"
+                  },
+                  {
                     "value": "10.13039/501100000780",
                     "name": "European Commission (EU)"
                   },
                   {
                     "value": "10.13039/501100001871",
                     "name": "Funda\u00e7\u00e3o para a Ci\u00eancia e a Tecnologia (PT)"
+                  },
+                  {
+                    "value": "10.13039/501100004488",
+                    "name": "Hrvatska Zaklada za Znanost (HR)"
                   },
                   {
                     "value": "10.13039/501100004564",
@@ -565,6 +573,14 @@
                   {
                     "value": "10.13039/501100003246",
                     "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NL)"
+                  },
+                  {
+                    "value": "10.13039/501100001711",
+                    "name": "Schweizerischer Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung (CH)"
+                  },
+                  {
+                    "value": "10.13039/501100001602",
+                    "name": "Science Foundation Ireland (IE)"
                   },
                   {
                     "value": "10.13039/100004440",
