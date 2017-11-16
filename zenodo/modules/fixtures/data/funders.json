@@ -198,5 +198,109 @@
     "remote_modified": "2015-10-28T13:34:53.000000",
     "subtype": "federal/national government",
     "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "SNF"
+    ],
+    "country": "CH",
+    "doi": "10.13039/501100001711",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Schweizerischer Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung",
+    "parent": {},
+    "remote_created": "2011-09-23T12:38:54.000000",
+    "remote_modified": "2015-04-08T12:39:48.000000",
+    "subtype": "foundation",
+    "type": "pri"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "NIH"
+    ],
+    "country": "US",
+    "doi": "10.13039/100000002",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "National Institutes of Health",
+    "parent": {
+      "$ref": "http://dx.doi.org/10.13039/100000016"
+    },
+    "remote_created": "2009-07-06T18:53:11.000000",
+    "remote_modified": "2015-09-02T11:38:17.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "HRZZ"
+    ],
+    "country": "HR",
+    "doi": "10.13039/501100004488",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Hrvatska Zaklada za Znanost",
+    "parent": {},
+    "remote_created": "2014-06-03T15:25:29.000000",
+    "remote_modified": null,
+    "subtype": "government non-federal",
+    "type": "gov"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "SFI"
+    ],
+    "country": "IE",
+    "doi": "10.13039/501100001602",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Science Foundation Ireland",
+    "parent": {},
+    "remote_created": "2011-09-02T08:46:06.000000",
+    "remote_modified": "2015-01-05T09:59:07.000000",
+    "subtype": "foundation",
+    "type": "pri"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "FWF"
+    ],
+    "country": "AT",
+    "doi": "10.13039/501100002428",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "Austrian Science Fund",
+    "parent": {},
+    "remote_created": "2013-11-23T10:48:52.000000",
+    "remote_modified": "2015-01-05T10:18:22.000000",
+    "subtype": "foundation",
+    "type": "pri"
+  },
+  {
+    "$schema": "http://zenodo.org/schemas/funders/funder-v1.0.0.json",
+    "acronyms": [
+      "HHS"
+    ],
+    "country": "US",
+    "doi": "10.13039/100000016",
+    "identifiers": {
+      "oaf": null
+    },
+    "name": "U.S. Department of Health and Human Services",
+    "parent": {},
+    "remote_created": "2009-07-06T18:53:11.000000",
+    "remote_modified": "2015-06-12T09:14:21.000000",
+    "subtype": "federal/national government",
+    "type": "gov"
   }
 ]
