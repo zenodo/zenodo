@@ -59,6 +59,15 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+  kibana:
+    build: ./docker/kibana/
+    image: zenodo-kibana:4.3
+    restart: "always"
+    command: kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - "ELASTICSEARCH_URL=http://es:9200"
   flower:
     image: mher/flower
     command: --broker=amqp://guest:guest@mq:5672// --broker_api=http://guest:guest@mq:15672/api/
