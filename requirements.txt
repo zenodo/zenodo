@@ -198,7 +198,7 @@ python-editor==1.0.3
 python-slugify==1.2.4
 pytz==2017.3
 pyzmq==16.0.3
-raven==5.1.0
+raven==6.3.0
 redis==2.10.6
 requests==2.18.4
 requests-oauthlib==0.8.0
