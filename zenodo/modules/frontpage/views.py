@@ -32,7 +32,7 @@ from flask import Blueprint, current_app, flash, render_template, \
     send_from_directory
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
-from invenio_cache import cached_unless_authenticated
+from .decorators import cached_unless_authenticated_or_flashes
 
 from .api import FrontpageRecordsSearch
 
@@ -62,7 +62,7 @@ def init_menu():
 
 
 @blueprint.route('/')
-@cached_unless_authenticated(timeout=600, key_prefix='frontpage')
+@cached_unless_authenticated_or_flashes(timeout=600, key_prefix='frontpage')
 def index():
     """Frontpage blueprint."""
     msg = current_app.config.get('FRONTPAGE_MESSAGE')
