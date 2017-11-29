@@ -75,8 +75,8 @@ def zenodo_reserved_record_minter(record_uuid=None, data=None):
     """Reserve a recid."""
     id_ = RecordIdentifier.next()
     recid = PersistentIdentifier.create(
-        'recid', id_, status=PIDStatus.RESERVED
+        'recid', str(id_), status=PIDStatus.RESERVED
     )
-    data['recid'] = recid.pid_value
+    data['recid'] = int(recid.pid_value)
 
     return recid
