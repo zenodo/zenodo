@@ -64,11 +64,12 @@ class OngoingMultipartUploadError(RESTValidationError):
 class MissingCommunityError(RESTValidationError):
     """Error for invalid community IDs."""
 
-    def __init__(self, community_ids):
+    def __init__(self, community_ids, *args, **kwargs):
         """Initialize the error with community IDs."""
         msg = _('Provided community does not exist: ')
         self.errors = [FieldError('metadata.communities', msg + c_id)
                        for c_id in community_ids]
+        super(MissingCommunityError, self).__init__(*args, **kwargs)
 
 
 class MarshmallowErrors(RESTValidationError):

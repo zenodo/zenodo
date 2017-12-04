@@ -472,4 +472,9 @@ def test_nonexisting_communities(app, db, users, communities, deposit,
                                  deposit_file):
     """Test adding nonexisting community."""
     deposit['communities'] = ['nonexisting', ]
-    pytest.raises(MissingCommunityError, publish_and_expunge, db, deposit)
+    with pytest.raises(MissingCommunityError) as exc_info:
+        publish_and_expunge(db, deposit)
+    assert exc_info.value.errors[0].res == {
+        'message': 'Provided community does not exist: nonexisting',
+        'field': 'metadata.communities',
+    }
