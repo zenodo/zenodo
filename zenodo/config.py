@@ -410,6 +410,24 @@ DEPOSIT_UI_JSTEMPLATE_FILESLIST = 'templates/zenodo_deposit/list.html'
 DEPOSIT_UI_ENDPOINT = '{scheme}://{host}/deposit/{pid_value}'
 #: Template path for angular form elements.
 DEPOSIT_FORM_TEMPLATES_BASE = 'templates/zenodo_deposit'
+#: Specific templates for the various deposit form elements.
+DEPOSIT_FORM_TEMPLATES = {
+    'actions': 'actions.html',
+    'array': 'array.html',
+    'button': 'button.html',
+    'checkbox': 'checkbox.html',
+    'ckeditor': 'ckeditor.html',
+    'default': 'default.html',
+    'fieldset': 'fieldset.html',
+    'radios_inline': 'radios_inline.html',
+    'radios': 'radios.html',
+    'select': 'select.html',
+    'strapselect': 'strapselect.html',
+    'textarea': 'textarea.html',
+    'uiselect': 'uiselect.html',
+    'grantselect': 'grantselect.html',
+}
+
 #: Allow list of contributor types.
 DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Contact person', marc='prc', datacite='ContactPerson'),
