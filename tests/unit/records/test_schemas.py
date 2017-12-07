@@ -45,25 +45,30 @@ def test_recid(app, minimal_record):
     pytest.raises(ValidationError, Record.create, minimal_record)
 
 
-def test_resource_type(app, db, minimal_record):
-    """Test recid property."""
-    # String instead of number
-    minimal_record['resource_type'] = 'publication'
-    pytest.raises(ValidationError, Record.create, minimal_record)
-    minimal_record['resource_type'] = {'type': 'publication', 'subtype': 'x'}
-    Record.create(minimal_record)
+@pytest.mark.parametrize(('val', 'passing'), [
+    ('publication', False),
+    ({'type': 'publication', 'subtype': 'x'}, True),
+    ({'type': 'publication', 'openaire_subtype': 'foo:t1'}, True),
+    ({'type': 'publication', 'subtype': 'book',
+      'openaire_subtype': 'foo:t1'}, True),
+])
+def test_resource_type(app, db, minimal_record, val, passing):
+    """Test resource type."""
+    minimal_record['resource_type'] = val
+    if passing:
+        Record.create(minimal_record)
+    else:
+        pytest.raises(ValidationError, Record.create, minimal_record)
 
 
 def test_publication_date(app, db, minimal_record):
-    """Test recid property."""
-    # String instead of number
+    """Test publication date."""
     minimal_record['publication_date'] = datetime.utcnow().date().isoformat()
     Record.create(minimal_record)
 
 
 def test_contributors(app, db, minimal_record):
-    """Test recid property."""
-    # String instead of number
+    """Test contributors."""
     minimal_record['contributors'] = [
         {'name': 'test', 'affiliation': 'test', 'type': 'ContactPerson'}
     ]

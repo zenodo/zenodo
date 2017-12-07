@@ -22,12 +22,14 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo OpenAIRE module."""
+"""Test for OpenAIRE extension."""
 
 from __future__ import absolute_import, print_function
 
-from .proxies import current_openaire
+from zenodo.modules.openaire import current_openaire
 
-__all__ = (
-    'current_openaire'
-)
+
+def test_openire_type(app):
+    """Test OpenAIRE type."""
+    assert len(current_openaire.inverse_openaire_community_map) == 3
+    assert current_openaire.inverse_openaire_community_map['c1'] == 'foo'

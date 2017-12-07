@@ -30,7 +30,7 @@ from zenodo.modules.openaire.helpers import openaire_id, openaire_link, \
     openaire_type
 
 
-def test_openire_type(app, minimal_record):
+def test_openaire_type(app, minimal_record):
     """Test OpenAIRE type."""
     r = minimal_record
     # Default zenodo type is software which has no OpenAIRE type.
@@ -59,7 +59,7 @@ def test_openire_type(app, minimal_record):
     assert openaire_type(r) is None
 
 
-def test_openire_id(app, minimal_record):
+def test_openaire_id(app, minimal_record):
     """Test OpenAIRE ID."""
     r = minimal_record
     r['doi'] = u'10.5281/zenodo.123'
@@ -77,7 +77,7 @@ def test_openire_id(app, minimal_record):
     assert openaire_id(r) == 'od______2659::47287d1800c112499a117ca17aa1909d'
 
 
-def test_openire_link(app, minimal_record):
+def test_openaire_link(app, minimal_record):
     """Test OpenAIRE ID."""
     r = minimal_record
     r['doi'] = u'10.5281/zenodo.123'

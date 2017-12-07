@@ -98,7 +98,7 @@ def get_abs_schema_path(schema_path):
 def save_jsonschema(schema, path):
     """Save jsonschema to disk path."""
     with open(path, 'w') as fp:
-        json.dump(schema, fp, indent=2, sort_keys=True)
+        json.dump(schema, fp, indent=2, sort_keys=True, separators=(',', ': '))
         fp.write('\n')
 
 

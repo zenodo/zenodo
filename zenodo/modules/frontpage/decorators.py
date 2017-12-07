@@ -28,9 +28,9 @@ from __future__ import absolute_import, print_function
 
 from functools import wraps
 
-from invenio_cache import current_cache
 from flask import session
 from flask_login import current_user
+from invenio_cache import current_cache
 
 
 def has_flashes_or_authenticated_user():

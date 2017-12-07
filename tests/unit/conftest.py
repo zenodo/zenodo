@@ -35,8 +35,8 @@ from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
-from click.testing import CliRunner
 from celery.messaging import establish_connection
+from click.testing import CliRunner
 from elasticsearch.exceptions import RequestError
 from flask import url_for
 from flask.cli import ScriptInfo
@@ -110,6 +110,33 @@ def tmp_db_path():
 @pytest.fixture(scope='session')
 def default_config(tmp_db_path):
     """Default configuration."""
+    ZENODO_OPENAIRE_SUBTYPES = {
+        'openaire_communities': {
+            'foo': ['c1', 'c2'],
+            'bar': ['c3', ],
+        },
+        'openaire_types': {
+            'software': {
+                'foo': [
+                    {'id': 'foo:t1', 'name': 'Foo sft type one'},
+                    {'id': 'foo:t2', 'name': 'Foo sft type two'},
+                ],
+                'bar': [
+                    {'id': 'bar:t3', 'name': 'Bar sft type three'},
+                ]
+            },
+            'other': {
+                'foo': [
+                    {'id': 'foo:t4', 'name': 'Foo other type four'},
+                    {'id': 'foo:t5', 'name': 'Foo other type five'},
+                ],
+                'bar': [
+                    {'id': 'bar:t6', 'name': 'Bar other type six'},
+                ]
+            }
+        }
+    }
+
     return dict(
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
@@ -124,6 +151,7 @@ def default_config(tmp_db_path):
         ZENODO_COMMUNITIES_NOTIFY_DISABLED=['zenodo', 'c2'],
         ZENODO_COMMUNITIES_ADD_IF_GRANTS=['grants_comm', ],
         ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],
+        ZENODO_OPENAIRE_SUBTYPES=ZENODO_OPENAIRE_SUBTYPES,
         SIPSTORE_ARCHIVER_WRITING_ENABLED=False,
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(

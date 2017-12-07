@@ -34,6 +34,7 @@ from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records.models import AccessRight, ObjectType
+from zenodo.modules.records.utils import is_valid_openaire_type
 
 from . import common
 from ...minters import doi_generator
@@ -104,6 +105,10 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         attribute='resource_type.subtype',
         validate=validate.OneOf(choices=ObjectType.get_subtypes('image')),
     )
+    openaire_type = fields.Method(
+        'dump_openaire_type',
+        attribute='resource_type.openaire_subtype'
+    )
 
     license = fields.Method('dump_license', 'load_license')
     communities = fields.Method('dump_communities', 'load_communities')
@@ -150,6 +155,10 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Get publication type."""
         return self._dump_subtype(obj, 'image')
 
+    def dump_openaire_type(self, obj):
+        """Get OpenAIRE type."""
+        return obj.get('resource_type', {}).get('openaire_subtype', missing)
+
     def dump_license(self, obj):
         """Dump license."""
         return obj.get('license', {}).get('id', missing)
@@ -195,6 +204,7 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Dump communities type."""
         return [dict(identifier=x) for x in obj.get('communities', [])] \
             or missing
+
 
     def load_communities(self, data):
         """Load communities type."""
@@ -336,6 +346,12 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         if ObjectType.get_by_dict(type_dict) is None:
             raise ValidationError(
                 _('Invalid upload, publication or image type.'),
+                field_names=field_names,
+            )
+        if not is_valid_openaire_type(obj.get('resource_type', {}),
+                                      obj.get('communities', [])):
+            raise ValidationError(
+                _('Invalid OpenAIRE subtype.'),
                 field_names=field_names,
             )
 

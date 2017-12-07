@@ -32,9 +32,9 @@ from flask import Blueprint, current_app, flash, render_template, \
     send_from_directory
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
-from .decorators import cached_unless_authenticated_or_flashes
 
 from .api import FrontpageRecordsSearch
+from .decorators import cached_unless_authenticated_or_flashes
 
 blueprint = Blueprint(
     'zenodo_frontpage',

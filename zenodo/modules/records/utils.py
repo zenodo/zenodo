@@ -32,6 +32,8 @@ from invenio_search import current_search
 from invenio_search.utils import schema_to_index
 from werkzeug.utils import import_string
 
+from zenodo.modules.openaire import current_openaire
+
 
 def schema_prefix(schema):
     """Get index prefix for a given schema."""
@@ -64,3 +66,27 @@ def is_doi_locally_managed(doi_value):
     """Determine if a DOI value is locally managed."""
     return any(doi_value.startswith(prefix) for prefix in
                current_app.config['ZENODO_LOCAL_DOI_PREFIXES'])
+
+
+def is_valid_openaire_type(resource_type, communities):
+    """Check if the OpenAIRE subtype is corresponding with other metadata.
+
+    :param resource_type: Dictionary corresponding to 'resource_type'.
+    :param communities: list of communities identifiers
+    :returns: True if the 'openaire_subtype' (if it exists) is valid w.r.t.
+        the `resource_type.type` and the selected communities, False otherwise.
+    """
+    if 'openaire_subtype' not in resource_type:
+        return True
+    subtypes = current_openaire.openaire_subtypes.get(
+        'openaire_types', {})
+    comm_map = current_openaire.openaire_community_map
+    type_ = resource_type['type']
+    oa_subtype = resource_type['openaire_subtype']
+    prefix = oa_subtype.split(':')[0] if ':' in oa_subtype else ''
+    # Check if the OA subtype is defined in config and at least one of its
+    # corresponding communities is present
+    is_defined = any(t['id'] == oa_subtype for t in
+                     subtypes.get(type_, {}).get(prefix, {}))
+    comms_match = len(set(communities) & set(comm_map.get(prefix, [])))
+    return is_defined and comms_match

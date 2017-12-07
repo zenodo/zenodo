@@ -111,7 +111,7 @@ def test_invalid_resource_type(val):
     ('2016', datetime.utcnow().date().isoformat()),
 ])
 def test_valid_publication_date(val, expected):
-    """Test resource type."""
+    """Test publication date."""
     data, errors = MetadataSchemaV1(partial=['publication_date']).load(
         dict(publication_date=val) if val is not None else dict())
     assert data['publication_date'] == val if expected is None else expected
@@ -134,7 +134,7 @@ def test_language():
     ' invalid',
 ])
 def test_invalid_publication_date(val):
-    """Test resource type."""
+    """Test publication date."""
     data, errors = MetadataSchemaV1(partial=['publication_date']).load(
         dict(publication_date=val))
     assert 'publication_date' in errors
@@ -148,7 +148,7 @@ def test_invalid_publication_date(val):
     ('  ', None),
 ])
 def test_title(val, expected):
-    """Test resource type."""
+    """Test title."""
     data, errors = MetadataSchemaV1(partial=['title']).load(
         dict(title=val))
     if expected is not None:

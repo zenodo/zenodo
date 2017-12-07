@@ -191,6 +191,10 @@
         "subtype": {
           "description": "Specific resource type.",
           "type": "string"
+        },
+        "openaire_subtype" : {
+          "description": "OpenAIRE-specific resource type.",
+          "type": "string"
         }
       },
       "required": [

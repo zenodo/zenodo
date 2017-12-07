@@ -193,6 +193,7 @@ setup(
             'utils = zenodo.modules.utils.cli:utils',
         ],
         'invenio_base.apps': [
+            'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
             'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
             'zenodo_communities = '
             'zenodo.modules.communities.ext:ZenodoCommunities',
@@ -202,12 +203,13 @@ setup(
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
             'zenodo_jsonschemas = '
             'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',
-            'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
+            'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '
             'zenodo.modules.communities.ext:ZenodoCommunities',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
+            'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
         ],
         'invenio_base.blueprints': [

@@ -60,6 +60,7 @@ class ResourceTypeSchema(StrictKeysSchema):
         ),
     )
     subtype = fields.Str()
+    openaire_subtype = fields.Str()
     title = fields.Method('get_title', dump_only=True)
 
     def get_title(self, obj):
@@ -73,6 +74,13 @@ class ResourceTypeSchema(StrictKeysSchema):
         obj = ObjectType.get_by_dict(data)
         if obj is None:
             raise ValidationError(_('Invalid resource type.'))
+
+    def dump_openaire_type(self, obj):
+        """Get OpenAIRE subtype."""
+        acc = obj.get('access_right')
+        if acc:
+            return AccessRight.as_category(acc)
+        return missing
 
 
 class JournalSchemaV1(StrictKeysSchema):

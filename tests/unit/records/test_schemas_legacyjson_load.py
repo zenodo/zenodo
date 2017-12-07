@@ -70,25 +70,33 @@ def test_title_invalid(val):
     )
 
 
-def test_upload_type():
+def test_upload_type(app):
     """Test upload type deserialization."""
     s = legacyjson.LegacyMetadataSchemaV1(
-        partial=['upload_type', 'publication_type', 'image_type'],
+        partial=['upload_type', 'publication_type', 'image_type',
+                 'communities'],
         strict=True
     )
-    s.load(d(
+    assert s.load(d(
         upload_type='publication',
         publication_type='book',
     )).data['resource_type'] == {'subtype': 'book', 'type': 'publication'}
     # Irrelevant extra key.
-    s.load(d(
+    assert s.load(d(
         upload_type='image',
         publication_type='book',
         image_type='photo',
     )).data['resource_type'] == {'subtype': 'photo', 'type': 'image'}
 
+    assert s.load(d(
+        upload_type='software',
+        openaire_type='foo:t1',
+        communities=['c1']
+        )).data['resource_type'] == {'type': 'software',
+                                     'openaire_subtype': 'foo:t1'}
 
-def test_upload_type_invalid():
+
+def test_upload_type_invalid(app):
     """Test upload type deserialization."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
 
@@ -112,6 +120,29 @@ def test_upload_type_invalid():
     # Subtype provided for type without possibility of subtype.
     obj.update(dict(upload_type='dataset', image_type='figure'))
     assert s.load(obj).data['resource_type'] == {'type': 'dataset'}
+
+    obj.update(dict(upload_type='image', image_type='invalid'))
+    pytest.raises(ValidationError, s.load, obj)
+
+    # OpenAIRE subtype and community mismatch
+    obj.update(dict(upload_type='software', openaire_type='foo:t1',
+                    communities=['foobar']))
+    pytest.raises(ValidationError, s.load, obj)
+
+    # OpenAIRE subtype invalid format (no prefix)
+    obj.update(dict(upload_type='software', openaire_type='invalid',
+                    communities=['c1']))
+    pytest.raises(ValidationError, s.load, obj)
+
+    # OpenAIRE subtype not found (wrong prefix)
+    obj.update(dict(upload_type='software', openaire_type='xxx:t1',
+                    communities=['c1']))
+    pytest.raises(ValidationError, s.load, obj)
+
+    # OpenAIRE subtype not found (good prefix, wrong type)
+    obj.update(dict(upload_type='software', openaire_type='foo:invalid',
+                    communities=['c1']))
+    pytest.raises(ValidationError, s.load, obj)
 
 
 def test_related_alternate_identifiers():
