@@ -76,7 +76,7 @@ file (recommended) located at:
 
 .. code-block:: console
 
-    ${VIRTUAL_ENV}/var/instance/zenodo.cfg
+    ${VIRTUAL_ENV}/var/instance/invenio.cfg
 
 Secure session cookie
 ~~~~~~~~~~~~~~~~~~~~~
