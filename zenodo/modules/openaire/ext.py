@@ -43,6 +43,11 @@ class _ZenodoOpenAIREState(object):
         return self.app.config['ZENODO_OPENAIRE_SUBTYPES']
 
     @cached_property
+    def openaire_types(self):
+        """Configuration for OpenAIRE communities types."""
+        return self.openaire_subtypes['openaire_types']
+
+    @cached_property
     def openaire_community_map(self):
         """Map between OpenAIRE community ID and Zenodo community ID."""
         return self.openaire_subtypes['openaire_communities']

@@ -31,6 +31,7 @@ from os.path import dirname, join
 
 import click
 from flask.cli import with_appcontext
+from invenio_communities.models import Community
 from invenio_communities.utils import initialize_communities_bucket
 from invenio_db import db
 from invenio_openaire.minters import funder_minter, grant_minter
@@ -38,11 +39,12 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from sqlalchemy.orm.exc import NoResultFound
 
-from .communities import loadcommunities
+from .communities import loadcommunity
 from .files import loaddemofiles, loadlocations
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .records import loaddemorecords, loadsipmetadatatypes
+from .users import loaduser
 from .utils import read_json
 
 
@@ -170,12 +172,27 @@ def matchlicenses_cli(legacy_source, od_source, destination):
 
 
 @fixtures.command('loadcommunities')
-@click.argument('owner_email')
 @click.option('-i', '--input-file')
 @with_appcontext
-def loadcommunities_cli(owner_email, input_file=None):
+def loadcommunities_cli(input_file=None):
     """Load Zenodo communities."""
-    try:
-        loadcommunities(owner_email, input_file)
-    except NoResultFound:
-        click.echo("Error: Provided owner email does not exist.")
+    data = read_json(input_file or 'data/communities.json')
+    skipped = 0
+    for comm_data in data:
+        if not Community.query.filter_by(id=comm_data['id']).count():
+            loadcommunity(comm_data)
+        else:
+            skipped += 1
+
+    click.secho('Loaded {0} communities (skipped {1} existing).'.format(
+        len(data) - skipped, skipped), fg='green')
+
+
+@fixtures.command('loadusers')
+@click.option('-i', '--input-file')
+@with_appcontext
+def loadusers_cli(input_file=None):
+    """Load Zenodo users."""
+    users = read_json(input_file or 'data/users.json')
+    for user_data in users:
+        loaduser(user_data)

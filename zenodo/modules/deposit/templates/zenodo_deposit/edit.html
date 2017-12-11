@@ -44,8 +44,7 @@
 
       // Configure OpenAIRE types and communities
       app.config(['openAIREProvider', function(openAIREProvider){
-        // TODO: Change `current_openaire.openaire_subtypes`
-        openAIREProvider.setTypes({{current_openaire.openaire_subtypes.openaire_types|tojson}});
+        openAIREProvider.setTypes({{current_openaire.openaire_types|tojson}});
         openAIREProvider.setCommunities({{current_openaire.inverse_openaire_community_map|tojson}});
       }]);
 

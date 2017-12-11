@@ -1,0 +1,10 @@
+[
+    {
+        "email": "info@zenodo.org",
+        "password": "123456",
+        "access": [
+            ["allow", "admin-access"],
+            ["allow", "deposit-admin-access"]
+        ]
+    }
+]

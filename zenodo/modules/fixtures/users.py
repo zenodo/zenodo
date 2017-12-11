@@ -26,23 +26,35 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import current_app
+from flask_security.utils import hash_password
+from invenio_access.models import ActionUsers
 from invenio_accounts.models import User
 from invenio_communities.models import Community
-from invenio_communities.utils import save_and_validate_logo
 from invenio_db import db
 
-from .utils import file_stream, read_json
 
+def loaduser(user_data):
+    """Load a single user to Zenodo from JSON fixture."""
+    kwargs = {
+        'email': user_data['email'],
+        'password': hash_password(user_data['password']),
+        'active': user_data.get('active', True)
+    }
 
-def loadcommunity(comm_data):
-    """Load the Zenodo communities fixture."""
-    logo_path = comm_data.pop('logo', None)
-    community_id = comm_data.pop('id')
-    owner_email = comm_data.pop('owner_email')
-    owner_id = User.query.filter_by(email=owner_email).one().id
-    c = Community.create(community_id, owner_id, **comm_data)
-    if logo_path:
-        logo = file_stream(logo_path)
-        ext = save_and_validate_logo(logo, logo.name, community_id)
-        c.logo_ext = ext
+    datastore = current_app.extensions['security'].datastore
+    datastore.create_user(**kwargs)
+    db.session.commit()
+    user = User.query.filter_by(email=user_data['email']).one()
+    actions = current_app.extensions['invenio-access'].actions
+    actionusers_f = {
+        'allow': ActionUsers.allow,
+        'deny': ActionUsers.deny,
+    }
+    # e.g. [('allow', 'admin-access'), ]
+    for action_type, action_name in user_data.get('access', []):
+        action = actions[action_name]
+        db.session.add(
+            actionusers_f[action_type](action, user_id=user.id)
+        )
     db.session.commit()

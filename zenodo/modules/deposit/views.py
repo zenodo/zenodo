@@ -259,7 +259,7 @@ def current_datetime():
 
 @blueprint.app_context_processor
 def current_openaire_ctx():
-    """OpenAIRE context."""
+    """Current OpenAIRE context."""
     return dict(current_openaire=current_openaire)
 
 
