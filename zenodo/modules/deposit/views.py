@@ -29,30 +29,26 @@ from __future__ import absolute_import, print_function, unicode_literals
 from datetime import datetime
 from functools import wraps
 
-import pycountry
-from elasticsearch.exceptions import NotFoundError
-from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
+from flask import Blueprint, abort, current_app, flash, redirect, \
     render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
 from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_db import db
-from invenio_indexer.api import RecordIndexer
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDDeletedError, PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidstore.resolver import Resolver
-from invenio_records_files.models import RecordsBuckets
 from invenio_records_ui.signals import record_viewed
 
 from zenodo.modules.deposit.utils import delete_record
+from zenodo.modules.openaire import current_openaire
 from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
 from .forms import RecordDeleteForm
-from .tasks import datacite_inactivate, datacite_register
 
 blueprint = Blueprint(
     'zenodo_deposit',
@@ -261,6 +257,12 @@ def current_datetime():
     }
 
 
+@blueprint.app_context_processor
+def current_openaire_ctx():
+    """OpenAIRE context."""
+    return dict(current_openaire=current_openaire)
+
+
 @blueprint.app_template_filter('tolinksjs')
 def to_links_js(pid, deposit=None):
     """Get API links."""
@@ -353,6 +355,7 @@ def to_files_js(deposit):
         })
 
     return res
+
 
 def default_view_method(pid, record, template=None):
     """Default view method for updating record.

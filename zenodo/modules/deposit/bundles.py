@@ -35,11 +35,13 @@ js_zenodo_deposit = Bundle(
     'js/zenodo_deposit/filters.js',
     'js/zenodo_deposit/directives.js',
     'js/zenodo_deposit/controllers.js',
+    'js/zenodo_deposit/providers.js',
     'js/zenodo_deposit/config.js',
     depends=(
         'js/zenodo_deposit/*.js',
     ),
 )
+
 
 js_deposit = NpmBundle(
     js_dependencies_jquery,

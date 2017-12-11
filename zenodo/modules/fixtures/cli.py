@@ -171,10 +171,11 @@ def matchlicenses_cli(legacy_source, od_source, destination):
 
 @fixtures.command('loadcommunities')
 @click.argument('owner_email')
+@click.option('-i', '--input-file')
 @with_appcontext
-def loadcommunities_cli(owner_email):
+def loadcommunities_cli(owner_email, input_file=None):
     """Load Zenodo communities."""
     try:
-        loadcommunities(owner_email)
+        loadcommunities(owner_email, input_file)
     except NoResultFound:
         click.echo("Error: Provided owner email does not exist.")

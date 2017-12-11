@@ -73,5 +73,121 @@ prereserveButton.$inject = [
   'InvenioRecordsAPI',
 ];
 
+
+function communitiesSelect($http, $q, openAIRE) {
+  function link($scope, elem, attrs, vm) {
+    // Locals
+    function initCommunities() {
+      $scope.model.communities = $scope.model.communities.filter(
+        function(comm) { return 'identifier' in comm; });
+      var requests = $scope.model.communities.filter(function(comm) {
+        return 'identifier' in comm;
+      }).map(function(comm) {
+        return $http.get('/api/communities/' + comm.identifier);
+      });
+      // TODO: Add a loading indicator
+      $q.all(requests).then(function(fetchedCommunities) {
+        $scope.communities = fetchedCommunities.map(function(res) {
+          return res.data;
+        }).filter(function(comm) { return 'id' in comm; });
+      });
+    }
+
+    $scope.communities = [];
+    $scope.communityResults = [];
+    $scope.openAIRETypes = openAIRE.types;
+    $scope.openAIRECommunities = openAIRE.communities;
+
+    initCommunities();
+
+    // Methods
+    $scope.refreshCommunityResults = function(data) {
+      var data = data || $scope.communityResults;
+      $scope.communityResults = _.filter(data, function(comm){
+        return _.find($scope.communities, function(c) { return c.id == comm.id}) == undefined;
+      });
+    };
+
+    $scope.searchCommunities = function(query) {
+      $http.get('/api/communities', {params: {q: query, size: 7} })
+      .then(function(res){
+        $scope.refreshCommunityResults(res.data.hits.hits);
+      });
+    }
+
+    $scope.communityOnSelect = function(community) {
+      $scope.communities.push(community)
+      $scope.model.communities.push({identifier: community.id})
+      $scope.refreshCommunityResults()
+    };
+
+    $scope.removeCommunity = function(commId) {
+      $scope.communities = _.filter($scope.communities, function(comm){
+        return comm.id !== commId;
+      });
+      $scope.model.communities = _.filter($scope.model.communities, function(comm){
+        return comm.identifier !== commId;
+      });
+      $scope.refreshCommunityResults()
+    }
+  }
+  return {
+    scope: false,
+    restrict: 'AE',
+    require: '^invenioRecords',
+    link: link,
+  };
+}
+
+communitiesSelect.$inject = [
+  '$http',
+  '$q',
+  'openAIRE',
+];
+
+
+function openaireSubtype(openAIRE) {
+  function link($scope, elem, attrs, vm) {
+    // Locals
+    $scope.openAIRETypes = openAIRE.types;
+    $scope.openAIRECommunities = openAIRE.communities;
+    $scope.vm = vm;
+
+    // Methods
+    function getPrimaryOpenAIRECommunity() {
+      for (var i = 0; i < $scope.model.communities.length; i++) {
+        var comm = $scope.model.communities[i];
+        if (comm.identifier in $scope.openAIRECommunities) {
+          return $scope.openAIRECommunities[comm.identifier];
+        }
+      }
+    }
+
+    $scope.show = function() {
+      return !angular.equals($scope.getOptions(), []);
+    }
+
+    $scope.getOptions = function() {
+      var uploadType = $scope.model.upload_type;
+      var openaireComm = getPrimaryOpenAIRECommunity();
+      var types = $scope.openAIRETypes[uploadType];
+      return (types && types[openaireComm]) || [];
+    }
+  }
+  return {
+    scope: false,
+    restrict: 'AE',
+    require: '^invenioRecords',
+    link: link,
+  };
+}
+
+openaireSubtype.$inject = [
+  'openAIRE',
+];
+
+
 angular.module('invenioRecords.directives')
   .directive('prereserveButton', prereserveButton)
+  .directive('communitiesSelect', communitiesSelect)
+  .directive('openaireSubtype', openaireSubtype);

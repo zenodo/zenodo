@@ -6,6 +6,14 @@
     <div class="panel-heading" ng-click="collapsed = !collapsed">
       <a class="panel-toggle">
         {{ form.title }}
+        <div
+          class="tooltip-wrapper"
+          ng-if="form.helptext"
+          bs-tooltip
+          data-container="div"
+          data-title="{{form.helptext}}">
+          <i class="fa fa-question-circle text-muted"></i>
+        </div>
         <span class="pull-right" ng-show="collapsed"><i class="glyphicon glyphicon-chevron-right"></i></span>
         <span class="pull-right" ng-hide="collapsed"><i class="glyphicon glyphicon-chevron-down"></i></span>
       </a>

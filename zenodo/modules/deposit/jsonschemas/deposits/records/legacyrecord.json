@@ -371,6 +371,10 @@
         "type": "string"
       }
     },
+    "openaire_type": {
+      "type": "string",
+      "descritpion": "OpenAIRE type."
+    },
     "subjects": {
       "description": "Subjects from specific vocabularies.",
       "items": {

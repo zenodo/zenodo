@@ -27,19 +27,16 @@
 from __future__ import absolute_import, print_function
 
 from invenio_accounts.models import User
-from invenio_communities.models import Community
 from invenio_db import db
+
+from invenio_communities.models import Community
 
 from .utils import read_json
 
 
-def loadcommunities(owner_email):
-    """Load the Zenodo communities fixture.
-
-    Create extra PID if license is to be mapped and already exists, otherwise
-    create a new license record and a PID.
-    """
-    data = read_json('data/communities.json')
+def loadcommunities(owner_email, file_path=None):
+    """Load the Zenodo communities fixture."""
+    data = read_json(file_path or 'data/communities.json')
     owner = User.query.filter_by(email=owner_email).one()
 
     for comm_data in data:

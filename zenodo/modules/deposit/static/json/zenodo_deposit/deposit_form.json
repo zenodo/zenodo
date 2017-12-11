@@ -1,6 +1,19 @@
 [
   {
     "type": "fieldset",
+    "title": "Communities",
+    "helptext": "Any user can create a community collection on Zenodo. Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
+    "fieldhint": "recommended",
+    "items": [
+      {
+        "type": "communities",
+        "key": "communities",
+        "placeholder": "Start typing a community name..."
+      }
+    ]
+  },
+  {
+    "type": "fieldset",
     "title": "Upload type",
     "items": [
       {
@@ -156,6 +169,12 @@
             "name": "Other"
           }
         ]
+      },
+      {
+        "type": "template",
+        "key": "openaire_type",
+        "title": "OpenAIRE sub-type",
+        "templateUrl": "/static/templates/zenodo_deposit/openaire-subtype.html"
       }
     ]
   },
@@ -433,55 +452,6 @@
               }
             },
             "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
-          }
-        ]
-      }
-    ]
-  },
-  {
-    "type": "fieldset",
-    "title": "Communities",
-    "description": "Any user can create a community collection on Zenodo (<a target='_blank' rel='noopener noreferrer' href='http://zenodo.org/communities/'>browse communities</a>). Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
-    "fieldhint": "recommended",
-    "items": [
-      {
-        "type": "array",
-        "key": "communities",
-        "title": "Communities",
-        "fa_cls": "fa-group",
-        "description": "",
-        "sortOptions": {
-          "disabled": true
-        },
-        "add": "Add another community",
-        "inline": true,
-        "items": [
-          {
-            "type": "section",
-            "notitle": true,
-            "description": "",
-            "items": [
-              {
-                "type": "uiselect",
-                "key": "communities[].identifier",
-                "notitle": true,
-                "description": "",
-                "placeholder": "Start typing a community name...",
-                "options": {
-                  "asyncCallback": "autocompleteSuggest",
-                  "url": "/api/communities/",
-                  "urlParameters": {
-                    "q": "value",
-                    "size": 15
-                  },
-                  "map": {
-                    "resultSource": "hits.hits",
-                    "valueProperty": "id",
-                    "nameProperty": "title"
-                  }
-                }
-              }
-            ]
           }
         ]
       }

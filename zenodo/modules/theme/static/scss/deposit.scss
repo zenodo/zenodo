@@ -243,6 +243,85 @@
             }
         }
     }
+
+    .form-communities {
+        .ui-select-choices {
+            max-height: 250px;
+
+            .ui-select-choices-row {
+                & > a:hover {
+                    background: #e5e5e5;
+                }
+
+                &.active > a:hover {
+                    background: #428bca;
+                }
+            }
+        }
+
+        .ui-select-match .caret {
+            display: none;
+        }
+
+        input.ui-select-search {
+            width: 100% !important;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            padding-right: 40px;
+        }
+    }
+
+    .community-results-item {
+        display: flex;
+        align-items: center;
+        padding-top: 10px;
+        padding-bottom:10px;
+        height: 60px;
+        white-space: normal;
+        word-wrap: break-word;
+
+        .community-logo {
+            margin: 10px;
+            text-align: center;
+
+            img {
+                max-height: 50px;
+                mix-blend-mode: multiply;
+            }
+        }
+
+        img.openaire-logo {
+            height: 15px;
+            margin: 0 5px 5px;
+        }
+    }
+
+    .communities-list {
+        padding-top: 15px;
+
+        .communities-list-item {
+            padding: 0px 10px 10px;
+
+            .communities-card {
+                height: 170px;
+                padding: 10px;
+            }
+
+            .community-logo {
+                padding: 10px;
+                height: 80px;
+                text-align: center;
+
+                img {
+                    max-height: 60px;
+                }
+            }
+
+            .communities-title {
+                text-align: center;
+            }
+        }
+    }
 }
 
 .modal-backdrop {

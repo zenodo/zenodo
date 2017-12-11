@@ -70,7 +70,24 @@ function formatGrant() {
   }
 };
 
+
+function striptags() {
+  return function(text) {
+    return text ? String(text).replace(/<[^>]+>/gm, '') : '';
+  };
+}
+
+
+function limitToEllipsis() {
+  return function(text, n) {
+    return (text.length > n) ? text.substr(0, n-1) + '&hellip;' : text;
+  };
+}
+
+
 angular.module('invenioRecords')
   .filter('fieldtitle', fieldtitle)
   .filter('notIn', notIn)
-  .filter('formatGrant', formatGrant);
+  .filter('formatGrant', formatGrant)
+  .filter('limitToEllipsis', limitToEllipsis)
+  .filter('striptags', striptags);

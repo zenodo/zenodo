@@ -21,14 +21,20 @@
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 function configZenodoDeposit($provide, decoratorsProvider) {
+
   // TODO: Check if these are needed, since we have DEPOSIT_FORM_TEMPLATES
   // New field types
-  decoratorsProvider.addMapping('bootstrapDecorator', 'uiselect', '{{ url_for("static", // filename="templates/zenodo_deposit/uiselect.html")}}');
-  decoratorsProvider.addMapping('bootstrapDecorator', 'ckeditor', '{{ url_for("static", // filename="templates/zenodo_deposit/ckeditor.html")}}');
+  decoratorsProvider.addMapping('bootstrapDecorator', 'uiselect', '/static/templates/zenodo_deposit/uiselect.html');
+  decoratorsProvider.addMapping('bootstrapDecorator', 'ckeditor', '/static/templates/zenodo_deposit/ckeditor.html');
   decoratorsProvider.defineAddOn(
     'bootstrapDecorator',
     'grantselect',
-    '{{ url_for("static", filename="templates/zenodo_deposit/grantselect.html")}}'
+    '/static/templates/zenodo_deposit/grantselect.html")}}'
+  );
+  decoratorsProvider.defineAddOn(
+    'bootstrapDecorator',
+    'communities',
+    '/static/templates/zenodo_deposit/communities.html'
   );
 
   // Override invenio-records-form
