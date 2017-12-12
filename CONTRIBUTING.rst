@@ -28,7 +28,7 @@ Co-develop Zenodo
 -----------------
 Are you missing a feature in Zenodo? Why not help us built the feature. We are
 happy to receive both tiny and large contributions to Zenodo. Have a look at
-our :ref:`development_process_` and :ref:`project_life_cycle`and don't hesitate to get in 
+our :ref:`development_process_` and :ref:`project_life_cycle` and don't hesitate to get in 
 contact with us.
 
 Contributor agreement
