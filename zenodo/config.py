@@ -35,7 +35,7 @@ or provide an instance configuration file (Python syntax):
 
 .. code-block:: python
 
-    # ${VIRTUAL_ENV}/var/instance/zenodo.cfg
+    # ${VIRTUAL_ENV}/var/instance/invenio.cfg
     SUPPORT_EMAIL = "info@example.org"
 
 Configuration variables
