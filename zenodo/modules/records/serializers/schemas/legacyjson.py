@@ -352,7 +352,7 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
                                       obj.get('communities', [])):
             raise ValidationError(
                 _('Invalid OpenAIRE subtype.'),
-                field_names=field_names,
+                field_names=['openaire_subtype'],
             )
 
 
