@@ -150,8 +150,8 @@ html_theme_options = {
     'github_banner': True,
     'show_powered_by': False,
     'extra_nav_links': {
-        'zenodo@GitHub': 'http://github.com/zenodo/zenodo',
-        'zenodo@PyPI': 'http://pypi.python.org/pypi/zenodo/',
+        'zenodo@GitHub': 'https://github.com/zenodo/zenodo',
+        'zenodo@PyPI': 'https://pypi.python.org/pypi/zenodo/',
     }
 }
 

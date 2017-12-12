@@ -50,7 +50,7 @@ any size, any format and from any science.
 Powered by Invenio
 ------------------
 Zenodo is a small layer on top of
-`Invenio <http://github.com/inveniosoftware/invenio>`_, a ​free software
+`Invenio <https://github.com/inveniosoftware/invenio>`_, a ​free software
 suite enabling you to run your own ​digital library or document repository on
 the web.
 
