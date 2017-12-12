@@ -1,5 +1,5 @@
 <openaire-subtype>
-  <div ng-show="show()" class="form-group schema-form-select">
+  <div ng-if="show()" class="form-group schema-form-select">
     <label class="control-label col-sm-3" ng-show="showTitle()">
     <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>{{form.title}}
     </label>
@@ -7,7 +7,7 @@
       <select
         class="form-control"
         ng-model="model.openaire_type"
-        ng-options="item.id as item.name for item in getOptions()">
+        ng-options="item.id as item.name group by item.commName for item in (getOptions()|stable:openaireTypeOptions)">
       </select>
     </div>
   </div>

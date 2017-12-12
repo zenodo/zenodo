@@ -84,10 +84,19 @@ function limitToEllipsis() {
   };
 }
 
+// Bestowed upon us by https://github.com/angular/angular.js/issues/15874#issuecomment-290662445
+function stable() {
+  var valueCache = {};
+  return function(value, key) {
+    valueCache[key] = angular.equals(value, valueCache[key]) ? valueCache[key] : value;
+    return valueCache[key];
+  };
+}
 
 angular.module('invenioRecords')
   .filter('fieldtitle', fieldtitle)
   .filter('notIn', notIn)
   .filter('formatGrant', formatGrant)
   .filter('limitToEllipsis', limitToEllipsis)
-  .filter('striptags', striptags);
+  .filter('striptags', striptags)
+  .filter('stable', stable);

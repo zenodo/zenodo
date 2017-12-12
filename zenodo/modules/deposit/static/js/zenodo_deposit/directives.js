@@ -96,8 +96,8 @@ function communitiesSelect($http, $q, openAIRE) {
 
     $scope.communities = [];
     $scope.communityResults = [];
-    $scope.openAIRETypes = openAIRE.types;
     $scope.openAIRECommunities = openAIRE.communities;
+    $scope.openAIRECommunitiesMapping = openAIRE.communitiesMapping;
 
     initCommunities();
 
@@ -129,6 +129,8 @@ function communitiesSelect($http, $q, openAIRE) {
       $scope.model.communities = _.filter($scope.model.communities, function(comm){
         return comm.identifier !== commId;
       });
+      // Unset the OpenAIRE subtype
+      $scope.model.openaire_type = undefined;
       $scope.refreshCommunityResults()
     }
   }
@@ -150,29 +152,42 @@ communitiesSelect.$inject = [
 function openaireSubtype(openAIRE) {
   function link($scope, elem, attrs, vm) {
     // Locals
-    $scope.openAIRETypes = openAIRE.types;
     $scope.openAIRECommunities = openAIRE.communities;
+    $scope.openAIRECommunitiesMapping = openAIRE.communitiesMapping;
     $scope.vm = vm;
 
     // Methods
-    function getPrimaryOpenAIRECommunity() {
-      for (var i = 0; i < $scope.model.communities.length; i++) {
-        var comm = $scope.model.communities[i];
-        if (comm.identifier in $scope.openAIRECommunities) {
-          return $scope.openAIRECommunities[comm.identifier];
+    function getOpenAIRECommunities() {
+      var modelCommunities = $scope.model.communities || [];
+      var openaireComms = [];
+      _.each(modelCommunities, function(comm) {
+        if (comm.identifier in $scope.openAIRECommunitiesMapping) {
+          openaireComms.push($scope.openAIRECommunitiesMapping[comm.identifier]);
         }
-      }
+      });
+      return _.uniq(openaireComms);
     }
 
     $scope.show = function() {
-      return !angular.equals($scope.getOptions(), []);
+      var uploadType = $scope.model.upload_type;
+      var openaireComms = getOpenAIRECommunities();
+      var commTypes = _.pick($scope.openAIRECommunities, openaireComms)
+      var res = !angular.equals(commTypes, {}) &&
+      _.any(commTypes, function(comm) { return uploadType in comm.types; });
+      return res;
     }
 
     $scope.getOptions = function() {
       var uploadType = $scope.model.upload_type;
-      var openaireComm = getPrimaryOpenAIRECommunity();
-      var types = $scope.openAIRETypes[uploadType];
-      return (types && types[openaireComm]) || [];
+      var openaireComms = getOpenAIRECommunities();
+      var commTypes = _.pick($scope.openAIRECommunities, openaireComms)
+      var options = [];
+      _.each(commTypes, function(comm) {
+        _.each(comm.types[uploadType] || [], function(type) {
+          options.push({ id: type.id, name: type.name, commName: comm.name })
+        })
+      })
+      return options;
     }
   }
   return {

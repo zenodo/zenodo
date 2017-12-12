@@ -24,12 +24,17 @@ angular.module('invenioRecords.providers', []);
 
 // OpenAIRE types configuration
 function openAIRE() {
-  var types = {};
   var communities = {};
+  var communitiesMapping = {};
   return {
-    setTypes: function(values) { types = values; },
     setCommunities: function(values) { communities = values; },
-    $get: function() { return {types: types, communities: communities}; } };
+    setCommunitiesMapping: function(values) { communitiesMapping = values; },
+    $get: function() {
+      return {
+        communities: communities, communitiesMapping: communitiesMapping
+      };
+    }
+  };
 }
 
 angular.module('invenioRecords.providers')

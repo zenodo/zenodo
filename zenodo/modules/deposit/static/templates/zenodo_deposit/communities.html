@@ -13,7 +13,7 @@
             <div class="community-results-item">
               <div>
                 <div>
-                  <img class="openaire-logo" ng-if="openAIRECommunities[item.id]" src="/static/img/openaire_logo_small.png"/>
+                  <img class="openaire-logo" ng-if="openAIRECommunitiesMapping[item.id]" src="/static/img/openaire_logo_small.png"/>
                   <span ng-bind-html="(item.title|limitToEllipsis:80|highlight:$select.search)"></span>
                 </div>
                 <div ng-if="item.description">
@@ -36,7 +36,7 @@
 
     <!-- List of community selections -->
     <div class="row communities-list">
-      <div ng-repeat="comm in communities track by comm.id" class="col-sm-3 communities-list-item">
+      <div ng-repeat="comm in communities" class="col-sm-3 communities-list-item">
         <div class="panel panel-default">
           <div class="panel-body communities-card">
             <button type="button" ng-click="removeCommunity(comm.id)" class="pull-right close" aria-label="Close"><span aria-hidden="true">&times;</span></button>
