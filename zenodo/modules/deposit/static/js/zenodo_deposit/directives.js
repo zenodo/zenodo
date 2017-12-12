@@ -78,6 +78,7 @@ function communitiesSelect($http, $q, openAIRE) {
   function link($scope, elem, attrs, vm) {
     // Locals
     function initCommunities() {
+      $scope.model.communities = $scope.model.communities || [];
       $scope.model.communities = $scope.model.communities.filter(
         function(comm) { return 'identifier' in comm; });
       var requests = $scope.model.communities.filter(function(comm) {
