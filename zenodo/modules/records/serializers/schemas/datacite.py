@@ -220,10 +220,14 @@ class DataCiteSchemaV1(Schema):
     def get_type(self, obj):
         """Resource type."""
         t = ObjectType.get_by_dict(obj['metadata']['resource_type'])
-        return {
+        type_ = {
             'resourceTypeGeneral': t['datacite']['general'],
             'resourceType': t['datacite'].get('type'),
         }
+        oa_type = obj['metadata']['resource_type'].get('openaire_subtype')
+        if oa_type:
+            type_['resourceType'] = 'openaire:' + oa_type
+        return type_
 
     def get_related_identifiers(self, obj):
         """Resource type."""

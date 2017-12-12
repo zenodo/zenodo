@@ -358,6 +358,14 @@ def test_resource_type(db, minimal_record_model, recid_pid):
         'resourceType': 'Poster',
     }
 
+    minimal_record_model['resource_type'] = {'type': 'software',
+                                             'openaire_subtype': 'foo:t1'}
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['resourceType'] == {
+        'resourceTypeGeneral': 'Software',
+        'resourceType': 'openaire:foo:t1',
+    }
+
 
 def test_alt_ids(db, minimal_record_model, recid_pid):
     """Test language."""

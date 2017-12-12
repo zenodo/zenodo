@@ -160,6 +160,17 @@ def test_types(app, db, minimal_record_model, recid_pid):
         'publication-conferencepaper'
     ]
 
+    minimal_record_model.update({
+        'resource_type': {'type': 'software',
+                          'openaire_subtype': 'foo:t1'}
+    })
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['types'] == [
+        'info:eu-repo/semantics/other',
+        'software',
+        'openaire:foo:t1',
+    ]
+
 
 def test_sources(app, db, minimal_record_model, recid_pid):
     """"Test contributors."""
