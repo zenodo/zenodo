@@ -37,7 +37,5 @@ zenodo fixtures loadlicenses
 zenodo fixtures loadfunders
 zenodo fixtures loadfp6grants
 zenodo fixtures loadsipmetadatatypes
-zenodo users create info@zenodo.org -a --password=123456
-zenodo access allow admin-access user info@zenodo.org
-zenodo access allow deposit-admin-access user info@zenodo.org
-zenodo fixtures loadcommunities info@zenodo.org
+zenodo fixtures loadusers
+zenodo fixtures loadcommunities
