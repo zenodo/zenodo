@@ -38,26 +38,16 @@ class _ZenodoOpenAIREState(object):
         self.app = app
 
     @cached_property
-    def openaire_subtypes(self):
+    def openaire_communities(self):
         """Configuration for OpenAIRE communities types."""
-        return self.app.config['ZENODO_OPENAIRE_SUBTYPES']
-
-    @cached_property
-    def openaire_types(self):
-        """Configuration for OpenAIRE communities types."""
-        return self.openaire_subtypes['openaire_types']
-
-    @cached_property
-    def openaire_community_map(self):
-        """Map between OpenAIRE community ID and Zenodo community ID."""
-        return self.openaire_subtypes['openaire_communities']
+        return self.app.config['ZENODO_OPENAIRE_COMMUNITIES']
 
     @cached_property
     def inverse_openaire_community_map(self):
         """Lookup for Zenodo community -> OpenAIRE community."""
-        comm_map = self.openaire_community_map
-        items = sum([[(z_comm, oa_comm) for z_comm in z_comms] \
-            for oa_comm, z_comms in comm_map.items()], [])
+        comm_map = self.openaire_communities
+        items = sum([[(z_comm, oa_comm) for z_comm in cfg['communities']] \
+            for oa_comm, cfg in comm_map.items()], [])
         ditems = dict(items)
         if len(ditems) < len(items):
             raise ValueError("Communities defined for given OpenAIRE community"

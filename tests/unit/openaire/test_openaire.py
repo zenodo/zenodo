@@ -31,5 +31,10 @@ from zenodo.modules.openaire import current_openaire
 
 def test_openire_type(app):
     """Test OpenAIRE type."""
-    assert len(current_openaire.inverse_openaire_community_map) == 3
-    assert current_openaire.inverse_openaire_community_map['c1'] == 'foo'
+    assert current_openaire.inverse_openaire_community_map == {
+        'c1': 'foo',
+        'c2': 'foo',
+        'c3': 'bar',
+    }
+    assert set(current_openaire.openaire_communities.keys()) == \
+        set(['foo', 'bar'])

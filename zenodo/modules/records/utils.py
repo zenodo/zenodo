@@ -78,15 +78,15 @@ def is_valid_openaire_type(resource_type, communities):
     """
     if 'openaire_subtype' not in resource_type:
         return True
-    subtypes = current_openaire.openaire_subtypes.get(
-        'openaire_types', {})
-    comm_map = current_openaire.openaire_community_map
-    type_ = resource_type['type']
     oa_subtype = resource_type['openaire_subtype']
     prefix = oa_subtype.split(':')[0] if ':' in oa_subtype else ''
+
+    cfg = current_openaire.openaire_communities
+    defined_comms = [c for c in cfg.get(prefix, {}).get('communities', [])]
+    type_ = resource_type['type']
+    subtypes = cfg.get(prefix, {}).get('types', {}).get(type_, [])
     # Check if the OA subtype is defined in config and at least one of its
     # corresponding communities is present
-    is_defined = any(t['id'] == oa_subtype for t in
-                     subtypes.get(type_, {}).get(prefix, {}))
-    comms_match = len(set(communities) & set(comm_map.get(prefix, [])))
+    is_defined = any(t['id'] == oa_subtype for t in subtypes)
+    comms_match = len(set(communities) & set(defined_comms))
     return is_defined and comms_match
