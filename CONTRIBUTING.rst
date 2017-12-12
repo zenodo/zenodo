@@ -28,14 +28,14 @@ Co-develop Zenodo
 -----------------
 Are you missing a feature in Zenodo? Why not help us built the feature. We are
 happy to receive both tiny and large contributions to Zenodo. Have a look at
-our Development Process and Project Life Cycle and don't hesitate to get in
+our `Development Process <https://github.com/zenodo/zenodo/blob/master/docs/development/process.rst>`_ and `Project Life Cycle <https://github.com/zenodo/zenodo/blob/master/docs/development/projectlifecycle.rst>`_ and don't hesitate to get in
 contact with us.
 
 Contributor agreement
 ~~~~~~~~~~~~~~~~~~~~~
 By making a pull request against our repository, we assume that you agree to
-license your contribution under GPLv2 (source code) / Creative Commons
-Attribution 4.0 International (text content).
+license your contribution under `GPLv2 (source code) <https://github.com/zenodo/zenodo/blob/master/LICENSE>`_ / `Creative Commons
+Attribution 4.0 International (text content) <https://creativecommons.org/licenses/by/4.0/>`_.
 
 Donate
 ------
