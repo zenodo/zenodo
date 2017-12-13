@@ -204,3 +204,7 @@ def test_description(app, db, minimal_record_model, recid_pid):
         "This&apos;&nbsp;is&nbsp;<i>&lt;it&gt;<i>"
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert obj['descriptions'] == ["Foo Bar Foo&Bar 'This' is <it>"]
+
+    minimal_record_model['description'] = ''
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['descriptions'] == []
