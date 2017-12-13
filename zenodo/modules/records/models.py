@@ -39,6 +39,8 @@ from invenio_search.api import RecordsSearch
 from jsonref import JsonRef
 from speaklater import make_lazy_gettext
 
+from .utils import is_valid_openaire_type
+
 _ = make_lazy_gettext(lambda: gettext)
 
 
@@ -229,3 +231,23 @@ class ObjectType(object):
         else:
             internal_id = value['type']
         return cls.get(internal_id)
+
+    @classmethod
+    def get_openaire_subtype(cls, value):
+        """Get the OpenAIRE community-specific subtype.
+
+        OpenAIRE community-specific subtype requires that the record is
+        accepted to the relevant community.
+
+        :param value: Full 'metadata' dictionary. Higher level metadata is
+                      required since we are fetching both 'resource_type' and
+                      'communities'.
+        :type value: dict
+        :returns: Subtype in the form "openaire:<OA-comm-ID>:<OA-subtype-ID>"
+                  or None.
+        :rtype: str
+        """
+        comms = value.get('communities', [])
+        oa_type = value['resource_type'].get('openaire_subtype')
+        if oa_type and is_valid_openaire_type(value['resource_type'], comms):
+            return 'openaire:' + oa_type

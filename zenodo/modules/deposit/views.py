@@ -362,24 +362,13 @@ def default_view_method(pid, record, template=None):
 
     Sends ``record_viewed`` signal and renders template.
 
-    :param pid: PID object.
-    :param record: Record object.
+    :param pid: PID object ('depid'-type PID).
+    :param record: Record object (Deposit API).
     :param template: Template to render.
     """
-    # Fetch deposit id from record and resolve deposit record and pid.
-    depid = zenodo_deposit_fetcher(None, record)
-    if not depid:
-        abort(404)
-
-    depid, deposit = Resolver(
-        pid_type=depid.pid_type,
-        object_type='rec',
-        getter=ZenodoDeposit.get_record,
-    ).resolve(depid.pid_value)
-
     # Put deposit in edit mode if not already.
-    if deposit['_deposit']['status'] != 'draft':
-        deposit = deposit.edit()
+    if record['_deposit']['status'] != 'draft':
+        record = record.edit()
         db.session.commit()
 
     record_viewed.send(

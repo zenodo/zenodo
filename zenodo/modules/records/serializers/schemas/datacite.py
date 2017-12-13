@@ -224,9 +224,11 @@ class DataCiteSchemaV1(Schema):
             'resourceTypeGeneral': t['datacite']['general'],
             'resourceType': t['datacite'].get('type'),
         }
-        oa_type = obj['metadata']['resource_type'].get('openaire_subtype')
+        oa_type = ObjectType.get_openaire_subtype(obj['metadata'])
+        # NOTE: This overwrites the resourceType if the configuration
+        # of the OpenAIRE subtypes overlaps with regular subtypes.
         if oa_type:
-            type_['resourceType'] = 'openaire:' + oa_type
+            type_['resourceType'] = oa_type
         return type_
 
     def get_related_identifiers(self, obj):

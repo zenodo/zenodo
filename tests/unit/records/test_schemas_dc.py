@@ -160,10 +160,19 @@ def test_types(app, db, minimal_record_model, recid_pid):
         'publication-conferencepaper'
     ]
 
+    # If the record is not in 'c1', OpenAIRE subtype should not be serialized
     minimal_record_model.update({
         'resource_type': {'type': 'software',
                           'openaire_subtype': 'foo:t1'}
     })
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['types'] == [
+        'info:eu-repo/semantics/other',
+        'software'
+    ]
+
+    # Add 'c1' to communities. 'foo:t1' should be serialized as a type
+    minimal_record_model.update({'communities': ['c1']})
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert obj['types'] == [
         'info:eu-repo/semantics/other',

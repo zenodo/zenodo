@@ -143,9 +143,6 @@ class ZenodoCommunity(object):
             for child in pv.children.all():
                 rec = ZenodoRecord.get_record(
                     child.get_assigned_object())
-                # req = InclusionRequest.get(self.community.id, rec.id)
-                # if req:
-                #     req.delete()
                 self.community.add_record(rec)
                 rec.commit()
             pending_q.delete(synchronize_session=False)

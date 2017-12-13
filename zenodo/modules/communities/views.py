@@ -34,6 +34,7 @@ from invenio_indexer.api import RecordIndexer
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.openaire.tasks import openaire_delete, \
     openaire_direct_index
 from zenodo.modules.records.resolvers import record_resolver
@@ -76,14 +77,16 @@ def curate(community):
         api.reject_record(record, pid=pid)
     elif action == "remove":
         api.remove_record(record, pid=pid)
-
-    if community.id == 'ecfunded' and \
-            current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED']:
-        if action == 'accept':
-            openaire_direct_index.delay(record_uuid=str(record.id))
-        elif action in ('reject', 'remove'):
-            openaire_delete.delay(record_uuid=str(record.id))
-
+    record_id = record.id
     db.session.commit()
-    RecordIndexer().index_by_id(record.id)
+    RecordIndexer().index_by_id(record_id)
+
+    if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED']:
+        if action == 'accept':
+            openaire_direct_index.delay(record_uuid=str(record_id))
+        elif action in ('reject', 'remove'):
+            openaire_delete.delay(record_uuid=str(record_id))
+    if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
+        datacite_register.delay(recid, str(record_id))
+
     return jsonify({'status': 'success'})

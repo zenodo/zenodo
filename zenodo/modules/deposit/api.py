@@ -50,7 +50,8 @@ from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
     zenodo_concept_doi_minter, zenodo_doi_updater
-from zenodo.modules.records.utils import is_doi_locally_managed
+from zenodo.modules.records.utils import is_doi_locally_managed, \
+    is_valid_openaire_type
 
 from .errors import MissingCommunityError, MissingFilesError, \
     OngoingMultipartUploadError, VersioningFilesError
@@ -149,6 +150,13 @@ class ZenodoDeposit(Deposit):
             [c.id_community for c in
              InclusionRequest.get_by_record(record.id)])
         data['communities'] = sorted(list(set(data['communities'])))
+
+        # Remove the OpenAIRE subtype if the record is no longer pending,
+        # nor in the relevant community
+        oa_type = data['resource_type'].get('openaire_subtype')
+        if oa_type and not is_valid_openaire_type(data['resource_type'],
+                data['communities']):
+            del data['resource_type']['openaire_subtype']
         if not data['communities']:
             del data['communities']
         return data
