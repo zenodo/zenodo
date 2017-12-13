@@ -30,7 +30,7 @@ from __future__ import absolute_import, print_function
 SUPPORT_ATTACHMENT_MAX_SIZE = 1000 * 1000 * 10  # 10 MB
 
 #: Description maximum length.
-SUPPORT_DESCRIPTION_MAX_LENGTH = 1000
+SUPPORT_DESCRIPTION_MAX_LENGTH = 5000
 
 #: Description minimum length.
 SUPPORT_DESCRIPTION_MIN_LENGTH = 20
