@@ -29,10 +29,12 @@ from __future__ import absolute_import
 from celery import shared_task
 from flask import current_app
 from invenio_db import db
+from invenio_indexer.api import RecordIndexer
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records_files.api import Record
+from invenio_search.api import RecordsSearch
 
 from zenodo.modules.records.minters import is_local_doi
 from zenodo.modules.records.serializers import datacite_v31
@@ -100,3 +102,38 @@ def datacite_inactivate(pid_value):
         db.session.commit()
     except Exception as exc:
         datacite_inactivate.retry(exc=exc)
+
+
+@shared_task(ignore_result=True)
+def cleanup_indexed_deposits():
+    """Delete indexed deposits that do not exist in the database.
+
+    .. note:: This task exists because of deposit REST API calls sometimes
+        failing after the deposit has already been sent for indexing to ES,
+        leaving an inconsistent state of a deposit existing in ES and not in
+        the database. It should be removed once a proper signal mechanism has
+        been implemented in the ``invenio-records-rest`` and
+        ``invenio-deposit`` modules.
+    """
+    search = RecordsSearch(index='deposits')
+    q = (search
+         .query('term', **{'_deposit.status': 'draft'})
+         .fields(['_deposit.id']))
+    res = q.scan()
+    es_depids_info = [(d.to_dict().get('_deposit.id', [None])[0], d.meta.id)
+                      for d in res]
+    es_depids = {p for p, _ in es_depids_info}
+    db_depids_query = PersistentIdentifier.query.filter(
+        PersistentIdentifier.pid_type == 'depid',
+        PersistentIdentifier.pid_value.in_(es_depids))
+    db_depids = {d.pid_value for d in db_depids_query}
+    missing_db_depids = filter(lambda d: d[0] not in db_depids, es_depids_info)
+
+    indexer = RecordIndexer()
+    deposit_index = 'deposits-records-record-v1.0.0'
+    deposit_doc_type = 'deposit-record-v1.0.0'
+    for _, deposit_id in missing_db_depids:
+        indexer.client.delete(
+            id=str(deposit_id),
+            index=deposit_index,
+            doc_type=deposit_doc_type)

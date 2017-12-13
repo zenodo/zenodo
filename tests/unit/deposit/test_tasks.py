@@ -27,14 +27,21 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from copy import deepcopy
+from uuid import uuid4
 
 import datacite
 import pytest
+from flask_security import login_user
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
+from invenio_search import current_search
+from invenio_search.api import RecordsSearch
 
-from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.deposit.api import ZenodoDeposit
+from zenodo.modules.deposit.minters import zenodo_deposit_minter
+from zenodo.modules.deposit.tasks import cleanup_indexed_deposits, \
+    datacite_register
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.minters import zenodo_record_minter
 
@@ -135,3 +142,32 @@ def test_datacite_register_fail(mocker, app, db, es, minimal_record):
     # Check that the task was retried ("max_retries" + 1) times
     dc_calls = len(dc_mock().metadata_post.mock_calls)
     assert dc_calls == datacite_register.max_retries + 1
+
+
+def test_cleanup_indexed_deposits(app, db, es, locations, users,
+                                  deposit_metadata, sip_metadata_types):
+    with app.test_request_context():
+        datastore = app.extensions['security'].datastore
+        login_user(datastore.get_user(users[0]['email']))
+        id_ = uuid4()
+        depid = zenodo_deposit_minter(id_, deposit_metadata)
+        ZenodoDeposit.create(deposit_metadata, id_=id_)
+
+    # Emulate a database "failure", which would wipe any models in the session
+    db.session.remove()
+    current_search.flush_and_refresh(index='deposits')
+
+    # Deposit has been indexed in ES, but not commimted in DB
+    assert PersistentIdentifier.query.filter(
+        PersistentIdentifier.pid_type == depid.pid_type,
+        PersistentIdentifier.pid_value == depid.pid_value).count() == 0
+    assert (RecordsSearch(index='deposits').get_record(id_).execute()[0]
+            ._deposit.id == depid.pid_value)
+
+    cleanup_indexed_deposits.apply()
+    current_search.flush_and_refresh(index='deposits')
+
+    assert PersistentIdentifier.query.filter(
+        PersistentIdentifier.pid_type == depid.pid_type,
+        PersistentIdentifier.pid_value == depid.pid_value).count() == 0
+    assert len(RecordsSearch(index='deposits').get_record(id_).execute()) == 0
