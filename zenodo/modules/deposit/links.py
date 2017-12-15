@@ -30,7 +30,7 @@ from flask import current_app, request
 from invenio_deposit.links import deposit_links_factory
 
 
-def links_factory(pid):
+def links_factory(pid, **kwargs):
     """Deposit links factory."""
     links = deposit_links_factory(pid)
 
