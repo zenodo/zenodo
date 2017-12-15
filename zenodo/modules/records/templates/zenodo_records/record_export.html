@@ -28,16 +28,16 @@
 
 {% block record_body %}
 <p>
-  <time itemprop="datePublished" datetime="{{ publication_date|dateformat(format='long') }}" data-toggle="tooltip" title="{{_("Publication date")}}">{{ publication_date|dateformat(format='long') }}</time>
+  <time datetime="{{ publication_date|dateformat(format='long') }}" data-toggle="tooltip" title="{{_("Publication date")}}">{{ publication_date|dateformat(format='long') }}</time>
   <span class="pull-right">
     {{ objecttype_label(object_type, lang=current_i18n.language) }}
     {{ accessright_label(record.access_right, embargo_date=embargo_date) }}
   </span>
 </p>
-<a href="{{canonical_url}}"><h1 itemprop="name">{{ record.title }}</h1></a>
+<a href="{{canonical_url}}"><h1>{{ record.title }}</h1></a>
 <p>{{ authors(record.creators) }}</p>
 <hr />
-<h3 itemprop="name">{{ format_title }} Export</h3>
+<h3>{{ format_title }} Export</h3>
 <pre style="white-space: pre-wrap;">{{data}}</pre>
 {% endblock record_body %}
 {% block record_body_extra %}{% endblock record_body_extra %}

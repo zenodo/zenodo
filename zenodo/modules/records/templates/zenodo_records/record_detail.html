@@ -54,17 +54,17 @@
 
 {%- block page_body %}
 <div class="container record-detail">
-  <div class="row" itemscope itemtype="{{object_type['schema.org']}}">
+  <div class="row">
     <div class="col-sm-8 col-md-8 col-left">
       {%- block record_body %}
       <p>
-        <time itemprop="datePublished" datetime="{{ publication_date|dateformat(format='long') }}" data-toggle="tooltip" title="{{_("Publication date")}}">{{ publication_date|dateformat(format='long') }}</time>
+        <time datetime="{{ publication_date|dateformat(format='long') }}" data-toggle="tooltip" title="{{_("Publication date")}}">{{ publication_date|dateformat(format='long') }}</time>
         <span class="pull-right">
           {{ objecttype_label(object_type, lang=current_i18n.language) }}
           {{ accessright_label(record.access_right, embargo_date=embargo_date) }}
         </span>
       </p>
-      <h1 itemprop="name">{{ record.title }}</h1>
+      <h1>{{ record.title }}</h1>
       <p>{{ authors(record.creators) }}</p>
       {%- if record.contributors %}
         <p>{{ contributors(record.contributors) }}</p>
@@ -73,7 +73,7 @@
         <h5>{{_('Thesis supervisor(s)')}}</h5>
         <p>{{ authors(record.thesis.supervisors) }}</p>
       {%- endif %}
-      <p itemprop="description">{{ record.description|safe }}</p>
+      <p>{{ record.description|safe }}</p>
       {%- if record.notes %}
       <div class="alert alert-warning">
         {{ record.notes}}
@@ -155,4 +155,8 @@
 </script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>
 <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+{% set jsonld_serialization = record | serialize_record(pid, 'schemaorg_jsonld_v1')%}
+<script type='application/ld+json'>
+{{ jsonld_serialization|safe }}
+</script>
 {%- endblock %}

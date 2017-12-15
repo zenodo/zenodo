@@ -619,6 +619,10 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         serializer='zenodo.modules.records.serializers.json_v1',
         order=1,
     ),
+    'schemaorg_jsonld': dict(
+        title='schema.org JSON-LD',
+        serializer='zenodo.modules.records.serializers.schemaorg_jsonld_v1',
+    ),
     'csl': dict(
         title='Citation Style Language JSON',
         serializer='zenodo.modules.records.serializers.csl_v1',
@@ -713,6 +717,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.legacyjson_v1_response'),
             'application/vnd.zenodo.v1+json': (
                 'zenodo.modules.records.serializers.json_v1_response'),
+            'application/ld+json': (
+                'zenodo.modules.records.serializers.schemaorg_jsonld_v1_response'),
             'application/marcxml+xml': (
                 'zenodo.modules.records.serializers.marcxml_v1_response'),
             'application/x-bibtex': (

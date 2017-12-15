@@ -191,6 +191,7 @@ pycountry==17.9.23
 pycparser==2.18
 Pygments==2.2.0
 PyJWT==1.5.3
+pyld==0.8.2
 pyOpenSSL==17.2.0
 pyPEG2==2.15.2
 python-dateutil==2.6.1

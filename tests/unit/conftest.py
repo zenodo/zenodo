@@ -413,6 +413,7 @@ def minimal_record():
     return {
         "$schema": "http://zenodo.org/schemas/records/record-v1.0.0.json",
         "recid": 123,
+        "doi": "10.1234/zenodo.123",
         "resource_type": {
             "type": "software",
         },

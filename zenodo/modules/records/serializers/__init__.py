@@ -40,6 +40,7 @@ from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
+from .schemas.schemaorg import CreativeWorkV1
 from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
     LegacyRecordSchemaV1, DepositFormSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
@@ -87,6 +88,8 @@ csl_v1 = JSONSerializer(RecordSchemaCSLJSON, replace_refs=True)
 citeproc_v1 = CiteprocSerializer(csl_v1)
 #: OpenAIRE JSON serializer
 openaire_json_v1 = JSONSerializer(RecordSchemaOpenAIREJSON, replace_refs=True)
+#: JSON-LD serializer
+schemaorg_jsonld_v1 = JSONSerializer(CreativeWorkV1, replace_refs=True)
 
 
 # Records-REST serializers
@@ -112,6 +115,7 @@ citeproc_v1_response = record_responsify(citeproc_v1, 'text/x-bibliography')
 #: OpenAIRE JSON serializer for individual records.
 openaire_json_v1_response = record_responsify(openaire_json_v1,
                                               'application/x-openaire+json')
+schemaorg_jsonld_v1_response = record_responsify(schemaorg_jsonld_v1, 'application/ld+json')
 
 
 #: JSON record serializer for search results.
@@ -127,6 +131,7 @@ datacite_v31_search = search_responsify(
     datacite_v31, 'application/x-datacite+xml')
 #: DublinCore record serializer for search records.
 dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
+schemaorg_jsonld_v1_search = record_responsify(schemaorg_jsonld_v1, 'application/ld+json')
 
 # Deposit serializers
 # ===================
