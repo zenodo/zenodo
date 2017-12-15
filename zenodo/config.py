@@ -1008,6 +1008,10 @@ COMMUNITIES_COMMUNITY_TEMPLATE = "zenodo_theme/communities/base.html"
 COMMUNITIES_CURATE_TEMPLATE = "zenodo_theme/communities/curate.html"
 #: Override templates to use custom search-js
 COMMUNITIES_SEARCH_TEMPLATE = "zenodo_theme/communities/search.html"
+#: Override detail page template
+COMMUNITIES_DETAIL_TEMPLATE = "zenodo_theme/communities/detail.html"
+#: Override about page template
+COMMUNITIES_ABOUT_TEMPLATE = "zenodo_theme/communities/about.html"
 
 #: Angular template for rendering search results for curation.
 COMMUNITIES_JSTEMPLATE_RESULTS_CURATE = \
