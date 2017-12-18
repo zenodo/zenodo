@@ -155,8 +155,8 @@
 </script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>
 <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
-{% set jsonld_serialization = record | serialize_record(pid, 'schemaorg_jsonld_v1')%}
-<script type='application/ld+json'>
-{{ jsonld_serialization|safe }}
-</script>
+{% set jsonld_serialization = record | serialize_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
+{%- if jsonld_serialization %}
+<script type='application/ld+json'>{{ jsonld_serialization|safe }}</script>
+{%- endif %}
 {%- endblock %}

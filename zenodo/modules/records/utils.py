@@ -1,3 +1,4 @@
+
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
@@ -54,12 +55,19 @@ def is_deposit(record):
     return schema_prefix(record.get('$schema')) == 'deposits'
 
 
-def serialize_record(record, pid, serializer, module=None, **kwargs):
+def serialize_record(record, pid, serializer, module=None, throws=True,
+                     **kwargs):
     """Serialize record according to the passed serializer."""
     if isinstance(record, Record):
-        module = module or 'zenodo.modules.records.serializers'
-        serializer = import_string('.'.join((module, serializer)))
-        return serializer.serialize(pid, record, **kwargs)
+        try:
+            module = module or 'zenodo.modules.records.serializers'
+            serializer = import_string('.'.join((module, serializer)))
+            return serializer.serialize(pid, record, **kwargs)
+        except Exception:
+            current_app.logger.exception(
+                u'Record serialization failed {}.'.format(str(record.id)))
+            if throws:
+                raise
 
 
 def is_doi_locally_managed(doi_value):
