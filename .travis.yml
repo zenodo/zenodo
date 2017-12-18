@@ -75,7 +75,7 @@ before_install:
   - "mkdir /tmp/elasticsearch"
   - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/${ES_VERSION}/elasticsearch-${ES_VERSION}.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/plugin install -b mapper-attachments"
-  - "/tmp/elasticsearch/bin/elasticsearch &"
+  - "/tmp/elasticsearch/bin/elasticsearch > /tmp/local-es.log &"
   - "travis_retry pip install --upgrade pip setuptools py"
   - "travis_retry pip install wheel coveralls requirements-builder"
   - "./scripts/setup-npm.sh"
@@ -84,14 +84,17 @@ before_install:
   - "if [ ${E2E} == 'yes' ]; then wget https://github.com/mozilla/geckodriver/releases/download/v0.18.0/geckodriver-v0.18.0-linux64.tar.gz; mkdir geckodriver; tar -xzf geckodriver-v0.18.0-linux64.tar.gz -C geckodriver; export PATH=$PATH:$PWD/geckodriver; fi"
 
 install:
+  - "cat .travis-${REQUIREMENTS}-requirements.txt"
   - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt --pre"
   - "travis_retry pip install -e .[all,postgresql] --pre"
+  - pip freeze
   - "./scripts/setup-assets.sh"
 
 before_script:
   - "if [ ${E2E} == 'yes' ]; then export DISPLAY=:99.0; sh -e /etc/init.d/xvfb start; export E2E_WEBDRIVER_BROWSERS='Firefox'; fi"
   # Allow ES to start
   - sleep 10
+  - curl http://127.0.0.1:9200 && echo "Elasticsearch is up!" || cat /tmp/local-es.log
 
 script:
   - "if [ ${E2E} == 'yes' ]; then py.test tests/e2e/; else ./run-tests.sh; fi"
