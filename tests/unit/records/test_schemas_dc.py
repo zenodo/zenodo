@@ -37,7 +37,7 @@ def test_minimal(app, db, minimal_record_model, recid_pid):
     assert obj == {
         'sources': [],
         'contributors': [],
-        'identifiers': ['https://zenodo.org/record/123', ''],
+        'identifiers': ['https://zenodo.org/record/123', '10.1234/zenodo.123'],
         'subjects': [],
         'languages': [''],
         'dates': [datetime.utcnow().date().isoformat()],

@@ -70,7 +70,7 @@ def test_full(db, record_with_bucket, recid_pid):
     _, full_record_model = record_with_bucket
     full_record_model['doi'] = '10.1234/foo'
     obj = datacite_v31.transform_record(recid_pid, full_record_model)
-    assert obj == {
+    expected = {
         "alternateIdentifiers": [
             {
                 "alternateIdentifier": "urn:lsid:ubio.org:namebank:11815",
@@ -78,7 +78,11 @@ def test_full(db, record_with_bucket, recid_pid):
             },
             {
                 "alternateIdentifier": "2011ApJS..192...18K",
-                "alternateIdentifierType": "issn"
+                "alternateIdentifierType": "ads"
+            },
+            {
+                'alternateIdentifier': '0317-8471',
+                'alternateIdentifierType': 'issn',
             },
             {
                 "alternateIdentifier": "10.1234/alternate.doi",
@@ -87,7 +91,7 @@ def test_full(db, record_with_bucket, recid_pid):
             {
                 "alternateIdentifier": "http://localhost/record/123",
                 "alternateIdentifierType": "url"
-            }
+            },
         ],
         "contributors": [
             {
@@ -180,14 +184,34 @@ def test_full(db, record_with_bucket, recid_pid):
         "publisher": "Zenodo",
         "relatedIdentifiers": [
             {
+                "relationType": "Cites",
                 "relatedIdentifier": "10.1234/foo.bar",
-                "relatedIdentifierType": "DOI",
-                "relationType": "Cites"
+                "relatedIdentifierType": "DOI"
             },
             {
+                "relationType": "IsIdenticalTo",
+                "relatedIdentifier": "1234.4325",
+                "relatedIdentifierType": "arXiv"
+            },
+            {
+                "relationType": "Cites",
                 "relatedIdentifier": "1234.4321",
-                "relatedIdentifierType": "arXiv",
-                "relationType": "Cites"
+                "relatedIdentifierType": "arXiv"
+            },
+            {
+                "relationType": "References",
+                "relatedIdentifier": "1234.4328",
+                "relatedIdentifierType": "arXiv"
+            },
+            {
+                "relationType": "IsPartOf",
+                "relatedIdentifier": "10.1234/zenodo.4321",
+                "relatedIdentifierType": "DOI"
+            },
+            {
+                "relationType": "HasPart",
+                "relatedIdentifier": "10.1234/zenodo.1234",
+                "relatedIdentifierType": "DOI"
             }
         ],
         "resourceType": {
@@ -196,8 +220,8 @@ def test_full(db, record_with_bucket, recid_pid):
         },
         "rightsList": [
             {
-                "rights": "Creative Commons",
-                "rightsURI": "http://zenodo.org"
+                "rights": "Creative Commons Attribution 4.0",
+                "rightsURI": "https://creativecommons.org/licenses/by/4.0/"
             },
             {
                 "rights": "Open Access",
@@ -226,12 +250,16 @@ def test_full(db, record_with_bucket, recid_pid):
         ],
         "version": "1.2.5"
     }
+    assert obj == expected
 
 
 def test_identifier(db, minimal_record_model, recid_pid):
     """Test identifier."""
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
-    assert 'identifier' not in obj
+    assert obj['identifier'] == {
+        'identifier': '10.1234/zenodo.123',
+        'identifierType': 'DOI',
+    }
 
 
 def test_creators(db, minimal_record_model, recid_pid):

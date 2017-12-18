@@ -37,11 +37,18 @@ from .common import format_pid_link
 
 
 def _serialize_identifiers(ids, relations=None):
-    """Serialize identifiers to URLs."""
+    """Serialize identifiers to URLs.
+
+    :param ids: List of related_identifier or alternate_identifier objects.
+    :param relations: if not None, will only select IDs of specific relation
+    :returns: List of identifiers in schema.org format.
+    :rtype dict:
+    """
     relations = relations or []
-    return [{'@type': 'CreativeWork',
+    ids = [{'@type': 'CreativeWork',
              '@id': idutils.to_url(i['identifier'], i['scheme'])}
-            for i in ids if i['relation'] in relations and 'scheme' in i]
+            for i in ids if (not relations or i['relation'] in relations) and 'scheme' in i]
+    return [id_ for id_ in ids if id_['@id']]
 
 
 def _serialize_subjects(ids):
@@ -59,10 +66,10 @@ def format_files_rest_link(bucket, key, scheme='https', host=None):
 
 
 class Person(Schema):
-    """Person schema."""
+    """Person schema (schema.org/Person)."""
 
-    id = fields.Method('get_id')
-    type_ = fields.Constant('Person', dump_to="@type")
+    id_ = fields.Method('get_id', dump_to='@id')
+    type_ = fields.Constant('Person', dump_to='@type')
     name = SanitizedUnicode()
     affiliation = SanitizedUnicode()
 
@@ -73,21 +80,23 @@ class Person(Schema):
         if orcid:
             return idutils.to_url(orcid, 'orcid', 'https')
         if gnd:
-            return idutils.to_url(orcid, 'gnd')
+            return idutils.to_url(gnd, 'gnd')
         return missing
 
 
 class Language(Schema):
-    """Language schema."""
+    """Language schema (schema.org/Language)."""
 
     type_ = fields.Constant('Language', dump_to="@type")
     name = fields.Method('get_name')
     alternateName = fields.Method('get_alternate_name')
 
     def get_name(self, obj):
+        """Get the language human-readable name."""
         return pycountry.languages.get(alpha_3=obj).name
 
     def get_alternate_name(self, obj):
+        """Get the lanugage code."""
         return obj
 
 
@@ -172,31 +181,38 @@ class CreativeWork(Schema):
     def get_citation(self, obj):
         """Get citations of the record."""
         relids = obj.get('metadata', {}).get('related_identifiers', [])
-        return _serialize_identifiers(relids, {'cites', 'references'})
+        ids = _serialize_identifiers(relids, {'cites', 'references'})
+        return ids or missing
 
     def get_is_part_of(self, obj):
         """Get records that this record is part of."""
         relids = obj.get('metadata', {}).get('related_identifiers', [])
-        return _serialize_identifiers(relids, {'isPartOf'})
+        ids = _serialize_identifiers(relids, {'isPartOf'})
+        return ids or missing
 
     def get_has_part(self, obj):
         """Get parts of the record."""
         relids = obj.get('metadata', {}).get('related_identifiers', [])
-        return _serialize_identifiers(relids, {'hasPart'})
+        ids = _serialize_identifiers(relids, {'hasPart'})
+        return ids or missing
 
     def get_sameAs(self, obj):
         """Get identical identifiers of the record."""
         relids = obj.get('metadata', {}).get('related_identifiers', [])
-        return [i['@id']
+        ids = [i['@id']
                 for i in _serialize_identifiers(relids, {'isIdenticalTo'})]
+        relids = obj.get('metadata', {}).get('alternate_identifiers', [])
+        ids += [i['@id'] for i in _serialize_identifiers(relids)]
+        return ids or missing
 
     def get_subjects(self, obj):
         """Get subjects of the record."""
         subjects = obj.get('metadata', {}).get('subjects', [])
-        return _serialize_subjects(subjects)
+        return _serialize_subjects(subjects) or missing
 
 
 class Distribution(Schema):
+    """Marshmallow schema for schema.org/Distribution."""
 
     type_ = fields.Constant('DataDownload', dump_to='@type')
     fileFormat = SanitizedUnicode(attribute='type')
@@ -208,38 +224,49 @@ class Distribution(Schema):
 
 
 class Dataset(CreativeWork):
+    """Marshmallow schema for schema.org/Dataset."""
 
-    # NOTE: Pretty important...
-    distribution = fields.Nested(
-        Distribution, many=True, attribute='metadata._files')
+    # TODO: This should serialize only for open access records
+    # distribution = fields.Nested(
+    #     Distribution, many=True, attribute='metadata._files')
+    pass
 
 
 class ScholarlyArticle(CreativeWork):
+    """Marshmallow schema for schema.org/ScholarlyArticle."""
 
-    # NOTE: Same as title?
+    # TODO: Investigate if this should be the same as title
     headline = SanitizedUnicode(attribute='metadata.title')
-    # NOTE: required by Google... could be thumbnail of PDF...
     image = fields.Constant(
         'https://zenodo.org/static/img/logos/zenodo-gradient-round.svg')
 
 
 class ImageObject(CreativeWork):
+    """Marshmallow schema for schema.org/ImageObject."""
+
     pass
 
 
 class Book(CreativeWork):
+    """Marshmallow schema for schema.org/Book."""
+
     pass
 
 
 class PresentationDigitalDocument(CreativeWork):
+    """Marshmallow schema for schema.org/PresentationDigitalDocument."""
+
     pass
 
 
 class MediaObject(CreativeWork):
+    """Marshmallow schema for schema.org/MediaObject."""
+
     pass
 
 
 class SoftwareSourceCode(CreativeWork):
+    """Marshmallow schema for schema.org/SoftwareSourceCode."""
 
     # TODO: Include GitHub url if it's there...
     # related_identifiers.
@@ -259,4 +286,6 @@ class SoftwareSourceCode(CreativeWork):
 
 
 class Photograph(CreativeWork):
+    """Marshmallow schema for schema.org/Photograph."""
+
     pass

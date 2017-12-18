@@ -545,8 +545,11 @@ def full_record():
         access_right='open',
         # embargo_date
         # access_conditions
-        license={'id': 'cc-by', 'url': 'http://zenodo.org',
-                 'title': 'Creative Commons', },
+        license={
+            'id': 'CC-BY-4.0',
+            'url': 'https://creativecommons.org/licenses/by/4.0/',
+            'title': 'Creative Commons Attribution 4.0',
+        },
         communities=['zenodo'],
         grants=[
             {'title': 'Grant Title', 'code': '1234', 'identifiers': {},
@@ -559,13 +562,23 @@ def full_record():
         related_identifiers=[
             {'identifier': '10.1234/foo.bar',
                 'scheme': 'doi', 'relation': 'cites'},
+            {'identifier': '1234.4325', 'scheme':
+                'arxiv', 'relation': 'isIdenticalTo'},
             {'identifier': '1234.4321', 'scheme':
                 'arxiv', 'relation': 'cites'},
+            {'identifier': '1234.4328', 'scheme':
+                'arxiv', 'relation': 'references'},
+            {'identifier': '10.1234/zenodo.4321', 'scheme':
+                'doi', 'relation': 'isPartOf'},
+            {'identifier': '10.1234/zenodo.1234', 'scheme':
+                'doi', 'relation': 'hasPart'},
         ],
         alternate_identifiers=[
             {'identifier': 'urn:lsid:ubio.org:namebank:11815',
              'scheme': 'lsid', },
             {'identifier': '2011ApJS..192...18K',
+             'scheme': 'ads', },
+            {'identifier': '0317-8471',
              'scheme': 'issn', },
             {'identifier': '10.1234/alternate.doi',
              'scheme': 'doi', },

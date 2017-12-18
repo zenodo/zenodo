@@ -39,6 +39,7 @@ def test_minimal(db, minimal_record, recid_pid):
     d = datetime.utcnow().date()
     assert obj == {
         'id': '123',
+        'DOI': '10.1234/zenodo.123',
         'type': 'article',
         'title': 'Test',
         'abstract': 'My description',
@@ -91,7 +92,7 @@ def test_full(db, full_record, recid_pid):
         "page": "20",
         "container_title": "Bam",
         "id": "123",
-        "ISSN": "2011ApJS..192...18K"
+        "ISSN": "0317-8471"
     }
 
 

@@ -39,44 +39,15 @@ class ZenodoSchemaOrgSerializer(ZenodoJSONSerializer):
     its schema.org type.
     """
 
-    SCHEMA_ORG_TYPES = {
-        'publication': schemas.ScholarlyArticle,
-        'poster': schemas.CreativeWork,
-        'presentation': schemas.PresentationDigitalDocument,
-        'dataset': schemas.Dataset,
-        'image': schemas.ImageObject,
-        'video': schemas.MediaObject,
-        'software': schemas.SoftwareSourceCode,
-        'lesson': schemas.CreativeWork,
-        'other': schemas.CreativeWork,
-        'publication-book': schemas.Book,
-        'publication-section': schemas.ScholarlyArticle,
-        'publication-conferencepaper': schemas.ScholarlyArticle,
-        'publication-article': schemas.ScholarlyArticle,
-        'publication-patent': schemas.CreativeWork,
-        'publication-preprint': schemas.ScholarlyArticle,
-        'publication-report': schemas.ScholarlyArticle,
-        'publication-softwaredocumentation': schemas.CreativeWork,
-        'publication-thesis': schemas.ScholarlyArticle,
-        'publication-technicalnote': schemas.ScholarlyArticle,
-        'publication-workingpaper': schemas.ScholarlyArticle,
-        'publication-proposal': schemas.CreativeWork,
-        'publication-deliverable': schemas.CreativeWork,
-        'publication-milestone': schemas.CreativeWork,
-        'publication-other': schemas.CreativeWork,
-        'image-figure': schemas.ImageObject,
-        'image-plot': schemas.ImageObject,
-        'image-drawing': schemas.ImageObject,
-        'image-diagram': schemas.ImageObject,
-        'image-photo': schemas.Photograph,
-        'image-other': schemas.ImageObject,
-    }
+    @classmethod
+    def _get_schema_class(self, obj):
+        data = obj['metadata']
+        obj_type = ObjectType.get_by_dict(data['resource_type'])
+        return getattr(schemas, obj_type['schema.org'][19:])
 
     def dump(self, obj, context=None):
         """Serialize object with schema."""
-        data = obj['metadata']
-        obj_type = ObjectType.get_by_dict(data['resource_type'])
-        internal_id = obj_type['internal_id']
-        schema_cls = self.SCHEMA_ORG_TYPES.get(
-            internal_id, schemas.CreativeWork)
+        # Resolve string "https://schema.org/ScholarlyArticle"
+        # to schemas.ScholarlyArticle class (etc.)
+        schema_cls = self._get_schema_class(obj)
         return schema_cls(context=context).dump(obj).data

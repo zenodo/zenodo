@@ -145,8 +145,10 @@ def test_full_record(app, db, full_record):
             u'copyright_status': u'open'
         },
         u'terms_governing_use_and_reproduction_note': {
-            u'uniform_resource_identifier': u'http://zenodo.org',
-            u'terms_governing_use_and_reproduction': u'Creative Commons'
+            u'uniform_resource_identifier':
+                u'https://creativecommons.org/licenses/by/4.0/',
+            u'terms_governing_use_and_reproduction':
+                u'Creative Commons Attribution 4.0'
         },
         u'communities': [
             u'zenodo',
@@ -162,9 +164,29 @@ def test_full_record(app, db, full_record):
                 u'relationship_information': u'cites',
             },
             {
+                'main_entry_heading': u'1234.4325',
+                'note': u'arxiv',
+                'relationship_information': u'isIdenticalTo'
+            },
+            {
                 u'main_entry_heading': u'1234.4321',
                 u'note': u'arxiv',
                 u'relationship_information': u'cites',
+            },
+            {
+                'main_entry_heading': u'1234.4328',
+                'note': u'arxiv',
+                'relationship_information': u'references'
+            },
+            {
+                'main_entry_heading': u'10.1234/zenodo.4321',
+                'note': u'doi',
+                'relationship_information': u'isPartOf'
+            },
+            {
+                'main_entry_heading': u'10.1234/zenodo.1234',
+                'note': u'doi',
+                'relationship_information': u'hasPart'
             },
             {
                 u'main_entry_heading': u'Staszkowka',
@@ -187,6 +209,11 @@ def test_full_record(app, db, full_record):
             },
             {
                 u'standard_number_or_code': u'2011ApJS..192...18K',
+                u'source_of_number_or_code': u'ads',
+                u'qualifying_information': u'alternateidentifier',
+            },
+            {
+                u'standard_number_or_code': u'0317-8471',
                 u'source_of_number_or_code': u'issn',
                 u'qualifying_information': u'alternateidentifier',
             },
@@ -265,10 +292,8 @@ def test_full_record(app, db, full_record):
 
     # Dump MARC21 JSON structure and compare against expected JSON.
     preprocessed_record = marcxml_v1.preprocess_record(record=record, pid=pid)
-    assert_dict(
-        expected,
-        marcxml_v1.schema_class().dump(preprocessed_record).data
-    )
+    data = marcxml_v1.schema_class().dump(preprocessed_record).data
+    assert expected == data
 
     # Assert that we can output MARCXML.
     assert marcxml_v1.serialize(record=record, pid=pid)
@@ -293,6 +318,12 @@ def test_minimal_record(app, db, minimal_record):
             'date_of_publication_distribution': record['publication_date']
         }],
         u'control_number': '123',
+        u'other_standard_identifier': [
+            {
+                'source_of_number_or_code': u'doi',
+                'standard_number_or_code': u'10.1234/zenodo.123'
+            }
+        ],
         u'information_relating_to_copyright_status': {
             'copyright_status': 'open'
         },
@@ -332,7 +363,7 @@ def test_minimal_record(app, db, minimal_record):
     data = marcxml_v1.schema_class().dump(marcxml_v1.preprocess_record(
         pid=pid,
         record=record)).data
-    assert_dict(expected, data)
+    assert expected == data
 
     marcxml_v1.serialize(pid=pid, record=record)
 
