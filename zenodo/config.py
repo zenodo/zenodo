@@ -696,6 +696,9 @@ FILES_REST_FILE_URI_MAX_LEN = 1000
 FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES = [
     # 'root://eospublic'
 ]
+#: URL template for generating URLs outside the application/request context
+FILES_REST_ENDPOINT = '{scheme}://{host}/api/files/{bucket}/{key}'
+
 
 #: Records REST API endpoints.
 RECORDS_API = '/api/records/{pid_value}'

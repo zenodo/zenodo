@@ -44,6 +44,20 @@ def _serialize_identifiers(ids, relations=None):
             for i in ids if i['relation'] in relations and 'scheme' in i]
 
 
+def _serialize_subjects(ids):
+    """Serialize subjects to URLs."""
+    return [{'@type': 'CreativeWork',
+             '@id': idutils.to_url(i['identifier'], i['scheme'])}
+            for i in ids if 'scheme' in i]
+
+
+def format_files_rest_link(bucket, key, scheme='https', host=None):
+    """Format Files REST URL."""
+    host = host or current_app.config['THEME_SITEURL']
+    return current_app.config['FILES_REST_ENDPOINT'].format(
+        scheme=scheme, host=host, bucket=bucket, key=key)
+
+
 class Person(Schema):
     """Person schema."""
 
@@ -150,7 +164,7 @@ class CreativeWork(Schema):
 
     def get_url(self, obj):
         """Get Zenodo URL of the record."""
-        recid = obj.get('recid')
+        recid = obj.get('metadata', {}).get('recid')
         return format_pid_link(
             current_app.config['RECORDS_UI_ENDPOINT'], recid
         ) if recid else missing
@@ -178,12 +192,26 @@ class CreativeWork(Schema):
 
     def get_subjects(self, obj):
         """Get subjects of the record."""
-        subjects = obj.get('metadata', {}).get('related_identifiers', [])
-        return _serialize_identifiers(subjects)
+        subjects = obj.get('metadata', {}).get('subjects', [])
+        return _serialize_subjects(subjects)
+
+
+class Distribution(Schema):
+
+    type_ = fields.Constant('DataDownload', dump_to='@type')
+    fileFormat = SanitizedUnicode(attribute='type')
+    contentUrl = fields.Method('get_content_url')
+
+    def get_content_url(self, obj):
+        """Get URL of the file."""
+        return format_files_rest_link(bucket=obj['bucket'], key=obj['key'])
 
 
 class Dataset(CreativeWork):
-    pass
+
+    # NOTE: Pretty important...
+    distribution = fields.Nested(
+        Distribution, many=True, attribute='metadata._files')
 
 
 class ScholarlyArticle(CreativeWork):
@@ -212,7 +240,22 @@ class MediaObject(CreativeWork):
 
 
 class SoftwareSourceCode(CreativeWork):
-    pass
+
+    # TODO: Include GitHub url if it's there...
+    # related_identifiers.
+    codeRepository = fields.Method('get_code_repository_url')
+
+    def get_code_repository_url(self, obj):
+        """Get URL of the record's code repository."""
+        relids = obj.get('metadata', {}).get('related_identifiers', [])
+
+        def is_github_url(id):
+            return (id['relation'] == 'isSupplementTo' and
+                    id['scheme'] == 'url' and
+                    id['identifier'].startswith('https://github.com'))
+        # TODO: Strip 'tree/v1.0'?
+        return next(
+            (i['identifier'] for i in relids if is_github_url(i)), missing)
 
 
 class Photograph(CreativeWork):

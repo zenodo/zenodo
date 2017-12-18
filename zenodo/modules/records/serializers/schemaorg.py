@@ -39,9 +39,6 @@ class ZenodoSchemaOrgSerializer(ZenodoJSONSerializer):
     its schema.org type.
     """
 
-    def funcname(parameter_list):
-        pass
-
     SCHEMA_ORG_TYPES = {
         'publication': schemas.ScholarlyArticle,
         'poster': schemas.CreativeWork,
