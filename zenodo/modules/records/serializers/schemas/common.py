@@ -45,8 +45,6 @@ from werkzeug.routing import BuildError
 
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
 from zenodo.modules.records.models import AccessRight
-from zenodo.modules.records.serializers.pidrelations import \
-    serialize_related_identifiers
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField

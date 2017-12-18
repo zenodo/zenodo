@@ -36,11 +36,11 @@ from .bibtex import BibTeXSerializer
 from .files import files_responsify
 from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
+from .schemaorg import ZenodoSchemaOrgSerializer
 from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
-from .schemas.schemaorg import CreativeWorkV1
 from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
     LegacyRecordSchemaV1, DepositFormSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
@@ -89,7 +89,7 @@ citeproc_v1 = CiteprocSerializer(csl_v1)
 #: OpenAIRE JSON serializer
 openaire_json_v1 = JSONSerializer(RecordSchemaOpenAIREJSON, replace_refs=True)
 #: JSON-LD serializer
-schemaorg_jsonld_v1 = JSONSerializer(CreativeWorkV1, replace_refs=True)
+schemaorg_jsonld_v1 = ZenodoSchemaOrgSerializer(replace_refs=True)
 
 
 # Records-REST serializers
@@ -115,7 +115,8 @@ citeproc_v1_response = record_responsify(citeproc_v1, 'text/x-bibliography')
 #: OpenAIRE JSON serializer for individual records.
 openaire_json_v1_response = record_responsify(openaire_json_v1,
                                               'application/x-openaire+json')
-schemaorg_jsonld_v1_response = record_responsify(schemaorg_jsonld_v1, 'application/ld+json')
+schemaorg_jsonld_v1_response = record_responsify(schemaorg_jsonld_v1,
+                                                 'application/ld+json')
 
 
 #: JSON record serializer for search results.
