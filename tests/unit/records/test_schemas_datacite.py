@@ -257,7 +257,7 @@ def test_identifier(db, minimal_record_model, recid_pid):
     """Test identifier."""
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj['identifier'] == {
-        'identifier': '10.1234/zenodo.123',
+        'identifier': '10.5072/zenodo.123',
         'identifierType': 'DOI',
     }
 

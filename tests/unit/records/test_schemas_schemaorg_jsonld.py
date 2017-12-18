@@ -143,7 +143,7 @@ def test_minimal_software_record(minimal_record_model):
     assert not err
     expected = {
         u'@context': u'https://schema.org/',
-        u'@id': 'https://doi.org/10.1234/zenodo.123',
+        u'@id': 'https://doi.org/10.5072/zenodo.123',
         u'@type': u'SoftwareSourceCode',
         u'url': 'http://localhost/record/123',
         u'description': u'My description',

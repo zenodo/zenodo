@@ -73,7 +73,7 @@ def test_minimal(app, db, minimal_oai_record, recid_pid):
         'description': 'My description',
         'pids': [
             {'type': 'oai', 'value': 'oai:zenodo.org:123'},
-            {'type': 'doi', 'value': '10.1234/zenodo.123'}
+            {'type': 'doi', 'value': '10.5072/zenodo.123'}
         ],
         'hostedById': 'opendoar____::2659',
         'collectedFromId': 'opendoar____::2659',
@@ -162,7 +162,7 @@ def test_pids(app, db, minimal_oai_record, recid_pid):
         recid_pid, Record(minimal_oai_record))
     assert obj['pids'] == \
         [{'value': 'oai:zenodo.org:123', 'type': 'oai'},
-         {'type': 'doi', 'value': '10.1234/zenodo.123'}]
+         {'type': 'doi', 'value': '10.5072/zenodo.123'}]
 
     minimal_oai_record['doi'] = '10.1234/foo'
     obj = openaire_json_v1.transform_record(

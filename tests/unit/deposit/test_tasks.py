@@ -90,6 +90,8 @@ def test_datacite_register(mocker, app, db, es, minimal_record):
         pv.insert_draft_child(recid)
 
         record_metadata = deepcopy(minimal_record)
+        # Remove the DOI
+        del record_metadata['doi']
         record_metadata['conceptrecid'] = conceptrecid.pid_value
         record_metadata['recid'] = int(recid.pid_value)
         record = ZenodoRecord.create(record_metadata)

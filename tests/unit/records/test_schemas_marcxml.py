@@ -321,7 +321,7 @@ def test_minimal_record(app, db, minimal_record):
         u'other_standard_identifier': [
             {
                 'source_of_number_or_code': u'doi',
-                'standard_number_or_code': u'10.1234/zenodo.123'
+                'standard_number_or_code': u'10.5072/zenodo.123'
             }
         ],
         u'information_relating_to_copyright_status': {

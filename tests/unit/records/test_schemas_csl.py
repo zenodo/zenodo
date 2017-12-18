@@ -39,7 +39,7 @@ def test_minimal(db, minimal_record, recid_pid):
     d = datetime.utcnow().date()
     assert obj == {
         'id': '123',
-        'DOI': '10.1234/zenodo.123',
+        'DOI': '10.5072/zenodo.123',
         'type': 'article',
         'title': 'Test',
         'abstract': 'My description',
