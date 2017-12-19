@@ -309,13 +309,13 @@ def test_dataset_with_files(app, users, minimal_record_model, recid_pid):
         assert data['distribution'] == [
             {
                 u'@type': u'DataDownload',
-                u'contentUrl': u'https://https://zenodo.org/api/files/'
+                u'contentUrl': u'https://localhost/api/files/'
                                u'22222222-2222-2222-2222-222222222222/test',
                 u'fileFormat': u'txt'
             },
             {
                 u'@type': u'DataDownload',
-                u'contentUrl': u'https://https://zenodo.org/api/files/'
+                u'contentUrl': u'https://localhost/api/files/'
                                u'22222222-2222-2222-2222-222222222222/test2',
                 u'fileFormat': u'pdf'
             }

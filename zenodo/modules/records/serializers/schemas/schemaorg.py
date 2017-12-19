@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import idutils
 import pycountry
-from flask import current_app
+from flask import current_app, request
 from marshmallow import Schema, fields, missing, pre_dump
 
 from ...models import ObjectType
@@ -58,11 +58,10 @@ def _serialize_subjects(ids):
             for i in ids if 'scheme' in i]
 
 
-def format_files_rest_link(bucket, key, scheme='https', host=None):
+def format_files_rest_link(bucket, key, scheme='https'):
     """Format Files REST URL."""
-    host = host or current_app.config['THEME_SITEURL']
     return current_app.config['FILES_REST_ENDPOINT'].format(
-        scheme=scheme, host=host, bucket=bucket, key=key)
+        scheme=scheme, host=request.host, bucket=bucket, key=key)
 
 
 class Person(Schema):
@@ -221,7 +220,6 @@ class Distribution(Schema):
     def get_content_url(self, obj):
         """Get URL of the file."""
         return format_files_rest_link(bucket=obj['bucket'], key=obj['key'])
-
 
 class Dataset(CreativeWork):
     """Marshmallow schema for schema.org/Dataset."""
