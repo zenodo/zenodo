@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import idutils
 import pycountry
 from flask import current_app
-from marshmallow import Schema, fields, missing
+from marshmallow import Schema, fields, missing, pre_dump
 
 from ...models import ObjectType
 from ..fields import DateString, SanitizedHTML, SanitizedUnicode
@@ -226,10 +226,15 @@ class Distribution(Schema):
 class Dataset(CreativeWork):
     """Marshmallow schema for schema.org/Dataset."""
 
-    # TODO: This should serialize only for open access records
-    # distribution = fields.Nested(
-    #     Distribution, many=True, attribute='metadata._files')
-    pass
+    distribution = fields.Nested(
+        Distribution, many=True, attribute='metadata._files')
+
+    @pre_dump
+    def hide_closed_files(self, obj):
+        """Hide the _files if the record is not Open Access."""
+        m = obj['metadata']
+        if m['access_right'] != 'open' and '_files' in m:
+            del obj['metadata']['_files']
 
 
 class ScholarlyArticle(CreativeWork):

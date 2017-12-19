@@ -117,7 +117,7 @@ def default_config(tmp_db_path):
             'types': {
                 'software': [
                     {'id': 'foo:t1', 'name': 'Foo sft type one'},
-                    {'id': 'foo:t2', 'name': 'Foo sft type one'},
+                    {'id': 'foo:t2', 'name': 'Foo sft type two'},
                 ],
                 'other': [
                     {'id': 'foo:t4', 'name': 'Foo other type four'},

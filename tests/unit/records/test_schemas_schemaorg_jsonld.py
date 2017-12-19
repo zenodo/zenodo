@@ -24,6 +24,10 @@
 
 from __future__ import absolute_import, print_function
 
+from datetime import datetime
+
+from flask_security import login_user
+
 from zenodo.modules.records.serializers import schemaorg_jsonld_v1
 from zenodo.modules.records.serializers.schemaorg import \
     ZenodoSchemaOrgSerializer
@@ -154,7 +158,7 @@ def test_minimal_software_record(minimal_record_model):
                 u'name': u'Test'
             }
         ],
-        u'datePublished': '2017-12-18',
+        u'datePublished': datetime.utcnow().date().isoformat(),
         u'name': u'Test'}
     assert data == expected
 
@@ -271,52 +275,55 @@ def test_full_record(record_with_files_creation):
     assert data == expected
 
 
-def off_test_dataset_with_files(minimal_record_model, recid_pid):
-    """Testing the dumping of _files in datasets."""
-    assert minimal_record_model['access_right'] == 'open'
-    minimal_record_model['resource_type'] = dict(type='dataset')
-    minimal_record_model['_files'] = [
-        {
-            'bucket': '22222222-2222-2222-2222-222222222222',
-            'version_id': '11111111-1111-1111-1111-111111111111',
-            'file_id': '22222222-3333-4444-5555-666666666666',
-            'checksum': 'md5:11111111111111111111111111111111',
-            'key': 'test',
-            'size': 4,
-            'type': 'txt',
-        },
-        {
-            'bucket': '22222222-2222-2222-2222-222222222222',
-            'version_id': '11111111-1111-1111-1111-111111111112',
-            'file_id': '22222222-3333-4444-5555-666666666667',
-            'checksum': 'md5:11111111111111111111111111111112',
-            'key': 'test2',
-            'size': 1000000,
-            'type': 'pdf',
-        },
-    ]
+def test_dataset_with_files(app, users, minimal_record_model, recid_pid):
+    """Testing the dumping of files in Open Access datasets."""
+    with app.test_request_context():
+        datastore = app.extensions['security'].datastore
+        login_user(datastore.get_user(users[0]['email']))
+        assert minimal_record_model['access_right'] == 'open'
+        minimal_record_model['resource_type'] = dict(type='dataset')
+        minimal_record_model['_files'] = [
+            {
+                'bucket': '22222222-2222-2222-2222-222222222222',
+                'version_id': '11111111-1111-1111-1111-111111111111',
+                'file_id': '22222222-3333-4444-5555-666666666666',
+                'checksum': 'md5:11111111111111111111111111111111',
+                'key': 'test',
+                'size': 4,
+                'type': 'txt',
+            },
+            {
+                'bucket': '22222222-2222-2222-2222-222222222222',
+                'version_id': '11111111-1111-1111-1111-111111111112',
+                'file_id': '22222222-3333-4444-5555-666666666667',
+                'checksum': 'md5:11111111111111111111111111111112',
+                'key': 'test2',
+                'size': 1000000,
+                'type': 'pdf',
+            },
+        ]
 
-    data, err = schemaorg.Dataset().dump(dict(metadata=minimal_record_model))
-    assert not err
-    assert data['distribution'] == [
-        {
-            u'@type': u'DataDownload',
-            u'contentUrl': u'https://https://zenodo.org/api/files/'
-                           u'22222222-2222-2222-2222-222222222222/test',
-            u'fileFormat': u'txt'
-        },
-        {
-            u'@type': u'DataDownload',
-            u'contentUrl': u'https://https://zenodo.org/api/files/'
-                           u'22222222-2222-2222-2222-222222222222/test2',
-            u'fileFormat': u'pdf'
-        }
-    ]
-    for right in ['closed', 'embargoed', 'restricted']:
-
-        minimal_record_model['access_right'] = right
-        out = schemaorg_jsonld_v1.serialize(recid_pid, minimal_record_model)
         data, err = schemaorg.Dataset().dump(
             dict(metadata=minimal_record_model))
         assert not err
-        assert 'distribution' not in data
+        assert data['distribution'] == [
+            {
+                u'@type': u'DataDownload',
+                u'contentUrl': u'https://https://zenodo.org/api/files/'
+                               u'22222222-2222-2222-2222-222222222222/test',
+                u'fileFormat': u'txt'
+            },
+            {
+                u'@type': u'DataDownload',
+                u'contentUrl': u'https://https://zenodo.org/api/files/'
+                               u'22222222-2222-2222-2222-222222222222/test2',
+                u'fileFormat': u'pdf'
+            }
+        ]
+        for right in ['closed', 'embargoed', 'restricted']:
+
+            minimal_record_model['access_right'] = right
+            data, err = schemaorg.Dataset().dump(
+                dict(metadata=minimal_record_model))
+            assert not err
+            assert 'distribution' not in data
