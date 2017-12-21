@@ -53,7 +53,7 @@ citeproc-py-styles==0.1.0
 click==6.7
 configparser==3.5.0
 cookiecutter==1.6.0
-cryptography==2.1.2
+cryptography==2.1.4
 datacite==0.3.0
 dcxml==0.1.0
 decorator==4.1.2
@@ -98,7 +98,7 @@ IDUtils==0.2.4
 infinity==1.4
 intervals==0.8.0
 invenio-access==1.0.0b1
-invenio-accounts==1.0.0b10
+invenio-accounts==1.0.0b12
 invenio-admin==1.0.0b4
 invenio-app==1.0.0b1
 invenio-assets==1.0.0b7
