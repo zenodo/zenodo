@@ -373,10 +373,15 @@ The ``--setspec`` option should be one of the following:
 
 from __future__ import absolute_import, print_function
 
+import urllib3
+
 from invenio_app.factory import create_app, create_ui
 from invenio_base.signals import app_created
 
 from .version import __version__
+
+
+urllib3.disable_warnings()
 
 
 def disable_strict_slashes(sender, app=None, **kwargs):
