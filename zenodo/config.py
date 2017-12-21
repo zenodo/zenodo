@@ -620,7 +620,7 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         order=1,
     ),
     'schemaorg_jsonld': dict(
-        title='schema.org JSON-LD',
+        title='JSON-LD (schema.org)',
         serializer='zenodo.modules.records.serializers.schemaorg_jsonld_v1',
     ),
     'csl': dict(
