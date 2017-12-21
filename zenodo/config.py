@@ -1008,6 +1008,14 @@ SEARCH_UI_JSTEMPLATE_FACETS = "templates/zenodo_search_ui/facets.html"
 SEARCH_DOC_TYPE_DEFAULT = None
 #: Do not map any keywords.
 SEARCH_ELASTIC_KEYWORD_MAPPING = {}
+#: Only create indexes we actually need.
+SEARCH_MAPPINGS = [
+    'deposits',
+    'funders',
+    'grants',
+    'licenses',
+    'records',
+]
 
 # Communities
 # ===========

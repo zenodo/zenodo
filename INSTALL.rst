@@ -147,7 +147,7 @@ Next, install Zenodo and code the dependencies:
 
     (zenodo)$ cd ~/src/zenodo
     (zenodo)$ pip install -r requirements.txt --src ~/src/ --pre --upgrade
-    (zenodo)$ pip install -e .[all,postgresql]
+    (zenodo)$ pip install -e .[all,postgresql,elasticsearch2]
 
 .. note::
 
@@ -156,11 +156,11 @@ Next, install Zenodo and code the dependencies:
 
 .. note::
 
-    Z shell users: wrap the ``.[all,postgresql]`` part in quotes:
+    Z shell users: wrap the ``.[all,postgresql,elasticsearch2]`` part in quotes:
 
     .. code-block:: console
 
-        (zenodo)$ pip install -e ".[all,postgresql]"
+        (zenodo)$ pip install -e ".[all,postgresql,elasticsearch2]"
 
 Media assets
 ~~~~~~~~~~~~

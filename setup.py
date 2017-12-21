@@ -47,7 +47,8 @@ tests_require = [
     'six>=1.10.0',
 ]
 
-db_version = '>=1.0.0b8'
+db_version = '>=1.0.0b9'
+search_version = '>=1.0.0b4'
 
 extras_require = {
     'docs': [
@@ -65,15 +66,21 @@ extras_require = {
     ],
     # Elasticsearch version
     'elasticsearch2': [
-        'elasticsearch>=2.0.0,<3.0.0',
-        'elasticsearch-dsl>=2.0.0,<3.0.0',
+        'invenio-search[elasticsearch2]{}'.format(search_version),
     ],
+    # 'elasticsearch5': [
+    #     'invenio-search[elasticsearch5]{}'.format(search_version),
+    # ],
+    # 'elasticsearch6': [
+    #     'invenio-search[elasticsearch5]{}'.format(search_version),
+    # ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
 for name, reqs in extras_require.items():
-    if name in ('postgresql', 'mysql', 'sqlite'):
+    if name in ('postgresql', 'mysql', 'sqlite', 'elasticsearch2',
+                'elasticsearch5', 'elasticsearch6'):
         continue
     extras_require['all'].extend(reqs)
 
@@ -103,31 +110,31 @@ install_requires = [
     'Flask-Caching>=1.3.2',
     'Flask-Debugtoolbar>=0.10.1',
     'ftfy>=4.4.3,<5',
-    'idutils>=0.2.4',
+    'idutils>=1.0.0',
     'invenio-access>=1.0.0b1',
     'invenio-accounts>=1.0.0b12',
     'invenio-admin>=1.0.0b4',
-    'invenio-app>=1.0.0b1',
+    'invenio-app>=1.0.0b2',
     'invenio-assets>=1.0.0b7',
-    'invenio-base>=1.0.0a16',
+    'invenio-base>=1.0.0b1',
     'invenio-cache>=1.0.0b1',
     'invenio-celery>=1.0.0b3',
     'invenio-communities>=1.0.0a18',
     'invenio-config>=1.0.0b3',
     'invenio-csl-rest>=1.0.0a1',
-    'invenio-deposit>=1.0.0a8',
+    'invenio-deposit>=1.0.0a9',
     'invenio-files-rest>=1.0.0a21',
     'invenio-formatter>=1.0.0b3',
     'invenio-github>=1.0.0a13',
     'invenio-i18n>=1.0.0b4',
-    'invenio-indexer>=1.0.0a10',
+    'invenio-indexer>=1.0.0b1',
     'invenio-jsonschemas>=1.0.0a7',
     'invenio-logging>=1.0.0b3',
     'invenio-mail>=1.0.0b1',
-    'invenio-marc21>=1.0.0a5',
+    'invenio-marc21>=1.0.0a6',
     'invenio-migrator>=1.0.0a9',
-    'invenio-oaiserver>=1.0.0a14',
-    'invenio-oauth2server>=1.0.0b2',
+    'invenio-oaiserver>=1.0.0b1',
+    'invenio-oauth2server>=1.0.0b3',
     'invenio-oauthclient[github]>=1.0.0b3',
     'invenio-openaire>=1.0.0a11',
     'invenio-opendefinition>=1.0.0a4',
@@ -136,10 +143,9 @@ install_requires = [
     'invenio-previewer>=1.0.0a11',
     'invenio-records>=1.0.0b4',
     'invenio-records-files>=1.0.0a9',
-    'invenio-records-rest>=1.0.0b3',
-    'invenio-records-ui>=1.0.0a9',
+    'invenio-records-rest>=1.0.0b5',
+    'invenio-records-ui>=1.0.0b2',
     'invenio-rest[cors]>=1.0.0b2',
-    'invenio-search>=1.0.0b1',
     'invenio-search-ui>=1.0.0a9',
     'invenio-sipstore>=1.0.0a7',
     'invenio-theme>=1.0.0b4',
@@ -147,7 +153,6 @@ install_requires = [
     'invenio-webhooks>=1.0.0a4',
     'jsonref>=0.1',
     'jsonresolver>=0.2.1',
-    'marshmallow==2.13.4',
     'mock>=2.0.0',
     'Pillow>=4.2.0',
     'pycountry>=17.5.14',

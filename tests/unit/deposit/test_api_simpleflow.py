@@ -314,7 +314,7 @@ def test_update_deposits_users(api, api_client, db, users, deposit,
     # admin user
     (dict(email='admin@zenodo.org', password='admin'), 204),
 ])
-def test_delete_deposits_users(api, api_client, db, users, deposit,
+def test_delete_deposits_users(api, api_client, db, es, users, deposit,
                                json_headers, user_info, status):
     """Test read deposit by users."""
     deposit_id = deposit['_deposit']['id']

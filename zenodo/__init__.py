@@ -255,7 +255,7 @@ installed by e.g. installing Zenodo with the ``xrootd`` extras:
 
 .. code-block:: console
 
-   $ pip install -e .[postgresql,xrootd]
+   $ pip install -e .[postgresql,elasticsearch2,xrootd]
 
 Sentry
 ~~~~~~
