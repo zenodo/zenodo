@@ -161,7 +161,9 @@ class CreativeWork(Schema):
     def get_doi(self, obj):
         """Get DOI of the record."""
         data = obj['metadata']
-        return idutils.to_url(data['doi'], 'doi') if data['doi'] else missing
+        return idutils.to_url(data['doi'], 'doi') \
+            if data.get('doi') \
+            else missing
 
     def get_type(self, obj):
         """Get schema.org type of the record."""
