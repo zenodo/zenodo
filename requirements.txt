@@ -120,7 +120,7 @@ invenio-logging==1.0.0b3
 invenio-mail==1.0.0b1
 invenio-marc21==1.0.0a6
 invenio-migrator==1.0.0a9
-invenio-oaiserver==1.0.0b1
+invenio-oaiserver==1.0.0b2
 invenio-oauth2server==1.0.0b3
 invenio-oauthclient==1.0.0b3
 invenio-openaire==1.0.0a11
