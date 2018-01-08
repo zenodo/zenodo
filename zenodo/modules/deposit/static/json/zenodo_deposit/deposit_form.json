@@ -268,14 +268,15 @@
             "ckeditor": {
               "height": 200,
               "toolbar": [
-                ["PasteText","PasteFromWord"],
-                ["Bold", "Italic", "Strike", "-", "Subscript", "Superscript"],
-                ["NumberedList", "BulletedList", "Blockquote"],
-                ["Undo", "Redo", "-", "Find", "Replace", "-", "RemoveFormat"],
+                ["PasteText", "PasteFromWord"],
+                ["Bold", "Italic", "Strike", "Subscript", "Superscript"],
+                ["Link", "Unlink"],
+                ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "CodeSnippet"],
+                ["Undo", "Redo", "Find", "Replace", "RemoveFormat"],
                 ["Mathjax", "SpecialChar"],
                 ["Source"], ["Maximize"]
               ],
-              "extraPlugins": "blockquote,mathjax",
+              "extraPlugins": "codesnippet,blockquote,mathjax",
               "disableNativeSpellChecker": false,
               "removePlugins": "elementspath",
               "removeButtons": ""
@@ -409,14 +410,15 @@
         "ckeditor": {
           "height": 200,
           "toolbar": [
-            ["PasteText","PasteFromWord"],
-            ["Bold", "Italic", "Strike", "-", "Subscript", "Superscript"],
-            ["NumberedList", "BulletedList", "Blockquote"],
-            ["Undo", "Redo", "-", "Find", "Replace", "-", "RemoveFormat"],
+            ["PasteText", "PasteFromWord"],
+            ["Bold", "Italic", "Strike", "Subscript", "Superscript"],
+            ["Link", "Unlink"],
+            ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "CodeSnippet"],
+            ["Undo", "Redo", "Find", "Replace", "RemoveFormat"],
             ["Mathjax", "SpecialChar"],
             ["Source"], ["Maximize"]
           ],
-          "extraPlugins": "blockquote,mathjax",
+          "extraPlugins": "codesnippet,blockquote,mathjax",
           "disableNativeSpellChecker": false,
           "removePlugins": "elementspath",
           "removeButtons": ""
