@@ -51,6 +51,7 @@ class SanitizedHTML(SanitizedUnicode):
             'li',
             'ol',
             'p',
+            'pre',
             'span',
             'strike',
             'strong',
