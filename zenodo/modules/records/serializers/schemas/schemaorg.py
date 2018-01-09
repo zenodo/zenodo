@@ -37,7 +37,7 @@ from .common import format_pid_link
 
 
 def _serialize_identifiers(ids, relations=None):
-    """Serialize identifiers to URLs.
+    """Serialize related and alternate identifiers to URLs.
 
     :param ids: List of related_identifier or alternate_identifier objects.
     :param relations: if not None, will only select IDs of specific relation
@@ -104,7 +104,8 @@ class CreativeWork(Schema):
 
     CONTEXT = "https://schema.org/"
 
-    doi = fields.Method('get_doi', dump_to='@id')
+    identifier = fields.Method('get_doi', dump_to='identifier')
+    id_ = fields.Method('get_doi', dump_to='@id')
 
     # NOTE: use `__class__`?
     type_ = fields.Method('get_type', dump_to='@type')

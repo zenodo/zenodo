@@ -149,6 +149,7 @@ def test_minimal_software_record(minimal_record_model):
         u'@context': u'https://schema.org/',
         u'@id': 'https://doi.org/10.5072/zenodo.123',
         u'@type': u'SoftwareSourceCode',
+        u'identifier': 'https://doi.org/10.5072/zenodo.123',
         u'url': 'http://localhost/record/123',
         u'description': u'My description',
         u'codeRepository': 'https://github.com/orgname/reponame/tree/v0.1.0',
@@ -176,6 +177,7 @@ def test_full_record(record_with_files_creation):
         u'@context': u'https://schema.org/',
         u'@id': 'https://doi.org/10.1234/foo.bar',
         u'@type': u'Book',
+        u'identifier': 'https://doi.org/10.1234/foo.bar',
         u'about': [
             {
                 u'@id': u'http://id.loc.gov/authorities/subjects/sh85009003',
