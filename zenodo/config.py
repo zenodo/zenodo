@@ -204,6 +204,10 @@ CELERY_BEAT_SCHEDULE = {
             'checksum_kwargs': {'use_default_impl': True},
         },
     },
+    'sitemap-updater': {
+        'task': 'zenodo.modules.sitemap.tasks.update_sitemap_cache',
+        'schedule': timedelta(hours=24)
+    }
 }
 
 # Cache

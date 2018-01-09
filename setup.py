@@ -203,6 +203,7 @@ setup(
             'zenodo_communities = '
             'zenodo.modules.communities.ext:ZenodoCommunities',
             'zenodo_fixtures = zenodo.modules.fixtures.ext:ZenodoFixtures',
+            'zenodo_sitemap = zenodo.modules.sitemap.ext:ZenodoSitemap',
             'zenodo_support = zenodo.modules.support.ext:ZenodoSupport',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_deposit = zenodo.modules.deposit.ext:ZenodoDeposit',
@@ -227,6 +228,7 @@ setup(
             'zenodo_search_ui = zenodo.modules.search_ui.views:blueprint',
             'zenodo_theme = zenodo.modules.theme.views:blueprint',
             'zenodo_spam = zenodo.modules.spam.views:blueprint',
+            'zenodo_sitemap = zenodo.modules.sitemap.views:blueprint',
         ],
         'invenio_base.api_blueprints': [
             'zenodo_rest = zenodo.modules.rest.views:blueprint',
@@ -243,6 +245,7 @@ setup(
             'zenodo_records = zenodo.modules.records.tasks',
             'zenodo_utils = zenodo.modules.utils.tasks',
             'zenodo_sipstore = zenodo.modules.sipstore.tasks',
+            'zenodo_sitemap = zenodo.modules.sitemap.tasks',
         ],
         'invenio_config.module': [
             'zenodo = zenodo.config',

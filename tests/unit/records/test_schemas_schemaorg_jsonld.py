@@ -104,7 +104,7 @@ def test_person():
                     '@type': 'Person',
                     '@id': 'http://d-nb.info/gnd/170118215'}
 
-    # Add ORCID - it should supercede GND as the identifier
+    # Add ORCID - it should supersede GND as the identifier
     simple_person['orcid'] = '0000-0002-1825-0097'
     data, err = schemaorg.Person().dump(simple_person)
     assert not err
