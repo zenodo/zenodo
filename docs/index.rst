@@ -29,6 +29,17 @@
 `Invenio <http://inveniosoftware.org>`_, a free software suite enabling you
 to run your own digital repository on the web.
 
+.. note::
+   Zenodo (R) and the Zenodo logo are trademarked by CERN and are not covered
+   by the GPLv2 license. Thus, if you instantiate Zenodo on your own servers
+   you must change the branding to your own.
+
+   Please consider creating your own overlay to
+   `Invenio <http://inveniosoftware.org>`_ and look to Zenodo for inspiration.
+   We will be happy to help you get started, just contact us on
+   info@zenodo.org.
+
+
 Developers's Guide
 ------------------
 
@@ -83,15 +94,6 @@ interested.
    license
    authors
 
-Zenodo is funded by CERN and European Commission via OpenAIRE, OpenAIREPlus,
-OpenAIRE2020.
-
-.. note::
-   Zenodo (R) and the Zenodo logo are trademarked by CERN and are not covered
-   by the GPLv2 license. Thus, if you instantiate Zenodo on your own servers
-   you must change the branding to your own.
-
-   Please consider creating your own overlay to
-   `Invenio <http://inveniosoftware.org>`_ and look to Zenodo for inspiration.
-   We will be happy to help you get started, just contact us on
-   info@zenodo.org.
+Zenodo is funded by CERN, the European Commission via OpenAIRE, OpenAIREPlus,
+OpenAIRE2020, OpenAIRE-Connect and OpenAIRE-Advance as well as the Alfred P.
+Sloan Foundation.
