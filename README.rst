@@ -63,6 +63,7 @@ Developer documentation
 =======================
 See https://zenodo.readthedocs.io/
 
+
 License
 =======
 Copyright (C) 2009-2017 CERN.
@@ -85,3 +86,13 @@ MA 02111-1307, USA.
 In applying this license, CERN does not
 waive the privileges and immunities granted to it by virtue of its status
 as an Intergovernmental Organization or submit itself to any jurisdiction.
+
+Zenodo (R)
+----------
+Zenodo (R) and the Zenodo logo are trademarked by CERN and are not covered
+by the GPLv2 license. Thus, if you instantiate Zenodo on your own servers
+you must change the branding to your own.
+
+Please consider creating your own overlay to
+`Invenio <http://inveniosoftware.org>`_ and look at Zenodo for inspiration.
+We will be happy to help you get started, just contact us on info@zenodo.org.
