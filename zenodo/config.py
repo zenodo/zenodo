@@ -180,6 +180,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': timedelta(hours=1),
         'kwargs': {
             'batch_interval': {'hours': 1},
+            'frequency': {'days': 14},
             'max_count': 0,
             # Query taking into account only files with URI prefixes defined by
             # the FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES config variable
