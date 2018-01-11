@@ -73,6 +73,12 @@ def _(x):
     """Identity function for string extraction."""
     return x
 
+
+#: System sender email address
+ZENODO_SYSTEM_SENDER_EMAIL = 'system@zenodo.org'
+#: Email address of admins
+ZENODO_ADMIN_EMAIL = 'zenodo-admin@cern.ch'
+
 #: Email address for support.
 SUPPORT_EMAIL = "info@zenodo.org"
 MAIL_SUPPRESS_SEND = True
@@ -208,7 +214,11 @@ CELERY_BEAT_SCHEDULE = {
     'sitemap-updater': {
         'task': 'zenodo.modules.sitemap.tasks.update_sitemap_cache',
         'schedule': timedelta(hours=24)
-    }
+    },
+    'file-integrity-report': {
+        'task': 'zenodo.modules.utils.tasks.file_integrity_report',
+        'schedule': timedelta(days=1),
+    },
 }
 
 # Cache

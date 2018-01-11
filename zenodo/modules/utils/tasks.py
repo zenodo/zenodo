@@ -25,12 +25,15 @@ from collections import namedtuple
 from datetime import datetime
 from itertools import chain as ichain
 
+import sqlalchemy as sa
 from celery import chain, group, shared_task
 from celery.utils.log import get_task_logger
 from dictdiffer import diff
 from elasticsearch_dsl import Q
 from flask import current_app
+from flask_mail import Message
 from invenio_db import db
+from invenio_files_rest.models import FileInstance
 from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.minters import oaiid_minter
 from invenio_oaiserver.models import OAISet
@@ -38,7 +41,11 @@ from invenio_oaiserver.query import OAIServerSearch
 from invenio_oaiserver.utils import datetime_to_datestamp
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
+from invenio_records_files.models import RecordsBuckets
 from six.moves import filter
+
+from zenodo.modules.records.serializers.schemas.common import format_pid_link
+from zenodo.modules.records.utils import is_deposit, is_record
 
 logger = get_task_logger(__name__)
 
@@ -263,3 +270,71 @@ def update_search_pattern_sets():
     """
     oaisets = OAISet.query.filter(OAISet.search_pattern.isnot(None))
     chain(make_oai_task_group(oais) for oais in oaisets).apply_async()
+
+
+def format_file_integrity_report(report):
+    """Format the email body for the file integrity report."""
+    lines = []
+    for entry in report:
+        f = entry['file']
+        lines.append('ID: {}'.format(str(f.id)))
+        lines.append('URI: {}'.format(f.uri))
+        lines.append('Name: {}'.format(entry.get('filename')))
+        lines.append('Created: {}'.format(f.created))
+        lines.append('Checksum: {}'.format(f.checksum))
+        lines.append('Last Check: {}'.format(f.last_check_at))
+        if 'record' in entry:
+            lines.append(u'Record: {}'.format(format_pid_link(
+                current_app.config['RECORDS_UI_ENDPOINT'],
+                entry['record'].get('recid'))))
+        if 'deposit' in entry:
+            lines.append(u'Deposit: {}'.format(format_pid_link(
+                    current_app.config['DEPOSIT_UI_ENDPOINT'],
+                    entry['deposit'].get('_deposit', {}).get('id'))))
+        lines.append(('-' * 80) + '\n')
+    return '\n'.join(lines)
+
+
+@shared_task
+def file_integrity_report():
+    """Send a report of uhealthy/missing files to Zenodo admins."""
+    # First retry verifying files that errored during their last check
+    files = FileInstance.query.filter(FileInstance.last_check.is_(None))
+    for f in files:
+        try:
+            f.clear_last_check()
+            db.session.commit()
+            f.verify_checksum(throws=False)
+            db.session.commit()
+        except Exception:
+            pass  # Don't fail sending the report in case of some file error
+
+    report = []
+    unhealthy_files = (
+        FileInstance.query
+        .filter(sa.or_(FileInstance.last_check.is_(None),
+                       FileInstance.last_check.is_(False)))
+        .order_by(FileInstance.created.desc()))
+
+    for f in unhealthy_files:
+        entry = {'file': f}
+        for o in f.objects:
+            entry['filename'] = o.key
+            # Find records/deposits for the files
+            rb = RecordsBuckets.query.filter(
+                RecordsBuckets.bucket_id == o.bucket_id).one_or_none()
+            if rb:
+                if is_deposit(rb.record.json):
+                    entry['deposit'] = rb.record.json
+                elif is_record(rb.record.json):
+                    entry['record'] = rb.record.json
+        report.append(entry)
+
+    if report:
+        # Format and send the email
+        subject = u'Zenodo files integrity report [{}]'.format(datetime.now())
+        body = format_file_integrity_report(report)
+        sender = current_app.config['ZENODO_SYSTEM_SENDER_EMAIL']
+        recipients = [current_app.config['ZENODO_ADMIN_EMAIL']]
+        msg = Message(subject, sender=sender, recipients=recipients, body=body)
+        current_app.extensions['mail'].send(msg)
