@@ -39,7 +39,8 @@ def update_sitemap_cache(urls=None, max_url_count=None):
     # We need request context to properly generate the external link
     # using url_for. We fix base_url as we want to simulate a
     # request as it looks from an external client, instead of a task.
-    with current_app.test_request_context(base_url='https://zenodo.org'):
+    siteurl = current_app.config['THEME_SITEURL']
+    with current_app.test_request_context(base_url=siteurl):
         max_url_count = max_url_count or \
             current_app.config['ZENODO_SITEMAP_MAX_URL_COUNT']
         sitemap = current_app.extensions['zenodo-sitemap']
