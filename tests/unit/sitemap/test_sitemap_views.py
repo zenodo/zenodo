@@ -79,16 +79,20 @@ def test_sitemap_views(app, record_with_bucket, communities):
             res = client.get(url_for('zenodo_sitemap.sitemapindex'))
             # Return 404 if sitemap has not been generated
             assert res.status_code == 404
+            assert res.content_type == 'text/html; charset=utf-8'
 
             res = client.get(url_for('zenodo_sitemap.sitemappage', page=1))
             # Return 404 if sitemap has not been generated
             assert res.status_code == 404
+            assert res.content_type == 'text/html; charset=utf-8'
 
             update_sitemap_cache()
             res = client.get(url_for('zenodo_sitemap.sitemapindex'))
             assert res.status_code == 200
+            assert res.content_type == 'text/xml; charset=utf-8'
             res = client.get(url_for('zenodo_sitemap.sitemappage', page=1))
             assert res.status_code == 200
+            assert res.content_type == 'text/xml; charset=utf-8'
 
             # Clear the cache to clean up after test
             sitemap = current_app.extensions['zenodo-sitemap']

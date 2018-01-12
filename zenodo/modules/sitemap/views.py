@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from flask import Blueprint, abort
+from flask import Blueprint, abort, current_app
 from invenio_cache import current_cache
 
 blueprint = Blueprint(
@@ -39,7 +39,10 @@ blueprint = Blueprint(
 
 def _get_cached_or_404(page):
     data =  current_cache.get('sitemap:' + str(page))
-    return data or abort(404)
+    if data:
+        return current_app.response_class(data, mimetype='text/xml')
+    else:
+        abort(404)
 
 @blueprint.route('/sitemap.xml', methods=['GET', ])
 def sitemapindex():
