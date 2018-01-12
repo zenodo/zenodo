@@ -77,7 +77,7 @@ def _(x):
 #: System sender email address
 ZENODO_SYSTEM_SENDER_EMAIL = 'system@zenodo.org'
 #: Email address of admins
-ZENODO_ADMIN_EMAIL = 'zenodo-admin@cern.ch'
+ZENODO_ADMIN_EMAIL = 'admin@zenodo.org'
 
 #: Email address for support.
 SUPPORT_EMAIL = "info@zenodo.org"
