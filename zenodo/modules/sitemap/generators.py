@@ -42,7 +42,7 @@ def records_generator():
                  PersistentIdentifier.pid_type == 'recid'))
 
     scheme = current_app.config['ZENODO_SITEMAP_URL_SCHEME']
-    for pid, rm in q:
+    for pid, rm in q.yield_per(1000):
         yield {
             'loc': url_for('invenio_records_ui.recid', pid_value=pid.pid_value,
                            _external=True, _scheme=scheme),
@@ -54,7 +54,7 @@ def communities_generator():
     """Generate the communities links."""
     q = Community.query.filter(Community.deleted_at.is_(None))
     scheme = current_app.config['ZENODO_SITEMAP_URL_SCHEME']
-    for comm in q:
+    for comm in q.yield_per(1000):
         for endpoint in 'detail', 'search', 'about':
             yield {
                 'loc': url_for('invenio_communities.{}'.format(endpoint),
