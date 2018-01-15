@@ -21,11 +21,11 @@
   <p>
   <small class="text-muted">
     {{config.THEME_SITENAME | default('Invenio')}} automatically
-    extracts metadata about your repository from GitHub APIs. The
-    authors are e.g. determined from the repository's contributor
-    statistics. The automatic extraction is <strong>solely a best
-    guess</strong>. Add a
-    <code>{{config.GITHUB_METADATA_FILE}}</code> file the root of
+    extracts metadata about your repository from GitHub APIs.
+    For example, the authors are determined from the repository's
+    contributor statistics.
+    The automatic extraction is <strong>solely a best guess</strong>.
+    Add a <code>{{config.GITHUB_METADATA_FILE}}</code> file the root of
     your repository to explicit define the metadata. The format of
     file is the same as for our REST API (use e.g. below JSON to
     get started).
