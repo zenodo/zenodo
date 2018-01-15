@@ -323,7 +323,7 @@ def file_integrity_report():
             # Find records/deposits for the files
             rb = RecordsBuckets.query.filter(
                 RecordsBuckets.bucket_id == o.bucket_id).one_or_none()
-            if rb:
+            if rb and rb.record and rb.record.json:
                 if is_deposit(rb.record.json):
                     entry['deposit'] = rb.record.json
                 elif is_record(rb.record.json):
