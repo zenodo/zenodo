@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+import re
+
 import mock
 from flask import current_app, render_template
 
@@ -65,9 +67,12 @@ def test_sitemap_generators(app, record_with_bucket, communities):
         sitemap = current_app.extensions['zenodo-sitemap']
         urls = list(sitemap._generate_all_urls())
 
-        # Make sure the last modified are there, but remove from the result
-        # for easier comparison of URLs
-        assert all('lastmod' in url for url in urls)
+        # Make sure the last modified are there and it's in proper UTC sitemap
+        # format, but remove from the result for easier comparison of URL sets
+        # make sure it's in the format 'YYYY-MM-DDTHH-MM-SST'
+        sitemap_dt_re = re.compile('\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$')
+        assert all('lastmod' in url and sitemap_dt_re.match(url['lastmod'])
+                   for url in urls)
         for url in urls:
             del url['lastmod']
         expected = [

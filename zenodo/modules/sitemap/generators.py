@@ -26,11 +26,23 @@
 
 from __future__ import absolute_import, print_function
 
+import arrow
 from flask import current_app, url_for
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.models import RecordMetadata
+
+
+def _sitemapdtformat(dt):
+    """Convert a datetime to a W3 Date and Time format.
+
+    Converts the date to a minute-resolution datetime timestamp with a special
+    UTC designator 'Z'. See more information at
+    https://www.w3.org/TR/NOTE-datetime.
+    """
+    adt = arrow.Arrow.fromdatetime(dt).to('utc')
+    return adt.format('YYYY-MM-DDTHH:MM:SS') + 'Z'
 
 
 def records_generator():
@@ -46,7 +58,7 @@ def records_generator():
         yield {
             'loc': url_for('invenio_records_ui.recid', pid_value=pid.pid_value,
                            _external=True, _scheme=scheme),
-            'lastmod': rm.updated.isoformat()
+            'lastmod': _sitemapdtformat(rm.updated)
         }
 
 
@@ -60,8 +72,9 @@ def communities_generator():
                 'loc': url_for('invenio_communities.{}'.format(endpoint),
                                community_id=comm.id, _external=True,
                                _scheme=scheme),
-                'lastmod': comm.updated.isoformat()
+                'lastmod': _sitemapdtformat(comm.updated)
             }
+
 
 generator_fns = [
     records_generator,
