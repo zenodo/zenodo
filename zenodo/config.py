@@ -217,7 +217,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'file-integrity-report': {
         'task': 'zenodo.modules.utils.tasks.file_integrity_report',
-        'schedule': timedelta(days=1),
+        'schedule': crontab(minute=0, hour=7),  # Every day at 07:00 UTC
     },
 }
 
