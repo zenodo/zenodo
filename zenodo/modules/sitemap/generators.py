@@ -42,7 +42,7 @@ def _sitemapdtformat(dt):
     https://www.w3.org/TR/NOTE-datetime.
     """
     adt = arrow.Arrow.fromdatetime(dt).to('utc')
-    return adt.format('YYYY-MM-DDTHH:MM:SS') + 'Z'
+    return adt.format('YYYY-MM-DDTHH:mm:ss') + 'Z'
 
 
 def records_generator():

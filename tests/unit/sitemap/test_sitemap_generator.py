@@ -26,11 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
+import datetime
 import re
 
 import mock
 from flask import current_app, render_template
 
+from zenodo.modules.sitemap.generators import _sitemapdtformat
 from zenodo.modules.sitemap.tasks import update_sitemap_cache
 
 
@@ -103,3 +105,11 @@ def test_sitemap_generators(app, record_with_bucket, communities):
             {'loc': 'https://localhost/communities/grants_comm/about/'}
         ]
         assert urls == expected
+
+
+def test_sitemap_date_generator():
+    """Test the sitemap timestamp generation."""
+    dt = datetime.datetime(2018, 1, 2, 3, 4, 5)
+    assert _sitemapdtformat(dt) == '2018-01-02T03:04:05Z'
+    dt = datetime.datetime(2018, 11, 12, 13, 14, 15)
+    assert _sitemapdtformat(dt) == '2018-11-12T13:14:15Z'
