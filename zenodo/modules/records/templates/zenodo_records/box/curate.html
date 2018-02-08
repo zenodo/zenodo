@@ -24,7 +24,7 @@
   <dl id="recordCommunityCuration">
     {%- if pending_comms %}
     <h5><i class="fa fa-legal"></i> <strong>Pending approvals</strong></h5>
-      {%- for comm in pending_comms %}
+      {%- for comm in pending_comms|sort(attribute='title') %}
         <dd>
         <span class="pull-right" id="span-comm-{{ comm.id }}">
         <button class="btn-accept btn btn-xs btn-info"
@@ -46,7 +46,7 @@
     {%- endif %}
     {%- if accepted_comms %}
       <h5><i class="fa fa-group"></i> <strong>Communities</strong></h5>
-      {%- for comm in accepted_comms %}
+      {%- for comm in accepted_comms|sort(attribute='title') %}
         <dd>
         <span class="pull-right" id="span-comm-{{ comm.id }}">
         <button class="btn-remove btn btn-xs btn-info"
