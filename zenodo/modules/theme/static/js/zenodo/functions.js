@@ -35,16 +35,14 @@ define([], function(){
       data: JSON.stringify(data),
       dataType: "json",
       success: function(result, status, xhr) {
-        $(commContainerElemId + " > .btn").addClass("disabled");
-        $(commContainerElemId + " > .btn").prop("disabled", true);
-        var buttonElem = $(commContainerElemId + " > .btn-" + action);
-        buttonElem.removeClass("btn-info");
-        if (action == "accept") {
-          buttonElem.addClass("btn-success");
-        } else if (action == "reject") {
-          buttonElem.addClass("btn-danger");
-        } else if (action == "remove") {
-          buttonElem.addClass("btn-danger");
+        console.log("Success");
+        $(commContainerElemId + " > .btn").addClass('hidden');
+        $(commContainerElemId + " > ." + action + "-success-msg").removeClass('hidden')
+      },
+      error: function(result, status, xhr) {
+        if (action == "accept" || action == "reject" || action == "remove") {
+          $(commContainerElemId + " > .btn").addClass('hidden');
+          $(commContainerElemId + " > .error-msg").removeClass('hidden');
         }
       }
     });

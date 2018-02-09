@@ -1,10 +1,17 @@
 <div class="row record-elem" ng-repeat="record in vm.invenioSearchResults.hits.hits track by $index">
   <div class="col-xs-12">
-    <div class="pull-right view-record">
+    <div ng-show="!communitiesCurationResults[record.id]" class="pull-right view-record">
       <span class="pull-right" id="curate_{{ record.id }}">
         <span class="ajaxmsg text-muted" style="display: none;"></span>
         <a class="btn 10 btn-default" ng-class="pressedClassSucc" ng-click="handleCommunityClick('accept', record.id);isPressed=true;pressedClassSucc='btn-success'" ng-disabled="isPressed"><i class="fa fa-check"></i>Accept</a>
         <a class="btn 10 btn-default" ng-class="pressedClassWarn" ng-click="handleCommunityClick('reject', record.id);isPressed=true;pressedClassWarn='btn-danger'" ng-disabled="isPressed"><i class="fa fa-check"></i>Reject</a>
+      </span>
+    </div>
+    <div ng-show="communitiesCurationResults[record.id]" class="pull-right view-record">
+      <span class="pull-right" id="curate_{{ record.id }}">
+        <span class="ajaxmsg text-muted" style="display: none;"></span>
+        <p ng-show="communitiesCurationResults[record.id].success" class="text-success"><i class="fa fa-check"></i> {{communitiesCurationResults[record.id].success}}</p>
+        <p ng-show="communitiesCurationResults[record.id].error" class="text-danger">{{communitiesCurationResults[record.id].error}}</p>
       </span>
     </div>
     <span class="label label-info" bs-tooltip data-container="div" data-title="Publication date">{{ record.metadata.
