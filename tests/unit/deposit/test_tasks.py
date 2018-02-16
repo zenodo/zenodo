@@ -52,13 +52,13 @@ def test_datacite_register(mocker, app, db, es, minimal_record):
     doi_tags = [
         '<identifier identifierType="DOI">{doi}</identifier>',
         ('<relatedIdentifier relatedIdentifierType="DOI" '
-         'relationType="IsPartOf">{conceptdoi}</relatedIdentifier>'),
+         'relationType="IsVersionOf">{conceptdoi}</relatedIdentifier>'),
     ]
     conceptdoi_tags = [
         '<identifier identifierType="DOI">{conceptdoi}</identifier>',
     ]
     has_part_tag = ('<relatedIdentifier relatedIdentifierType="DOI" '
-                    'relationType="HasPart">{doi}</relatedIdentifier>')
+                    'relationType="HasVersion">{doi}</relatedIdentifier>')
 
     # Assert calls and content
     def assert_datacite_calls_and_content(record, doi_tags, conceptdoi_tags):

@@ -38,14 +38,14 @@ from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
 from .schemaorg import ZenodoSchemaOrgSerializer
 from .schemas.csl import RecordSchemaCSLJSON
-from .schemas.datacite import DataCiteSchemaV1
+from .schemas.datacite import DataCiteSchemaV1, DataCiteSchemaV4
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
 from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
     LegacyRecordSchemaV1, DepositFormSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
 from zenodo.modules.records.serializers.datacite import \
-    ZenodoDataCite31Serializer
+    ZenodoDataCite31Serializer, ZenodoDataCite41Serializer
 from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
 from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
 from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
@@ -75,6 +75,7 @@ marcxml_v1 = ZenodoMARCXMLSerializer(
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializer
 datacite_v31 = ZenodoDataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
+datacite_v41 = ZenodoDataCite41Serializer(DataCiteSchemaV4, replace_refs=True)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     serializer=datacite_v31,
@@ -105,6 +106,9 @@ bibtex_v1_response = record_responsify(bibtex_v1, 'application/x-bibtex')
 #: DataCite v3.1 record serializer for individual records.
 datacite_v31_response = record_responsify(
     datacite_v31, 'application/x-datacite+xml')
+#: DataCite v4.1 record serializer for individual records.
+datacite_v41_response = record_responsify(
+    datacite_v41, 'application/x-datacite+xml')
 #: DublinCore record serializer for individual records.
 dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 #: CSL-JSON record serializer for individual records.

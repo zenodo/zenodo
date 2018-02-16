@@ -27,7 +27,8 @@
 from __future__ import absolute_import, print_function
 
 from flask import current_app
-from invenio_records_rest.serializers.datacite import DataCite31Serializer
+from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
+    DataCite40Serializer
 
 from .pidrelations import preprocess_related_identifiers
 from .schemas.common import format_pid_link
@@ -43,6 +44,31 @@ class ZenodoDataCite31Serializer(DataCite31Serializer):
     def preprocess_record(self, pid, record, links_factory=None):
         """Add related identifiers from PID relations."""
         result = super(ZenodoDataCite31Serializer, self).preprocess_record(
+            pid, record, links_factory=links_factory
+        )
+        # Versioning links
+        result = preprocess_related_identifiers(pid, record, result)
+        # Alternate identifiers
+        altidentifiers = result['metadata'].get('alternate_identifiers', [])
+        altidentifiers.append({
+            'identifier': format_pid_link(
+                current_app.config['RECORDS_UI_ENDPOINT'], pid.pid_value),
+            'scheme': 'url'
+        })
+        result['metadata']['alternate_identifiers'] = altidentifiers
+        return result
+
+
+class ZenodoDataCite41Serializer(DataCite40Serializer):
+    """Marshmallow based DataCite serializer for records.
+
+    Note: This serializer is not suitable for serializing large number of
+    records.
+    """
+
+    def preprocess_record(self, pid, record, links_factory=None):
+        """Add related identifiers from PID relations."""
+        result = super(ZenodoDataCite41Serializer, self).preprocess_record(
             pid, record, links_factory=links_factory
         )
         # Versioning links

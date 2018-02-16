@@ -743,6 +743,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.bibtex_v1_response'),
             'application/x-datacite+xml': (
                 'zenodo.modules.records.serializers.datacite_v31_response'),
+            'application/x-datacite+xmlv41': (
+                'zenodo.modules.records.serializers.datacite_v41_response'),
             'application/x-dc+xml': (
                 'zenodo.modules.records.serializers.dc_v1_response'),
             'application/vnd.citationstyles.csl+json': (

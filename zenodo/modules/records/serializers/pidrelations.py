@@ -43,7 +43,7 @@ def serialize_related_identifiers(pid):
         if 'conceptdoi' in rec:
             ri = {
                 'scheme': 'doi',
-                'relation': 'isPartOf',
+                'relation': 'isVersionOf',
                 'identifier': rec['conceptdoi']
             }
             related_identifiers.append(ri)
@@ -79,7 +79,7 @@ def serialize_related_identifiers(pid):
             rec = ZenodoRecord.get_record(p.get_assigned_object())
             ri = {
                 'scheme': 'doi',
-                'relation': 'hasPart',
+                'relation': 'hasVersion',
                 'identifier': rec['doi']
             }
             related_identifiers.append(ri)

@@ -117,13 +117,10 @@ class RelatedIdentifierSchema(Schema):
             return obj['scheme'].upper()
 
 
-class DataCiteSchemaV1(Schema):
-    """Schema for records v1 in JSON."""
+class DataCiteSchema(Schema):
+    """Base class for schemas."""
 
     identifier = fields.Nested(IdentifierSchema, attribute='metadata.doi')
-    creators = fields.List(
-        fields.Nested(CreatorSchema),
-        attribute='metadata.creators')
     titles = fields.List(
         fields.Nested(TitleSchema),
         attribute='metadata.title')
@@ -131,7 +128,6 @@ class DataCiteSchemaV1(Schema):
     publicationYear = fields.Function(
         lambda o: str(arrow.get(o['metadata']['publication_date']).year))
     subjects = fields.Method('get_subjects')
-    contributors = fields.Method('get_contributors')
     dates = fields.Method('get_dates')
     language = fields.Method('get_language')
     version = fields.Str(attribute='metadata.version')
@@ -279,6 +275,16 @@ class DataCiteSchemaV1(Schema):
                 date=obj['metadata']['publication_date'],
                 type='Issued')).data, ]
 
+
+class DataCiteSchemaV1(DataCiteSchema):
+    """Schema for records v1 in JSON."""
+
+    creators = fields.List(
+        fields.Nested(CreatorSchema),
+        attribute='metadata.creators')
+
+    contributors = fields.Method('get_contributors')
+
     def get_contributors(self, obj):
         """Get contributors."""
         def inject_type(c):
@@ -310,6 +316,137 @@ class DataCiteSchemaV1(Schema):
                         'nameIdentifier': eurepo,
                         'nameIdentifierScheme': 'info',
                     },
+                })
+
+        return items
+
+    def get_related_identifiers(self, obj):
+        """Resource type."""
+        items = super(DataCiteSchemaV1, self).get_related_identifiers(obj)
+        print('get_related_identifiers:')
+        print(items)
+        for item in items:
+            if item['relationType'] and item['relationType'] == 'IsVersionOf':
+                item['relationType'] = 'IsPartOf'
+            if item['relationType'] and item['relationType'] == 'HasVersion':
+                item['relationType'] = 'HasPart'
+        print(items)
+        return items
+
+
+class PersonSchemav4(Schema):
+    """Creator/contributor common schema for v4."""
+
+    affiliations = fields.List(
+        fields.Str(),
+        attribute='affiliation')
+
+    nameIdentifiers = fields.Method('get_nameidentifiers')
+
+    familyName = fields.Method('get_familyname')
+    givenName = fields.Method('get_givennames')
+
+    def get_familyname(self, obj):
+        """Get family name."""
+        name = obj.get('name')
+        if name:
+            names = name.split(',')
+            if len(names) == 2:
+                return names.pop(0).strip()
+        return ''
+
+    def get_givennames(self, obj):
+        """Get given name."""
+        name = obj.get('name')
+        if name:
+            names = name.split(',')
+            if len(names) == 2:
+                return names.pop(1).strip()
+        return ''
+
+    def get_nameidentifiers(self, obj):
+        """Get name identifier."""
+        name_identifiers = []
+        if obj.get('orcid'):
+            name_identifiers.append({
+                "nameIdentifier": obj.get('orcid'),
+                "nameIdentifierScheme": "ORCID",
+                "schemeURI": "http://orcid.org/"
+            })
+        if obj.get('gnd'):
+            name_identifiers.append({
+                "nameIdentifier": obj.get('gnd'),
+                "nameIdentifierScheme": "GND",
+            })
+        return name_identifiers
+
+
+class CreatorSchemav4(PersonSchemav4):
+    """Creator schema."""
+
+    creatorName = fields.Str(attribute='name')
+
+
+class ContributorSchemav4(PersonSchemav4):
+    """Contributor schema."""
+
+    contributorName = fields.Str(attribute='name')
+    contributorType = fields.Str(attribute='type')
+
+
+class DataCiteSchemaV4(DataCiteSchema):
+    """Schema for records v4 in JSON."""
+
+    creators = fields.List(
+        fields.Nested(CreatorSchemav4),
+        attribute='metadata.creators')
+
+    contributors = fields.Method('get_contributors')
+
+    fundingReferences = fields.Method('get_fundingreferences')
+
+    def get_contributors(self, obj):
+        """Get contributors."""
+        def inject_type(c):
+            c['type'] = 'Supervisor'
+            return c
+
+        # Contributors and supervisors
+        s = ContributorSchemav4()
+        contributors = obj['metadata'].get('contributors', [])
+        contributors.extend([
+            inject_type(c) for c in
+            obj['metadata'].get('thesis').get('supervisors', [])
+        ])
+
+        items = []
+        for c in contributors:
+            items.append(s.dump(c).data)
+
+        return items
+
+    def get_fundingreferences(self, obj):
+        """Get funding references."""
+        items = []
+        for g in obj['metadata'].get('grants', []):
+            funder_name = g.get('funder', {}).get('name')
+            funder_identifier = g.get('funder', {}).get('doi')
+            award_number = g.get('code')
+            award_title = g.get('title')
+
+            eurepo = g.get('identifiers', {}).get('eurepo')
+            if funder_name and eurepo:
+                items.append({
+                    'funderName': funder_name,
+                    'funderIdentifier': {
+                        'funderIdentifier': funder_identifier,
+                        'funderIdentifierType': 'Crossref Funder ID',
+                    },
+                    'awardNumber': {
+                        'awardNumber': award_number,
+                        'awardURI': eurepo
+                    },
+                    'awardTitle': award_title
                 })
 
         return items
