@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017, 2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -151,6 +151,7 @@ install_requires = [
     'invenio-theme>=1.0.0b4',
     'invenio-userprofiles>=1.0.0b2',
     'invenio-webhooks>=1.0.0a4',
+    'httpretty>=0.8.14',
     'jsonref>=0.1',
     'jsonresolver>=0.2.1',
     'mock>=2.0.0',
@@ -196,6 +197,11 @@ setup(
             'audit = zenodo.modules.auditor.cli:audit',
             'github = zenodo.modules.github.cli:github',
             'utils = zenodo.modules.utils.cli:utils',
+        ],
+        'invenio_admin.views': [(
+            'zenodo_update_datacite =' 
+            'zenodo.modules.records.admin:updatedatacite_adminview'
+        )
         ],
         'invenio_base.apps': [
             'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',

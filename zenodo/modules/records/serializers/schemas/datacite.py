@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017, 2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -323,14 +323,11 @@ class DataCiteSchemaV1(DataCiteSchema):
     def get_related_identifiers(self, obj):
         """Resource type."""
         items = super(DataCiteSchemaV1, self).get_related_identifiers(obj)
-        print('get_related_identifiers:')
-        print(items)
         for item in items:
             if item['relationType'] and item['relationType'] == 'IsVersionOf':
                 item['relationType'] = 'IsPartOf'
             if item['relationType'] and item['relationType'] == 'HasVersion':
                 item['relationType'] = 'HasPart'
-        print(items)
         return items
 
 

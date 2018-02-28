@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Invenio.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017, 2018 CERN.
 #
 # Invenio is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -28,7 +28,7 @@ from __future__ import absolute_import, print_function
 
 from flask import current_app
 from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
-    DataCite40Serializer
+    DataCite41Serializer
 
 from .pidrelations import preprocess_related_identifiers
 from .schemas.common import format_pid_link
@@ -59,7 +59,7 @@ class ZenodoDataCite31Serializer(DataCite31Serializer):
         return result
 
 
-class ZenodoDataCite41Serializer(DataCite40Serializer):
+class ZenodoDataCite41Serializer(DataCite41Serializer):
     """Marshmallow based DataCite serializer for records.
 
     Note: This serializer is not suitable for serializing large number of

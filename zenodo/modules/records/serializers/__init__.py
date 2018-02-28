@@ -108,7 +108,7 @@ datacite_v31_response = record_responsify(
     datacite_v31, 'application/x-datacite+xml')
 #: DataCite v4.1 record serializer for individual records.
 datacite_v41_response = record_responsify(
-    datacite_v41, 'application/x-datacite+xml')
+    datacite_v41, 'application/x-datacite-v41+xml')
 #: DublinCore record serializer for individual records.
 dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 #: CSL-JSON record serializer for individual records.

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017, 2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -106,6 +106,8 @@ PIDSTORE_DATACITE_DOI_PREFIX = "10.5072"
 PIDSTORE_DATACITE_USERNAME = "CERN.ZENODO"
 #: DataCite MDS password.
 PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
+#: DataCite updating rate.
+DATACITE_UPDATING_RATE_PER_HOUR = 1000
 
 #: Zenodo PID relations
 PIDRELATIONS_RELATION_TYPES = [
@@ -218,6 +220,13 @@ CELERY_BEAT_SCHEDULE = {
     'file-integrity-report': {
         'task': 'zenodo.modules.utils.tasks.file_integrity_report',
         'schedule': crontab(minute=0, hour=7),  # Every day at 07:00 UTC
+    },
+    'datacite-metadata-updater': {
+        'task': 'zenodo.modules.records.schedule_update_datacite_metadata',
+        'schedule': timedelta(hours=1),
+        'kwargs': {
+            'max_count': DATACITE_UPDATING_RATE_PER_HOUR,
+        }
     },
 }
 
@@ -743,7 +752,7 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.bibtex_v1_response'),
             'application/x-datacite+xml': (
                 'zenodo.modules.records.serializers.datacite_v31_response'),
-            'application/x-datacite+xmlv41': (
+            'application/x-datacite-v41+xml': (
                 'zenodo.modules.records.serializers.datacite_v41_response'),
             'application/x-dc+xml': (
                 'zenodo.modules.records.serializers.dc_v1_response'),
