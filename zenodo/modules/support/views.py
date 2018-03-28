@@ -26,8 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint, current_app, flash, redirect, render_template, \
-    request, url_for
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_babelex import lazy_gettext as _
 from flask_security import current_user
 

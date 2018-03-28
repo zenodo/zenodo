@@ -30,7 +30,6 @@ import itertools
 
 from celery import shared_task
 from flask import current_app, render_template, url_for
-from invenio_communities.models import Community
 
 
 @shared_task(ignore_results=True)

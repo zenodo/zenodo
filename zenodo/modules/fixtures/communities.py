@@ -31,7 +31,7 @@ from invenio_communities.models import Community
 from invenio_communities.utils import save_and_validate_logo
 from invenio_db import db
 
-from .utils import file_stream, read_json
+from .utils import file_stream
 
 
 def loadcommunity(comm_data):
