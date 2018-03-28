@@ -85,8 +85,8 @@ before_install:
 
 install:
   - "cat .travis-${REQUIREMENTS}-requirements.txt"
-  - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt --pre"
-  - "travis_retry pip install -e .[all,postgresql,elasticsearch2] --pre"
+  - "travis_retry pip install -r .travis-${REQUIREMENTS}-requirements.txt"
+  - "travis_retry pip install -e .[all,postgresql,elasticsearch2]"
   - pip freeze
   - "./scripts/setup-assets.sh"
 
