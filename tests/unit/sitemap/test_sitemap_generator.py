@@ -29,7 +29,6 @@ from __future__ import absolute_import, print_function
 import datetime
 import re
 
-import mock
 from flask import current_app, render_template
 
 from zenodo.modules.sitemap.generators import _sitemapdtformat

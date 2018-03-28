@@ -26,9 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-import mock
 from flask import current_app, render_template, url_for
-from invenio_cache import current_cache
 
 from zenodo.modules.sitemap.tasks import update_sitemap_cache
 

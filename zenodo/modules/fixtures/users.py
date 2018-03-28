@@ -30,7 +30,6 @@ from flask import current_app
 from flask_security.utils import hash_password
 from invenio_access.models import ActionUsers
 from invenio_accounts.models import User
-from invenio_communities.models import Community
 from invenio_db import db
 
 

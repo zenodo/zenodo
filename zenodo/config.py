@@ -66,7 +66,7 @@ from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
-    record_create_permission_factory, record_update_permission_factory
+    record_create_permission_factory
 
 
 def _(x):

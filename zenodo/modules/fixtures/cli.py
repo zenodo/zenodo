@@ -37,7 +37,6 @@ from invenio_db import db
 from invenio_openaire.minters import funder_minter, grant_minter
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
-from sqlalchemy.orm.exc import NoResultFound
 
 from .communities import loadcommunity
 from .files import loaddemofiles, loadlocations

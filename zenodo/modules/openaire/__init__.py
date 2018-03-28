@@ -29,5 +29,5 @@ from __future__ import absolute_import, print_function
 from .proxies import current_openaire
 
 __all__ = (
-    'current_openaire'
+    'current_openaire',
 )
