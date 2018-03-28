@@ -23,9 +23,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Test Zenodo records tasks."""
+import uuid
 from copy import deepcopy
 from datetime import datetime
-import uuid
 
 from invenio_cache import current_cache
 from invenio_pidrelations.contrib.versioning import PIDVersioning
