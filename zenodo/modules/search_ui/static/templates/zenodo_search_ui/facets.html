@@ -6,7 +6,7 @@
   </span>
 </a>
 <div ng-init="tree=[];tree_more=[]" ng-repeat="(key, value) in vm.invenioSearchResults.aggregations track by $index">
-  <div ng-if="value.buckets.length > 0" class="panel panel-default">
+  <div ng-if="value.buckets.length > 0 || getValues(key)" class="panel panel-default">
     <div class="panel-heading">
       <h3 class="panel-title titlecase">{{ key|titlecase}}</h3>
     </div>
@@ -39,7 +39,14 @@
           </div>
         </li>
       </ul>
+      <!-- Show previously selected facets with no results at the bottom -->
+      <ul class="list-unstyled" ng-repeat="selectedValue in getValues(key)">
+        <li class="titlecase">
+          <div ng-if="(value.buckets|filter:{key:selectedValue}:true).length == 0">
+            <input type="checkbox" checked ng-click="handleClick(key, selectedValue)" /> {{ selectedValue|titlecase }} (0)
+          </div>
+        </li>
+      </ul>
     </div>
   </div>
 </div>
-
