@@ -59,7 +59,6 @@ def update_expired_embargos():
 @shared_task(ignore_result=True, rate_limit='1000/h')
 def update_datacite_metadata(pid_value, object_uuid, job_id):
     """Update DataCite metadata of a single PersistentIdentifier."""
-
     task_details = current_cache.get('update_datacite:task_details')
 
     if task_details is None or job_id != task_details['job_id']:
