@@ -143,7 +143,7 @@ def default_config(tmp_db_path):
     return dict(
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
-        CELERY_ALWAYS_EAGER=True,
+        CELERY_TASK_ALWAYS_EAGER=True,
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         COMMUNITIES_MAIL_ENABLED=False,
         MAIL_SUPPRESS_SEND=True,
