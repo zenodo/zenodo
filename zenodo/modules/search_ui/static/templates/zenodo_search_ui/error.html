@@ -1,0 +1,6 @@
+<div ng-show='vm.invenioSearchError.name'>
+  <div class="alert alert-danger">
+    <i class="fa fa-bolt"></i> <strong translate>Error:</strong> {{ vm.invenioSearchErrorResults.message }}
+    <small ng-if="vm.invenioSearchErrorResults.error_id">Error ID: {{vm.invenioSearchErrorResults.error_id}}</small>
+  </div>
+</div>

@@ -1030,6 +1030,8 @@ SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
 SEARCH_UI_JSTEMPLATE_RESULTS = "templates/zenodo_search_ui/results.html"
 #: Angular template for rendering search facets.
 SEARCH_UI_JSTEMPLATE_FACETS = "templates/zenodo_search_ui/facets.html"
+#: Angular template for rendering search errors.
+SEARCH_UI_JSTEMPLATE_ERROR = "templates/zenodo_search_ui/error.html"
 #: Default Elasticsearch document type.
 SEARCH_DOC_TYPE_DEFAULT = None
 #: Do not map any keywords.
