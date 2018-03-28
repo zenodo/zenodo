@@ -979,6 +979,8 @@ OAISERVER_METADATA_FORMATS = {
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_dc',
     }
 }
+# Relative URL to XSL Stylesheet, placed under `modules/records/static`.
+OAISERVER_OAI2_XSL_PATH = '/static/xsl/oai2.xsl'
 
 # REST
 # ====
