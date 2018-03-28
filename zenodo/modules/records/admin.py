@@ -24,8 +24,8 @@
 
 """Admin view for updating datacite metadata."""
 
-from datetime import datetime
 import uuid
+from datetime import datetime
 
 from flask import current_app, flash, redirect, request, url_for
 from flask_admin import BaseView, expose
