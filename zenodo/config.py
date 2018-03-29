@@ -87,9 +87,10 @@ MAIL_SUPPRESS_SEND = True
 # ===========
 #: Disable Content Security Policy headers.
 APP_DEFAULT_SECURE_HEADERS['content_security_policy'] = {}
-# Allow us to run the development server without enabling debug.
-APP_DEFAULT_SECURE_HEADERS['force_https'] = False
-APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
+# NOTE: These should be set explicitly inside ``invenio.cfg`` for development,
+# if one wants to run wihtout ``FLASK_DEBUG`` enabled.
+# APP_DEFAULT_SECURE_HEADERS['force_https'] = False
+# APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
 # DataCite
 # ========

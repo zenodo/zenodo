@@ -39,17 +39,23 @@ from invenio_search import current_search, current_search_client
 from selenium import webdriver
 from sqlalchemy_utils.functions import create_database, database_exists
 
+from zenodo.config import APP_DEFAULT_SECURE_HEADERS
 from zenodo.factory import create_app
 
 
 @pytest.yield_fixture(scope='session', autouse=True)
 def base_app(request):
     """Flask application fixture."""
+    # Disable HTTPS
+    APP_DEFAULT_SECURE_HEADERS['force_https'] = False
+    APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
+
     app = create_app(
         # CELERY_ALWAYS_EAGER=True,
         # CELERY_CACHE_BACKEND="memory",
         # CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         # CELERY_RESULT_BACKEND="cache",
+        APP_DEFAULT_SECURE_HEADERS=APP_DEFAULT_SECURE_HEADERS,
         DEBUG_TB_ENABLED=False,
         SECRET_KEY="CHANGE_ME",
         SECURITY_PASSWORD_SALT="CHANGE_ME",

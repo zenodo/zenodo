@@ -68,6 +68,7 @@ from invenio_sipstore import current_sipstore
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
 
+from zenodo.config import APP_DEFAULT_SECURE_HEADERS
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
@@ -140,9 +141,14 @@ def default_config(tmp_db_path):
 
     }
 
+    # Disable HTTPS
+    APP_DEFAULT_SECURE_HEADERS['force_https'] = False
+    APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
+
     return dict(
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
+        APP_DEFAULT_SECURE_HEADERS=APP_DEFAULT_SECURE_HEADERS,
         CELERY_TASK_ALWAYS_EAGER=True,
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         COMMUNITIES_MAIL_ENABLED=False,
