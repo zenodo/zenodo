@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2017, 2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -27,10 +27,16 @@
 
 from __future__ import absolute_import, print_function
 
+from os.path import dirname, join
+
 from flask import current_app
+from invenio_db import db
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
 from invenio_search.utils import schema_to_index
+from lxml import etree
+from sqlalchemy import or_
 from werkzeug.utils import import_string
 
 from zenodo.modules.openaire import current_openaire
@@ -98,3 +104,39 @@ def is_valid_openaire_type(resource_type, communities):
     is_defined = any(t['id'] == oa_subtype for t in subtypes)
     comms_match = len(set(communities) & set(defined_comms))
     return is_defined and comms_match
+
+
+def find_registered_doi_pids(from_date, until_date, prefixes):
+    """Find all local DOI's which are in the REGISTERED state."""
+    query = db.session.query(PersistentIdentifier).filter(
+        PersistentIdentifier.pid_type == 'doi',
+        PersistentIdentifier.status == PIDStatus.REGISTERED,
+        PersistentIdentifier.updated.between(from_date, until_date)
+    )
+
+    query.filter(or_(PersistentIdentifier.pid_value.like(prefix + '%') for prefix in prefixes))
+
+    query.order_by(PersistentIdentifier.updated)
+
+    return query
+
+
+def xsd41():
+    """Load DataCite v4.1 full example as an etree."""
+    from zenodo.modules.records.httpretty_mock import httpretty
+
+    # Ensure the schema validator doesn't make any http requests.
+    with open(join(dirname(__file__), 'data', 'xml.xsd')) as fp:
+        xmlxsd = fp.read()
+
+    httpretty.enable()
+    httpretty.register_uri(
+        httpretty.GET,
+        'https://www.w3.org/2009/01/xml.xsd',
+        body=xmlxsd)
+
+    yield etree.XMLSchema(
+        file='file://' + join(dirname(__file__), 'data', 'metadata41.xsd')
+    )
+
+    httpretty.disable()

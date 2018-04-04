@@ -29,7 +29,9 @@ from __future__ import absolute_import, print_function
 import json
 from datetime import datetime, timedelta
 
-from zenodo.modules.records.serializers import datacite_v31
+import pytest
+
+from zenodo.modules.records.serializers import datacite_v31, datacite_v41
 
 
 def today():
@@ -253,9 +255,13 @@ def test_full(db, record_with_bucket, recid_pid):
     assert obj == expected
 
 
-def test_identifier(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_identifier(db, minimal_record_model, recid_pid, serializer):
     """Test identifier."""
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['identifier'] == {
         'identifier': '10.5072/zenodo.123',
         'identifierType': 'DOI',
@@ -281,27 +287,74 @@ def test_creators(db, minimal_record_model, recid_pid):
     ]
 
 
-def test_embargo_date(db, minimal_record_model, recid_pid):
+def test_creators_v4(db, minimal_record_model, recid_pid):
+    """Test creators."""
+    minimal_record_model.update({
+        'creators': [
+            {'name': 'A, B', 'affiliation': 'AA', 'gnd': '1234'},
+            {
+                'name': 'B',
+                'affiliation': 'BA',
+                'orcid': '0000-0000-0000-0000',
+                'gnd': '4321'
+            },
+        ]})
+    obj = datacite_v41.transform_record(recid_pid, minimal_record_model)
+    assert obj['creators'] == [{
+        'affiliations': ['AA'],
+        'creatorName': 'A, B',
+        'givenName': 'B',
+        'familyName': 'A',
+        'nameIdentifiers': [{
+            'nameIdentifier': '1234',
+            'nameIdentifierScheme': 'GND'
+        }]},
+        {
+            'affiliations': ['BA'],
+            'creatorName': 'B',
+            'givenName': '',
+            'familyName': '',
+            'nameIdentifiers': [{
+                'nameIdentifier': '0000-0000-0000-0000',
+                'nameIdentifierScheme': 'ORCID',
+                'schemeURI': 'http://orcid.org/'
+            }, {
+                'nameIdentifier': '4321',
+                'nameIdentifierScheme': 'GND'
+            }]
+        }
+    ]
+
+
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_embargo_date(db, minimal_record_model, recid_pid, serializer):
     """Test embargo date."""
     dt = (today() + timedelta(days=1)).isoformat()
     minimal_record_model.update({
         'embargo_date': dt,
         'access_right': 'embargoed',
     })
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['dates'] == [
         {'dateType': 'Available', 'date': dt},
         {'dateType': 'Accepted', 'date': today().isoformat()},
     ]
 
 
-def test_subjects(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_subjects(db, minimal_record_model, recid_pid, serializer):
     """Test subjects date."""
     minimal_record_model.update({
         'keywords': ['kw1'],
         'subjects': [{'term': 'test', 'identifier': 'id', 'scheme': 'loc'}],
     })
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['subjects'] == [
         {'subject': 'kw1'},
         {'subject': 'id', 'subjectScheme': 'loc'},
@@ -357,30 +410,86 @@ def test_contributors(db, minimal_record_model, recid_pid):
     ]
 
 
-def test_language(db, minimal_record_model, recid_pid):
+def test_contributors_v4(db, minimal_record_model, recid_pid):
+    """Test creators."""
+    minimal_record_model.update({
+        'contributors': [{
+            'name': 'A, B',
+            'affiliation': 'AA',
+            'gnd': '1234',
+            'orcid': '0000-0000-0000-0000',
+            'type': 'Researcher'
+        }, ],
+        'thesis': {
+            'supervisors': [{
+                'name': 'B',
+                'affiliation': 'BA',
+                'type': 'Supervisor'
+            }]
+        }
+    })
+    obj = datacite_v41.transform_record(recid_pid, minimal_record_model)
+    assert obj['contributors'] == [
+        {
+            'affiliations': ['AA'],
+            'contributorName': 'A, B',
+            'givenName': 'B',
+            'familyName': 'A',
+            'contributorType': 'Researcher',
+            'nameIdentifiers': [
+                {
+                    'nameIdentifier': '0000-0000-0000-0000',
+                    'nameIdentifierScheme': 'ORCID',
+                    'schemeURI': 'http://orcid.org/'},
+                {
+                    'nameIdentifier': '1234',
+                    'nameIdentifierScheme': 'GND'},
+
+            ]
+        },
+        {
+            'affiliations': ['BA'],
+            'contributorName': 'B',
+            'givenName': '',
+            'familyName': '',
+            'contributorType': 'Supervisor',
+            'nameIdentifiers': [],
+        },
+    ]
+
+
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_language(db, minimal_record_model, recid_pid, serializer):
     """Test language."""
     assert 'language' not in minimal_record_model
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert 'language' not in obj
 
     minimal_record_model['language'] = 'eng'
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['language'] == 'en'  # DataCite supports ISO 639-1 (2-letter)
 
     minimal_record_model['language'] = 'twa'  # No ISO 639-1 code
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert 'language' not in obj
 
     # This should never happen, but in case of dirty data
     minimal_record_model['language'] = 'Esperanto'
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert 'language' not in obj
 
 
-def test_resource_type(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_resource_type(db, minimal_record_model, recid_pid, serializer):
     """Test language."""
     minimal_record_model['resource_type'] = {'type': 'poster'}
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['resourceType'] == {
         'resourceTypeGeneral': 'Text',
         'resourceType': 'Poster',
@@ -389,7 +498,7 @@ def test_resource_type(db, minimal_record_model, recid_pid):
     # If the record is not in 'c1', OpenAIRE subtype should not be serialized
     minimal_record_model['resource_type'] = {'type': 'software',
                                              'openaire_subtype': 'foo:t1'}
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['resourceType'] == {
         'resourceTypeGeneral': 'Software',
         'resourceType': None
@@ -397,14 +506,18 @@ def test_resource_type(db, minimal_record_model, recid_pid):
 
     # Add 'c1' to communities. 'foo:t1' should be serialized as a type
     minimal_record_model['communities'] = ['c1', ]
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['resourceType'] == {
         'resourceTypeGeneral': 'Software',
         'resourceType': 'openaire:foo:t1',
     }
 
 
-def test_alt_ids(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_alt_ids(db, minimal_record_model, recid_pid, serializer):
     """Test language."""
     minimal_record_model.update({
         'alternate_identifiers': [{
@@ -412,7 +525,7 @@ def test_alt_ids(db, minimal_record_model, recid_pid):
             'scheme': 'doi'
         }],
     })
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['alternateIdentifiers'] == [{
         'alternateIdentifier': '10.1234/foo.bar',
         'alternateIdentifierType': 'doi',
@@ -422,7 +535,11 @@ def test_alt_ids(db, minimal_record_model, recid_pid):
     }]
 
 
-def test_related_identifiers(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
     """Test language."""
     tests = [
         ('handle', 'Handle'),
@@ -443,7 +560,7 @@ def test_related_identifiers(db, minimal_record_model, recid_pid):
                 'relation': 'isCitedBy',
             }],
         })
-        obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+        obj = serializer.transform_record(recid_pid, minimal_record_model)
         assert obj['relatedIdentifiers'] == [{
             'relatedIdentifier': '1234',
             'relatedIdentifierType': dc_t,
@@ -451,7 +568,11 @@ def test_related_identifiers(db, minimal_record_model, recid_pid):
         }]
 
 
-def test_rights(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_rights(db, minimal_record_model, recid_pid, serializer):
     """Test language."""
     minimal_record_model.update({
         'license': {
@@ -461,7 +582,7 @@ def test_rights(db, minimal_record_model, recid_pid):
             'url': 'http://www.opendefinition.org/licenses/cc-by-sa'
         }
     })
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['rightsList'] == [{
         'rights': 'Creative Commons Attribution Share-Alike',
         'rightsURI': 'http://www.opendefinition.org/licenses/cc-by-sa',
@@ -471,14 +592,18 @@ def test_rights(db, minimal_record_model, recid_pid):
     }]
 
 
-def test_descriptions(db, minimal_record_model, recid_pid):
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_descriptions(db, minimal_record_model, recid_pid, serializer):
     """Test language."""
     minimal_record_model.update({
         'description': 'test',
         'notes': 'again',
         'references': [{'raw_reference': 'A'}],
     })
-    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
     assert obj['descriptions'] == [{
         'description': 'test',
         'descriptionType': 'Abstract',
@@ -489,3 +614,48 @@ def test_descriptions(db, minimal_record_model, recid_pid):
         'description': json.dumps({'references': ['A']}),
         'descriptionType': 'Other',
     }]
+
+
+def test_funding_ref_v4(db, minimal_record_model, recid_pid):
+    """Test creators."""
+    minimal_record_model.update({
+        'grants': [
+            {'title': 'Grant Title',
+             'code': '1234',
+             'identifiers': {'eurepo': 'eurepo 1'},
+             'internal_id': '10.1234/foo::1234',
+             'funder': {'name': 'EC', 'doi': '10.1234/foo'}},
+            {'title': 'Title Grant',
+             'code': '4321',
+             'identifiers': {'eurepo': 'eurepo 2'},
+             'internal_id': '10.1234/foo::4321',
+             'funder': {'name': 'EC', 'doi': '10.1234/foo'}},
+        ]})
+    obj = datacite_v41.transform_record(recid_pid, minimal_record_model)
+    assert obj['fundingReferences'] == [
+        {
+            'funderName': 'EC',
+            'funderIdentifier': {
+                'funderIdentifier': '10.1234/foo',
+                'funderIdentifierType': 'Crossref Funder ID',
+            },
+            'awardNumber': {
+                'awardNumber': '1234',
+                'awardURI': 'eurepo 1'
+            },
+            'awardTitle': 'Grant Title'
+        },
+        {
+            'funderName': 'EC',
+            'funderIdentifier': {
+                'funderIdentifier': '10.1234/foo',
+                'funderIdentifierType': 'Crossref Funder ID',
+            },
+            'awardNumber': {
+                'awardNumber': '4321',
+                'awardURI': 'eurepo 2'
+            },
+            'awardTitle': 'Title Grant'
+        }
+
+    ]

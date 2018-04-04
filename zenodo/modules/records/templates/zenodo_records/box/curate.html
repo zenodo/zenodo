@@ -24,39 +24,58 @@
   <dl id="recordCommunityCuration">
     {%- if pending_comms %}
     <h5><i class="fa fa-legal"></i> <strong>Pending approvals</strong></h5>
-      {%- for comm in pending_comms %}
+      {%- for comm in pending_comms|sort(attribute='title') %}
         <dd>
-        <span class="pull-right" id="span-comm-{{ comm.id }}">
-        <button class="btn-accept btn btn-xs btn-info"
-                type="button"
-                action="accept"
-                commId="{{ comm.id }}"
-                endpoint="{{url_for('zenodo_communities.curate', community_id=comm.id)}}"
-                recid="{{record.recid}}"><i class="fa fa-check"></i> Accept</button>
-        <button class="btn-reject btn btn-xs btn-info"
-                type="button"
-                action="reject"
-                commId="{{ comm.id }}"
-                endpoint="{{url_for('zenodo_communities.curate', community_id=comm.id)}}"
-                recid="{{record.recid}}"><i class="fa fa-times"></i> Reject</button>
-        </span>
-        {{ comm.title }}
+          <div class="row">
+            <div class="col-sm-6">
+              {{ comm.title }}
+            </div>
+            <div class="col-sm-6">
+              <span id="span-comm-{{ comm.id }}">
+                <div class="hidden text-success accept-success-msg"><i class="fa fa-check"></i> Accepted</div>
+                <div class="hidden text-success reject-success-msg"><i class="fa fa-check"></i> Rejected</div>
+                <div class="hidden text-danger error-msg">An error occurred</div>
+
+                <button class="btn-accept btn btn-xs btn-info"
+                        type="button"
+                        action="accept"
+                        commId="{{ comm.id }}"
+                        endpoint="{{url_for('zenodo_communities.curate', community_id=comm.id)}}"
+                        recid="{{record.recid}}"><i class="fa fa-check"></i> Accept</button>
+                <button class="btn-reject btn btn-xs btn-info"
+                        type="button"
+                        action="reject"
+                        commId="{{ comm.id }}"
+                        endpoint="{{url_for('zenodo_communities.curate', community_id=comm.id)}}"
+                        recid="{{record.recid}}"><i class="fa fa-times"></i> Reject</button>
+              </span>
+            </div>
+          </div>
         </dd>
       {%- endfor %}
     {%- endif %}
     {%- if accepted_comms %}
       <h5><i class="fa fa-group"></i> <strong>Communities</strong></h5>
-      {%- for comm in accepted_comms %}
+      {%- for comm in accepted_comms|sort(attribute='title') %}
         <dd>
-        <span class="pull-right" id="span-comm-{{ comm.id }}">
-        <button class="btn-remove btn btn-xs btn-info"
-                type="button"
-                action="remove"
-                commId="{{ comm.id }}"
-                endpoint="{{ url_for('zenodo_communities.curate', community_id=comm.id) }}"
-                recid="{{ record.recid }}"><i class="fa fa-times"></i> Remove</button>
-        </span>
-        {{ comm.title }}
+          <div class="row">
+            <div class="col-sm-7">
+              {{ comm.title }}
+            </div>
+            <div class="col-sm-5">
+              <span id="span-comm-{{ comm.id }}">
+                <div class="hidden text-success remove-success-msg"><i class="fa fa-check"></i>Removed</div>
+                <div class="hidden text-danger error-msg">An error occurred</div>
+
+                <button class="btn-remove btn btn-xs btn-info"
+                        type="button"
+                        action="remove"
+                        commId="{{ comm.id }}"
+                        endpoint="{{ url_for('zenodo_communities.curate', community_id=comm.id) }}"
+                        recid="{{ record.recid }}"><i class="fa fa-times"></i> Remove</button>
+              </span>
+            </div>
+          </div>
         </dd>
       {%- endfor %}
     {%- endif %}

@@ -360,7 +360,7 @@ def community_curation(record, user):
     # Additionally filter out community IDs that did not resolve (None)
     accepted = [c for c in accepted if c]
 
-    # Check for global curation permission (all communites on this record).
+    # Check for global curation permission (all communities on this record).
     global_perm = None
     if user.is_anonymous:
         global_perm = False

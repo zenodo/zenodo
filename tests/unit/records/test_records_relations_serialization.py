@@ -166,7 +166,7 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
         {
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.1',
-            'relation': 'isPartOf'
+            'relation': 'isVersionOf'
         }
         # TODO: serialization of new version realtions is disabled
         # {
@@ -182,7 +182,7 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
         {
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.1',
-            'relation': 'isPartOf'
+            'relation': 'isVersionOf'
         }
         # TODO: serialization of new version realtions is disabled
         # {
@@ -197,12 +197,12 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
 
     expected_parent = [
         {
-            'relation': 'hasPart',
+            'relation': 'hasVersion',
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.2'
         },
         {
-            'relation': 'hasPart',
+            'relation': 'hasVersion',
             'scheme': 'doi',
             'identifier': '10.5072/zenodo.3'
         }

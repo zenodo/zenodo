@@ -37,7 +37,7 @@ from invenio_records_files.api import Record
 from invenio_search.api import RecordsSearch
 
 from zenodo.modules.records.minters import is_local_doi
-from zenodo.modules.records.serializers import datacite_v31
+from zenodo.modules.records.serializers import datacite_v41
 
 
 @shared_task(ignore_result=True, max_retries=6, default_retry_delay=10 * 60,
@@ -57,7 +57,7 @@ def datacite_register(pid_value, record_uuid):
             return
 
         dcp = DataCiteProvider.get(record['doi'])
-        doc = datacite_v31.serialize(dcp.pid, record)
+        doc = datacite_v41.serialize(dcp.pid, record)
 
         url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
             recid=pid_value)
@@ -77,7 +77,7 @@ def datacite_register(pid_value, record_uuid):
             url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
                 recid=conceptrecid)
 
-            doc = datacite_v31.serialize(concept_dcp.pid, record)
+            doc = datacite_v41.serialize(concept_dcp.pid, record)
             if concept_dcp.pid.status == PIDStatus.REGISTERED:
                 concept_dcp.update(url, doc)
             else:

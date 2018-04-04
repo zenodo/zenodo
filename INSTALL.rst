@@ -18,7 +18,7 @@ If you can't use docker you can run Zenodo and all of the required services
 directly in your system. Take a look at
 `docker-compose.yml <https://github.com/zenodo/zenodo/blob/master/docker-compose.yml/>`_
 file to find out what is required and how the configuration looks like.
-For development you will need to set-up an configure
+For development you will need to set-up and configure
 four services: PostgreSQL (``db``), Elasticsearch (``es``),
 Redis (``cache``) and RabbitMQ (``mq``).
 

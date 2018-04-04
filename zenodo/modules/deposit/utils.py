@@ -117,6 +117,7 @@ def delete_record(record_uuid, reason, user):
     :param user: ID or email of the Zenodo user (admin)
         responsible for the removal.
     """
+    from invenio_github.models import ReleaseStatus
     if isinstance(user, text_type):
         user_id = User.query.filter_by(email=user).one().id
     elif isinstance(user, int):
@@ -190,6 +191,10 @@ def delete_record(record_uuid, reason, user):
         'removed_by': user_id,
     })
     record.commit()
+
+    # Mark the relevant GitHub Release as deleted
+    for ghr in record.model.github_releases:
+        ghr.status = ReleaseStatus.DELETED
 
     db.session.commit()
 

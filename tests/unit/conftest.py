@@ -68,6 +68,7 @@ from invenio_sipstore import current_sipstore
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
 
+from zenodo.config import APP_DEFAULT_SECURE_HEADERS
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
@@ -140,10 +141,15 @@ def default_config(tmp_db_path):
 
     }
 
+    # Disable HTTPS
+    APP_DEFAULT_SECURE_HEADERS['force_https'] = False
+    APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
+
     return dict(
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
-        CELERY_ALWAYS_EAGER=True,
+        APP_DEFAULT_SECURE_HEADERS=APP_DEFAULT_SECURE_HEADERS,
+        CELERY_TASK_ALWAYS_EAGER=True,
         CELERY_EAGER_PROPAGATES_EXCEPTIONS=True,
         COMMUNITIES_MAIL_ENABLED=False,
         MAIL_SUPPRESS_SEND=True,
@@ -155,6 +161,7 @@ def default_config(tmp_db_path):
         ZENODO_COMMUNITIES_ADD_IF_GRANTS=['grants_comm', ],
         ZENODO_COMMUNITIES_REQUEST_IF_GRANTS=['ecfunded', ],
         ZENODO_OPENAIRE_COMMUNITIES=ZENODO_OPENAIRE_COMMUNITIES,
+        ZENODO_SITEMAP_MAX_URL_COUNT=20,
         SIPSTORE_ARCHIVER_WRITING_ENABLED=False,
         OAUTHLIB_INSECURE_TRANSPORT=True,
         SQLALCHEMY_DATABASE_URI=os.environ.get(

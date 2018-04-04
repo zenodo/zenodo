@@ -1,0 +1,86 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2018 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{% extends 'admin/master.html' %}
+{%- from "zenodo_support/macros.html" import render_form_field, render_form_input %}
+
+{% block body %}
+{% if is_task_running == False %}
+<form method="POST">
+  {{ form.csrf_token }}
+    <div class="form-group row">
+      {{ render_form_field(form.from_date) }}
+    </div>
+    <div class="form-group row">
+      {{ render_form_field(form.until_date) }}
+    </div>
+    <div class="form-group row">
+      <div class="col-sm-offset-2 col-sm-10">
+            <button type="submit" class="btn btn-primary" name="action" value="SubmitDates">Submit</button>
+      </div>
+    </div>
+    {% if details and details.total_pids != None %}
+    <div class="form-group">
+      <div class="row">
+        <div class="col-sm-12">
+          <p>
+            You are about to update {{details.total_pids}} DOIs.
+            This will take {{time}} hours.
+          </p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-sm-12">
+          <button type="submit" class="btn btn-primary" name="action" value="Confirm">Confirm</button>
+          <button type="submit" class="btn btn-danger" name="action" value="Cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+</form>
+{% endif %}
+
+{% if is_task_running %}
+<form method="POST">
+  {{ cancel_or_new_task_form.csrf_token }}
+  <div class="row">
+      <div class="col-sm-6">
+        <h4>Task details</h4>
+        <p>The job started on: {{details.start_date}}</p>
+        {% if details.finish_date %}
+          <p>The job finished on: {{details.finish_date}}</p>
+        {% endif %}
+        <p>From: {{details.from_date}}</p>
+        <p>Until: {{details.until_date}}</p>
+        <p>Progress: {{details.total_pids-details.left_pids}}/{{details.total_pids}} updated DOIs.</p>
+        <p>Last update: {{details.last_update}}</p>
+        <button type="submit"
+                class="btn {{'btn-primary' if details.left_pids == 0 }} {{'btn-danger' if details.left_pids > 0 }}">
+          {{'New Task' if details.left_pids == 0 }} {{'Cancel Task' if details.left_pids > 0 }}
+        </button>
+      </div>
+    </div>
+</form>
+{% endif %}
+{% endblock %}

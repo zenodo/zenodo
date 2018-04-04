@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015, 2016, 2017, 2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -66,12 +66,18 @@ from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
-    record_create_permission_factory, record_update_permission_factory
+    record_create_permission_factory
 
 
 def _(x):
     """Identity function for string extraction."""
     return x
+
+
+#: System sender email address
+ZENODO_SYSTEM_SENDER_EMAIL = 'system@zenodo.org'
+#: Email address of admins
+ZENODO_ADMIN_EMAIL = 'admin@zenodo.org'
 
 #: Email address for support.
 SUPPORT_EMAIL = "info@zenodo.org"
@@ -81,9 +87,10 @@ MAIL_SUPPRESS_SEND = True
 # ===========
 #: Disable Content Security Policy headers.
 APP_DEFAULT_SECURE_HEADERS['content_security_policy'] = {}
-# Allow us to run the development server without enabling debug.
-APP_DEFAULT_SECURE_HEADERS['force_https'] = False
-APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
+# NOTE: These should be set explicitly inside ``invenio.cfg`` for development,
+# if one wants to run wihtout ``FLASK_DEBUG`` enabled.
+# APP_DEFAULT_SECURE_HEADERS['force_https'] = False
+# APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
 # DataCite
 # ========
@@ -100,6 +107,8 @@ PIDSTORE_DATACITE_DOI_PREFIX = "10.5072"
 PIDSTORE_DATACITE_USERNAME = "CERN.ZENODO"
 #: DataCite MDS password.
 PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
+#: DataCite updating rate.
+DATACITE_UPDATING_RATE_PER_HOUR = 1000
 
 #: Zenodo PID relations
 PIDRELATIONS_RELATION_TYPES = [
@@ -180,6 +189,7 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': timedelta(hours=1),
         'kwargs': {
             'batch_interval': {'hours': 1},
+            'frequency': {'days': 14},
             'max_count': 0,
             # Query taking into account only files with URI prefixes defined by
             # the FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES config variable
@@ -203,6 +213,21 @@ CELERY_BEAT_SCHEDULE = {
             # Actual checksum calculation, instead of relying on a EOS query
             'checksum_kwargs': {'use_default_impl': True},
         },
+    },
+    'sitemap-updater': {
+        'task': 'zenodo.modules.sitemap.tasks.update_sitemap_cache',
+        'schedule': timedelta(hours=24)
+    },
+    'file-integrity-report': {
+        'task': 'zenodo.modules.utils.tasks.file_integrity_report',
+        'schedule': crontab(minute=0, hour=7),  # Every day at 07:00 UTC
+    },
+    'datacite-metadata-updater': {
+        'task': 'zenodo.modules.records.schedule_update_datacite_metadata',
+        'schedule': timedelta(hours=1),
+        'kwargs': {
+            'max_count': DATACITE_UPDATING_RATE_PER_HOUR,
+        }
     },
 }
 
@@ -728,6 +753,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.bibtex_v1_response'),
             'application/x-datacite+xml': (
                 'zenodo.modules.records.serializers.datacite_v31_response'),
+            'application/x-datacite-v41+xml': (
+                'zenodo.modules.records.serializers.datacite_v41_response'),
             'application/x-dc+xml': (
                 'zenodo.modules.records.serializers.dc_v1_response'),
             'application/vnd.citationstyles.csl+json': (
@@ -953,6 +980,8 @@ OAISERVER_METADATA_FORMATS = {
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_dc',
     }
 }
+# Relative URL to XSL Stylesheet, placed under `modules/records/static`.
+OAISERVER_OAI2_XSL_PATH = '/static/xsl/oai2.xsl'
 
 # REST
 # ====
@@ -1004,6 +1033,8 @@ SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
 SEARCH_UI_JSTEMPLATE_RESULTS = "templates/zenodo_search_ui/results.html"
 #: Angular template for rendering search facets.
 SEARCH_UI_JSTEMPLATE_FACETS = "templates/zenodo_search_ui/facets.html"
+#: Angular template for rendering search errors.
+SEARCH_UI_JSTEMPLATE_ERROR = "templates/zenodo_search_ui/error.html"
 #: Default Elasticsearch document type.
 SEARCH_DOC_TYPE_DEFAULT = None
 #: Do not map any keywords.
