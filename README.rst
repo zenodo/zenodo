@@ -94,5 +94,5 @@ by the GPLv2 license. Thus, if you instantiate Zenodo on your own servers
 you must change the branding to your own.
 
 Please consider creating your own overlay to
-`Invenio <http://inveniosoftware.org>`_ and look to Zenodo for inspiration.
+`Invenio <http://inveniosoftware.org>`_ and look at Zenodo for inspiration.
 We will be happy to help you get started, just contact us on info@zenodo.org.
