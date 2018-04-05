@@ -127,6 +127,7 @@ install_requires = [
     'invenio-formatter>=1.0.0',
     'invenio-github>=1.0.0a15',
     'invenio-i18n>=1.0.0',
+    'invenio-iiif>=1.0.0a1',
     'invenio-indexer>=1.0.0',
     'invenio-jsonschemas>=1.0.0',
     'invenio-logging>=1.0.0',
