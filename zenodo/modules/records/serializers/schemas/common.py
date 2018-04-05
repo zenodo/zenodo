@@ -452,6 +452,17 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             pass
         return links
 
+    def is_image(self, file_extension):
+        """."""
+        return file_extension == 'jpg' or file_extension == 'png'\
+               or file_extension == 'gif' or file_extension == 'tif'
+
+    def thumbnail_url(self, uuid, thumbnail_size):
+        return "{base}/api/iiif/v2/{uuid}/full/{size},/0/default.jpg".format(
+            base=current_app.config.get('THEME_SITEURL'),
+            uuid=uuid,
+            size=thumbnail_size)
+
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
         links = {}
@@ -472,6 +483,18 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                     base=current_app.config.get('THEME_SITEURL'),
                     value=quote(conceptdoi))
             links['conceptdoi'] = idutils.to_url(conceptdoi, 'doi')
+
+        files = m.get('_files', [])
+        for file in files:
+            if self.is_image(file.get('type')):
+                uuid = "{bucket}:{version}:{key}".format(
+                    bucket=file.get('bucket'),
+                    version=file.get('version_id'),
+                    key=file.get('key'))
+                links['thumb250'] = self.thumbnail_url(uuid, 250)
+                links['thumb500'] = self.thumbnail_url(uuid, 500)
+                break
+
         return links
 
     def _dump_record_links(self, obj):
