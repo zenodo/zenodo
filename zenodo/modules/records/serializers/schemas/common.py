@@ -34,6 +34,7 @@ import jsonref
 import pycountry
 from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
+from flask_iiif.utils import iiif_image_url
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
@@ -458,10 +459,10 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                or file_extension == 'gif' or file_extension == 'tif'
 
     def thumbnail_url(self, uuid, thumbnail_size):
-        return "{base}/api/iiif/v2/{uuid}/full/{size},/0/default.jpg".format(
-            base=current_app.config.get('THEME_SITEURL'),
-            uuid=uuid,
-            size=thumbnail_size)
+        """Create the thumbnail url for an image."""
+        return current_app.config.get('THEME_SITEURL') + \
+                    iiif_image_url(uuid=uuid,
+                                   size="{0},".format(thumbnail_size))
 
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
