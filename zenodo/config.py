@@ -981,7 +981,7 @@ OAISERVER_METADATA_FORMATS = {
     }
 }
 # Relative URL to XSL Stylesheet, placed under `modules/records/static`.
-OAISERVER_OAI2_XSL_PATH = '/static/xsl/oai2.xsl'
+OAISERVER_XSL_URL = '/static/xsl/oai2.xsl'
 
 # REST
 # ====
