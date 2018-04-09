@@ -78,6 +78,7 @@ Flask-CeleryExt==0.3.0
 Flask-Collect==1.2.2
 Flask-Cors==3.0.3
 Flask-DebugToolbar==0.10.1
+Flask-IIIF==0.3.2
 Flask-KVSession==0.6.2
 Flask-Limiter==1.0.1
 Flask-Login==0.4.1
@@ -119,7 +120,7 @@ invenio-files-rest==1.0.0a22
 invenio-formatter==1.0.0
 invenio-github==1.0.0a15
 invenio-i18n==1.0.0
-invenio-iiif==1.0.0a1
+invenio-iiif==1.0.0a2
 invenio-indexer==1.0.0
 invenio-jsonschemas==1.0.0
 invenio-logging==1.0.0

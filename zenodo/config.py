@@ -920,6 +920,23 @@ PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
 PREVIEWER_CSV_VALIDATION_BYTES = 2 * 1024
 #: Max file size to preview for images
 PREVIEWER_MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
+#: List of previewers (adds IIIF previewer).
+PREVIEWER_PREFERENCE = [
+    'csv_dthreejs',
+    'iiif_image',
+    'simple_image',
+    'json_prismjs',
+    'xml_prismjs',
+    'mistune',
+    'pdfjs',
+    'ipynb',
+    'zip',
+]
+
+# IIIF
+# ====
+#: Improve quality of image resampling using better algorithm
+IIIF_RESIZE_RESAMPLE = 'PIL.Image:BICUBIC'
 
 # OAI-PMH
 # =======

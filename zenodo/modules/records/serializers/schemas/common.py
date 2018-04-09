@@ -34,7 +34,8 @@ import jsonref
 import pycountry
 from flask import current_app, has_request_context, request, url_for
 from flask_babelex import lazy_gettext as _
-from flask_iiif.utils import iiif_image_url
+from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
+from invenio_iiif.utils import iiif_image_key, ui_iiif_image_url
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
@@ -453,16 +454,28 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             pass
         return links
 
-    def is_image(self, file_extension):
-        """."""
-        return file_extension == 'jpg' or file_extension == 'png'\
-               or file_extension == 'gif' or file_extension == 'tif'
-
-    def thumbnail_url(self, uuid, thumbnail_size):
-        """Create the thumbnail url for an image."""
-        return current_app.config.get('THEME_SITEURL') + \
-                    iiif_image_url(uuid=uuid,
-                                   size="{0},".format(thumbnail_size))
+    def _thumbnail_url(self, fileobj , thumbnail_size):
+        """Create the thumbnail URL for an image."""
+        try:
+            return external_url_for(
+                'iiifimageapi',
+                version='v2',
+                uuid=iiif_image_key(fileobj),
+                region='full',
+                size='{},'.format(thumbnail_size),
+                rotation=0,
+                quality='default',
+                image_format='jpg',
+            )
+        except BuildError:
+            return '{}{}'.format(
+                current_app.config.get('THEME_SITEURL'),
+                ui_iiif_image_url(
+                    fileobj,
+                    size='{},'.format(thumbnail_size),
+                    image_format='jpg'
+                )
+            )
 
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
@@ -486,14 +499,10 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             links['conceptdoi'] = idutils.to_url(conceptdoi, 'doi')
 
         files = m.get('_files', [])
-        for file in files:
-            if self.is_image(file.get('type')):
-                uuid = "{bucket}:{version}:{key}".format(
-                    bucket=file.get('bucket'),
-                    version=file.get('version_id'),
-                    key=file.get('key'))
-                links['thumb250'] = self.thumbnail_url(uuid, 250)
-                links['thumb500'] = self.thumbnail_url(uuid, 500)
+        for f in files:
+            if f.get('type') in thumbnail_exts:
+                links['thumb250'] = self._thumbnail_url(f, 250)
+                # First previewable image is used for preview.
                 break
 
         return links
