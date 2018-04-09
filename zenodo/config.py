@@ -613,12 +613,15 @@ ZENODO_REMOVAL_REASONS = [
 ZENODO_RECORDS_EXPORTFORMATS = {
     'dcite': dict(
         title='DataCite XML',
-        serializer='zenodo.modules.records.serializers.datacite_v31',
+        serializer='zenodo.modules.records.serializers.datacite_v41',
     ),
     'dcite3': dict(
         title='DataCite XML',
         serializer='zenodo.modules.records.serializers.datacite_v31',
-        order=3,
+    ),
+    'dcite4': dict(
+        title='DataCite XML',
+        serializer='zenodo.modules.records.serializers.datacite_v41',
     ),
     'hm': dict(
         title='MARC21 XML',
@@ -627,22 +630,18 @@ ZENODO_RECORDS_EXPORTFORMATS = {
     'hx': dict(
         title='BibTeX',
         serializer='zenodo.modules.records.serializers.bibtex_v1',
-        order=2,
     ),
     'xd': dict(
         title='Dublin Core',
         serializer='zenodo.modules.records.serializers.dc_v1',
-        order=4,
     ),
     'xm': dict(
         title='MARC21 XML',
         serializer='zenodo.modules.records.serializers.marcxml_v1',
-        order=5,
     ),
     'json': dict(
         title='JSON',
         serializer='zenodo.modules.records.serializers.json_v1',
-        order=1,
     ),
     'schemaorg_jsonld': dict(
         title='JSON-LD (schema.org)',
@@ -651,12 +650,10 @@ ZENODO_RECORDS_EXPORTFORMATS = {
     'csl': dict(
         title='Citation Style Language JSON',
         serializer='zenodo.modules.records.serializers.csl_v1',
-        order=6,
     ),
     'cp': dict(
         title='Citation',
         serializer='zenodo.modules.records.serializers.citeproc_v1',
-        order=7,
     ),
     # Unsupported formats.
     'xe': None,
@@ -971,15 +968,20 @@ OAISERVER_METADATA_FORMATS = {
         'schema': 'http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_marc21_v1',
     },
+    'datacite4': {
+        'namespace': 'http://datacite.org/schema/kernel-4',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v41',
+    },
     'datacite3': {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v31',
     },
     'datacite': {
-        'namespace': 'http://datacite.org/schema/kernel-3',
-        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
-        'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v31',
+        'namespace': 'http://datacite.org/schema/kernel-4',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v41',
     },
     'oai_datacite': {
         'namespace': 'http://datacite.org/schema/kernel-3',

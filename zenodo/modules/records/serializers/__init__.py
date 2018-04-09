@@ -161,6 +161,8 @@ deposit_json_v1_search = search_responsify(
 #: OAI-PMH MARC21 record serializer.
 oaipmh_marc21_v1 = marcxml_v1.serialize_oaipmh
 #: OAI-PMH DataCite record serializer.
+oaipmh_datacite_v41 = datacite_v41.serialize_oaipmh
+#: OAI-PMH DataCite record serializer.
 oaipmh_datacite_v31 = datacite_v31.serialize_oaipmh
 #: OAI-PMH OAI DataCite record serializer.
 oaipmh_oai_datacite = oai_datacite.serialize_oaipmh
