@@ -33,6 +33,7 @@ from flask import current_app
 from invenio_cache import current_cache
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
+from invenio_pidstore.models import PIDStatus
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records import Record
 from lxml import etree
@@ -57,8 +58,17 @@ def update_expired_embargos():
 
 
 @shared_task(ignore_result=True, rate_limit='1000/h')
-def update_datacite_metadata(pid_value, object_uuid, job_id):
-    """Update DataCite metadata of a single PersistentIdentifier."""
+def update_datacite_metadata(doi, object_uuid, job_id):
+    """Update DataCite metadata of a single PersistentIdentifier.
+
+    :param doi: Value of doi PID, with pid_type='doi'. It could be a normal
+    DOI or a concept DOI.
+    :type doi: str
+    :param object_uuid: Record Metadata UUID.
+    :type object_uuid: str
+    :param job_id: id of the job to which this task belongs.
+    :type job_id: str
+    """
     task_details = current_cache.get('update_datacite:task_details')
 
     if task_details is None or job_id != task_details['job_id']:
@@ -66,15 +76,22 @@ def update_datacite_metadata(pid_value, object_uuid, job_id):
 
     record = Record.get_record(object_uuid)
 
-    dcp = DataCiteProvider.get(record['doi'])
+    dcp = DataCiteProvider.get(doi)
+    if dcp.pid.status != PIDStatus.REGISTERED:
+        return
 
     doc = datacite_v41.serialize(dcp.pid, record)
 
     for validator in xsd41():
         validator.assertValid(etree.XML(doc.encode('utf8')))
 
-    url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
-        recid=pid_value)
+    url = None
+    if doi == record.get('doi'):
+        url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+            recid=str(record['recid']))
+    elif doi == record.get('conceptdoi'):
+        url = current_app.config['ZENODO_RECORDS_UI_LINKS_FORMAT'].format(
+            recid=str(record['conceptrecid']))
 
     result = dcp.update(url, doc)
     if result is True:
@@ -90,23 +107,25 @@ def schedule_update_datacite_metadata(max_count):
     if task_details is None or 'from_date' not in task_details or 'until_date' not in task_details:
         return
 
-    pids = find_registered_doi_pids(task_details['from_date'],
-                                          task_details['until_date'],
-                                          current_app.config['ZENODO_LOCAL_DOI_PREFIXES'])
-    pids_count = pids.count()
+    doi_pids = find_registered_doi_pids(task_details['from_date'],
+                                        task_details['until_date'],
+                                        current_app.config['ZENODO_LOCAL_DOI_PREFIXES'])
+    dois_count = doi_pids.count()
 
-    task_details['left_pids'] = pids_count
+    task_details['left_pids'] = dois_count
     task_details['last_update'] = datetime.utcnow()
     current_cache.set('update_datacite:task_details', task_details)
 
-    if pids_count == 0:
+    if dois_count == 0:
         if 'finish_date' not in task_details:
             task_details['finish_date'] = datetime.utcnow()
             current_cache.set('update_datacite:task_details', task_details)
         return
 
-    scheduled_pids_count = max_count if max_count < pids_count else pids_count
-    scheduled_pids = pids.limit(scheduled_pids_count)
+    scheduled_dois_count = max_count if max_count < dois_count else dois_count
+    scheduled_dois_pids = doi_pids.limit(scheduled_dois_count)
 
-    for pid in scheduled_pids:
-        update_datacite_metadata.delay(pid.pid_value, pid.object_uuid, task_details['job_id'])
+    for doi_pid in scheduled_dois_pids:
+        update_datacite_metadata.delay(doi_pid.pid_value,
+                                       str(doi_pid.object_uuid),
+                                       task_details['job_id'])

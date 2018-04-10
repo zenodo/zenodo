@@ -57,7 +57,7 @@ def test_datacite_update(mocker, db, minimal_record):
         assert dc_mock().doi_post.call_count == 1
         dc_mock().doi_post.assert_any_call(
             record['doi'],
-            'https://zenodo.org/record/{}'.format(record['doi']))
+            'https://zenodo.org/record/{}'.format(record['recid']))
 
     def assert_datacite_calls_with_missing_data():
         """Datacite client calls assertion helper."""

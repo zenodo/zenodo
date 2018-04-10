@@ -52,7 +52,8 @@ class ZenodoDataCite31Serializer(DataCite31Serializer):
         altidentifiers = result['metadata'].get('alternate_identifiers', [])
         altidentifiers.append({
             'identifier': format_pid_link(
-                current_app.config['RECORDS_UI_ENDPOINT'], pid.pid_value),
+                current_app.config['RECORDS_UI_ENDPOINT'],
+                str(record['recid'])),
             'scheme': 'url'
         })
         result['metadata']['alternate_identifiers'] = altidentifiers
@@ -77,7 +78,8 @@ class ZenodoDataCite41Serializer(DataCite41Serializer):
         altidentifiers = result['metadata'].get('alternate_identifiers', [])
         altidentifiers.append({
             'identifier': format_pid_link(
-                current_app.config['RECORDS_UI_ENDPOINT'], pid.pid_value),
+                current_app.config['RECORDS_UI_ENDPOINT'],
+                str(record['recid'])),
             'scheme': 'url'
         })
         result['metadata']['alternate_identifiers'] = altidentifiers
