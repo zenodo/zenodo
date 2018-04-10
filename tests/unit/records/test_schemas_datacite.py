@@ -91,7 +91,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "alternateIdentifierType": "doi"
             },
             {
-                "alternateIdentifier": "http://localhost/record/123",
+                "alternateIdentifier": "http://localhost/record/12345",
                 "alternateIdentifierType": "url"
             },
         ],
@@ -152,12 +152,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 }
             }
         ],
-        "dates": [
-            {
-                "date": "2014-02-27",
-                "dateType": "Issued"
-            }
-        ],
+        "dates": [{"date": "2014-02-27", "dateType": "Issued"}],
         "descriptions": [
             {
                 "description": "Test Description",
@@ -177,10 +172,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "descriptionType": "Other"
             }
         ],
-        "identifier": {
-            "identifier": "10.1234/foo",
-            "identifierType": "DOI"
-        },
+        "identifier": {"identifier": "10.1234/foo", "identifierType": "DOI"},
         "language": "en",
         "publicationYear": "2014",
         "publisher": "Zenodo",
@@ -231,27 +223,112 @@ def test_full(db, record_with_bucket, recid_pid):
             }
         ],
         "subjects": [
-            {
-                "subject": "kw1"
-            },
-            {
-                "subject": "kw2"
-            },
-            {
-                "subject": "kw3"
-            },
+            {"subject": "kw1"},
+            {"subject": "kw2"},
+            {"subject": "kw3"},
             {
                 "subject": "http://id.loc.gov/authorities/subjects/sh85009003",
                 "subjectScheme": "url"
             }
         ],
-        "titles": [
-            {
-                "title": "Test Title"
-            }
-        ],
+        "titles": [{"title": "Test Title"}],
         "version": "1.2.5"
     }
+    assert obj == expected
+
+    obj = datacite_v41.transform_record(recid_pid, full_record_model)
+    expected['creators'] = [
+        {
+            'affiliations': ['CERN'],
+            'creatorName': 'Doe, John',
+            'familyName': 'Doe',
+            'givenName': 'John',
+            'nameIdentifiers': [
+                {
+                    'nameIdentifierScheme': 'ORCID',
+                    'schemeURI': 'http://orcid.org/',
+                    'nameIdentifier': '0000-0002-1694-233X'
+                },
+                {
+                    'nameIdentifierScheme': 'GND',
+                    'nameIdentifier': '170118215'
+                }
+            ],
+        },
+        {
+            'affiliations': ['CERN'],
+            'creatorName': 'Doe, Jane',
+            'familyName': 'Doe',
+            'givenName': 'Jane',
+            'nameIdentifiers': [
+                {
+                    'nameIdentifierScheme': 'ORCID',
+                    'schemeURI': 'http://orcid.org/',
+                    'nameIdentifier': '0000-0002-1825-0097'
+                }
+            ],
+        },
+        {
+            'affiliations': ['CERN'],
+            'creatorName': 'Smith, John',
+            'familyName': 'Smith',
+            'givenName': 'John',
+            'nameIdentifiers': [],
+        },
+        {
+            'affiliations': ['CERN'],
+            'creatorName': 'Nowak, Jack',
+            'familyName': 'Nowak',
+            'givenName': 'Jack',
+            'nameIdentifiers': [
+                {
+                    'nameIdentifierScheme': 'GND',
+                    'nameIdentifier': '170118215'
+                }
+            ],
+        }
+    ]
+
+    expected['contributors'] = [
+        {
+            'affiliations': ['CERN'],
+            'nameIdentifiers': [
+                {
+                    'nameIdentifierScheme': 'ORCID',
+                    'schemeURI': 'http://orcid.org/',
+                    'nameIdentifier': '0000-0002-1825-0097'
+                }
+            ],
+            'contributorName': 'Smith, Other',
+            'familyName': 'Smith',
+            'givenName': 'Other',
+            'contributorType': 'Other',
+        },
+        {
+            'affiliations': [''],
+            'nameIdentifiers': [],
+            'contributorName': 'Hansen, Viggo',
+            'familyName': 'Hansen',
+            'givenName': 'Viggo',
+            'contributorType': 'Other',
+        },
+        {
+            'affiliations': ['CERN'],
+            'nameIdentifiers': [],
+            'contributorName': 'Kowalski, Manager',
+            'familyName': 'Kowalski',
+            'givenName': 'Manager',
+            'contributorType': 'DataManager',
+        },
+        {
+            'contributorName': 'Smith, Professor',
+            'familyName': 'Smith',
+            'givenName': 'Professor',
+            'nameIdentifiers': [],
+            'contributorType': 'Supervisor',
+        }
+    ]
+    expected['fundingReferences'] = []
     assert obj == expected
 
 
