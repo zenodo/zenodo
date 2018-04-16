@@ -501,8 +501,11 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         files = m.get('_files', [])
         for f in files:
             if f.get('type') in thumbnail_exts:
-                links['thumb250'] = self._thumbnail_url(f, 250)
-                # First previewable image is used for preview.
+                try:
+                    links['thumb250'] = self._thumbnail_url(f, 250)
+                    # First previewable image is used for preview.
+                except RuntimeError:
+                    pass
                 break
 
         return links

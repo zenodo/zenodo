@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+import json
+
 from flask import has_request_context
 from flask_security import current_user
 from invenio_pidrelations.contrib.versioning import PIDVersioning
@@ -83,3 +85,10 @@ class ZenodoJSONSerializer(JSONSerializer):
                 pid, record_hit, links_factory=links_factory),
             context={'pid': pid}
         )
+
+    def serialize_exporter(self, pid, record):
+        """Serialize a single record for the exporter."""
+        return json.dumps(
+            self.transform_search_hit(pid, record),
+            **self._format_args()
+        ).encode('utf8')  + b'\n'

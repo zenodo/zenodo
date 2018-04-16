@@ -223,10 +223,18 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': crontab(minute=0, hour=7),  # Every day at 07:00 UTC
     },
     'datacite-metadata-updater': {
-        'task': 'zenodo.modules.records.schedule_update_datacite_metadata',
+        'task': (
+            'zenodo.modules.records.tasks.schedule_update_datacite_metadata'),
         'schedule': timedelta(hours=1),
         'kwargs': {
             'max_count': DATACITE_UPDATING_RATE_PER_HOUR,
+        }
+    },
+    'export': {
+        'task': 'zenodo.modules.exporter.tasks.export_job',
+        'job': crontab(minute=0, hour=4, day_of_month=1),
+        'kwargs': {
+            'job_id': 'records',
         }
     },
 }
