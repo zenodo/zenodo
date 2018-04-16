@@ -36,6 +36,7 @@ class BucketWriter(object):
     """Export writer that writes to an object in a bucket."""
 
     def __init__(self, bucket_id=None, key=None, **kwargs):
+        """Initialize writer."""
         self.bucket_id = bucket_id
         self.key = key
         self.obj = None

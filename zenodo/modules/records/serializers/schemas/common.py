@@ -82,6 +82,38 @@ external_url_for = partial(url_for, _external=True)
 """Helper for external url_for link generation."""
 
 
+URLS = {
+    'badge': '{base}/badge/doi/{doi}.svg',
+    'bucket': '{base}/files/{bucket}',
+    'funder': '{base}/funders/{id}',
+    'grant': '{base}/grants/{id}',
+    'object': '{base}/files/{bucket}/{key}',
+    'deposit_html': '{base}/deposits/{id}',
+    'deposit': '{base}/deposit/depositions/{id}',
+    'record_html': '{base}/record/{id}',
+    'record': '{base}/records/{id}',
+}
+
+def link_for(base, tpl, **kwargs):
+    """Create a link using specific template."""
+    tpl = URLS.get(tpl)
+    return tpl.format(base=base, **kwargs)
+
+def api_link_for(tpl, **kwargs):
+    """Create an API link using specific template."""
+    is_api_app = 'invenio-deposit-rest' in current_app.extensions
+
+    base = '{}/api'
+    if current_app.testing and is_api_app:
+        base = '{}'
+
+    return link_for(
+        base.format(current_app.config['THEME_SITEURL']), tpl, **kwargs)
+
+def ui_link_for(tpl, **kwargs):
+    """Create an UI link using specific template."""
+    return link_for(current_app.config['THEME_SITEURL'], tpl, **kwargs)
+
 class StrictKeysMixin(object):
     """Ensure only defined keys exists in data."""
 
@@ -444,12 +476,11 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             links.update(self._dump_common_links(obj))
 
         try:
-            if has_request_context():
-                m = obj.get('metadata', {})
-                if is_deposit(m):
-                    links.update(self._dump_deposit_links(obj))
-                else:
-                    links.update(self._dump_record_links(obj))
+            m = obj.get('metadata', {})
+            if is_deposit(m):
+                links.update(self._dump_deposit_links(obj))
+            else:
+                links.update(self._dump_record_links(obj))
         except BuildError:
             pass
         return links
@@ -484,18 +515,12 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
 
         doi = m.get('doi')
         if doi:
-            links['badge'] = \
-                "{base}/badge/doi/{value}.svg".format(
-                    base=current_app.config.get('THEME_SITEURL'),
-                    value=quote(doi))
+            links['badge'] = ui_link_for('badge', doi=quote(doi))
             links['doi'] = idutils.to_url(doi, 'doi')
 
         conceptdoi = m.get('conceptdoi')
         if conceptdoi:
-            links['conceptbadge'] = \
-                "{base}/badge/doi/{value}.svg".format(
-                    base=current_app.config.get('THEME_SITEURL'),
-                    value=quote(conceptdoi))
+            links['conceptbadge'] = ui_link_for('badge', doi=quote(conceptdoi))
             links['conceptdoi'] = idutils.to_url(conceptdoi, 'doi')
 
         files = m.get('_files', [])
@@ -518,11 +543,9 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         recid = m.get('recid')
 
         if bucket_id:
-            links['bucket'] = external_url_for(
-                'invenio_files_rest.bucket_api', bucket_id=bucket_id)
+            links['bucket'] = api_link_for('bucket', bucket=bucket_id)
 
-        links['html'] = format_pid_link(
-            current_app.config['RECORDS_UI_ENDPOINT'], recid)
+        links['html'] = ui_link_for('record_html', id=recid)
 
         # Generate relation links
         links.update(self._dump_relation_links(m))
@@ -537,15 +560,12 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         is_published = 'pid' in m.get('_deposit', {})
 
         if bucket_id:
-            links['bucket'] = external_url_for(
-                'invenio_files_rest.bucket_api', bucket_id=bucket_id)
+            links['bucket'] = api_link_for('bucket', bucket=bucket_id)
 
         # Record links
         if is_published:
-            links['record'] = external_url_for(
-                'invenio_records_rest.recid_item', pid_value=recid)
-            links['record_html'] = format_pid_link(
-                current_app.config['RECORDS_UI_ENDPOINT'], recid)
+            links['record'] = api_link_for('record', id=recid)
+            links['record_html'] = ui_link_for('record_html', id=recid)
 
         # Generate relation links
         links.update(self._dump_relation_links(m))
@@ -560,22 +580,18 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             if version_info:
                 last_child = version_info.get('last_child')
                 if last_child:
-                    links['latest'] = external_url_for(
-                        'invenio_records_rest.recid_item',
-                        pid_value=last_child['pid_value'])
-                    links['latest_html'] = format_pid_link(
-                        current_app.config['RECORDS_UI_ENDPOINT'],
-                        last_child['pid_value'])
+                    links['latest'] = api_link_for(
+                        'record', id=last_child['pid_value'])
+                    links['latest_html'] = ui_link_for(
+                        'record_html', id=last_child['pid_value'])
 
                 if is_deposit(metadata):
                     draft_child_depid = version_info.get('draft_child_deposit')
                     if draft_child_depid:
-                        links['latest_draft'] = external_url_for(
-                            'invenio_deposit_rest.depid_item',
-                            pid_value=draft_child_depid['pid_value'])
-                        links['latest_draft_html'] = format_pid_link(
-                            current_app.config['DEPOSIT_UI_ENDPOINT'],
-                            draft_child_depid['pid_value'])
+                        links['latest_draft'] = api_link_for(
+                            'deposit', id=draft_child_depid['pid_value'])
+                        links['latest_draft_html'] = ui_link_for(
+                            'deposit', id=draft_child_depid['pid_value'])
         return links
 
     @post_load(pass_many=False)
