@@ -41,12 +41,13 @@ def bucket(db, locations):
 
 @pytest.fixture()
 def writer(bucket):
+    """Bucket writer object fixture."""
     return BucketWriter(bucket_id=bucket.id, key='test.json')
 
 
 @pytest.fixture()
 def searchobj():
-    """Search object"""
+    """Search object."""
     class Hit(dict):
         def __init__(self, *args, **kwargs):
             super(Hit, self).__init__(*args, **kwargs)
@@ -68,7 +69,7 @@ def searchobj():
 
 @pytest.fixture()
 def serializerobj():
-    """Serialize object"""
+    """Serialize object."""
     class Serializer(object):
         def serialize_exporter(self, pid, record):
             return record['_source']['title'].encode('utf8')
@@ -77,7 +78,7 @@ def serializerobj():
 
 @pytest.fixture()
 def fetcher():
-    """PID fetcher method"""
+    """PID fetcher method."""
     def fetcher(id_, data):
         return id_
     return fetcher
@@ -85,11 +86,11 @@ def fetcher():
 
 @pytest.fixture()
 def resultstream(searchobj, serializerobj, fetcher):
-    """Result stream"""
+    """Result stream."""
     return ResultStream(searchobj, fetcher, serializerobj)
 
 
 @pytest.fixture()
 def bzip2resultstream(searchobj, serializerobj, fetcher):
-    """BZip2 Result stream"""
+    """BZip2 Result stream."""
     return BZip2ResultStream(searchobj, fetcher, serializerobj)

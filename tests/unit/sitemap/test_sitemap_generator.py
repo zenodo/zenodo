@@ -38,7 +38,7 @@ from zenodo.modules.sitemap.tasks import update_sitemap_cache
 def test_sitemap_cache_update_simple(mocker, app):
     """Test Sitemap cache updating with fixed parameters."""
     def make_url(loc):
-        return {'loc': 'https://zenodo.org' + loc}
+        return {'loc': 'https://localhost' + loc}
 
     urls = [make_url('/record/' + str(i)) for i in range(5)]
     cache_mock = mocker.patch('zenodo.modules.sitemap.ext.current_cache')

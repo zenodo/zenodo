@@ -46,6 +46,7 @@ class ResultStream(object):
     """
 
     def __init__(self, search, pid_fetcher, serializer):
+        """Initialize result stream."""
         self.pid_fetcher = pid_fetcher
         self.search = search
         self.serializer = serializer
@@ -90,10 +91,12 @@ class BZip2ResultStream(ResultStream):
     """
 
     def __init__(self, *args, **kwargs):
+        """Initialize result stream."""
         super(BZip2ResultStream, self).__init__(*args, **kwargs)
         self.compressor = bz2.BZ2Compressor()
 
     def __next__(self):
+        """Fetch next serialized bzip2 compressed chunk of records(s)."""
         try:
             data = None
             while not data:

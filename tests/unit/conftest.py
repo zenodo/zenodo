@@ -167,6 +167,7 @@ def default_config(tmp_db_path):
         SQLALCHEMY_DATABASE_URI=os.environ.get(
             'SQLALCHEMY_DATABASE_URI', tmp_db_path),
         TESTING=True,
+        THEME_SITEURL='http://localhost',
         WTF_CSRF_ENABLED=False,
     )
 

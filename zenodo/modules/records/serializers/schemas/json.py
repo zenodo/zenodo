@@ -26,7 +26,6 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from flask import url_for
 from flask_babelex import lazy_gettext as _
 from invenio_pidrelations.serializers.utils import serialize_relations
 from marshmallow import Schema, ValidationError, fields, missing, \
@@ -137,14 +136,7 @@ class FunderSchemaV1(StrictKeysSchema):
 
     def get_funder_url(self, obj):
         """Get grant url."""
-        try:
-            return dict(self=url_for(
-                'invenio_records_rest.frdoi_item',
-                pid_value=obj['doi'],
-                _external=True
-            ))
-        except BuildError:
-            return missing
+        return dict(self=common.api_link_for('funder', id=obj['doi']))
 
 
 class GrantSchemaV1(StrictKeysSchema):
@@ -159,14 +151,7 @@ class GrantSchemaV1(StrictKeysSchema):
 
     def get_grant_url(self, obj):
         """Get grant url."""
-        try:
-            return dict(self=url_for(
-                'invenio_records_rest.grant_item',
-                pid_value=obj['internal_id'],
-                _external=True
-            ))
-        except BuildError:
-            return missing
+        return dict(self=common.api_link_for('grant', id=obj['internal_id']))
 
 
 class CommunitiesSchemaV1(StrictKeysSchema):
@@ -193,17 +178,10 @@ class FilesSchema(Schema):
 
     def get_links(self, obj):
         """Get links."""
-        try:
-            return {
-                'self': url_for(
-                    'invenio_files_rest.object_api',
-                    bucket_id=obj['bucket'],
-                    key=obj['key'],
-                    _external=True
-                )
-            }
-        except (BuildError, KeyError):
-            return missing
+        return {
+            'self': common.api_link_for(
+                'object', bucket=obj['bucket'], key=obj['key'])
+        }
 
 
 class OwnerSchema(StrictKeysSchema):
