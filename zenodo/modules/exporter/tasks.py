@@ -35,8 +35,5 @@ from .api import Exporter
 @shared_task
 def export_job(job_id=None):
     """Export job."""
-    base_url = current_app.config['THEME_SITEURL']
-    # Execute in API request context, to enable proper URL generation.
-    with current_app.test_request_context(base_url):
-        job_definition = current_app.extensions['invenio-exporter'].job(job_id)
-        Exporter(**job_definition).run()
+    job_definition = current_app.extensions['invenio-exporter'].job(job_id)
+    Exporter(**job_definition).run()

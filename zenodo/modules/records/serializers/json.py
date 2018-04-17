@@ -89,6 +89,5 @@ class ZenodoJSONSerializer(JSONSerializer):
     def serialize_exporter(self, pid, record):
         """Serialize a single record for the exporter."""
         return json.dumps(
-            self.transform_search_hit(pid, record),
-            **self._format_args()
+            self.transform_search_hit(pid, record)
         ).encode('utf8')  + b'\n'

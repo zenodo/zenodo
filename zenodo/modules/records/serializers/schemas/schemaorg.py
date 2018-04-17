@@ -33,7 +33,7 @@ from marshmallow import Schema, fields, missing, pre_dump
 
 from ...models import ObjectType
 from ..fields import DateString, SanitizedHTML, SanitizedUnicode
-from .common import format_pid_link
+from .common import ui_link_for
 
 
 def _serialize_identifiers(ids, relations=None):
@@ -176,9 +176,7 @@ class CreativeWork(Schema):
     def get_url(self, obj):
         """Get Zenodo URL of the record."""
         recid = obj.get('metadata', {}).get('recid')
-        return format_pid_link(
-            current_app.config['RECORDS_UI_ENDPOINT'], recid
-        ) if recid else missing
+        return ui_link_for('record_html', id=recid) if recid else missing
 
     def get_citation(self, obj):
         """Get citations of the record."""
