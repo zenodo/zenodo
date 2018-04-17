@@ -44,7 +44,7 @@ from invenio_records.api import Record
 from invenio_records_files.models import RecordsBuckets
 from six.moves import filter
 
-from zenodo.modules.records.serializers.schemas.common import format_pid_link
+from zenodo.modules.records.serializers.schemas.common import ui_link_for
 from zenodo.modules.records.utils import is_deposit, is_record
 
 logger = get_task_logger(__name__)
@@ -284,13 +284,15 @@ def format_file_integrity_report(report):
         lines.append('Checksum: {}'.format(f.checksum))
         lines.append('Last Check: {}'.format(f.last_check_at))
         if 'record' in entry:
-            lines.append(u'Record: {}'.format(format_pid_link(
-                current_app.config['RECORDS_UI_ENDPOINT'],
-                entry['record'].get('recid'))))
+            lines.append(u'Record: {}'.format(
+                ui_link_for('record_html', id=entry['record'].get('recid'))
+            ))
         if 'deposit' in entry:
-            lines.append(u'Deposit: {}'.format(format_pid_link(
-                    current_app.config['DEPOSIT_UI_ENDPOINT'],
-                    entry['deposit'].get('_deposit', {}).get('id'))))
+            lines.append(u'Deposit: {}'.format(
+                ui_link_for(
+                    'deposit_html',
+                    id=entry['deposit'].get('_deposit', {}).get('id'))
+            ))
         lines.append(('-' * 80) + '\n')
     return '\n'.join(lines)
 

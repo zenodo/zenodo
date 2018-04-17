@@ -31,7 +31,7 @@ from invenio_records_rest.serializers.datacite import DataCite31Serializer, \
     DataCite41Serializer
 
 from .pidrelations import preprocess_related_identifiers
-from .schemas.common import format_pid_link
+from .schemas.common import ui_link_for
 
 
 class ZenodoDataCite31Serializer(DataCite31Serializer):
@@ -51,10 +51,8 @@ class ZenodoDataCite31Serializer(DataCite31Serializer):
         # Alternate identifiers
         altidentifiers = result['metadata'].get('alternate_identifiers', [])
         altidentifiers.append({
-            'identifier': format_pid_link(
-                current_app.config['RECORDS_UI_ENDPOINT'],
-                str(record['recid'])),
-            'scheme': 'url'
+            'identifier': ui_link_for('record_html', id=str(record['recid'])),
+            'scheme': 'url',
         })
         result['metadata']['alternate_identifiers'] = altidentifiers
         return result
@@ -77,9 +75,7 @@ class ZenodoDataCite41Serializer(DataCite41Serializer):
         # Alternate identifiers
         altidentifiers = result['metadata'].get('alternate_identifiers', [])
         altidentifiers.append({
-            'identifier': format_pid_link(
-                current_app.config['RECORDS_UI_ENDPOINT'],
-                str(record['recid'])),
+            'identifier': ui_link_for('record_html', id=str(record['recid'])),
             'scheme': 'url'
         })
         result['metadata']['alternate_identifiers'] = altidentifiers

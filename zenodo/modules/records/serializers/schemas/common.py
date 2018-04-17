@@ -32,7 +32,7 @@ import arrow
 import idutils
 import jsonref
 import pycountry
-from flask import current_app, has_request_context, request, url_for
+from flask import current_app, has_request_context, request
 from flask_babelex import lazy_gettext as _
 from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
 from invenio_iiif.utils import iiif_image_key, ui_iiif_image_url
@@ -61,27 +61,6 @@ def clean_empty(data, keys):
     return data
 
 
-def format_pid_link(url_template, pid_value):
-    """Format a pid url."""
-    if request:
-        return url_template.format(
-            host=request.host,
-            scheme=request.scheme,
-            pid_value=pid_value,
-        )
-    else:
-        r = urlparse(current_app.config['THEME_SITEURL'])
-        return url_template.format(
-            host=r.netloc,
-            scheme=r.scheme,
-            pid_value=pid_value,
-        )
-
-
-external_url_for = partial(url_for, _external=True)
-"""Helper for external url_for link generation."""
-
-
 URLS = {
     'badge': '{base}/badge/doi/{doi}.svg',
     'bucket': '{base}/files/{bucket}',
@@ -92,12 +71,18 @@ URLS = {
     'deposit': '{base}/deposit/depositions/{id}',
     'record_html': '{base}/record/{id}',
     'record': '{base}/records/{id}',
+    'thumbnail': '{base}{path}',
 }
+
 
 def link_for(base, tpl, **kwargs):
     """Create a link using specific template."""
     tpl = URLS.get(tpl)
+    for k in ['key', ]:
+        if k in kwargs:
+            kwargs[k] = quote(k)
     return tpl.format(base=base, **kwargs)
+
 
 def api_link_for(tpl, **kwargs):
     """Create an API link using specific template."""
@@ -110,9 +95,11 @@ def api_link_for(tpl, **kwargs):
     return link_for(
         base.format(current_app.config['THEME_SITEURL']), tpl, **kwargs)
 
+
 def ui_link_for(tpl, **kwargs):
     """Create an UI link using specific template."""
     return link_for(current_app.config['THEME_SITEURL'], tpl, **kwargs)
+
 
 class StrictKeysMixin(object):
     """Ensure only defined keys exists in data."""
@@ -487,26 +474,15 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
 
     def _thumbnail_url(self, fileobj , thumbnail_size):
         """Create the thumbnail URL for an image."""
-        try:
-            return external_url_for(
-                'iiifimageapi',
-                version='v2',
-                uuid=iiif_image_key(fileobj),
-                region='full',
+        return link_for(
+            current_app.config.get('THEME_SITEURL'),
+            'thumbnail',
+            path=ui_iiif_image_url(
+                fileobj,
                 size='{},'.format(thumbnail_size),
-                rotation=0,
-                quality='default',
-                image_format='jpg',
+                image_format='png' if fileobj['type'] == 'png' else 'jpg',
             )
-        except BuildError:
-            return '{}{}'.format(
-                current_app.config.get('THEME_SITEURL'),
-                ui_iiif_image_url(
-                    fileobj,
-                    size='{},'.format(thumbnail_size),
-                    image_format='jpg'
-                )
-            )
+        )
 
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
