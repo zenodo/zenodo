@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, abort, current_app, flash, redirect, \
+from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
     render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
@@ -114,6 +114,26 @@ def new():
     c = Community.get(request.args.get('c', type=str))
     return render_template(current_app.config['DEPOSIT_UI_NEW_TEMPLATE'],
                            record={'_deposit': {'id': None}}, community=c)
+
+
+@blueprint.route('/relationships')
+def asclepias_relationships():
+    """Mock asclepias-broker API call."""
+    import json
+    with open('./zenodo/modules/deposit/data/asclepias-relationships.json') as json_data:
+        events = json.load(json_data)
+        page = int(request.args.get('page', 1))
+        size = int(request.args.get('size', 5))
+        if size > 0 and page > 0:
+            offset = (page-1)*size
+            relationships = events.get('hits').get('Relationship')
+            if len(relationships) - offset > size:
+                relationships = relationships[offset: size]
+            else:
+                relationships = relationships[offset: len(relationships)]
+
+            events['hits']['Relationship'] = relationships
+        return jsonify(events)
 
 
 @blueprint.route(
