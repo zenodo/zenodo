@@ -34,6 +34,13 @@ from flask import current_app
 from invenio_db import db
 from invenio_files_rest.models import FileInstance, Location, ObjectVersion
 
+from zenodo.modules.exporter.utils import initialize_exporter_bucket
+
+
+def loadbuckets():
+    """Initialize any special buckets."""
+    initialize_exporter_bucket()
+
 
 def loadlocations(force=False):
     """Load default file store and archive location."""

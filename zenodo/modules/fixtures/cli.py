@@ -39,7 +39,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 
 from .communities import loadcommunity
-from .files import loaddemofiles, loadlocations
+from .files import loadbuckets, loaddemofiles, loadlocations
 from .licenses import loadlicenses, matchlicenses
 from .oai import loadoaisets
 from .records import loaddemorecords, loadsipmetadatatypes
@@ -57,6 +57,7 @@ def fixtures():
 def init():
     """Load basic data."""
     loadlocations()
+    loadbuckets()
     loadoaisets()
     initialize_communities_bucket()
 
