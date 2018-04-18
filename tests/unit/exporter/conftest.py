@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import pytest
+from flask import current_app
 from invenio_files_rest.models import Bucket
 
 from zenodo.modules.exporter import BucketWriter, BZip2ResultStream, \
@@ -36,7 +37,8 @@ from zenodo.modules.exporter import BucketWriter, BZip2ResultStream, \
 @pytest.fixture()
 def bucket(db, locations):
     """Bucket to write in."""
-    return Bucket.create(id='00000000-0000-0000-0000-000000000000')
+    bucket_uuid = current_app.config['EXPORTER_BUCKET_UUID']
+    return Bucket.create(id=bucket_uuid)
 
 
 @pytest.fixture()

@@ -43,6 +43,16 @@ from .models import AccessRight
 from .utils import is_deposit, is_record
 
 
+def get_public_bucket_uuids():
+    """Return a list of UUIDs (strings) with publicly accessible buckets."""
+    buckets = [
+        'COMMUNITIES_BUCKET_UUID',
+        'EXPORTER_BUCKET_UUID',
+    ]
+    return [current_app.config[k] for k in buckets]
+
+
+
 def files_permission_factory(obj, action=None):
     """Permission for files are always based on the type of bucket.
 
@@ -65,8 +75,8 @@ def files_permission_factory(obj, action=None):
     # Retrieve record
     if bucket_id is not None:
         # Community bucket
-        if str(bucket_id) == current_app.config['COMMUNITIES_BUCKET_UUID']:
-            return CommunityBucketPermission(action)
+        if str(bucket_id) in get_public_bucket_uuids():
+            return PublicBucketPermission(action)
 
         # Record or deposit bucket
         rb = RecordsBuckets.query.filter_by(bucket_id=bucket_id).one_or_none()
@@ -145,8 +155,8 @@ def deposit_delete_permission_factory(record=None):
 #
 # Permission classes
 #
-class CommunityBucketPermission(object):
-    """Permission for files in community bucket.
+class PublicBucketPermission(object):
+    """Permission for files in public buckets.
 
     Everyone are allowed to read. Admin can do everything.
     """
