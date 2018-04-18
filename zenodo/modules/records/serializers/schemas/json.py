@@ -240,8 +240,8 @@ class MetadataSchemaV1(common.CommonMetadataSchemaV1):
 class RecordSchemaV1(common.CommonRecordSchemaV1):
     """Schema for records v1 in JSON."""
 
-    files = fields.Nested(
-        FilesSchema, many=True, dump_only=True, attribute='metadata._files')
+    # files = fields.Nested(
+    #     FilesSchema, many=True, dump_only=True, attribute='metadata._files')
     metadata = fields.Nested(MetadataSchemaV1)
     owners = fields.List(
         fields.Integer, attribute='metadata.owners', dump_only=True)
