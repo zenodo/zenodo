@@ -35,16 +35,16 @@ from zenodo.modules.exporter import BucketWriter, BZip2ResultStream, \
 
 
 @pytest.fixture()
-def bucket(db, locations):
+def exporter_bucket(db, locations):
     """Bucket to write in."""
     bucket_uuid = current_app.config['EXPORTER_BUCKET_UUID']
     return Bucket.create(id=bucket_uuid)
 
 
 @pytest.fixture()
-def writer(bucket):
+def writer(exporter_bucket):
     """Bucket writer object fixture."""
-    return BucketWriter(bucket_id=bucket.id, key='test.json')
+    return BucketWriter(bucket_id=exporter_bucket.id, key='test.json')
 
 
 @pytest.fixture()
