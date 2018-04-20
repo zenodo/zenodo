@@ -21,13 +21,17 @@
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 define([
+  'js/zenodo/filters/citations',
   'js/zenodo/filters/striptags',
   'js/zenodo/filters/safe',
   'js/zenodo/filters/titlecase'
-], function(striptagsFilter, safeFilter, titlecaseFilter){
+], function(citationFilters, striptagsFilter, safeFilter, titlecaseFilter){
   var app = angular.module('zenodo.filters', ['ngSanitize'])
     .filter('striptags', striptagsFilter)
     .filter('titlecase', titlecaseFilter)
-    .filter('safe', ['$sce', safeFilter]);
+    .filter('safe', ['$sce', safeFilter])
+    .filter('providerNames', citationFilters.providerNamesFilter)
+    .filter('creatorNames', citationFilters.creatorNamesFilter)
+    .filter('doiUrl', citationFilters.doiUrlFilter);
   return app;
 });

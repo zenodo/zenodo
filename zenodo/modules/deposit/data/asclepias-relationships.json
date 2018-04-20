@@ -1,78 +1,191 @@
 {
-  "Source": {
-    "Identifier": [
-      {
-        "ID": "10.5281/zenodo.250258",
-        "IDScheme": "doi"
-      }
-    ],
-    "Type": {
-      "Name": "software"
-    }
-  },
-  "Relation": "isCitedBy",
-  "GroupBy": "identity",
   "links": {
     "self": "http://localhost:5000/api/relationships?relation=isCitedBy&groupBy=identity&page=1&size=5&scheme=doi&id=10.5281%2Fzenodo.250258"
   },
   "hits": {
     "total": 9,
-    "Relationship": [{
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "Thomas H. Gibson",
-            "Identifier": []
-          }
-        ],
-        "PublicationDate": "2018-01-01T00:00:00"
-      },
-      "LinkHistory": [
-          {
-            "LinkProvider": [
+    "hits": [
+      {
+        "metadata": {
+          "Target": {
+            "Identifier": [
               {
-                "Name": "SAO/NASA Astrophysics Data System"
+                "IDScheme": "doi",
+                "IDURL": "https://doi.org/10.5281/zenodo.573267",
+                "ID": "10.5281/zenodo.573267"
               }
             ],
-            "LinkPublicationDate": "2018-01-01T00:00:00"
-          }
-        ]
-    },
+            "Type": {
+              "Name": "software"
+            },
+            "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+            "Creator": [
+              {
+                "Name": "Thomas H. Gibson",
+                "Identifier": []
+              }
+            ],
+            "PublicationDate": "2018-01-01T00:00:00"
+          },
+          "History": [
+            {
+              "LinkProvider": [
+                {
+                  "Name": "SAO/NASA Astrophysics Data System"
+                }
+              ],
+              "LinkPublicationDate": "2018-01-01T00:00:00"
+            }
+          ]
+        }
+      },
+      {
+        "metadata": {
+          "Target": {
+            "Identifier": [
+              {
+                "IDScheme": "doi",
+                "IDURL": "https://doi.org/10.5281/zenodo.573267",
+                "ID": "10.5281/zenodo.573267"
+              },
+              {
+                "ID": "2017arXiv170701615H",
+                "IDURL": "https://doi.org/10.5281/zenodo.573267111",
+                "IDScheme": "ads"
+              }
+            ],
+            "Type": {
+              "Name": "software"
+            },
+            "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+            "Creator": [
+              {
+                "Name": "Fabio Luporini",
+                "Identifier": []
+              },
+              {
+                "Name": "Lawrence Mitchell",
+                "Identifier": []
+              }
+            ]
+          },
+          "History": [
+            {
+              "LinkProvider": [
+                {
+                  "Name": "SAO/NASA Astrophysics Data System"
+                },
+                {
+                  "Name": "Link Provider Ltd"
+                }
+              ],
+              "LinkPublicationDate": "2018-01-01T00:00:00"
+            }
+          ]
+        }
+      },
+      {
+        "metadata": {
+          "Target": {
+            "Identifier": [
+              {
+                "IDScheme": "doi",
+                "ID": "10.5281/zenodo.573267"
+              }
+            ],
+            "Type": {
+              "Name": "software"
+            },
+            "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+            "Creator": [
+              {
+                "Name": "Miklós Homolya",
+                "Identifier": []
+              }
+            ]
+          },
+          "History": [
+            {
+              "LinkProvider": [
+                {
+                  "Name": "SAO/NASA Astrophysics Data System"
+                }
+              ],
+              "LinkPublicationDate": "2018-01-01T00:00:00"
+            }
+          ]
+        }
+      },
+      {
+        "metadata": {
+          "Target": {
+            "Identifier": [
+              {
+                "IDScheme": "doi",
+                "IDURL": "https://doi.org/10.5281/zenodo.573267",
+                "ID": "10.5281/zenodo.573267"
+              }
+            ],
+            "Type": {
+              "Name": "software"
+            },
+            "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+            "Creator": [
+              {
+                "Name": "Thomas H. Gibson",
+                "Identifier": []
+              }
+            ]
+          },
+          "History": [
+            {
+              "LinkProvider": [
+                {
+                  "Name": "SAO/NASA Astrophysics Data System"
+                }
+              ],
+              "LinkPublicationDate": "2018-01-01T00:00:00"
+            }
+          ]
+        }
+      },
     {
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }, {
-            "ID": "2017arXiv170701615H",
-            "IDScheme": "ads"
+      "metadata": {
+        "Target": {
+          "Identifier": [{
+            "IDScheme": "doi",
+            "IDURL": "https://doi.org/10.5281/zenodo.573267",
+            "ID": "10.5281/zenodo.573267"
           }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "Fabio Luporini",
-            "Identifier": []
+          "Type": {
+            "Name": "software"
           },
-          {
-            "Name": "Lawrence Mitchell",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
+          "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+          "Creator": [
+            {
+              "Name": "Fabio Luporini",
+              "Identifier": []
+            },
+            {
+              "Name": "Lawrence Mitchell",
+              "Identifier": []
+            },
+            {
+              "Name": "Miklós Homolya",
+              "Identifier": []
+            },{
+              "Name": "Thomas H. Gibson",
+              "Identifier": []
+            },{
+              "Name": "Florian Rathgeber",
+              "Identifier": []
+            },{
+              "Name": "Michael Lange",
+              "Identifier": []
+            }
+          ]
+        },
+        "History": [
           {
             "LinkProvider": [
               {
@@ -82,88 +195,28 @@
             "LinkPublicationDate": "2018-01-01T00:00:00"
           }
         ]
+      }
     },
     {
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "Miklós Homolya",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
-          {
-            "LinkProvider": [
-              {
-                "Name": "SAO/NASA Astrophysics Data System"
-              }
-            ],
-            "LinkPublicationDate": "2018-01-01T00:00:00"
-          }
-        ]
-    },
-    {
-      "Target": {
-        "Identifier":[{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "Thomas H. Gibson",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
-          {
-            "LinkProvider": [
-              {
-                "Name": "SAO/NASA Astrophysics Data System"
-              }
-            ],
-            "LinkPublicationDate": "2018-01-01T00:00:00"
-          }
-        ]
-    },
-    {
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "creator name A",
-            "Identifier": []
+      "metadata": {
+        "Target": {
+          "Identifier": [{
+            "IDScheme": "doi",
+            "IDURL": "https://doi.org/10.5281/zenodo.573267",
+            "ID": "10.5281/zenodo.573267"
+          }],
+          "Type": {
+            "Name": "software"
           },
-          {
-            "Name": "creator name B",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
+          "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+          "Creator": [
+            {
+              "Name": "creator name C",
+              "Identifier": []
+            }
+          ]
+        },
+        "History": [
           {
             "LinkProvider": [
               {
@@ -173,82 +226,23 @@
             "LinkPublicationDate": "2018-01-01T00:00:00"
           }
         ]
+      }
     },
     {
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "creator name C",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
-          {
-            "LinkProvider": [
-              {
-                "Name": "SAO/NASA Astrophysics Data System"
-              }
-            ],
-            "LinkPublicationDate": "2018-01-01T00:00:00"
-          }
-        ]
-    },{
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": []
-      },
-      "LinkHistory": [
-          {
-            "LinkProvider": [
-              {
-                "Name": "SAO/NASA Astrophysics Data System"
-              }
-            ],
-            "LinkPublicationDate": "2018-01-01T00:00:00"
-          }
-        ]
-    },
-    {
-      "Target": {
-        "Identifier":[{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
-        },
-        "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
-        "Creator": [
-          {
-            "Name": "creator name A",
-            "Identifier": []
+      "metadata":{
+        "Target": {
+          "Identifier": [{
+            "IDScheme": "doi",
+            "IDURL": "https://doi.org/10.5281/zenodo.573267",
+            "ID": "10.5281/zenodo.573267"
+          }],
+          "Type": {
+            "Name": "software"
           },
-          {
-            "Name": "creator name B",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
+          "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+          "Creator": []
+        },
+        "History": [
           {
             "LinkProvider": [
               {
@@ -258,25 +252,34 @@
             "LinkPublicationDate": "2018-01-01T00:00:00"
           }
         ]
+      }
     },
     {
-      "Target": {
-        "Identifier": [{
-          "IDScheme": "doi",
-          "IDURL": "https://doi.org/10.5281/zenodo.573267",
-          "ID": "10.5281/zenodo.573267"
-        }],
-        "Type": {
-          "Name": "software"
+      "metadata": {
+        "Target": {
+          "Identifier": [
+            {
+              "IDScheme": "doi",
+              "IDURL": "https://doi.org/10.5281/zenodo.573267",
+              "ID": "10.5281/zenodo.573267"
+            }
+          ],
+          "Type": {
+            "Name": "software"
+          },
+          "Title": "coneoproject/COFFEE: A Compiler for Fast Expression Evaluation",
+          "Creator": [
+            {
+              "Name": "creator name A",
+              "Identifier": []
+            },
+            {
+              "Name": "creator name B",
+              "Identifier": []
+            }
+          ]
         },
-        "Creator": [
-          {
-            "Name": "creator name C",
-            "Identifier": []
-          }
-        ]
-      },
-      "LinkHistory": [
+        "History": [
           {
             "LinkProvider": [
               {
@@ -286,6 +289,40 @@
             "LinkPublicationDate": "2018-01-01T00:00:00"
           }
         ]
-    }]
+      }
+    },
+      {
+        "metadata": {
+          "Target": {
+            "Identifier": [
+              {
+                "IDScheme": "doi",
+                "IDURL": "https://doi.org/10.5281/zenodo.573267",
+                "ID": "10.5281/zenodo.573267"
+              }
+            ],
+            "Type": {
+              "Name": "software"
+            },
+            "Creator": [
+              {
+                "Name": "creator name C",
+                "Identifier": []
+              }
+            ]
+          },
+          "History": [
+            {
+              "LinkProvider": [
+                {
+                  "Name": "SAO/NASA Astrophysics Data System"
+                }
+              ],
+              "LinkPublicationDate": "2018-01-01T00:00:00"
+            }
+          ]
+        }
+      }
+    ]
   }
 }

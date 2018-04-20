@@ -1,0 +1,61 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2018 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- if 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
+<div id="search-citations">
+  <invenio-search
+   disable-url-handler="true"
+   search-endpoint="/relationships"
+   search-extra-params='{"page": 1, "size": 5}'
+   search-hidden-params='{% if search_hidden_params %}{{search_hidden_params|tojson}}{% endif %}'
+   search-headers='{"Accept": "{{ 'application/json'}}"}' >
+    <div class="panel panel-default" id="citation">
+      <div class="panel-heading">
+        <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations">
+          {{_('Citations')}}
+          <small class="text-muted">
+            <invenio-search-count
+            template="{{ url_for('static', filename='templates/citations/count.html') }}">
+            </invenio-search-count>
+          </small>
+          <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+          <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
+        </a>
+      </div>
+      <div id="collapseCitations" class="collapse in">
+        <div class="search-page">
+          <invenio-search-results
+           template="{{ url_for('static', filename='templates/citations/results.html') }}">
+          </invenio-search-results>
+          <div align="center">
+            <invenio-search-pagination
+              template="{{ url_for('static', filename='templates/citations/pagination.html') }}">
+            </invenio-search-pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+  </invenio-search>
+</div>
+{%- endif %}

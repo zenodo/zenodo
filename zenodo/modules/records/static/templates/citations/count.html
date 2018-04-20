@@ -1,0 +1,6 @@
+<span ng-if="vm.invenioSearchResults.hits.total > 0">
+  <span class="badge citationBadge"> {{vm.invenioSearchResults.hits.total}}</span>
+</span>
+<span ng-if="!vm.invenioSearchResults.hits.total > 0">
+  <span class="badge citationBadge"> 0</span>
+</span>

@@ -1,0 +1,25 @@
+<ul class="pagination citationsPagination" ng-if="vm.invenioSearchResults.hits.total">
+  <li ng-show="showGoToFirstLast" ng-class="paginationHelper.getFirstClass()">
+    <a ng-click="paginationHelper.changePage(1)" aria-label="First">
+      <span aria-hidden="true"><<</span>
+    </a>
+  </li>
+  <li ng-class="paginationHelper.getPrevClass()">
+    <a ng-click="paginationHelper.changePage(paginationHelper.previous())" aria-label="Previous">
+      <span aria-hidden="true"><</span>
+    </a>
+  </li>
+  <li ng-class="paginationHelper.getPageClass(page.value)" ng-repeat="page in paginatePages">
+    <a ng-click="paginationHelper.changePage(page.value)" alt="{{ page.title }}">{{ page.value }}</a>
+  </li>
+  <li ng-class="paginationHelper.getNextClass()">
+    <a ng-click="paginationHelper.changePage(paginationHelper.next())" aria-label="Next">
+      <span aria-hidden="true">></span>
+    </a>
+  </li>
+  <li ng-show="showGoToFirstLast" ng-class="paginationHelper.getLastClass()">
+    <a ng-click="paginationHelper.changePage(paginationHelper.total())" aria-label="Last">
+      <span aria-hidden="true">>></span>
+    </a>
+  </li>
+</ul>

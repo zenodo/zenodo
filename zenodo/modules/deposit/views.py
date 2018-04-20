@@ -126,13 +126,13 @@ def asclepias_relationships():
         size = int(request.args.get('size', 5))
         if size > 0 and page > 0:
             offset = (page-1)*size
-            relationships = events.get('hits').get('Relationship')
+            relationships = events.get('hits').get('hits')
             if len(relationships) - offset > size:
                 relationships = relationships[offset: size]
             else:
                 relationships = relationships[offset: len(relationships)]
 
-            events['hits']['Relationship'] = relationships
+            events['hits']['hits'] = relationships
         return jsonify(events)
 
 

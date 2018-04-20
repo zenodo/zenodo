@@ -1,0 +1,45 @@
+<div ng-if="vm.invenioSearchResults.hits.total > 0">
+  <table class="table table-striped" >
+    <thead>
+      <tr class="">
+        <th>Title and authors</th>
+        <th>Year</th>
+        <th>Links</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="relationship in vm.invenioSearchResults.hits.hits">
+        <td>
+          <a ng-if="relationship | doiUrl" href="{{relationship | doiUrl}}">
+            {{relationship.metadata.Target.Title}}
+            <em ng-if="!relationship.metadata.Target.Title">Title unknown</em>
+          </a>
+          <span ng-if="!(relationship | doiUrl)">
+            {{relationship.metadata.Target.Title}}
+            <em ng-if="!relationship.metadata.Target.Title">Title unknown</em>
+          </span>
+          <br/>
+          <small class="text-muted" >
+            {{relationship | creatorNames}}
+            <em ng-if="!(relationship | creatorNames)">Authors unknown</em>
+          </small>
+        </td>
+        <td>
+          {{(relationship.metadata.Target.PublicationDate | date : "yyyy") || "-"}}
+        </td>
+        <td>
+          <a ng-repeat="identifier in relationship.metadata.Target.Identifier"
+             ng-if="identifier.IDURL" href="{{identifier.IDURL}}">
+            <span class="label label-primary" data-toggle="tooltip"
+                data-placement="top" title="{{identifier.ID}}">{{identifier.IDScheme | uppercase}}</span>
+          </a>
+          <small class="text-muted nowrap pull-right">
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" data-placement="top"
+               title="Provided by {{relationship | providerNames}}">
+            </i>
+          </small>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
