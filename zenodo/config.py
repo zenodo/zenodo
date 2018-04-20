@@ -232,7 +232,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'export': {
         'task': 'zenodo.modules.exporter.tasks.export_job',
-        'job': crontab(minute=0, hour=4, day_of_month=1),
+        'schedule': crontab(minute=0, hour=4, day_of_month=1),
         'kwargs': {
             'job_id': 'records',
         }
