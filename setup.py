@@ -218,6 +218,7 @@ setup(
             'zenodo.modules.jsonschemas.ext:ZenodoJSONSchemas',
             'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
             'zenodo_exporter = zenodo.modules.exporter.ext:InvenioExporter',
+            'zenodo_frontpage = zenodo.modules.frontpage.ext:ZenodoFrontpage',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '

@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function
 import os
 
 from flask import Blueprint, current_app, flash, render_template, \
-    send_from_directory
+    request, send_from_directory, session
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
 
@@ -88,4 +88,20 @@ def favicon():
 @blueprint.route('/ping', methods=['HEAD', 'GET'])
 def ping():
     """Load balancer ping view."""
+    return 'OK'
+
+
+@blueprint.route('/beta-features', methods=['HEAD', 'GET'])
+def feature_flags():
+    """Enable or disable beta features."""
+    features = request.args.getlist('feature')
+    for feature in features:
+        if feature == 'reset' and 'featureFlags' in session:
+            del session['featureFlags']
+
+        if feature in current_app.config.get('ZENODO_FRONTPAGE_BETA_FEATURES'):
+            if 'featureFlags' in session:
+                session['featureFlags'].add(feature)
+            else:
+                session['featureFlags'] = set([feature])
     return 'OK'

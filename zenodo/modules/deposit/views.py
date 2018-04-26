@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from datetime import datetime
 from functools import wraps
+import json
 
 from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
     render_template, request, url_for
@@ -119,7 +120,6 @@ def new():
 @blueprint.route('/relationships')
 def asclepias_relationships():
     """Mock asclepias-broker API call."""
-    import json
     with open('./zenodo/modules/deposit/data/asclepias-relationships.json') as json_data:
         events = json.load(json_data)
         page = int(request.args.get('page', 1))
