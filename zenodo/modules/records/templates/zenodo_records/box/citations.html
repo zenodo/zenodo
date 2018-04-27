@@ -23,10 +23,12 @@
 -#}
 
 {%- if 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
+{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy"} %}
+
 <div id="search-citations">
   <invenio-search
    disable-url-handler="true"
-   search-endpoint="/relationships"
+   search-endpoint="{{config['ZENODO_RECORDS_UI_CITATIONS_ENDPOINT'] }}"
    search-extra-params='{"page": 1, "size": 5}'
    search-hidden-params='{% if search_hidden_params %}{{search_hidden_params|tojson}}{% endif %}'
    search-headers='{"Accept": "{{ 'application/json'}}"}' >

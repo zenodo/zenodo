@@ -39,11 +39,13 @@
     return function(relationship) {
       var creatorNames = [];
       var creators = relationship.metadata.Target.Creator;
-      for(var i=0; i<creators.length && i<5; i++) {
-        creatorNames.push(creators[i].Name);
-      }
-      if(creators.length > 5) {
-      creatorNames.push("et al.");
+      if (creators) {
+        for(var i=0; i<creators.length && i<5; i++) {
+          creatorNames.push(creators[i].Name);
+        }
+        if(creators.length > 5) {
+        creatorNames.push("et al.");
+        }
       }
       return creatorNames.join(', ');
     };

@@ -31,6 +31,10 @@ from speaklater import make_lazy_gettext
 
 _ = make_lazy_gettext(lambda: gettext)
 
+ZENODO_RECORDS_UI_CITATIONS_ENDPOINT = '/relationships'
+# ZENODO_RECORDS_UI_CITATIONS_ENDPOINT = 'https://test-zenodo-broker.web.cern.ch/api/relationships'
+# ZENODO_RECORDS_UI_CITATIONS_ENDPOINT = 'http://localhost:5001/api/relationships'
+
 ZENODO_RELATION_RULES = {
     'f1000research': [{
         'prefix': '10.12688/f1000research',
