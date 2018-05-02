@@ -67,6 +67,17 @@ class ZenodoJSONSerializer(JSONSerializer):
                     'related_identifiers', []).extend(rels)
         return result
 
+    def preprocess_search_hit(self, pid, record_hit, links_factory=None,
+                              **kwargs):
+        """Prepare a record hit from Elasticsearch for serialization."""
+        result = super(ZenodoJSONSerializer, self).preprocess_search_hit(
+            pid, record_hit, links_factory=links_factory, **kwargs
+        )
+        # Add files if in search hit (only public files exists in index)
+        if '_files' in record_hit:
+            result['files'] = record_hit['_files']
+        return result
+
     def dump(self, obj, context=None):
         """Serialize object with schema."""
         return self.schema_class(context=context).dump(obj).data
