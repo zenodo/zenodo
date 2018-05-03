@@ -74,7 +74,9 @@ class ZenodoJSONSerializer(JSONSerializer):
             pid, record_hit, links_factory=links_factory, **kwargs
         )
         # Add files if in search hit (only public files exists in index)
-        if '_files' in record_hit:
+        if '_files' in record_hit['_source']:
+            result['files'] = record_hit['_source']['_files']
+        elif '_files' in record_hit:
             result['files'] = record_hit['_files']
         return result
 
