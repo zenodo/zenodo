@@ -114,12 +114,12 @@ def schedule_update_datacite_metadata(max_count):
 
     task_details['left_pids'] = dois_count
     task_details['last_update'] = datetime.utcnow()
-    current_cache.set('update_datacite:task_details', task_details)
+    current_cache.set('update_datacite:task_details', task_details, timeout=-1)
 
     if dois_count == 0:
         if 'finish_date' not in task_details:
             task_details['finish_date'] = datetime.utcnow()
-            current_cache.set('update_datacite:task_details', task_details)
+            current_cache.set('update_datacite:task_details', task_details, timeout=-1)
         return
 
     scheduled_dois_count = max_count if max_count < dois_count else dois_count

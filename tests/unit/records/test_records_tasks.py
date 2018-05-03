@@ -113,7 +113,7 @@ def test_datacite_update(mocker, db, minimal_record):
         until_date=datetime(2016, 1, 1, 13, 33),
         last_update=datetime.utcnow()
     )
-    current_cache.set('update_datacite:task_details', task_details)
+    current_cache.set('update_datacite:task_details', task_details, timeout=-1)
 
     # no registered local DOIs updated inside the interval
     schedule_update_datacite_metadata(1)
@@ -127,7 +127,7 @@ def test_datacite_update(mocker, db, minimal_record):
         until_date=datetime.utcnow(),
         last_update=datetime.utcnow()
     )
-    current_cache.set('update_datacite:task_details', task_details)
+    current_cache.set('update_datacite:task_details', task_details, timeout=-1)
 
     schedule_update_datacite_metadata(1)
     new_update_date3 = doi_pids[0].updated
