@@ -80,7 +80,7 @@ def link_for(base, tpl, **kwargs):
     tpl = URLS.get(tpl)
     for k in ['key', ]:
         if k in kwargs:
-            kwargs[k] = quote(kwargs[k])
+            kwargs[k] = quote(kwargs[k].encode('utf8'))
     return tpl.format(base=base, **kwargs)
 
 
