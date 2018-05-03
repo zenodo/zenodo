@@ -46,20 +46,20 @@ def test_sitemap_cache_update_simple(mocker, app):
 
     sitemap1 = render_template('zenodo_sitemap/sitemap.xml',
                                urlset=urls[:2])
-    cache_mock.set.assert_any_call('sitemap:1', sitemap1, timeout=0)
+    cache_mock.set.assert_any_call('sitemap:1', sitemap1, timeout=-1)
 
     sitemap2 = render_template('zenodo_sitemap/sitemap.xml',
                                urlset=urls[2:4])
-    cache_mock.set.assert_any_call('sitemap:2', sitemap2, timeout=0)
+    cache_mock.set.assert_any_call('sitemap:2', sitemap2, timeout=-1)
 
     sitemap3 = render_template('zenodo_sitemap/sitemap.xml',
                                urlset=urls[4:])
-    cache_mock.set.assert_any_call('sitemap:3', sitemap3, timeout=0)
+    cache_mock.set.assert_any_call('sitemap:3', sitemap3, timeout=-1)
 
     sitemapindex = [make_url('/sitemap{}.xml'.format(i)) for i in range(1, 4)]
     sitemap0 = render_template('zenodo_sitemap/sitemapindex.xml',
                                urlset=sitemapindex, url_scheme='https')
-    cache_mock.set.assert_any_call('sitemap:0', sitemap0, timeout=0)
+    cache_mock.set.assert_any_call('sitemap:0', sitemap0, timeout=-1)
 
 
 def test_sitemap_generators(app, record_with_bucket, communities):

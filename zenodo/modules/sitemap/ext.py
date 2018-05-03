@@ -51,7 +51,7 @@ class ZenodoSitemap(object):
 
     def set_cache(self, key, value):
         """Set the sitemap cache."""
-        current_cache.set(key, value, timeout=0)
+        current_cache.set(key, value, timeout=-1)
         self.cache_keys.add(key)
 
     @staticmethod
