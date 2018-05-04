@@ -38,7 +38,7 @@
   function creatorNamesFilter() {
     return function(relationship) {
       var creatorNames = [];
-      var creators = relationship.metadata.Target.Creator;
+      var creators = relationship.metadata.Source.Creator;
       if (creators) {
         for(var i=0; i<creators.length && i<5; i++) {
           creatorNames.push(creators[i].Name);
@@ -55,7 +55,7 @@
      return function(relationship) {
       var doiUrl = "";
       var url = "";
-        for(identifier of relationship.metadata.Target.Identifier) {
+        for(identifier of relationship.metadata.Source.Identifier) {
           if(identifier.IDURL) {
             url = identifier.IDURL;
             if (identifier.IDScheme == "doi") {

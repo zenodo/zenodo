@@ -23,8 +23,7 @@
 -#}
 
 {%- if 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
-{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy"} %}
-
+{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy", "id": record.doi, "groupBy": "version" } %}
 <div id="search-citations">
   <invenio-search
    disable-url-handler="true"
