@@ -1155,6 +1155,53 @@ STATSD_PORT = 8125
 #: Default StatsD port
 STATSD_PREFIX = "zenodo"
 
+# Stats
+# =====
+STATS_EVENTS = {
+    'file-download': {
+        'signal': 'invenio_files_rest.signals.file_downloaded',
+        'event_builders': [
+            'invenio_stats.contrib.event_builders.file_download_event_builder'
+        ],
+        'processor_config': {
+            'preprocessors': [
+                'zenodo.modules.stats.processors:skip_deposit_file',
+                # TODO: review these processors
+                'invenio_stats.processors:flag_robots',
+                'invenio_stats.processors:anonymize_user',
+                'invenio_stats.contrib.event_builders:build_file_unique_id',
+            ],
+            # Keep only 1 file download for each file and user every 30 sec
+            'double_click_window': 30,
+            # Create one index per month which will store file download events
+            'suffix': '%Y-%m',
+        },
+    },
+    'record-view': {
+        'signal': 'invenio_records_ui.signals.record_viewed',
+        'event_builders': [
+            'invenio_stats.contrib.event_builders.record_view_event_builder',
+        ],
+        'processor_config': {
+            'preprocessors': [
+                'zenodo.modules.stats.processors:skip_deposit_record',
+                # TODO: review these processors
+                'invenio_stats.processors:flag_robots',
+                'invenio_stats.processors:anonymize_user',
+                'invenio_stats.contrib.event_builders:build_record_unique_id',
+            ],
+            # Keep only 1 file download for each file and user every 30 sec
+            'double_click_window': 30,
+            # Create one index per month which will store file download events
+            'suffix': '%Y-%m',
+        },
+    },
+}
+
+# Queues
+# ======
+QUEUES_BROKER_URL = CELERY_BROKER_URL
+
 # Proxy configuration
 #: Number of proxies in front of application.
 WSGI_PROXIES = 0
