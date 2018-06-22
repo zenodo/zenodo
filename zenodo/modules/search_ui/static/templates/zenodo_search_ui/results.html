@@ -13,25 +13,32 @@
           <span class="label label-{{record.metadata.access_right_category}} titlecase">{{ record.metadata.access_right }} Access</span>
       </span>
     </span>
-    <h4><a target="_self" ng-href="/record/{{record.id}}">{{record.metadata.title}}</a></h4>
-    <p>
-      <span ng-repeat='creator in record.metadata.creators'>
-        <span ng-if='creator.orcid'>
-          <a href="http://orcid.org/{{creator.orcid}}"><img class="inline-orcid" src="/static/img/orcid.png" /></a>
+    <div class="col-xs-9">
+      <h4><a target="_self" ng-href="/record/{{record.id}}">{{record.metadata.title}}</a></h4>
+      <p>
+        <span ng-repeat='creator in record.metadata.creators'>
+          <span ng-if='creator.orcid'>
+            <a href="http://orcid.org/{{creator.orcid}}"><img class="inline-orcid" src="/static/img/orcid.png" /></a>
+          </span>
+        <a target="_self" ng-href="/record/{{record.id}}" class="text-muted">{{ creator.name }}</a>;
         </span>
-      <a target="_self" ng-href="/record/{{record.id}}" class="text-muted">{{ creator.name }}</a>;
-      </span>
-    </p>
-    <p class="hidden-xs"><a target="_self" ng-href="/record/{{record.id}}"><span ng-bind-html="record.metadata.description|striptags|limitTo:300"></span></a></p>
-    <p>
-      <small class="text-muted hidden-xs">
-        Uploaded on {{ record.created|date:'longDate' }}
-      </small>
-    </p>
+      </p>
+      <p class="hidden-xs"><a target="_self" ng-href="/record/{{record.id}}"><span ng-bind-html="record.metadata.description|striptags|limitTo:300"></span></a></p>
+      <p>
+        <small class="text-muted hidden-xs">
+          Uploaded on {{ record.created|date:'longDate' }}
+        </small>
+      </p>
+    </div>
+    <div class="col-xs-3">
+      <div class="altmetric-embed search-altmetric" data-badge-type="donut" data-badge-details="left" data-condensed="true" data-hide-no-mentions="true" data-doi="{{record.doi}}"></div>
+      <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
+    </div>
     <p ng-if="!vm.invenioSearchArgs.all_versions && record.metadata.relations.version[0].count > 1">
       <span class="text-muted hidden-xs"><a href ng-click="vm.invenioSearchArgs.q = 'conceptrecid:' + record.conceptrecid; vm.invenioSearchArgs.all_versions = true; vm.invenioSearchArgs.sort='-version'"><small><i>{{ record.metadata.relations.version[0].count - 1 }} more version(s) exist for this record</i></small></a></span>
     </p>
 
     <hr />
   </div>
+
 </div>
