@@ -27,6 +27,7 @@
 
 # Requirements not on PyPI
 -e git+https://github.com/zenodo/zenodo-migrator.git#egg=zenodo-migrator
+-e git+https://github.com/inveniosoftware/invenio-stats.git@counter-sprint#egg=invenio-stats
 
 # PyPI requirements
 alembic==0.9.9

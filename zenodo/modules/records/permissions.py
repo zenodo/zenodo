@@ -52,7 +52,6 @@ def get_public_bucket_uuids():
     return [current_app.config[k] for k in buckets]
 
 
-
 def files_permission_factory(obj, action=None):
     """Permission for files are always based on the type of bucket.
 
@@ -82,6 +81,9 @@ def files_permission_factory(obj, action=None):
         rb = RecordsBuckets.query.filter_by(bucket_id=bucket_id).one_or_none()
         if rb is not None:
             record = Record.get_record(rb.record_id)
+            # "Cache" the file's record in the request context
+            if record and request:
+                setattr(request, 'current_file_record', record)
             if is_record(record):
                 return RecordFilesPermission.create(record, action)
             elif is_deposit(record):
