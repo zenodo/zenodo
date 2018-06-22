@@ -22,23 +22,29 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Statistics events processors."""
+"""Statistics utilities."""
 
-from invenio_records.models import RecordMetadata
-from invenio_records_files.models import RecordsBuckets
-
-from zenodo.modules.records.utils import is_deposit
+from flask import request
 
 
-def skip_deposit_file(doc):
-    """Check if event is coming from deposit file and skip."""
-    rb = RecordsBuckets.query.filter_by(bucket_id=doc["bucket_id"]).first()
-    record = RecordMetadata.query.filter_by(id=rb.record_id).first()
-    if is_deposit(record.json):
-        return None
-    return doc
+def get_record_from_context(**kwargs):
+    """Get the cached record object from kwargs or the request context."""
+    if 'record' in kwargs:
+        return kwargs['record']
+    else:
+        if request and \
+                hasattr(request._get_current_object(), 'current_file_record'):
+            return request.current_file_record
 
 
-def skip_deposit_record(doc):
-    """Check if event is coming from deposit record and skip."""
-    return None if doc["pid_type"] == "depid" else doc
+def extract_event_record_metadata(record):
+    """Extract from a record the payload needed for a statistics event."""
+    return dict(
+        record_id=str(record.id),
+        recid=record.get('recid'),
+        conceptrecid=record.get('conceptrecid'),
+        doi=record.get('doi'),
+        conceptdoi=record.get('conceptdoi'),
+        resource_type=record.get('resource_type'),
+        communities=record.get('communities'),
+    )

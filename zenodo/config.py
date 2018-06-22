@@ -1161,12 +1161,12 @@ STATS_EVENTS = {
     'file-download': {
         'signal': 'invenio_files_rest.signals.file_downloaded',
         'event_builders': [
-            'invenio_stats.contrib.event_builders.file_download_event_builder'
+            'invenio_stats.contrib.event_builders.file_download_event_builder',
+            'zenodo.modules.stats.event_builders:skip_deposit',
+            'zenodo.modules.stats.event_builders:add_record_metadata',
         ],
         'processor_config': {
             'preprocessors': [
-                'zenodo.modules.stats.processors:skip_deposit_file',
-                # TODO: review these processors
                 'invenio_stats.processors:flag_robots',
                 'invenio_stats.processors:anonymize_user',
                 'invenio_stats.contrib.event_builders:build_file_unique_id',
@@ -1180,12 +1180,13 @@ STATS_EVENTS = {
     'record-view': {
         'signal': 'invenio_records_ui.signals.record_viewed',
         'event_builders': [
+            # TODO: Check if this builder is needed now...
             'invenio_stats.contrib.event_builders.record_view_event_builder',
+            'zenodo.modules.stats.event_builders:skip_deposit',
+            'zenodo.modules.stats.event_builders:add_record_metadata',
         ],
         'processor_config': {
             'preprocessors': [
-                'zenodo.modules.stats.processors:skip_deposit_record',
-                # TODO: review these processors
                 'invenio_stats.processors:flag_robots',
                 'invenio_stats.processors:anonymize_user',
                 'invenio_stats.contrib.event_builders:build_record_unique_id',
