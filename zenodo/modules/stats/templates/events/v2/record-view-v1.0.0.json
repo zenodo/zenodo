@@ -1,0 +1,81 @@
+{
+  "template": "events-stats-record-view-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "record-view-v1.0.0": {
+      "_source": {
+        "enabled": false
+      },
+      "_all": {
+        "enabled": false
+      },
+      "date_detection": false,
+      "numeric_detection": false,
+      "properties": {
+        "timestamp": {
+          "type": "date",
+          "format": "strict_date_hour_minute_second"
+        },
+        "record_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "country": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "visitor_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "is_machine": {
+          "type": "boolean",
+          "index": "not_analyzed"
+        },
+        "is_robot": {
+          "type": "boolean",
+          "index": "not_analyzed"
+        },
+        "recid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "conceptrecid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "doi": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "conceptdoi": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resource_type": {
+          "type": "object",
+          "index": "not_analyzed"
+        },
+        "communities": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "unique_session_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "referrer": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  },
+  "aliases": {
+    "events-stats-record-view": {}
+  }
+}
