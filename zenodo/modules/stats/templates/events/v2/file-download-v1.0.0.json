@@ -1,0 +1,114 @@
+{
+  "template": "events-stats-file-download-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "_default_": {
+      "dynamic_templates": [
+        {
+          "date_fields": {
+            "match_mapping_type": "date",
+            "mapping": {
+              "type": "date",
+              "format": "strict_date_hour_minute_second"
+            }
+          }
+        }
+      ]
+    },
+    "file-download-v1.0.0": {
+      "_source": {
+        "enabled": false
+      },
+      "_all": {
+        "enabled": false
+      },
+      "date_detection": false,
+      "numeric_detection": false,
+      "properties": {
+        "timestamp": {
+          "type": "date",
+          "format": "strict_date_hour_minute_second"
+        },
+        "bucket_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "file_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "file_key": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "unique_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "country": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "visitor_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "size": {
+          "type": "double",
+          "index": "not_analyzed"
+        },
+        "is_machine": {
+          "type": "boolean",
+          "index": "not_analyzed"
+        },
+        "is_robot": {
+          "type": "boolean",
+          "index": "not_analyzed"
+        },
+        "record_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "recid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "conceptrecid": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "doi": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "conceptdoi": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "resource_type": {
+          "type": "object",
+          "index": "not_analyzed"
+        },
+        "communities": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "unique_session_id": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "referrer": {
+          "type": "string",
+          "index": "not_analyzed"
+        }
+      }
+    }
+  },
+  "aliases": {
+    "events-stats-file-download": {}
+  }
+}
