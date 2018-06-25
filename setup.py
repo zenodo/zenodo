@@ -197,6 +197,7 @@ setup(
         'flask.commands': [
             'audit = zenodo.modules.auditor.cli:audit',
             'github = zenodo.modules.github.cli:github',
+            'stats = zenodo.modules.stats.cli:stats',
             'utils = zenodo.modules.utils.cli:utils',
         ],
         'invenio_admin.views': [(
