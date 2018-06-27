@@ -19,7 +19,7 @@
         }
       ]
     },
-    "file-download-v1.0.0": {
+    "stats-file-download": {
       "_source": {
         "enabled": false
       },
