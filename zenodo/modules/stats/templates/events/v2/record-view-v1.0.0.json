@@ -6,7 +6,7 @@
     }
   },
   "mappings": {
-    "record-view-v1.0.0": {
+    "stats-record-view": {
       "_source": {
         "enabled": false
       },
