@@ -30,9 +30,61 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.proxies import current_pidrelations
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
+from invenio_stats import current_stats
 
 from zenodo.modules.records.serializers.pidrelations import \
     serialize_related_identifiers
+
+
+def _build_stats(record, skip_files=False):
+    stats = {}
+    stats_sources = {
+        'record-view-agg': {
+            'params': {'recid': record['recid']},
+            'fields': {
+                'views': 'count',
+                'unique_views': 'unique_count',
+            },
+        },
+        'record-download-agg': {
+            'files_related': True,
+            'params': {'recid': record['recid']},
+            'fields': {
+                'downloads': 'count',
+                'unique_downloads': 'unique_count',
+                'volume': 'volume',
+            },
+        },
+        'record-view-all-versions-agg': {
+            'params': {'conceptrecid': record['conceptrecid']},
+            'fields': {
+                'version_views': 'count',
+                'version_unique_views': 'unique_count',
+            }
+        },
+        'record-download-all-versions-agg': {
+            'files_related': True,
+            'params': {'conceptrecid': record['conceptrecid']},
+            'fields': {
+                'version_downloads': 'count',
+                'version_unique_downloads': 'unique_count',
+                'version_volume': 'volume',
+            },
+        },
+    }
+
+    for query_name, cfg in stats_sources.items():
+        if cfg.get('files_related') and skip_files:
+            continue
+        try:
+            query_cfg = current_stats.queries[query_name]
+            query = query_cfg.query_class(**query_cfg.query_config)
+            result = query.run(**cfg['params'])
+            for dst, src in cfg['fields'].items():
+                stats[dst] = result.get(src)
+        except Exception:
+            pass
+    return stats
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,
@@ -70,3 +122,6 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     # Remove internal data.
     if '_internal' in json:
         del json['_internal']
+
+    json['_stats'] = _build_stats(
+        record, skip_files=json['access_right'] != 'open')

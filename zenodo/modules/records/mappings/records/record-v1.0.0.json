@@ -645,6 +645,40 @@
             }
           },
           "type": "object"
+        },
+        "_stats": {
+          "properties": {
+            "views": {
+              "type": "integer"
+            },
+            "unique_views": {
+              "type": "integer"
+            },
+            "downloads": {
+              "type": "integer"
+            },
+            "unique_downloads": {
+              "type": "integer"
+            },
+            "volume": {
+              "type": "double"
+            },
+            "version_volume": {
+              "type": "double"
+            },
+            "version_views": {
+              "type": "integer"
+            },
+            "version_unique_views": {
+              "type": "integer"
+            },
+            "version_downloads": {
+              "type": "integer"
+            },
+            "version_unique_downloads": {
+              "type": "integer"
+            }
+          }
         }
       }
     }
