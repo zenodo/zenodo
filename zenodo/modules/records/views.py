@@ -40,6 +40,7 @@ from invenio_i18n.ext import current_i18n
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
+from invenio_search.api import RecordsSearch
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
@@ -188,6 +189,7 @@ def zenodo_community_branding_links(record):
             ret.append((comm, comm_model.logo_url))
     return ret
 
+
 #
 # Object type template filters and tests.
 #
@@ -232,6 +234,29 @@ def select_preview_file(files):
     except KeyError:
         pass
     return selected
+
+
+#
+# Stats filters
+#
+
+@blueprint.app_template_filter()
+def record_stats(record):
+    """Fetch record statistics from Elasticsearch."""
+    try:
+        res = (RecordsSearch()
+               .source(include='_stats')  # only include "_stats" field
+               .get_record(record.id)
+               .execute())
+        return res[0]._stats.to_dict() if res else None
+    except Exception:
+        pass
+
+
+@blueprint.app_template_filter()
+def stats_num_format(num):
+    """Format a statistics value."""
+    return '{:,.0f}'.format(num or 0)
 
 
 #
