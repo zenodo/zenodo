@@ -1,0 +1,198 @@
+{%- set stats, has_versions = record|record_stats %}
+<div class="row stats-box">
+  {%- if has_versions %}
+  <div id="accordion">
+    <div class="row">
+      <div class="col-sm-6">
+        <span class="stats-data">{{stats.version_views}}</span>
+      </div>
+      <div class="col-sm-6">
+        <span class="stats-data">{{stats.version_downloads}}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <i class="fa fa-eye" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total views."></i> views
+      </div>
+      <div class="col-sm-6">
+        <i class="fa fa-download" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total downloads."></i> downloads
+      </div>
+    </div>
+    <div id="toggle-stats" class="row" style="margin-top: 10px;">
+      <div class="col-sm-12">
+        <a class="panel-toggle" data-toggle="collapse" data-target="#collapseStats" aria-expanded="true" aria-controls="collapseStats">
+          See more details...
+        </a>
+      </div>
+    </div>
+
+    <div id="collapseStats" style="margin-top: 15px; margin-left: 10px; font-size: 12px;" class="collapse" aria-labelledby="toggle-stats" data-parent="#accordion">
+      <table class="table stats-title">
+        <tr>
+          <th>
+          </th>
+          <th>
+             All versions
+           </th>
+          <th>
+             This version
+           </th>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Views
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total views."></i>
+          </td>
+          <td>
+            {{stats.version_views}}
+          </td>
+          <td>
+            {{stats.views}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Downloads
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total downloads."></i>
+          </td>
+          <td>
+            {{stats.version_downloads}}
+          </td>
+           <td>
+            {{stats.downloads}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Volume
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total download volume."></i>
+          </td>
+          <td>
+            {{stats.version_volume|filesizeformat}}
+          </td>
+          <td>
+            {{stats.volume|filesizeformat}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Unique views
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Views in one hour user-sessions are counted only once."></i>
+          </td>
+          <td class="col-sm-3">
+            {{stats.version_unique_views}}
+          </td>
+          <td class="col-sm-3">
+            {{stats.unique_views}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Unique downloads
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Downloads in one hour user-sessions are counted only once."></i>
+          </td>
+          <td>
+            {{stats.version_unique_downloads}}
+          </td>
+          <td>
+            {{stats.unique_downloads}}
+          </td>
+        </tr>
+      </table>
+
+      <div class="row">
+        <a herf="#">More info on how stats are collected.</a>
+      </div>
+    </div>
+  </div>
+
+  {%- else %}
+
+  <div id="accordion">
+    <div class="row">
+      <div class="col-sm-6">
+        <span class="stats-data">{{stats.views}}</span>
+      </div>
+      <div class="col-sm-6">
+        <span class="stats-data">{{stats.downloads}}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        <i class="fa fa-eye" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total views."></i> views
+      </div>
+      <div class="col-sm-6">
+        <i class="fa fa-download" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total downloads."></i> downloads
+      </div>
+    </div>
+    <div id="toggle-stats" class="row" style="margin-top: 10px;">
+      <div class="col-sm-12">
+        <a class="panel-toggle" data-toggle="collapse" data-target="#collapseStats" aria-expanded="true" aria-controls="collapseStats">
+          See more details...
+        </a>
+      </div>
+    </div>
+
+    <div id="collapseStats" style="margin-top: 15px; margin-left: 10px; font-size: 12px;" class="collapse" aria-labelledby="toggle-stats" data-parent="#accordion">
+      <table class="table stats-title">
+        <tr>
+          <td style="text-align: left;">
+            Views
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total views."></i>
+          </td>
+          <td>
+            {{stats.views}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Downloads
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total downloads."></i>
+          </td>
+           <td>
+            {{stats.downloads}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Volume
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Total download volume."></i>
+          </td>
+          <td>
+            {{stats.volume|filesizeformat}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Unique views
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Views in one hour user-sessions are counted only once."></i>
+          </td>
+          <td class="col-sm-3">
+            {{stats.unique_views}}
+          </td>
+        </tr>
+        <tr>
+          <td style="text-align: left;">
+            Unique downloads
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" tooltip="" data-placement="top" title="" data-original-title="Downloads in one hour user-sessions are counted only once."></i>
+          </td>
+          <td>
+            {{stats.unique_downloads}}
+          </td>
+        </tr>
+      </table>
+      <div class="row">
+        <a herf="#">More info on how stats are collected.</a>
+      </div>
+    </div>
+  </div>
+
+  {%- endif %}
+
+
+</div>
+{%- if record.doi %}
+  <!--{{ altmetric_badge('record.doi') }}-->
+  {{ altmetric_badge('10.5281/zenodo.60215') }}
+{%- endif %}
+

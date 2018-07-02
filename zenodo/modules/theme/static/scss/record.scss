@@ -154,3 +154,16 @@
     margin: 0;
     margin-bottom: 15px;
 }
+
+.stats-box {
+    text-align: center;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+
+    .stats-title {
+    }
+
+    .stats-data {
+        font-size: 36px;
+    }
+}

@@ -40,9 +40,11 @@ from invenio_i18n.ext import current_i18n
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
+from invenio_search.api import RecordsSearch
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.records.minters import is_local_doi
 from zenodo.modules.records.utils import is_doi_locally_managed
 
 from .api import ZenodoRecord
@@ -188,6 +190,7 @@ def zenodo_community_branding_links(record):
             ret.append((comm, comm_model.logo_url))
     return ret
 
+
 #
 # Object type template filters and tests.
 #
@@ -232,6 +235,26 @@ def select_preview_file(files):
     except KeyError:
         pass
     return selected
+
+
+#
+# Stats filters
+#
+
+@blueprint.app_template_filter()
+def record_stats(record):
+    # res = RecordsSearch(index='records').source(include='_stats').get(record.id).execute()
+    # if res and res._stats:
+    #     return res._stats
+    # else:
+    #     return (dict(views=0, version_views=0, downloads=0,
+    #       version_downloads=0, volume=0, version_volume=0),
+    #       is_local_doi(record.doi))
+    return (dict(views=260800, version_views=307100, downloads=533,
+                 version_downloads=1034, volume=100, version_volume=1500,
+                 unique_views=1071, version_unique_views=2608,
+                 unique_downloads=500, version_unique_downloads=634),
+            True)
 
 
 #
