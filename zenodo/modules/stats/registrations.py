@@ -148,6 +148,7 @@ def register_queries():
                     recid='recid',
                 ),
                 metric_fields=dict(
+                    count=('sum', 'count'),
                     unique_count=('sum', 'unique_count'),
                     volume=('sum', 'volume'),
                 )
@@ -167,12 +168,13 @@ def register_queries():
                     is_parent='is_parent'
                 ),
                 query_modifiers=[
-                    lambda query, _: query.filter('term', is_parent=True)
+                    lambda query, **_: query.filter('term', is_parent=True)
                 ],
                 required_filters=dict(
                     conceptrecid='conceptrecid',
                 ),
                 metric_fields=dict(
+                    count=('sum', 'count'),
                     unique_count=('sum', 'unique_count'),
                     volume=('sum', 'volume'),
                 )
@@ -198,6 +200,7 @@ def register_queries():
                     recid='recid',
                 ),
                 metric_fields=dict(
+                    count=('sum', 'count'),
                     unique_count=('sum', 'unique_count'),
                 )
             )
@@ -216,12 +219,13 @@ def register_queries():
                     is_parent='is_parent'
                 ),
                 query_modifiers=[
-                    lambda query, _: query.filter('term', is_parent=True)
+                    lambda query, **_: query.filter('term', is_parent=True)
                 ],
                 required_filters=dict(
                     conceptrecid='conceptrecid',
                 ),
                 metric_fields=dict(
+                    count=('sum', 'count'),
                     unique_count=('sum', 'unique_count'),
                 )
             )
