@@ -1198,6 +1198,43 @@ STATS_EVENTS = {
         },
     },
 }
+#: Enabled aggregations from 'zenoodo.modules.stats.registrations'
+STATS_AGGREGATIONS = {
+    'record-download-agg': {},
+    'record-download-all-versions-agg': {},
+    # NOTE: Since the "record-view-agg" aggregations is alrady registered in
+    # "invenio_stasts.contrib.registrations", we have to overwrite the
+    # configuration here
+    'record-view-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        aggregator_config=dict(
+            event='record-view',
+            aggregation_field='recid',
+            aggregation_interval='day',
+            copy_fields=dict(
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (list(d.communities)
+                                          if d.communities else None),
+                is_parent=lambda *_: False
+            ),
+            metric_aggregation_fields=dict(
+                unique_count=('cardinality', 'unique_session_id'),
+            )
+        )
+    ),
+    'record-view-all-versions-agg': {},
+}
+#: Enabled queries from 'zenoodo.modules.stats.registrations'
+STATS_QUERIES = {
+    'record-view': {},
+    'record-view-all-versions': {},
+    'record-download': {},
+    'record-download-all-versions': {},
+}
 
 # Queues
 # ======

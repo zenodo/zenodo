@@ -77,29 +77,9 @@ def register_aggregations():
                     volume=('sum', 'size'),
                 )
             )),
-        dict(
-            aggregation_name='record-view-agg',
-            templates='zenodo.modules.stats.templates.aggregations',
-            aggregator_class=StatAggregator,
-            aggregator_config=dict(
-                client=current_search_client,
-                event='record-view',
-                aggregation_field='recid',
-                aggregation_interval='day',
-                copy_fields=dict(
-                    record_id='record_id',
-                    recid='recid',
-                    conceptrecid='conceptrecid',
-                    doi='doi',
-                    conceptdoi='conceptdoi',
-                    communities=lambda d, _: (list(d.communities)
-                                              if d.communities else None),
-                    is_parent=lambda *_: False
-                ),
-                metric_aggregation_fields=dict(
-                    unique_count=('cardinality', 'unique_session_id'),
-                )
-            )),
+        # NOTE: Since the "record-view-agg" aggregations is already registered
+        # in "invenio_stasts.contrib.registrations", we have to overwrite the
+        # configuration in "zenodo.config.STATS_AGGREGATIONS".
         dict(
             aggregation_name='record-view-all-versions-agg',
             templates='zenodo.modules.stats.templates.aggregations',
@@ -140,8 +120,7 @@ def register_queries():
                     conceptrecid='conceptrecid',
                     doi='doi',
                     conceptdoi='conceptdoi',
-                    communities=lambda d, _: (list(d.communities)
-                                              if d.communities else None),
+                    communities='communities',
                     is_parent='is_parent'
                 ),
                 required_filters=dict(
@@ -163,8 +142,7 @@ def register_queries():
                 copy_fields=dict(
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',
-                    communities=lambda d, _: (list(d.communities)
-                                              if d.communities else None),
+                    communities='communities',
                     is_parent='is_parent'
                 ),
                 query_modifiers=[
@@ -192,8 +170,7 @@ def register_queries():
                     conceptrecid='conceptrecid',
                     doi='doi',
                     conceptdoi='conceptdoi',
-                    communities=lambda d, _: (list(d.communities)
-                                              if d.communities else None),
+                    communities='communities',
                     is_parent='is_parent'
                 ),
                 required_filters=dict(
@@ -214,8 +191,7 @@ def register_queries():
                 copy_fields=dict(
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',
-                    communities=lambda d, _: (list(d.communities)
-                                              if d.communities else None),
+                    communities='communities',
                     is_parent='is_parent'
                 ),
                 query_modifiers=[
