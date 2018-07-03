@@ -24,66 +24,63 @@
 
 """Tasks for statistics."""
 
+from datetime import datetime
+
 from celery import shared_task
-from invenio_stats import current_stats
 from elasticsearch_dsl import Index, Search
-import datetime
 from invenio_indexer.api import RecordIndexer
+from invenio_stats import current_stats
 
 
 @shared_task(ignore_result=True)
 def update_record_statistics():
-    # Get last 2 bookmarks for aggregations
-    start_date = datetime.date.today()
-    end_date = datetime.date.today()
+    start_date = datetime.utcnow()
+    end_date = datetime.utcnow()
 
-    aggr_indices = set()
+    aggr_configs = {}
 
-    for a in current_stats.enabled_aggregations:
-        aggregator = current_stats.aggregations[a].aggregator_class(
-            **current_stats.aggregations[a].aggregator_config)
+    for aggr_name in current_stats.enabled_aggregations:
+        aggr = current_stats.aggregations[aggr_name].aggregator_class(
+            **current_stats.aggregations[aggr_name].aggregator_config)
 
-        # Get the last two bookmarks
-        if not Index(aggregator.aggregation_alias,
-                     using=aggregator.client).exists():
-            if not Index(aggregator.event_index,
-                         using=aggregator.client).exists():
-                start_date = min(start_date, datetime.date.today())
-            start_date = min(start_date,
-                             aggregator._get_oldest_event_timestamp())
+        if not Index(aggr.aggregation_alias, using=aggr.client).exists():
+            if not Index(aggr.event_index, using=aggr.client).exists():
+                start_date = min(start_date, datetime.utcnow())
+            else:
+                start_date = min(
+                    start_date, aggr._get_oldest_event_timestamp())
 
         # Retrieve the last two bookmarks
         bookmarks = Search(
-            using=aggregator.client,
-            index=aggregator.aggregation_alias,
-            doc_type='{0}-bookmark'.format(aggregator.event)
+            using=aggr.client,
+            index=aggr.aggregation_alias,
+            doc_type='{0}-bookmark'.format(aggr.event)
         )[0:2].sort({'date': {'order': 'desc'}}).execute()
 
         if len(bookmarks) >= 1:
             end_date = max(
-                end_date, datetime.datetime.strptime(
-                    bookmarks[0].date, aggregator.doc_id_suffix).date())
+                end_date,
+                datetime.strptime(bookmarks[0].date, aggr.doc_id_suffix))
         if len(bookmarks) == 2:
             start_date = min(
-                start_date, datetime.datetime.strptime(
-                    bookmarks[1].date, aggregator.doc_id_suffix).date())
+                start_date,
+                datetime.strptime(bookmarks[1].date, aggr.doc_id_suffix))
 
-        aggr_indices.add(aggregator.aggregation_alias)
-
-    import wdb; wdb.set_trace()
+        aggr_configs[aggr.aggregation_alias] = aggr
 
     # Get all the affected records between the two dates:
     record_ids = set()
-    for i in aggr_indices:
+    for aggr_alias, aggr_config in aggr_configs.items():
         doc_type = '{0}-{1}-aggregation'.format(
-            aggregator.event, aggregator.aggregation_interval)
+            aggr_config.event, aggr_config.aggregation_interval)
         query = Search(
-            using=aggregator.client,
-            index=aggregator.aggregation_alias,
+            using=aggr_config.client,
+            index=aggr_alias,
             doc_type=doc_type,
         ).filter(
-            'range', timestamp={'gte': start_date.isoformat(),
-                                'lte': end_date.isoformat()}
+            'range', timestamp={
+                'gte': start_date.replace(microsecond=0).isoformat(),
+                'lte': end_date.replace(microsecond=0).isoformat()}
         ).extra(_source=False)
         query.aggs.bucket('ids', 'terms', field='record_id', size=0)
         record_ids |= {b.key for b in query.execute().aggregations.ids.buckets}

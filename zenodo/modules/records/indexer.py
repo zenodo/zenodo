@@ -39,14 +39,14 @@ from zenodo.modules.records.serializers.pidrelations import \
 def _build_stats(record, skip_files=False):
     stats = {}
     stats_sources = {
-        'record-view-agg': {
+        'record-view': {
             'params': {'recid': record['recid']},
             'fields': {
                 'views': 'count',
                 'unique_views': 'unique_count',
             },
         },
-        'record-download-agg': {
+        'record-download': {
             'files_related': True,
             'params': {'recid': record['recid']},
             'fields': {
@@ -55,16 +55,16 @@ def _build_stats(record, skip_files=False):
                 'volume': 'volume',
             },
         },
-        'record-view-all-versions-agg': {
-            'params': {'conceptrecid': record['conceptrecid']},
+        'record-view-all-versions': {
+            'params': {'conceptrecid': record.get('conceptrecid')},
             'fields': {
                 'version_views': 'count',
                 'version_unique_views': 'unique_count',
             }
         },
-        'record-download-all-versions-agg': {
+        'record-download-all-versions': {
             'files_related': True,
-            'params': {'conceptrecid': record['conceptrecid']},
+            'params': {'conceptrecid': record.get('conceptrecid')},
             'fields': {
                 'version_downloads': 'count',
                 'version_unique_downloads': 'unique_count',
@@ -72,7 +72,6 @@ def _build_stats(record, skip_files=False):
             },
         },
     }
-
     for query_name, cfg in stats_sources.items():
         if cfg.get('files_related') and skip_files:
             continue
