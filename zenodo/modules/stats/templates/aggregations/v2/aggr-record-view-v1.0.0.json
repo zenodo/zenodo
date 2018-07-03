@@ -8,7 +8,7 @@
   "mappings": {
     "record-view-day-aggregation": {
       "_source": {
-        "enabled": false
+        "enabled": true
       },
       "_all": {
         "enabled": false
