@@ -296,6 +296,10 @@ setup(
             'zenodo_stats = '
             'zenodo.modules.stats.registrations:register_aggregations'
         ],
+        'invenio_stats.queries': [
+            'zenodo_stats = '
+            'zenodo.modules.stats.registrations:register_queries'
+        ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
         ],
