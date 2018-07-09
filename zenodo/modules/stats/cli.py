@@ -33,8 +33,8 @@ from datetime import datetime as dt
 
 import click
 from flask.cli import with_appcontext
+from invenio_stats.cli import stats
 from invenio_stats.proxies import current_stats
-from invenio_stats.tasks import aggregate_events, process_events
 from six.moves.urllib.parse import urlparse
 
 from zenodo.modules.records.resolvers import record_resolver
@@ -133,11 +133,6 @@ EVENT_TYPE_BUILDERS = {
 }
 
 
-@click.group()
-def stats():
-    """Statistics commands."""
-
-
 @stats.command('import')
 @click.argument('event-type', type=click.Choice(EVENT_TYPE_BUILDERS.keys()))
 @click.argument('csv-dir', type=click.Path(file_okay=False, resolve_path=True))
@@ -169,41 +164,3 @@ def import_piwik_events(event_type, csv_dir, chunk_size):
     click.secho(
         'Run the "invenio_stats.tasks.process_events" to index the events...',
         fg='yellow')
-
-
-@stats.command('process-events')
-@click.argument('event-types', nargs=-1)
-@click.option('--eager', '-e', is_flag=True)
-@with_appcontext
-def _process_events(event_types, eager):
-    """Process stats events.
-
-    Event types:
-
-    \b
-    - record-view
-    - file-download
-    """
-    if eager:
-        process_events.apply((event_types,), throw=True)
-    else:
-        process_events.delay(event_types)
-
-
-@stats.command('aggregate-events')
-@click.argument('aggregation-types', nargs=-1)
-@click.option('--eager', '-e', is_flag=True)
-@with_appcontext
-def _aggregate_events(aggregation_types, eager):
-    """Process stats aggregations.
-
-    Aggregation types:
-
-    \b
-    - file-download-agg
-    - record-view-agg
-    """
-    if eager:
-        aggregate_events.apply((aggregation_types,), throw=True)
-    else:
-        aggregate_events.delay(aggregation_types)
