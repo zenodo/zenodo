@@ -1,6 +1,7 @@
 {
   "template": "events-stats-file-download-*",
   "settings": {
+    "index.mapper.dynamic": false,
     "index": {
       "refresh_interval": "5s"
     }
@@ -20,9 +21,6 @@
       ]
     },
     "stats-file-download": {
-      "_source": {
-        "enabled": false
-      },
       "_all": {
         "enabled": false
       },
@@ -91,8 +89,7 @@
           "index": "not_analyzed"
         },
         "resource_type": {
-          "type": "object",
-          "index": "not_analyzed"
+          "type": "object"
         },
         "communities": {
           "type": "string",

@@ -1,15 +1,13 @@
 {
   "template": "stats-record-view-*",
   "settings": {
+    "index.mapper.dynamic": false,
     "index": {
       "refresh_interval": "5s"
     }
   },
   "mappings": {
     "record-view-day-aggregation": {
-      "_source": {
-        "enabled": true
-      },
       "_all": {
         "enabled": false
       },
@@ -59,7 +57,16 @@
         }
       }
     },
-    "record-view-bookmark": {
+    "record-view-agg-bookmark": {
+      "date_detection": false,
+      "properties": {
+        "date": {
+          "type": "date",
+          "format": "date_optional_time"
+        }
+      }
+    },
+    "record-view-all-versions-agg-bookmark": {
       "date_detection": false,
       "properties": {
         "date": {

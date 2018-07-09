@@ -1166,6 +1166,7 @@ STATSD_PREFIX = "zenodo"
 STATS_EVENTS = {
     'file-download': {
         'signal': 'invenio_files_rest.signals.file_downloaded',
+        'templates': 'zenodo.modules.stats.templates.events',
         'event_builders': [
             'invenio_stats.contrib.event_builders.file_download_event_builder',
             'zenodo.modules.stats.event_builders:skip_deposit',
@@ -1185,6 +1186,7 @@ STATS_EVENTS = {
     },
     'record-view': {
         'signal': 'invenio_records_ui.signals.record_viewed',
+        'templates': 'zenodo.modules.stats.templates.events',
         'event_builders': [
             # TODO: Check if this builder is needed now...
             'invenio_stats.contrib.event_builders.record_view_event_builder',

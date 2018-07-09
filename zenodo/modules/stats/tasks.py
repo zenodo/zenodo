@@ -54,7 +54,7 @@ def update_record_statistics():
         bookmarks = Search(
             using=aggr.client,
             index=aggr.aggregation_alias,
-            doc_type='{0}-bookmark'.format(aggr.event)
+            doc_type=aggr.bookmark_doc_type
         )[0:2].sort({'date': {'order': 'desc'}}).execute()
 
         if len(bookmarks) >= 1:
@@ -70,13 +70,11 @@ def update_record_statistics():
 
     # Get all the affected records between the two dates:
     record_ids = set()
-    for aggr_alias, aggr_config in aggr_configs.items():
-        doc_type = '{0}-{1}-aggregation'.format(
-            aggr_config.event, aggr_config.aggregation_interval)
+    for aggr_alias, aggr in aggr_configs.items():
         query = Search(
-            using=aggr_config.client,
-            index=aggr_alias,
-            doc_type=doc_type,
+            using=aggr.client,
+            index=aggr.aggregation_alias,
+            doc_type=aggr.aggregation_doc_type,
         ).filter(
             'range', timestamp={
                 'gte': start_date.replace(microsecond=0).isoformat(),
