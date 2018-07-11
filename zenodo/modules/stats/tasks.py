@@ -27,46 +27,59 @@
 from datetime import datetime
 
 from celery import shared_task
+from dateutil.parser import parse as dateutil_parse
 from elasticsearch_dsl import Index, Search
 from invenio_indexer.api import RecordIndexer
 from invenio_stats import current_stats
 
 
 @shared_task(ignore_result=True)
-def update_record_statistics():
-    start_date = datetime.utcnow()
-    end_date = datetime.utcnow()
-
+def update_record_statistics(start_date=None, end_date=None):
+    """Update "_stats" field of affected records."""
     aggr_configs = {}
 
-    for aggr_name in current_stats.enabled_aggregations:
-        aggr = current_stats.aggregations[aggr_name].aggregator_class(
-            **current_stats.aggregations[aggr_name].aggregator_config)
+    if not start_date and not end_date:
+        start_date = datetime.utcnow()
+        end_date = datetime.utcnow()
 
-        if not Index(aggr.aggregation_alias, using=aggr.client).exists():
-            if not Index(aggr.event_index, using=aggr.client).exists():
-                start_date = min(start_date, datetime.utcnow())
-            else:
+        for aggr_name in current_stats.enabled_aggregations:
+            aggr = current_stats.aggregations[aggr_name].aggregator_class(
+                **current_stats.aggregations[aggr_name].aggregator_config)
+
+            if not Index(aggr.aggregation_alias, using=aggr.client).exists():
+                if not Index(aggr.event_index, using=aggr.client).exists():
+                    start_date = min(start_date, datetime.utcnow())
+                else:
+                    start_date = min(
+                        start_date, aggr._get_oldest_event_timestamp())
+
+            # Retrieve the last two bookmarks
+            bookmarks = Search(
+                using=aggr.client,
+                index=aggr.aggregation_alias,
+                doc_type=aggr.bookmark_doc_type
+            )[0:2].sort({'date': {'order': 'desc'}}).execute()
+
+            if len(bookmarks) >= 1:
+                end_date = max(
+                    end_date,
+                    datetime.strptime(bookmarks[0].date, aggr.doc_id_suffix))
+            if len(bookmarks) == 2:
                 start_date = min(
-                    start_date, aggr._get_oldest_event_timestamp())
+                    start_date,
+                    datetime.strptime(bookmarks[1].date, aggr.doc_id_suffix))
 
-        # Retrieve the last two bookmarks
-        bookmarks = Search(
-            using=aggr.client,
-            index=aggr.aggregation_alias,
-            doc_type=aggr.bookmark_doc_type
-        )[0:2].sort({'date': {'order': 'desc'}}).execute()
+            aggr_configs[aggr.aggregation_alias] = aggr
+    elif start_date and end_date:
+        start_date = dateutil_parse(start_date)
+        end_date = dateutil_parse(end_date)
 
-        if len(bookmarks) >= 1:
-            end_date = max(
-                end_date,
-                datetime.strptime(bookmarks[0].date, aggr.doc_id_suffix))
-        if len(bookmarks) == 2:
-            start_date = min(
-                start_date,
-                datetime.strptime(bookmarks[1].date, aggr.doc_id_suffix))
-
-        aggr_configs[aggr.aggregation_alias] = aggr
+        for aggr_name in current_stats.enabled_aggregations:
+            aggr = current_stats.aggregations[aggr_name].aggregator_class(
+                    **current_stats.aggregations[aggr_name].aggregator_config)
+            aggr_configs[aggr.aggregation_alias] = aggr
+    else:
+        return
 
     # Get all the affected records between the two dates:
     record_ids = set()
@@ -77,8 +90,8 @@ def update_record_statistics():
             doc_type=aggr.aggregation_doc_type,
         ).filter(
             'range', timestamp={
-                'gte': start_date.replace(microsecond=0).isoformat(),
-                'lte': end_date.replace(microsecond=0).isoformat()}
+                'gte': start_date.replace(microsecond=0).isoformat() + '||/d',
+                'lte': end_date.replace(microsecond=0).isoformat() + '||/d'}
         ).extra(_source=False)
         query.aggs.bucket('ids', 'terms', field='record_id', size=0)
         record_ids |= {b.key for b in query.execute().aggregations.ids.buckets}
