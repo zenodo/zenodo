@@ -58,6 +58,10 @@
         "resource_type": {
           "type": "object"
         },
+        "access_right": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
         "communities": {
           "type": "string",
           "index": "not_analyzed"

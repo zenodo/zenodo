@@ -41,10 +41,11 @@ def extract_event_record_metadata(record):
     """Extract from a record the payload needed for a statistics event."""
     return dict(
         record_id=str(record.id),
-        recid=record.get('recid'),
+        recid=str(record['recid']) if record.get('recid') else None,
         conceptrecid=record.get('conceptrecid'),
         doi=record.get('doi'),
         conceptdoi=record.get('conceptdoi'),
+        access_right=record.get('access_right'),
         resource_type=record.get('resource_type'),
         communities=record.get('communities'),
     )
