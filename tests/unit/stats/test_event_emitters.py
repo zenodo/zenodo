@@ -25,6 +25,7 @@
 from flask import url_for
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
+from elasticsearch_dsl import Search
 from invenio_search import current_search
 from invenio_stats.tasks import process_events
 
@@ -32,6 +33,7 @@ from invenio_stats.tasks import process_events
 def test_record_page(app, db, es, event_queues, full_record):
     """Test record page views."""
     full_record['conceptdoi'] = '10.1234/foo.concept'
+    full_record['conceptrecid'] = 'foo.concept'
     r = Record.create(full_record)
     PersistentIdentifier.create(
         'recid', '12345', object_type='rec', object_uuid=r.id,
@@ -39,16 +41,48 @@ def test_record_page(app, db, es, event_queues, full_record):
     db.session.commit()
 
     with app.test_client() as client:
-        res = client.get(
-            url_for('invenio_records_ui.recid', pid_value='12345'))
-        assert res.status_code == 200
+        record_url = url_for('invenio_records_ui.recid', pid_value='12345')
+        assert client.get(record_url).status_code == 200
 
     process_events(['record-view'])
     current_search.flush_and_refresh(index='events-stats-record-view')
 
-    res = es.search(index='events-stats-record-view')
-    doc = res['hits']['hits'][0]['_source']
-    assert res['hits']['total'] == 1
+    search = Search(using=es, index='events-stats-record-view')
+    assert search.count() == 1
+    doc = search.execute()[0]
     assert doc['doi'] == '10.1234/foo.bar'
     assert doc['conceptdoi'] == '10.1234/foo.concept'
+    assert doc['recid'] == '12345'
+    assert doc['conceptrecid'] == 'foo.concept'
     assert doc['resource_type'] == {'type': 'publication', 'subtype': 'book'}
+    assert doc['access_right'] == 'open'
+
+
+def test_file_download(app, db, es, event_queues, record_with_files_creation):
+    """Test file download views."""
+    recid, record, _ = record_with_files_creation
+    record['conceptdoi'] = '10.1234/foo.concept'
+    record['conceptrecid'] = 'foo.concept'
+    record.commit()
+    db.session.commit()
+
+    with app.test_client() as client:
+        file_url = url_for(
+            'invenio_records_ui.recid_files',
+            pid_value=recid.pid_value,
+            filename='Test.pdf',
+        )
+        assert client.get(file_url).status_code == 200
+
+    process_events(['file-download'])
+    current_search.flush_and_refresh(index='events-stats-file-download')
+
+    search = Search(using=es, index='events-stats-file-download')
+    assert search.count() == 1
+    doc = search.execute()[0]
+    assert doc['doi'] == '10.1234/foo.bar'
+    assert doc['conceptdoi'] == '10.1234/foo.concept'
+    assert doc['recid'] == '12345'
+    assert doc['conceptrecid'] == 'foo.concept'
+    assert doc['resource_type'] == {'type': 'publication', 'subtype': 'book'}
+    assert doc['access_right'] == 'open'
