@@ -36,7 +36,7 @@ from zenodo.modules.records.serializers.pidrelations import \
     serialize_related_identifiers
 
 
-def _build_stats(record, skip_files=False):
+def _build_stats(record):
     stats = {}
     stats_sources = {
         'record-view': {
@@ -47,7 +47,6 @@ def _build_stats(record, skip_files=False):
             },
         },
         'record-download': {
-            'files_related': True,
             'params': {'recid': record['recid']},
             'fields': {
                 'downloads': 'count',
@@ -63,7 +62,6 @@ def _build_stats(record, skip_files=False):
             }
         },
         'record-download-all-versions': {
-            'files_related': True,
             'params': {'conceptrecid': record.get('conceptrecid')},
             'fields': {
                 'version_downloads': 'count',
@@ -73,8 +71,6 @@ def _build_stats(record, skip_files=False):
         },
     }
     for query_name, cfg in stats_sources.items():
-        if cfg.get('files_related') and skip_files:
-            continue
         try:
             query_cfg = current_stats.queries[query_name]
             query = query_cfg.query_class(**query_cfg.query_config)
@@ -122,5 +118,4 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     if '_internal' in json:
         del json['_internal']
 
-    json['_stats'] = _build_stats(
-        record, skip_files=json['access_right'] != 'open')
+    json['_stats'] = _build_stats(record)

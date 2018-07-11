@@ -43,8 +43,9 @@ def update_record_statistics(start_date=None, end_date=None):
         end_date = datetime.utcnow()
 
         for aggr_name in current_stats.enabled_aggregations:
-            aggr = current_stats.aggregations[aggr_name].aggregator_class(
-                **current_stats.aggregations[aggr_name].aggregator_config)
+            aggr_cfg = current_stats.aggregations[aggr_name]
+            aggr = aggr_cfg.aggregator_class(
+                name=aggr_cfg.name, **aggr_cfg.aggregator_config)
 
             if not Index(aggr.aggregation_alias, using=aggr.client).exists():
                 if not Index(aggr.event_index, using=aggr.client).exists():
@@ -75,8 +76,9 @@ def update_record_statistics(start_date=None, end_date=None):
         end_date = dateutil_parse(end_date)
 
         for aggr_name in current_stats.enabled_aggregations:
-            aggr = current_stats.aggregations[aggr_name].aggregator_class(
-                    **current_stats.aggregations[aggr_name].aggregator_config)
+            aggr_cfg = current_stats.aggregations[aggr_name]
+            aggr = aggr_cfg.aggregator_class(
+                name=aggr_cfg.name, **aggr_cfg.aggregator_config)
             aggr_configs[aggr.aggregation_alias] = aggr
     else:
         return
