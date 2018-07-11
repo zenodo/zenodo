@@ -1175,6 +1175,9 @@ STATS_EVENTS = {
         'processor_config': {
             'preprocessors': [
                 'invenio_stats.processors:flag_robots',
+                # Don't index robot events
+                lambda doc: doc if not doc['is_robot'] else None,
+                'invenio_stats.processors:flag_machines',
                 'invenio_stats.processors:anonymize_user',
                 'invenio_stats.contrib.event_builders:build_file_unique_id',
             ],
@@ -1188,7 +1191,6 @@ STATS_EVENTS = {
         'signal': 'invenio_records_ui.signals.record_viewed',
         'templates': 'zenodo.modules.stats.templates.events',
         'event_builders': [
-            # TODO: Check if this builder is needed now...
             'invenio_stats.contrib.event_builders.record_view_event_builder',
             'zenodo.modules.stats.event_builders:skip_deposit',
             'zenodo.modules.stats.event_builders:add_record_metadata',
@@ -1196,6 +1198,9 @@ STATS_EVENTS = {
         'processor_config': {
             'preprocessors': [
                 'invenio_stats.processors:flag_robots',
+                # Don't index robot events
+                lambda doc: doc if not doc['is_robot'] else None,
+                'invenio_stats.processors:flag_machines',
                 'invenio_stats.processors:anonymize_user',
                 'invenio_stats.contrib.event_builders:build_record_unique_id',
             ],
