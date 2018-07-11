@@ -32,12 +32,14 @@ import sys
 from datetime import datetime as dt
 
 import click
+from dateutil.parser import parse as dateutil_parse
 from flask.cli import with_appcontext
 from invenio_stats.cli import stats
 from invenio_stats.proxies import current_stats
 from six.moves.urllib.parse import urlparse
 
 from zenodo.modules.records.resolvers import record_resolver
+from zenodo.modules.stats.tasks import update_record_statistics
 from zenodo.modules.stats.utils import extract_event_record_metadata
 
 try:
@@ -56,6 +58,11 @@ def chunkify(iterable, n):
         if not chunk:
             return
         yield chunk
+
+
+def _parse_date(ctx, param, value):
+    if value:
+        return dateutil_parse(value)
 
 
 def parse_record_url(url):
@@ -138,7 +145,7 @@ EVENT_TYPE_BUILDERS = {
 @click.argument('csv-dir', type=click.Path(file_okay=False, resolve_path=True))
 @click.option('--chunk-size', '-s', type=int, default=100)
 @with_appcontext
-def import_piwik_events(event_type, csv_dir, chunk_size):
+def import_events(event_type, csv_dir, chunk_size):
     """Import stats events from a directory of CSV files.
 
     Available event types: "file-download", "record-view"
@@ -164,3 +171,21 @@ def import_piwik_events(event_type, csv_dir, chunk_size):
     click.secho(
         'Run the "invenio_stats.tasks.process_events" to index the events...',
         fg='yellow')
+
+
+@stats.command('update-records')
+@click.option('--start-date', callback=_parse_date)
+@click.option('--end-date', callback=_parse_date)
+@click.option('--eager', '-e', is_flag=True)
+@with_appcontext
+def update_records(start_date=None, end_date=None, eager=False):
+    """Update records' statistics on ES."""
+    if eager:
+        update_record_statistics.apply(
+            kwargs=dict(start_date=start_date, end_date=end_date), throw=True)
+        click.secho('Records sent for bulk indexing. Wait for the scheduled '
+                    'indexer or run `zenodo index run ...`', fg='yellow')
+    else:
+        update_record_statistics.delay(
+            start_date=start_date, end_date=end_date)
+        click.secho('Update records statistics task sent...', fg='yellow')

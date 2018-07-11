@@ -26,7 +26,7 @@ from click.testing import CliRunner
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 
-from zenodo.modules.stats.cli import import_piwik_events
+from zenodo.modules.stats.cli import import_events
 
 
 def test_record_view_import(app, db, es, event_queues, full_record,
@@ -48,10 +48,7 @@ def test_record_view_import(app, db, es, event_queues, full_record,
 
     runner = CliRunner()
     res = runner.invoke(
-        import_piwik_events,
-        ['record-view', csv_file.dirname],
-        catch_exceptions=False,
-        obj=script_info)
+        import_events, ['record-view', csv_file.dirname], obj=script_info)
     assert res.exit_code == 0
     events = list(event_queues['stats-record-view'].consume())
     assert len(events) == 1
