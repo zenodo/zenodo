@@ -1235,7 +1235,8 @@ STATS_AGGREGATIONS = {
                 is_parent=lambda *_: False
             ),
             metric_aggregation_fields=dict(
-                unique_count=('cardinality', 'unique_session_id'),
+                unique_count=('cardinality', 'unique_session_id',
+                              {'precision_threshold': 1000}),
             )
         )
     ),

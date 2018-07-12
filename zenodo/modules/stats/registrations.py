@@ -52,8 +52,9 @@ def register_aggregations():
                 is_parent=lambda *_: False
             ),
             metric_aggregation_fields=dict(
-                unique_count=('cardinality', 'unique_session_id'),
-                volume=('sum', 'size'),
+                unique_count=('cardinality', 'unique_session_id',
+                              {'precision_threshold': 1000}),
+                volume=('sum', 'size', {}),
             )
         )),
         dict(
@@ -73,8 +74,9 @@ def register_aggregations():
                     is_parent=lambda *_: True
                 ),
                 metric_aggregation_fields=dict(
-                    unique_count=('cardinality', 'unique_session_id'),
-                    volume=('sum', 'size'),
+                    unique_count=('cardinality', 'unique_session_id',
+                                  {'precision_threshold': 1000}),
+                    volume=('sum', 'size', {}),
                 )
             )),
         # NOTE: Since the "record-view-agg" aggregations is already registered
@@ -97,7 +99,8 @@ def register_aggregations():
                     is_parent=lambda *_: True
                 ),
                 metric_aggregation_fields=dict(
-                    unique_count=('cardinality', 'unique_session_id'),
+                    unique_count=('cardinality', 'unique_session_id',
+                                  {'precision_threshold': 1000}),
                 )
             )),
 
@@ -127,9 +130,9 @@ def register_queries():
                     recid='recid',
                 ),
                 metric_fields=dict(
-                    count=('sum', 'count'),
-                    unique_count=('sum', 'unique_count'),
-                    volume=('sum', 'volume'),
+                    count=('sum', 'count', {}),
+                    unique_count=('sum', 'unique_count', {}),
+                    volume=('sum', 'volume', {}),
                 )
             ),
         ),
@@ -152,9 +155,9 @@ def register_queries():
                     conceptrecid='conceptrecid',
                 ),
                 metric_fields=dict(
-                    count=('sum', 'count'),
-                    unique_count=('sum', 'unique_count'),
-                    volume=('sum', 'volume'),
+                    count=('sum', 'count', {}),
+                    unique_count=('sum', 'unique_count', {}),
+                    volume=('sum', 'volume', {}),
                 )
             )
         ),
@@ -177,8 +180,8 @@ def register_queries():
                     recid='recid',
                 ),
                 metric_fields=dict(
-                    count=('sum', 'count'),
-                    unique_count=('sum', 'unique_count'),
+                    count=('sum', 'count', {}),
+                    unique_count=('sum', 'unique_count', {}),
                 )
             )
         ),
@@ -201,8 +204,8 @@ def register_queries():
                     conceptrecid='conceptrecid',
                 ),
                 metric_fields=dict(
-                    count=('sum', 'count'),
-                    unique_count=('sum', 'unique_count'),
+                    count=('sum', 'count', {}),
+                    unique_count=('sum', 'unique_count', {}),
                 )
             )
         ),
