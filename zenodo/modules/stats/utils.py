@@ -48,4 +48,5 @@ def extract_event_record_metadata(record):
         access_right=record.get('access_right'),
         resource_type=record.get('resource_type'),
         communities=record.get('communities'),
+        owners=record.get('owners'),
     )

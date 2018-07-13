@@ -51,6 +51,7 @@ def register_aggregations():
                 conceptdoi='conceptdoi',
                 communities=lambda d, _: (list(d.communities)
                                           if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: False
             ),
             metric_aggregation_fields=dict(
@@ -73,6 +74,7 @@ def register_aggregations():
                     conceptdoi='conceptdoi',
                     communities=lambda d, _: (list(d.communities)
                                               if d.communities else None),
+                    owners=lambda d, _: (list(d.owners) if d.owners else None),
                     is_parent=lambda *_: True
                 ),
                 metric_aggregation_fields=dict(
@@ -98,6 +100,7 @@ def register_aggregations():
                     conceptdoi='conceptdoi',
                     communities=lambda d, _: (list(d.communities)
                                               if d.communities else None),
+                    owners=lambda d, _: (list(d.owners) if d.owners else None),
                     is_parent=lambda *_: True
                 ),
                 metric_aggregation_fields=dict(
@@ -132,6 +135,7 @@ def register_queries():
                     doi='doi',
                     conceptdoi='conceptdoi',
                     communities='communities',
+                    owners='owners',
                     is_parent='is_parent'
                 ),
                 required_filters=dict(
@@ -155,6 +159,7 @@ def register_queries():
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',
                     communities='communities',
+                    owners='owners',
                     is_parent='is_parent'
                 ),
                 query_modifiers=[
@@ -184,6 +189,7 @@ def register_queries():
                     doi='doi',
                     conceptdoi='conceptdoi',
                     communities='communities',
+                    owners='owners',
                     is_parent='is_parent'
                 ),
                 required_filters=dict(
@@ -206,6 +212,7 @@ def register_queries():
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',
                     communities='communities',
+                    owners='owners',
                     is_parent='is_parent'
                 ),
                 query_modifiers=[
