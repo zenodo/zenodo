@@ -54,6 +54,7 @@ def test_record_view_import(app, db, es, event_queues, full_record,
     assert len(events) == 1
     assert events[0] == {
         'communities': ['zenodo'],
+        'owners': [1],
         'conceptdoi': '10.1234/foo.concept',
         'conceptrecid': '12344',
         'doi': '10.1234/foo.bar',

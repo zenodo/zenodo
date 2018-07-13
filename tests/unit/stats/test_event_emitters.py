@@ -56,6 +56,8 @@ def test_record_page(app, db, es, event_queues, full_record):
     assert doc['conceptrecid'] == 'foo.concept'
     assert doc['resource_type'] == {'type': 'publication', 'subtype': 'book'}
     assert doc['access_right'] == 'open'
+    assert doc['communities'] == ['zenodo']
+    assert doc['owners'] == [1]
 
 
 def test_file_download(app, db, es, event_queues, record_with_files_creation):
@@ -86,3 +88,5 @@ def test_file_download(app, db, es, event_queues, record_with_files_creation):
     assert doc['conceptrecid'] == 'foo.concept'
     assert doc['resource_type'] == {'type': 'publication', 'subtype': 'book'}
     assert doc['access_right'] == 'open'
+    assert doc['communities'] == ['zenodo']
+    assert doc['owners'] == [1]

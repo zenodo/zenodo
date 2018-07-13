@@ -1232,6 +1232,7 @@ STATS_AGGREGATIONS = {
                 conceptdoi='conceptdoi',
                 communities=lambda d, _: (list(d.communities)
                                           if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: False
             ),
             metric_aggregation_fields=dict(
