@@ -22,10 +22,10 @@
 
 """Unit tests statistics for record views."""
 
+from elasticsearch_dsl import Search
 from flask import url_for
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
-from elasticsearch_dsl import Search
 from invenio_search import current_search
 from invenio_stats.tasks import process_events
 
