@@ -24,12 +24,12 @@
 
 from elasticsearch_dsl import Search
 from flask import url_for
+from invenio_indexer.api import RecordIndexer
 from invenio_search import current_search
 from invenio_search.api import RecordsSearch
-
 from invenio_stats.tasks import aggregate_events, process_events
+
 from zenodo.modules.stats.tasks import update_record_statistics
-from invenio_indexer.api import RecordIndexer
 
 
 def test_record_stats(app, db, es, event_queues, record_with_files_creation):
