@@ -24,6 +24,8 @@
 
 """Registration of aggregations."""
 
+from flask_principal import ActionNeed
+from invenio_access.permissions import Permission
 from invenio_search import current_search_client
 from invenio_stats.aggregations import StatAggregator
 from invenio_stats.queries import ESTermsQuery
@@ -107,12 +109,18 @@ def register_aggregations():
     ]
 
 
+def queries_permission_factory(query_name, params):
+    """Queries permission factory."""
+    return Permission(ActionNeed('admin-access'))
+
+
 def register_queries():
     """Register Zenodo queries."""
     return [
         dict(
             query_name='record-download',
             query_class=ESTermsQuery,
+            permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-file-download',
                 doc_type='file-download-day-aggregation',
@@ -139,6 +147,7 @@ def register_queries():
         dict(
             query_name='record-download-all-versions',
             query_class=ESTermsQuery,
+            permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-file-download',
                 doc_type='file-download-day-aggregation',
@@ -164,6 +173,7 @@ def register_queries():
         dict(
             query_name='record-view',
             query_class=ESTermsQuery,
+            permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-record-view',
                 doc_type='record-view-day-aggregation',
@@ -188,6 +198,7 @@ def register_queries():
         dict(
             query_name='record-view-all-versions',
             query_class=ESTermsQuery,
+            permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-record-view',
                 doc_type='record-view-day-aggregation',
