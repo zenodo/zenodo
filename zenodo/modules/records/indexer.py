@@ -33,7 +33,7 @@ from invenio_pidstore.models import PersistentIdentifier
 
 from zenodo.modules.records.serializers.pidrelations import \
     serialize_related_identifiers
-from zenodo.modules.stats.utils import build_stats
+from zenodo.modules.stats.utils import build_record_stats
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,
@@ -72,4 +72,5 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     if '_internal' in json:
         del json['_internal']
 
-    json['_stats'] = build_stats(record['recid'], record.get('conceptrecid'))
+    json['_stats'] = build_record_stats(record['recid'],
+                                        record.get('conceptrecid'))

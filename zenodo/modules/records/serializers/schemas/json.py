@@ -33,7 +33,7 @@ from marshmallow import Schema, ValidationError, fields, missing, \
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records.utils import is_deposit
-from zenodo.modules.stats.utils import build_stats
+from zenodo.modules.stats.utils import get_record_stats
 
 from . import common
 from ...models import AccessRight, ObjectType
@@ -249,15 +249,14 @@ class RecordSchemaV1(common.CommonRecordSchemaV1):
     revision = fields.Integer(dump_only=True)
     updated = fields.Str(dump_only=True)
 
-    _stats = fields.Method('dump_stats')
+    stats = fields.Method('dump_stats')
 
     def dump_stats(self, obj):
         """Dump the stats to a dictionary."""
         if '_stats' in obj:
             return obj['_stats']
         else:
-            return build_stats(obj['metadata']['recid'],
-                               obj['metadata'].get('conceptrecid'))
+            return get_record_stats(obj['metadata']['recid'], False)
 
 
 class DepositSchemaV1(RecordSchemaV1):

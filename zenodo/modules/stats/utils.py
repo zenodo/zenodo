@@ -25,6 +25,7 @@
 """Statistics utilities."""
 
 from flask import request
+from invenio_search.api import RecordsSearch
 from invenio_stats import current_stats
 
 
@@ -53,7 +54,7 @@ def extract_event_record_metadata(record):
     )
 
 
-def build_stats(recid, conceptrecid):
+def build_record_stats(recid, conceptrecid):
     """Build the record's stats."""
     stats = {}
     stats_sources = {
@@ -100,3 +101,15 @@ def build_stats(recid, conceptrecid):
     return stats
 
 
+def get_record_stats(recordid, throws=True):
+    """Fetch record statistics from Elasticsearch."""
+    try:
+        res = (RecordsSearch()
+               .source(include='_stats')  # only include "_stats" field
+               .get_record(recordid)
+               .execute())
+        return res[0]._stats.to_dict() if res else None
+    except Exception:
+        if throws:
+            raise
+        pass
