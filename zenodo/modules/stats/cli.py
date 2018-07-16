@@ -36,6 +36,7 @@ from dateutil.parser import parse as dateutil_parse
 from flask.cli import with_appcontext
 from invenio_stats.cli import stats
 from invenio_stats.proxies import current_stats
+from six.moves import filter, map
 from six.moves.urllib.parse import urlparse
 
 from zenodo.modules.records.resolvers import record_resolver
