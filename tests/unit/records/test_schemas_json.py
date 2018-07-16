@@ -27,7 +27,6 @@
 from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
-
 from mock import patch
 
 from zenodo.modules.records.serializers import json_v1

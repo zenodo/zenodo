@@ -1,3 +1,4 @@
+{%- from "zenodo_records/macros/altmetric.html" import altmetric_badge -%}
 {%- set stats = record|record_stats or {} %}
 {%- set show_version_stats = record.doi and record.doi is local_doi -%}
 
