@@ -32,6 +32,8 @@ zenodo db create
 zenodo index destroy --force --yes-i-know
 zenodo index queue init
 zenodo index init
+zenodo queues purge
+zenodo queues declare
 zenodo fixtures init
 zenodo fixtures loadlicenses
 zenodo fixtures loadfunders
