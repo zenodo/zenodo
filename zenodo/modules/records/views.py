@@ -40,11 +40,11 @@ from invenio_i18n.ext import current_i18n
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
-from invenio_search.api import RecordsSearch
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.utils import is_doi_locally_managed
+from zenodo.modules.stats.utils import get_record_stats
 
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
@@ -243,14 +243,7 @@ def select_preview_file(files):
 @blueprint.app_template_filter()
 def record_stats(record):
     """Fetch record statistics from Elasticsearch."""
-    try:
-        res = (RecordsSearch()
-               .source(include='_stats')  # only include "_stats" field
-               .get_record(record.id)
-               .execute())
-        return res[0]._stats.to_dict() if res else None
-    except Exception:
-        pass
+    return get_record_stats(record.id, False)
 
 
 @blueprint.app_template_filter()
