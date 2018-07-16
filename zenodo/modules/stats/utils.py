@@ -25,6 +25,8 @@
 """Statistics utilities."""
 
 from flask import request
+from invenio_search.api import RecordsSearch
+from invenio_stats import current_stats
 
 
 def get_record_from_context(**kwargs):
@@ -50,3 +52,64 @@ def extract_event_record_metadata(record):
         communities=record.get('communities'),
         owners=record.get('owners'),
     )
+
+
+def build_record_stats(recid, conceptrecid):
+    """Build the record's stats."""
+    stats = {}
+    stats_sources = {
+        'record-view': {
+            'params': {'recid': recid},
+            'fields': {
+                'views': 'count',
+                'unique_views': 'unique_count',
+            },
+        },
+        'record-download': {
+            'params': {'recid': recid},
+            'fields': {
+                'downloads': 'count',
+                'unique_downloads': 'unique_count',
+                'volume': 'volume',
+            },
+        },
+        'record-view-all-versions': {
+            'params': {'conceptrecid': conceptrecid},
+            'fields': {
+                'version_views': 'count',
+                'version_unique_views': 'unique_count',
+            }
+        },
+        'record-download-all-versions': {
+            'params': {'conceptrecid': conceptrecid},
+            'fields': {
+                'version_downloads': 'count',
+                'version_unique_downloads': 'unique_count',
+                'version_volume': 'volume',
+            },
+        },
+    }
+    for query_name, cfg in stats_sources.items():
+        try:
+            query_cfg = current_stats.queries[query_name]
+            query = query_cfg.query_class(**query_cfg.query_config)
+            result = query.run(**cfg['params'])
+            for dst, src in cfg['fields'].items():
+                stats[dst] = result.get(src)
+        except Exception:
+            pass
+    return stats
+
+
+def get_record_stats(recordid, throws=True):
+    """Fetch record statistics from Elasticsearch."""
+    try:
+        res = (RecordsSearch()
+               .source(include='_stats')  # only include "_stats" field
+               .get_record(recordid)
+               .execute())
+        return res[0]._stats.to_dict() if res else None
+    except Exception:
+        if throws:
+            raise
+        pass
