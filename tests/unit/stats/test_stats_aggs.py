@@ -22,6 +22,8 @@
 
 """Unit tests statistics aggregations."""
 
+from collections import defaultdict
+from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta
 from types import MethodType
@@ -30,18 +32,16 @@ from elasticsearch_dsl import Search
 from flask import current_app, url_for
 from invenio_db import db
 from invenio_files_rest.models import Bucket
+from invenio_files_rest.signals import file_downloaded
 from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records_files.models import RecordsBuckets
+from invenio_records_ui.signals import record_viewed
 from invenio_search import current_search
 from invenio_search.api import RecordsSearch
 from invenio_stats import current_stats
 from invenio_stats.tasks import aggregate_events, process_events
 from six import BytesIO
-from contextlib import contextmanager
-from invenio_records_ui.signals import record_viewed
-from invenio_files_rest.signals import file_downloaded
-from collections import defaultdict
 
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.stats.tasks import update_record_statistics
