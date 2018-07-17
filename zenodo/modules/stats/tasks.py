@@ -30,6 +30,8 @@ from celery import shared_task
 from dateutil.parser import parse as dateutil_parse
 from elasticsearch_dsl import Index, Search
 from invenio_indexer.api import RecordIndexer
+from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_stats import current_stats
 
 
@@ -82,8 +84,8 @@ def update_record_statistics(start_date=None, end_date=None):
     else:
         return
 
-    # Get all the affected records between the two dates:
-    record_ids = set()
+    # Get conceptrecids for all the affected records between the two dates
+    conceptrecids = set()
     for aggr_alias, aggr in aggr_configs.items():
         query = Search(
             using=aggr.client,
@@ -94,7 +96,13 @@ def update_record_statistics(start_date=None, end_date=None):
                 'gte': start_date.replace(microsecond=0).isoformat() + '||/d',
                 'lte': end_date.replace(microsecond=0).isoformat() + '||/d'}
         ).extra(_source=False)
-        query.aggs.bucket('ids', 'terms', field='record_id', size=0)
-        record_ids |= {b.key for b in query.execute().aggregations.ids.buckets}
+        query.aggs.bucket('ids', 'terms', field='conceptrecid', size=0)
+        conceptrecids |= {
+            b.key for b in query.execute().aggregations.ids.buckets}
 
-    RecordIndexer().bulk_index(record_ids)
+    indexer = RecordIndexer()
+    for concpetrecid_val in conceptrecids:
+        conceptrecid = PersistentIdentifier.get('recid', concpetrecid_val)
+        pv = PIDVersioning(parent=conceptrecid)
+        children_recids = pv.children.all()
+        indexer.bulk_index([str(p.object_uuid) for p in children_recids])

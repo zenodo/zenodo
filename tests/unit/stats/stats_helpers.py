@@ -34,7 +34,7 @@ from invenio_files_rest.models import Bucket
 from invenio_files_rest.signals import file_downloaded
 from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier
-from invenio_queues.proxies import current_queues
+from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_records_files.models import RecordsBuckets
 from invenio_records_ui.signals import record_viewed
 from invenio_search import current_search
@@ -46,33 +46,31 @@ from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.stats.tasks import update_record_statistics
 
 
-def get_queue_size(queue_name):
-    """Get the current number of messages in a queue."""
-    queue = current_queues.queues[queue_name]
-    _, size, _ = queue.queue.queue_declare(passive=True)
-    return size
-
-
 def _create_records(base_metadata, total, versions, files):
     records = []
-    cur_recid = 1
+    cur_recid_val = 1
     for _ in range(total):
-        conceptrecid = cur_recid
+        conceptrecid_val = cur_recid_val
+        conceptrecid = PersistentIdentifier.create(
+            'recid', str(conceptrecid_val), status='R')
+        db.session.commit()
+        versioning = PIDVersioning(parent=conceptrecid)
         for ver_idx in range(versions):
-            recid = conceptrecid + ver_idx + 1
+            recid_val = conceptrecid_val + ver_idx + 1
             data = deepcopy(base_metadata)
             data.update({
-                'conceptrecid': str(conceptrecid),
-                'conceptdoi': '10.1234/{}'.format(recid),
-                'recid': recid,
-                'doi': '10.1234/{}'.format(recid),
+                'conceptrecid': str(conceptrecid_val),
+                'conceptdoi': '10.1234/{}'.format(recid_val),
+                'recid': recid_val,
+                'doi': '10.1234/{}'.format(recid_val),
             })
             record = ZenodoRecord.create(data)
             bucket = Bucket.create()
             RecordsBuckets.create(bucket=bucket, record=record.model)
-            pid = PersistentIdentifier.create(
+            recid = PersistentIdentifier.create(
                 pid_type='recid', pid_value=record['recid'], object_type='rec',
                 object_uuid=record.id, status='R')
+            versioning.insert_child(recid)
 
             file_objects = []
             for f in range(files):
@@ -83,8 +81,8 @@ def _create_records(base_metadata, total, versions, files):
             record.commit()
 
             db.session.commit()
-            records.append((pid, record, file_objects))
-        cur_recid += versions + 1
+            records.append((recid, record, file_objects))
+        cur_recid_val += versions + 1
     return records
 
 
