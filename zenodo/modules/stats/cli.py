@@ -61,9 +61,10 @@ def chunkify(iterable, n):
         yield chunk
 
 
-def _parse_date(ctx, param, value):
+def _verify_date(ctx, param, value):
     if value:
-        return dateutil_parse(value)
+        dateutil_parse(value)
+        return value
 
 
 def parse_record_url(url):
@@ -177,8 +178,8 @@ def import_events(event_type, csv_dir, chunk_size):
 
 
 @stats.command('update-records')
-@click.option('--start-date', callback=_parse_date)
-@click.option('--end-date', callback=_parse_date)
+@click.option('--start-date', callback=_verify_date)
+@click.option('--end-date', callback=_verify_date)
 @click.option('--eager', '-e', is_flag=True)
 @with_appcontext
 def update_records(start_date=None, end_date=None, eager=False):

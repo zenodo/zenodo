@@ -36,6 +36,8 @@ from invenio_stats import current_stats
 @shared_task(ignore_result=True)
 def update_record_statistics(start_date=None, end_date=None):
     """Update "_stats" field of affected records."""
+    start_date = dateutil_parse(start_date) if start_date else None
+    end_date = dateutil_parse(end_date) if start_date else None
     aggr_configs = {}
 
     if not start_date and not end_date:
@@ -72,9 +74,6 @@ def update_record_statistics(start_date=None, end_date=None):
 
             aggr_configs[aggr.aggregation_alias] = aggr
     elif start_date and end_date:
-        start_date = dateutil_parse(start_date)
-        end_date = dateutil_parse(end_date)
-
         for aggr_name in current_stats.enabled_aggregations:
             aggr_cfg = current_stats.aggregations[aggr_name]
             aggr = aggr_cfg.aggregator_class(
