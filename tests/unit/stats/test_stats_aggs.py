@@ -22,125 +22,17 @@
 
 """Unit tests statistics aggregations."""
 
-from collections import defaultdict
-from contextlib import contextmanager
-from copy import deepcopy
 from datetime import datetime, timedelta
-from types import MethodType
 
 from elasticsearch_dsl import Search
-from flask import current_app, url_for
-from invenio_db import db
-from invenio_files_rest.models import Bucket
-from invenio_files_rest.signals import file_downloaded
-from invenio_indexer.api import RecordIndexer
-from invenio_pidstore.models import PersistentIdentifier
-from invenio_records_files.models import RecordsBuckets
-from invenio_records_ui.signals import record_viewed
-from invenio_search import current_search
 from invenio_search.api import RecordsSearch
-from invenio_stats import current_stats
-from invenio_stats.tasks import aggregate_events, process_events
-from six import BytesIO
-
-from zenodo.modules.records.api import ZenodoRecord
-from zenodo.modules.stats.tasks import update_record_statistics
-
-
-def _create_records(base_metadata, total, versions, files):
-    records = []
-    cur_recid = 1
-    for _ in range(total):
-        conceptrecid = cur_recid
-        for ver_idx in range(versions):
-            recid = conceptrecid + ver_idx + 1
-            data = deepcopy(base_metadata)
-            data.update({
-                'conceptrecid': str(conceptrecid),
-                'conceptdoi': '10.1234/{}'.format(recid),
-                'recid': recid,
-                'doi': '10.1234/{}'.format(recid),
-            })
-            record = ZenodoRecord.create(data)
-            bucket = Bucket.create()
-            RecordsBuckets.create(bucket=bucket, record=record.model)
-            pid = PersistentIdentifier.create(
-                pid_type='recid', pid_value=record['recid'], object_type='rec',
-                object_uuid=record.id, status='R')
-
-            file_objects = []
-            for f in range(files):
-                filename = 'Test{0}_v{1}.pdf'.format(f, ver_idx)
-                record.files[filename] = BytesIO(b'1234567890')  # 10 bytes
-                record.files[filename]['type'] = 'pdf'
-                file_objects.append(record.files[filename].obj)
-            record.commit()
-
-            db.session.commit()
-            records.append((pid, record, file_objects))
-        cur_recid += versions + 1
-    return records
-
-
-def _gen_date_range(start, end, interval):
-    assert isinstance(interval, timedelta)
-    cur_date = start
-    while cur_date < end:
-        yield cur_date
-        cur_date += interval
-
-
-def _create_and_process_events(metadata, n_records, n_versions, n_files,
-                               event_data, start_date, end_date, interval):
-    records = _create_records(
-        metadata, total=n_records, versions=n_versions, files=n_files)
-
-    @contextmanager
-    def _patch_stats_publish():
-        original_publish = current_stats.publish
-
-        event_batches = defaultdict(list)
-
-        def _patched_publish(self, event_type, events):
-            events[0].update(event_data)
-            event_batches[event_type].append(events[0])
-        current_stats.publish = MethodType(_patched_publish, current_stats)
-        yield
-        current_stats.publish = original_publish
-        for event_type, events in event_batches.items():
-            current_stats.publish(event_type, events)
-
-    with _patch_stats_publish():
-        for ts in _gen_date_range(start_date, end_date, interval):
-            event_data['timestamp'] = ts.isoformat()
-            for recid, record, file_objects in records:
-                with current_app.test_request_context():
-                    record_viewed.send(current_app._get_current_object(),
-                                       pid=recid, record=record)
-                    for obj in file_objects:
-                        file_downloaded.send(
-                            current_app._get_current_object(),
-                            obj=obj, record=record)
-    process_events(['record-view', 'file-download'])
-    current_search.flush_and_refresh(index='events-stats-*')
-
-    aggregate_events(
-        ['record-view-agg', 'record-view-all-versions-agg',
-         'record-download-agg', 'record-download-all-versions-agg'])
-    current_search.flush_and_refresh(index='stats-*')
-
-    update_record_statistics(start_date=start_date.isoformat(),
-                             end_date=end_date.isoformat())
-    RecordIndexer().process_bulk_queue()
-    current_search.flush_and_refresh(index='records')
-
-    return records
+from stats_helpers import create_stats_fixtures
 
 
 def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
     """Test basic statistics results."""
     search = Search(using=es)
-    records = _create_and_process_events(
+    records = create_stats_fixtures(
         # (10 * 2) -> 20 records and (10 * 2 * 3) -> 60 files
         metadata=minimal_record, n_records=10, n_versions=2, n_files=3,
         event_data={'user_id': '1'},
@@ -181,7 +73,7 @@ def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
 def test_large_stats(app, db, es, locations, event_queues, minimal_record):
     """Test record page view event import."""
     search = Search(using=es)
-    records = _create_and_process_events(
+    records = create_stats_fixtures(
         # (3 * 4) -> 12 records and (3 * 4 * 2) -> 24 files
         metadata=minimal_record, n_records=3, n_versions=4, n_files=2,
         event_data={'user_id': '1'},
