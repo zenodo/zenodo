@@ -240,12 +240,12 @@ CELERY_BEAT_SCHEDULE = {
     # Stats
     'stats-process-events': {
         'task': 'invenio_stats.tasks.process_events',
-        'schedule': timedelta(hours=1),
+        'schedule': timedelta(minutes=30),
         'args': [('record-view', 'file-download')],
     },
     'stats-aggregate-events': {
         'task': 'invenio_stats.tasks.aggregate_events',
-        'schedule': timedelta(hours=2),
+        'schedule': timedelta(hours=1),
         'args': [(
             'record-view-agg', 'record-view-all-versions-agg',
             'record-download-agg', 'record-download-all-versions-agg',
@@ -253,7 +253,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'stats-update-record-statistics': {
         'task': 'zenodo.modules.stats.tasks.update_record_statistics',
-        'schedule': crontab(minute=0, hour=2),  # Every day at 02:00 UTC
+        'schedule': timedelta(hours=1),
     },
 }
 
