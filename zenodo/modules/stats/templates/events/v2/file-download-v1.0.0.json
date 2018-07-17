@@ -44,6 +44,14 @@
           "type": "string",
           "index": "not_analyzed"
         },
+        "pid_type": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
+        "pid_value": {
+          "type": "string",
+          "index": "not_analyzed"
+        },
         "unique_id": {
           "type": "string",
           "index": "not_analyzed"

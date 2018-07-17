@@ -96,6 +96,8 @@ def build_common_event(record, data):
     """Build common fields of a stats event from a record and request data."""
     return dict(
         timestamp=dt.utcfromtimestamp(float(data['timestamp'])).isoformat(),
+        pid_type='recid',
+        pid_value=str(record.get('recid')),
         referrer=data['referrer'],
         ip_address=data['ipAddress'],
         user_agent=data['userAgent'],

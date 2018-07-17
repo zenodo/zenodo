@@ -53,6 +53,8 @@ def test_record_view_import(app, db, es, event_queues, full_record,
     events = list(event_queues['stats-record-view'].consume())
     assert len(events) == 1
     assert events[0] == {
+        'pid_type': 'recid',
+        'pid_value': '12345',
         'communities': ['zenodo'],
         'owners': [1],
         'conceptdoi': '10.1234/foo.concept',
