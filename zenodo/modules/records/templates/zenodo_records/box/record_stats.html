@@ -56,7 +56,7 @@
     <!-- Collapsed details -->
     <div id="toggle-stats" class="row">
       <div class="col-sm-12">
-        <a class="panel-toggle" data-toggle="collapse" data-target="#collapse-stats" aria-expanded="true" aria-controls="collapse-stats">
+        <a style="cursor: pointer;" class="panel-toggle" data-toggle="collapse" data-target="#collapse-stats" aria-expanded="true" aria-controls="collapse-stats">
           See more details...
         </a>
       </div>
@@ -106,6 +106,6 @@
 
 <!-- Altmetric -->
 {%- if record.doi %}
-  {{ altmetric_badge('record.doi') }}
+  {{ altmetric_badge(record.doi) }}
 {%- endif %}
 
