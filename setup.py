@@ -149,6 +149,7 @@ install_requires = [
     'invenio-rest>=1.0.0',
     'invenio-search-ui>=1.0.1',
     'invenio-sipstore>=1.0.0a7',
+    'invenio-stats>=1.0.0a10',
     'invenio-theme>=1.0.0',
     'invenio-userprofiles>=1.0.0',
     'invenio-webhooks>=1.0.0a4',
