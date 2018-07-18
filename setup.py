@@ -149,6 +149,7 @@ install_requires = [
     'invenio-rest>=1.0.0',
     'invenio-search-ui>=1.0.1',
     'invenio-sipstore>=1.0.0a7',
+    'invenio-stats>=1.0.0a10',
     'invenio-theme>=1.0.0',
     'invenio-userprofiles>=1.0.0',
     'invenio-webhooks>=1.0.0a4',
@@ -197,6 +198,7 @@ setup(
         'flask.commands': [
             'audit = zenodo.modules.auditor.cli:audit',
             'github = zenodo.modules.github.cli:github',
+            'stats = zenodo.modules.stats.cli:stats',
             'utils = zenodo.modules.utils.cli:utils',
         ],
         'invenio_admin.views': [(
@@ -257,6 +259,7 @@ setup(
             'zenodo_sipstore = zenodo.modules.sipstore.tasks',
             'zenodo_sitemap = zenodo.modules.sitemap.tasks',
             'zenodo_exporter = zenodo.modules.exporter.tasks',
+            'zenodo_stats = zenodo.modules.stats.tasks',
         ],
         'invenio_config.module': [
             'zenodo = zenodo.config',
@@ -289,6 +292,14 @@ setup(
         'invenio_search.mappings': [
             'records = zenodo.modules.records.mappings',
             'deposits = zenodo.modules.deposit.mappings',
+        ],
+        'invenio_stats.aggregations': [
+            'zenodo_stats = '
+            'zenodo.modules.stats.registrations:register_aggregations'
+        ],
+        'invenio_stats.queries': [
+            'zenodo_stats = '
+            'zenodo.modules.stats.registrations:register_queries'
         ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',

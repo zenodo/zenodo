@@ -60,6 +60,7 @@ from invenio_oauth2server.models import Client, Token
 from invenio_oauthclient.models import RemoteAccount
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.resolver import Resolver
+from invenio_queues.proxies import current_queues
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 from invenio_records_files.api import RecordsBuckets
@@ -206,6 +207,17 @@ def indexer_queue(app):
         q.delete()
 
 
+@pytest.yield_fixture()
+def event_queues(app):
+    """Delete and declare test queues."""
+    current_queues.delete()
+    try:
+        current_queues.declare()
+        yield current_queues.queues
+    finally:
+        current_queues.delete()
+
+
 @pytest.yield_fixture
 def communities_autoadd_enabled(app):
     """Temporarily enable auto-adding and auto-requesting of communities."""
@@ -295,14 +307,17 @@ def archive_fs(locations):
 @pytest.yield_fixture
 def es(app):
     """Provide elasticsearch access."""
-    try:
-        list(current_search.create())
-    except RequestError:
-        list(current_search.delete(ignore=[400, 404]))
-        list(current_search.create())
+    list(current_search.delete(ignore=[400, 404]))
+    current_search_client.indices.delete(index='*')
+    current_search_client.indices.delete_template('*')
+    list(current_search.create())
+    list(current_search.put_templates())
     current_search_client.indices.refresh()
-    yield current_search_client
-    list(current_search.delete(ignore=[404]))
+    try:
+        yield current_search_client
+    finally:
+        current_search_client.indices.delete(index='*')
+        current_search_client.indices.delete_template('*')
 
 
 @pytest.fixture

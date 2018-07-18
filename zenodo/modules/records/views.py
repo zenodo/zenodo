@@ -39,10 +39,12 @@ from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
+from invenio_records_ui.signals import record_viewed
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.utils import is_doi_locally_managed
+from zenodo.modules.stats.utils import get_record_stats
 
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
@@ -187,6 +189,7 @@ def zenodo_community_branding_links(record):
             ret.append((comm, comm_model.logo_url))
     return ret
 
+
 #
 # Object type template filters and tests.
 #
@@ -231,6 +234,22 @@ def select_preview_file(files):
     except KeyError:
         pass
     return selected
+
+
+#
+# Stats filters
+#
+
+@blueprint.app_template_filter()
+def record_stats(record):
+    """Fetch record statistics from Elasticsearch."""
+    return get_record_stats(record.id, False)
+
+
+@blueprint.app_template_filter()
+def stats_num_format(num):
+    """Format a statistics value."""
+    return '{:,.0f}'.format(num or 0)
 
 
 #
@@ -332,6 +351,12 @@ def records_ui_export(pid, record, template=None, **kwargs):
         if isinstance(data, six.binary_type):
             data = data.decode('utf8')
 
+        # emit record_viewed event
+        record_viewed.send(
+            current_app._get_current_object(),
+            pid=pid,
+            record=record,
+        )
         return render_template(
             template, pid=pid, record=record,
             data=data, format_title=formats[fmt]['title'])
