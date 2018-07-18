@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from flask_babelex import lazy_gettext as _
 from invenio_pidrelations.serializers.utils import serialize_relations
+from invenio_pidstore.models import PersistentIdentifier
 from marshmallow import Schema, ValidationError, fields, missing, \
     validates_schema
 from werkzeug.routing import BuildError
@@ -253,10 +254,14 @@ class RecordSchemaV1(common.CommonRecordSchemaV1):
 
     def dump_stats(self, obj):
         """Dump the stats to a dictionary."""
-        if '_stats' in obj:
-            return obj['_stats']
+        if '_stats' in obj.get('metadata', {}):
+            return obj['metadata'].get('_stats', {})
         else:
-            return get_record_stats(obj['metadata']['recid'], False)
+            pid = self.context.get('pid')
+            if isinstance(pid, PersistentIdentifier):
+                return get_record_stats(pid.object_uuid, False)
+            else:
+                return None
 
 
 class DepositSchemaV1(RecordSchemaV1):
