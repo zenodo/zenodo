@@ -816,9 +816,9 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='asc',
             order=1,
         ),
-        mostviews=dict(
+        mostviewed=dict(
             fields=['-_stats.version_views'],
-            title='Most views',
+            title='Most viewed',
             default_order='asc',
             order=1,
         ),
