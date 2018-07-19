@@ -25,6 +25,7 @@
 zenodo db create
 zenodo index queue init
 zenodo index init
+zenodo queues declare
 zenodo fixtures init
 zenodo fixtures loadlicenses
 zenodo fixtures loadfunders

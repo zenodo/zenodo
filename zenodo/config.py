@@ -237,6 +237,24 @@ CELERY_BEAT_SCHEDULE = {
             'job_id': 'records',
         }
     },
+    # Stats
+    'stats-process-events': {
+        'task': 'invenio_stats.tasks.process_events',
+        'schedule': timedelta(minutes=30),
+        'args': [('record-view', 'file-download')],
+    },
+    'stats-aggregate-events': {
+        'task': 'invenio_stats.tasks.aggregate_events',
+        'schedule': timedelta(hours=1),
+        'args': [(
+            'record-view-agg', 'record-view-all-versions-agg',
+            'record-download-agg', 'record-download-all-versions-agg',
+        )],
+    },
+    'stats-update-record-statistics': {
+        'task': 'zenodo.modules.stats.tasks.update_record_statistics',
+        'schedule': timedelta(hours=1),
+    },
 }
 
 # Cache
@@ -798,6 +816,12 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='asc',
             order=1,
         ),
+        mostviewed=dict(
+            fields=['-_stats.version_views'],
+            title='Most viewed',
+            default_order='asc',
+            order=1,
+        ),
         mostrecent=dict(
             fields=['-_created'],
             title='Most recent',
@@ -1154,6 +1178,100 @@ STATSD_HOST = None
 STATSD_PORT = 8125
 #: Default StatsD port
 STATSD_PREFIX = "zenodo"
+
+# Stats
+# =====
+STATS_EVENTS = {
+    'file-download': {
+        'signal': 'invenio_files_rest.signals.file_downloaded',
+        'templates': 'zenodo.modules.stats.templates.events',
+        'event_builders': [
+            'invenio_stats.contrib.event_builders.file_download_event_builder',
+            'zenodo.modules.stats.event_builders:skip_deposit',
+            'zenodo.modules.stats.event_builders:add_record_metadata',
+        ],
+        'processor_config': {
+            'preprocessors': [
+                'invenio_stats.processors:flag_robots',
+                # Don't index robot events
+                lambda doc: doc if not doc['is_robot'] else None,
+                'invenio_stats.processors:flag_machines',
+                'invenio_stats.processors:anonymize_user',
+                'invenio_stats.contrib.event_builders:build_file_unique_id',
+            ],
+            # Keep only 1 file download for each file and user every 30 sec
+            'double_click_window': 30,
+            # Create one index per month which will store file download events
+            'suffix': '%Y-%m',
+        },
+    },
+    'record-view': {
+        'signal': 'invenio_records_ui.signals.record_viewed',
+        'templates': 'zenodo.modules.stats.templates.events',
+        'event_builders': [
+            'invenio_stats.contrib.event_builders.record_view_event_builder',
+            'zenodo.modules.stats.event_builders:skip_deposit',
+            'zenodo.modules.stats.event_builders:add_record_metadata',
+        ],
+        'processor_config': {
+            'preprocessors': [
+                'invenio_stats.processors:flag_robots',
+                # Don't index robot events
+                lambda doc: doc if not doc['is_robot'] else None,
+                'invenio_stats.processors:flag_machines',
+                'invenio_stats.processors:anonymize_user',
+                'invenio_stats.contrib.event_builders:build_record_unique_id',
+            ],
+            # Keep only 1 file download for each file and user every 30 sec
+            'double_click_window': 30,
+            # Create one index per month which will store file download events
+            'suffix': '%Y-%m',
+        },
+    },
+}
+#: Enabled aggregations from 'zenoodo.modules.stats.registrations'
+STATS_AGGREGATIONS = {
+    'record-download-agg': {},
+    'record-download-all-versions-agg': {},
+    # NOTE: Since the "record-view-agg" aggregations is alrady registered in
+    # "invenio_stasts.contrib.registrations", we have to overwrite the
+    # configuration here
+    'record-view-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        aggregator_config=dict(
+            event='record-view',
+            aggregation_field='recid',
+            aggregation_interval='day',
+            copy_fields=dict(
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (list(d.communities)
+                                          if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: False
+            ),
+            metric_aggregation_fields=dict(
+                unique_count=('cardinality', 'unique_session_id',
+                              {'precision_threshold': 1000}),
+            )
+        )
+    ),
+    'record-view-all-versions-agg': {},
+}
+#: Enabled queries from 'zenoodo.modules.stats.registrations'
+STATS_QUERIES = {
+    'record-view': {},
+    'record-view-all-versions': {},
+    'record-download': {},
+    'record-download-all-versions': {},
+}
+
+# Queues
+# ======
+QUEUES_BROKER_URL = CELERY_BROKER_URL
 
 # Proxy configuration
 #: Number of proxies in front of application.

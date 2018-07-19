@@ -1,6 +1,7 @@
-{#
+# -*- coding: utf-8 -*-
+#
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2016 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -20,11 +21,6 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
--#}
 
-{%- macro altmetric_badge(doi, badge_type='donut', badge_details='left', hide_no_mentions=True, css_class='', with_script=False) %}
-<div class="altmetric-embed{% if css_class %} {{css_class}}{% endif%}" data-badge-type="{{badge_type}}" data-badge-details="{{badge_details}}" data-hide-no-mentions="true" data-doi="{{doi}}"></div>
-{%- if with_script %}
-<script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
-{%- endif %}
-{%- endmacro %}
+"""Elasticsearch templates."""
+
