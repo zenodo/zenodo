@@ -1233,7 +1233,7 @@ STATS_EVENTS = {
 STATS_AGGREGATIONS = {
     'record-download-agg': {},
     'record-download-all-versions-agg': {},
-    # NOTE: Since the "record-view-agg" aggregations is alrady registered in
+    # NOTE: Since the "record-view-agg" aggregations is already registered in
     # "invenio_stasts.contrib.registrations", we have to overwrite the
     # configuration here
     'record-view-agg': dict(
