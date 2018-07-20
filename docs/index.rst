@@ -59,7 +59,7 @@ This part of the documentation describes the architecture of Zenodo.
 .. toctree::
    :maxdepth: 2
 
-   architecture/architecture
+   architecture/statistics
 
 API Reference
 -------------
