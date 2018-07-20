@@ -253,7 +253,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'stats-update-record-statistics': {
         'task': 'zenodo.modules.stats.tasks.update_record_statistics',
-        'schedule': timedelta(hours=1),
+        'schedule': timedelta(hours=3),
     },
 }
 
