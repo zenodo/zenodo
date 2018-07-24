@@ -33,13 +33,8 @@ import pycountry
 from marshmallow import Schema, fields, post_dump
 
 from ...models import ObjectType
-
-
-class IdentifierSchema(Schema):
-    """Identifier schema."""
-
-    identifier = fields.Function(lambda o: o)
-    identifierType = fields.Constant('DOI')
+from ...utils import is_doi_locally_managed
+from .common import ui_link_for
 
 
 class PersonSchema(Schema):
@@ -120,7 +115,7 @@ class RelatedIdentifierSchema(Schema):
 class DataCiteSchema(Schema):
     """Base class for schemas."""
 
-    identifier = fields.Nested(IdentifierSchema, attribute='metadata.doi')
+    identifier = fields.Method('get_identifier', attribute='metadata.doi')
     titles = fields.List(
         fields.Nested(TitleSchema),
         attribute='metadata.title')
@@ -147,6 +142,21 @@ class DataCiteSchema(Schema):
         if 'language' in data and data['language'] is None:
             del data['language']
         return data
+
+    def get_identifier(self, obj):
+        """Get record main identifier."""
+        doi = obj['metadata'].get('doi', '')
+        if is_doi_locally_managed(doi):
+            return {
+                'identifier': doi,
+                'identifierType': 'DOI'
+            }
+        else:
+            recid = obj.get('metadata', {}).get('recid', '')
+            return {
+                'identifier': ui_link_for('record_html', id=recid),
+                'identifierType': 'URL',
+            }
 
     def get_language(self, obj):
         """Export language to the Alpha-2 code (if available)."""
@@ -228,7 +238,7 @@ class DataCiteSchema(Schema):
         return type_
 
     def get_related_identifiers(self, obj):
-        """Resource type."""
+        """Related identifiers."""
         accepted_types = [
             'doi', 'ark', 'ean13', 'eissn', 'handle', 'isbn', 'issn', 'istc',
             'lissn', 'lsid', 'purl', 'upc', 'url', 'urn', 'ads', 'arxiv',
@@ -240,6 +250,14 @@ class DataCiteSchema(Schema):
         for r in obj['metadata'].get('related_identifiers', []):
             if r['scheme'] in accepted_types:
                 items.append(s.dump(r).data)
+
+        doi = obj['metadata'].get('doi', '')
+        if not is_doi_locally_managed(doi):
+            items.append(s.dump({
+                'identifier': doi,
+                'scheme': 'doi',
+                'relation': 'IsIdenticalTo',
+            }).data)
         return items
 
     def get_subjects(self, obj):
@@ -321,7 +339,7 @@ class DataCiteSchemaV1(DataCiteSchema):
         return items
 
     def get_related_identifiers(self, obj):
-        """Resource type."""
+        """Related identifiers."""
         items = super(DataCiteSchemaV1, self).get_related_identifiers(obj)
         for item in items:
             if item['relationType'] and item['relationType'] == 'IsVersionOf':

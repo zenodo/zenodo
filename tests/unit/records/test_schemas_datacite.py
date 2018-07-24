@@ -41,10 +41,10 @@ def today():
 
 def test_minimal(db, minimal_record_model, recid_pid):
     """Test minimal."""
-    minimal_record_model['doi'] = '10.1234/foo'
+    minimal_record_model['doi'] = '10.5072/foo'
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj == {
-        'identifier': {'identifier': '10.1234/foo', 'identifierType': 'DOI'},
+        'identifier': {'identifier': '10.5072/foo', 'identifierType': 'DOI'},
         'creators': [{'creatorName': 'Test', 'nameIdentifier': {}}],
         'titles': [{'title': 'Test'}],
         'publisher': 'Zenodo',
@@ -67,10 +67,23 @@ def test_minimal(db, minimal_record_model, recid_pid):
     }
 
 
+def test_non_local_doi(db, minimal_record_model, recid_pid):
+    """Test non-local DOI."""
+    minimal_record_model['doi'] = '10.1234/foo'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['identifier'] == {'identifier': 'http://localhost/record/123',
+                                 'identifierType': 'URL'}
+    assert obj['relatedIdentifiers'] == [{
+        'relatedIdentifier': '10.1234/foo',
+        'relatedIdentifierType': 'DOI',
+        'relationType': 'IsIdenticalTo',
+    }]
+
+
 def test_full(db, record_with_bucket, recid_pid):
     """Test full record metadata."""
     _, full_record_model = record_with_bucket
-    full_record_model['doi'] = '10.1234/foo'
+    full_record_model['doi'] = '10.5072/foo'
     obj = datacite_v31.transform_record(recid_pid, full_record_model)
     expected = {
         "alternateIdentifiers": [
@@ -172,7 +185,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "descriptionType": "Other"
             }
         ],
-        "identifier": {"identifier": "10.1234/foo", "identifierType": "DOI"},
+        "identifier": {"identifier": "10.5072/foo", "identifierType": "DOI"},
         "language": "en",
         "publicationYear": "2014",
         "publisher": "Zenodo",
