@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import six
 from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
 from werkzeug.routing import BuildError
@@ -186,7 +187,8 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Load grants."""
         if not isinstance(data, list):
             raise ValidationError(_('Not a list.'))
-        res = set()
+        result = set()
+        errors = set()
         for g in data:
             if not isinstance(g, dict):
                 raise ValidationError(_('Element not an object.'))
@@ -196,9 +198,19 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             # FP7 project grant
             if not g.startswith('10.13039/'):
                 g = '10.13039/501100000780::{0}'.format(g)
-            res.add(g)
+            # Check that the PID exists
+            grant_pid = PersistentIdentifier.query.filter_by(
+                pid_type='grant', pid_value=g).one_or_none()
+            if not grant_pid or grant_pid.status != PIDStatus.REGISTERED:
+                errors.add(g)
+                continue
+            result.add(g)
+        if errors:
+            raise ValidationError(
+                'Invalid grant ID(s): {0}'.format(', '.join(errors)),
+                field_names='grants')
         return [{'$ref': 'https://dx.zenodo.org/grants/{0}'.format(grant_id)}
-                for grant_id in res] or missing
+                for grant_id in result] or missing
 
     def dump_communities(self, obj):
         """Dump communities type."""
