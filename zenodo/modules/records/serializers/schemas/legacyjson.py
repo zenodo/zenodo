@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import six
 from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
+from invenio_communities.models import Community
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
@@ -222,9 +223,15 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Load communities type."""
         if not isinstance(data, list):
             raise ValidationError(_('Not a list.'))
-        return list(sorted([
+        comm_ids = list(sorted([
             x['identifier'] for x in data if x.get('identifier')
-        ])) or missing
+        ]))
+        errors = {c for c in comm_ids if not Community.get(c)}
+        if errors:
+            raise ValidationError(
+                'Invalid communities: {0}'.format(', '.join(errors)),
+                field_names='communities')
+        return comm_ids or missing
 
     def dump_prereservedoi(self, obj):
         """Dump pre-reserved DOI."""
