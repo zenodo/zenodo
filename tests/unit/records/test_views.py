@@ -28,8 +28,8 @@ from __future__ import absolute_import, print_function
 
 import json
 from datetime import datetime, timedelta
-import pytest
 
+import pytest
 from flask import render_template, render_template_string, url_for
 from helpers import login_user_via_session
 from invenio_indexer.api import RecordIndexer

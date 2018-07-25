@@ -33,8 +33,8 @@ from invenio_db import db
 from invenio_files_rest.models import Bucket
 from invenio_files_rest.signals import file_downloaded
 from invenio_indexer.api import RecordIndexer
-from invenio_pidstore.models import PersistentIdentifier
 from invenio_pidrelations.contrib.versioning import PIDVersioning
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_records_files.models import RecordsBuckets
 from invenio_records_ui.signals import record_viewed
 from invenio_search import current_search
