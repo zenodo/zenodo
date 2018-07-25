@@ -1123,7 +1123,7 @@ COMMUNITIES_REQUEST_EMAIL_SENDER = SUPPORT_EMAIL
 #: Default site name.
 THEME_SITENAME = _("Zenodo")
 #: Default site URL (used only when not in a context - e.g. like celery tasks).
-THEME_SITEURL = "https://zenodo.org"
+THEME_SITEURL = "http://localhost:5000"
 #: Endpoint for breadcrumb root.
 THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
 #: Twitter handle.
