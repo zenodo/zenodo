@@ -24,9 +24,18 @@
 
 """Statistics utilities."""
 
+import itertools
+
 from flask import request
 from invenio_search.api import RecordsSearch
 from invenio_stats import current_stats
+
+from zenodo.modules.records.resolvers import record_resolver
+
+try:
+    from functools import lru_cache
+except ImportError:
+    from functools32 import lru_cache
 
 
 def get_record_from_context(**kwargs):
@@ -113,3 +122,26 @@ def get_record_stats(recordid, throws=True):
         if throws:
             raise
         pass
+
+
+def chunkify(iterable, n):
+    """Create equally sized tuple-chunks from an iterable."""
+    it = iter(iterable)
+    while True:
+        chunk = tuple(itertools.islice(it, n))
+        if not chunk:
+            return
+        yield chunk
+
+
+@lru_cache(maxsize=1024)
+def fetch_record(recid):
+    """Cached record fetch."""
+    return record_resolver.resolve(recid)
+
+
+@lru_cache(maxsize=1024)
+def fetch_record_file(recid, filename):
+    """Cached record file fetch."""
+    _, record = fetch_record(recid)
+    return record.files[filename].obj

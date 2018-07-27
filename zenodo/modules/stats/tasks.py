@@ -34,6 +34,8 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_stats import current_stats
 
+from zenodo.modules.stats.exporters import PiwikExporter
+
 
 @shared_task(ignore_result=True)
 def update_record_statistics(start_date=None, end_date=None):
@@ -106,3 +108,18 @@ def update_record_statistics(start_date=None, end_date=None):
         pv = PIDVersioning(parent=conceptrecid)
         children_recids = pv.children.all()
         indexer.bulk_index([str(p.object_uuid) for p in children_recids])
+
+
+@shared_task(ignore_result=True, max_retries=3, default_retry_delay=60 * 60)
+def export_stats(start_date=None, end_date=None, update_bookmark=True, retry=False):
+    """Export stats events."""
+
+    start_date = dateutil_parse(start_date) if start_date else None
+    end_date = dateutil_parse(end_date) if end_date else None
+
+    try:
+        PiwikExporter().run(start_date=start_date, end_date=end_date,
+                            update_bookmark=update_bookmark)
+    except Exception as exc:
+        if retry:
+            export_stats.retry(exc=exc)

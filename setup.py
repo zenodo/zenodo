@@ -221,6 +221,7 @@ setup(
             'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
             'zenodo_exporter = zenodo.modules.exporter.ext:InvenioExporter',
             'zenodo_frontpage = zenodo.modules.frontpage.ext:ZenodoFrontpage',
+            'zenodo_stats = zenodo.modules.stats.ext:ZenodoStats',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '

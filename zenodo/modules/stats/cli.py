@@ -26,7 +26,6 @@
 
 import csv
 import glob
-import itertools
 import re
 import sys
 from datetime import datetime as dt
@@ -39,26 +38,11 @@ from invenio_stats.proxies import current_stats
 from six.moves import filter, map
 from six.moves.urllib.parse import urlparse
 
-from zenodo.modules.records.resolvers import record_resolver
 from zenodo.modules.stats.tasks import update_record_statistics
-from zenodo.modules.stats.utils import extract_event_record_metadata
-
-try:
-    from functools import lru_cache
-except ImportError:
-    from functools32 import lru_cache
+from zenodo.modules.stats.utils import chunkify, extract_event_record_metadata, \
+    fetch_record, fetch_record_file
 
 PY3 = sys.version_info[0] == 3
-
-
-def chunkify(iterable, n):
-    """Create equally sized tuple-chunks from an iterable."""
-    it = iter(iterable)
-    while True:
-        chunk = tuple(itertools.islice(it, n))
-        if not chunk:
-            return
-        yield chunk
 
 
 def _verify_date(ctx, param, value):
@@ -78,19 +62,6 @@ def parse_record_url(url):
         r'(?:\/files\/(?P<filename>.+)$)?',
         record_url.path).groupdict()
     return match.get('recid'), match.get('filename')
-
-
-@lru_cache(maxsize=1024)
-def fetch_record(recid):
-    """Cached record fetch."""
-    return record_resolver.resolve(recid)
-
-
-@lru_cache(maxsize=1024)
-def fetch_record_file(recid, filename):
-    """Cached record file fetch."""
-    _, record = fetch_record(recid)
-    return record.files[filename].obj
 
 
 def build_common_event(record, data):
