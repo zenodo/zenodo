@@ -748,24 +748,38 @@ def funder_record(db):
 
 
 @pytest.fixture
-def grant_record(db, funder_record):
-    """Create a grant record."""
-    grant = Record.create(dict(
-        internal_id='10.13039/501100000780::282896',
-        funder={'$ref': 'https://dx.doi.org/10.13039/501100000780'},
-        identifiers=dict(
-            eurepo='info:eu-repo/grantAgreement/EC/FP7/282896',
-        ),
-        code='282896',
-        title='Open Access Research Infrastructure in Europe',
-        acronym='OpenAIREplus',
-        program='FP7',
-    ))
-    PersistentIdentifier.create(
-        pid_type='grant', pid_value=grant['internal_id'], object_type='rec',
-        object_uuid=grant.id, status='R')
+def grant_records(db, funder_record):
+    """Create grant records."""
+    grants = [
+        Record.create(dict(
+            internal_id='10.13039/501100000780::282896',
+            funder={'$ref': 'https://dx.doi.org/10.13039/501100000780'},
+            identifiers=dict(
+                eurepo='info:eu-repo/grantAgreement/EC/FP7/282896',
+            ),
+            code='282896',
+            title='Open Access Research Infrastructure in Europe',
+            acronym='OpenAIREplus',
+            program='FP7',
+        )),
+        Record.create(dict(
+            internal_id='10.13039/501100000780::027819',
+            funder={'$ref': 'https://dx.doi.org/10.13039/501100000780'},
+            identifiers=dict(
+                eurepo='info:eu-repo/grantAgreement/EC/FP6/027819',
+            ),
+            code='027819',
+            title='Integrating cognition, emotion and autonomy',
+            acronym='ICEA',
+            program='FP6',
+        )),
+    ]
+    for g in grants:
+        PersistentIdentifier.create(
+            pid_type='grant', pid_value=g['internal_id'], object_type='rec',
+            object_uuid=g.id, status='R')
     db.session.commit()
-    return grant
+    return grants
 
 
 @pytest.fixture

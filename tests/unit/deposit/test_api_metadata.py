@@ -56,7 +56,7 @@ def test_invalid_create(api_client, es, json_auth_headers, deposit_url,
 
 
 def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
-                      license_record, grant_record, locations, communities):
+                      license_record, grant_records, locations, communities):
     """Rough validation of input against output data."""
     client = api_client
     headers = json_auth_headers
@@ -153,7 +153,7 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
 
 
 def test_unicode(api_client, es, locations, json_auth_headers, deposit_url,
-                 get_json, license_record, grant_record, auth_headers,
+                 get_json, license_record, grant_records, auth_headers,
                  communities):
     """Rough validation of input against output data."""
     client = api_client
@@ -244,7 +244,7 @@ def test_unicode(api_client, es, locations, json_auth_headers, deposit_url,
 
 
 def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
-                    license_record, grant_record, auth_headers):
+                    license_record, grant_records, auth_headers):
     """Test validation."""
     client = api_client
     headers = json_auth_headers
