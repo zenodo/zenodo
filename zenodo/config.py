@@ -424,6 +424,8 @@ OPENAIRE_API_USERNAME = None
 OPENAIRE_API_PASSWORD = None
 #: URL to OpenAIRE portal.
 OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
+#: OpenAIRE community identifier prefix.
+OPENAIRE_COMMUNITY_IDENTIFIER_PREFIX = 'https://openaire.eu/communities'
 #: Enable sending published records for direct indexing at OpenAIRE.
 OPENAIRE_DIRECT_INDEXING_ENABLED = False
 

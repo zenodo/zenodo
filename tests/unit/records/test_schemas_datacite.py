@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -656,6 +656,31 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
             'relatedIdentifierType': dc_t,
             'relationType': 'IsCitedBy',
         }]
+
+
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_openaire_communities(db, minimal_record_model, recid_pid, serializer):
+    """Test OpenAIRE communities."""
+    tests = [
+        (['zenodo'], set()),
+        (['c1'], {'foo'}),
+        (['c1', 'c2'], {'foo'}),
+        (['c1', 'c2', 'c3'], {'foo', 'bar'}),
+    ]
+
+    for comms, expected_oa_comms in tests:
+        minimal_record_model['communities'] = comms
+        obj = serializer.transform_record(recid_pid, minimal_record_model)
+        for oa_comm in expected_oa_comms:
+            assert {
+                'relatedIdentifier':
+                    'https://openaire.eu/communities/{}'.format(oa_comm),
+                'relatedIdentifierType': 'URL',
+                'relationType': 'IsPartOf',
+            } in obj['relatedIdentifiers']
 
 
 @pytest.mark.parametrize("serializer", [

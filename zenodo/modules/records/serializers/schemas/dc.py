@@ -29,6 +29,9 @@ from __future__ import absolute_import, print_function
 import lxml.html
 from marshmallow import Schema, fields
 
+from zenodo.modules.openaire.helpers import openaire_community_identifier, \
+    resolve_openaire_communities
+
 from ...models import ObjectType
 
 
@@ -86,6 +89,13 @@ class DublinCoreV1(Schema):
                 u'{0}:{1}'.format(
                     a['scheme'],
                     a['identifier']))
+
+        # OpenAIRE community identifiers
+        openaire_comms = resolve_openaire_communities(
+            obj['metadata'].get('communities', []))
+        for oa_comm in openaire_comms:
+            rels.append(
+                u'url:{0}'.format(openaire_community_identifier(oa_comm)))
 
         return rels
 
