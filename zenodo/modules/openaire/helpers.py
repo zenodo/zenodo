@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2017-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -31,6 +31,8 @@ import hashlib
 from flask import current_app
 
 from zenodo.modules.records.models import ObjectType
+
+from .proxies import current_openaire
 
 
 class _OAType(object):
@@ -122,3 +124,20 @@ def openaire_link(record):
             oaid,
         )
     return None
+
+
+def resolve_openaire_communities(communities):
+    """Resolve a Zenodo communities list to an OpenAIRE communities set."""
+    openaire_comms = set()
+    for comm in communities:
+        oa_comm = current_openaire.inverse_openaire_community_map.get(comm)
+        if oa_comm:
+            openaire_comms.add(oa_comm)
+    return openaire_comms
+
+
+def openaire_community_identifier(openaire_community):
+    """Get OpenAIRE community identifier."""
+    return u'{0}/{1}'.format(
+        current_app.config['OPENAIRE_COMMUNITY_IDENTIFIER_PREFIX'],
+        openaire_community)

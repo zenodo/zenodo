@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016, 2017, 2018 CERN.
+# Copyright (C) 2016-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -31,6 +31,9 @@ import json
 import arrow
 import pycountry
 from marshmallow import Schema, fields, post_dump
+
+from zenodo.modules.openaire.helpers import openaire_community_identifier, \
+    resolve_openaire_communities
 
 from ...models import ObjectType
 from ...utils import is_doi_locally_managed
@@ -258,6 +261,17 @@ class DataCiteSchema(Schema):
                 'scheme': 'doi',
                 'relation': 'IsIdenticalTo',
             }).data)
+
+        # OpenAIRE community identifiers
+        openaire_comms = resolve_openaire_communities(
+            obj['metadata'].get('communities', []))
+        for oa_comm in openaire_comms:
+            items.append(s.dump({
+                'identifier': openaire_community_identifier(oa_comm),
+                'scheme': 'url',
+                'relation': 'IsPartOf',
+            }).data)
+
         return items
 
     def get_subjects(self, obj):

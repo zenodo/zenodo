@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -179,6 +179,45 @@ def test_types(app, db, minimal_record_model, recid_pid):
         'software',
         'openaire:foo:t1',
     ]
+
+
+def test_openaire_communities(db, minimal_record_model, recid_pid):
+    """Test OpenAIRE communities."""
+    tests = [
+        (['zenodo'], set()),
+        (['c1'], {'foo'}),
+        (['c1', 'c2'], {'foo'}),
+        (['c1', 'c2', 'c3'], {'foo', 'bar'}),
+    ]
+
+    for comms, expected_oa_comms in tests:
+        minimal_record_model['communities'] = comms
+        obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+        for oa_comm in expected_oa_comms:
+            assert ('url:https://openaire.eu/communities/{}'.format(oa_comm)
+                    in obj['relations'])
+
+
+def test_sources(app, db, minimal_record_model, recid_pid):
+    """"Test contributors."""
+    minimal_record_model.update({
+        'journal': {
+            'title': 'CAP',
+            'volume': '22',
+            'issue': '1',
+            'pages': '1-2',
+            'year': '2002'
+        }})
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['sources'] == ['CAP 22(1) 1-2 (2002)']
+
+    minimal_record_model.update({
+        'journal': {
+            'title': 'CAP',
+            'issue': '1',
+        }})
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['sources'] == ['CAP 1']
 
 
 def test_sources(app, db, minimal_record_model, recid_pid):
