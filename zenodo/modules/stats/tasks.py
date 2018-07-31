@@ -113,7 +113,6 @@ def update_record_statistics(start_date=None, end_date=None):
 @shared_task(ignore_result=True, max_retries=3, default_retry_delay=60 * 60)
 def export_stats(start_date=None, end_date=None, update_bookmark=True, retry=False):
     """Export stats events."""
-
     start_date = dateutil_parse(start_date) if start_date else None
     end_date = dateutil_parse(end_date) if end_date else None
 

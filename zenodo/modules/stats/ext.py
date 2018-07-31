@@ -48,4 +48,3 @@ class ZenodoStats(object):
         """Flask application initialization."""
         self.init_config(app)
         app.extensions['zenodo-stats'] = self
-

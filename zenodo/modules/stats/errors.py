@@ -30,10 +30,7 @@ from __future__ import absolute_import, print_function
 class PiwikExportRequestError(Exception):
     """Error for failed requests on Piwik export."""
 
-    def __init__(self, export_info=None, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         """Initialize the error with first and last events' timestamps."""
-        super(PiwikExportRequestError, self).__init__(*args, **kwargs)
-        self.extra = export_info
-
-
-
+        super(PiwikExportRequestError, self).__init__(*args)
+        self.extra = kwargs['export_info']

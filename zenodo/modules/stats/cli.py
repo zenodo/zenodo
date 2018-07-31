@@ -39,8 +39,8 @@ from six.moves import filter, map
 from six.moves.urllib.parse import urlparse
 
 from zenodo.modules.stats.tasks import update_record_statistics
-from zenodo.modules.stats.utils import chunkify, extract_event_record_metadata, \
-    fetch_record, fetch_record_file
+from zenodo.modules.stats.utils import chunkify, \
+    extract_event_record_metadata, fetch_record, fetch_record_file
 
 PY3 = sys.version_info[0] == 3
 
@@ -121,7 +121,7 @@ EVENT_TYPE_BUILDERS = {
 @click.option('--chunk-size', '-s', type=int, default=100)
 @with_appcontext
 def import_events(event_type, csv_dir, chunk_size):
-    """Import stats events from a directory of CSV files.
+    r"""Import stats events from a directory of CSV files.
 
     Available event types: "file-download", "record-view"
 

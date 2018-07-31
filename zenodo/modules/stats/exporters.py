@@ -25,11 +25,11 @@
 """Zenodo stats exporters."""
 
 import json
-import requests
 
+import requests
 from dateutil.parser import parse as dateutil_parse
-from flask import current_app
 from elasticsearch_dsl import Search
+from flask import current_app
 from invenio_cache import current_cache
 from invenio_search import current_search_client
 from six.moves.urllib.parse import urlencode
@@ -43,7 +43,6 @@ class PiwikExporter:
 
     def run(self, start_date=None, end_date=None, update_bookmark=True):
         """Run export job."""
-
         if start_date is None:
             bookmark = current_cache.get('piwik_export:bookmark')
             start_date = dateutil_parse(bookmark) if bookmark else None
@@ -83,7 +82,7 @@ class PiwikExporter:
             res = requests.post(url, json=payload)
 
             # Failure: not 200 or not "success"
-            content = json.loads(res.content) if res.ok else None
+            content = res.json() if res.ok else None
             if res.status_code == 200 and content.get('status') == 'success':
                 if content.get('invalid') != 0:
                     msg = 'Invalid events in Piwik export request.'
@@ -111,8 +110,8 @@ class PiwikExporter:
         url = 'zenodo.org/record/{}'.format(event.recid)
         visitor_id = event.visitor_id[0:16]
         _, record = fetch_record(event.recid)
-        oai = record.get('_oai').get('id')
-        cvar = "{\"1\":[\"oaipmhID\",\"" + oai + "\"]}"
+        oai = record.get('_oai', {}).get('id')
+        cvar = json.dumps({'1': ['oaipmhID', oai]})
         action_name = record.get('title')[:150]  # max 150 characters
 
         params = dict(
@@ -133,4 +132,3 @@ class PiwikExporter:
             params['download'] = params['url']
 
         return '?{}'.format(urlencode(params))
-
