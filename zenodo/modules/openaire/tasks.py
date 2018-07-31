@@ -28,7 +28,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import requests
 from celery import shared_task
+from datetime import datetime
 from flask import current_app
+from invenio_cache import current_cache
 
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.serializers import openaire_json_v1
@@ -75,7 +77,13 @@ def openaire_direct_index(record_uuid):
         res = req.post(url, data=data)
         if not res.ok:
             raise OpenAIRERequestError(res.text)
+        else:
+            recid = record.get('recid')
+            current_cache.delete('openaire_direct_index:{}'.format(recid))
     except Exception as exc:
+        recid = record.get('recid')
+        current_cache.set('openaire_direct_index:{}'.format(recid),
+                          datetime.now(), timeout=-1)
         openaire_direct_index.retry(exc=exc)
 
 
