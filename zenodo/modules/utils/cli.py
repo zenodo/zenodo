@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 import os
 from io import SEEK_END, SEEK_SET
 
@@ -42,6 +43,7 @@ from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
 from .grants import OpenAIREGrantsDump
+from .openaire import OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
     sync_record_oai, update_oaisets_cache, update_search_pattern_sets
 
@@ -388,3 +390,17 @@ def split_openaire_grants_dump(source, target_prefix, grants_per_file=None,
         click.secho('{0} - {1} (Total: {2})'
                     .format(filepath, row_count, total_rows),
                     fg='blue')
+
+
+@utils.command('update_openaire_communities')
+@click.argument('path', type=click.Path(exists=True, dir_okay=False))
+@with_appcontext
+def update_openaire_communities(path):
+    """Get the updated mapping between OpenAIRE and Zenodo communities."""
+    mapping_updater = OpenAIRECommunitiesMappingUpdater(path)
+    mapping, unresolved_communities = mapping_updater\
+        .update_communities_mapping()
+    click.secho('Communities not found:\n{0}'.format(json.dumps(
+        unresolved_communities, indent=4, separators=(', ', ': '))))
+    click.secho('{0}'.format(json.dumps(mapping, indent=4,
+                                        separators=(', ', ': '))), fg='blue')
