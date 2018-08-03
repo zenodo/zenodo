@@ -130,7 +130,11 @@ class DublinCoreV1(Schema):
 
     def get_subjects(self, obj):
         """Get subjects."""
-        return obj['metadata'].get('keywords', [])
+        metadata = obj['metadata']
+        subjects = []
+        subjects.extend(metadata.get('keywords', []))
+        subjects.extend((s['term'] for s in metadata.get('subjects', [])))
+        return subjects
 
     def get_publishers(self, obj):
         """Get publishers."""

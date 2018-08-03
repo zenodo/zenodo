@@ -220,28 +220,6 @@ def test_sources(app, db, minimal_record_model, recid_pid):
     assert obj['sources'] == ['CAP 1']
 
 
-def test_sources(app, db, minimal_record_model, recid_pid):
-    """"Test contributors."""
-    minimal_record_model.update({
-        'journal': {
-            'title': 'CAP',
-            'volume': '22',
-            'issue': '1',
-            'pages': '1-2',
-            'year': '2002'
-        }})
-    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
-    assert obj['sources'] == ['CAP 22(1) 1-2 (2002)']
-
-    minimal_record_model.update({
-        'journal': {
-            'title': 'CAP',
-            'issue': '1',
-        }})
-    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
-    assert obj['sources'] == ['CAP 1']
-
-
 def test_sources_meetings(app, db, minimal_record_model, recid_pid):
     """"Test contributors."""
     minimal_record_model['meetings'] = {
@@ -267,3 +245,11 @@ def test_description(app, db, minimal_record_model, recid_pid):
     minimal_record_model['description'] = ''
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert obj['descriptions'] == []
+
+
+def test_subjects(app, db, minimal_record_model, recid_pid):
+    """Test description."""
+    minimal_record_model['subjects'] = [{'term': 's1'}, {'term': 's2'}]
+    minimal_record_model['keywords'] = ['k1', 'k2']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert set(obj['subjects']) == {'s1', 's2', 'k1', 'k2'}
