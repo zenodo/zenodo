@@ -89,6 +89,12 @@ def instance_path():
     shutil.rmtree(path)
 
 
+@pytest.fixture(scope='module')
+def script_dir(request):
+    """Return the directory of the currently running test script."""
+    return request.fspath.join('..')
+
+
 @pytest.fixture(scope='session')
 def env_config(instance_path):
     """Default instance path."""
