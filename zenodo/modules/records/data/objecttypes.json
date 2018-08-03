@@ -64,7 +64,7 @@
   "eurepo": "info:eu-repo/semantics/lecture",
   "schema.org": "https://schema.org/PresentationDigitalDocument",
   "openaire": {
-    "resourceType": "0010",
+    "resourceType": "0004",
     "type": "publication"
   },
   "csl": "speech"
@@ -154,6 +154,10 @@
   "datacite": {"general": "InteractiveResource"},
   "eurepo": "info:eu-repo/semantics/lecture",
   "schema.org": "https://schema.org/CreativeWork",
+  "openaire": {
+    "resourceType": "0010",
+    "type": "publication"
+  },
   "csl": "speech"
 },
 {
@@ -330,7 +334,7 @@
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0032",
+    "resourceType": "0009",
     "type": "publication"
   },
   "csl": "article"
@@ -350,7 +354,7 @@
   "eurepo": "info:eu-repo/semantics/doctoralThesis",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0007",
+    "resourceType": "0006",
     "type": "publication"
   },
   "csl": "thesis"
@@ -370,7 +374,7 @@
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0020",
+    "resourceType": "0009",
     "type": "publication"
   },
   "csl": "article"
@@ -390,7 +394,7 @@
   "eurepo": "info:eu-repo/semantics/workingPaper",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0016",
+    "resourceType": "0014",
     "type": "publication"
   },
   "csl": "article"
@@ -410,7 +414,7 @@
   "eurepo": "info:eu-repo/semantics/researchProposal",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0020",
+    "resourceType": "0036",
     "type": "publication"
   },
   "csl": "article"
@@ -430,7 +434,7 @@
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0017",
+    "resourceType": "0034",
     "type": "publication"
   },
   "csl": "report"
@@ -450,7 +454,7 @@
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0017",
+    "resourceType": "0035",
     "type": "publication"
   },
   "csl": "report"
@@ -489,6 +493,10 @@
   "datacite": {"general": "Image", "type": "Figure"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/image#"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
   "csl": "figure"
 },
 {
@@ -505,6 +513,10 @@
   "datacite": {"general": "Image", "type": "Plot"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
   "csl": "figure"
 },
 {
@@ -521,6 +533,10 @@
   "datacite": {"general": "Image", "type": "Drawing"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
   "csl": "graphic"
 },
 {
@@ -537,6 +553,10 @@
   "datacite": {"general": "Image", "type": "Diagram"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
   "csl": "figure"
 },
 {
@@ -553,6 +573,10 @@
   "datacite": {"general": "Image", "type": "Photo"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
   "csl": "graphic"
 },
 {
@@ -569,5 +593,9 @@
   "datacite": {"general": "Image", "type": "Other"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
   "csl": "graphic"
 }]
