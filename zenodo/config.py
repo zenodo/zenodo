@@ -255,6 +255,14 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'zenodo.modules.stats.tasks.update_record_statistics',
         'schedule': timedelta(hours=3),
     },
+    'stats-export': {
+        'task': 'zenodo.modules.stats.tasks.export_stats',
+        'schedule': crontab(minute=0, hour=4),
+        'kwargs': {
+            'retry': True,
+        }
+    },
+
 }
 
 # Cache
