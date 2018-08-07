@@ -70,6 +70,7 @@ URLS = {
     'deposit_html': '{base}/deposits/{id}',
     'deposit': '{base}/deposit/depositions/{id}',
     'record_html': '{base}/record/{id}',
+    'record_file': '{base}/record/{id}/files/{filename}',
     'record': '{base}/records/{id}',
     'thumbnail': '{base}{path}',
 }

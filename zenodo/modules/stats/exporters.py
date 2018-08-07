@@ -31,9 +31,11 @@ from dateutil.parser import parse as dateutil_parse
 from elasticsearch_dsl import Search
 from flask import current_app
 from invenio_cache import current_cache
+from invenio_pidstore.errors import PIDDeletedError
 from invenio_search import current_search_client
 from six.moves.urllib.parse import urlencode
 
+from zenodo.modules.records.serializers.schemas.common import ui_link_for
 from zenodo.modules.stats.errors import PiwikExportRequestError
 from zenodo.modules.stats.utils import chunkify, fetch_record
 
@@ -71,8 +73,13 @@ class PiwikExporter:
         for event_chunk in chunkify(events, chunk_size):
             query_strings = []
             for event in event_chunk:
-                query_string = self._build_query_string(event)
-                query_strings.append(query_string)
+                if 'recid' not in event:
+                    continue
+                try:
+                    query_string = self._build_query_string(event)
+                    query_strings.append(query_string)
+                except PIDDeletedError:
+                    pass
 
             payload = {
                 'requests': query_strings,
@@ -107,7 +114,7 @@ class PiwikExporter:
     def _build_query_string(self, event):
         id_site = current_app.config['ZENODO_STATS_PIWIK_EXPORTER']\
             .get('id_site', None)
-        url = 'zenodo.org/record/{}'.format(event.recid)
+        url = ui_link_for('record_html', id=event.recid)
         visitor_id = event.visitor_id[0:16]
         _, record = fetch_record(event.recid)
         oai = record.get('_oai', {}).get('id')
@@ -128,7 +135,8 @@ class PiwikExporter:
         )
 
         if 'file_key' in event:
-            params['url'] = '{}/files/{}'.format(url, event.file_key)
+            params['url'] = ui_link_for('record_file', id=event.recid,
+                                        filename=event.file_key)
             params['download'] = params['url']
 
-        return '?{}'.format(urlencode(params))
+        return '?{}'.format(urlencode(params, 'utf-8'))
