@@ -70,7 +70,7 @@ def test_title_invalid(val):
     )
 
 
-def test_upload_type(app):
+def test_upload_type(app, communities):
     """Test upload type deserialization."""
     s = legacyjson.LegacyMetadataSchemaV1(
         partial=['upload_type', 'publication_type', 'image_type',
@@ -91,12 +91,12 @@ def test_upload_type(app):
     assert s.load(d(
         upload_type='software',
         openaire_type='foo:t1',
-        communities=['c1']
-        )).data['resource_type'] == {'type': 'software',
-                                     'openaire_subtype': 'foo:t1'}
+        communities=[{'identifier': 'c1'}],
+    )).data['resource_type'] == {'type': 'software',
+                                 'openaire_subtype': 'foo:t1'}
 
 
-def test_upload_type_invalid(app):
+def test_upload_type_invalid(app, communities):
     """Test upload type deserialization."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
 
@@ -126,22 +126,22 @@ def test_upload_type_invalid(app):
 
     # OpenAIRE subtype and community mismatch
     obj.update(dict(upload_type='software', openaire_type='foo:t1',
-                    communities=['foobar']))
+                    communities=[{'identifier': 'foobar'}]))
     pytest.raises(ValidationError, s.load, obj)
 
     # OpenAIRE subtype invalid format (no prefix)
     obj.update(dict(upload_type='software', openaire_type='invalid',
-                    communities=['c1']))
+                    communities=[{'identifier': 'c1'}]))
     pytest.raises(ValidationError, s.load, obj)
 
     # OpenAIRE subtype not found (wrong prefix)
     obj.update(dict(upload_type='software', openaire_type='xxx:t1',
-                    communities=['c1']))
+                    communities=[{'identifier': 'c1'}]))
     pytest.raises(ValidationError, s.load, obj)
 
     # OpenAIRE subtype not found (good prefix, wrong type)
     obj.update(dict(upload_type='software', openaire_type='foo:invalid',
-                    communities=['c1']))
+                    communities=[{'identifier': 'c1'}]))
     pytest.raises(ValidationError, s.load, obj)
 
 
@@ -725,7 +725,7 @@ def test_communities(communities):
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         communities=[
-            dict(identifier='zenodo'), dict(), dict(identifier='ecfunded'),
+            dict(identifier='zenodo'), dict(identifier='ecfunded'),
         ],
     )).data['communities'] == ['ecfunded', 'zenodo']
 
@@ -734,7 +734,9 @@ def test_communities(communities):
     1234,
     [1234],
     'zenodo',
-    {'dict': 'test'}
+    {'dict': 'test'},
+    ['zenodo'],
+    [{'dict': 'test'}, {}],
 ])
 def test_communities_invalid(comms):
     """Test communities."""

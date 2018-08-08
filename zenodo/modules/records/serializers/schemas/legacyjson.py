@@ -218,11 +218,17 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         return [dict(identifier=x) for x in obj.get('communities', [])] \
             or missing
 
-
     def load_communities(self, data):
         """Load communities type."""
         if not isinstance(data, list):
             raise ValidationError(_('Not a list.'))
+        invalid_format_comms = [
+            c for c in data if not (isinstance(c, dict) and 'identifier' in c)]
+        if invalid_format_comms:
+            raise ValidationError(
+                'Invalid community format: {}.'.format(invalid_format_comms),
+                field_names='communities')
+
         comm_ids = list(sorted([
             x['identifier'] for x in data if x.get('identifier')
         ]))
