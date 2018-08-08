@@ -72,10 +72,17 @@ class OpenAIRECommunitiesMappingUpdater:
                 if comm is not None:
                     zenodo_community_ids.append(comm.id)
                 else:
-                    unresolved_communities.append(zenodo_community)
+                    unresolved_communities.append(dict(
+                        openaire_community=openaire_community['id'],
+                        zenodo_community=zenodo_community))
 
             comm_id = openaire_community['id']
-            mapping[comm_id]['name'] = openaire_community['name']
-            mapping[comm_id]['communities'] = zenodo_community_ids
+            if mapping.get(comm_id):
+                mapping[comm_id]['name'] = openaire_community['name']
+                mapping[comm_id]['communities'] = zenodo_community_ids
+            else:
+                mapping[comm_id] = dict(name=openaire_community['name'],
+                                        communities=zenodo_community_ids,
+                                        types={})
 
         return mapping, unresolved_communities
