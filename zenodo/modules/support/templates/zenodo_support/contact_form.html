@@ -106,6 +106,31 @@
           </form>
         </div>
       </div>
+
+      <!-- Modal -->
+      <div class="modal fade" id="confirmationModal" tabindex="-1" role="dialog" aria-labelledby="confirmationModalLabel">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title" id="confirmationModalLabel">Warning!</h4>
+            </div>
+            <div class="modal-body">
+              <form>
+                <div class="form-group">
+                  <p>You haven't attached any files. If you want to add/update files, make sure you attach the files
+                    you want to add/update, or you provide us with the link to these files.</p>
+                  <p>Do you want to proceed anyway?</p>
+                </div>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+              <button type="button" class="btn btn-primary" id="confirm">Send request</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -119,6 +144,8 @@
 var MAX_FILE_SIZE = {{ config.SUPPORT_ATTACHMENT_MAX_SIZE|tojson }};
 var DESCRIPTION_MIN_LENGTH = {{ config.SUPPORT_DESCRIPTION_MIN_LENGTH|tojson }};
 var DESCRIPTION_MAX_LENGTH = {{ config.SUPPORT_DESCRIPTION_MAX_LENGTH|tojson }};
+
+var confirmed = false;
 
 function formatFileSize(bytes) {
   if (bytes == 0) {return '0.00 B';}
@@ -232,6 +259,19 @@ function validateForm() {
       field.closest('div.form-group').removeClass('has-error');
     }
   });
+
+  var category = $('#contact-form :input#issue_category').val();
+  var files = $('#attachments')[0].files;
+  // if there's no file to be uploaded, display a warning
+  // and ask for a confirmation before sending the request
+  if (isValid && category=='file-modification' && files.length == 0 && !confirmed) {
+    isValid = false;
+    $('#confirmationModal').modal({backdrop: 'static'}),
+    $('#confirm').click(function(e){
+      confirmed = true;
+      $('form#contact-form').submit();
+    })
+  }
 
   return isValid;
 }
