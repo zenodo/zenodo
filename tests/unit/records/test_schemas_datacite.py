@@ -712,7 +712,7 @@ def test_rights(db, minimal_record_model, recid_pid, serializer):
     datacite_v41,
 ])
 def test_descriptions(db, minimal_record_model, recid_pid, serializer):
-    """Test language."""
+    """Test descriptions."""
     minimal_record_model.update({
         'description': 'test',
         'notes': 'again',
@@ -729,6 +729,15 @@ def test_descriptions(db, minimal_record_model, recid_pid, serializer):
         'description': json.dumps({'references': ['A']}),
         'descriptionType': 'Other',
     }]
+
+    minimal_record_model.update({
+        'description': (20000 * 'A') + 'BBB',
+        'notes': (20000 * 'A') + 'BBB',
+        'references': [{'raw_reference': (20000 * 'A') + 'BBB'}],
+    })
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
+    assert all(len(d['description']) == 20000 and 'B' not in d['description']
+               for d in obj['descriptions'])
 
 
 def test_funding_ref_v4(db, minimal_record_model, recid_pid):

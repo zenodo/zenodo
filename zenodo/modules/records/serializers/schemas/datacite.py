@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from flask import current_app
 import json
 
 import arrow
@@ -175,21 +176,21 @@ class DataCiteSchema(Schema):
         return None
 
     def get_descriptions(self, obj):
-        """."""
+        """Get descriptions."""
         items = []
         desc = obj['metadata']['description']
+        max_descr_size = current_app.config.get(
+            'DATACITE_MAX_DESCRIPTION_SIZE', 20000)
         if desc:
             items.append({
-                'description': desc,
+                'description': desc[:max_descr_size],
                 'descriptionType': 'Abstract'
-
             })
         notes = obj['metadata'].get('notes')
         if notes:
             items.append({
-                'description': notes,
+                'description': notes[:max_descr_size],
                 'descriptionType': 'Other'
-
             })
         refs = obj['metadata'].get('references')
         if refs:
@@ -198,9 +199,8 @@ class DataCiteSchema(Schema):
                     'references': [
                         r['raw_reference'] for r in refs
                         if 'raw_reference' in r]
-                }),
+                })[:max_descr_size],
                 'descriptionType': 'Other'
-
             })
         return items
 
