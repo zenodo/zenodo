@@ -26,9 +26,10 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from datetime import datetime
+
 import requests
 from celery import shared_task
-from datetime import datetime
 from flask import current_app
 from invenio_cache import current_cache
 

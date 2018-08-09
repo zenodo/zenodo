@@ -963,12 +963,16 @@ def audit_records(minimal_record, db):
 
         db.session.add(record)
         db.session.commit()
-        records[i] = ZenodoRecord(data=record.json, model=record)
+        records[i] = str(ZenodoRecord(data=record.json, model=record).id)
 
         recid = PersistentIdentifier(pid_type='recid', pid_value=str(i),
                                      status='R', object_type='rec',
                                      object_uuid=record.id)
+        oai_id = PersistentIdentifier(
+            pid_type='oai', pid_value=record.json['_oai']['id'], status='R',
+            object_type='rec', object_uuid=record.id)
         db.session.add(recid)
+        db.session.add(oai_id)
         db.session.commit()
     return records
 

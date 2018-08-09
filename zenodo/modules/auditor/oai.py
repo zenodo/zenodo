@@ -28,7 +28,6 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from itertools import chain
 
-import sqlalchemy as sa
 from elasticsearch_dsl import Q
 from flask import current_app
 from invenio_cache import current_cache
@@ -40,7 +39,6 @@ from invenio_records.models import RecordMetadata
 from invenio_search import RecordsSearch
 from mock import patch
 from sickle import Sickle
-from sqlalchemy import cast
 
 from .api import Audit, Check
 from .utils import sickle_requests_get_mock
@@ -72,20 +70,23 @@ class OAIAudit(Audit):
                 PersistentIdentifier,
                 RecordMetadata.id == PersistentIdentifier.object_uuid)
             .filter(
-                PersistentIdentifier.pid_type == 'recid',
+                PersistentIdentifier.pid_type == 'oai',
                 PersistentIdentifier.status == PIDStatus.REGISTERED)
             .with_entities(
-                cast(PersistentIdentifier.pid_value, sa.Integer),
+                PersistentIdentifier.pid_value,
                 RecordMetadata.json)
         )
 
-        for recid, record in record_oai_sets:
+        for oai_id, record in record_oai_sets:
             for s in record.get('_oai', {}).get('sets', []):
-                self.cache.sadd('{}:{}'.format(self.cache_prefix, s), recid)
+                oai_control_number = oai_id.split(':')[-1]
+                self.cache.sadd('{}:{}'.format(self.cache_prefix, s),
+                                oai_control_number)
 
     def pop_db_oai_set(self, oai_set):
         """Return and remove from cache an OAI Set."""
         key = '{}:{}'.format(self.cache_prefix, oai_set)
+        # TODO: Remove map as it needs to be string
         oai_sets = set(map(int, self.cache.smembers(key)))
         self.cache.delete(key)
         return oai_sets
@@ -143,10 +144,11 @@ class OAISetResultCheck(Check):
         """
         db_ids = self._db_identifiers()
         es_ids = self._es_identifiers()
-        api_ids = self._oai2d_endpoint_identifiers()
+        oai2d_ids = self._oai2d_endpoint_identifiers()
 
-        all_ids = (db_ids | es_ids | api_ids)
-        for source, ids in zip(('db', 'es', 'api'), (db_ids, es_ids, api_ids)):
+        all_ids = (db_ids | es_ids | oai2d_ids)
+        for source, ids in zip(('db', 'es', 'oai2d'),
+                               (db_ids, es_ids, oai2d_ids)):
             missing_ids = list(all_ids - ids)
             if missing_ids:
                 self.issues['missing_ids'][source] = missing_ids
@@ -161,9 +163,10 @@ class OAISetResultCheck(Check):
                   filter=Q('exists', field='_oai.id'),
                   must=Q('match', **{'_oai.sets': self.community.oaiset_spec}))
         index = current_app.config['OAISERVER_RECORD_INDEX']
-        fields = ['recid']
+        fields = ['_oai.id']
         search = RecordsSearch(index=index).fields(fields).query(query)
-        return {int(r.meta.fields['recid'][0]) for r in search.scan()}
+        return {int(r.meta.fields['_oai.id'][0].rsplit(':', 1)[-1])
+                for r in search.scan()}
 
     def _oai2d_endpoint_identifiers(self):
         """Return a set of the Community OAI Set recids from OAI endpoint."""
