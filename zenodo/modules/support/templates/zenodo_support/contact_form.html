@@ -118,8 +118,10 @@
             <div class="modal-body">
               <form>
                 <div class="form-group">
-                  <p>You haven't attached any files. If you want to add/update files, make sure you attach the files
-                    you want to add/update, or you provide us with the link to these files.</p>
+                  <p>
+                    You haven't attached any files. If you want to add/update files, make sure to attach them or
+                    provide us with the link to them.
+                  </p>
                   <p>Do you want to proceed anyway?</p>
                 </div>
               </form>
@@ -245,7 +247,7 @@ function validateForm() {
   if (description.length < DESCRIPTION_MIN_LENGTH ||
       description.length > DESCRIPTION_MAX_LENGTH) {
     errorMessages.description.push(
-      'Field must be between 20 and 1000 characters long.');
+      'Field must be between ' + DESCRIPTION_MIN_LENGTH + ' and ' + DESCRIPTION_MAX_LENGTH + ' characters long.');
     isValid = false;
   }
 
