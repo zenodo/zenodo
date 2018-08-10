@@ -76,6 +76,7 @@ from zenodo.modules.deposit.minters import zenodo_deposit_minter
 from zenodo.modules.fixtures.records import loadsipmetadatatypes
 from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
+from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
@@ -718,6 +719,19 @@ def record_with_files_creation(db, record_with_bucket):
     record_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value)
 
     return pid, record, record_url
+
+
+@pytest.fixture
+def closed_access_record(db, es, record_with_files_creation):
+    """Creation of a full record with closed access right."""
+    _, record, record_url = record_with_files_creation
+    record['access_right'] = AccessRight.CLOSED
+    record.commit()
+    db.session.commit()
+    indexer = RecordIndexer()
+    indexer.index(record)
+    current_search.flush_and_refresh(index='records')
+    return record
 
 
 @pytest.fixture
