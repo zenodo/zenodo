@@ -443,7 +443,8 @@
               "asyncCallback": "autocompleteSuggest",
               "url": "/api/licenses/_suggest",
               "urlParameters": {
-                "text": "value"
+                "text": "value",
+                "size": 10
               },
               "map": {
                 "resultSource": "text.0.options",
@@ -451,7 +452,8 @@
                 "nameSource": "text",
                 "valueProperty": "value",
                 "nameProperty": "text"
-              }
+              },
+              "maxResultDisplay": 10
             },
             "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
           }
