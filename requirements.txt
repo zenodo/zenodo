@@ -132,7 +132,7 @@ invenio-oaiserver==1.0.0
 invenio-oauth2server==1.0.0
 invenio-oauthclient==1.0.0
 invenio-openaire==1.0.0a13
-invenio-opendefinition==1.0.0a7
+invenio-opendefinition==1.0.0a8
 invenio-pidrelations==1.0.0a4
 invenio-pidstore==1.0.0
 invenio-previewer==1.0.0a11
