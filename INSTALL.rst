@@ -320,7 +320,7 @@ similar to the production instance at https://zenodo.org.
 .. note::
 
     When running the development server, it's sometimes convenient to run
-    it in ``debug`` mode. You can do that by setting up the evironment flag:
+    it in ``debug`` mode. You can do that by setting up the environment flag:
 
     .. code-block:: console
 
