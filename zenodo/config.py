@@ -247,7 +247,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'stats-aggregate-events': {
         'task': 'invenio_stats.tasks.aggregate_events',
-        'schedule': timedelta(hours=1),
+        'schedule': crontab(minute=0, hour=3),
         'args': [(
             'record-view-agg', 'record-view-all-versions-agg',
             'record-download-agg', 'record-download-all-versions-agg',
@@ -255,7 +255,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'stats-update-record-statistics': {
         'task': 'zenodo.modules.stats.tasks.update_record_statistics',
-        'schedule': timedelta(hours=3),
+        'schedule': crontab(minute=0, hour=6),
     },
     'stats-export': {
         'task': 'zenodo.modules.stats.tasks.export_stats',
