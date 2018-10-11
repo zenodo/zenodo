@@ -163,6 +163,7 @@ CELERY_TASK_ROUTES = {
     'zenodo.modules.sipstore.tasks.archive_sip': {'queue': 'low'},
     'zenodo_migrator.tasks.migrate_concept_recid_sips': {'queue': 'low'},
     'invenio_openaire.tasks.register_grant': {'queue': 'low'},
+    'invenio_indexer.tasks.process_bulk_queue': {'queue': 'celery-indexer'}
 }
 #: Beat schedule
 CELERY_BEAT_SCHEDULE = {
