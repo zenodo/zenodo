@@ -173,6 +173,9 @@ CELERY_BEAT_SCHEDULE = {
     'indexer': {
         'task': 'invenio_indexer.tasks.process_bulk_queue',
         'schedule': timedelta(minutes=5),
+        'kwargs': {
+            'es_bulk_kwargs': {'raise_on_error': False},
+        },
     },
     'openaire-updater': {
         'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
