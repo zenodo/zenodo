@@ -128,13 +128,14 @@ class PiwikExporter:
             _id=visitor_id,
             cid=visitor_id,
             cvar=cvar,
-            country=event.country,
             cdt=event.timestamp,
             urlref=event.referrer,
             action_name=action_name
         )
 
-        if 'file_key' in event:
+        if event.to_dict().get('country'):
+            params['country'] = event.country.lower()
+        if event.to_dict().get('file_key'):
             params['url'] = ui_link_for('record_file', id=event.recid,
                                         filename=event.file_key)
             params['download'] = params['url']
