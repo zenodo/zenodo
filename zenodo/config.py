@@ -67,6 +67,7 @@ from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
+from zenodo.modules.stats import current_stats_search_client
 
 
 def _(x):
@@ -1255,9 +1256,11 @@ STATS_AGGREGATIONS = {
     'record-view-agg': dict(
         templates='zenodo.modules.stats.templates.aggregations',
         aggregator_config=dict(
+            client=current_stats_search_client,
             event='record-view',
             aggregation_field='recid',
             aggregation_interval='day',
+            batch_size=1,
             copy_fields=dict(
                 record_id='record_id',
                 recid='recid',

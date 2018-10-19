@@ -26,11 +26,11 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from flask import current_app
 import json
 
 import arrow
 import pycountry
+from flask import current_app
 from marshmallow import Schema, fields, post_dump
 
 from zenodo.modules.openaire.helpers import openaire_community_identifier, \

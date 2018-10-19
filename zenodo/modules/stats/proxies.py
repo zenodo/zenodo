@@ -22,17 +22,13 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo stats."""
+"""Proxies for Zenodo stats module."""
 
-ZENODO_STATS_PIWIK_EXPORTER = {
-    'id_site': 1,
-    'url': 'https://analytics.openaire.eu/piwik.php',
-    'token_auth': 'api-token',
-    'chunk_size': 85  # [max piwik payload size = 64k] / [max querystring size = 750]
-}
+from __future__ import absolute_import, print_function
 
-ZENODO_STATS_PIWIK_EXPORT_ENABLED = True
+from flask import current_app
+from werkzeug.local import LocalProxy
 
-# Queries performed when processing aggregations might take more time than
-# usual. This is fine though, since this is happening during Celery tasks.
-ZENODO_STATS_ELASTICSEARCH_CLIENT_CONFIG = {'timeout': 30}
+current_stats_search_client = LocalProxy(
+    lambda: current_app.extensions['zenodo-stats'].search_client)
+"""Proxy to Elasticsearch client used for statistics queries."""
