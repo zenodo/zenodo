@@ -50,6 +50,12 @@
           <div class="modal-content">
             <div class="modal-body">
               <h4>Zenodo DOI Badge</h4>
+              <h4>
+                  <small>DOI</small>
+              </h4>
+              <h4>
+                  <pre>{{record.doi}}</pre>
+              </h4>
               {% from "invenio_formatter/macros/badges.html" import badges_formats_list %}
               {{ badges_formats_list(url_for('invenio_formatter_badges.badge', title='DOI', value=record.doi, ext='svg', _external=True, _scheme='https'), record.doi|pid_url(scheme='doi')) }}
             </div>
