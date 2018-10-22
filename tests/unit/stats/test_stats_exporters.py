@@ -103,7 +103,10 @@ def test_piwik_exporter_invalid_request(app, db, es, locations, event_queues,
     bookmark = current_cache.get('piwik_export:bookmark')
     assert bookmark is None
 
-    PiwikExporter().run()
+    start_date = datetime(2018, 1, 1, 12)
+    end_date = datetime(2018, 1, 1, 14)
+
+    PiwikExporter().run(start_date=start_date, end_date=end_date)
     bookmark = current_cache.get('piwik_export:bookmark')
     assert bookmark is None
 
@@ -125,7 +128,30 @@ def test_piwik_exporter_request_fail(app, db, es, locations, event_queues,
     bookmark = current_cache.get('piwik_export:bookmark')
     assert bookmark is None
 
+    start_date = datetime(2018, 1, 1, 12)
+    end_date = datetime(2018, 1, 1, 14)
+
     with pytest.raises(PiwikExportRequestError):
-        PiwikExporter().run()
+        PiwikExporter().run(start_date=start_date, end_date=end_date)
+    bookmark = current_cache.get('piwik_export:bookmark')
+    assert bookmark is None
+
+
+def test_piwik_exporter_no_bookmark(app, db, es, locations, event_queues,
+                                    full_record):
+    records = create_stats_fixtures(
+        metadata=full_record, n_records=1, n_versions=1, n_files=1,
+        event_data={'user_id': '1', 'country': 'CH'},
+        # 4 event timestamps
+        start_date=datetime(2018, 1, 1, 13),
+        end_date=datetime(2018, 1, 1, 15),
+        interval=timedelta(minutes=30),
+        do_process_events=True)
+
+    current_cache.delete('piwik_export:bookmark')
+    bookmark = current_cache.get('piwik_export:bookmark')
+    assert bookmark is None
+
+    PiwikExporter().run()
     bookmark = current_cache.get('piwik_export:bookmark')
     assert bookmark is None

@@ -47,6 +47,10 @@ class PiwikExporter:
         """Run export job."""
         if start_date is None:
             bookmark = current_cache.get('piwik_export:bookmark')
+            if bookmark is None:
+                msg = 'Bookmark not found.'
+                current_app.logger.warning(msg)
+                return
             start_date = dateutil_parse(bookmark) if bookmark else None
 
         time_range = {}
