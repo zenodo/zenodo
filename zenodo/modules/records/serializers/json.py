@@ -58,7 +58,7 @@ class ZenodoJSONSerializer(JSONSerializer):
                     current_user, record):
                 result['files'] = record['_files']
             else:
-                del result['metadata']['_buckets']
+                result['metadata'].pop('_buckets', None)
 
         # Serialize PID versioning as related identifiers
         pv = PIDVersioning(child=pid)
@@ -82,7 +82,7 @@ class ZenodoJSONSerializer(JSONSerializer):
             result['files'] = record_hit['_files']
         else:
             # delete the bucket if no files
-            del result['metadata']['_buckets']
+            result['metadata'].pop('_buckets', None)
         return result
 
     def dump(self, obj, context=None):
