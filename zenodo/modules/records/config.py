@@ -91,6 +91,8 @@ ZENODO_RELATION_TYPES = [
     ('compiles', _('Compiles')),
     ('isCompiledBy', _('Compiled by')),
     ('isIdenticalTo', _('Identical to')),
+    ('reviews', _('Reviews')),
+    ('isReviewedBy', _('Is reviewed by')),
 ]
 
 ZENODO_LOCAL_DOI_PREFIXES = []

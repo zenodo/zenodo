@@ -652,6 +652,14 @@
                 "name": "is documented by this upload"
               },
               {
+                "value": "reviews",
+                "name": "is reviewed by this upload"
+              },
+              {
+                "value": "isReviewedBy",
+                "name": "reviews this upload"
+              },
+              {
                 "value": "compiles",
                 "name": "is compiled/create by this upload"
               },
