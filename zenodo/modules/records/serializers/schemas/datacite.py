@@ -33,9 +33,6 @@ import pycountry
 from flask import current_app
 from marshmallow import Schema, fields, post_dump
 
-from zenodo.modules.openaire.helpers import openaire_community_identifier, \
-    resolve_openaire_communities
-
 from ...models import ObjectType
 from ...utils import is_doi_locally_managed
 from .common import ui_link_for
@@ -260,12 +257,10 @@ class DataCiteSchema(Schema):
                 'relation': 'IsIdenticalTo',
             }).data)
 
-        # OpenAIRE community identifiers
-        openaire_comms = resolve_openaire_communities(
-            obj['metadata'].get('communities', []))
-        for oa_comm in openaire_comms:
+        # Zenodo community identifiers
+        for comm in obj['metadata'].get('communities', []):
             items.append(s.dump({
-                'identifier': openaire_community_identifier(oa_comm),
+                'identifier': ui_link_for('community', id=comm),
                 'scheme': 'url',
                 'relation': 'IsPartOf',
             }).data)
