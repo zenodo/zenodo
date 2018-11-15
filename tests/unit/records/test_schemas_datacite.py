@@ -244,7 +244,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "subjectScheme": "url"
             }
         ],
-        "titles": [{"title": "Test Title"}],
+        "titles": [{"title": "Test title"}],
         "version": "1.2.5"
     }
     assert obj == expected
@@ -783,3 +783,15 @@ def test_funding_ref_v4(db, minimal_record_model, recid_pid):
         }
 
     ]
+
+
+def test_titles(db, minimal_record_model, recid_pid):
+    """Test title."""
+    # NOTE: There used to be a bug which was modifying the case of the title
+    minimal_record_model['title'] = 'a lower-case title'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['titles'] == [{'title': 'a lower-case title'}]
+
+    minimal_record_model['title'] = 'Mixed-caSe titLE'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['titles'] == [{'title': 'Mixed-caSe titLE'}]

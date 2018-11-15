@@ -79,7 +79,7 @@ class ContributorSchema(PersonSchema):
 class TitleSchema(Schema):
     """Title schema."""
 
-    title = fields.Str(attribute='title')
+    title = fields.Str()
 
 
 class DateSchema(Schema):
@@ -120,9 +120,7 @@ class DataCiteSchema(Schema):
     """Base class for schemas."""
 
     identifier = fields.Method('get_identifier', attribute='metadata.doi')
-    titles = fields.List(
-        fields.Nested(TitleSchema),
-        attribute='metadata.title')
+    titles = fields.List(fields.Nested(TitleSchema), attribute='metadata')
     publisher = fields.Constant('Zenodo')
     publicationYear = fields.Function(
         lambda o: str(arrow.get(o['metadata']['publication_date']).year))
