@@ -22,29 +22,14 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Exporter programmatic API."""
+"""Exporter errors."""
 
-from __future__ import absolute_import, print_function
 
-from zenodo.modules.records.fetchers import zenodo_record_fetcher
-from zenodo.modules.records.serializers import json_v1
+class FailedExportJobError(Exception):
+    """Error for failed export job."""
 
-from .streams import BZip2ResultStream
-from .writers import BucketWriter, filename_factory
-
-EXPORTER_BUCKET_UUID = '00000000-0000-0000-0000-000000000001'
-
-EXPORTER_JOBS = {
-    'records': {
-        'index': 'records',
-        'serializer': json_v1,
-        'writer': BucketWriter(
-            bucket_id=EXPORTER_BUCKET_UUID,
-            key=filename_factory(index='records', format='json.bz2'),
-        ),
-        'resultstream_cls': BZip2ResultStream,
-        'pid_fetcher': zenodo_record_fetcher,
-        'query': "+_exists_:recid +_missing_:removal_reason"
-    }
-}
-"""Export jobs definitions."""
+    def __init__(self, record_ids=None):
+        """Initialize the error with the list of not serialized records."""
+        msg = "Serialization failed for the following records: {}"\
+            .format(', '.join(record_ids))
+        super(FailedExportJobError, self).__init__(msg)
