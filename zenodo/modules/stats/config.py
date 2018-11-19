@@ -35,4 +35,4 @@ ZENODO_STATS_PIWIK_EXPORT_ENABLED = True
 
 # Queries performed when processing aggregations might take more time than
 # usual. This is fine though, since this is happening during Celery tasks.
-ZENODO_STATS_ELASTICSEARCH_CLIENT_CONFIG = {'timeout': 30}
+ZENODO_STATS_ELASTICSEARCH_CLIENT_CONFIG = {'timeout': 60}
