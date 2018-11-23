@@ -1,68 +1,29 @@
-<!-- VERSION TOGGLE -->
-<!-- <a class="btn btn-link version-toggle"
-  ng-class="{'active': vm.invenioSearchArgs.group_by === 'version'}"
-  ng-click="vm.invenioSearchArgs.group_by = (vm.invenioSearchArgs.group_by === 'identity' ? 'version' : 'identity')">
-  <span class="text-muted">
-    <i class="fa fa-code-fork fa-lg"></i>&nbsp; All versions
-  </span>
-</a> -->
+<div class="row">
+  <div class="col-sm-3">Show only:</div>
+  <div class="col-sm-9" style="margin-left:-35px">
+    <!-- Type filter-->
+    <div class="row">
+      <span class="titlecase type-filter"
+            ng-repeat="item in vm.invenioSearchResults.aggregations.type.buckets track by $index">
+        <input type="checkbox" ng-checked="handler.type.indexOf(item.key) > -1"
+               ng-click="handleClick('type', item.key)" />
+        {{ item.key }} ({{ item.doc_count }})
+      </span>
+      <span class="titlecase type-filter"
+            ng-if="vm.invenioSearchResults.aggregations.type.buckets.length != 4"
+            ng-repeat="type in vm.invenioSearchResults.aggregations.type.buckets | missingTypes track by $index">
+        <input type="checkbox" disabled />
+        {{ type }} (0)
+      </span>
 
-<!-- VERSION CHECKBOX -->
-<hr>
-<div class="container">
-  <div class="row">
-    <div class='col-lg-12'>
+    </div>
+    <!-- Version filter-->
+    <div class="row">
+      <input type="checkbox" ng-checked="!vm.invenioSearchArgs.group_by === 'version'"
+           ng-click="vm.invenioSearchArgs.type=[];
+           vm.invenioSearchArgs.id = (vm.invenioSearchArgs.group_by === 'identity' ? vm.version_id : vm.record_id);
+           vm.invenioSearchArgs.group_by = (vm.invenioSearchArgs.group_by === 'identity' ? 'version' : 'identity');">
+      Citations to this version
     </div>
   </div>
-
-  <div class="row">
-
-    <div class="col-lg-12">
-
-      <!-- TYPE TOGGLE-->
-      <!-- <div>
-        <ul class="list-unstyled" ng-repeat="item in vm.invenioSearchResults.aggregations.type.buckets track by $index">
-          <li class="titlecase">
-            <input type="checkbox" ng-checked="handler[key].indexOf(item.key) > -1" ng-click="handleClick('type', item.key)" />
-            {{ item.key }} ({{ item.doc_count }})
-          </li>
-        </ul>
-      </div> -->
-
-      <table>
-          <tr>
-              <td><strong>Type :</strong></td>
-              <td class="titlecase" ng-repeat="item in vm.invenioSearchResults.aggregations.type.buckets track by $index">
-                <input class="typeDisplay" type="checkbox" ng-checked="handler[key].indexOf(item.key) > -1" ng-click="handleClick('type', item.key)" />
-                {{ item.key }} ({{ item.doc_count }})
-                <!-- <div style="border-left:thin solid #000000"></div> -->
-              </td>
-            </tr>
-
-          </table>
-
-      <input type="checkbox" ng-checked="vm.invenioSearchArgs.group_by === 'version'" ng-click="vm.invenioSearchArgs.group_by = (vm.invenioSearchArgs.group_by === 'identity' ? 'version' : 'identity')">
-      </i>&nbsp;All version <i class="fa fa-code-fork fa-lg"></i>
-
-    </div>
-    <!-- <div class="col-lg-2">
-    </div>
-    <div class="col-lg-8 col-lg-offset-2">
-      From
-      <select ng-model="from_date" ng-change="to_date = from_date >= (to_date || '') ? from_date : to_date; vm.invenioSearchArgs.publication_year=(from_date) + '--' + (to_date); ">
-        <option ng-repeat="item in vm.invenioSearchResults.aggregations.publication_year.buckets" value="{{item.key_as_string}}">
-          {{ item.key_as_string }} ({{ item.doc_count }})
-        </option>
-      </select>
-
-      To
-      <select ng-model="to_date" ng-change="from_date = to_date <= (from_date || '')? to_date : from_date; vm.invenioSearchArgs.publication_year=(from_date) + '--' + (to_date)">
-        <option ng-repeat="item in vm.invenioSearchResults.aggregations.publication_year.buckets" value="{{item.key_as_string}}">
-          {{ item.key_as_string }} ({{ item.doc_count }})
-        </option>
-      </select>
-    </div> -->
-  </div>
-
 </div>
-<hr>

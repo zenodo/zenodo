@@ -147,7 +147,7 @@
 }
 
 
-#search-citations{
+#citations {
   .citationBadge {
     background-color: #777777 !important;
   }
@@ -156,6 +156,89 @@
       margin: 0;
       margin-bottom: 15px;
   }
+
+  .doiDisplayed {
+      font-size: 12px;
+  }
+
+  .titlecase {
+      text-transform: capitalize;
+  }
+
+   .facets {
+        margin-top:15px;
+        margin-bottom:15px;
+        border-bottom: 2px;
+   }
+
+   .logo {
+     padding-top: 16px;
+   }
+
+   .identifier-badge:hover {
+        text-decoration: none;
+   }
+
+    .type-filter {
+        margin-right: 5px;
+        padding-bottom: -5px;
+    }
+
+    .navbar-form {
+      margin: 0;
+      padding: 0;
+    }
+
+    .ribbon-wrapper-green {
+        overflow: hidden;
+        width: 50px;
+        height: 53px;
+        margin-top: -10px;
+        margin-left: -15px;
+    }
+
+    .corner-ribbon {
+        width: 150px;
+        position: relative;
+        top: 15px;
+        left: -60px;
+        text-align: center;
+        letter-spacing: 1px;
+        font: 11px Sans-Serif;
+        padding: 2px 0;
+        padding-left: 13px;
+        color: #f0f0f0;
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+        -moz-transform: rotate(-45deg);
+        -ms-transform: rotate(-45deg);
+        -o-transform: rotate(-45deg);
+    }
+
+    .corner-ribbon.top-left {
+        top: 15px;
+        left: -60px;
+        transform: rotate(-45deg);
+        -webkit-transform: rotate(-45deg);
+    }
+    *, :after, :before {
+        -webkit-box-sizing: border-box;
+        -moz-box-sizing: border-box;
+        box-sizing: border-box;
+    }
+
+    .corner-ribbon.ribbon-green {
+        color: #fff;
+        background-color: #28a745;
+        -webkit-box-shadow: 0 0 3px rgba(0,0,0,.3);
+        -moz-box-shadow: 0 0 3px rgba(0,0,0,.3);
+        box-shadow: 0 0 3px rgba(0,0,0,.3);
+    }
+
+    .no-results {
+        margin-bottom:15px;
+        font-size: 16px;
+    }
 }
 
 .stats-box {

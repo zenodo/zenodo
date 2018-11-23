@@ -1,48 +1,40 @@
 <div ng-if="vm.invenioSearchResults.hits.total > 0">
   <table class="table table-striped">
-    <thead>
-      <tr class="">
-        <th class="t_type"></th>
-        <th class="t_title">Title and authors</th>
-        <th class="t_year">Year</th>
-        <th class="t_links">Links</th>
-      </tr>
-    </thead>
     <tbody>
-      <div>
-        <tr ng-repeat="relationship in vm.invenioSearchResults.hits.hits">
-          <td><span class="fa {{ relationship | logoType }} fa-2x fa-fw"></span></td>
-          <td>
-            <a ng-if="relationship | doiUrl" href="{{ relationship | doiUrl }}">
-              {{relationship.metadata.Source.Title | limitTo: 65 }}{{relationship.metadata.Source.Title.length > 65 ?
-              '&hellip;' : ''}}
-              <em ng-if="!relationship.metadata.Source.Title">Title unknown</em>
-            </a>
-            <br />
-            <small class="text-muted trunc">
-              {{relationship | creatorNames | limitTo: 65 }}
-              <em ng-if="!(relationship | creatorNames)">Authors unknown</em>
-            </small>
-            <br />
-            <em class="doiDisplayed">{{relationship | doiUrl}}</em>
-          </td>
-          <td>
-            {{relationship.metadata.Source.PublicationDate || "-"}}
-          </td>
-          <td>
-            <!-- <p>{{relationship.metadata.Source.Identifier.length }}</p> -->
-            <a ng-repeat="identifier in relationship.metadata.Source.Identifier  | filter : {IDURL: ''} | orderBy:'IDScheme' | limitTo:5 track by $index"
-              href="{{ identifier.IDURL }}">
-              <span class="label {{identifier | identifierColor }}" data-toggle="tooltip" data-placement="top" title="{{identifier.ID}}">{{identifier.IDScheme
-                | uppercase }}</span>
-            </a>
-            <small class="text-muted nowrap pull-right">
-              <i class="fa fa-question-circle text-muted" data-toggle="tooltip" data-placement="top" title="Provided by {{relationship | providerNames}}">
-              </i>
-            </small>
-          </td>
-        </tr>
-      </div>
+      <tr ng-repeat="relationship in vm.invenioSearchResults.hits.hits">
+        <td class="logo"><span class="fa {{ relationship | logoType }} fa-lg fa-fw"></span></td>
+        <td>
+          <a ng-if="relationship | doiUrl" href="{{ relationship | doiUrl }}">
+            {{relationship.metadata.Source.Title | limitTo: 70 }}{{relationship.metadata.Source.Title.length > 70 ?
+            '&hellip;' : ''}}
+            <em ng-if="!relationship.metadata.Source.Title">Title unknown</em>
+          </a>
+          <br />
+          <small class="text-muted">
+            {{relationship | creatorNames }}
+            <em ng-if="!(relationship | creatorNames)">Authors unknown</em>
+          </small>
+          <span class="doiDisplayed">(doi: {{relationship | doi}})</span>
+        </td>
+        <td>
+          {{relationship.metadata.Source.PublicationDate || "-"}}
+        </td>
+        <td>
+          <a ng-repeat="identifier in (relationship.metadata.Source.Identifier | uniqueBadge) | orderBy:'IDScheme' | limitTo:5 track by $index"
+            href="{{ identifier.IDURL }}" class="identifier-badge" target="_blank">
+            <span class="label label-info" data-toggle="tooltip" data-placement="top" title="{{identifier.ID}}">
+              {{identifier.IDScheme | uppercase }}</span>
+          </a>
+          <small class="text-muted nowrap pull-right">
+            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" data-placement="top"
+               title="Citation provided by {{relationship | providerNames}}">
+            </i>
+          </small>
+        </td>
+      </tr>
     </tbody>
   </table>
+</div>
+<div ng-if="vm.invenioSearchResults.hits.total == 0" class="no-results text-center">
+  No citations.
 </div>
