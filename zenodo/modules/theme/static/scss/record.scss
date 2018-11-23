@@ -146,13 +146,16 @@
   }
 }
 
-.citationBadge {
-  background-color: #777777 !important;
-}
 
-.citationsPagination {
-    margin: 0;
-    margin-bottom: 15px;
+#search-citations{
+  .citationBadge {
+    background-color: #777777 !important;
+  }
+
+  .citationsPagination {
+      margin: 0;
+      margin-bottom: 15px;
+  }
 }
 
 .stats-box {

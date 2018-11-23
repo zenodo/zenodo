@@ -20,9 +20,9 @@
 // waive the privileges and immunities granted to it by virtue of its status
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
- define([], function(){
+define([], function () {
   function providerNamesFilter() {
-    return function(relationship) {
+    return function (relationship) {
       var providerNames = [];
       for (var linkHistory of relationship.metadata.History) {
         for (var provider of linkHistory.LinkProvider) {
@@ -36,39 +36,84 @@
   }
 
   function creatorNamesFilter() {
-    return function(relationship) {
+    return function (relationship) {
       var creatorNames = [];
       var creators = relationship.metadata.Source.Creator;
       if (creators) {
-        for(var i=0; i<creators.length && i<5; i++) {
+        for (var i = 0; i < creators.length && i < 5; i++) {
           creatorNames.push(creators[i].Name);
         }
-        if(creators.length > 5) {
-        creatorNames.push("et al.");
+        if (creators.length > 5) {
+          creatorNames.push("et al.");
         }
       }
-      return creatorNames.join(', ');
+      return creatorNames.join('; ');
     };
-   }
+  }
 
-   function doiUrlFilter() {
-     return function(relationship) {
+  // Modify to return both DOI_URL and DOI
+  function doiUrlFilter() {
+    return function (relationship) {
       var doiUrl = "";
       var url = "";
-        for(identifier of relationship.metadata.Source.Identifier) {
-          if(identifier.IDURL) {
-            url = identifier.IDURL;
-            if (identifier.IDScheme == "doi") {
-              doiUrl = identifier.IDURL;
-              break;
-            }
+      for (identifier of relationship.metadata.Source.Identifier) { // Modify to foreach
+        if (identifier.IDURL) {
+          url = identifier.IDURL;
+          if (identifier.IDScheme == "doi") {
+            doiUrl = identifier.IDURL;
+            break;
           }
         }
+      }
       return doiUrl || url;
-     };
-   }
+    };
+  }
 
-  return {providerNamesFilter:providerNamesFilter, creatorNamesFilter: creatorNamesFilter, doiUrlFilter: doiUrlFilter};
+  // function doiIdentifierFilter() {
+  //   return function (relationship) {
+  //     var doi_identifier_object = null;
+  //     var default_identifier_object = null;
+  //     relationship.metadata.Source.Identifier.forEach(function(identifier) {
+  //       if (identifier.IDURL) {
+  //         default_identifier_object = identifier;
+  //         if (identifier.IDScheme == "doi") {
+  //           doi_identifier_object = identifier;
+  //         }
+  //       }
+  //     })
+  //     return doi_identifier_object || default_identifier_object;
+  //   };
+  // }
+
+  function identifierColorFilter() {
+    return function (identifier) {
+      var typeID = {
+        "doi": function () {
+          return "label-info";
+        },
+        "arxiv": function () {
+          return "label-danger";
+        },
+        "ads": function () {
+          return "label-default";
+        },
+        "default": function () {
+          return "label-success";
+        }
+      };
+      return (typeID[identifier.IDScheme] || typeID['default'])();
+    };
+  }
+
+  function logoTypeFilter() {
+    return function (relationship) {
+      return {
+        "literature": "fa-file-text",
+        "dataset": "fa-table",
+        "software": "fa-code",
+        "unknown": "fa-asterisk"
+      }[relationship.metadata.Source.Type.Name] || "fa-asterisk";
+    };
+  }
+  return { providerNamesFilter: providerNamesFilter, creatorNamesFilter: creatorNamesFilter, doiUrlFilter: doiUrlFilter, identifierColorFilter: identifierColorFilter, logoTypeFilter: logoTypeFilter };
 });
-
-

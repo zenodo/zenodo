@@ -32,6 +32,9 @@ define([
     .filter('safe', ['$sce', safeFilter])
     .filter('providerNames', citationFilters.providerNamesFilter)
     .filter('creatorNames', citationFilters.creatorNamesFilter)
-    .filter('doiUrl', citationFilters.doiUrlFilter);
+    .filter('doiUrl', citationFilters.doiUrlFilter)
+    .filter('identifierColor', citationFilters.identifierColorFilter)
+    .filter('logoType', citationFilters.logoTypeFilter);
+    // ADD FILTER
   return app;
 });
