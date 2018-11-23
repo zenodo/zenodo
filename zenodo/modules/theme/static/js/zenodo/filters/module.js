@@ -33,8 +33,9 @@ define([
     .filter('providerNames', citationFilters.providerNamesFilter)
     .filter('creatorNames', citationFilters.creatorNamesFilter)
     .filter('doiUrl', citationFilters.doiUrlFilter)
-    .filter('identifierColor', citationFilters.identifierColorFilter)
-    .filter('logoType', citationFilters.logoTypeFilter);
-    // ADD FILTER
+    .filter('doi', citationFilters.doiFilter)
+    .filter('logoType', citationFilters.logoTypeFilter)
+    .filter('uniqueBadge', citationFilters.uniqueBadgeFilter)
+    .filter('missingTypes', citationFilters.missingTypesFilter);
   return app;
 });

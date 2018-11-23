@@ -33,6 +33,8 @@ _ = make_lazy_gettext(lambda: gettext)
 
 ZENODO_RECORDS_UI_CITATIONS_ENDPOINT = 'https://zenodo-broker-qa.web.cern.ch/api/relationships'
 
+ZENODO_RECORDS_UI_CITATIONS_ENABLE = False
+
 ZENODO_RELATION_RULES = {
     'f1000research': [{
         'prefix': '10.12688/f1000research',
