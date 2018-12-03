@@ -40,6 +40,8 @@ class _OAType(object):
 
     publication = 'publication'
     dataset = 'dataset'
+    software = 'software'
+    other = 'other'
 
 
 def is_openaire_publication(record):
@@ -63,12 +65,30 @@ def is_openaire_dataset(record):
     return oatype and oatype['type'] == _OAType.dataset
 
 
+def is_openaire_software(record):
+    """Determine if the record is a software for OpenAIRE."""
+    oatype = ObjectType.get_by_dict(record.get('resource_type')).get(
+        'openaire', {})
+    return oatype and oatype['type'] == _OAType.software
+
+
+def is_openaire_other(record):
+    """Determine if the record has type 'other' for OpenAIRE."""
+    oatype = ObjectType.get_by_dict(record.get('resource_type')).get(
+        'openaire', {})
+    return oatype and oatype['type'] == _OAType.other
+
+
 def openaire_type(record):
     """Get the OpenAIRE type of a record."""
     if is_openaire_publication(record):
         return _OAType.publication
     elif is_openaire_dataset(record):
         return _OAType.dataset
+    elif is_openaire_software(record):
+        return _OAType.software
+    elif is_openaire_other(record):
+        return _OAType.other
     return None
 
 
@@ -100,7 +120,8 @@ def openaire_original_id(record, oatype):
     prefix = current_app.config['OPENAIRE_NAMESPACE_PREFIXES'].get(oatype)
 
     value = None
-    if oatype == _OAType.publication:
+    if oatype == _OAType.publication or oatype == _OAType.software or \
+        oatype == _OAType.other:
         value = record.get('_oai', {}).get('id')
     elif oatype == _OAType.dataset:
         value = record.get('doi')
@@ -120,6 +141,16 @@ def openaire_link(record):
         )
     elif oatype == _OAType.dataset:
         return '{}/search/dataset?datasetId={}'.format(
+            current_app.config['OPENAIRE_PORTAL_URL'],
+            oaid,
+        )
+    elif oatype == _OAType.software:
+        return '{}/search/software?softwareId={}'.format(
+            current_app.config['OPENAIRE_PORTAL_URL'],
+            oaid,
+        )
+    elif oatype == _OAType.other:
+        return '{}/search/other?orpId={}'.format(
             current_app.config['OPENAIRE_PORTAL_URL'],
             oaid,
         )

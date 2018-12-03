@@ -425,11 +425,15 @@ OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
 OPENAIRE_ZENODO_IDS = {
     'publication': 'opendoar____::2659',
     'dataset': 're3data_____::r3d100010468',
+    'software': 're3data_____::r3d100010468',
+    'other': 're3data_____::r3d100010468'
 }
 #: OpenAIRE ID namespace prefixes for Zenodo.
 OPENAIRE_NAMESPACE_PREFIXES = {
     'publication': 'od______2659',
     'dataset': 'r37b0ad08687',
+    'software': 'r37b0ad08687',
+    'other': 'r37b0ad08687'
 }
 #: OpenAIRE API endpoint.
 OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc/api/results'
