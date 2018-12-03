@@ -38,6 +38,7 @@ from zenodo.modules.records.serializers import openaire_json_v1
 
 from .errors import OpenAIRERequestError
 from .helpers import is_openaire_dataset, is_openaire_publication, \
+    is_openaire_software, is_openaire_other, \
     openaire_datasource_id, openaire_original_id, openaire_type
 
 
@@ -68,7 +69,9 @@ def openaire_direct_index(record_uuid):
 
         # Bail out if not an OpenAIRE record.
         if not (is_openaire_publication(record) or
-                is_openaire_dataset(record)):
+                is_openaire_dataset(record) or
+                is_openaire_software(record) or
+                is_openaire_other(record)):
             return
 
         data = openaire_json_v1.serialize(record.pid, record)
