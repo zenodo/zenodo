@@ -76,8 +76,18 @@ def openaire_direct_index(record_uuid):
             current_app.config['OPENAIRE_API_URL'])
         req = _openaire_request_factory()
         res = req.post(url, data=data)
+
         if not res.ok:
             raise OpenAIRERequestError(res.text)
+
+        res_beta = None
+        if current_app.config['OPENAIRE_API_URL_BETA']:
+            url_beta = '{}/api/results/feedObject'.format(
+                current_app.config['OPENAIRE_API_URL_BETA'])
+            res_beta = req.post(url_beta, data=data)
+
+        if res_beta and not res_beta.ok:
+            raise OpenAIRERequestError(res_beta.text)
         else:
             recid = record.get('recid')
             current_cache.delete('openaire_direct_index:{}'.format(recid))
@@ -111,7 +121,13 @@ def openaire_delete(record_uuid=None, original_id=None, datasource_id=None):
         params = {'originalId': original_id, 'collectedFromId': datasource_id}
         req = _openaire_request_factory()
         res = req.delete(current_app.config['OPENAIRE_API_URL'], params=params)
-        if not res.ok:
+        res_beta = None
+        if current_app.config['OPENAIRE_API_URL_BETA']:
+            url_beta = '{}/api/results'.format(
+                current_app.config['OPENAIRE_API_URL_BETA'])
+            res_beta = req.delete(url_beta, params=params)
+
+        if not res.ok or (res_beta and not res_beta.ok):
             raise OpenAIRERequestError(res.text)
     except Exception as exc:
         openaire_delete.retry(exc=exc)
