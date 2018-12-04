@@ -73,13 +73,13 @@ define([], function() {
   function doiFilter() {
     return function(relationship) {
       var doi = "";
-
-      relationship.metadata.Source.Identifier.forEach( function(identifier) {
-        if (identifier.ID && identifier.IDScheme == "doi") {
-            doi = identifier.ID;
-        }
-      })
-
+      if(relationship.metadata.Source.Identifier) {
+        relationship.metadata.Source.Identifier.forEach( function(identifier) {
+          if (identifier.ID && identifier.IDScheme == "doi") {
+              doi = identifier.ID;
+          }
+        });
+      }
       return doi;
     };
   }
@@ -100,13 +100,14 @@ define([], function() {
     return function(identifiers) {
       schemes = []
       uniqueIdentifiers = []
+      if(identifiers) {
         identifiers.forEach( function(identifier) {
           if (identifier.IDURL && !schemes.includes(identifier.IDScheme)) {
             uniqueIdentifiers.push(identifier)
             schemes.push(identifier.IDScheme)
           }
-
         });
+       }
         return uniqueIdentifiers;
       };
   }
@@ -114,10 +115,11 @@ define([], function() {
   function missingTypesFilter() {
     return function(buckets) {
       var missingTypes = ["literature", "dataset", "software", "unknown"];
-
-      buckets.forEach(function(bucket) {
-        missingTypes.splice(missingTypes.indexOf(bucket.key), 1);
-      });
+      if(buckets) {
+        buckets.forEach(function(bucket) {
+          missingTypes.splice(missingTypes.indexOf(bucket.key), 1);
+        });
+      }
 
       return missingTypes;
     };

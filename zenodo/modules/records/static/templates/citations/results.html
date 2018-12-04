@@ -5,7 +5,7 @@
         <td class="logo"><span class="fa {{ relationship | logoType }} fa-lg fa-fw"></span></td>
         <td>
           <a ng-if="relationship | doiUrl" href="{{ relationship | doiUrl }}">
-            {{relationship.metadata.Source.Title | limitTo: 70 }}{{relationship.metadata.Source.Title.length > 70 ?
+            {{relationship.metadata.Source.Title | limitTo: 65 }}{{relationship.metadata.Source.Title.length > 65 ?
             '&hellip;' : ''}}
             <em ng-if="!relationship.metadata.Source.Title">Title unknown</em>
           </a>
@@ -17,7 +17,7 @@
           <span class="doiDisplayed">(doi: {{relationship | doi}})</span>
         </td>
         <td>
-          {{relationship.metadata.Source.PublicationDate || "-"}}
+          {{relationship.metadata.Source.PublicationDate | date : 'yyyy' || "-"}}
         </td>
         <td>
           <a ng-repeat="identifier in (relationship.metadata.Source.Identifier | uniqueBadge) | orderBy:'IDScheme' | limitTo:5 track by $index"
