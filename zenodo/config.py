@@ -260,7 +260,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'stats-update-record-statistics': {
         'task': 'zenodo.modules.stats.tasks.update_record_statistics',
-        'schedule': timedelta(hours=3),
+        'schedule': crontab(minute=0, hour=1),  # Every day at 01:00 UTC
     },
     'stats-export': {
         'task': 'zenodo.modules.stats.tasks.export_stats',
