@@ -764,6 +764,8 @@ FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES = [
 #: URL template for generating URLs outside the application/request context
 FILES_REST_ENDPOINT = '{scheme}://{host}/api/files/{bucket}/{key}'
 
+#: Toexplain
+ZENODO_FILE_INTEGRITY_REPORT_SEND = True
 
 #: Records REST API endpoints.
 RECORDS_API = '/api/records/{pid_value}'
@@ -1310,3 +1312,16 @@ INDEXER_SCHEMA_TO_INDEX_MAP = {
     'deposits-records-record-v1.0.0': 'deposit-record-v1.0.0',
     'funders-funder-v1.0.0': 'funder-v1.0.0',
 }
+
+# SNOW
+# ======
+#: Base URL for Service Now instance
+SNOW_BASE_URL = None
+#: Business service - related to Service Now instance
+SNOW_BUSINESS_SERVICE = None
+#: Functional element - related to Service Now instance
+SNOW_FUNCTIONAL_ELEMENT = None
+#: Username used to create the incident
+SNOW_CLIENT_ID = None
+#: Password used to create the incident
+SNOW_CLIENT_SECRET = None
