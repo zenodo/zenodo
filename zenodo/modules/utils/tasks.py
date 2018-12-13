@@ -46,6 +46,7 @@ from six.moves import filter
 
 from zenodo.modules.records.serializers.schemas.common import ui_link_for
 from zenodo.modules.records.utils import is_deposit, is_record
+from zenodo.modules.snow.snow_api import snow_factory
 
 logger = get_task_logger(__name__)
 
@@ -332,11 +333,20 @@ def file_integrity_report():
                     entry['record'] = rb.record.json
         report.append(entry)
 
-    if report:
+    send_file_integrity_report = \
+        current_app.config['ZENODO_FILE_INTEGRITY_REPORT_SEND']
+
+    if report and send_file_integrity_report:
         # Format and send the email
-        subject = u'Zenodo files integrity report [{}]'.format(datetime.now())
+        subject = u'Zenodo file integrity report [{}]'.format(datetime.now())
         body = format_file_integrity_report(report)
-        sender = current_app.config['ZENODO_SYSTEM_SENDER_EMAIL']
-        recipients = [current_app.config['ZENODO_ADMIN_EMAIL']]
-        msg = Message(subject, sender=sender, recipients=recipients, body=body)
-        current_app.extensions['mail'].send(msg)
+
+        # Using SNOW API
+        sapi = snow_factory()
+        sapi.create_incident(
+            description=subject,
+            comments=body,
+            impact='2',  # medium
+            urgency='3',  # high
+            functional_category='record-loss'
+        )

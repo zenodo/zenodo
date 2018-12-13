@@ -829,6 +829,8 @@ FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES = [
 #: URL template for generating URLs outside the application/request context
 FILES_REST_ENDPOINT = '{scheme}://{host}/api/files/{bucket}/{key}'
 
+#: Toexplain
+ZENODO_FILE_INTEGRITY_REPORT_SEND = True
 
 #: Records REST API endpoints.
 RECORDS_API = '/api/records/{pid_value}'
@@ -1638,3 +1640,16 @@ SECURITY_MSG_PASSWORD_NOT_SET = failed_login_msg
 SECURITY_MSG_INVALID_PASSWORD = failed_login_msg
 SECURITY_MSG_CONFIRMATION_REQUIRED = failed_login_msg
 SECURITY_MSG_DISABLED_ACCOUNT = failed_login_msg
+
+# SNOW
+# ======
+#: Base URL for Service Now instance
+SNOW_BASE_URL = None
+#: Business service - related to Service Now instance
+SNOW_BUSINESS_SERVICE = None
+#: Functional element - related to Service Now instance
+SNOW_FUNCTIONAL_ELEMENT = None
+#: Username used to create the incident
+SNOW_CLIENT_ID = None
+#: Password used to create the incident
+SNOW_CLIENT_SECRET = None
