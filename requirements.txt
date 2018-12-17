@@ -228,7 +228,7 @@ ua-parser==0.7.3
 Unidecode==1.0.22
 uritemplate.py==1.0.1
 uritools==2.1.0
-urllib3==1.22
+urllib3==1.23
 uWSGI==2.0.17
 uwsgitop==0.10
 validators==0.12.1

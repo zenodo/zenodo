@@ -181,7 +181,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'openaire-updater': {
         'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
-        'schedule': timedelta(hours=2),
+        'schedule': timedelta(hours=12),
     },
     'cleanup-indexed-deposits': {
         'task': 'zenodo.modules.deposit.tasks.cleanup_indexed_deposits',
