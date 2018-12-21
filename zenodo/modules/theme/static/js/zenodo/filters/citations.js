@@ -92,7 +92,11 @@ define([], function() {
         "software": "fa-code",
         "unknown": "fa-asterisk"
       };
-      return logoType[relationship.metadata.Source.Type.Name] || "fa-asterisk";
+      var logo = "fa-asterisk";
+      if (relationship.metadata.Source.Type) {
+        logo = logoType[relationship.metadata.Source.Type.Name] || "fa-asterisk";
+      }
+      return logo;
     };
   }
 
