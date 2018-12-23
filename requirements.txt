@@ -69,7 +69,7 @@ elasticsearch-dsl==2.2.0
 entrypoints==0.2.3
 enum34==1.1.6
 Flask==0.12.4
-Flask-Admin==1.5.1
+Flask-Admin==1.5.3
 Flask-Alembic==2.0.1
 Flask-Assets==0.12
 Flask-BabelEx==0.9.3
