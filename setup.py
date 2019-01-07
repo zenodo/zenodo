@@ -96,7 +96,7 @@ setup_requires = [
 
 install_requires = [
     'arrow>=0.10.0',
-    'bleach>=2.0.0',
+    'bleach>=2.1.3',
     'CairoSVG>=1.0.22,<2.0.0',
     'citeproc-py-styles>=0.1.1',
     'citeproc-py>=0.4.0',
