@@ -219,6 +219,11 @@ def test_full(db, record_with_bucket, recid_pid):
                 "relationType": "HasPart",
                 "relatedIdentifier": "10.1234/zenodo.1234",
                 "relatedIdentifierType": "DOI"
+            },
+            {
+                "relationType": "IsPartOf",
+                "relatedIdentifier": "http://localhost/communities/zenodo",
+                "relatedIdentifierType": "URL"
             }
         ],
         "resourceType": {
@@ -244,7 +249,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "subjectScheme": "url"
             }
         ],
-        "titles": [{"title": "Test Title"}],
+        "titles": [{"title": "Test title"}],
         "version": "1.2.5"
     }
     assert obj == expected
@@ -662,22 +667,15 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
     datacite_v31,
     datacite_v41,
 ])
-def test_openaire_communities(db, minimal_record_model, recid_pid, serializer):
-    """Test OpenAIRE communities."""
-    tests = [
-        (['zenodo'], set()),
-        (['c1'], {'foo'}),
-        (['c1', 'c2'], {'foo'}),
-        (['c1', 'c2', 'c3'], {'foo', 'bar'}),
-    ]
-
-    for comms, expected_oa_comms in tests:
-        minimal_record_model['communities'] = comms
+def test_communities_rel_ids(db, minimal_record_model, recid_pid, serializer):
+    """Test communities in related identifiers."""
+    for communities in (['zenodo'], ['c1', 'c2', 'c3']):
+        minimal_record_model['communities'] = communities
         obj = serializer.transform_record(recid_pid, minimal_record_model)
-        for oa_comm in expected_oa_comms:
+        for comm in communities:
             assert {
                 'relatedIdentifier':
-                    'https://openaire.eu/communities/{}'.format(oa_comm),
+                    'http://localhost/communities/{}'.format(comm),
                 'relatedIdentifierType': 'URL',
                 'relationType': 'IsPartOf',
             } in obj['relatedIdentifiers']
@@ -783,3 +781,15 @@ def test_funding_ref_v4(db, minimal_record_model, recid_pid):
         }
 
     ]
+
+
+def test_titles(db, minimal_record_model, recid_pid):
+    """Test title."""
+    # NOTE: There used to be a bug which was modifying the case of the title
+    minimal_record_model['title'] = 'a lower-case title'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['titles'] == [{'title': 'a lower-case title'}]
+
+    minimal_record_model['title'] = 'Mixed-caSe titLE'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['titles'] == [{'title': 'Mixed-caSe titLE'}]

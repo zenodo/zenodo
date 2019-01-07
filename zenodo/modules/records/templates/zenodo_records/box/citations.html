@@ -22,40 +22,114 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{%- if 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
-{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy", "id": record.doi, "groupBy": "version" } %}
-<div id="search-citations">
+{% set show_betafeature = 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
+{% set show_citations = current_user.has_role('admin') or config['ZENODO_RECORDS_UI_CITATIONS_ENABLE'] %}
+
+{%- if  show_citations or show_betafeature %}
+{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy", "id": record.doi } %}
+
+<div id="citations">
   <invenio-search
    disable-url-handler="true"
    search-endpoint="{{config['ZENODO_RECORDS_UI_CITATIONS_ENDPOINT'] }}"
-   search-extra-params='{"page": 1, "size": 5}'
+   search-extra-params='{"page": 1, "size": "10", "group_by": "version"}'
    search-hidden-params='{% if search_hidden_params %}{{search_hidden_params|tojson}}{% endif %}'
    search-headers='{"Accept": "{{ 'application/json'}}"}' >
     <div class="panel panel-default" id="citation">
       <div class="panel-heading">
-        <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations">
-          {{_('Citations')}}
-          <small class="text-muted">
-            <invenio-search-count
-            template="{{ url_for('static', filename='templates/citations/count.html') }}">
-            </invenio-search-count>
-          </small>
-          <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
-          <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
-        </a>
+        <!-- Beta ribbon -->
+        <div class="row" style="margin-bottom: -15px;">
+          <div class="col-sm-1">
+            <div class="ribbon-wrapper-green">
+              <div class="corner-ribbon top-left ribbon-green">Beta</div>
+            </div>
+          </div>
+          <div class="col-sm-11" style="margin-top: 5px;">
+            <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
+              {{_('Citations')}}
+              <small class="text-muted">
+                <invenio-search-count
+                template="{{ url_for('static', filename='templates/citations/count.html') }}">
+                </invenio-search-count>
+              </small>
+              <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+              <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
+            </a>
+          </div>
+        </div>
+
+        <!-- Without beta ribbon -->
+        <!--<a class="panel-toggle" data-toggle="collapse" href="#collapseCitations">-->
+          <!--{{_('Citations')}}-->
+          <!--<small class="text-muted">-->
+            <!--<invenio-search-count-->
+            <!--template="{{ url_for('static', filename='templates/citations/count.html') }}">-->
+            <!--</invenio-search-count>-->
+          <!--</small>-->
+          <!--<span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>-->
+          <!--<span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>-->
+        <!--</a>-->
+
       </div>
       <div id="collapseCitations" class="collapse in">
         <div class="search-page">
+          <div class="container-fluid facets">
+            <div class="row">
+              <div class="col-sm-9">
+                 <invenio-search-facets
+                   ng-init="vm.record_id='{{record.doi}}'; vm.version_id='{% if record.conceptdoi %}{{record.conceptdoi}}{% else %}{{record.doi}}{% endif %}'"
+                   template="{{ url_for('static', filename='templates/citations/facets.html') }}">
+                </invenio-search-facets>
+              </div>
+              <div class="col-sm-3">
+                <invenio-search-bar
+                  template="{{ url_for('static', filename='templates/invenio_search_ui/searchbar.html') }}"
+                  placeholder="{{ search_input_placeholder|default(_('Search')) }}">
+                </invenio-search-bar>
+              </div>
+            </div>
+          </div>
+          <div class="container-fluid">
+          <invenio-search-error
+            template="{{ url_for('static', filename=config.SEARCH_UI_JSTEMPLATE_ERROR) }}"
+            message="{{ _('Error') }}">
+          </invenio-search-error>
+          </div>
           <invenio-search-results
            template="{{ url_for('static', filename='templates/citations/results.html') }}">
           </invenio-search-results>
-          <div align="center">
-            <invenio-search-pagination
-              template="{{ url_for('static', filename='templates/citations/pagination.html') }}">
-            </invenio-search-pagination>
+          <div class="row">
+            <div class="col-md-2 col-sm-12">
+            </div>
+            <div class="col-md-7 col-sm-12 text-center">
+              <invenio-search-pagination
+                template="{{ url_for('static', filename='templates/citations/pagination.html') }}">
+              </invenio-search-pagination>
+            </div>
+            <div class="col-md-3 col-sm-12" style="padding-top: 5px;">
+              <invenio-search-select-box
+                 sort-key="size"
+                 available-options='{
+                  "options": [
+                     {
+                       "title": "10",
+                       "value": "10"
+                     },
+                     {
+                       "title": "20",
+                       "value": "20"
+                     },
+                     {
+                       "title": "50",
+                       "value": "50"
+                     }
+                  ]}'
+                 template="{{ url_for('static', filename='templates/citations/selectbox.html') }}">
+                </invenio-search-select-box>
+            </div>
           </div>
-        </div>
       </div>
+    </div>
     </div>
   </invenio-search>
 </div>

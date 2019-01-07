@@ -29,10 +29,8 @@ from __future__ import absolute_import, print_function
 import lxml.html
 from marshmallow import Schema, fields
 
-from zenodo.modules.openaire.helpers import openaire_community_identifier, \
-    resolve_openaire_communities
-
 from ...models import ObjectType
+from .common import ui_link_for
 
 
 class DublinCoreV1(Schema):
@@ -90,13 +88,9 @@ class DublinCoreV1(Schema):
                     a['scheme'],
                     a['identifier']))
 
-        # OpenAIRE community identifiers
-        openaire_comms = resolve_openaire_communities(
-            obj['metadata'].get('communities', []))
-        for oa_comm in openaire_comms:
-            rels.append(
-                u'url:{0}'.format(openaire_community_identifier(oa_comm)))
-
+        # Zenodo community identifiers
+        for comm in obj['metadata'].get('communities', []):
+            rels.append(u'url:{}'.format(ui_link_for('community', id=comm)))
         return rels
 
     def get_rights(self, obj):

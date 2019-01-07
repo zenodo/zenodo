@@ -20,7 +20,7 @@
 // waive the privileges and immunities granted to it by virtue of its status
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
- define([], function(){
+define([], function() {
   function providerNamesFilter() {
     return function(relationship) {
       var providerNames = [];
@@ -37,38 +37,101 @@
 
   function creatorNamesFilter() {
     return function(relationship) {
-      var creatorNames = [];
+      var creatorNames = "";
       var creators = relationship.metadata.Source.Creator;
       if (creators) {
-        for(var i=0; i<creators.length && i<5; i++) {
-          creatorNames.push(creators[i].Name);
+        creatorNames = creators[0].Name;
+        if (creators.length == 2) {
+          creatorNames = creatorNames + " & " + creators[1].Name;
         }
-        if(creators.length > 5) {
-        creatorNames.push("et al.");
+        else if (creators.length > 2) {
+          creatorNames = creatorNames + " et al.";
         }
       }
-      return creatorNames.join(', ');
+      return creatorNames;
     };
-   }
+  }
 
-   function doiUrlFilter() {
-     return function(relationship) {
+  function doiUrlFilter() {
+    return function(relationship) {
       var doiUrl = "";
       var url = "";
-        for(identifier of relationship.metadata.Source.Identifier) {
-          if(identifier.IDURL) {
-            url = identifier.IDURL;
-            if (identifier.IDScheme == "doi") {
-              doiUrl = identifier.IDURL;
-              break;
-            }
+
+      relationship.metadata.Source.Identifier.forEach(function(identifier) {
+        if (identifier.IDURL) {
+          url = identifier.IDURL;
+          if (identifier.IDScheme == "doi") {
+            doiUrl = identifier.IDURL;
           }
         }
+      })
+
       return doiUrl || url;
-     };
-   }
+    };
+  }
 
-  return {providerNamesFilter:providerNamesFilter, creatorNamesFilter: creatorNamesFilter, doiUrlFilter: doiUrlFilter};
+  function doiFilter() {
+    return function(relationship) {
+      var doi = "";
+      if(relationship.metadata.Source.Identifier) {
+        relationship.metadata.Source.Identifier.forEach( function(identifier) {
+          if (identifier.ID && identifier.IDScheme == "doi") {
+              doi = identifier.ID;
+          }
+        });
+      }
+      return doi;
+    };
+  }
+
+  function logoTypeFilter() {
+    return function(relationship) {
+      var logoType = {
+        "literature": "fa-file-text",
+        "dataset": "fa-table",
+        "software": "fa-code",
+        "unknown": "fa-asterisk"
+      };
+      var logo = "fa-asterisk";
+      if (relationship.metadata.Source.Type) {
+        logo = logoType[relationship.metadata.Source.Type.Name] || "fa-asterisk";
+      }
+      return logo;
+    };
+  }
+
+  function uniqueBadgeFilter() {
+    return function(identifiers) {
+      schemes = []
+      uniqueIdentifiers = []
+      if(identifiers) {
+        identifiers.forEach( function(identifier) {
+          if (identifier.IDURL && !schemes.includes(identifier.IDScheme)) {
+            uniqueIdentifiers.push(identifier)
+            schemes.push(identifier.IDScheme)
+          }
+        });
+       }
+        return uniqueIdentifiers;
+      };
+  }
+
+  function missingTypesFilter() {
+    return function(buckets) {
+      var missingTypes = ["literature", "dataset", "software", "unknown"];
+      if(buckets) {
+        buckets.forEach(function(bucket) {
+          missingTypes.splice(missingTypes.indexOf(bucket.key), 1);
+        });
+      }
+
+      return missingTypes;
+    };
+
+  }
+
+  return { providerNamesFilter: providerNamesFilter, creatorNamesFilter: creatorNamesFilter,
+           doiUrlFilter: doiUrlFilter, doiFilter: doiFilter, logoTypeFilter: logoTypeFilter,
+           uniqueBadgeFilter: uniqueBadgeFilter, missingTypesFilter: missingTypesFilter
+         };
 });
-
-

@@ -41,7 +41,7 @@ backports.functools-lru-cache==1.5
 backports.shutil-get-terminal-size==1.0.0
 billiard==3.5.0.3
 binaryornot==0.4.4
-bleach==2.1.3
+bleach==3.0.2
 blinker==1.4
 cairocffi==0.8.0
 CairoSVG==1.0.22
@@ -69,7 +69,7 @@ elasticsearch-dsl==2.2.0
 entrypoints==0.2.3
 enum34==1.1.6
 Flask==0.12.4
-Flask-Admin==1.5.1
+Flask-Admin==1.5.3
 Flask-Alembic==2.0.1
 Flask-Assets==0.12
 Flask-BabelEx==0.9.3
@@ -132,7 +132,7 @@ invenio-oaiserver==1.0.0
 invenio-oauth2server==1.0.0
 invenio-oauthclient==1.0.0
 invenio-openaire==1.0.0a13
-invenio-opendefinition==1.0.0a7
+invenio-opendefinition==1.0.0a8
 invenio-pidrelations==1.0.0a4
 invenio-pidstore==1.0.0
 invenio-previewer==1.0.0a11
@@ -207,7 +207,7 @@ pytz==2018.3
 pyzmq==17.0.0
 raven==6.6.0
 redis==2.10.6
-requests==2.18.4
+requests==2.20.1
 requests-oauthlib==0.8.0
 scandir==1.7
 Sickle==0.6.2
@@ -228,7 +228,7 @@ ua-parser==0.7.3
 Unidecode==1.0.22
 uritemplate.py==1.0.1
 uritools==2.1.0
-urllib3==1.22
+urllib3==1.23
 uWSGI==2.0.17
 uwsgitop==0.10
 validators==0.12.1

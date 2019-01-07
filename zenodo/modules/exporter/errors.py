@@ -1,7 +1,7 @@
-#!/usr/bin/env bash
+# -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015-2018 CERN.
+# Copyright (C) 2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,16 +22,14 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-if [ -d "$VIRTUAL_ENV/var/instance/data" ]; then
-    rm -Rf $VIRTUAL_ENV/var/instance/data
-fi
+"""Exporter errors."""
 
-# Remove all data
-zenodo db destroy --yes-i-know
-zenodo db init
-zenodo queues purge
-zenodo index destroy --force --yes-i-know
 
-# Initialize everything again
-script_path=$(dirname "$0")
-"$script_path/init.sh"
+class FailedExportJobError(Exception):
+    """Error for failed export job."""
+
+    def __init__(self, record_ids=None):
+        """Initialize the error with the list of not serialized records."""
+        msg = "Serialization failed for the following records: {}"\
+            .format(', '.join(record_ids))
+        super(FailedExportJobError, self).__init__(msg)

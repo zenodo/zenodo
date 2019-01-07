@@ -181,20 +181,13 @@ def test_types(app, db, minimal_record_model, recid_pid):
     ]
 
 
-def test_openaire_communities(db, minimal_record_model, recid_pid):
-    """Test OpenAIRE communities."""
-    tests = [
-        (['zenodo'], set()),
-        (['c1'], {'foo'}),
-        (['c1', 'c2'], {'foo'}),
-        (['c1', 'c2', 'c3'], {'foo', 'bar'}),
-    ]
-
-    for comms, expected_oa_comms in tests:
-        minimal_record_model['communities'] = comms
+def test_community_relations(db, minimal_record_model, recid_pid):
+    """Test communities."""
+    for communities in (['zenodo'], ['c1', 'c2', 'c3']):
+        minimal_record_model['communities'] = communities
         obj = dc_v1.transform_record(recid_pid, minimal_record_model)
-        for oa_comm in expected_oa_comms:
-            assert ('url:https://openaire.eu/communities/{}'.format(oa_comm)
+        for comm in communities:
+            assert ('url:http://localhost/communities/{}'.format(comm)
                     in obj['relations'])
 
 

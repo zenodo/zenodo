@@ -73,6 +73,7 @@ URLS = {
     'record_file': '{base}/record/{id}/files/{filename}',
     'record': '{base}/records/{id}',
     'thumbnail': '{base}{path}',
+    'community': '{base}/communities/{id}',
 }
 
 

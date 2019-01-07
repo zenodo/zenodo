@@ -28,6 +28,8 @@ from __future__ import absolute_import, print_function
 
 import bz2
 
+from .errors import FailedExportJobError
+
 
 class ResultStream(object):
     """Stream of serialized records for a search.
@@ -51,6 +53,7 @@ class ResultStream(object):
         self.search = search
         self.serializer = serializer
         self._iter = None
+        self.failed_record_ids = []
 
     def __next__(self):
         """Fetch next serialized record."""
@@ -61,10 +64,16 @@ class ResultStream(object):
         # Fetch next hit.
         hit = next(self._iter)
         # Serialize and return hit.
-        return self.serializer.serialize_exporter(
-            self.pid_fetcher(hit.meta.id, hit),
-            dict(_source=hit._d_, _version=0),
-        )
+        result = ''
+        try:
+            result = self.serializer.serialize_exporter(
+                self.pid_fetcher(hit.meta.id, hit),
+                dict(_source=hit._d_, _version=0),
+            )
+        except Exception as e:
+            self.failed_record_ids.append(hit.meta.id)
+
+        return result
 
     def next(self):
         """Python 2.x compatibility function."""
@@ -79,8 +88,10 @@ class ResultStream(object):
         try:
             return next(self)
         except StopIteration:
+            if self.failed_record_ids:
+                # raise an exception with the list of not serialized records
+                raise FailedExportJobError(record_ids=self.failed_record_ids)
             return b''
-
 
 
 class BZip2ResultStream(ResultStream):
