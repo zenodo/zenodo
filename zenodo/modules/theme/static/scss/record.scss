@@ -157,7 +157,7 @@
       margin-bottom: 15px;
   }
 
-  .doiDisplayed {
+  .doi-displayed {
       font-size: 12px;
   }
 
@@ -195,6 +195,10 @@
         height: 53px;
         margin-top: -10px;
         margin-left: -15px;
+
+        a {
+          text-decoration: none;
+        }
     }
 
     .corner-ribbon {
@@ -233,6 +237,12 @@
         -webkit-box-shadow: 0 0 3px rgba(0,0,0,.3);
         -moz-box-shadow: 0 0 3px rgba(0,0,0,.3);
         box-shadow: 0 0 3px rgba(0,0,0,.3);
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -khtml-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
     }
 
     .no-results {

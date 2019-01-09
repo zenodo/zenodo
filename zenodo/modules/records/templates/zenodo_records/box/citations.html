@@ -41,7 +41,9 @@
         <div class="row" style="margin-bottom: -15px;">
           <div class="col-sm-1">
             <div class="ribbon-wrapper-green">
-              <div class="corner-ribbon top-left ribbon-green">Beta</div>
+              <a href="https://help.zenodo.org/#citations" target="_blank" rel="noopener noreferrer">
+                <div class="corner-ribbon top-left ribbon-green">Beta</div>
+              </a>
             </div>
           </div>
           <div class="col-sm-11" style="margin-top: 5px;">
@@ -76,7 +78,7 @@
           <div class="container-fluid facets">
             <div class="row">
               <div class="col-sm-9">
-                 <invenio-search-facets
+                <invenio-search-facets
                    ng-init="vm.record_id='{{record.doi}}'; vm.version_id='{% if record.conceptdoi %}{{record.conceptdoi}}{% else %}{{record.doi}}{% endif %}'"
                    template="{{ url_for('static', filename='templates/citations/facets.html') }}">
                 </invenio-search-facets>
