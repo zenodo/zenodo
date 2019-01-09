@@ -84,6 +84,24 @@ define([], function() {
     };
   }
 
+  function citationTitleFilter() {
+    return function(relationship) {
+      var title = relationship.metadata.Source.Title;
+      if (!title || title.length === 0) {
+        // Use the first identifier or the DOI
+        relationship.metadata.Source.Identifier.forEach(function(identifier) {
+          if (identifier.IDURL) {
+            title = identifier.IDScheme.toUpperCase() + ': ' + identifier.ID;
+            if (identifier.IDScheme == 'doi') {
+              title = 'DOI: ' + identifier.ID;
+            }
+          }
+        })
+      }
+      return title;
+    };
+  }
+
   function logoTypeFilter() {
     return function(relationship) {
       var logoType = {
@@ -127,11 +145,16 @@ define([], function() {
 
       return missingTypes;
     };
-
   }
 
-  return { providerNamesFilter: providerNamesFilter, creatorNamesFilter: creatorNamesFilter,
-           doiUrlFilter: doiUrlFilter, doiFilter: doiFilter, logoTypeFilter: logoTypeFilter,
-           uniqueBadgeFilter: uniqueBadgeFilter, missingTypesFilter: missingTypesFilter
-         };
+  return {
+    providerNamesFilter: providerNamesFilter,
+    creatorNamesFilter: creatorNamesFilter,
+    doiUrlFilter: doiUrlFilter,
+    doiFilter: doiFilter,
+    citationTitleFilter: citationTitleFilter,
+    logoTypeFilter: logoTypeFilter,
+    uniqueBadgeFilter: uniqueBadgeFilter,
+    missingTypesFilter: missingTypesFilter,
+  };
 });

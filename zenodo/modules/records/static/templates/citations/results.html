@@ -4,30 +4,28 @@
       <tr ng-repeat="relationship in vm.invenioSearchResults.hits.hits">
         <td class="logo"><span class="fa {{ relationship | logoType }} fa-lg fa-fw"></span></td>
         <td>
-          <a ng-if="relationship | doiUrl" href="{{ relationship | doiUrl }}">
-            {{relationship.metadata.Source.Title | limitTo: 65 }}{{relationship.metadata.Source.Title.length > 65 ?
-            '&hellip;' : ''}}
-            <em ng-if="!relationship.metadata.Source.Title">Title unknown</em>
-          </a>
+          <a href="{{ relationship | doiUrl }}" ng-bind-html="relationship | citationTitle | limitToEllipsis:60"></a>
           <br />
-          <small class="text-muted">
-            {{relationship | creatorNames }}
-            <em ng-if="!(relationship | creatorNames)">Authors unknown</em>
-          </small>
-          <span class="doiDisplayed">(doi: {{relationship | doi}})</span>
+          <small class="text-muted">{{relationship | creatorNames }}</small>
+          <span ng-if="relationship.metadata.Source.Title && (relationship | doi)" class="doi-displayed">(DOI: {{relationship | doi}})</span>
         </td>
         <td>
-          {{relationship.metadata.Source.PublicationDate | date : 'yyyy' || "-"}}
+          <span ng-if="relationship.metadata.Source.PublicationDate">
+            {{relationship.metadata.Source.PublicationDate.length === 4 ? relationship.metadata.Source.PublicationDate : (relationship.metadata.Source.PublicationDate | date:'yyyy') }}
+          </span>
         </td>
         <td>
           <a ng-repeat="identifier in (relationship.metadata.Source.Identifier | uniqueBadge) | orderBy:'IDScheme' | limitTo:5 track by $index"
             href="{{ identifier.IDURL }}" class="identifier-badge" target="_blank">
-            <span class="label label-info" data-toggle="tooltip" data-placement="top" title="{{identifier.ID}}">
+            <span class="label label-info" bs-tooltip
+              data-container="a" data-placement="top"
+              data-title="{{identifier.ID}}">
               {{identifier.IDScheme | uppercase }}</span>
           </a>
           <small class="text-muted nowrap pull-right">
-            <i class="fa fa-question-circle text-muted" data-toggle="tooltip" data-placement="top"
-               title="Citation provided by {{relationship | providerNames}}">
+            <i class="fa fa-question-circle text-muted" bs-tooltip
+              data-container="small" data-placement="top"
+              data-title="Citation provided by {{relationship | providerNames}}">
             </i>
           </small>
         </td>

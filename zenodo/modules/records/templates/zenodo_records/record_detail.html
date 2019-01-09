@@ -139,9 +139,18 @@
     ], function(typeahead, Bloodhound) {
       angular.element(document).ready(function() {
 
+        // FIXME: This is already defined in js/zenodo_deposit/filters.js.
+        // It should be moved to a common place...
+        angular.module('zenodo.filters').filter('limitToEllipsis', function () {
+          return function(text, n) {
+            return (text.length > n) ? text.substr(0, n-1) + '&hellip;' : text;
+          };
+        });
+
         angular.bootstrap(document.getElementById("citations"), [
             'invenioSearch',
-            'zenodo.filters'
+            'zenodo.filters',
+            'mgcrea.ngStrap.tooltip',
           ]
         );
 
