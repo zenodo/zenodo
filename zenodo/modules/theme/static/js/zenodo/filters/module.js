@@ -33,6 +33,7 @@ define([
     .filter('providerNames', citationFilters.providerNamesFilter)
     .filter('creatorNames', citationFilters.creatorNamesFilter)
     .filter('doiUrl', citationFilters.doiUrlFilter)
+    .filter('citationTitle', citationFilters.citationTitleFilter)
     .filter('doi', citationFilters.doiFilter)
     .filter('logoType', citationFilters.logoTypeFilter)
     .filter('uniqueBadge', citationFilters.uniqueBadgeFilter)
