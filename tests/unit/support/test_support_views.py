@@ -57,7 +57,7 @@ def test_send_support_email(app, db, es, users):
 
             form = MultiDict(dict(
                 name='Aman',
-                email='abcxyz@gmail.com',
+                email='abcxyz@example.com',
                 subject='hello',
                 issue_category='tech-support',
                 description='Please help us! Troubleshoot our problem.'
@@ -70,10 +70,10 @@ def test_send_support_email(app, db, es, users):
             assert b('has-error') not in res.data
             assert len(outbox) == 2
             sent_msg = outbox[0]
-            assert sent_msg.sender == 'Aman <abcxyz@gmail.com>'
+            assert sent_msg.sender == 'Aman <abcxyz@example.com>'
             assert sent_msg.subject == '[tech-support]: hello'
-            assert sent_msg.reply_to == 'abcxyz@gmail.com'
-            assert 'Aman <abcxyz@gmail.com>' in sent_msg.body
+            assert sent_msg.reply_to == 'abcxyz@example.com'
+            assert 'Aman <abcxyz@example.com>' in sent_msg.body
 
             sent_msg = outbox[1]
             assert sent_msg.sender == 'Zenodo <info@zenodo.org>'
