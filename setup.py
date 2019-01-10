@@ -95,7 +95,7 @@ setup_requires = [
 ]
 
 install_requires = [
-    'arrow>=0.10.0',
+    'arrow>=0.13.0',
     'bleach>=2.1.3',
     'CairoSVG>=1.0.22,<2.0.0',
     'citeproc-py-styles>=0.1.1',
@@ -133,7 +133,7 @@ install_requires = [
     'invenio-mail>=1.0.0',
     'invenio-marc21>=1.0.0a8',
     'invenio-migrator>=1.0.0a9',
-    'invenio-oaiserver>=1.0.0',
+    'invenio-oaiserver>=1.0.2',
     'invenio-oauth2server>=1.0.0',
     'invenio-oauthclient[github]>=1.0.0',
     'invenio-openaire>=1.0.0a13',

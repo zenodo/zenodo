@@ -32,7 +32,7 @@
 alembic==0.9.9
 amqp==2.2.2
 angular-gettext-babel==0.3
-arrow==0.12.1
+arrow==0.13.0
 asn1crypto==0.24.0
 autosemver==0.5.3
 Babel==2.5.3
