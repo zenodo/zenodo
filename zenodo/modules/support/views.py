@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+import smtplib
+
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 from flask_babelex import lazy_gettext as _
 from flask_security import current_user
@@ -59,16 +61,35 @@ def support():
                 'info': form.data,
                 'uap': uap
             }
-            send_support_email(context)
-            send_confirmation_email(context)
-            flash(
-                _('Request sent successfully, '
-                  'You should receive a confirmation email within several '
-                  'minutes - if this does not happen you should retry or send '
-                  'us an email directly to info@zenodo.org.'),
-                category='success'
-            )
-            return redirect(url_for('zenodo_frontpage.index'))
+            
+            try:
+                send_support_email(context)
+                send_confirmation_email(context)
+            except smtplib.SMTPSenderRefused:
+                flash(
+                    _('There was an issue sending an email to the provided '
+                      'address, please make sure it is correct. '
+                      'If this issue persists you can send '
+                      'us an email directly to info@zenodo.org.'),
+                    category='danger'
+                )
+            except Exception:
+                flash(
+                    _("There was an issue sending the support request."
+                      'If this issue persists send '
+                      'us an email directly to info@zenodo.org.'),
+                    category='danger'
+                )
+                raise
+            else:
+                flash(
+                    _('Request sent successfully. '
+                      'You should receive a confirmation email within several '
+                      'minutes - if this does not happen you should retry or '
+                      'send us an email directly to info@zenodo.org.'),
+                    category='success'
+                )
+                return redirect(url_for('zenodo_frontpage.index'))
     return render_template(
         'zenodo_support/contact_form.html',
         uap=uap,
