@@ -24,13 +24,13 @@ define([], function() {
   function providerNamesFilter() {
     return function(relationship) {
       var providerNames = [];
-      for (var linkHistory of relationship.metadata.History) {
-        for (var provider of linkHistory.LinkProvider) {
+      relationship.metadata.History.forEach(function(linkHistory) {
+        linkHistory.LinkProvider.forEach(function(provider) {
           if (!providerNames.includes(provider.Name)) {
             providerNames.push(provider.Name);
           }
-        }
-      }
+        });
+      });
       return providerNames.join(', ');
     };
   }
@@ -64,7 +64,7 @@ define([], function() {
             doiUrl = identifier.IDURL;
           }
         }
-      })
+      });
 
       return doiUrl || url;
     };
@@ -119,19 +119,19 @@ define([], function() {
   }
 
   function uniqueBadgeFilter() {
-    return function(identifiers) {
-      schemes = []
-      uniqueIdentifiers = []
-      if(identifiers) {
-        identifiers.forEach( function(identifier) {
+    return function (identifiers) {
+      schemes = [];
+      uniqueIdentifiers = [];
+      if (identifiers) {
+        identifiers.forEach(function (identifier) {
           if (identifier.IDURL && !schemes.includes(identifier.IDScheme)) {
             uniqueIdentifiers.push(identifier)
-            schemes.push(identifier.IDScheme)
+            schemes.push(identifier.IDScheme);
           }
         });
-       }
-        return uniqueIdentifiers;
-      };
+      }
+      return uniqueIdentifiers;
+    };
   }
 
   function missingTypesFilter() {
