@@ -864,13 +864,12 @@ RECORDS_REST_SORT_OPTIONS = dict(
         ),
         journal=dict(
             fields=[
-                'journal.year',
+                'journal.title',
                 'journal.volume',
                 'journal.issue',
                 'journal.pages',
             ],
             title='Journal',
-            default_order='desc',
             order=6,
         ),
         version=dict(
@@ -929,9 +928,9 @@ RECORDS_REST_FACETS = dict(
             ),
             years=dict(
                 date_histogram=dict(field='publication_date', interval='year', format='yyyy')
-            )
+            ),
 
-        ),
+),
         filters=dict(
             communities=terms_filter('communities'),
             provisional_communities=terms_filter('provisional_communities'),
