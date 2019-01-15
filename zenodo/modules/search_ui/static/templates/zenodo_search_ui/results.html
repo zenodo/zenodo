@@ -26,6 +26,9 @@
     <p>
       <small class="text-muted hidden-xs">
         Uploaded on {{ record.created|date:'longDate' }}
+        <p ng-if="record.metadata.journal">
+          {{ record.metadata.journal | formatJournal }}
+        </p>
       </small>
     </p>
     <p ng-if="!vm.invenioSearchArgs.all_versions && record.metadata.relations.version[0].count > 1">

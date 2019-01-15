@@ -24,11 +24,13 @@ define([
   'js/zenodo/filters/citations',
   'js/zenodo/filters/striptags',
   'js/zenodo/filters/safe',
-  'js/zenodo/filters/titlecase'
-], function(citationFilters, striptagsFilter, safeFilter, titlecaseFilter){
+  'js/zenodo/filters/titlecase',
+  'js/zenodo/filters/journal'
+], function(citationFilters, striptagsFilter, safeFilter, titlecaseFilter, formatJournalFilter){
   var app = angular.module('zenodo.filters', ['ngSanitize'])
     .filter('striptags', striptagsFilter)
     .filter('titlecase', titlecaseFilter)
+    .filter('formatJournal', formatJournalFilter)
     .filter('safe', ['$sce', safeFilter])
     .filter('providerNames', citationFilters.providerNamesFilter)
     .filter('creatorNames', citationFilters.creatorNamesFilter)
