@@ -60,7 +60,7 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_pidrelations.config import RelationType
-from invenio_records_rest.facets import terms_filter
+from invenio_records_rest.facets import range_filter, terms_filter
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
@@ -927,10 +927,16 @@ RECORDS_REST_FACETS = dict(
             keywords=dict(
                 terms=dict(field="keywords"),
             ),
+            years=dict(
+                date_histogram=dict(field='publication_date', interval='year', format='yyyy')
+            )
+
         ),
         filters=dict(
             communities=terms_filter('communities'),
             provisional_communities=terms_filter('provisional_communities'),
+            years=range_filter('publication_date', format='yyyy', end_date_math='/y'),
+
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
@@ -1101,6 +1107,8 @@ SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
 SEARCH_UI_JSTEMPLATE_RESULTS = "templates/zenodo_search_ui/results.html"
 #: Angular template for rendering search facets.
 SEARCH_UI_JSTEMPLATE_FACETS = "templates/zenodo_search_ui/facets.html"
+#: Angular template for rendering the range facet.
+SEARCH_UI_JSTEMPLATE_RANGE = 'templates/zenodo_search_ui/range.html'
 #: Angular template for rendering search errors.
 SEARCH_UI_JSTEMPLATE_ERROR = "templates/zenodo_search_ui/error.html"
 #: Default Elasticsearch document type.

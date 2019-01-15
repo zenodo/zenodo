@@ -49,3 +49,25 @@
   );
   </script>
 {%- endblock javascript %}
+
+{%- block search_facets %}
+  <div class="col-md-3 col-md-pull-9 col-xs-12">
+    <a class="btn btn-link version-toggle"
+      ng-class="{'active': vm.invenioSearchArgs.all_versions}"
+      ng-click="vm.invenioSearchArgs.all_versions = (vm.invenioSearchArgs.all_versions === undefined ? true : undefined)">
+      <span class="text-muted">
+          <i class="fa fa-code-fork fa-lg"></i>&nbsp; All versions
+      </span>
+    </a>
+
+    {%- block search_range %}
+    <invenio-search-range
+     options='{{ config.SEARCH_UI_JSTEMPLATE_RANGE_OPTIONS | tojson }}'
+     template="{{ url_for('static', filename=config.SEARCH_UI_JSTEMPLATE_RANGE) }}">
+    </invenio-search-range>
+    {%- endblock search_range %}
+    <invenio-search-facets
+     template="{{ url_for('static', filename=config.SEARCH_UI_JSTEMPLATE_FACETS) }}">
+    </invenio-search-facets>
+  </div>
+{%- endblock search_facets %}

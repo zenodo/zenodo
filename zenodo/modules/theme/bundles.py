@@ -90,11 +90,13 @@ js = NpmBundle(
 search_js = NpmBundle(
     Bundle(
         'js/zenodo.search.js',
+        'node_modules/d3/d3.js',
         filters='requirejs',
     ),
     depends=(
         'node_modules/invenio-search-js/dist/*.js',
         'node_modules/angular-strap/dist/*.js',
+        'node_modules/d3/*',
         'js/invenio_communities/*.js',
         'js/invenio_communities/directives/*.js',
     ),
@@ -102,6 +104,7 @@ search_js = NpmBundle(
     output="gen/zenodo.search.%(version)s.js",
     npm={
         'clipboard': '1.5.12',
+        'd3': '^3.5.17',
         'invenio-search-js': '~0.2.0',
         'angular-strap': '~2.3.9',
     }

@@ -1,0 +1,16 @@
+<div class="bg-w" ng-show="vm.invenioSearchResults.aggregations.years.buckets.length > 0">
+  <div class="year-facet panel panel-default">
+    <div class="panel-heading">
+      <h2 class="text-capitalize year-facet-title">
+        year
+        <span class="pull-right" ng-show="vm.invenioSearchArgs['years'] && vm.invenioSearchArgs.years.length > 0">
+          <a ng-click="resetRangeSelection()">reset</a>
+        </span>
+      </h2>
+    </div>
+    <div class="year-facet-graph">
+      <div ng-style="{'margin': '0 auto'}" id="year_hist"></div>
+      <div ng-style="{'margin': '0 auto'}" id="year_select"></div>
+    </div>
+  </div>
+</div>
