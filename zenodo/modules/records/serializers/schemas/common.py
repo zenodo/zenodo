@@ -267,7 +267,7 @@ class SubjectSchemaV1(IdentifierSchemaV1):
 class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     """Common metadata schema."""
 
-    doi = DOIField()
+    doi = DOIField(missing='')
     publication_date = DateString(required=True)
     title = SanitizedUnicode(required=True, validate=validate.Length(min=3))
     creators = fields.Nested(
