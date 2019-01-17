@@ -187,9 +187,15 @@
         text-decoration: none;
    }
 
-    .type-filter {
+    .filter {
         margin-right: 5px;
         padding-bottom: -5px;
+        label {
+          font-weight: 300;
+        }
+        input[type=checkbox][disabled] + label{
+          cursor: not-allowed;
+        }
     }
 
     .navbar-form {
