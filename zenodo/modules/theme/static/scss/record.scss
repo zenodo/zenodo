@@ -24,6 +24,11 @@
   margin-bottom: 10px;
 }
 
+.record-detail{
+  p, h1 {
+    word-wrap: break-word;
+  }
+}
 
 .well {
   word-wrap: break-word;
@@ -122,6 +127,9 @@
             color: #777;
             text-decoration: none;
         }
+    }
+    h4 ,p {
+      word-wrap: break-word;
     }
 }
 

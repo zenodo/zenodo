@@ -34,7 +34,7 @@
     <div class="panel-body">
       <ul>
         {%- for reference in record.references|sort(attribute='raw_reference') -%}
-          <li>{{ reference.raw_reference }}</li>
+          <li><p>{{ reference.raw_reference }}</p></li>
         {%- endfor -%}
       </ul>
     </div>
