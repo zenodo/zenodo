@@ -138,6 +138,10 @@
   },
   "datacite": {"general": "Software"},
   "eurepo": "info:eu-repo/semantics/other",
+  "openaire": {
+    "resourceType": "0029",
+    "type": "software"
+  },
   "schema.org": "https://schema.org/SoftwareSourceCode",
   "csl": "article"
 },
@@ -175,7 +179,7 @@
   "schema.org": "https://schema.org/CreativeWork",
   "openaire": {
     "resourceType": "0020",
-    "type": "publication"
+    "type": "other"
   },
   "csl": "article"
 },

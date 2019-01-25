@@ -37,9 +37,9 @@ from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.serializers import openaire_json_v1
 
 from .errors import OpenAIRERequestError
-from .helpers import is_openaire_dataset, is_openaire_publication, \
-    is_openaire_software, is_openaire_other, \
-    openaire_datasource_id, openaire_original_id, openaire_type
+from .helpers import is_openaire_dataset, is_openaire_other, \
+    is_openaire_publication, is_openaire_software, openaire_datasource_id, \
+    openaire_original_id, openaire_type
 
 
 def _openaire_request_factory(headers=None, auth=None):

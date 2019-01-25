@@ -33,8 +33,12 @@ from zenodo.modules.openaire.helpers import openaire_id, openaire_link, \
 def test_openaire_type(app, minimal_record):
     """Test OpenAIRE type."""
     r = minimal_record
-    # Default zenodo type is software which has no OpenAIRE type.
-    assert openaire_type(r) is None
+    # Default zenodo type is software.
+    assert openaire_type(r) == 'software'
+
+    # Other type
+    r['resource_type']['type'] = 'other'
+    assert openaire_type(r) == 'other'
 
     # Datasets just map to datasets.
     r['resource_type']['type'] = 'dataset'
