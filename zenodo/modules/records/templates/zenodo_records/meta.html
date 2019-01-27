@@ -49,7 +49,7 @@
 {{- meta_opengraph(meta_title, meta_description, url=meta_url) }}
 {{- meta_twittercard(meta_title, meta_description) }}
     <link rel="canonical" href="{{ meta_url }}">
-
+{{ share.load(serve_local=True) }}
 {%- for file in files or [] -%}
     {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key, _external=True) %}
     <link rel="alternate" type="{{file.mimetype}}" href="{{ file_url }}">

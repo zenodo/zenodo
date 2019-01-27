@@ -88,6 +88,7 @@ Flask-Menu==0.7.0
 Flask-OAuthlib==0.9.4
 Flask-Principal==0.4.0
 Flask-Security==3.0.0
+Flask-Share==0.1.1
 flask-shell-ipython==0.3.0
 Flask-SQLAlchemy==2.3.2
 flask-talisman==0.5.0

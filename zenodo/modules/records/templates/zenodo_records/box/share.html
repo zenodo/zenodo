@@ -22,17 +22,13 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
   <h4>{{_('Share')}}</h4>
-  <!-- AddThis Button BEGIN -->
-  <div class="addthis_toolbox addthis_default_style addthis_32x32_style"{% if record.doi and record.doi is local_doi %} addthis:url="{{record.doi|pid_url}}{% else %}{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value)}}{%- endif %}">
-  <a class="addthis_button_mendeley"></a>
-  <a class="addthis_button_citeulike"></a>
-  <a class="addthis_button_twitter"></a>
-  <a class="addthis_button_preferred_1"></a>
-  <a class="addthis_button_preferred_2"></a>
-  <a class="addthis_button_compact"></a>
+  <!-- Share buttons BEGIN -->
+  <!-- TODO: add Citeulike, Mendeley, URL {% if record.doi and record.doi is local_doi %} addthis:url="{{record.doi|pid_url}}{% else %}{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value)}}{%- endif %} -->
+  <div id="share-buttons">
+  {{ share.create(title="{{_('Share')}}", sites="twitter, facebook")  }}
   </div>
   {#- NOTE: zenodo_records/record_detail.html includes the JavaScript #}
-  <!-- AddThis Button END -->
+  <!-- Share buttons END -->
   <h4>{{_('Cite as')}}</h4>
   <div id='invenio-csl'>
     {% set citation_result = record|citation(pid, style='apa') %}

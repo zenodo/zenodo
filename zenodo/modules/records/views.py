@@ -33,6 +33,7 @@ import idutils
 import six
 from flask import Blueprint, current_app, render_template, request
 from flask_principal import ActionNeed
+from flask_share import Share
 from invenio_access.permissions import Permission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
