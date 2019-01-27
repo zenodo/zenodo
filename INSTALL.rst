@@ -107,6 +107,22 @@ installed.
     Since docker will be mapping the services to the default system
     ports on localhost, make sure you are not running PostgreSQL,
     Redis, RabbitMQ or Elasticsearch on those ports in your system.
+    
+Requirements
+~~~~~~~~~~~~~~~~~~~~~~
+
+In this version of the installation, a number of dependencies are installed on
+your development host itself.
+
+On a Fedora host, you will need at least:
+```
+sudo dnf groupinstall "Development Tools"
+sudo dnf install docker docker-compose python3-virtualenv libpqxx-devel gcc-c++ libxml2-devel libxslt-devel \
+libtiff-devel libjpeg-devel zlib-devel freetype-devel lcms2-devel libwebp-devel tcl-devel tk-devel libraqm-devel libimagequant-devel
+```
+
+Essential docker nodes and local installation
+~~~~~~~~~~~~~~~~~~~~~~
 
 Similarly to how we previously ran ``docker-compose up`` to run full-stack
 Zenodo, this time we run only four docker nodes with the database,
@@ -116,7 +132,7 @@ Elasticsearch, Redis and RabbitMQ:
 
     $ docker-compose up db es cache mq
 
-Keep the docker-compose session above alive and in a separate shell, create a
+Keep the docker-compose session above alive. In a separate shell, create a
 new Python virtual environment using virtualenvwrapper
 (`virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/>`_),
 in which we will install Zenodo code and its dependencies:
