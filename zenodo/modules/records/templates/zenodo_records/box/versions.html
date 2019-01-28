@@ -24,7 +24,7 @@
         {% if pid_version_index < active_versions|length - 6 %}<tr><td colspan="3" align="center">...</tr>{% endif %}
         <tr class="info">
           <td>
-            <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value) }}">Version {{ pid_version_index + 1 }}</a>
+            <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value) }}">Version {{ record.version or (pid_version_index + 1) }}</a>
             <small class="text-muted">{{record.doi}}</small>
           </td>
           <td align="right"><small class="text-muted">{{ record.publication_date|from_isodate|dateformat(format='medium')}}</small></td>
