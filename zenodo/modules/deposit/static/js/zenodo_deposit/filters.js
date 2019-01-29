@@ -93,10 +93,23 @@ function stable() {
   };
 }
 
+function checkAllFilesUploaded() {
+  return function(file_objects) {
+    var incompleted_uploads= false;
+    angular.forEach(file_objects, function(file_object) {
+      if (typeof file_object.completed == "undefined" || file_object.completed !== true) {
+        incompleted_uploads = true;
+      }
+    });
+    return incompleted_uploads;
+ }
+};
+
 angular.module('invenioRecords')
   .filter('fieldtitle', fieldtitle)
   .filter('notIn', notIn)
   .filter('formatGrant', formatGrant)
   .filter('limitToEllipsis', limitToEllipsis)
   .filter('striptags', striptags)
-  .filter('stable', stable);
+  .filter('stable', stable)
+  .filter('checkAllFilesUploaded',checkAllFilesUploaded);
