@@ -443,7 +443,7 @@ OPENAIRE_API_USERNAME = None
 #: OpenAIRE API endpoint password.
 OPENAIRE_API_PASSWORD = None
 #: URL to OpenAIRE portal.
-OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
+OPENAIRE_PORTAL_URL = 'https://explore.openaire.eu'
 #: OpenAIRE community identifier prefix.
 OPENAIRE_COMMUNITY_IDENTIFIER_PREFIX = 'https://openaire.eu/communities'
 #: Enable sending published records for direct indexing at OpenAIRE.

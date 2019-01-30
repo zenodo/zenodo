@@ -85,7 +85,7 @@ def openaire_direct_index(record_uuid):
 
         res_beta = None
         if current_app.config['OPENAIRE_API_URL_BETA']:
-            url_beta = '{}/api/results/feedObject'.format(
+            url_beta = '{}/feedObject'.format(
                 current_app.config['OPENAIRE_API_URL_BETA'])
             res_beta = req.post(url_beta, data=data)
 
@@ -126,9 +126,8 @@ def openaire_delete(record_uuid=None, original_id=None, datasource_id=None):
         res = req.delete(current_app.config['OPENAIRE_API_URL'], params=params)
         res_beta = None
         if current_app.config['OPENAIRE_API_URL_BETA']:
-            url_beta = '{}/api/results'.format(
-                current_app.config['OPENAIRE_API_URL_BETA'])
-            res_beta = req.delete(url_beta, params=params)
+            res_beta = req.delete(current_app.config['OPENAIRE_API_URL_BETA'],
+                                  params=params)
 
         if not res.ok or (res_beta and not res_beta.ok):
             raise OpenAIRERequestError(res.text)
