@@ -20,7 +20,7 @@
 // waive the privileges and immunities granted to it by virtue of its status
 // as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-function configZenodoDeposit($provide, decoratorsProvider) {
+function configZenodoDeposit($provide, decoratorsProvider, $windowProvider) {
 
   // TODO: Check if these are needed, since we have DEPOSIT_FORM_TEMPLATES
   // New field types
@@ -71,11 +71,26 @@ function configZenodoDeposit($provide, decoratorsProvider) {
     };
     return $delegate;
   });
+
+ // We are injecting the record that has already been put by the jinja template in the window to prevent angular from
+ // interpreting accidental angular expressions from the record's fields.
+  $provide.decorator('invenioRecordsDirective', function($delegate) {
+    var directive = $delegate[0];
+    var link = directive.link;
+    directive.compile = function() {
+      return function Link(scope, element, attrs, ctrls) {
+        attrs.record = JSON.stringify($windowProvider.$get().record)
+        return link.apply(this, arguments);
+      };
+    };
+    return $delegate;
+  });
 }
 
 configZenodoDeposit.$inject = [
   '$provide',
   'schemaFormDecoratorsProvider',
+  '$windowProvider',
 ];
 
 angular.module('invenioRecords')
