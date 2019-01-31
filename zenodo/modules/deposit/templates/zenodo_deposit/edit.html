@@ -47,6 +47,11 @@
         openAIREProvider.setCommunities({{current_openaire.openaire_communities|tojson}});
         openAIREProvider.setCommunitiesMapping({{current_openaire.inverse_openaire_community_map|tojson}});
       }]);
+      {% if community %}
+        window.record={{ (record | serialize_record(pid, "deposit_formjson_v1") or ({"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson )) | safe }};
+      {% else %}
+        window.record={{ (record | serialize_record(pid, "deposit_formjson_v1") or ({"publication_date": current_date.isoformat()} | tojson )) | safe }};
+      {% endif %}
 
       angular.bootstrap(
         document.getElementById('invenio-records'), [
@@ -115,11 +120,6 @@
       {%- endif %}
       extra-params='{"headers":{"Content-Type": "application/json"}}'
       template-params='{{ deposit_template_params | tojson }}'
-      {% if community %}
-      record='{{ record | serialize_record(pid, "deposit_formjson_v1") or ({"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson) }}'
-      {% else %}
-      record='{{ record | serialize_record(pid, "deposit_formjson_v1") or ({"publication_date": current_date.isoformat()} | tojson) }}'
-      {% endif %}
       form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
       schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}"
     >
