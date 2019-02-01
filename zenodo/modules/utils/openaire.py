@@ -25,8 +25,11 @@
 """Communities utilities."""
 
 import csv
+import re
+import requests
 
 from flask import current_app
+from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_db import db
 
@@ -86,3 +89,94 @@ class OpenAIRECommunitiesMappingUpdater:
                                         types={})
 
         return mapping, unresolved_communities
+
+
+def fetch_communities_mapping():
+    """Fetch communities mapping via the OpenAIRE APIs."""
+    oa_communities_url = 'https://beta.services.openaire.eu/openaire/community/communities'
+    z_communities_url = 'https://beta.services.openaire.eu/openaire/community/{id}/zenodocommunities'
+    mapping = {}
+    res = requests.get(oa_communities_url)
+    if res.ok:
+        openaire_communities = res.json()
+        for openaire_community in openaire_communities:
+            zenodo_community_ids = []
+            comm_id = openaire_community['id']
+            res = requests.get(z_communities_url.format(id=comm_id))
+            if res.ok:
+                for z_comm in res.json():
+                    if not _is_url(z_comm['zenodoid']):
+                        zenodo_community_ids.append(z_comm['zenodoid'])
+
+            mapping[comm_id] = dict(name=openaire_community['name'],
+                                    communities=zenodo_community_ids,
+                                    types=openaire_community['type'],
+                                    primary_community=
+                                    openaire_community['zenodoCommunity'],
+                                    curators=openaire_community['managers'])
+
+    return mapping
+
+
+def _is_url(string):
+    """Check is the string is a URL."""
+    url = re.match('http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+] | [! * \(\),] | (?: %[0-9a-fA-F][0-9a-fA-F]))+', string)
+    return url is not None
+
+
+def _community_exists(community_id):
+    """Search if the community exists in Zenodo."""
+    query = db.session.query(Community).filter(
+        Community.id == community_id
+    )
+    comm = query.one_or_none()
+    return comm is not None
+
+
+def _fetch_community_curator_id(curators):
+    """Fetch the id of the first Zenodo user in the list."""
+    curator_id = None
+
+    for curator in curators:
+        query = User.query.filter_by(email=curator)
+        user = query.one_or_none()
+        if user:
+            curator_id = user.id
+        break
+
+    return curator_id
+
+
+def get_new_communites(community_mapping):
+    """Return the list of the communities which are not in Zenodo.
+
+    :param community_mapping: The community mapping
+    """
+    new_communities = []
+
+    for oa_community_id in community_mapping:
+        openaire_community = community_mapping[oa_community_id]
+        primary_community = openaire_community['primary_community']
+        if primary_community and not _community_exists(primary_community):
+            curators = openaire_community['curators']
+            curator_id = _fetch_community_curator_id(curators)
+            new_community = dict(id=primary_community,
+                                 title=openaire_community['name'],
+                                 owner=curator_id)
+            new_communities.append(new_community)
+
+    return new_communities
+
+
+def create_communities(new_communities):
+    """Create new communities.
+
+    :param new_communities: array of new communities. Each element of the
+    array is a dictionary with the id, title and owner of the new community.
+    """
+    for comm in new_communities:
+        if comm['owner']:
+            Community.create(comm['id'],
+                             user_id=comm['owner'],
+                             title=comm['title'])
+            db.session.commit()

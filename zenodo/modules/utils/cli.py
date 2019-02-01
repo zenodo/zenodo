@@ -43,7 +43,8 @@ from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
 from .grants import OpenAIREGrantsDump
-from .openaire import OpenAIRECommunitiesMappingUpdater
+from .openaire import create_communities, fetch_communities_mapping,\
+    get_new_communites, OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
     sync_record_oai, update_oaisets_cache, update_search_pattern_sets
 
@@ -403,4 +404,26 @@ def update_openaire_communities(path):
     click.secho('Communities not found:\n{0}'.format(json.dumps(
         unresolved_communities, indent=4, separators=(', ', ': '))))
     click.secho('{0}'.format(json.dumps(mapping, indent=4,
+                                        separators=(', ', ': '))), fg='blue')
+
+
+@utils.command('detect_new_communities')
+@click.option('--create', '-c', is_flag=True)
+@with_appcontext
+def detect_new_communities(create):
+    """Detect if there are new OpenAIRE communities.
+
+    If the flag is set, the new communities will be created in Zenodo.
+    """
+    # 1) fetch OpenAIRE communities
+    # 2) get the list of new communities
+    # 3) if the flag is set, create the new communities
+    # 4) print the list of the new communities
+
+    new_mapping = fetch_communities_mapping()
+    new_communities = get_new_communites(new_mapping)
+    if create:
+        create_communities(new_communities)
+
+    click.secho('{0}'.format(json.dumps(new_communities, indent=4,
                                         separators=(', ', ': '))), fg='blue')
