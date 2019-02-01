@@ -55,6 +55,7 @@ class _ZenodoOpenAIREState(object):
         return items
 
 
+
 class ZenodoOpenAIRE(object):
     """Zenodo OpenAIRE extension."""
 
