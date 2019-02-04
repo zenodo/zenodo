@@ -83,6 +83,7 @@ from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
+from zenodo.modules.thumbnails.cache import ImageRedisCache
 
 
 def wrap_rate_limit():
@@ -1364,3 +1365,12 @@ def mock_datacite_minting(mocker, app):
         'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     yield datacite_mock
     app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig
+
+
+def iiif_cache():
+    """Fixture for iiif chache."""
+    cache = ImageRedisCache()
+    yield cache
+    iiif_keys = [k for k in cache.cache._client.keys() if k.find("iiif:") != -1]
+    for key in iiif_keys:
+        cache.delete(key)

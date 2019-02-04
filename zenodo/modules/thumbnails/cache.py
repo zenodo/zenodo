@@ -22,6 +22,31 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo IIIF."""
+"""Implements a Redis cache."""
 
-from __future__ import absolute_import, print_function
+from __future__ import absolute_import
+
+from flask_iiif.cache.redis import ImageRedisCache as ImageCache
+
+
+class ImageRedisCache(ImageCache):
+    """Redis image cache."""
+
+    def __init__(self):
+        """Initialize the cache."""
+        super(ImageRedisCache, self).__init__()
+
+    def set(self, key, value, timeout=None):
+        """Cache the object.
+
+        :param key: the object's key
+        :param value: the stored object
+        :type value: `BytesIO` object
+        :param timeout: the cache timeout in seconds
+        """
+        identifier, _, size, _, _ = key.split('/')
+        if size == '250,':
+            timeout = timeout if timeout else self.timeout
+            self.cache.set(key, value, timeout=timeout)
+
+

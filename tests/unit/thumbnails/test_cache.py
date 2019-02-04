@@ -22,6 +22,20 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo IIIF."""
+"""Unit tests for thumbnail caching."""
 
-from __future__ import absolute_import, print_function
+
+def test_thumbnail_caching(app, iiif_cache):
+    """Test thumbnail cache."""
+    key_250 = 'iiif:identifier1/full/250,/0/default.png'
+    key = 'iiif:identifier2/full/260,/0/default.jpg'
+    value = 'value'
+
+    # only images with size == (250,) are cached
+    assert iiif_cache.get(key_250) is None
+    iiif_cache.set(key_250, value)
+    assert iiif_cache.get(key_250) == 'value'
+
+    assert iiif_cache.get(key) is None
+    iiif_cache.set(key, value)
+    assert iiif_cache.get(key) is None

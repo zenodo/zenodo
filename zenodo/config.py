@@ -1099,6 +1099,14 @@ CACHED_THUMBNAILS = {
     '1200': '1200,'
     }
 
+#: IIIF Cache handler
+IIIF_CACHE_HANDLER = 'zenodo.modules.thumbnails.cache:ImageRedisCache'
+
+#: Cache duration
+# 60 seconds * 60 minutes (1 hour) * 24 (24 hours) * 2 (2 days) = 172800 secs
+# 60 seconds * 60 (1 hour) * 24 (1 day) * 2 (2 days)
+IIIF_CACHE_TIME = 60 * 60 * 24 * 2
+
 # OAI-PMH
 # =======
 #: Index to use for the OAI-PMH server.
@@ -1630,7 +1638,7 @@ RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
 # Error template
 THEME_429_TEMPLATE = "zenodo_errors/429.html"
 
-failed_login_msg  = (_("Login failed; Invalid user or password."), 'error')
+failed_login_msg = (_("Login failed; Invalid user or password."), 'error')
 
 SECURITY_MSG_USER_DOES_NOT_EXIST = failed_login_msg
 SECURITY_MSG_PASSWORD_NOT_SET = failed_login_msg
