@@ -36,6 +36,7 @@ from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PIDStatus
 from invenio_pidstore.providers.datacite import DataCiteProvider
 from invenio_records import Record
+from invenio_search.api import RecordsSearch
 from lxml import etree
 
 from zenodo.modules.records.models import AccessRight
