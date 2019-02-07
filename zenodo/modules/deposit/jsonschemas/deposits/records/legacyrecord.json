@@ -350,7 +350,8 @@
           "thesis",
           "technicalnote",
           "workingpaper",
-          "other"
+          "other",
+          "part"
         ],
         "type": "string"
       }

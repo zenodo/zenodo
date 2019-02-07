@@ -23,6 +23,7 @@
     {"$ref": "https://zenodo.org/objecttypes/publication/thesis"},
     {"$ref": "https://zenodo.org/objecttypes/publication/technicalnote"},
     {"$ref": "https://zenodo.org/objecttypes/publication/workingpaper"},
+    {"$ref": "https://zenodo.org/objecttypes/publication/part"},
     {"$ref": "https://zenodo.org/objecttypes/publication/other"}
   ],
   "openaire": {
@@ -478,6 +479,26 @@
     "type": "publication"
   },
   "csl": "article"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-part",
+  "id": "https://zenodo.org/objecttypes/publication/part#",
+  "title": {
+    "en": "Part"
+  },
+  "title_plural": {
+    "en": "Parts"
+  },
+  "schema.org": "https://schema.org/ImageObject",
+  "datacite": {"general": "Image", "type": "Figure"},
+  "eurepo": "info:eu-repo/semantics/other",
+  "parent": {"$ref": "https://zenodo.org/objecttypes/publication#"},
+  "openaire": {
+    "resourceType": "0025",
+    "type": "publication"
+  },
+  "csl": "figure"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
