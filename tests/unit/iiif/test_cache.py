@@ -27,8 +27,8 @@
 
 def test_thumbnail_caching(app, iiif_cache):
     """Test thumbnail cache."""
-    key_250 = 'iiif:identifier1/full/250,/0/default.png'
-    key = 'iiif:identifier2/full/260,/0/default.jpg'
+    key_250 = 'iiif:identifier1/full/250,/default/0.png'
+    key = 'iiif:identifier2/full/260,/default/0.jpg'
     value = 'value'
 
     # only images with size == (250,) are cached

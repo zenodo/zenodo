@@ -1084,7 +1084,6 @@ IIIF_RESIZE_RESAMPLE = 'PIL.Image:BICUBIC'
 #: Use the Redis storage backend for caching IIIF images
 # TODO: Fix Python 3 caching key issue to enable:
 #   https://github.com/inveniosoftware/flask-iiif/issues/66
-# IIIF_CACHE_HANDLER = 'flask_iiif.cache.redis:ImageRedisCache'
 
 # Redis storage for thumbnails caching.
 IIIF_CACHE_REDIS_URL = CACHE_REDIS_URL
@@ -1100,7 +1099,7 @@ CACHED_THUMBNAILS = {
     }
 
 #: IIIF Cache handler
-IIIF_CACHE_HANDLER = 'zenodo.modules.thumbnails.cache:ImageRedisCache'
+IIIF_CACHE_HANDLER = 'zenodo.modules.iiif.cache:FilteredImageRedisCache'
 
 #: Cache duration
 # 60 seconds * 60 minutes (1 hour) * 24 (24 hours) * 2 (2 days) = 172800 secs

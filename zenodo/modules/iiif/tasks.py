@@ -30,11 +30,9 @@ from datetime import datetime
 
 import arrow
 from celery import shared_task
-from flask import current_app
 from flask_iiif.restful import IIIFImageAPI
 from invenio_cache import current_cache
 from invenio_iiif.utils import iiif_image_key
-from invenio_indexer.api import RecordIndexer
 from invenio_search.api import RecordsSearch
 
 

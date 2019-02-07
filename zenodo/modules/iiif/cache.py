@@ -26,15 +26,15 @@
 
 from __future__ import absolute_import
 
-from flask_iiif.cache.redis import ImageRedisCache as ImageCache
+from flask_iiif.cache.redis import ImageRedisCache
 
 
-class ImageRedisCache(ImageCache):
+class FilteredImageRedisCache(ImageRedisCache):
     """Redis image cache."""
 
     def __init__(self):
         """Initialize the cache."""
-        super(ImageRedisCache, self).__init__()
+        super(FilteredImageRedisCache, self).__init__()
 
     def set(self, key, value, timeout=None):
         """Cache the object.
@@ -44,7 +44,8 @@ class ImageRedisCache(ImageCache):
         :type value: `BytesIO` object
         :param timeout: the cache timeout in seconds
         """
-        identifier, _, size, _, _ = key.split('/')
-        if size == '250,':
-            timeout = timeout if timeout else self.timeout
-            self.cache.set(key, value, timeout=timeout)
+        identifier, region, size, quality, rotation_format = key.split('/')
+        if size == '250,' and region == 'full' and quality == 'default' and \
+            rotation_format.startswith(u'0.'):
+                timeout = timeout if timeout else self.timeout
+                self.cache.set(key, value, timeout=timeout)

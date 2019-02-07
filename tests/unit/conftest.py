@@ -80,10 +80,10 @@ from zenodo.modules.deposit.minters import zenodo_deposit_minter
 from zenodo.modules.deposit.scopes import extra_formats_scope
 from zenodo.modules.fixtures.records import loadsipmetadatatypes
 from zenodo.modules.github.cli import github
+from zenodo.modules.iiif.cache import FilteredImageRedisCache
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
-from zenodo.modules.thumbnails.cache import ImageRedisCache
 
 
 def wrap_rate_limit():
@@ -1367,10 +1367,12 @@ def mock_datacite_minting(mocker, app):
     app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig
 
 
-def iiif_cache():
+@pytest.fixture
+def iiif_cache(app):
     """Fixture for iiif chache."""
-    cache = ImageRedisCache()
+    cache = app.extensions['iiif'].cache()
     yield cache
-    iiif_keys = [k for k in cache.cache._client.keys() if k.find("iiif:") != -1]
+    iiif_keys = [k.decode('utf-8') for k in cache.cache._client.keys()
+                 if k.decode('utf-8').startswith(u"iiif:")]
     for key in iiif_keys:
         cache.delete(key)

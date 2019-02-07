@@ -26,12 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import current_app
-from invenio_cache import current_cache
+from invenio_iiif.utils import iiif_image_key
 from invenio_indexer.api import RecordIndexer
 from invenio_search import current_search
 from pkg_resources import resource_stream
-from werkzeug import LocalProxy
 
 from zenodo.modules.iiif.tasks import preprocess_thumbnails
 
@@ -49,7 +47,8 @@ def test_preprocess_thumbnails(app, db, es, record_with_bucket, iiif_cache):
     RecordIndexer().index(record)
     current_search.flush_and_refresh(index='records')
     preprocess_thumbnails('zenodo')
-    key = 'iiif:'+str(record.files['test.png'].obj)+'/full/250,/default/0.png'
+    key = 'iiif:' + iiif_image_key(record.files['test.png'].obj) + \
+          '/full/250,/default/0.png'
     assert iiif_cache.get(key)
     iiif_cache.delete(key)
     preprocess_thumbnails('zenodo')
