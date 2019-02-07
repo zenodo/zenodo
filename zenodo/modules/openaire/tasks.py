@@ -72,7 +72,7 @@ def openaire_direct_index(record_uuid):
             return
 
         data = openaire_json_v1.serialize(record.pid, record)
-        url = '{}/api/results/feedObject'.format(
+        url = '{}/feedObject'.format(
             current_app.config['OPENAIRE_API_URL'])
         req = _openaire_request_factory()
         res = req.post(url, data=data)
@@ -109,9 +109,8 @@ def openaire_delete(record_uuid=None, original_id=None, datasource_id=None):
             datasource_id = openaire_datasource_id(record)
 
         params = {'originalId': original_id, 'collectedFromId': datasource_id}
-        url = '{}/api/results'.format(current_app.config['OPENAIRE_API_URL'])
         req = _openaire_request_factory()
-        res = req.delete(url, params=params)
+        res = req.delete(current_app.config['OPENAIRE_API_URL'], params=params)
         if not res.ok:
             raise OpenAIRERequestError(res.text)
     except Exception as exc:

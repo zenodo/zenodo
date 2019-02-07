@@ -432,7 +432,7 @@ OPENAIRE_NAMESPACE_PREFIXES = {
     'dataset': 'r37b0ad08687',
 }
 #: OpenAIRE API endpoint.
-OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc'
+OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc/api/results'
 #: OpenAIRE API endpoint username.
 OPENAIRE_API_USERNAME = None
 #: OpenAIRE API endpoint password.
