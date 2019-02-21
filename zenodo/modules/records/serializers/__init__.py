@@ -39,6 +39,7 @@ from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
 from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
 
 from .bibtex import BibTeXSerializer
+from .derived import DerivedMetadataSerializer
 from .files import files_responsify
 from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
@@ -92,6 +93,8 @@ citeproc_v1 = CiteprocSerializer(csl_v1)
 openaire_json_v1 = JSONSerializer(RecordSchemaOpenAIREJSON, replace_refs=True)
 #: JSON-LD serializer
 schemaorg_jsonld_v1 = ZenodoSchemaOrgSerializer(replace_refs=True)
+#: Derived metadata serializer
+derived_metadata = DerivedMetadataSerializer()
 
 
 # Records-REST serializers

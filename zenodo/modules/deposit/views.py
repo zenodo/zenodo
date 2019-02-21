@@ -316,7 +316,7 @@ def to_files_js(deposit):
 
     res = []
 
-    for f in deposit.files:
+    for f in deposit.visible_files:  # FIXME: Refine this...
         res.append({
             'key': f.key,
             'version_id': f.version_id,

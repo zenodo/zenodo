@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -28,6 +28,7 @@ from __future__ import absolute_import, unicode_literals
 
 import itertools
 import uuid
+from contextlib import contextmanager
 
 import pycountry
 from elasticsearch.exceptions import NotFoundError
@@ -241,3 +242,14 @@ def suggest_language(q, limit=5):
     if lut:
         langs = ([lut, ] + [l for l in langs if l != lut])[:limit]
     return langs
+
+
+@contextmanager
+def unlocked_bucket(bucket):
+    """Temporarily unlocks a bucket, allowing modifying its ObjectVersions."""
+    if bucket.locked:
+        bucket.locked = False
+        yield bucket
+        bucket.locked = True
+    else:
+        yield bucket

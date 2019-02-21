@@ -37,6 +37,10 @@
 <a href="{{canonical_url}}"><h1>{{ record.title }}</h1></a>
 <p>{{ authors(record.creators) }}</p>
 <hr />
+{% if expr %}
+
+{% else %}
+{% endif %}
 <h3>{{ format_title }} Export</h3>
 <pre style="white-space: pre-wrap;">{{data}}</pre>
 {% endblock record_body %}

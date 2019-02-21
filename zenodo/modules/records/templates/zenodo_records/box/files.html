@@ -22,7 +22,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
-{%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
+{%- set files = record.visible_files if current_user|has_record_perm(record, 'read-files') else [] %}
 {%- if record._files -%}
 <div class="panel panel-{{state}}" id="files">
   <div class="panel-heading">
@@ -53,7 +53,7 @@
       </tr>
     </thead>
     <tbody>
-    {%- for file in files|sort(attribute='key') -%}
+    {%- for file in files|sort(attribute='key') if not file.key.startswith(config.ZENODO_METAFILE_KEY_PREFIX) -%}
     {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key, download=1) %}
       <tr>
         <td>

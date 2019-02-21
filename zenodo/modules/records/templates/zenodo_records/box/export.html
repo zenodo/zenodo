@@ -31,4 +31,7 @@
   <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='schemaorg_jsonld') }}">JSON-LD</a></li>
   <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='xm') }}">MARCXML</a></li>
   <li><a href="https://www.mendeley.com/import/?url={{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value, _external=True) }}"><i class="fa fa-external-link"></i> Mendeley</a></li>
+  {%- for mimetype, format_description in (record | derived_metadata_from_record).items() %}
+    <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='dm', mimetype=mimetype) }}">{{ format_description }}</a></li>
+  {%- endfor %}
 </ul>

@@ -46,6 +46,8 @@ from werkzeug.utils import import_string
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
+from zenodo.modules.deposit.api import ZenodoDeposit
+from zenodo.modules.deposit.views_rest import _metadata_file_key, _metadata_key_prefix, _mimetype_whitelist
 
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
@@ -79,6 +81,17 @@ def is_embargoed(embargo_date, accessright=None):
     if embargo_date is not None:
         return AccessRight.is_embargoed(embargo_date)
     return False
+
+
+@blueprint.app_template_filter('derived_metadata_from_record')
+def derived_metadata_from_record(record):
+    """."""
+    whitelist = _mimetype_whitelist()
+    deposit = ZenodoDeposit.get_record(record.depid.object_uuid)
+    avaiable_mimetypes = (f.key.replace(_metadata_key_prefix(), '')
+                          for f in deposit.files
+                          if f['key'].startswith(_metadata_key_prefix()))
+    return {m: whitelist[m] for m in avaiable_mimetypes}
 
 
 @blueprint.app_template_filter('pidstatus')

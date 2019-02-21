@@ -46,8 +46,8 @@ from invenio_sipstore.models import SIP as SIPModel
 from invenio_sipstore.models import RecordSIP as RecordSIPModel
 
 from zenodo.modules.communities.api import ZenodoCommunity
-from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
-    ZenodoRecord
+from zenodo.modules.records.api import MetaFilesMixin, ZenodoFileObject, \
+    ZenodoFilesIterator, ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
     zenodo_concept_doi_minter, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed, \
@@ -73,7 +73,7 @@ PRESERVE_FIELDS = (
 """Fields which will not be overwritten on edit."""
 
 
-class ZenodoDeposit(Deposit):
+class ZenodoDeposit(Deposit, MetaFilesMixin):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject

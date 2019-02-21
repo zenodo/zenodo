@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2019 CERN.
+# Copyright (C) 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,19 +22,24 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Records."""
+"""OAuth2 deposit scopes."""
 
 from __future__ import absolute_import, print_function
 
-ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
-"""Maximum quota per bucket."""
+from flask_babelex import lazy_gettext as _
 
-ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
-"""Maximum file size accepted."""
+from invenio_deposit.scopes import DepositScope
 
-ZENODO_METAFILE_MIMETYPE_WHITELIST = {
-    'application/vnd.plazi+xml': 'Plazi XML',
-    'application/dwca+xml': 'Darwin Core XML',
-}
+metadata_read_scope = DepositScope(
+    'metadata_read',
+    help_text=_('Allow reading supplementary deposit metadata files.'),
+    internal=True,
+)
+"""Allow reading supplementary deposit metadata files."""
 
-ZENODO_METAFILE_KEY_PREFIX = '.hidden/'
+metadata_write_scope = DepositScope(
+    'metadata_write',
+    help_text=_('Allow writing supplementary deposit metadata files.'),
+    internal=True,
+)
+"""Allow writing supplementary deposit metadata files."""
