@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -31,6 +31,7 @@ import os
 from io import SEEK_END, SEEK_SET
 
 import click
+from flask import current_app
 from flask.cli import with_appcontext
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
@@ -44,7 +45,8 @@ from zenodo.modules.records.resolvers import record_resolver
 
 from .grants import OpenAIREGrantsDump
 from .openaire import create_communities, fetch_communities_mapping,\
-    get_new_communites, OpenAIRECommunitiesMappingUpdater
+    get_new_communites, OpenAIRECommunitiesMappingUpdater, \
+    update_communities_mapping
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
     sync_record_oai, update_oaisets_cache, update_search_pattern_sets
 
@@ -427,3 +429,32 @@ def detect_new_communities(create):
 
     click.secho('{0}'.format(json.dumps(new_communities, indent=4,
                                         separators=(', ', ': '))), fg='blue')
+
+
+@utils.command('sync_community_mappings')
+@click.option('--update', '-u', is_flag=True)
+@with_appcontext
+def sync_community_mappings(update):
+    """Compare the current community mapping with the new OpenAIRE mapping.
+
+    If the flag is set, it will print the updated community mapping.
+    """
+    # 1) fetch OpenAIRE communities
+    # 2) compare current mapping with the new mapping
+    # 3) if the flag is set, return the updated mapping
+    # 4) print the list of the new communities
+
+    new_mapping = fetch_communities_mapping()
+    current_mapping = current_app.config['ZENODO_OPENAIRE_COMMUNITIES']
+    updated_mapping, diff, unresolved_comm = \
+        update_communities_mapping(current_mapping, new_mapping)
+
+    click.secho('Diff between current and new mappings: {0}'
+                .format(json.dumps(diff, indent=4, separators=(', ', ': '))),
+                fg='blue')
+
+    if update:
+        click.secho('Updated OpenAIRE communities mapping: {0}'
+                    .format(json.dumps(updated_mapping, indent=4,
+                                       separators=(', ', ': '))),
+                    fg='blue')
