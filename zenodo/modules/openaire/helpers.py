@@ -161,9 +161,10 @@ def resolve_openaire_communities(communities):
     """Resolve a Zenodo communities list to an OpenAIRE communities set."""
     openaire_comms = set()
     for comm in communities:
-        oa_comm = current_openaire.inverse_openaire_community_map.get(comm)
-        if oa_comm:
-            openaire_comms.add(oa_comm)
+        oa_comms = current_openaire.inverse_openaire_community_map.get(comm)
+        if oa_comms:
+            for oa_comm in oa_comms:
+                openaire_comms.add(oa_comm)
     return openaire_comms
 
 

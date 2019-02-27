@@ -162,7 +162,7 @@ function openaireSubtype(openAIRE) {
       var openaireComms = [];
       _.each(modelCommunities, function(comm) {
         if (comm.identifier in $scope.openAIRECommunitiesMapping) {
-          openaireComms.push($scope.openAIRECommunitiesMapping[comm.identifier]);
+          openaireComms = openaireComms.concat($scope.openAIRECommunitiesMapping[comm.identifier]);
         }
       });
       return _.uniq(openaireComms);

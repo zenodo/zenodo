@@ -23,7 +23,7 @@
                   <span class="muted"><small><em>No description</em></small></span>
                 </div>
                 <div ng-if="openAIRECommunitiesMapping[item.id]" class="openaire-community">
-                  <span ng-bind-html="('<small>' + 'Indexed in OpenAIRE ' + openAIRECommunities[openAIRECommunitiesMapping[item.id]].name|limitToEllipsis:80|highlight:$select.search)+ '</small>'"></span>
+                  <span ng-bind-html="('<small>' + 'Indexed in OpenAIRE ' + (openAIRECommunitiesMapping[item.id] | formatOpenAIRECommunities:openAIRECommunities)|limitToEllipsis:150|highlight:$select.search + '</small>')"></span>
                 </div>
               </div>
             </div>
@@ -54,4 +54,5 @@
         </div>
       </div>
     </div>
+  </div>
 </communities-select>

@@ -136,7 +136,7 @@ def default_config(tmp_db_path):
         },
         'bar': {
             'name': 'Bar Association Resources',
-            'communities': ['c3', ],
+            'communities': ['c3', 'c1'],
             'types': {
                 'software': [
                     {'id': 'bar:t3', 'name': 'Bar sft type three'},
