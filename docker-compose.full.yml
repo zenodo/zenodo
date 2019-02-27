@@ -28,7 +28,6 @@ services:
       - es
       - mq
       - db
-      - statsd
     volumes_from:
       - static
   worker:
@@ -42,7 +41,6 @@ services:
       - es
       - mq
       - db
-      - statsd
     volumes_from:
       - static
   static:
@@ -64,6 +62,12 @@ services:
       service: flower
     links:
       - mq
+  kibana:
+    extends:
+      file: docker-services.yml
+      service: kibana
+    links:
+      - es
   # Base services
   cache:
     extends:
@@ -81,9 +85,3 @@ services:
     extends:
       file: docker-services.yml
       service: es
-  kibana:
-    extends:
-      file: docker-services.yml
-      service: kibana
-    links:
-      - es
