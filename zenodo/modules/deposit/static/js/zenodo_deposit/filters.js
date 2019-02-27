@@ -42,7 +42,7 @@ function fieldtitle() {
     }
     return title;
   };
-};
+}
 
 function notIn($filter) {
   return function(srcArray, filterArray, srcKey, filterKey){
@@ -56,8 +56,8 @@ function notIn($filter) {
       });
     }
     return srcArray;
-  }
-};
+  };
+}
 
 
 function formatGrant() {
@@ -67,8 +67,8 @@ function formatGrant() {
     }
     var result = (grant.acronym && grant.acronym + ' ') || '';
     return result + '(' + grant.code + ') - ' + grant.title;
-  }
-};
+  };
+}
 
 
 function striptags() {
@@ -102,8 +102,23 @@ function checkAllFilesUploaded() {
       }
     });
     return incompleted_uploads;
- }
-};
+ };
+}
+
+function formatOpenAIRECommunities() {
+  return function (comm_ids, oa_comms) {
+    result = '';
+    if (comm_ids) {
+      result = [];
+      angular.forEach(comm_ids, function(comm_id) {
+        oa_comm = oa_comms[comm_id].name
+        result.push(oa_comm)
+      });
+      result = result.join(', ') + '.';
+    }
+    return result;
+  };
+}
 
 angular.module('invenioRecords')
   .filter('fieldtitle', fieldtitle)
@@ -112,4 +127,5 @@ angular.module('invenioRecords')
   .filter('limitToEllipsis', limitToEllipsis)
   .filter('striptags', striptags)
   .filter('stable', stable)
-  .filter('checkAllFilesUploaded',checkAllFilesUploaded);
+  .filter('checkAllFilesUploaded',checkAllFilesUploaded)
+  .filter('formatOpenAIRECommunities', formatOpenAIRECommunities);
