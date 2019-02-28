@@ -40,10 +40,10 @@
           {{ form.csrf_token }}
           <div class="contact">
             <div class="row">
-              {{ render_form_field(form.name, input_extras={'disabled': True} if form.name.data else {}) }}
+              {{ render_form_field(form.name, input_extras={'disabled': True} if user else {}) }}
             </div>
             <div class="row">
-              {{ render_form_field(form.email, input_extras={'disabled': True} if form.email.data else {}) }}
+              {{ render_form_field(form.email, input_extras={'disabled': True} if user else {}) }}
             </div>
             <div class="row">
               {{ render_form_field(form.issue_category) }}
