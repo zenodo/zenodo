@@ -756,6 +756,70 @@
               {
                 "value": "Other",
                 "name": "Other"
+              },
+              {
+                "value": "Distributor",
+                "name": "Distributor"
+              },
+              {
+                "value": "Funder",
+                "name": "Funder"
+              },
+              {
+                "value": "HostingInstitution",
+                "name": "Hosting institution"
+              },
+              {
+                "value": "Producer",
+                "name": "Producer"
+              },
+              {
+                "value": "ProjectLeader",
+                "name": "Project leader"
+              },
+              {
+                "value": "ProjectManager",
+                "name": "Project manager"
+              },
+              {
+                "value": "ProjectMember",
+                "name": "Project member"
+              },
+              {
+                "value": "RegistrationAgency",
+                "name": "Registration agency"
+              },
+              {
+                "value": "RegistrationAuthority",
+                "name": "Registration authority"
+              },
+              {
+                "value": "RelatedPerson",
+                "name": "Related person"
+              },
+              {
+                "value": "ResearchGroup",
+                "name": "Research group"
+              },
+              {
+                "value": "RightsHolder",
+                "name": "Rights holder"
+              },
+              {
+                "value": "Researcher",
+                "name": "Researcher"
+              },
+              {
+                "value": "Sponsor",
+                "name": "Sponsor"
+              },
+              {
+                "value": "Supervisor",
+                "name": "Supervisor"
+              },
+              {
+                "value": "WorkPackageLeader",
+                "name": "Work package leader"
               }
             ]
           }
