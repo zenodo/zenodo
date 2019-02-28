@@ -630,6 +630,14 @@
                 "name": "references this upload"
               },
               {
+                "value": "continues",
+                "name": "is continued by this upload"
+              },
+              {
+                "value": "isContinuedBy",
+                "name": "continues this upload"
+              },
+              {
                 "value": "isNewVersionOf",
                 "name": "is previous version of this upload"
               },
@@ -644,6 +652,14 @@
               {
                 "value": "hasPart",
                 "name": "is part of this upload"
+              },
+              {
+                "value": "isMetadataFor",
+                "name": "has metadata in this upload"
+              },
+              {
+                "value": "hasMetadata",
+                "name": "has metadata of this upload"
               },
               {
                 "value": "isDocumentedBy",
@@ -662,12 +678,36 @@
                 "name": "compiled/created this upload"
               },
               {
+                "value": "isVariantFormOf",
+                "name": "has this upload as its variant form"
+              },
+              {
                 "value": "isIdenticalTo",
                 "name": "is identical to this upload"
               },
               {
+                "value": "isOrignialFormOf",
+                "name": "has this upload as its original form"
+              },
+              {
                 "value": "isAlternateIdentifier",
                 "name": "is an alternate identifier of this upload"
+              },
+              {
+                "value": "isSourceOf",
+                "name": "has this upload as its source"
+              },
+              {
+                "value": "isDerivedFrom",
+                "name": "derives this upload"
+              },
+              {
+                "value": "reviews",
+                "name": "is reviewed by this upload"
+              },
+              {
+                "value": "isReviewedBy",
+                "name": "reviews this upload"
               }
             ]
           }
