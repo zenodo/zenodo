@@ -350,10 +350,13 @@ def test_edit_doi(api_client, db, es, locations, json_auth_headers,
     res = client.put(links['self'], data=json.dumps(data), headers=headers)
     assert res.status_code == 400
 
-    # Update api returns the data with no doi field
+    # Update api accepts data with no doi field
     del data['metadata']['doi']
     res = client.put(links['self'], data=json.dumps(data), headers=headers)
-    assert res.status_code == 400
+    assert res.status_code == 200
+    data = get_json(res, code=200)
+    assert data['doi'] == '10.1234/bar'
+    assert data['metadata']['doi'] == '10.1234/bar'
 
     # Update
     data['metadata']['doi'] = '10.4321/foo'
