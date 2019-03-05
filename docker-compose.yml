@@ -17,10 +17,3 @@ services:
     extends:
       file: docker-services.yml
       service: es
-  # Monitoring
-  flower:
-    extends:
-      file: docker-services.yml
-      service: flower
-    links:
-      - mq

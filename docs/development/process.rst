@@ -167,24 +167,34 @@ a clean virtual environment and install the current requirements.
 
 .. code-block:: console
 
-    $ mkvirtualenv zenodo-req
-    (zenodo-req)$ cdvirtualenv
+    $ mkvirtualenv zenodo-current
+    (zenodo-current)$ cdvirtualenv
     # Install current requirements
-    (zenodo-req)$ pip install -r <path to>/src/zenodo/requirements.txt
-    (zenodo-req)$ pip freeze > req-current.txt
+    (zenodo-current)$ pip install -r <path to>/src/zenodo/requirements.txt
+    (zenodo-current)$ pip freeze > reqs-current.txt
+    (zenodo-current)$ deactivate
+    $ rmvirtualenv zenodo-current
 
-Next we use ``pip-tools`` to review and install all updated requirements.
-Please be aware that requirements in
+The quick way to update the packages is to create a new virtualenv and to
+install the latest packages version. Please be aware that requirements in
 ``src/zenodo/requirements.pinned.txt`` should not be updated without also
 fixing the issues in Zenodo or the related package.
 
 .. code-block:: console
 
-    (zenodo-req)$ pip install pip-tools
-    (zenodo-req)$ pip-review --interactive
-    (zenodo-req)$ pip freeze > req-new.txt
+    $ mkvirtualenv zenodo-update
+    (zenodo-update)$ pip install -e .[postgres,elasticsearch2]
+    (zenodo-update)$ pip freeze > reqs-update.txt
     # Diff current vs new requirements
-    (zenodo-req)$ diff req-current.txt req-new.txt
+    (zenodo-update)$ diff reqs-current.txt reqs-update.txt
+
+If you want to have a closer look at the changes and dependency relationships,
+use ``pip-tools`` to review and install all updated requirements.
+
+.. code-block:: console
+
+    (zenodo-update)$ pip install pip-tools
+    (zenodo-update)$ pip-compile
 
 Now manually update ``src/zenodo/requirements.txt`` with changes displayed
 in the diff.
