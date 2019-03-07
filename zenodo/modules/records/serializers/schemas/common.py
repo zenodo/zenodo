@@ -67,7 +67,7 @@ URLS = {
     'funder': '{base}/funders/{id}',
     'grant': '{base}/grants/{id}',
     'object': '{base}/files/{bucket}/{key}',
-    'deposit_html': '{base}/deposits/{id}',
+    'deposit_html': '{base}/deposit/{id}',
     'deposit': '{base}/deposit/depositions/{id}',
     'record_html': '{base}/record/{id}',
     'record_file': '{base}/record/{id}/files/{filename}',
@@ -569,7 +569,7 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                         links['latest_draft'] = api_link_for(
                             'deposit', id=draft_child_depid['pid_value'])
                         links['latest_draft_html'] = ui_link_for(
-                            'deposit', id=draft_child_depid['pid_value'])
+                            'deposit_html', id=draft_child_depid['pid_value'])
         return links
 
     @post_load(pass_many=False)
