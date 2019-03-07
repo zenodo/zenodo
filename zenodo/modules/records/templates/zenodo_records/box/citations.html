@@ -25,7 +25,7 @@
 {% set show_betafeature = 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
 {% set show_citations = current_user.has_role('admin') or config['ZENODO_RECORDS_UI_CITATIONS_ENABLE'] %}
 
-{%- if  show_citations or show_betafeature %}
+{%- if record.doi and (show_citations or show_betafeature) %}
 {% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy", "id": record.doi } %}
 
 <div id="citations">
