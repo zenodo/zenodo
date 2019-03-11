@@ -46,7 +46,7 @@ def _serialize_identifiers(ids, relations=None):
     """
     relations = relations or []
     ids = [{'@type': 'CreativeWork',
-             '@id': idutils.to_url(i['identifier'], i['scheme'])}
+             '@id': idutils.to_url(i['identifier'], i['scheme'], 'https')}
             for i in ids if (not relations or i['relation'] in relations) and 'scheme' in i]
     return [id_ for id_ in ids if id_['@id']]
 
@@ -54,7 +54,7 @@ def _serialize_identifiers(ids, relations=None):
 def _serialize_subjects(ids):
     """Serialize subjects to URLs."""
     return [{'@type': 'CreativeWork',
-             '@id': idutils.to_url(i['identifier'], i['scheme'])}
+             '@id': idutils.to_url(i['identifier'], i['scheme'], 'https')}
             for i in ids if 'scheme' in i]
 
 
@@ -79,7 +79,7 @@ class Person(Schema):
         if orcid:
             return idutils.to_url(orcid, 'orcid', 'https')
         if gnd:
-            return idutils.to_url(gnd, 'gnd')
+            return idutils.to_url(gnd, 'gnd', 'https')
         return missing
 
 
@@ -162,7 +162,7 @@ class CreativeWork(Schema):
     def get_doi(self, obj):
         """Get DOI of the record."""
         data = obj['metadata']
-        return idutils.to_url(data['doi'], 'doi') \
+        return idutils.to_url(data['doi'], 'doi', 'https') \
             if data.get('doi') \
             else missing
 

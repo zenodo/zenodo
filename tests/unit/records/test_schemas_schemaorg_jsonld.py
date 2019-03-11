@@ -102,7 +102,7 @@ def test_person():
     assert data == {'name': 'Doe, John',
                     'affiliation': 'CERN',
                     '@type': 'Person',
-                    '@id': 'http://d-nb.info/gnd/170118215'}
+                    '@id': 'https://d-nb.info/gnd/170118215'}
 
     # Add ORCID - it should supersede GND as the identifier
     simple_person['orcid'] = '0000-0002-1825-0097'
@@ -190,11 +190,11 @@ def test_full_record(record_with_files_creation):
                 u'@type': u'CreativeWork'
             },
             {
-                u'@id': 'http://arxiv.org/abs/arXiv:1234.4321',
+                u'@id': 'https://arxiv.org/abs/arXiv:1234.4321',
                 u'@type': u'CreativeWork'
             },
             {
-                '@id': 'http://arxiv.org/abs/arXiv:1234.4328',
+                '@id': 'https://arxiv.org/abs/arXiv:1234.4328',
                 '@type': 'CreativeWork'
             }
         ],
@@ -235,7 +235,7 @@ def test_full_record(record_with_files_creation):
                 u'name': u'Smith, John'
             },
             {
-                u'@id': 'http://d-nb.info/gnd/170118215',
+                u'@id': 'https://d-nb.info/gnd/170118215',
                 u'@type': u'Person',
                 u'affiliation': u'CERN',
                 u'name': u'Nowak, Jack'
@@ -252,8 +252,8 @@ def test_full_record(record_with_files_creation):
             u'name': u'English'
         },
         u'sameAs': [
-            u'http://arxiv.org/abs/arXiv:1234.4325',
-            u'http://adsabs.harvard.edu/abs/2011ApJS..192...18K',
+            u'https://arxiv.org/abs/arXiv:1234.4325',
+            u'https://ui.adsabs.harvard.edu/#abs/2011ApJS..192...18K',
             u'https://doi.org/10.1234/alternate.doi',
         ],
         u'isPartOf': [
