@@ -101,7 +101,7 @@ html5lib==1.0.1
 httpretty==0.8.14
 humanize==0.5.1
 idna==2.6
-IDUtils==1.0.0
+IDUtils==1.1.2
 infinity==1.4
 intervals==0.8.1
 invenio-access==1.0.0

@@ -151,7 +151,7 @@ def zenodo_related_links(record, communities):
     """Get logos for related links."""
     def apply_rule(item, rule):
         r = copy.deepcopy(rule)
-        r['link'] = idutils.to_url(item['identifier'], item['scheme'])
+        r['link'] = idutils.to_url(item['identifier'], item['scheme'], 'https')
         return r
 
     def match_rules(item):

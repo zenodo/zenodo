@@ -494,12 +494,12 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         doi = m.get('doi')
         if doi:
             links['badge'] = ui_link_for('badge', doi=quote(doi))
-            links['doi'] = idutils.to_url(doi, 'doi')
+            links['doi'] = idutils.to_url(doi, 'doi', 'https')
 
         conceptdoi = m.get('conceptdoi')
         if conceptdoi:
             links['conceptbadge'] = ui_link_for('badge', doi=quote(conceptdoi))
-            links['conceptdoi'] = idutils.to_url(conceptdoi, 'doi')
+            links['conceptdoi'] = idutils.to_url(conceptdoi, 'doi', 'https')
 
         files = m.get('_files', [])
         for f in files:
