@@ -32,6 +32,12 @@ from invenio_records_rest.serializers.datacite import OAIDataCiteSerializer
 from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
+from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
+from zenodo.modules.records.serializers.datacite import ZenodoDataCite31Serializer, \
+    ZenodoDataCite41Serializer
+from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
+from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
+
 from .bibtex import BibTeXSerializer
 from .files import files_responsify
 from .json import ZenodoJSONSerializer as JSONSerializer
@@ -41,14 +47,9 @@ from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1, DataCiteSchemaV4
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
-from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
-    LegacyRecordSchemaV1, DepositFormSchemaV1
+from .schemas.legacyjson import DepositFormSchemaV1, FileSchemaV1, \
+    GitHubRecordSchemaV1, LegacyRecordSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
-from zenodo.modules.records.serializers.datacite import \
-    ZenodoDataCite31Serializer, ZenodoDataCite41Serializer
-from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
-from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
-from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
 
 # Serializers
 # ===========

@@ -36,8 +36,8 @@ from werkzeug.routing import BuildError
 from zenodo.modules.records.utils import is_deposit
 from zenodo.modules.stats.utils import get_record_stats
 
-from . import common
 from ...models import AccessRight, ObjectType
+from . import common
 
 
 class StrictKeysSchema(Schema):

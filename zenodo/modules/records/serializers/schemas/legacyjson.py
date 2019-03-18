@@ -38,9 +38,9 @@ from werkzeug.routing import BuildError
 from zenodo.modules.records.models import AccessRight, ObjectType
 from zenodo.modules.records.utils import is_valid_openaire_type
 
-from . import common
 from ...minters import doi_generator
 from ..fields import DOILink, SanitizedUnicode, SanitizedUrl
+from . import common
 
 
 class FileSchemaV1(Schema):

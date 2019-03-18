@@ -30,9 +30,9 @@ from .datetime import DateString
 from .doi import DOI, DOILink
 from .html import SanitizedHTML
 from .persistentid import PersistentId
-from .trimmedstring import TrimmedString
 from .sanitizedunicode import SanitizedUnicode
 from .sanitizedurl import SanitizedUrl
+from .trimmedstring import TrimmedString
 
 __all__ = (
     'DateString',

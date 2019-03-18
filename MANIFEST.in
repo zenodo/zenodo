@@ -62,3 +62,6 @@ recursive-include zenodo *.xcf
 recursive-include zenodo *.xsl
 recursive-include zenodo *.xml
 recursive-include zenodo *.xsd
+
+# added by check_manifest.py
+recursive-include tests *.gz
