@@ -364,8 +364,10 @@ def records_ui_export(pid, record, template=None, **kwargs):
 
 def _can_curate(community, user, record, accepted=False):
     """Determine whether user can curate given community."""
-    if (community.id_user == user.get_id()) or \
-            (accepted and (user.get_id() in record.get('owners', []))):
+    if user.is_anonymous:
+        return False
+    if (community.id_user == int(user.get_id())) or \
+            (accepted and (int(user.get_id()) in record.get('owners', []))):
         return True
     return False
 
