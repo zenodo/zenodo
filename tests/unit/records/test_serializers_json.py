@@ -72,8 +72,8 @@ def test_closed_access_record_serializer(api, users, json_headers,
     # admin user
     dict(email='admin@zenodo.org', password='admin'),
 ])
-def test_closed_access_record_serializer(api, users, json_headers, user_info,
-                                         closed_access_record):
+def test_closed_access_record_search_serializer(
+        api, users, json_headers, user_info, closed_access_record):
     """Test closed access record serialisation of the search result."""
     with api.test_request_context():
         with api.test_client() as client:

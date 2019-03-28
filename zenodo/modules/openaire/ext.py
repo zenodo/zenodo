@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from collections import defaultdict
+
 from werkzeug.utils import cached_property
 
 from . import config
