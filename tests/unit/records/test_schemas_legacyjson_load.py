@@ -176,6 +176,17 @@ def test_related_alternate_identifiers():
     ]
 
 
+def test_identifier_schemes(app, db, es, locations, license_record,
+                            sample_identifiers):
+    """Test supported identifier schemes."""
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
+    result = s.load(d(related_identifiers=[
+        {'identifier': _id, 'scheme': scheme, 'relation': 'references'}
+        for scheme, (_id, _) in sample_identifiers.items()
+    ]))
+    ZenodoDeposit.create(result.data).validate()
+
+
 @pytest.mark.parametrize('relation', [
     'IsCitedBy',
     'invalid',

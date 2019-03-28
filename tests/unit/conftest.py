@@ -1130,3 +1130,57 @@ def g_tester_id(app, db):
     )
     db.session.commit()
     return tester.id
+
+
+@pytest.fixture
+def sample_identifiers():
+    """Sample of various identifiers."""
+    return {
+        'ads': ('ads:2011ApJS..192...18K',
+                'https://ui.adsabs.harvard.edu/#abs/2011ApJS..192...18K'),
+        'ark': ('ark:/13030/tqb3kh97gh8w', ''),
+        'arxiv': ('hep-th/1601.07616',
+                  'https://arxiv.org/abs/arXiv:1601.07616'),
+        'bioproject': ('PRJNA224116',
+                       'https://www.ebi.ac.uk/ena/data/view/PRJNA224116'),
+        'biosample': ('SAMN08289383',
+                      'https://www.ebi.ac.uk/ena/data/view/SAMN08289383'),
+        'doi': ('10.1002/example',
+                'https://doi.org/10.1002/example'),
+        'ean13': ('4006381333931', ''),
+        'ean8': ('73513537', ''),
+        'ensembl': ('ENSMUST00000017290',
+                    'https://www.ensembl.org/id/ENSMUST00000017290'),
+        'genome': ('GCF_000001405.38',
+                   'https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.38'),
+        'gnd': ('4079154-3',
+                'https://d-nb.info/gnd/4079154-3'),
+        'hal': ('mem_13102590',
+                'https://hal.archives-ouvertes.fr/mem_13102590'),
+        'handle': ('10013/epic.10033',
+                   'https://hdl.handle.net/10013/epic.10033'),
+        'isbn': ('0-9752298-0-X', ''),
+        'isni': ('1422-4586-3573-0476', ''),
+        'issn': ('1188-1534', ''),
+        'istc': ('0A9 2002 12B4A105 7', ''),
+        'lsid': ('urn:lsid:ubio.org:namebank:11815', ''),
+        'orcid': ('0000-0002-1694-233X',
+                  'https://orcid.org/0000-0002-1694-233X'),
+        'pmcid': ('PMC2631623',
+                  'https://www.ncbi.nlm.nih.gov/pmc/PMC2631623'),
+        'pmid': ('pmid:12082125',
+                 'https://www.ncbi.nlm.nih.gov/pubmed/12082125'),
+        'purl': ('http://purl.oclc.org/foo/bar',
+                 'http://purl.oclc.org/foo/bar'),
+        'refseq': ('NZ_JXSL01000036.1',
+                   'https://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi'
+                   '?val=NZ_JXSL01000036.1'),
+        'sra': ('SRR6437777',
+                'https://www.ebi.ac.uk/ena/data/view/SRR6437777'),
+        'uniprot': ('Q9GYV0',
+                    'https://purl.uniprot.org/uniprot/Q9GYV0'),
+        'url': ('http://www.heatflow.und.edu/index2.html',
+                'http://www.heatflow.und.edu/index2.html'),
+        'urn': ('urn:nbn:de:101:1-201102033592',
+                'https://nbn-resolving.org/urn:nbn:de:101:1-201102033592'),
+    }
