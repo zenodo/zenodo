@@ -655,7 +655,7 @@
               },
               {
                 "value": "compiles",
-                "name": "is compiled/create by this upload"
+                "name": "is compiled/created by this upload"
               },
               {
                 "value": "isCompiledBy",
