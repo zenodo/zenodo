@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
+import json
 from operator import itemgetter
 
 import idutils
@@ -50,6 +51,7 @@ from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
+from .serializers.json import ZenodoJSONSerializer
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -347,7 +349,12 @@ def records_ui_export(pid, record, template=None, **kwargs):
             'zenodo_records/records_export_unsupported.html'), 410
     else:
         serializer = import_string(formats[fmt]['serializer'])
-        data = serializer.serialize(pid, record)
+        # Pretty print if JSON
+        if isinstance(serializer, ZenodoJSONSerializer):
+            json_data = serializer.transform_record(pid, record)
+            data = json.dumps(json_data, indent=2, separators=(', ', ': '))
+        else:
+            data = serializer.serialize(pid, record)
         if isinstance(data, six.binary_type):
             data = data.decode('utf8')
 
