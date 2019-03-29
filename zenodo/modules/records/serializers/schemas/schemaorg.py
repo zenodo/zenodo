@@ -92,7 +92,9 @@ class Language(Schema):
 
     def get_name(self, obj):
         """Get the language human-readable name."""
-        return pycountry.languages.get(alpha_3=obj).name
+        lang = pycountry.languages.get(alpha_3=obj)
+        if lang:
+            return lang.name
 
     def get_alternate_name(self, obj):
         """Get the lanugage code."""

@@ -45,8 +45,8 @@ tests_require = [
     'selenium>=3.5.0,<3.6.0',
 ]
 
-db_version = '>=1.0.0'
-search_version = '>=1.0.0'
+db_version = '>=1.0.3'
+search_version = '>=1.0.2'
 
 extras_require = {
     'docs': [
@@ -89,29 +89,30 @@ extras_require['xrootd'] = [
 ]
 
 setup_requires = [
-    'Babel>=2.4.0',
+    'Babel>=2.6.0',
     'pytest-runner>=2.7.0',
 ]
 
 install_requires = [
     'arrow>=0.13.0',
-    'bleach>=2.1.3',
+    'bleach>=3.1.0',
     'CairoSVG>=1.0.22,<2.0.0',
     'citeproc-py-styles>=0.1.1',
     'citeproc-py>=0.4.0',
     'datacite>=1.0.1',
     'dcxml>=0.1.1',
     'dojson>=1.3.2',
-    'Flask>=0.12.4',
     'Flask-Admin>=1.5.3',
     'Flask-BabelEx>=0.9.3',
-    'Flask-Caching>=1.3.2',
+    'Flask-Caching>=1.6.0',
     'Flask-Debugtoolbar>=0.10.1',
+    'Flask>=1.0.2',
     'ftfy>=4.4.3,<5',
+    'httpretty>=0.9.6',
     'idutils>=1.1.2',
     'invenio-access>=1.1.0',
     'invenio-accounts>=1.1.1',
-    'invenio-admin>=1.0.0,<1.1.0',
+    'invenio-admin>=1.0.1,<1.1.0',
     'invenio-app>=1.1.0',
     'invenio-assets>=1.0.0,<1.1.0',
     'invenio-base>=1.0.2',
@@ -137,33 +138,32 @@ install_requires = [
     'invenio-oauthclient[github]>=1.1.2',
     'invenio-openaire>=1.0.0a13',
     'invenio-opendefinition>=1.0.0a8',
-    'invenio-queues>=1.0.0a1',
     'invenio-pidrelations>=1.0.0a4',
     'invenio-pidstore>=1.0.0',
     'invenio-previewer>=1.0.0a11',
-    'invenio-records>=1.1.0',
+    'invenio-queues>=1.0.0a1',
     'invenio-records-files>=1.0.0a11',
     'invenio-records-rest>=1.4.0',
     'invenio-records-ui>=1.0.1',
+    'invenio-records>=1.1.0',
     'invenio-rest>=1.0.0',
-    'invenio-search>=1.0.0',
     'invenio-search-ui>=1.0.1,<1.1.0',
+    'invenio-search>=1.0.0',
     'invenio-sipstore>=1.0.0a7',
     'invenio-stats>=1.0.0a10',
     'invenio-theme>=1.0.0,<1.1.0',
     'invenio-userprofiles>=1.0.1',
     'invenio-webhooks>=1.0.0a4',
-    'httpretty>=0.8.14',
     'jsonref>=0.1',
     'jsonresolver>=0.2.1',
     'mock>=2.0.0',
-    'Pillow>=4.2.0',
-    'pycountry>=17.5.14',
-    'python-slugify>=1.2.4',
-    'raven>=6.3.0',
-    'sickle>=0.6.1',
-    'uwsgi>=2.0.15',
-    'uwsgitop>=0.10',
+    'Pillow>=5.4.1',
+    'pycountry>=18.12.8',
+    'python-slugify>=3.0.1',
+    'raven>=6.10.0',
+    'sickle>=0.6.4',
+    'uwsgi>=2.0.18',
+    'uwsgitop>=0.11',
     'wsgi-statsd>=0.3.1',
     'zenodo-accessrequests>=1.0.0a2',
 ]
@@ -207,7 +207,6 @@ setup(
         )
         ],
         'invenio_base.apps': [
-            'flask_debugtoolbar = flask_debugtoolbar:DebugToolbarExtension',
             'zenodo_auditor = zenodo.modules.auditor.ext:ZenodoAuditor',
             'zenodo_communities = '
             'zenodo.modules.communities.ext:ZenodoCommunities',

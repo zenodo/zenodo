@@ -299,10 +299,9 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     @validates('language')
     def validate_language(self, value):
         """Validate that language is ISO 639-3 value."""
-        try:
-            pycountry.languages.get(alpha_3=value)
-        except KeyError:
-            raise ValidationError(_('Language must be a lower-cased 3-letter ISO 639-3 string.'),
+        if not pycountry.languages.get(alpha_3=value):
+            raise ValidationError(
+                _('Language must be a lower-cased 3-letter ISO 639-3 string.'),
                 field_name=['language']
             )
 

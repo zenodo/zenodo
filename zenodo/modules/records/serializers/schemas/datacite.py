@@ -161,13 +161,10 @@ class DataCiteSchema(Schema):
         """Export language to the Alpha-2 code (if available)."""
         lang = obj['metadata'].get('language', None)
         if lang:
-            try:
-                l = pycountry.languages.get(alpha_3=lang)
-            except KeyError:
+            lang_res = pycountry.languages.get(alpha_3=lang)
+            if not lang_res or not hasattr(lang_res, 'alpha_2'):
                 return None
-            if not hasattr(l, 'alpha_2'):
-                return None
-            return l.alpha_2
+            return lang_res.alpha_2
         return None
 
     def get_descriptions(self, obj):
