@@ -1094,6 +1094,9 @@ SECURITY_PASSWORD_SCHEMES = [
 SECURITY_DEPRECATED_PASSWORD_SCHEMES = [
     'sha512_crypt', 'invenio_aes_encrypted_email']
 
+#: Session and User ID headers
+ACCOUNTS_USERINFO_HEADERS = True
+
 # Search
 # ======
 #: Default API endpoint for search UI.
