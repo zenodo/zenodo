@@ -23,7 +23,9 @@
     {"$ref": "https://zenodo.org/objecttypes/publication/thesis"},
     {"$ref": "https://zenodo.org/objecttypes/publication/technicalnote"},
     {"$ref": "https://zenodo.org/objecttypes/publication/workingpaper"},
-    {"$ref": "https://zenodo.org/objecttypes/publication/other"}
+    {"$ref": "https://zenodo.org/objecttypes/publication/other"},
+    {"$ref": "https://zenodo.org/objecttypes/publication/datamanagementplan"},
+    {"$ref": "https://zenodo.org/objecttypes/publication/annotationcollection"}
   ],
   "openaire": {
     "resourceType": "0001",
@@ -602,4 +604,44 @@
     "type": "publication"
   },
   "csl": "graphic"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-datamanagementplan",
+  "id": "https://zenodo.org/objecttypes/publication/datamanagementplan#",
+  "title": {
+    "en": "Data management plan"
+  },
+  "title_plural": {
+    "en": "Data management plans"
+  },
+  "schema.org": "https://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Data Management Plan"},
+  "eurepo": "info:eu-repo/semantics/technicalDocumentation",
+  "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0009",
+    "type": "publication"
+  },
+  "csl": "report"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-annotationcollection",
+  "id": "https://zenodo.org/objecttypes/publication/annotationcollection#",
+  "title": {
+    "en": "Annotation Collection"
+  },
+  "title_plural": {
+    "en": "Annotation Collections"
+  },
+  "schema.org": "https://schema.org/Collection",
+  "datacite": {"general": "Collection"},
+  "eurepo": "info:eu-repo/semantics/technicalDocumentation",
+  "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0009",
+    "type": "publication"
+  },
+  "csl": "report"
 }]

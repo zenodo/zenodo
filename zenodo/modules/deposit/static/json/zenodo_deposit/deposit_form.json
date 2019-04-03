@@ -77,6 +77,10 @@
         "condition": "model.upload_type == 'publication'",
         "titleMap": [
           {
+            "value": "annotationcollection",
+            "name": "Annotation collection"
+          },
+          {
             "value": "book",
             "name": "Book"
           },
@@ -87,6 +91,10 @@
           {
             "value": "conferencepaper",
             "name": "Conference paper"
+          },
+          {
+            "value": "datamanagementplan",
+            "name": "Data management plan"
           },
           {
             "value": "article",

@@ -355,6 +355,8 @@
           "thesis",
           "technicalnote",
           "workingpaper",
+          "datamanagementplan",
+          "annotationcollection",
           "other"
         ],
         "type": "string"
