@@ -683,6 +683,31 @@
       "title": "License",
       "type": "object"
     },
+    "locations": {
+      "description": "Geographical location.",
+      "items": {
+        "properties": {
+          "description": {
+            "description": "Place of the location",
+            "type": "string"
+          },
+          "lat": {
+            "description": "Latitude of the location.",
+            "type": "number"
+          },
+          "lon": {
+            "description": "Longitude of the location.",
+            "type": "number"
+          },
+          "place": {
+            "description": "Description of the location",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
     "meeting": {
       "description": "Associated meeting.",
       "properties": {
