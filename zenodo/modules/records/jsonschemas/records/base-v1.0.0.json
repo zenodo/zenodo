@@ -267,6 +267,36 @@
         "type": "string"
       }
     },
+    "locations": {
+      "description": "Geographical location.",
+      "items": {
+        "properties": {
+          "lat":{
+            "description": "Latitude of the location.",
+            "type": "number"
+          },
+          "lon":{
+            "description": "Longitude of the location.",
+            "type": "number"
+          },
+          "place":{
+            "description": "Description of the location",
+            "type": "string"
+          },
+          "description":{
+            "description": "Place of the location",
+            "type": "string"
+          }
+        },
+        "required": [
+          "lat",
+          "lon",
+          "place"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "subjects": {
       "description": "Subjects from specific vocabularies.",
       "type": "array",
