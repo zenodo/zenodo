@@ -221,6 +221,39 @@
         "$ref": "#/definitions/person_or_org"
       }
     },
+    "dates": {
+      "description": "Date interval.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "description": "Start date.",
+            "type": "string"
+          },
+          "end": {
+            "description": "End date.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the date interval.",
+            "enum": [
+              "Collected",
+              "Valid",
+              "Withdrawn"
+            ]
+          },
+          "description": {
+            "description": "Description of the date interval.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "type":"array"
+    },
     "description": {
       "description": "Description/abstract for record.",
       "type": "string"

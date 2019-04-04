@@ -264,6 +264,15 @@ class SubjectSchemaV1(IdentifierSchemaV1):
     term = SanitizedUnicode()
 
 
+class DateSchemaV1(Schema):
+    """Schema for date intervals."""
+
+    start = DateString()
+    end = DateString()
+    type = fields.Str(required=True)
+    description = fields.Str()
+
+
 class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     """Common metadata schema."""
 
@@ -272,6 +281,8 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     title = SanitizedUnicode(required=True, validate=validate.Length(min=3))
     creators = fields.Nested(
         PersonSchemaV1, many=True, validate=validate.Length(min=1))
+    dates = fields.List(
+        fields.Nested(DateSchemaV1), validate=validate.Length(min=1))
     description = SanitizedHTML(
         required=True, validate=validate.Length(min=3))
     keywords = fields.List(SanitizedUnicode())
@@ -304,6 +315,26 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 _('Language must be a lower-cased 3-letter ISO 639-3 string.'),
                 field_name=['language']
             )
+
+    @validates('dates')
+    def validate_dates(self, value):
+        """Validate that start date is before the corresponding end date."""
+        for interval in value:
+            start = arrow.get(interval.get('start'), 'YYYY-MM-DD').date() \
+                if interval.get('start') else None
+            end = arrow.get(interval.get('end'), 'YYYY-MM-DD').date() \
+                if interval.get('end') else None
+
+            if not start and not end:
+                raise ValidationError(
+                    _('There must be at least one date.'),
+                    field_names=['dates']
+                )
+            if start and end and start > end:
+                raise ValidationError(
+                    _('"start" date must be before "end" date.'),
+                    field_names=['dates']
+                )
 
     @validates('embargo_date')
     def validate_embargo_date(self, value):

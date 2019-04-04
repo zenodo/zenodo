@@ -590,6 +590,39 @@
       },
       "type": "array"
     },
+    "dates": {
+      "description": "Date interval.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "description": "Description of the date interval.",
+            "type": "string"
+          },
+          "end": {
+            "description": "End date.",
+            "type": "string"
+          },
+          "start": {
+            "description": "Start date.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the date interval.",
+            "enum": [
+              "Collected",
+              "Valid",
+              "Withdrawn"
+            ]
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "description": {
       "description": "Description/abstract for record.",
       "type": "string"
