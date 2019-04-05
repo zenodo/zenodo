@@ -152,7 +152,7 @@ requirements files which broadly fall in two categories:
    to either problems in Zenodo or problems in the related packages.
  - ``requirements.txt``: Base requirements for all installations (includes all above requirements files as well).
 
-.. _updateing_requirements:
+.. _updating_requirements:
 
 Updating Python requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -172,21 +172,34 @@ a clean virtual environment and install the current requirements.
     # Install current requirements
     (zenodo-current)$ pip install -r <path to>/src/zenodo/requirements.txt
     (zenodo-current)$ pip freeze > reqs-current.txt
+    # Delete the virtualenv
     (zenodo-current)$ deactivate
     $ rmvirtualenv zenodo-current
 
-The quick way to update the packages is to create a new virtualenv and to
-install the latest packages version. Please be aware that requirements in
+The quickest way to update the packages is to create a new virtualenv and to
+install the latest package versions. Please be aware that requirements in
 ``src/zenodo/requirements.pinned.txt`` should not be updated without also
 fixing the issues in Zenodo or the related package.
 
 .. code-block:: console
 
     $ mkvirtualenv zenodo-update
+    # Install from setup.py, to get latest versions of dependencies
     (zenodo-update)$ pip install -e .[postgres,elasticsearch2]
     (zenodo-update)$ pip freeze > reqs-update.txt
     # Diff current vs new requirements
     (zenodo-update)$ diff reqs-current.txt reqs-update.txt
+
+Now manually review the diff and update ``src/zenodo/requirements.txt``. Things
+to keep in mind:
+
+- If a dependency has a major or minor version bump (i.e. ``1.3.0 -> 2.0.0`` or
+  ``1.3.0`` -> ``1.5.0``), check the package's changelog for breaking changes,
+  deprecations and fixes.
+- If a dependency introduces a breaking change/feature that cannot easily be
+  fixed on our side, try to update only the minor/patch version and pin
+  appropriately in setup.py (e.g. if Flask ``1.1.x`` breaks something, put
+  ``'Flask>=1.0.0,<1.1.0'`` in ``install_requires``).
 
 If you want to have a closer look at the changes and dependency relationships,
 use ``pip-tools`` to review and install all updated requirements.
