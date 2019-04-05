@@ -31,7 +31,7 @@ import json
 import arrow
 import pycountry
 from flask import current_app
-from marshmallow import Schema, fields, post_dump
+from marshmallow import Schema, fields, missing, post_dump
 
 from ...models import ObjectType
 from ...utils import is_doi_locally_managed
@@ -82,6 +82,18 @@ class TitleSchema(Schema):
 class DateSchema(Schema):
     """Date schema."""
 
+    VALID_DATE_TYPES = {
+        'Accepted',
+        'Available',
+        'Copyrighted',
+        'Collected',
+        'Created',
+        'Issued',
+        'Submitted',
+        'Updated',
+        'Valid',
+    }
+
     date = fields.Str(attribute='date')
     dateType = fields.Str(attribute='type')
 
@@ -115,6 +127,8 @@ class RelatedIdentifierSchema(Schema):
 
 class DataCiteSchema(Schema):
     """Base class for schemas."""
+
+    DATE_SCHEMA = DateSchema
 
     identifier = fields.Method('get_identifier', attribute='metadata.doi')
     titles = fields.List(fields.Nested(TitleSchema), attribute='metadata')
@@ -279,23 +293,39 @@ class DataCiteSchema(Schema):
         return items
 
     def get_dates(self, obj):
-        """Get dates."""
-        s = DateSchema()
-
+        """Get dates from record."""
+        schema_cls = self.DATE_SCHEMA
+        schema = schema_cls()
+        dates = []
         if obj['metadata']['access_right'] == 'embargoed' and \
                 obj['metadata'].get('embargo_date'):
-            return [
-                s.dump(dict(
-                    date=obj['metadata']['embargo_date'],
-                    type='Available')).data,
-                s.dump(dict(
-                    date=obj['metadata']['publication_date'],
-                    type='Accepted')).data,
-            ]
-        else:
-            return [s.dump(dict(
+            dates.append(schema.dump(dict(
+                date=obj['metadata']['embargo_date'],
+                type='Available')).data)
+
+            dates.append(schema.dump(dict(
                 date=obj['metadata']['publication_date'],
-                type='Issued')).data, ]
+                type='Accepted')).data)
+        else:
+            dates.append(schema.dump(dict(
+                date=obj['metadata']['publication_date'],
+                type='Issued')).data)
+        for interval in obj['metadata'].get('dates', []):
+            date_type = interval.get('type')
+            if date_type in schema.VALID_DATE_TYPES:
+                start = interval.get('start') or ''
+                end = interval.get('end') or ''
+                if start != '' and end != '' and start == end:
+                    dates.append(schema.dump(dict(
+                        date=start,
+                        type=date_type,
+                        info=interval.get('description', missing))).data)
+                else:
+                    dates.append(schema.dump(dict(
+                        date=start + '/' + end,
+                        type=date_type,
+                        info=interval.get('description', missing))).data)
+        return dates
 
 
 class DataCiteSchemaV1(DataCiteSchema):
@@ -401,27 +431,48 @@ class PersonSchemav4(Schema):
 
 
 class CreatorSchemav4(PersonSchemav4):
-    """Creator schema."""
+    """Creator schema for v4."""
 
     creatorName = fields.Str(attribute='name')
 
 
 class ContributorSchemav4(PersonSchemav4):
-    """Contributor schema."""
+    """Contributor schema for v4."""
 
     contributorName = fields.Str(attribute='name')
     contributorType = fields.Str(attribute='type')
 
 
+class DateSchemaV4(DateSchema):
+    """Date schema for v4."""
+
+    VALID_DATE_TYPES = {
+        'Accepted',
+        'Available',
+        'Copyrighted',
+        'Collected',
+        'Created',
+        'Issued',
+        'Submitted',
+        'Updated',
+        'Valid',
+        'Withdrawn',
+        'Other',
+    }
+
+    dateInformation = fields.Str(attribute='info')
+
+
 class DataCiteSchemaV4(DataCiteSchema):
     """Schema for records v4 in JSON."""
+
+    DATE_SCHEMA = DateSchemaV4
 
     creators = fields.List(
         fields.Nested(CreatorSchemav4),
         attribute='metadata.creators')
 
     contributors = fields.Method('get_contributors')
-
     fundingReferences = fields.Method('get_fundingreferences')
 
     def get_contributors(self, obj):

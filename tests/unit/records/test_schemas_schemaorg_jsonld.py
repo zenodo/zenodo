@@ -272,7 +272,7 @@ def test_full_record(record_with_files_creation):
         u'license': u'https://creativecommons.org/licenses/by/4.0/',
         u'name': u'Test title',
         u'url': u'http://localhost/record/12345',
-        u'version': u'1.2.5'
+        u'version': u'1.2.5',
     }
     assert data == expected
 
