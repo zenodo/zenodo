@@ -110,6 +110,13 @@ class DublinCoreV1(Schema):
             dates.append(
                 u'info:eu-repo/date/embargoEnd/{0}'.format(
                     obj['metadata']['embargo_date']))
+        for interval in obj['metadata'].get('dates', []):
+            start = interval.get('start') or ''
+            end = interval.get('end') or ''
+            if start != '' and end != '' and start == end:
+                dates.append(start)
+            else:
+                dates.append(start + '/' + end)
 
         return dates
 

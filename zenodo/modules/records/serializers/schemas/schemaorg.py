@@ -123,6 +123,8 @@ class CreativeWork(Schema):
     # dateModified
     datePublished = DateString(attribute='metadata.publication_date')
 
+    temporal = fields.Method('get_dates')
+
     # NOTE: could also be  "author"
     creator = fields.Nested(Person, many=True, attribute='metadata.creators')
 
@@ -156,6 +158,18 @@ class CreativeWork(Schema):
 
     # NOTE: Zenodo communities?
     # sourceOrganization
+
+    def get_dates(self, obj):
+        """Get dates of the record."""
+        dates = []
+        for interval in obj['metadata'].get('dates', []):
+            start = interval.get('start') or '..'
+            end = interval.get('end') or '..'
+            if start != '..' and end != '..' and start == end:
+                dates.append(start)
+            else:
+                dates.append(start + '/' + end)
+        return dates or missing
 
     def get_context(self, obj):
         """Returns the value for '@context' value."""
