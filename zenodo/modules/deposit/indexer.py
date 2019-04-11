@@ -53,6 +53,7 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     :param index: Elasticsearch index name.
     :type index: str
     """
+
     if not index.startswith('deposits-records-'):
         return
 
@@ -97,6 +98,9 @@ def indexer_receiver(sender, json=None, record=None, index=None,
             relations = {'version': [{'is_last': True, 'index': 0}, ]}
         if relations:
             json['relations'] = relations
+
+    for loc in json.get('locations', []):
+        loc['point'] = {'lat': loc['lat'], 'lon': loc['lon']}
 
 
 def index_versioned_record_siblings(sender, action=None, pid=None,
