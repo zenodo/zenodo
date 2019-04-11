@@ -582,6 +582,24 @@
         },
         "updated": {
           "type": "date"
+        },
+        "dates": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "date"
+            },
+            "end": {
+              "type": "date"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
         }
       }
     }
