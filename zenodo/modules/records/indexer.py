@@ -68,6 +68,9 @@ def indexer_receiver(sender, json=None, record=None, index=None,
         if rels:
             json.setdefault('related_identifiers', []).extend(rels)
 
+    for loc in json.get('locations', []):
+        loc['point'] = {'lat': loc['lat'], 'lon': loc['lon']}
+
     # Remove internal data.
     if '_internal' in json:
         del json['_internal']

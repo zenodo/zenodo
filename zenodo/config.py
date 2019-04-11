@@ -61,9 +61,11 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_pidrelations.config import RelationType
 from invenio_records_rest.facets import terms_filter
+from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
+from zenodo.modules.records.facets import geo_bounding_box_filter
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
@@ -883,6 +885,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=6,
         ),
+        distance=dict(
+            title='Distance',
+            fields=[geolocation_sort('location.point', 'center', 'km')],
+            default_order='asc',
+            display=False,
+            order=2,
+        ),
         version=dict(
             # TODO: There are a lot of implications when sorting record results
             # by versions and using the `_score`... Maybe there's some
@@ -897,6 +906,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
 )
 DEPOSIT_REST_SORT_OPTIONS['deposits'].update(
     dict(
+        distance=dict(
+            title=_('Distance'),
+            fields=[geolocation_sort('location.point', 'center', 'km')],
+            default_order='asc',
+            display=False,
+            order=2,
+        ),
         version=dict(
             # FIXME: No `_score` in deposit search response...
             fields=['conceptrecid', 'relations.version.index'],
@@ -941,6 +957,8 @@ RECORDS_REST_FACETS = dict(
         filters=dict(
             communities=terms_filter('communities'),
             provisional_communities=terms_filter('provisional_communities'),
+            locations=geo_bounding_box_filter(
+                'locations', 'locations.point', type='indexed'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
@@ -951,6 +969,16 @@ RECORDS_REST_FACETS = dict(
         )
     )
 )
+
+#: Update deposit facets as well
+DEPOSIT_REST_FACETS['deposits'].setdefault('filters', {})
+DEPOSIT_REST_FACETS['deposits']['filters'].update(dict(
+    communities=terms_filter('communities'),
+    provisional_communities=terms_filter('provisional_communities'),
+    locations=geo_bounding_box_filter(
+        'locations', 'locations.point', type='indexed'),
+))
+
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
