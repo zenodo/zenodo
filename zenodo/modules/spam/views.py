@@ -29,8 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import islice
 
 from elasticsearch_dsl import Q
-from flask import Blueprint, abort, flash, redirect, render_template, \
-    request, url_for
+from flask import Blueprint, abort, flash, redirect, render_template, url_for
 from flask_login import login_required
 from flask_principal import ActionNeed
 from flask_security import current_user
@@ -61,7 +60,7 @@ def delete(user_id):
         abort(403)
 
     user = User.query.get(user_id)
-    deleteform = DeleteSpamForm(request.values)
+    deleteform = DeleteSpamForm()
     communities = Community.query.filter_by(id_user=user.id)
 
     rs = RecordsSearch(index='records').query(
