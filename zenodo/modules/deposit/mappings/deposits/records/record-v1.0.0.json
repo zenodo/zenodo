@@ -603,6 +603,20 @@
         },
         "method": {
           "type": "string"
+        },
+        "locations": {
+          "type": "object",
+          "properties": {
+            "place": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "point": {
+              "type": "geo_point"
+            }
+          }
         }
       }
     }

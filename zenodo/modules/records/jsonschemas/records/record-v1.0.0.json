@@ -726,7 +726,7 @@
             "type": "number"
           },
           "lon": {
-            "description": "Lontitude of the location.",
+            "description": "Longitude of the location.",
             "type": "number"
           },
           "place": {
