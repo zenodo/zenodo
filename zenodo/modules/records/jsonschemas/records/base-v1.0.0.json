@@ -530,6 +530,10 @@
         "type": "number"
       }
     },
+    "method": {
+      "description": "Information about the used Method",
+      "type": "string"
+    },
     "_oai": {
       "description": "OAI-PMH specific information.",
       "type": "object",
