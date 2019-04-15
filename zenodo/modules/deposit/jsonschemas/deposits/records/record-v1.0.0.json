@@ -713,6 +713,10 @@
       },
       "type": "object"
     },
+    "method": {
+      "description": "Information about the used Method",
+      "type": "string"
+    },
     "notes": {
       "description": "Additional notes for record.",
       "title": "Additional notes",

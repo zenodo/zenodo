@@ -306,6 +306,8 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
+    method = fields.Str()
+
 
     @validates('language')
     def validate_language(self, value):
