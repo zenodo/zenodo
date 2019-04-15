@@ -82,6 +82,8 @@ def delete(user_id):
                 if not c.deleted_at:
                     if not c.description.startswith('--SPAM--'):
                         c.description = '--SPAM--' + c.description
+                    if c.oaiset:
+                        db.session.delete(c.oaiset)
                     c.delete()
             db.session.commit()
         if deleteform.deactivate_user.data:
