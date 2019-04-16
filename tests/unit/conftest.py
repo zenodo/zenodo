@@ -1241,3 +1241,14 @@ def sample_identifiers():
         'urn': ('urn:nbn:de:101:1-201102033592',
                 'https://nbn-resolving.org/urn:nbn:de:101:1-201102033592'),
     }
+
+
+@pytest.fixture
+def mock_datacite_minting(mocker, app):
+    """DOI registration enabled and DataCite calls mocked."""
+    orig = app.config['DEPOSIT_DATACITE_MINTING_ENABLED']
+    app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = True
+    datacite_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
+    yield datacite_mock
+    app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig
