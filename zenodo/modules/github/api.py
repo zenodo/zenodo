@@ -156,7 +156,8 @@ class ZenodoGitHubRelease(GitHubRelease):
             db.session.commit()
 
             # Send Datacite DOI registration task
-            datacite_register.delay(recid_pid.pid_value, record_id)
+            if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
+                datacite_register.delay(recid_pid.pid_value, record_id)
 
             # Index the record
             RecordIndexer().index_by_id(record_id)
