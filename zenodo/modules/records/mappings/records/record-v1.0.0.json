@@ -697,6 +697,9 @@
               "type": "integer"
             }
           }
+        },
+        "method": {
+          "type": "string"
         }
       }
     }
