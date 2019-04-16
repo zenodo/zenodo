@@ -208,6 +208,12 @@ class DataCiteSchema(Schema):
                 })[:max_descr_size],
                 'descriptionType': 'Other'
             })
+        method = obj['metadata'].get('method')
+        if method:
+            items.append({
+                'description': method[:max_descr_size],
+                'descriptionType': 'Methods'
+            })
         return items
 
     def get_rights(self, obj):
