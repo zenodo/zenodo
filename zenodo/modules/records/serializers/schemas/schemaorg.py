@@ -238,11 +238,14 @@ class Distribution(Schema):
         """Get URL of the file."""
         return format_files_rest_link(bucket=obj['bucket'], key=obj['key'])
 
+
 class Dataset(CreativeWork):
     """Marshmallow schema for schema.org/Dataset."""
 
     distribution = fields.Nested(
         Distribution, many=True, attribute='metadata._files')
+
+    measurementTechnique = SanitizedUnicode(attribute='metadata.method')
 
     @pre_dump
     def hide_closed_files(self, obj):

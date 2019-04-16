@@ -127,6 +127,14 @@ class DublinCoreV1(Schema):
             descriptions.append(
                 lxml.html.document_fromstring(obj['metadata']['description'])
                 .text_content().replace(u"\xa0", u" "))
+        if obj['metadata'].get('notes', '').strip():
+            descriptions.append(
+                lxml.html.document_fromstring(obj['metadata']['notes'])
+                .text_content().replace(u"\xa0", u" "))
+        if obj['metadata'].get('method', '').strip():
+            descriptions.append(
+                lxml.html.document_fromstring(obj['metadata']['method'])
+                .text_content().replace(u"\xa0", u" "))
         return descriptions
 
     def get_subjects(self, obj):
