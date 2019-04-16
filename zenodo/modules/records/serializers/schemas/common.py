@@ -306,7 +306,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
-    method = fields.Str()
+    method = SanitizedUnicode()
 
 
     @validates('language')
