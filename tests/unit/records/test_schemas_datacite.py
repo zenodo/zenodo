@@ -196,6 +196,10 @@ def test_full(db, record_with_bucket, recid_pid):
         ],
         "identifier": {"identifier": "10.5072/foo", "identifierType": "DOI"},
         "language": "en",
+        "geoLocations": [{
+            "geoLocationPlace": "my place",
+            "geoLocationPoint": "2.35 1.534"
+        }],
         "publicationYear": "2014",
         "publisher": "Zenodo",
         "relatedIdentifiers": [
@@ -364,6 +368,13 @@ def test_full(db, record_with_bucket, recid_pid):
         {"date": "2019-01-01", "dateType": "Withdrawn"},
         {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
     ]
+    expected['geoLocations'] = [{
+        "geoLocationPlace": "my place",
+        "geoLocationPoint": {
+          "pointLatitude": 2.35,
+          "pointLongitude": 1.534
+        }
+    }]
     assert obj == expected
 
 
