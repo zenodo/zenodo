@@ -197,3 +197,28 @@ def test_dates():
                     'start': '2019-01-01', 'end': '2019-01-31',
                     'description': 'Some description'}]})
     assert 'dates' not in errors
+
+
+@pytest.mark.parametrize(('val', 'expected'), [
+    ([{'lat': '2.35', 'lon': '1.534', 'place': 'my place'}],
+     {'lat': 2.35, 'lon': 1.534, 'place': 'my place'},),
+    ([{'lat': 2.35, 'lon': 1.534, 'place': 'my place'}],
+     {'lat': 2.35, 'lon': 1.534, 'place': 'my place'}),
+    ({'lat': 2.35, 'place': 'my place'}, None),
+    ({'lon': 1.534, 'place': 'my place'}, None),
+    ({'lat': 2.35, 'lon': 1.534}, None),
+    ({'lat': None, 'lon': 1.534, 'place': 'my place'}, None),
+    ({'lat': 2.35, 'lon': 91, 'place': 'my place'}, None),
+    ({'lat': -91, 'lon': 1.534, 'place': 'my place'}, None),
+    ([{'lat': -90, 'lon': 90, 'place': 'my place'}],
+     {'lat': -90, 'lon': 90, 'place': 'my place'}),
+])
+def test_geographical_metadata(val, expected):
+    """Test geographical metadata."""
+    data, errors = MetadataSchemaV1(partial=['locations']).load(
+        dict(locations=val))
+    if expected is not None:
+        assert data['locations'][0] == expected
+    else:
+        assert 'locations' in errors
+        assert 'locations' not in data
