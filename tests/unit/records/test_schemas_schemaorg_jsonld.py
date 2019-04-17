@@ -278,7 +278,16 @@ def test_full_record(record_with_files_creation):
             '../2019-01-01',
             '2019-01-01',
             '2019-01-01/2019-02-01',
-        ]
+        ],
+        u'spatial': [{
+            u'@type': u'Place',
+            u'geo': {
+                u'@type': u'GeoCoordinates',
+                u'latitude': 2.35,
+                u'longitude': 1.534
+            },
+            u'name': u'my place'
+        }]
     }
     assert data == expected
 
