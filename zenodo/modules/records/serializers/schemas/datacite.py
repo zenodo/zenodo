@@ -138,6 +138,7 @@ class DataCiteSchema(Schema):
     subjects = fields.Method('get_subjects')
     dates = fields.Method('get_dates')
     language = fields.Method('get_language')
+    geoLocations = fields.Method('get_locations')
     version = fields.Str(attribute='metadata.version')
     resourceType = fields.Method('get_type')
     alternateIdentifiers = fields.List(
@@ -378,6 +379,15 @@ class DataCiteSchemaV1(DataCiteSchema):
 
         return items
 
+    def get_locations(self, obj):
+        """Get locations."""
+        locations = [
+            {'geoLocationPlace': l['place'],
+             'geoLocationPoint': '{} {}'.format(l['lat'], l['lon'])}
+            for l in obj['metadata'].get('locations', [])
+        ]
+        return locations or missing
+
     def get_related_identifiers(self, obj):
         """Related identifiers."""
         items = super(DataCiteSchemaV1, self).get_related_identifiers(obj)
@@ -526,3 +536,13 @@ class DataCiteSchemaV4(DataCiteSchema):
                 })
 
         return items
+
+    def get_locations(self, obj):
+        """Get locations."""
+        locations = [
+            {'geoLocationPlace': l['place'],
+             'geoLocationPoint': {'pointLongitude': l['lon'],
+                                  'pointLatitude': l['lat']}}
+            for l in obj['metadata'].get('locations', [])
+        ]
+        return locations or missing

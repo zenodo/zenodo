@@ -49,6 +49,7 @@ class DublinCoreV1(Schema):
     types = fields.Method('get_types')
     sources = fields.Method('get_sources')
     languages = fields.Function(lambda o: [o['metadata'].get('language', u'')])
+    coverage = fields.Method('get_locations')
 
     def get_identifiers(self, obj):
         """Get identifiers."""
@@ -205,3 +206,11 @@ class DublinCoreV1(Schema):
             items.append(', '.join([x for x in parts if x]))
 
         return items
+
+    def get_locations(self, obj):
+        """Get locations."""
+        locations = [
+            'name={place}; east={lon}; north={lat}'.format(**location)
+            for location in obj['metadata'].get('locations', [])
+        ]
+        return locations or missing

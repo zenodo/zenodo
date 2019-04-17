@@ -101,6 +101,22 @@ class Language(Schema):
         return obj
 
 
+class Place(Schema):
+    """Marshmallow schema for schema.org/Place."""
+
+    type_ = fields.Constant('Place', dump_to='@type')
+    geo = fields.Method('get_geo')
+    name = SanitizedUnicode(attribute='place')
+
+    def get_geo(self, obj):
+        """Generate geo field."""
+        return {
+            '@type': 'GeoCoordinates',
+            'latitude': obj['lat'],
+            'longitude': obj['lon']
+        }
+
+
 class CreativeWork(Schema):
     """Schema for schema.org/CreativeWork type."""
 
@@ -117,6 +133,7 @@ class CreativeWork(Schema):
     description = SanitizedHTML(attribute='metadata.description')
     context = fields.Method('get_context', dump_to='@context')
     keywords = fields.List(SanitizedUnicode(), attribute='metadata.keywords')
+    spatial = fields.Nested(Place, many=True, attribute='metadata.locations')
 
     # TODO: What date?
     # dateCreated

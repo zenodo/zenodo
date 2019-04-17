@@ -710,6 +710,10 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='Formats',
         serializer='zenodo.modules.records.serializers.extra_formats_v1',
     ),
+    'geojson': dict(
+        title='GeoJSON',
+        serializer='zenodo.modules.records.serializers.geojson_v1',
+    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
@@ -813,6 +817,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.csl_v1_response'),
             'text/x-bibliography': (
                 'zenodo.modules.records.serializers.citeproc_v1_response'),
+            'application/vnd.geo+json': (
+                'zenodo.modules.records.serializers.geojson_v1_response'),
         },
         search_serializers={
             'application/json': (

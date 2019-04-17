@@ -278,13 +278,13 @@ class LocationSchemaV1(Schema):
 
     lat = fields.Float(required=True)
     lon = fields.Float(required=True)
-    place = fields.Str(required=True)
-    description = fields.Str()
+    place = SanitizedUnicode(required=True)
+    description = SanitizedUnicode()
 
     @validates('lat')
     def validate_latitude(self, value):
         """Validate that location exists."""
-        if not (-90 <= value and value <= 90):
+        if not (-90 <= value <= 90):
             raise ValidationError(
                 _('Latitude must be between -90 and 90.')
             )
@@ -292,7 +292,7 @@ class LocationSchemaV1(Schema):
     @validates('lon')
     def validate_longitude(self, value):
         """Validate that location exists."""
-        if not (-180 <= value and value <= 180):
+        if not (-180 <= value <= 180):
             raise ValidationError(
                 _('Longitude must be between -180 and 180.')
             )
@@ -311,7 +311,8 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     description = SanitizedHTML(
         required=True, validate=validate.Length(min=3))
     keywords = fields.List(SanitizedUnicode())
-    locations = fields.List(fields.Nested(LocationSchemaV1))
+    locations = fields.List(
+        fields.Nested(LocationSchemaV1), validate=validate.Length(min=1))
     notes = SanitizedUnicode()
     version = SanitizedUnicode()
     language = SanitizedUnicode()
