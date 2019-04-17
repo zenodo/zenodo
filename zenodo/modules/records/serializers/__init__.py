@@ -41,6 +41,7 @@ from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
 from .bibtex import BibTeXSerializer
 from .extra_formats import ExtraFormatsSerializer
 from .files import files_responsify
+from .geojson import ZenodoGeoJSONSerializer as GeoJSONSerializer
 from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
 from .schemaorg import ZenodoSchemaOrgSerializer
@@ -95,7 +96,8 @@ openaire_json_v1 = JSONSerializer(RecordSchemaOpenAIREJSON, replace_refs=True)
 schemaorg_jsonld_v1 = ZenodoSchemaOrgSerializer(replace_refs=True)
 #: Extra formats serializer
 extra_formats_v1 = ExtraFormatsSerializer()
-
+#: GeoJSON serializer
+geojson_v1 = GeoJSONSerializer(replace_refs=False)
 
 # Records-REST serializers
 # ========================
@@ -141,6 +143,8 @@ datacite_v31_search = search_responsify(
 #: DublinCore record serializer for search records.
 dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
 schemaorg_jsonld_v1_search = record_responsify(schemaorg_jsonld_v1, 'application/ld+json')
+#: GeoJSON record serializer for search records.
+geojson_v1_response = record_responsify(geojson_v1, 'application/vnd.geo+json')
 
 # Deposit serializers
 # ===================
