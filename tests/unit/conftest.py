@@ -665,6 +665,7 @@ def full_record():
             {'type': 'Collected', 'start': '2019-01-01', 'end': '2019-02-01'},
         ],
         owners=[1, ],
+        method='microscopic supersampling',
         _oai={
             'id': 'oai:zenodo.org:1',
             'sets': ['user-zenodo', 'user-ecfunded'],
