@@ -192,7 +192,7 @@ def test_community_relations(db, minimal_record_model, recid_pid):
 
 
 def test_sources(app, db, minimal_record_model, recid_pid):
-    """"Test contributors."""
+    """Test contributors."""
     minimal_record_model.update({
         'journal': {
             'title': 'CAP',
@@ -246,3 +246,16 @@ def test_subjects(app, db, minimal_record_model, recid_pid):
     minimal_record_model['keywords'] = ['k1', 'k2']
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert set(obj['subjects']) == {'s1', 's2', 'k1', 'k2'}
+
+
+def test_dates(app, db, full_record, minimal_record_model, recid_pid):
+    """Test dates."""
+    minimal_record_model['dates'] = full_record['dates']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['dates'] == [
+        datetime.utcnow().date().isoformat(),
+        '2019-01-01/',
+        '/2019-01-01',
+        '2019-01-01',
+        '2019-01-01/2019-02-01',
+    ]
