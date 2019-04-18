@@ -273,6 +273,12 @@ def test_full_record(record_with_files_creation):
         u'name': u'Test title',
         u'url': u'http://localhost/record/12345',
         u'version': u'1.2.5',
+        u'temporal': [
+            '2019-01-01/..',
+            '../2019-01-01',
+            '2019-01-01',
+            '2019-01-01/2019-02-01',
+        ]
     }
     assert data == expected
 

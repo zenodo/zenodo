@@ -156,3 +156,44 @@ def test_title(val, expected):
     else:
         assert 'title' in errors
         assert 'title' not in data
+
+
+def test_dates():
+    """Test dates."""
+    schema = MetadataSchemaV1(partial=['dates'])
+
+    data, errors = schema.load({'dates': None})
+    assert 'not be null' in errors['dates'][0]
+    data, errors = schema.load({'dates': []})
+    assert 'Shorter than minimum' in errors['dates'][0]
+    data, errors = schema.load({'dates': [{}]})
+    assert 'required field' in errors['dates'][0]['type'][0]
+    data, errors = schema.load({'dates': [{'type': 'Valid'}]})
+    assert 'at least one date' in errors['dates'][0]
+    data, errors = schema.load({'dates': [{'type': 'Valid', 'start': None}]})
+    assert 'not be null' in errors['dates'][0]['start'][0]
+    data, errors = schema.load({'dates': [{'type': 'Valid', 'start': ''}]})
+    assert 'Not a valid date' in errors['dates'][0]['start'][0]
+
+    # "start" date after "end"
+    data, errors = schema.load(
+        {'dates': [{'type': 'Valid',
+                    'start': '2019-02-01', 'end': '2019-01-01'}]})
+    assert 'must be before "end"' in errors['dates'][0]
+
+    # Single date value (i.e. start == end)
+    data, errors = schema.load(
+        {'dates': [{'type': 'Valid',
+                    'start': '2019-01-01', 'end': '2019-01-01'}]})
+    assert 'dates' not in errors
+    data, errors = schema.load(
+        {'dates': [{'type': 'Valid', 'start': '2019-01-01'}]})
+    assert 'dates' not in errors
+    data, errors = schema.load(
+        {'dates': [{'type': 'Valid', 'end': '2019-01-01'}]})
+    assert 'dates' not in errors
+    data, errors = schema.load(
+        {'dates': [{'type': 'Valid',
+                    'start': '2019-01-01', 'end': '2019-01-31',
+                    'description': 'Some description'}]})
+    assert 'dates' not in errors
