@@ -165,7 +165,14 @@ def test_full(db, record_with_bucket, recid_pid):
                 }
             }
         ],
-        "dates": [{"date": "2014-02-27", "dateType": "Issued"}],
+        "dates": [
+            {"date": "2014-02-27", "dateType": "Issued"},
+            {"date": "2019-01-01/", "dateType": "Valid"},
+            # NOTE: "Withdrawn" is not in the DataCite v3.1 dateType vocabulary
+            # {"date": "2019-01-01", "dateType": "Withdrawn"},
+            {"date": "/2019-01-01", "dateType": "Collected"},
+            {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+        ],
         "descriptions": [
             {
                 "description": "Test Description",
@@ -347,6 +354,14 @@ def test_full(db, record_with_bucket, recid_pid):
         }
     ]
     expected['fundingReferences'] = []
+    expected["dates"] = [
+        {"date": "2014-02-27", "dateType": "Issued"},
+        {"date": "2019-01-01/", "dateType": "Valid",
+         "dateInformation": "Bongo"},
+        {"date": "/2019-01-01", "dateType": "Collected"},
+        {"date": "2019-01-01", "dateType": "Withdrawn"},
+        {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+    ]
     assert obj == expected
 
 

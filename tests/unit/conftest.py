@@ -658,6 +658,12 @@ def full_record():
                 {'name': 'Smith, Professor'},
             ],
         },
+        dates=[
+            {'type': 'Valid', 'start': '2019-01-01', 'description': 'Bongo'},
+            {'type': 'Collected', 'end': '2019-01-01'},
+            {'type': 'Withdrawn', 'start': '2019-01-01', 'end': '2019-01-01'},
+            {'type': 'Collected', 'start': '2019-01-01', 'end': '2019-02-01'},
+        ],
         owners=[1, ],
         _oai={
             'id': 'oai:zenodo.org:1',
