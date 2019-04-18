@@ -283,13 +283,14 @@ def test_full_record(record_with_files_creation):
     assert data == expected
 
 
-def test_dataset_with_files(app, users, minimal_record_model, recid_pid):
+def test_dataset(app, users, minimal_record_model, recid_pid):
     """Testing the dumping of files in Open Access datasets."""
     with app.test_request_context():
         datastore = app.extensions['security'].datastore
         login_user(datastore.get_user(users[0]['email']))
         assert minimal_record_model['access_right'] == 'open'
         minimal_record_model['resource_type'] = dict(type='dataset')
+        minimal_record_model['method'] = 'microscopic supersampling'
         minimal_record_model['_files'] = [
             {
                 'bucket': '22222222-2222-2222-2222-222222222222',
@@ -328,6 +329,7 @@ def test_dataset_with_files(app, users, minimal_record_model, recid_pid):
                 u'fileFormat': u'pdf'
             }
         ]
+        assert data['measurementTechnique'] == 'microscopic supersampling'
         for right in ['closed', 'embargoed', 'restricted']:
 
             minimal_record_model['access_right'] = right

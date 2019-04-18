@@ -259,3 +259,10 @@ def test_dates(app, db, full_record, minimal_record_model, recid_pid):
         '2019-01-01',
         '2019-01-01/2019-02-01',
     ]
+
+
+def test_method(app, db, full_record, minimal_record_model, recid_pid):
+    """Test method."""
+    minimal_record_model['method'] = full_record['method']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert 'microscopic supersampling' in obj['descriptions']
