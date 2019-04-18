@@ -190,7 +190,9 @@ def test_full(db, record_with_bucket, recid_pid):
                     "10.5281/zenodo.34\"]}"
                 ),
                 "descriptionType": "Other"
-            }
+            },
+            {'description': 'microscopic supersampling',
+             'descriptionType': 'Methods'}
         ],
         "identifier": {"identifier": "10.5072/foo", "identifierType": "DOI"},
         "language": "en",
