@@ -44,6 +44,7 @@ from invenio_records_ui.signals import record_viewed
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.deposit.extra_formats import ExtraFormats
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
 
@@ -79,6 +80,12 @@ def is_embargoed(embargo_date, accessright=None):
     if embargo_date is not None:
         return AccessRight.is_embargoed(embargo_date)
     return False
+
+
+@blueprint.app_template_filter('extra_formats_title')
+def extra_formats_title(mimetype):
+    """Return a dict of a record's available extra formats and their title."""
+    return ExtraFormats.mimetype_whitelist.get(mimetype, '')
 
 
 @blueprint.app_template_filter('pidstatus')
@@ -366,7 +373,7 @@ def records_ui_export(pid, record, template=None, **kwargs):
         )
         return render_template(
             template, pid=pid, record=record,
-            data=data, format_title=formats[fmt]['title'])
+            data=data, format_code=fmt, format_title=formats[fmt]['title'])
 
 
 def _can_curate(community, user, record, accepted=False):

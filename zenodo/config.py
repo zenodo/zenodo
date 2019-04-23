@@ -703,6 +703,11 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='Citation',
         serializer='zenodo.modules.records.serializers.citeproc_v1',
     ),
+    # Generic serializer
+    'ef': dict(
+        title='Formats',
+        serializer='zenodo.modules.records.serializers.extra_formats_v1',
+    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
