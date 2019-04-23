@@ -183,6 +183,22 @@ def default_config(tmp_db_path):
         ZENODO_EXTRA_FORMATS_MIMETYPE_WHITELIST={
             'application/foo+xml': 'Test 1',
             'application/bar+xml': 'Test 2',
+        },
+        ZENODO_CUSTOM_METADATA_DEFINITIONS={
+            'custom-metadata-community': {
+                'family': {
+                    'scheme': 'http://rs.tdwg.org/dwc/terms/family',
+                    'type': 'keyword',
+                },
+                'genus': {
+                    'scheme': 'http://rs.tdwg.org/dwc/terms/genus',
+                    'type': 'keyword',
+                },
+                'behavior': {
+                    'scheme': 'http://rs.tdwg.org/dwc/iri/behavior',
+                    'type': 'text',
+                },
+            }
         }
     )
 
@@ -382,6 +398,7 @@ def communities(db, users):
         {'id': 'zenodo', 'user_id': users[2]['id']},
         {'id': 'ecfunded', 'user_id': users[2]['id']},
         {'id': 'grants_comm', 'user_id': users[2]['id']},
+        {'id': 'custom-metadata-community', 'user_id': users[2]['id']},
     ]
     for c in comm_data:
         Community.create(c['id'], user_id=c['user_id'])
