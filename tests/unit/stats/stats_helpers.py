@@ -66,6 +66,8 @@ def _create_records(base_metadata, total, versions, files):
             })
             record = ZenodoRecord.create(data)
             bucket = Bucket.create()
+            record['_buckets'] = {'record': str(bucket.id)}
+            record.commit()
             RecordsBuckets.create(bucket=bucket, record=record.model)
             recid = PersistentIdentifier.create(
                 pid_type='recid', pid_value=record['recid'], object_type='rec',

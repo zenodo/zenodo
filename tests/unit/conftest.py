@@ -78,6 +78,7 @@ from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
+from zenodo.modules.deposit.scopes import extra_formats_scope
 
 
 @pytest.yield_fixture(scope='session')
@@ -177,6 +178,10 @@ def default_config(tmp_db_path):
         TESTING=True,
         THEME_SITEURL='http://localhost',
         WTF_CSRF_ENABLED=False,
+        ZENODO_EXTRA_FORMATS_MIMETYPE_WHITELIST={
+            'application/foo+xml': 'Test 1',
+            'application/bar+xml': 'Test 2',
+        }
     )
 
 
@@ -426,6 +431,30 @@ def write_token(app, db, oauth2_client, users):
             is_personal=False,
             is_internal=True,
             _scopes=write_scope.id,
+        )
+        db.session.add(token_)
+    db.session.commit()
+    return dict(
+        token=token_,
+        auth_header=[
+            ('Authorization', 'Bearer {0}'.format(token_.access_token)),
+        ]
+    )
+
+
+@pytest.fixture
+def extra_token(app, db, oauth2_client, users):
+    """Create token."""
+    with db.session.begin_nested():
+        token_ = Token(
+            client_id=oauth2_client,
+            user_id=users[0]['id'],
+            access_token='dev_access_2',
+            refresh_token='dev_refresh_2',
+            expires=datetime.utcnow() + timedelta(hours=10),
+            is_personal=False,
+            is_internal=True,
+            _scopes=' '.join([extra_formats_scope.id, write_scope.id])
         )
         db.session.add(token_)
     db.session.commit()
@@ -706,6 +735,9 @@ def full_record():
 def record_with_bucket(db, full_record, bucket, sip_metadata_types):
     """Create a bucket."""
     record = ZenodoRecord.create(full_record)
+    record['_buckets']['record'] = str(bucket.id)
+    record['_files'][0]['bucket'] = str(bucket.id)
+    record.commit()
     RecordsBuckets.create(bucket=bucket, record=record.model)
     pid = PersistentIdentifier.create(
         pid_type='recid', pid_value=12345, object_type='rec',
@@ -938,6 +970,24 @@ def auth_headers(write_token):
     It uses the token associated with the first user.
     """
     return bearer_auth([], write_token)
+
+
+@pytest.fixture
+def extra_auth_headers(extra_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth([], extra_token)
+
+
+@pytest.fixture
+def json_extra_auth_headers(json_headers, extra_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth(json_headers, extra_token)
 
 
 @pytest.fixture
