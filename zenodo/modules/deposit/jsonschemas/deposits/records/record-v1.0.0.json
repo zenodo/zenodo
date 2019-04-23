@@ -173,12 +173,12 @@
           "description": "UUID of the deposit bucket.",
           "type": "string"
         },
-        "record": {
-          "description": "UUID of the record bucket.",
-          "type": "string"
-        },
         "extra_formats": {
           "description": "UUID of the extra formats bucket.",
+          "type": "string"
+        },
+        "record": {
+          "description": "UUID of the record bucket.",
           "type": "string"
         }
       },
@@ -566,6 +566,29 @@
         "type": "object"
       },
       "type": "array"
+    },
+    "custom": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "properties": {
+            "uri": {
+              "description": "Uri of the provided value.",
+              "type": "string"
+            },
+            "value": {
+              "description": "Value of the mentioned schema.",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          "type": "object"
+        },
+        "type": "object"
+      },
+      "description": "Custom metadata",
+      "type": "object"
     },
     "dates": {
       "description": "Date interval.",
