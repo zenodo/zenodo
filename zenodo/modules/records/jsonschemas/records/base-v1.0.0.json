@@ -586,6 +586,29 @@
         }
       }
     },
+    "custom": {
+      "description": "Custom metadata",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "properties": {
+            "uri": {
+              "description": "Uri of the provided value.",
+              "type": "string"
+            },
+            "value": {
+              "description": "Value of the mentioned schema.",
+              "type": ["number", "string"]
+            }
+          },
+          "required": [
+            "value"
+          ],
+          "type": "object"
+        }
+      }
+    },
     "_internal": {
       "description": "Metadata for internal use only.",
       "type": "object",

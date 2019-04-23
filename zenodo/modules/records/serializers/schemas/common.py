@@ -40,7 +40,7 @@ from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
-from marshmallow import Schema, ValidationError, fields, post_dump, \
+from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
 from six.moves.urllib.parse import quote, urlparse
 from werkzeug.routing import BuildError
@@ -50,7 +50,8 @@ from zenodo.modules.records.models import AccessRight
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
-from ..fields import DateString, PersistentId, SanitizedHTML, SanitizedUnicode
+from ..fields import DateString, PersistentId, SanitizedHTML, \
+    SanitizedUnicode, SanitizedUrl
 
 
 def clean_empty(data, keys):
@@ -298,6 +299,15 @@ class LocationSchemaV1(Schema):
             )
 
 
+class CustomMetadataSchema(Schema):
+    """Schema for custom metadata."""
+
+    value = SanitizedUnicode(required=True)
+    uri = SanitizedUrl()
+
+custom_metadata_text_schema = CustomMetadataSchema(strict=True)
+
+
 class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     """Common metadata schema."""
 
@@ -334,7 +344,6 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
     method = SanitizedUnicode()
-
 
     @validates('language')
     def validate_language(self, value):
@@ -447,6 +456,45 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 field_names=['access_conditions']
             )
 
+    custom = fields.Method('dump_custom', 'load_custom')
+
+    def load_custom(self, obj):
+        """Validate the custom metadata according to config."""
+        if not obj:
+            return missing
+        else:
+            custom_metadata_rules = \
+                current_app.config.get('ZENODO_CUSTOM_METADATA_DEFINITIONS')
+            for community in obj:
+                if community not in custom_metadata_rules:
+                    raise ValidationError(
+                        'The community: {0} is not supporting custom metadata'
+                        .format(community)
+                        )
+                for scheme in obj[community]:
+                    if scheme not in custom_metadata_rules[community]:
+                        raise ValidationError(
+                            'The community {0} is not supporting {1}'
+                            ' as a metadata scheme'
+                            .format(community, scheme)
+                            )
+                    obj[community][scheme] = \
+                        custom_metadata_text_schema.load(
+                            obj[community][scheme]).data
+            return obj
+
+    def dump_custom(self, data):
+        """Enrich custom metadata according to config."""
+        custom_metadata_rules = \
+            current_app.config.get('ZENODO_CUSTOM_METADATA_DEFINITIONS')
+        if not data.get('custom', []):
+            return missing
+        for community in data['custom']:
+            for item in data['custom'][community]:
+                data['custom'][community][item]['scheme'] = \
+                    custom_metadata_rules[community][item]['scheme']
+        return data['custom']
+
     @pre_load()
     def preload_accessrights(self, data):
         """Remove invalid access rights combinations."""
@@ -485,6 +533,18 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 {'raw_reference': ref}
                 for ref in data['references'] if ref.strip()
             ]
+
+    @post_load()
+    def postload_custom(self, data):
+        """Compare record communities with custom metadata used."""
+        if 'custom' in data:
+            if not set(data['custom'].keys()) <= \
+                    set(data.get('communities', [])):
+                raise ValidationError(
+                    'You have included custom metadata for '
+                    'communities this record does not belong to.',
+                    field_names=['custom']
+                    )
 
 
 class CommonRecordSchemaV1(Schema, StrictKeysMixin):
@@ -533,7 +593,7 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             pass
         return links
 
-    def _thumbnail_url(self, fileobj , thumbnail_size):
+    def _thumbnail_url(self, fileobj, thumbnail_size):
         """Create the thumbnail URL for an image."""
         return link_for(
             current_app.config.get('THEME_SITEURL'),

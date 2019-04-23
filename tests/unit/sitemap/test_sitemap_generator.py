@@ -101,7 +101,16 @@ def test_sitemap_generators(app, record_with_bucket, communities):
             {'loc': 'https://localhost/communities/ecfunded/about/'},
             {'loc': 'https://localhost/communities/grants_comm/'},
             {'loc': 'https://localhost/communities/grants_comm/search'},
-            {'loc': 'https://localhost/communities/grants_comm/about/'}
+            {'loc': 'https://localhost/communities/grants_comm/about/'},
+            {'loc':
+                'https://localhost/communities/'
+                'custom-metadata-community/'},
+            {'loc':
+                'https://localhost/communities/'
+                'custom-metadata-community/search'},
+            {'loc':
+                'https://localhost/communities/'
+                'custom-metadata-community/about/'}
         ]
         assert urls == expected
 

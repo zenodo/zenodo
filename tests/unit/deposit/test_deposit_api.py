@@ -21,8 +21,10 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 from copy import deepcopy
 
+from flask import url_for
 from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 
@@ -74,3 +76,111 @@ def test_deposit_versioning_draft_child_unlinking_bug(
     # the edited draft
     assert pv.draft_child_deposit
     assert pv.draft_child
+
+
+def test_deposit_with_custom_field(
+    json_auth_headers, api, api_client, db, es, locations, users,
+        license_record, minimal_deposit, communities, deposit_url,
+        ):
+    """Test deposit with custom field publishing."""
+    auth_headers = json_auth_headers
+
+    # Test wrong community
+    minimal_deposit['metadata']['custom'] = {
+        "not-custom-metadata-community": {
+            "family": {"value": "Felidae",
+                       "uri": "https://en.wikipedia.org/wiki/Felidae"},
+            }
+    }
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'The community: not-custom-metadata-community is'
+                   ' not supporting custom metadata'
+            }]
+
+    # Test wrong scheme
+    minimal_deposit['metadata']['custom'] = {
+        "custom-metadata-community": {
+            "non-existent-scheme": {
+                "value": "Felidae",
+                "uri": "https://en.wikipedia.org/wiki/Felidae"
+                }
+            }
+    }
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'The community custom-metadata-community is not supporting'
+                   ' non-existent-scheme as a metadata scheme'
+            }]
+
+    # Test wrong value
+    minimal_deposit['metadata']['custom'] = {
+        "custom-metadata-community": {
+            "family": {"value": 12131,
+                       "uri": "https://en.wikipedia.org/wiki/Felidae"}
+            }
+    }
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom.value',
+        'message': 'Not a valid string.'
+            }]
+
+    # Test that the used community for custom metadata is in the record
+    minimal_deposit['metadata']['custom'] = {
+        "custom-metadata-community": {
+            "family": {"value": "Felidae",
+                       "uri": "https://en.wikipedia.org/wiki/Felidae"},
+            "behavior": {"value": "Plays with yarn, sleeps in cardboard box."}
+            }
+    }
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'You have included custom metadata for communities'
+                   ' this record does not belong to.'
+            }]
+
+    # Add the missing community creating a valid record with custom metadata
+    minimal_deposit['metadata']['communities'] = \
+        [{'identifier': 'custom-metadata-community'}]
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    links = response.json['links']
+    expected_custom_data = {
+        "custom-metadata-community": {
+            "family": {
+                "scheme": "http://rs.tdwg.org/dwc/terms/family",
+                "uri": "https://en.wikipedia.org/wiki/Felidae",
+                "value": "Felidae"
+            },
+            "behavior": {
+                'scheme': 'http://rs.tdwg.org/dwc/iri/behavior',
+                "value": "Plays with yarn, sleeps in cardboard box."
+            }
+        }
+    }
+    assert response.json['metadata']['custom'] == expected_custom_data
+
+    response = api_client.put(
+            links['bucket']+'/test',
+            data='foo file',
+            headers=auth_headers,
+        )
+    assert response.status_code == 200
+
+    # Publish the record
+    response = api_client.post(links['publish'], headers=auth_headers)
+
+    # Get published record
+    response = api_client.get(response.json['links']['record'])
+    assert response.json['metadata']['custom'] == expected_custom_data
