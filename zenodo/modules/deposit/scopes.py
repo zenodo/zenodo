@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2019 CERN.
+# Copyright (C) 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,15 +22,16 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Records."""
+"""OAuth2 deposit scopes."""
 
 from __future__ import absolute_import, print_function
 
-ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
-"""Maximum quota per bucket."""
+from flask_babelex import lazy_gettext as _
+from invenio_deposit.scopes import DepositScope
 
-ZENODO_EXTRA_FORMATS_BUCKET_QUOTA_SIZE = 100 * 1000 * 1000  # 100 MB
-"""Maximum quota per extra formats bucket."""
-
-ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
-"""Maximum file size accepted."""
+extra_formats_scope = DepositScope(
+    'extra_formats',
+    help_text=_('Allow CRUD operations on extra formats files.'),
+    internal=True,
+)
+"""Allow CRUD operations on extra formats files."""

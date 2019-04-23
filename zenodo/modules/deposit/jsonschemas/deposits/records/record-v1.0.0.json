@@ -176,6 +176,10 @@
         "record": {
           "description": "UUID of the record bucket.",
           "type": "string"
+        },
+        "extra_formats": {
+          "description": "UUID of the extra formats bucket.",
+          "type": "string"
         }
       },
       "type": "object"

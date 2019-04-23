@@ -47,7 +47,7 @@ from invenio_sipstore.models import RecordSIP as RecordSIPModel
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
-    ZenodoRecord
+    ZenodoFilesMixin, ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
     zenodo_concept_doi_minter, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed, \
@@ -73,7 +73,7 @@ PRESERVE_FIELDS = (
 """Fields which will not be overwritten on edit."""
 
 
-class ZenodoDeposit(Deposit):
+class ZenodoDeposit(Deposit, ZenodoFilesMixin):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject
@@ -263,6 +263,11 @@ class ZenodoDeposit(Deposit):
             db.session.add(RecordsBuckets(
                 record_id=record_id, bucket_id=snapshot.id
             ))
+            # Add extra_formats bucket
+            if 'extra_formats' in self['_buckets']:
+                db.session.add(RecordsBuckets(
+                    record_id=record_id, bucket_id=self.extra_formats.bucket.id
+                ))
         else:
             yield data
 
@@ -524,9 +529,11 @@ class ZenodoDeposit(Deposit):
                 pid_type='recid', pid_value=self['conceptrecid'])
             if concept_recid.status == PIDStatus.RESERVED:
                 db.session.delete(concept_recid)
-
         # Completely remove bucket
         bucket = self.files.bucket
+        extra_formats_bucket = None
+        if 'extra_formats' in self['_buckets']:
+            extra_formats_bucket = self.extra_formats.bucket
         with db.session.begin_nested():
             # Remove Record-Bucket link
             RecordsBuckets.query.filter_by(record_id=self.id).delete()
@@ -537,6 +544,8 @@ class ZenodoDeposit(Deposit):
                     MultipartObject.upload_id).subquery())
             ).delete(synchronize_session='fetch')
             mp_q.delete(synchronize_session='fetch')
+        if extra_formats_bucket:
+            extra_formats_bucket.remove()
         bucket.locked = False
         bucket.remove()
 
@@ -616,11 +625,17 @@ class ZenodoDeposit(Deposit):
                     # Create snapshot from the record's bucket and update data
                     snapshot = latest_record.files.bucket.snapshot(lock=False)
                     snapshot.locked = False
-                # FIXME: `snapshot.id` might not be present because we need to
-                # commit first to the DB.
-                # db.session.commit()
+                    if 'extra_formats' in latest_record['_buckets']:
+                        extra_formats_snapshot = \
+                            latest_record.extra_formats.bucket.snapshot(
+                                lock=False)
                 deposit['_buckets'] = {'deposit': str(snapshot.id)}
                 RecordsBuckets.create(record=deposit.model, bucket=snapshot)
+                if 'extra_formats' in latest_record['_buckets']:
+                    deposit['_buckets']['extra_formats'] = \
+                        str(extra_formats_snapshot.id)
+                    RecordsBuckets.create(
+                        record=deposit.model, bucket=extra_formats_snapshot)
                 deposit.commit()
         return self
 
