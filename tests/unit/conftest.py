@@ -35,9 +35,11 @@ from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
+from celery import Task
 from celery.messaging import establish_connection
 from click.testing import CliRunner
 from elasticsearch.exceptions import RequestError
+from flask import current_app as flask_current_app
 from flask import url_for
 from flask.cli import ScriptInfo
 from flask_celeryext import create_celery_app
@@ -73,12 +75,12 @@ from zenodo.config import APP_DEFAULT_SECURE_HEADERS
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
+from zenodo.modules.deposit.scopes import extra_formats_scope
 from zenodo.modules.fixtures.records import loadsipmetadatatypes
 from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
-from zenodo.modules.deposit.scopes import extra_formats_scope
 
 
 @pytest.yield_fixture(scope='session')
@@ -197,6 +199,19 @@ def app(env_config, default_config):
     cca = cca._get_current_object()
     delattr(cca, "flask_app")
     celery_app = create_celery_app(app)
+
+    # FIXME: When https://github.com/inveniosoftware/flask-celeryext/issues/35
+    # is closed and Flask-CeleryExt is released, this can be removed.
+    class _TestAppContextTask(Task):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            if flask_current_app:
+                return Task.__call__(self, *args, **kwargs)
+            with self.app.flask_app.app_context():
+                return Task.__call__(self, *args, **kwargs)
+
+    celery_app.Task = _TestAppContextTask
     celery_app.set_current()
 
     with app.app_context():
