@@ -301,6 +301,10 @@ setup(
             'zenodo_stats = '
             'zenodo.modules.stats.registrations:register_queries'
         ],
+        'invenio_oauth2server.scopes': [
+            ('deposit_extra_formats = '
+             'zenodo.modules.deposit.scopes:extra_formats_scope'),
+        ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
         ],

@@ -32,8 +32,10 @@ from flask import request
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier
-from invenio_records_files.api import FileObject, FilesIterator, Record, \
-    _writable
+from invenio_records.api import Record
+from invenio_records_files.api import FileObject, FilesIterator, FilesMixin, \
+    MissingModelError, _writable
+from invenio_records_files.models import RecordsBuckets
 
 from .fetchers import zenodo_record_fetcher
 
@@ -68,7 +70,65 @@ class ZenodoFilesIterator(FilesIterator):
             self.flush()
 
 
-class ZenodoRecord(Record):
+class ZenodoFilesMixin(FilesMixin):
+    """Metafiles mixin."""
+
+    @property
+    def extra_formats(self):
+        """Get extra formats files iterator.
+
+        :returns: Files iterator.
+        """
+        if self.model is None:
+            raise MissingModelError()
+        extra_formats_bucket = None
+        records_buckets = RecordsBuckets.query.filter_by(
+            record_id=self.id)
+        for record_bucket in records_buckets:
+            if self['_buckets'].get('extra_formats') == \
+                    str(record_bucket.bucket.id):
+                extra_formats_bucket = record_bucket.bucket
+
+        if not extra_formats_bucket:
+            return None
+        else:
+            return self.files_iter_cls(
+                self, bucket=extra_formats_bucket, file_cls=self.file_cls)
+
+    @extra_formats.setter
+    def extra_formats(self, data):
+        """Set files from data."""
+        current_files = self.extra_formats
+        if current_files:
+            raise RuntimeError('Can not update existing files.')
+        for key in data:
+            current_files[key] = data[key]
+
+    @property
+    def files(self):
+        """Get files iterator.
+
+        :returns: Files iterator.
+        """
+        if self.model is None:
+            raise MissingModelError()
+
+        records_buckets = RecordsBuckets.query.filter_by(
+            record_id=self.id)
+        bucket = None
+        for record_bucket in records_buckets:
+            if self['_buckets'].get('record') == str(record_bucket.bucket.id):
+                bucket = record_bucket.bucket
+            if self['_buckets'].get('deposit') == str(record_bucket.bucket.id):
+                bucket = record_bucket.bucket
+
+        if not bucket:
+            return None
+
+        return self.files_iter_cls(self, bucket=bucket, file_cls=self.file_cls)
+
+
+class ZenodoRecord(Record, ZenodoFilesMixin):
     """Zenodo Record."""
 
     file_cls = ZenodoFileObject

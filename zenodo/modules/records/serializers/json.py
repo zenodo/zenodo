@@ -31,7 +31,7 @@ import json
 from flask import has_request_context
 from flask_security import current_user
 from invenio_pidrelations.contrib.versioning import PIDVersioning
-from invenio_records_files.api import Record
+from invenio_records.api import Record
 from invenio_records_rest.serializers.json import JSONSerializer
 
 from zenodo.modules.records.serializers.pidrelations import \
