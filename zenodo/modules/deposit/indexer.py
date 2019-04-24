@@ -35,6 +35,7 @@ from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
 
 from .api import ZenodoDeposit
+from zenodo.modules.records.utils import build_record_custom_fields
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,
@@ -101,6 +102,9 @@ def indexer_receiver(sender, json=None, record=None, index=None,
 
     for loc in json.get('locations', []):
         loc['point'] = {'lat': loc['lat'], 'lon': loc['lon']}
+
+    custom_es_fields = build_record_custom_fields(json)
+    json.update(custom_es_fields)
 
 
 def index_versioned_record_siblings(sender, action=None, pid=None,

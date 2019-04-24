@@ -26,7 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.records.utils import is_valid_openaire_type
+from zenodo.modules.records.utils import build_record_custom_fields,\
+    is_valid_openaire_type
 
 
 def test_openaire_type_validation(app):
@@ -63,3 +64,24 @@ def test_openaire_type_validation(app):
     # non-existing prefix
     assert not is_valid_openaire_type(
         {'openaire_subtype': 'xxx:t1', 'type': 'software'}, ['c1'])
+
+
+def test_build_record_custom_fields(record_with_custom_metadata):
+    """Test building of the records' custom fields."""
+    expected = dict(
+        custom_keywords={
+            ('family', 'Felidae', 'https://en.wikipedia.org/wiki/Felidae'),
+            ('genus', 'Felis', 'https://en.wikipedia.org/wiki/Felis')
+        },
+        custom_text={
+            ('behavior', 'Plays with yarn, sleeps in cardboard box.', None)
+        }
+    )
+
+    result = build_record_custom_fields(record_with_custom_metadata)
+    assert expected == {
+        'custom_keywords': {(v['key'], v['value'], v['uri'])
+                            for v in result['custom_keywords']},
+        'custom_text': {(v['key'], v['value'], v['uri'])
+                        for v in result['custom_text']}
+    }
