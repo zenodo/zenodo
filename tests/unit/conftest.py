@@ -765,6 +765,21 @@ def full_record():
 
 
 @pytest.fixture
+def record_with_custom_metadata(app, full_record):
+    """Full record fixture."""
+    full_record['custom'] = {
+        'zenodo': {
+            'family': {'value': 'Felidae',
+                       'uri': 'https://en.wikipedia.org/wiki/Felidae'},
+            'genus': {'value': 'Felis',
+                      'uri': 'https://en.wikipedia.org/wiki/Felis'},
+            'behavior': {'value': 'Plays with yarn, sleeps in cardboard box.'},
+        }
+    }
+    return full_record
+
+
+@pytest.fixture
 def record_with_bucket(db, full_record, bucket, sip_metadata_types):
     """Create a bucket."""
     record = ZenodoRecord.create(full_record)
