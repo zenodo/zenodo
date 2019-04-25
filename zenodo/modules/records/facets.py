@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 from decimal import Decimal, InvalidOperation
 
 from elasticsearch_dsl import Q
+from flask import current_app
 from invenio_rest.errors import FieldError, RESTValidationError
 
 
@@ -92,4 +93,69 @@ def geo_bounding_box_filter(name, field, type=None):
             query['type'] = type
         return Q('geo_bounding_box', **query)
 
+    return inner
+
+
+def custom_metadata_filter(field):
+    """Custom metadata fields filter.
+
+    :param field: Field name.
+    :returns: Function that returns the custom metadata query.
+    """
+    def inner(values):
+        config = current_app.config['ZENODO_CUSTOM_METADATA_DEFINITIONS']
+        must_conditions = []
+        for value in values:
+            try:
+                community, search_term = value.split('.', 1)
+                search_key, search_value = search_term.split(':', 1)
+            except Exception:
+                raise RESTValidationError(
+                    errors=[FieldError(
+                        field, 'The query should have the format: '
+                               'custom=community.field_name:filed_value.')])
+            community = community.strip()
+            search_key = search_key.strip()
+            search_value = search_value.strip()
+
+            # check if the community supports custom fields
+            if community not in config:
+                raise RESTValidationError(
+                    errors=[FieldError(field, 'The "{}" community does not '
+                            'support custom fields.'.format(community))])
+
+            # check if the field is supported by the community
+            if search_key not in config[community]:
+                raise RESTValidationError(
+                    errors=[FieldError(
+                        field, 'The "{}" key is not supported by the "{}" '
+                        'community.'.format(search_key, community))])
+
+            # TODO: check if the search value has the correct type
+            # for now we have only 'keyword' and 'text'
+
+            # TODO: move this to a central place
+            # get the elasticsearch custom field name
+            custom_fields_mapping = dict(
+                keyword='custom_keywords',
+                text='custom_text'
+            )
+
+            custom_type = config[community][search_key]['type']
+            es_field = custom_fields_mapping[custom_type]
+
+            must_conditions.append({
+                'nested': {
+                    'path': es_field,
+                    # 'score_mode': 'avg',
+                    'query': {
+                        'bool': {'must': [
+                            {'match': {es_field + '.key': search_key}},
+                            {'match': {es_field + '.value': search_value}}
+                        ]}
+                    }
+                }
+            })
+
+        return Q('bool', must=must_conditions)
     return inner
