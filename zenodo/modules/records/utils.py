@@ -171,4 +171,5 @@ def build_record_custom_fields(record):
                     es_custom_field = custom_fields_mapping[custom_type]
                     es_custom_fields[es_custom_field].append(es_object)
 
-    return {k: v for k, v in es_custom_fields if v}
+    return {k: es_custom_fields[k] for k in es_custom_fields
+            if es_custom_fields[k]}

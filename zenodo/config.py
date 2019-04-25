@@ -65,7 +65,8 @@ from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
-from zenodo.modules.records.facets import geo_bounding_box_filter
+from zenodo.modules.records.facets import custom_metadata_filter, \
+    geo_bounding_box_filter
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
@@ -962,6 +963,7 @@ RECORDS_REST_FACETS = dict(
         ),
         filters=dict(
             communities=terms_filter('communities'),
+            custom=custom_metadata_filter('custom'),
             provisional_communities=terms_filter('provisional_communities'),
             locations=geo_bounding_box_filter(
                 'locations', 'locations.point', type='indexed'),
@@ -980,6 +982,7 @@ RECORDS_REST_FACETS = dict(
 DEPOSIT_REST_FACETS['deposits'].setdefault('filters', {})
 DEPOSIT_REST_FACETS['deposits']['filters'].update(dict(
     communities=terms_filter('communities'),
+    custom=custom_metadata_filter('custom'),
     provisional_communities=terms_filter('provisional_communities'),
     locations=geo_bounding_box_filter(
         'locations', 'locations.point', type='indexed'),

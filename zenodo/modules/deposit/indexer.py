@@ -34,8 +34,9 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
 
-from .api import ZenodoDeposit
 from zenodo.modules.records.utils import build_record_custom_fields
+
+from .api import ZenodoDeposit
 
 
 def indexer_receiver(sender, json=None, record=None, index=None,
@@ -54,7 +55,6 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     :param index: Elasticsearch index name.
     :type index: str
     """
-
     if not index.startswith('deposits-records-'):
         return
 

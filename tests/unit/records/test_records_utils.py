@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
-from zenodo.modules.records.utils import build_record_custom_fields,\
+from zenodo.modules.records.utils import build_record_custom_fields, \
     is_valid_openaire_type
 
 
@@ -80,8 +80,8 @@ def test_build_record_custom_fields(record_with_custom_metadata):
 
     result = build_record_custom_fields(record_with_custom_metadata)
     assert expected == {
-        'custom_keywords': {(v['key'], v['value'], v['uri'])
+        'custom_keywords': {(v['key'], v['value'], v.get('uri'))
                             for v in result['custom_keywords']},
-        'custom_text': {(v['key'], v['value'], v['uri'])
+        'custom_text': {(v['key'], v['value'], v.get('uri'))
                         for v in result['custom_text']}
     }

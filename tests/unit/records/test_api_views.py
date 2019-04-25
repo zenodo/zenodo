@@ -84,3 +84,51 @@ def test_geographical_search(es, api, json_headers, record_with_bucket):
                 headers=json_headers
             )
             assert len(res.json) == 1
+
+
+@pytest.mark.parametrize(('val', 'status', 'error_message'), [
+    ('custom-metadata-community.family:Felidae', 200, None),
+    ('family:Felidae', 400, 'The query should have the format: '
+     'custom=community.field_name:filed_value.'),
+    ('custom-metadata-community.family', 400, 'The query should have the '
+     'format: custom=community.field_name:filed_value.'),
+    ('zenodo.family:Felidae', 400,
+     'The "zenodo" community does not support custom fields.'),
+    ('custom-metadata-community.foo:Felidae', 400, 'The "foo" key is not '
+     'supported by the "custom-metadata-community" community.'),
+])
+def test_custom_search_validation(es, api, json_headers, record_with_bucket,
+                                  val, status, error_message):
+    """Test custom metadata search validation."""
+    pid, record = record_with_bucket
+    RecordIndexer().index(record)
+    with api.test_request_context():
+        with api.test_client() as client:
+            res = client.get(
+                url_for('invenio_records_rest.recid_list', custom=val),
+                headers=json_headers
+            )
+            assert res.status_code == status
+            if error_message:
+                assert res.json['message'] == 'Validation error.'
+                assert len(res.json['errors']) == 1
+                assert res.json['errors'][0]['field'] == 'custom'
+                assert res.json['errors'][0]['message'] == error_message
+
+
+def test_custom_search(es, api, json_headers, record_with_bucket,
+                       record_with_custom_metadata):
+    """Test custom metadata search."""
+    pid, record = record_with_bucket
+    record['custom'] = record_with_custom_metadata['custom']
+    RecordIndexer().index(record)
+    current_search.flush_and_refresh(index='records')
+
+    with api.test_request_context():
+        with api.test_client() as client:
+            res = client.get(
+                url_for('invenio_records_rest.recid_list',
+                        custom='custom-metadata-community.family:Felidae'),
+                headers=json_headers
+            )
+            assert len(res.json) == 1

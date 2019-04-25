@@ -767,8 +767,9 @@ def full_record():
 @pytest.fixture
 def record_with_custom_metadata(app, full_record):
     """Full record fixture."""
+    full_record['communities'].append('custom-metadata-community')
     full_record['custom'] = {
-        'zenodo': {
+        'custom-metadata-community': {
             'family': {'value': 'Felidae',
                        'uri': 'https://en.wikipedia.org/wiki/Felidae'},
             'genus': {'value': 'Felis',
