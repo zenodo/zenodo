@@ -124,7 +124,7 @@ install_requires = [
     'invenio-deposit>=1.0.0a9',
     'invenio-files-rest>=1.0.0a23.post1',
     'invenio-formatter>=1.0.1',
-    'invenio-github>=1.0.0a15',
+    'invenio-github>=1.0.0a16',
     'invenio-i18n>=1.0.0,<1.1.0',
     'invenio-iiif>=1.0.0a5',
     'invenio-indexer>=1.0.1',
@@ -165,7 +165,7 @@ install_requires = [
     'uwsgi>=2.0.18',
     'uwsgitop>=0.11',
     'wsgi-statsd>=0.3.1',
-    'zenodo-accessrequests>=1.0.0a4',
+    'zenodo-accessrequests>=1.0.0a5',
 ]
 
 packages = find_packages()
