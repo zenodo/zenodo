@@ -597,23 +597,10 @@
     "custom": {
       "additionalProperties": {
         "additionalProperties": {
-          "properties": {
-            "uri": {
-              "description": "Uri of the provided value.",
-              "type": "string"
-            },
-            "value": {
-              "description": "Value of the mentioned schema.",
-              "type": [
-                "number",
-                "string"
-              ]
-            }
-          },
-          "required": [
-            "value"
-          ],
-          "type": "object"
+          "type": [
+            "string",
+            "number"
+          ]
         },
         "type": "object"
       },

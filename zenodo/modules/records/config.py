@@ -114,3 +114,9 @@ ZENODO_DOIID4RECID = {
 Wrong DOIs were minted for a short period in 2013 due to mistake in the legacy
 system.
 """
+
+ZENODO_CUSTOM_METADATA_TERM_TYPES = {
+    'keyword': 'six.string_types',
+    'text': 'six.string_types',
+}
+"""Custom metadata term types mapping."""

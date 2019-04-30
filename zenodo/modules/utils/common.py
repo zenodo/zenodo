@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,13 +22,23 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Data model package."""
+"""Zenodo common utils."""
 
 from __future__ import absolute_import, print_function
 
-from .proxies import current_custom_metadata, current_zenodo_records
+import six
+from werkzeug.utils import import_string
 
-__all__ = (
-    'current_custom_metadata',
-    'current_zenodo_records',
-)
+
+def obj_or_import_string(value, default=None):
+    """Import string or return object.
+
+    :params value: Import path or class object to instantiate.
+    :params default: Default object to return if the import fails.
+    :returns: The imported object.
+    """
+    if isinstance(value, six.string_types):
+        return import_string(value)
+    elif value:
+        return value
+    return default
