@@ -156,16 +156,13 @@ def build_record_custom_fields(record):
     }
 
     custom_metadata = record.get('custom', {})
-    communities = set(record.get('communities', []))
-    for community, community_metadata in custom_metadata.items():
-        if community in communities:
-            for term, value in community_metadata.items():
-                term_type = valid_terms.get(term)
-                if term_type:
-                    # TODO: in the futurem also add "community"
-                    es_object = {'key': term, 'value': value}
-                    es_custom_field = custom_fields_mapping[term_type]
-                    es_custom_fields[es_custom_field].append(es_object)
+    for term, value in custom_metadata.items():
+        term_type = valid_terms.get(term)
+        if term_type:
+            # TODO: in the futurem also add "community"
+            es_object = {'key': term, 'value': value}
+            es_custom_field = custom_fields_mapping[term_type]
+            es_custom_fields[es_custom_field].append(es_object)
 
     return {k: es_custom_fields[k] for k in es_custom_fields
             if es_custom_fields[k]}

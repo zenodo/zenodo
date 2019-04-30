@@ -66,8 +66,9 @@ def test_openaire_type_validation(app):
         {'openaire_subtype': 'xxx:t1', 'type': 'software'}, ['c1'])
 
 
-def test_build_record_custom_fields(record_with_custom_metadata):
+def test_build_record_custom_fields(full_record, custom_metadata):
     """Test building of the records' custom fields."""
+    full_record['custom'] = custom_metadata
     expected = dict(
         custom_keywords={
             ('dwc:family', 'Felidae'),
@@ -78,7 +79,7 @@ def test_build_record_custom_fields(record_with_custom_metadata):
         }
     )
 
-    result = build_record_custom_fields(record_with_custom_metadata)
+    result = build_record_custom_fields(full_record)
     assert expected == {
         'custom_keywords': {
             (v['key'], v['value']) for v in result['custom_keywords']},

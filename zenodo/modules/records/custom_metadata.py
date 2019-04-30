@@ -32,11 +32,10 @@ from zenodo.modules.utils import obj_or_import_string
 class CustomMetadataAPI(object):
     """Custom metadata helper class."""
 
-    def __init__(self, term_types=None, vocabularies=None, definitions=None):
+    def __init__(self, term_types=None, vocabularies=None):
         """Initialize custom metadata API object."""
         self._term_types = term_types or {}
         self._vocabularies = vocabularies or {}
-        self._definitions = definitions or {}
         self._validate()
 
     @cached_property
@@ -51,6 +50,15 @@ class CustomMetadataAPI(object):
         return self._vocabularies
 
     @cached_property
+    def available_vocabulary_set(self):
+        """Get available vocabularies."""
+        vocabulary = []
+        for scheme in self.vocabularies:
+            for value in self.vocabularies[scheme]['attributes']:
+                vocabulary.append(scheme+':'+value)
+        return set(vocabulary)
+
+    @cached_property
     def terms(self):
         """Term-to-fieldtype lookup."""
         result = {}
@@ -60,11 +68,6 @@ class CustomMetadataAPI(object):
                 result[term] = term_type
         return result
 
-    @cached_property
-    def definitions(self):
-        """Get available definitions."""
-        return {k: set(v) for k, v in self._definitions.items()}
-
     def _validate(self):
         """Validates term types, vocabularies and definitions."""
         valid_term_types = set(self.term_types.keys())
@@ -73,6 +76,3 @@ class CustomMetadataAPI(object):
             (v['@context'] and v['attributes'] and
              set(v['attributes'].values()) <= valid_term_types)
             for k, v in self.vocabularies.items())
-        assert all(
-            set(comm_terms) <= valid_terms
-            for comm, comm_terms in self.definitions.items())

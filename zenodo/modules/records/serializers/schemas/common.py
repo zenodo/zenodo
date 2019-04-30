@@ -456,29 +456,23 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         if not isinstance(obj, dict):
             raise ValidationError('Not an object.', field_names=['custom'])
 
-        valid_terms = current_custom_metadata.terms
-        definitions = current_custom_metadata.definitions
+        valid_vocabulary = current_custom_metadata.available_vocabulary_set
         term_types = current_custom_metadata.term_types
-        for community, comm_data in obj.items():
-            comm_definition = definitions.get(community)
-            if not comm_definition:
+        valid_terms = current_custom_metadata.terms
+        for term, value in obj.items():
+            if term not in valid_vocabulary:
                 raise ValidationError(
-                    'Community "{0}" does not support custom metadata.'
-                    .format(community), field_names=['custom'])
-            for term, value in comm_data.items():
-                if term not in comm_definition:
-                    raise ValidationError(
-                        'Community "{0}" does not support "{1}" as a custom '
-                        'metadata term.'.format(community, term),
-                        field_names=['custom'])
+                    'Zenodo does not support "{0}" as a custom metadata term.'
+                    .format(term),
+                    field_names=['custom'])
 
-                # Validate term type
-                term_type = term_types[valid_terms[term]]
-                if not isinstance(value, term_type):
-                    raise ValidationError(
-                        'Invalid type for term "{0}", should be "{1}".'
-                        .format(term, valid_terms[term]),
-                        field_names=['custom'])
+            # Validate term type
+            term_type = term_types[valid_terms[term]]
+            if not isinstance(value, term_type):
+                raise ValidationError(
+                    'Invalid type for term "{0}", should be "{1}".'
+                    .format(term, valid_terms[term]),
+                    field_names=['custom'])
         return obj
 
     def dump_custom(self, data):
@@ -523,17 +517,6 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 {'raw_reference': ref}
                 for ref in data['references'] if ref.strip()
             ]
-
-    @post_load()
-    def postload_custom(self, data):
-        """Compare record communities with custom metadata used."""
-        if not set(data.get('custom', {}).keys()) <= \
-                set(data.get('communities', [])):
-            raise ValidationError(
-                'You have included custom metadata for '
-                'communities that this record does not belong to.',
-                field_names=['custom']
-            )
 
 
 class CommonRecordSchemaV1(Schema, StrictKeysMixin):

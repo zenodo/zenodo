@@ -87,15 +87,12 @@ def test_geographical_search(es, api, json_headers, record_with_bucket):
 
 
 @pytest.mark.parametrize(('val', 'status', 'error_message'), [
-    ('custom-metadata-comm[dwc:family]:Felidae', 200, None),
     ('[dwc:family]:Felidae', 200, None),
     ('[dwc:foobar]:Felidae', 400, 'The "dwc:foobar" term is not supported.'),
-    ('custom-metadata-comm[dwc:family]', 400, 'The parameter should have the '
-     'format: custom=community[field_name]:filed_value.'),
-    ('zenodo[dwc:family]:Felidae', 400,
-     'The "zenodo" community does not support custom metadata.'),
-    ('custom-metadata-comm[foo:bar]:Felidae', 400, 'The "foo:bar" term is not '
-     'supported by the "custom-metadata-comm" community.'),
+    ('[dwc:family]', 400, 'The parameter should have the '
+     'format: custom=[field_name]:filed_value.'),
+    (':Felidae', 400, 'The parameter should have the '
+     'format: custom=[field_name]:filed_value.')
 ])
 def test_custom_search_validation(es, api, json_headers, record_with_bucket,
                                   val, status, error_message):
@@ -116,28 +113,21 @@ def test_custom_search_validation(es, api, json_headers, record_with_bucket,
                 assert res.json['errors'][0]['message'] == error_message
 
 
+@pytest.mark.parametrize(('query', 'result'), [
+    ('[dwc:family]:Felidae', 1),
+    ('[dwc:family]:foobar', 0)
+])
 def test_custom_search(es, api, json_headers, record_with_bucket,
-                       custom_metadata):
+                       custom_metadata, query, result):
     """Test custom metadata search."""
     pid, record = record_with_bucket
-    record['communities'].append('custom-metadata-comm')
-    record['custom'] = {'custom-metadata-comm': {'dwc:family': 'Felidae'}}
+    record['custom'] = custom_metadata
     RecordIndexer().index(record)
     current_search.flush_and_refresh(index='records')
     with api.test_request_context():
         with api.test_client() as client:
-            match_queries = [
-                'custom-metadata-comm[dwc:family]:Felidae',
-                '[dwc:family]:Felidae',
-            ]
-            for q in match_queries:
-                res = client.get(
-                    url_for('invenio_records_rest.recid_list', custom=q),
-                    headers=json_headers)
-                assert len(res.json) == 1
             res = client.get(
-                url_for(
-                    'invenio_records_rest.recid_list',
-                    custom='custom-metadata-comm[dwc:family]:foobar'),
+                url_for('invenio_records_rest.recid_list',
+                        custom=query),
                 headers=json_headers)
-            assert len(res.json) == 0
+            assert len(res.json) == result

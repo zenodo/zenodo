@@ -105,36 +105,24 @@ def custom_metadata_filter(field):
     :returns: Function that returns the custom metadata query.
     """
     def inner(values):
-        definitions = current_custom_metadata.definitions
         terms = current_custom_metadata.terms
+        available_terms = current_custom_metadata.available_vocabulary_set
+
         must_conditions = []
+
         for value in values:
-            # Matches one of:
-            #
-            #   community[vocabulary:term]:value
+            # Matches this:
             #   [vocabulary:term]:value
-            parsed = re.match(r'([-\w]+)?\[([-\w]+\:[-\w]+)\]\:(.+)', value)
+            parsed = re.match(r'\[([-\w]+\:[-\w]+)\]\:(.+)', value)
             if not parsed:
                 raise RESTValidationError(
                     errors=[FieldError(
                         field, 'The parameter should have the format: '
-                               'custom=community[field_name]:filed_value.')])
+                               'custom=[field_name]:filed_value.')])
 
-            community, search_key, search_value = parsed.groups()
+            search_key, search_value = parsed.groups()
 
-            # check if the community supports custom fields
-            if community and community not in definitions:
-                raise RESTValidationError(
-                    errors=[FieldError(field, 'The "{}" community does not '
-                            'support custom metadata.'.format(community))])
-
-            # check if the field is supported by the community
-            if community and search_key not in definitions[community]:
-                raise RESTValidationError(
-                    errors=[FieldError(
-                        field, 'The "{}" term is not supported by the "{}" '
-                        'community.'.format(search_key, community))])
-            elif search_key not in terms:
+            if search_key not in available_terms:
                 raise RESTValidationError(
                     errors=[FieldError(
                         field, 'The "{}" term is not supported.'
