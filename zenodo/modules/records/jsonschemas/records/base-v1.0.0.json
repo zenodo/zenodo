@@ -197,7 +197,7 @@
           "description": "Specific resource type.",
           "type": "string"
         },
-        "openaire_subtype" : {
+        "openaire_subtype": {
           "description": "OpenAIRE-specific resource type.",
           "type": "string"
         }
@@ -252,7 +252,7 @@
         ],
         "type": "object"
       },
-      "type":"array"
+      "type": "array"
     },
     "description": {
       "description": "Description/abstract for record.",
@@ -271,19 +271,19 @@
       "description": "Geographical location.",
       "items": {
         "properties": {
-          "lat":{
+          "lat": {
             "description": "Latitude of the location.",
             "type": "number"
           },
-          "lon":{
+          "lon": {
             "description": "Longitude of the location.",
             "type": "number"
           },
-          "place":{
+          "place": {
             "description": "Description of the location",
             "type": "string"
           },
-          "description":{
+          "description": {
             "description": "Place of the location",
             "type": "string"
           }
@@ -587,14 +587,14 @@
       }
     },
     "custom": {
-      "description": "Custom metadata",
-      "type": "object",
       "additionalProperties": {
-        "type": "object",
-        "additionalProperties": {
-          "type": ["string", "number"]
-        }
-      }
+        "type": [
+          "string",
+          "number"
+        ]
+      },
+      "description": "Custom metadata",
+      "type": "object"
     },
     "_internal": {
       "description": "Metadata for internal use only.",

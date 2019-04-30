@@ -61,7 +61,6 @@ class ZenodoRecords(object):
         self.custom_metadata = CustomMetadataAPI(
             term_types=app.config.get('ZENODO_CUSTOM_METADATA_TERM_TYPES'),
             vocabularies=app.config.get('ZENODO_CUSTOM_METADATA_VOCABULARIES'),
-            definitions=app.config.get('ZENODO_CUSTOM_METADATA_DEFINITIONS'),
         )
 
         before_record_index.connect(indexer_receiver, sender=app)

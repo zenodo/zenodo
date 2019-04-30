@@ -569,13 +569,10 @@
     },
     "custom": {
       "additionalProperties": {
-        "additionalProperties": {
-          "type": [
-            "string",
-            "number"
-          ]
-        },
-        "type": "object"
+        "type": [
+          "string",
+          "number"
+        ]
       },
       "description": "Custom metadata",
       "type": "object"

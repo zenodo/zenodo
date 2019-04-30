@@ -38,7 +38,6 @@ import pytest
 from celery import Task
 from celery.messaging import establish_connection
 from click.testing import CliRunner
-from elasticsearch.exceptions import RequestError
 from flask import current_app as flask_current_app
 from flask import url_for
 from flask.cli import ScriptInfo
@@ -194,13 +193,6 @@ def default_config(tmp_db_path):
                 }
             }
         },
-        ZENODO_CUSTOM_METADATA_DEFINITIONS={
-            'custom-metadata-comm': [
-                'dwc:family',
-                'dwc:genus',
-                'dwc:behavior',
-            ]
-        }
     )
 
 
@@ -399,7 +391,6 @@ def communities(db, users):
         {'id': 'zenodo', 'user_id': users[2]['id']},
         {'id': 'ecfunded', 'user_id': users[2]['id']},
         {'id': 'grants_comm', 'user_id': users[2]['id']},
-        {'id': 'custom-metadata-comm', 'user_id': users[2]['id']},
     ]
     for c in comm_data:
         Community.create(c['id'], user_id=c['user_id'])
@@ -769,20 +760,10 @@ def full_record():
 def custom_metadata():
     """Custom metadata dictionary."""
     return {
-        'custom-metadata-comm': {
-            'dwc:family': 'Felidae',
-            'dwc:genus': 'Felis',
-            'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
-        }
+        'dwc:family': 'Felidae',
+        'dwc:genus': 'Felis',
+        'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
     }
-
-
-@pytest.fixture
-def record_with_custom_metadata(app, full_record, custom_metadata):
-    """Full record fixture."""
-    full_record['communities'].append('custom-metadata-comm')
-    full_record['custom'] = custom_metadata
-    return full_record
 
 
 @pytest.fixture

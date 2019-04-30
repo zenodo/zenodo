@@ -80,69 +80,44 @@ def test_deposit_versioning_draft_child_unlinking_bug(
 
 def test_deposit_with_custom_field(
     json_auth_headers, api, api_client, db, es, locations, users,
-        license_record, minimal_deposit, communities, deposit_url,
+        license_record, minimal_deposit, deposit_url,
         ):
     """Test deposit with custom field publishing."""
     auth_headers = json_auth_headers
 
-    # Test wrong community
-    minimal_deposit['metadata']['custom'] = {
-        'not-custom-metadata-comm': {'dwc:family': 'Felidae'}}
-    response = api_client.post(
-        deposit_url, json=minimal_deposit, headers=auth_headers)
-    assert response.json['errors'] == [{
-        'field': 'metadata.custom',
-        'message': 'Community "not-custom-metadata-comm" does not support '
-                   'custom metadata.'}]
-
     # Test wrong term
-    minimal_deposit['metadata']['custom'] = {
-        'custom-metadata-comm': {'foobar': 'Felidae'}}
+    minimal_deposit['metadata']['custom'] = {'foobar': 'Felidae'}
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
-        'message': 'Community "custom-metadata-comm" does not support '
-                   '"foobar" as a custom metadata term.'}]
+        'message':
+        'Zenodo does not support "foobar" as a custom metadata term.'}]
 
     # Test wrong value
     minimal_deposit['metadata']['custom'] = {
-        'custom-metadata-comm': {'dwc:family': 12131}}
+        'dwc:family': 12131
+    }
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
         'message': 'Invalid type for term "dwc:family", should be "keyword".'}]
 
-    # Test that the used community for custom metadata is in the record
     minimal_deposit['metadata']['custom'] = {
-        'custom-metadata-comm': {
-            'dwc:family': 'Felidae',
-            'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
-        }
+        'dwc:family': 'Felidae',
+        'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
     }
-    response = api_client.post(
-        deposit_url, json=minimal_deposit, headers=auth_headers)
-
-    assert response.json['errors'] == [{
-        'field': 'metadata.custom',
-        'message': 'You have included custom metadata for communities that '
-                   'this record does not belong to.'}]
-
-    # Add the missing community creating a valid record with custom metadata
-    minimal_deposit['metadata']['communities'] = \
-        [{'identifier': 'custom-metadata-comm'}]
 
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
 
     links = response.json['links']
     expected_custom_data = {
-        'custom-metadata-comm': {
             'dwc:family': 'Felidae',
             'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
-        }
     }
+
     assert response.json['metadata']['custom'] == expected_custom_data
 
     response = api_client.put(
