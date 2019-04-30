@@ -26,11 +26,13 @@
 
 from __future__ import absolute_import, print_function
 
+import re
 from decimal import Decimal, InvalidOperation
 
 from elasticsearch_dsl import Q
-from flask import current_app
 from invenio_rest.errors import FieldError, RESTValidationError
+
+from zenodo.modules.records import current_custom_metadata
 
 
 def geo_bounding_box_filter(name, field, type=None):
@@ -103,33 +105,40 @@ def custom_metadata_filter(field):
     :returns: Function that returns the custom metadata query.
     """
     def inner(values):
-        config = current_app.config['ZENODO_CUSTOM_METADATA_DEFINITIONS']
+        definitions = current_custom_metadata.definitions
+        terms = current_custom_metadata.terms
         must_conditions = []
         for value in values:
-            try:
-                community, search_term = value.split('.', 1)
-                search_key, search_value = search_term.split(':', 1)
-            except Exception:
+            # Matches one of:
+            #
+            #   community[vocabulary:term]:value
+            #   [vocabulary:term]:value
+            parsed = re.match(r'([-\w]+)?\[([-\w]+\:[-\w]+)\]\:(.+)', value)
+            if not parsed:
                 raise RESTValidationError(
                     errors=[FieldError(
-                        field, 'The query should have the format: '
-                               'custom=community.field_name:filed_value.')])
-            community = community.strip()
-            search_key = search_key.strip()
-            search_value = search_value.strip()
+                        field, 'The parameter should have the format: '
+                               'custom=community[field_name]:filed_value.')])
+
+            community, search_key, search_value = parsed.groups()
 
             # check if the community supports custom fields
-            if community not in config:
+            if community and community not in definitions:
                 raise RESTValidationError(
                     errors=[FieldError(field, 'The "{}" community does not '
-                            'support custom fields.'.format(community))])
+                            'support custom metadata.'.format(community))])
 
             # check if the field is supported by the community
-            if search_key not in config[community]:
+            if community and search_key not in definitions[community]:
                 raise RESTValidationError(
                     errors=[FieldError(
-                        field, 'The "{}" key is not supported by the "{}" '
+                        field, 'The "{}" term is not supported by the "{}" '
                         'community.'.format(search_key, community))])
+            elif search_key not in terms:
+                raise RESTValidationError(
+                    errors=[FieldError(
+                        field, 'The "{}" term is not supported.'
+                        .format(search_key))])
 
             # TODO: check if the search value has the correct type
             # for now we have only 'keyword' and 'text'
@@ -141,7 +150,7 @@ def custom_metadata_filter(field):
                 text='custom_text'
             )
 
-            custom_type = config[community][search_key]['type']
+            custom_type = terms[search_key]
             es_field = custom_fields_mapping[custom_type]
 
             must_conditions.append({
@@ -152,10 +161,10 @@ def custom_metadata_filter(field):
                         'bool': {'must': [
                             {'match': {es_field + '.key': search_key}},
                             {'match': {es_field + '.value': search_value}}
+                            # TODO: in the future also filter ".community"
                         ]}
                     }
                 }
             })
-
         return Q('bool', must=must_conditions)
     return inner
