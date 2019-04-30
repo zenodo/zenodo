@@ -25,3 +25,9 @@
 """Zenodo utils."""
 
 from __future__ import absolute_import, print_function
+
+from .common import obj_or_import_string
+
+__all__ = (
+    'obj_or_import_string',
+)

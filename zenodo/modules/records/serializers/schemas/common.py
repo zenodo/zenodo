@@ -26,32 +26,31 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from functools import partial
-
 import arrow
 import idutils
 import jsonref
 import pycountry
-from flask import current_app, has_request_context, request
+from flask import current_app, has_request_context
 from flask_babelex import lazy_gettext as _
 from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
-from invenio_iiif.utils import iiif_image_key, ui_iiif_image_url
+from invenio_iiif.utils import ui_iiif_image_url
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
-from six.moves.urllib.parse import quote, urlparse
+from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
 
+from zenodo.modules.records import current_custom_metadata
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
 from zenodo.modules.records.models import AccessRight
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
 from ..fields import DateString, PersistentId, SanitizedHTML, \
-    SanitizedUnicode, SanitizedUrl
+    SanitizedUnicode
 
 
 def clean_empty(data, keys):
@@ -299,15 +298,6 @@ class LocationSchemaV1(Schema):
             )
 
 
-class CustomMetadataSchema(Schema):
-    """Schema for custom metadata."""
-
-    value = SanitizedUnicode(required=True)
-    uri = SanitizedUrl()
-
-custom_metadata_text_schema = CustomMetadataSchema(strict=True)
-
-
 class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     """Common metadata schema."""
 
@@ -462,38 +452,38 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         """Validate the custom metadata according to config."""
         if not obj:
             return missing
-        else:
-            custom_metadata_rules = \
-                current_app.config.get('ZENODO_CUSTOM_METADATA_DEFINITIONS')
-            for community in obj:
-                if community not in custom_metadata_rules:
+
+        if not isinstance(obj, dict):
+            raise ValidationError('Not an object.', field_names=['custom'])
+
+        valid_terms = current_custom_metadata.terms
+        definitions = current_custom_metadata.definitions
+        term_types = current_custom_metadata.term_types
+        for community, comm_data in obj.items():
+            comm_definition = definitions.get(community)
+            if not comm_definition:
+                raise ValidationError(
+                    'Community "{0}" does not support custom metadata.'
+                    .format(community), field_names=['custom'])
+            for term, value in comm_data.items():
+                if term not in comm_definition:
                     raise ValidationError(
-                        'The community: {0} is not supporting custom metadata'
-                        .format(community)
-                        )
-                for scheme in obj[community]:
-                    if scheme not in custom_metadata_rules[community]:
-                        raise ValidationError(
-                            'The community {0} is not supporting {1}'
-                            ' as a metadata scheme'
-                            .format(community, scheme)
-                            )
-                    obj[community][scheme] = \
-                        custom_metadata_text_schema.load(
-                            obj[community][scheme]).data
-            return obj
+                        'Community "{0}" does not support "{1}" as a custom '
+                        'metadata term.'.format(community, term),
+                        field_names=['custom'])
+
+                # Validate term type
+                term_type = term_types[valid_terms[term]]
+                if not isinstance(value, term_type):
+                    raise ValidationError(
+                        'Invalid type for term "{0}", should be "{1}".'
+                        .format(term, valid_terms[term]),
+                        field_names=['custom'])
+        return obj
 
     def dump_custom(self, data):
-        """Enrich custom metadata according to config."""
-        custom_metadata_rules = \
-            current_app.config.get('ZENODO_CUSTOM_METADATA_DEFINITIONS')
-        if not data.get('custom', []):
-            return missing
-        for community in data['custom']:
-            for item in data['custom'][community]:
-                data['custom'][community][item]['scheme'] = \
-                    custom_metadata_rules[community][item]['scheme']
-        return data['custom']
+        """Dump custom metadata."""
+        return data.get('custom', missing)
 
     @pre_load()
     def preload_accessrights(self, data):
@@ -537,14 +527,13 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     @post_load()
     def postload_custom(self, data):
         """Compare record communities with custom metadata used."""
-        if 'custom' in data:
-            if not set(data['custom'].keys()) <= \
-                    set(data.get('communities', [])):
-                raise ValidationError(
-                    'You have included custom metadata for '
-                    'communities this record does not belong to.',
-                    field_names=['custom']
-                    )
+        if not set(data.get('custom', {}).keys()) <= \
+                set(data.get('communities', [])):
+            raise ValidationError(
+                'You have included custom metadata for '
+                'communities that this record does not belong to.',
+                field_names=['custom']
+            )
 
 
 class CommonRecordSchemaV1(Schema, StrictKeysMixin):
