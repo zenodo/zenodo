@@ -87,92 +87,66 @@ def test_deposit_with_custom_field(
 
     # Test wrong community
     minimal_deposit['metadata']['custom'] = {
-        "not-custom-metadata-community": {
-            "family": {"value": "Felidae",
-                       "uri": "https://en.wikipedia.org/wiki/Felidae"},
-            }
-    }
+        'not-custom-metadata-comm': {'dwc:family': 'Felidae'}}
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
-        'message': 'The community: not-custom-metadata-community is'
-                   ' not supporting custom metadata'
-            }]
+        'message': 'Community "not-custom-metadata-comm" does not support '
+                   'custom metadata.'}]
 
-    # Test wrong scheme
+    # Test wrong term
     minimal_deposit['metadata']['custom'] = {
-        "custom-metadata-community": {
-            "non-existent-scheme": {
-                "value": "Felidae",
-                "uri": "https://en.wikipedia.org/wiki/Felidae"
-                }
-            }
-    }
+        'custom-metadata-comm': {'foobar': 'Felidae'}}
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
-        'message': 'The community custom-metadata-community is not supporting'
-                   ' non-existent-scheme as a metadata scheme'
-            }]
+        'message': 'Community "custom-metadata-comm" does not support '
+                   '"foobar" as a custom metadata term.'}]
 
     # Test wrong value
     minimal_deposit['metadata']['custom'] = {
-        "custom-metadata-community": {
-            "family": {"value": 12131,
-                       "uri": "https://en.wikipedia.org/wiki/Felidae"}
-            }
-    }
+        'custom-metadata-comm': {'dwc:family': 12131}}
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
-        'field': 'metadata.custom.value',
-        'message': 'Not a valid string.'
-            }]
+        'field': 'metadata.custom',
+        'message': 'Invalid type for term "dwc:family", should be "keyword".'}]
 
     # Test that the used community for custom metadata is in the record
     minimal_deposit['metadata']['custom'] = {
-        "custom-metadata-community": {
-            "family": {"value": "Felidae",
-                       "uri": "https://en.wikipedia.org/wiki/Felidae"},
-            "behavior": {"value": "Plays with yarn, sleeps in cardboard box."}
-            }
+        'custom-metadata-comm': {
+            'dwc:family': 'Felidae',
+            'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
+        }
     }
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
 
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
-        'message': 'You have included custom metadata for communities'
-                   ' this record does not belong to.'
-            }]
+        'message': 'You have included custom metadata for communities that '
+                   'this record does not belong to.'}]
 
     # Add the missing community creating a valid record with custom metadata
     minimal_deposit['metadata']['communities'] = \
-        [{'identifier': 'custom-metadata-community'}]
+        [{'identifier': 'custom-metadata-comm'}]
 
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
 
     links = response.json['links']
     expected_custom_data = {
-        "custom-metadata-community": {
-            "family": {
-                "scheme": "http://rs.tdwg.org/dwc/terms/family",
-                "uri": "https://en.wikipedia.org/wiki/Felidae",
-                "value": "Felidae"
-            },
-            "behavior": {
-                'scheme': 'http://rs.tdwg.org/dwc/iri/behavior',
-                "value": "Plays with yarn, sleeps in cardboard box."
-            }
+        'custom-metadata-comm': {
+            'dwc:family': 'Felidae',
+            'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
         }
     }
     assert response.json['metadata']['custom'] == expected_custom_data
 
     response = api_client.put(
-            links['bucket']+'/test',
+            links['bucket'] + '/test',
             data='foo file',
             headers=auth_headers,
         )

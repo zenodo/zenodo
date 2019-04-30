@@ -70,18 +70,18 @@ def test_build_record_custom_fields(record_with_custom_metadata):
     """Test building of the records' custom fields."""
     expected = dict(
         custom_keywords={
-            ('family', 'Felidae', 'https://en.wikipedia.org/wiki/Felidae'),
-            ('genus', 'Felis', 'https://en.wikipedia.org/wiki/Felis')
+            ('dwc:family', 'Felidae'),
+            ('dwc:genus', 'Felis'),
         },
         custom_text={
-            ('behavior', 'Plays with yarn, sleeps in cardboard box.', None)
+            ('dwc:behavior', 'Plays with yarn, sleeps in cardboard box.'),
         }
     )
 
     result = build_record_custom_fields(record_with_custom_metadata)
     assert expected == {
-        'custom_keywords': {(v['key'], v['value'], v.get('uri'))
-                            for v in result['custom_keywords']},
-        'custom_text': {(v['key'], v['value'], v.get('uri'))
-                        for v in result['custom_text']}
+        'custom_keywords': {
+            (v['key'], v['value']) for v in result['custom_keywords']},
+        'custom_text': {
+            (v['key'], v['value']) for v in result['custom_text']}
     }
