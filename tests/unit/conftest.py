@@ -184,21 +184,22 @@ def default_config(tmp_db_path):
             'application/foo+xml': 'Test 1',
             'application/bar+xml': 'Test 2',
         },
-        ZENODO_CUSTOM_METADATA_DEFINITIONS={
-            'custom-metadata-community': {
-                'family': {
-                    'scheme': 'http://rs.tdwg.org/dwc/terms/family',
-                    'type': 'keyword',
-                },
-                'genus': {
-                    'scheme': 'http://rs.tdwg.org/dwc/terms/genus',
-                    'type': 'keyword',
-                },
-                'behavior': {
-                    'scheme': 'http://rs.tdwg.org/dwc/iri/behavior',
-                    'type': 'text',
-                },
+        ZENODO_CUSTOM_METADATA_VOCABULARIES={
+            'dwc': {
+                '@context': 'http://rs.tdwg.org/dwc/terms/',
+                'attributes': {
+                    'family': 'keyword',
+                    'genus': 'keyword',
+                    'behavior': 'text',
+                }
             }
+        },
+        ZENODO_CUSTOM_METADATA_DEFINITIONS={
+            'custom-metadata-comm': [
+                'dwc:family',
+                'dwc:genus',
+                'dwc:behavior',
+            ]
         }
     )
 
@@ -398,7 +399,7 @@ def communities(db, users):
         {'id': 'zenodo', 'user_id': users[2]['id']},
         {'id': 'ecfunded', 'user_id': users[2]['id']},
         {'id': 'grants_comm', 'user_id': users[2]['id']},
-        {'id': 'custom-metadata-community', 'user_id': users[2]['id']},
+        {'id': 'custom-metadata-comm', 'user_id': users[2]['id']},
     ]
     for c in comm_data:
         Community.create(c['id'], user_id=c['user_id'])
@@ -765,18 +766,22 @@ def full_record():
 
 
 @pytest.fixture
-def record_with_custom_metadata(app, full_record):
-    """Full record fixture."""
-    full_record['communities'].append('custom-metadata-community')
-    full_record['custom'] = {
-        'custom-metadata-community': {
-            'family': {'value': 'Felidae',
-                       'uri': 'https://en.wikipedia.org/wiki/Felidae'},
-            'genus': {'value': 'Felis',
-                      'uri': 'https://en.wikipedia.org/wiki/Felis'},
-            'behavior': {'value': 'Plays with yarn, sleeps in cardboard box.'},
+def custom_metadata():
+    """Custom metadata dictionary."""
+    return {
+        'custom-metadata-comm': {
+            'dwc:family': 'Felidae',
+            'dwc:genus': 'Felis',
+            'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
         }
     }
+
+
+@pytest.fixture
+def record_with_custom_metadata(app, full_record, custom_metadata):
+    """Full record fixture."""
+    full_record['communities'].append('custom-metadata-comm')
+    full_record['custom'] = custom_metadata
     return full_record
 
 
