@@ -40,7 +40,7 @@ from sqlalchemy import or_
 from werkzeug.utils import import_string
 
 from zenodo.modules.openaire import current_openaire
-from zenodo.modules.records.resolvers import record_resolver
+from zenodo.modules.records import current_custom_metadata
 
 
 def schema_prefix(schema):
@@ -145,7 +145,7 @@ def xsd41():
 
 def build_record_custom_fields(record):
     """Build the custom metadata fields for ES indexing."""
-    config = current_app.config['ZENODO_CUSTOM_METADATA_DEFINITIONS']
+    valid_terms = current_custom_metadata.terms
     es_custom_fields = dict(
         custom_keywords=[],
         custom_text=[]
@@ -158,17 +158,13 @@ def build_record_custom_fields(record):
     custom_metadata = record.get('custom', {})
     communities = set(record.get('communities', []))
     for community, community_metadata in custom_metadata.items():
-        custom_schema = config.get(community)
-        if community in communities and custom_schema:
-            for field, field_data in community_metadata.items():
-                field_cfg = custom_schema.get(field)
-                if field_cfg:
-                    custom_type = field_cfg['type']
-                    es_object = {'key': field, 'value': field_data['value']}
-                    uri = field_data.get('uri')
-                    if uri:
-                        es_object['uri'] = uri
-                    es_custom_field = custom_fields_mapping[custom_type]
+        if community in communities:
+            for term, value in community_metadata.items():
+                term_type = valid_terms.get(term)
+                if term_type:
+                    # TODO: in the futurem also add "community"
+                    es_object = {'key': term, 'value': value}
+                    es_custom_field = custom_fields_mapping[term_type]
                     es_custom_fields[es_custom_field].append(es_object)
 
     return {k: es_custom_fields[k] for k in es_custom_fields

@@ -618,20 +618,23 @@
             }
           }
         },
+        "custom": {
+          "type": "object",
+          "dynamic": false,
+          "enabled": false
+        },
         "custom_keywords": {
           "type" : "nested",
           "properties": {
             "key": {"type": "string", "index": "not_analyzed"},
-            "value": {"type": "string", "index": "not_analyzed"},
-            "uri": {"type": "string", "index": "not_analyzed"}
+            "value": {"type": "string", "index": "not_analyzed"}
           }
         },
         "custom_text": {
           "type" : "nested",
           "properties": {
             "key": {"type": "string", "index": "not_analyzed"},
-            "value": {"type": "string"},
-            "uri": {"type": "string", "index": "not_analyzed"}
+            "value": {"type": "string"}
           }
         }
       }

@@ -80,4 +80,5 @@ def indexer_receiver(sender, json=None, record=None, index=None,
                                         record.get('conceptrecid'))
 
     custom_es_fields = build_record_custom_fields(json)
-    json.update(custom_es_fields)
+    for es_field, es_value in custom_es_fields.items():
+        json[es_field] = es_value
