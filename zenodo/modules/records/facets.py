@@ -123,7 +123,7 @@ def custom_metadata_filter(field):
                 raise RESTValidationError(
                     errors=[FieldError(
                         field, 'The parameter should have the format: '
-                               'custom=[field_name]:filed_value.')])
+                               'custom=[field_name]:field_value.')])
 
             search_key, search_value = parsed.groups()
 
