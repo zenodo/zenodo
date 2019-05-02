@@ -90,9 +90,9 @@ def test_geographical_search(es, api, json_headers, record_with_bucket):
     ('[dwc:family]:Felidae', 200, None),
     ('[dwc:foobar]:Felidae', 400, 'The "dwc:foobar" term is not supported.'),
     ('[dwc:family]', 400, 'The parameter should have the '
-     'format: custom=[field_name]:filed_value.'),
+     'format: custom=[field_name]:field_value.'),
     (':Felidae', 400, 'The parameter should have the '
-     'format: custom=[field_name]:filed_value.')
+     'format: custom=[field_name]:field_value.')
 ])
 def test_custom_search_validation(es, api, json_headers, record_with_bucket,
                                   val, status, error_message):
