@@ -715,6 +715,10 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='GeoJSON',
         serializer='zenodo.modules.records.serializers.geojson_v1',
     ),
+    'dcat': dict(
+        title='DCAT',
+        serializer='zenodo.modules.records.serializers.dcat_v1',
+    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
@@ -816,6 +820,8 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.dc_v1_response'),
             'application/vnd.citationstyles.csl+json': (
                 'zenodo.modules.records.serializers.csl_v1_response'),
+            'application/dcat+xml': (
+                'zenodo.modules.records.serializers.dcat_response'),
             'text/x-bibliography': (
                 'zenodo.modules.records.serializers.citeproc_v1_response'),
             'application/vnd.geo+json': (
@@ -1079,6 +1085,11 @@ OAISERVER_METADATA_FORMATS = {
         'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v41',
     },
+    'dcat': {
+        'namespace': 'https://www.w3.org/ns/dcat',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_dcat_v1',
+    },
     'oai_datacite': {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
@@ -1088,6 +1099,12 @@ OAISERVER_METADATA_FORMATS = {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
+    },
+    'oai_datacite4': {
+        'namespace': 'http://datacite.org/schema/kernel-4',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer':
+            'zenodo.modules.records.serializers.oaipmh_oai_datacite_v41',
     },
     'oai_dc': {
         'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
