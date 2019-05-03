@@ -29,8 +29,8 @@ from invenio_search import current_search
 
 
 @pytest.mark.parametrize(('val', 'status', 'error_message'), [
-    ('2.45,1.63,-1.43,-1.53', 200, None),
-    ('1.53  ,    -1.43  ,   2.34,1.23', 200, None),
+    ('-1.43,-1.53, 2.45,1.63', 200, None),
+    ('1.23,     -1.43  , 1.53  ,   2.34', 200, None),
     ('2.45,1.63', 400,
      'Invalid bounds: four comma-separated numbers required. '
      'Example: 143.37158,-38.99357,146.90918,-37.35269'),
@@ -48,6 +48,8 @@ from invenio_search import current_search
      'Invalid number: "NaN" is not a permitted value.'),
     ('2.45,1.63,Infinity,-1.53', 400,
      'Longitude must be between -180 and 180.'),
+    ('-1.43,1.63,2.45,-1.53', 400,
+     'Top-right latitude must be greater than bottom-left latitude.'),
 ])
 def test_geographical_search_validation(
         es, api, json_headers, record_with_bucket, val, status, error_message):

@@ -73,6 +73,11 @@ def geo_bounding_box_filter(name, field, type=None):
                 raise RESTValidationError(
                     errors=[FieldError(
                         name, 'Longitude must be between -180 and 180.')])
+            if top_right_lat <= bottom_left_lat:
+                raise RESTValidationError(
+                    errors=[FieldError(
+                        name, 'Top-right latitude must be greater than '
+                              'bottom-left latitude.')])
         except InvalidOperation:  # comparison with "NaN" raises exception
             raise RESTValidationError(
                 errors=[FieldError(
