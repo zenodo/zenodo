@@ -965,8 +965,8 @@ RECORDS_REST_FACETS = dict(
             communities=terms_filter('communities'),
             custom=custom_metadata_filter('custom'),
             provisional_communities=terms_filter('provisional_communities'),
-            locations=geo_bounding_box_filter(
-                'locations', 'locations.point', type='indexed'),
+            bounds=geo_bounding_box_filter(
+                'bounds', 'locations.point', type='indexed'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),

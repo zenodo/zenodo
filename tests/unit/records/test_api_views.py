@@ -59,14 +59,14 @@ def test_geographical_search_validation(
     with api.test_request_context():
         with api.test_client() as client:
             res = client.get(
-                url_for('invenio_records_rest.recid_list', locations=val),
+                url_for('invenio_records_rest.recid_list', bounds=val),
                 headers=json_headers
             )
             assert res.status_code == status
             if error_message:
                 assert res.json['message'] == 'Validation error.'
                 assert len(res.json['errors']) == 1
-                assert res.json['errors'][0]['field'] == 'locations'
+                assert res.json['errors'][0]['field'] == 'bounds'
                 assert res.json['errors'][0]['message'] == error_message
 
 
@@ -82,7 +82,7 @@ def test_geographical_search(es, api, json_headers, record_with_bucket):
         with api.test_client() as client:
             res = client.get(
                 url_for('invenio_records_rest.recid_list',
-                        locations='6.059634,46.167928,6.230161,46.244911'),
+                        bounds='6.059634,46.167928,6.230161,46.244911'),
                 headers=json_headers
             )
             assert len(res.json) == 1
