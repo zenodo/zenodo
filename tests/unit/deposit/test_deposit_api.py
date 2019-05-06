@@ -86,39 +86,113 @@ def test_deposit_with_custom_field(
     auth_headers = json_auth_headers
 
     # Test wrong term
-    minimal_deposit['metadata']['custom'] = {'foobar': 'Felidae'}
+    minimal_deposit['metadata']['custom'] = {'dwc:foobar': 'Felidae'}
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
         'message':
-        'Zenodo does not support "foobar" as a custom metadata term.'}]
+        'Zenodo does not support "dwc:foobar" as a custom metadata term.'}]
 
     # Test wrong value
     minimal_deposit['metadata']['custom'] = {
-        'dwc:family': 12131
+        'dwc:family': [12131]
     }
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
         'message': 'Invalid type for term "dwc:family", should be "keyword".'}]
-
+    # Test multiple values on a non list field
     minimal_deposit['metadata']['custom'] = {
-        'dwc:family': 'Felidae',
-        'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
+        'dwc:family': ['Felidae', 'Fluffness'],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
     }
 
     response = api_client.post(
         deposit_url, json=minimal_deposit, headers=auth_headers)
 
-    links = response.json['links']
-    expected_custom_data = {
-            'dwc:family': 'Felidae',
-            'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'The term "dwc:family" accepts only one value.'}]
+
+    # Test data not provided in an array
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': 'Fox'
     }
 
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Term "dwc:family" should be of type array.'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:genus': None,
+        'dwc:family': ['Felidae'],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Term "dwc:genus" should be of type array.'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': [],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'No values were provided for term "dwc:family".'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': ['Felidae'],
+        'dwc:behavior': ['foobar', None],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Invalid type for term "dwc:behavior", should be "text".'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': ['Felidae'],
+        'dwc:behavior': [None],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Invalid type for term "dwc:behavior", should be "text".'}]
+
+    expected_custom_data = {
+        'dwc:family': ['Felidae'],
+        'dwc:genus': ['Nighty', 'Reddish'],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
+    }
+
+    minimal_deposit['metadata']['custom'] = expected_custom_data
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
     assert response.json['metadata']['custom'] == expected_custom_data
+    links = response.json['links']
 
     response = api_client.put(
             links['bucket'] + '/test',

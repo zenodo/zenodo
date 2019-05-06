@@ -157,7 +157,7 @@ def build_record_custom_fields(record):
 
     custom_metadata = record.get('custom', {})
     for term, value in custom_metadata.items():
-        term_type = valid_terms.get(term)
+        term_type = valid_terms.get(term)['term_type']
         if term_type:
             # TODO: in the futurem also add "community"
             es_object = {'key': term, 'value': value}

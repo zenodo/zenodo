@@ -459,7 +459,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         valid_vocabulary = current_custom_metadata.available_vocabulary_set
         term_types = current_custom_metadata.term_types
         valid_terms = current_custom_metadata.terms
-        for term, value in obj.items():
+        for term, values in obj.items():
             if term not in valid_vocabulary:
                 raise ValidationError(
                     'Zenodo does not support "{0}" as a custom metadata term.'
@@ -467,11 +467,28 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                     field_names=['custom'])
 
             # Validate term type
-            term_type = term_types[valid_terms[term]]
-            if not isinstance(value, term_type):
+            term_type = term_types[valid_terms[term]['term_type']]
+            if not isinstance(values, list):
                 raise ValidationError(
-                    'Invalid type for term "{0}", should be "{1}".'
-                    .format(term, valid_terms[term]),
+                        'Term "{0}" should be of type array.'
+                        .format(term),
+                        field_names=['custom'])
+            if len(values) == 0:
+                raise ValidationError(
+                        'No values were provided for term "{0}".'
+                        .format(term),
+                        field_names=['custom'])
+            for value in values:
+                if not isinstance(value, term_type):
+                    raise ValidationError(
+                        'Invalid type for term "{0}", should be "{1}".'
+                        .format(term, valid_terms[term]['term_type']),
+                        field_names=['custom'])
+            multiple_values = valid_terms[term]['multiple']
+            if len(values) > 1 and not multiple_values:
+                raise ValidationError(
+                    'The term "{0}" accepts only one value.'
+                    .format(term),
                     field_names=['custom'])
         return obj
 

@@ -187,9 +187,18 @@ def default_config(tmp_db_path):
             'dwc': {
                 '@context': 'http://rs.tdwg.org/dwc/terms/',
                 'attributes': {
-                    'family': 'keyword',
-                    'genus': 'keyword',
-                    'behavior': 'text',
+                    'family': {
+                        'type': 'keyword',
+                        'multiple': False
+                    },
+                    'genus': {
+                        'type': 'keyword',
+                        'multiple': True
+                    },
+                    'behavior': {
+                        'type': 'text',
+                        'multiple': False
+                    }
                 }
             }
         },

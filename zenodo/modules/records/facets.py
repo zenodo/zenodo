@@ -143,7 +143,7 @@ def custom_metadata_filter(field):
                 text='custom_text'
             )
 
-            custom_type = terms[search_key]
+            custom_type = terms[search_key]['term_type']
             es_field = custom_fields_mapping[custom_type]
 
             must_conditions.append({

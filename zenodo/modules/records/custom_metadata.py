@@ -63,9 +63,13 @@ class CustomMetadataAPI(object):
         """Term-to-fieldtype lookup."""
         result = {}
         for vocab, cfg in self.vocabularies.items():
-            for attr, term_type in cfg['attributes'].items():
+            for attr in cfg['attributes']:
                 term = '{}:{}'.format(vocab, attr)
-                result[term] = term_type
+                term_conf = cfg['attributes'][attr]
+                result[term] = {
+                    'term_type': term_conf['type'],
+                    'multiple': term_conf['multiple']
+                }
         return result
 
     def _validate(self):
@@ -74,5 +78,6 @@ class CustomMetadataAPI(object):
         valid_terms = set(self.terms.keys())
         assert all(
             (v['@context'] and v['attributes'] and
-             set(v['attributes'].values()) <= valid_term_types)
+             set([k['type'] for k in v['attributes'].values()]) <=
+             valid_term_types)
             for k, v in self.vocabularies.items())

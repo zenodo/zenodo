@@ -596,10 +596,13 @@
     },
     "custom": {
       "additionalProperties": {
-        "type": [
-          "string",
-          "number"
-        ]
+        "items": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "type": "array"
       },
       "description": "Custom metadata",
       "type": "object"
