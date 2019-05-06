@@ -110,11 +110,14 @@ class Place(Schema):
 
     def get_geo(self, obj):
         """Generate geo field."""
-        return {
-            '@type': 'GeoCoordinates',
-            'latitude': obj['lat'],
-            'longitude': obj['lon']
-        }
+        if obj.get('lat') and obj.get('lon'):
+            return {
+                '@type': 'GeoCoordinates',
+                'latitude': obj['lat'],
+                'longitude': obj['lon']
+            }
+        else:
+            return missing
 
 
 class CreativeWork(Schema):

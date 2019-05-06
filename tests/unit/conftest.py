@@ -728,7 +728,8 @@ def full_record():
         ],
         owners=[1, ],
         method='microscopic supersampling',
-        locations=[{"lat": 2.35, "lon": 1.534, "place": "my place"}],
+        locations=[{"lat": 2.35, "lon": 1.534, "place": "my place"},
+                   {'place': 'New York'}],
         _oai={
             'id': 'oai:zenodo.org:1',
             'sets': ['user-zenodo', 'user-ecfunded'],

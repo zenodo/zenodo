@@ -209,8 +209,10 @@ class DublinCoreV1(Schema):
 
     def get_locations(self, obj):
         """Get locations."""
-        locations = [
-            'name={place}; east={lon}; north={lat}'.format(**location)
-            for location in obj['metadata'].get('locations', [])
-        ]
+        locations = []
+        for location in obj['metadata'].get('locations', []):
+            if location.get('lat') and location.get('lon'):
+                locations.append(
+                    'name={place}; east={lon}; north={lat}'.format(**location)
+                )
         return locations or missing

@@ -381,11 +381,13 @@ class DataCiteSchemaV1(DataCiteSchema):
 
     def get_locations(self, obj):
         """Get locations."""
-        locations = [
-            {'geoLocationPlace': l['place'],
-             'geoLocationPoint': '{} {}'.format(l['lat'], l['lon'])}
-            for l in obj['metadata'].get('locations', [])
-        ]
+        locations = []
+        for l in obj['metadata'].get('locations', []):
+            location = {'geoLocationPlace': l['place']}
+            if l.get('lat') and l.get('lon'):
+                location['geoLocationPoint'] = '{} {}'\
+                    .format(l['lat'], l['lon'])
+            locations.append(location)
         return locations or missing
 
     def get_related_identifiers(self, obj):
@@ -539,10 +541,13 @@ class DataCiteSchemaV4(DataCiteSchema):
 
     def get_locations(self, obj):
         """Get locations."""
-        locations = [
-            {'geoLocationPlace': l['place'],
-             'geoLocationPoint': {'pointLongitude': l['lon'],
-                                  'pointLatitude': l['lat']}}
-            for l in obj['metadata'].get('locations', [])
-        ]
+        locations = []
+        for l in obj['metadata'].get('locations', []):
+            location = {'geoLocationPlace': l['place']}
+            if l.get('lat') and l.get('lon'):
+                location['geoLocationPoint'] = {
+                         'pointLongitude': l['lon'],
+                         'pointLatitude': l['lat']
+                    }
+            locations.append(location)
         return locations or missing

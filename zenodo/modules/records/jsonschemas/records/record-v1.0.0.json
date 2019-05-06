@@ -748,8 +748,6 @@
           }
         },
         "required": [
-          "lat",
-          "lon",
           "place"
         ],
         "type": "object"

@@ -49,8 +49,7 @@ from zenodo.modules.records.models import AccessRight
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
-from ..fields import DateString, PersistentId, SanitizedHTML, \
-    SanitizedUnicode
+from ..fields import DateString, PersistentId, SanitizedHTML, SanitizedUnicode
 
 
 def clean_empty(data, keys):
@@ -276,8 +275,8 @@ class DateSchemaV1(Schema):
 class LocationSchemaV1(Schema):
     """Schema for geographical locations."""
 
-    lat = fields.Float(required=True)
-    lon = fields.Float(required=True)
+    lat = fields.Float()
+    lon = fields.Float()
     place = SanitizedUnicode(required=True)
     description = SanitizedUnicode()
 
@@ -334,6 +333,16 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
     method = SanitizedUnicode()
+
+    @validates('locations')
+    def validate_locations(self, value):
+        """Validate that there should be both latitude and longitude."""
+        for location in value:
+            if (location.get('lon') and not location.get('lat')) or \
+                (location.get('lat') and not location.get('lon')):
+                raise ValidationError(
+                    _('There should be both latitude and longitude.'),
+                    field_names=['locations'])
 
     @validates('language')
     def validate_language(self, value):

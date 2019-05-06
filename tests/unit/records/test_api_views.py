@@ -74,7 +74,9 @@ def test_geographical_search(es, api, json_headers, record_with_bucket):
     """Test geographical search."""
     pid, record = record_with_bucket
     record['locations'] = [
-        {'lat': 46.204391, 'lon': 6.143158, 'place': 'Geneva'}]
+        {'lat': 46.204391, 'lon': 6.143158, 'place': 'Geneva'},
+        {'place': 'New York'}
+    ]
     RecordIndexer().index(record)
     current_search.flush_and_refresh(index='records')
 

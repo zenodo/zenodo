@@ -199,6 +199,8 @@ def test_full(db, record_with_bucket, recid_pid):
         "geoLocations": [{
             "geoLocationPlace": "my place",
             "geoLocationPoint": "2.35 1.534"
+        }, {
+            'geoLocationPlace': 'New York'
         }],
         "publicationYear": "2014",
         "publisher": "Zenodo",
@@ -374,6 +376,8 @@ def test_full(db, record_with_bucket, recid_pid):
           "pointLatitude": 2.35,
           "pointLongitude": 1.534
         }
+    }, {
+        'geoLocationPlace': 'New York'
     }]
     assert obj == expected
 

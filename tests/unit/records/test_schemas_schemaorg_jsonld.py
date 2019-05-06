@@ -287,6 +287,8 @@ def test_full_record(record_with_files_creation):
                 u'longitude': 1.534
             },
             u'name': u'my place'
+        }, {
+            '@type': 'Place', 'name': 'New York'
         }]
     }
     assert data == expected

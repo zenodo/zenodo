@@ -26,7 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from marshmallow import Schema, fields, post_dump
+from marshmallow import Schema, fields, missing
 
 
 class Feature(Schema):
@@ -38,10 +38,13 @@ class Feature(Schema):
 
     def get_locations(self, obj):
         """Get locations of the record."""
-        return {
-            "type": "Point",
-            "coordinates": [obj['lon'], obj['lat']]
+        if obj.get('lat') and obj.get('lon'):
+            return {
+                "type": "Point",
+                "coordinates": [obj['lon'], obj['lat']]
             }
+        else:
+            return missing
 
     def get_name(self, obj):
         """Get name of the record."""
@@ -51,10 +54,18 @@ class Feature(Schema):
 class FeatureCollection(Schema):
     """Schema for FeatureCollection."""
 
-    features = fields.Nested(
-            Feature,
-            many=True,
-            attribute='metadata.locations',
-            default=[]
-        )
+    features = fields.Method('get_locations')
+
     type_ = fields.Constant('FeatureCollection', dump_to='type')
+
+    def get_locations(self, obj):
+        """Get locations."""
+        s = Feature()
+        items = []
+        for l in obj['metadata'].get('locations', []):
+            if l.get('lat') and l.get('lon'):
+                items.append(s.dump({
+                    'lat': l['lat'], 'lon': l['lon'], 'place': l['place']
+                }).data)
+
+        return items
