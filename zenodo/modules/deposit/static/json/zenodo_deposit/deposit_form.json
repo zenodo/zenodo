@@ -746,36 +746,20 @@
                 "name": "Data manager"
               },
               {
-                "value": "Editor",
-                "name": "Editor"
-              },
-              {
-                "value": "Researcher",
-                "name": "Researcher"
-              },
-              {
-                "value": "RightsHolder",
-                "name": "Rights holder"
-              },
-              {
-                "value": "Sponsor",
-                "name": "Sponsor"
-              },
-              {
-                "value": "Other",
-                "name": "Other"
-              },
-              {
                 "value": "Distributor",
                 "name": "Distributor"
               },
               {
-                "value": "Funder",
-                "name": "Funder"
+                "value": "Editor",
+                "name": "Editor"
               },
               {
                 "value": "HostingInstitution",
                 "name": "Hosting institution"
+              },
+              {
+                "value": "Other",
+                "name": "Other"
               },
               {
                 "value": "Producer",
@@ -810,12 +794,12 @@
                 "name": "Research group"
               },
               {
-                "value": "RightsHolder",
-                "name": "Rights holder"
-              },
-              {
                 "value": "Researcher",
                 "name": "Researcher"
+              },
+              {
+                "value": "RightsHolder",
+                "name": "Rights holder"
               },
               {
                 "value": "Sponsor",
