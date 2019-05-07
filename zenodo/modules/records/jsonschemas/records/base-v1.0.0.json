@@ -73,7 +73,6 @@
             "DataManager",
             "Distributor",
             "Editor",
-            "Funder",
             "HostingInstitution",
             "Other",
             "Producer",
@@ -83,9 +82,9 @@
             "RegistrationAgency",
             "RegistrationAuthority",
             "RelatedPerson",
+            "Researcher",
             "ResearchGroup",
             "RightsHolder",
-            "Researcher",
             "Sponsor",
             "Supervisor",
             "WorkPackageLeader"
