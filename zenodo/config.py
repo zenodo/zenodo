@@ -1201,6 +1201,8 @@ SEARCH_MAPPINGS = [
     'licenses',
     'records',
 ]
+#: ElasticSearch index prefix
+SEARCH_INDEX_PREFIX = 'zenodo-dev-'
 
 # Communities
 # ===========

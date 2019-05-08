@@ -113,7 +113,7 @@ def build_record_stats(recid, conceptrecid):
 def get_record_stats(recordid, throws=True):
     """Fetch record statistics from Elasticsearch."""
     try:
-        res = (RecordsSearch()
+        res = (RecordsSearch(index='records')
                .source(include='_stats')  # only include "_stats" field
                .get_record(recordid)
                .execute())
