@@ -1,5 +1,5 @@
 {
-  "template": "events-stats-record-view-*",
+  "template": "__SEARCH_INDEX_PREFIX__events-stats-record-view-*",
   "settings": {
     "index.mapper.dynamic": false,
     "index": {
@@ -94,6 +94,6 @@
     }
   },
   "aliases": {
-    "events-stats-record-view": {}
+    "__SEARCH_INDEX_PREFIX__events-stats-record-view": {}
   }
 }

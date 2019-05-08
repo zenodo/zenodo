@@ -1,5 +1,5 @@
 {
-  "template": "stats-file-download-*",
+  "template": "__SEARCH_INDEX_PREFIX__stats-file-download-*",
   "settings": {
     "index.mapper.dynamic": false,
     "index": {
@@ -102,6 +102,6 @@
     }
   },
   "aliases": {
-    "stats-file-download": {}
+    "__SEARCH_INDEX_PREFIX__stats-file-download": {}
   }
 }

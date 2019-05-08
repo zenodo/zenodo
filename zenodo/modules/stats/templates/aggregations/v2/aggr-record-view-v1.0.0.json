@@ -1,5 +1,5 @@
 {
-  "template": "stats-record-view-*",
+  "template": "__SEARCH_INDEX_PREFIX__stats-record-view-*",
   "settings": {
     "index.mapper.dynamic": false,
     "index": {
@@ -81,6 +81,6 @@
     }
   },
   "aliases": {
-    "stats-record-view": {}
+    "__SEARCH_INDEX_PREFIX__stats-record-view": {}
   }
 }

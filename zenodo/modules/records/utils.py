@@ -48,7 +48,7 @@ def schema_prefix(schema):
     if not schema:
         return None
     index, doctype = schema_to_index(
-        schema, index_names=current_search.mappings.keys())
+        schema, index_names=current_search.mappings.keys(), prefixed=False)
     return index.split('-')[0]
 
 
@@ -174,7 +174,7 @@ def build_record_custom_fields(record):
     for term, value in custom_metadata.items():
         term_type = valid_terms.get(term)['term_type']
         if term_type:
-            # TODO: in the futurem also add "community"
+            # TODO: in the future also add "community"
             es_object = {'key': term, 'value': value}
             es_custom_field = custom_fields_mapping[term_type]
             es_custom_fields[es_custom_field].append(es_object)

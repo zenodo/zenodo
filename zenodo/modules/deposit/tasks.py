@@ -120,9 +120,9 @@ def cleanup_indexed_deposits():
          .query('term', **{'_deposit.status': 'draft'})
          .fields(['_deposit.id']))
     res = q.scan()
-    es_depids_info = [(d.to_dict().get('_deposit.id', [None])[0], d.meta.id)
-                      for d in res]
-    es_depids = {p for p, _ in es_depids_info}
+    es_depids_info = [(d.to_dict().get('_deposit.id', [None])[0], d.meta.id,
+                       d.meta.index, d.meta.doc_type) for d in res]
+    es_depids = {p[0] for p in es_depids_info}
     db_depids_query = PersistentIdentifier.query.filter(
         PersistentIdentifier.pid_type == 'depid',
         PersistentIdentifier.pid_value.in_(es_depids))
@@ -130,10 +130,9 @@ def cleanup_indexed_deposits():
     missing_db_depids = filter(lambda d: d[0] not in db_depids, es_depids_info)
 
     indexer = RecordIndexer()
-    deposit_index = 'deposits-records-record-v1.0.0'
-    deposit_doc_type = 'deposit-record-v1.0.0'
-    for _, deposit_id in missing_db_depids:
+
+    for _, deposit_id, index, doc_type in missing_db_depids:
         indexer.client.delete(
             id=str(deposit_id),
-            index=deposit_index,
-            doc_type=deposit_doc_type)
+            index=index,
+            doc_type=doc_type)

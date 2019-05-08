@@ -31,6 +31,7 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
+from invenio_search.api import RecordsSearch
 from six import BytesIO, b
 
 from zenodo.modules.deposit.api import ZenodoDeposit
@@ -65,7 +66,7 @@ def test_deposit_index(db, es):
     })
     db.session.commit()
     current_search.flush_and_refresh(deposit_index_name)
-    res = current_search.client.search(index=deposit_index_name)
+    res = RecordsSearch(index=deposit_index_name).execute()
     # Make sure the 'title' was indexed from record
     assert res['hits']['hits'][0]['_source']['title'] == 'One'
 
@@ -84,10 +85,9 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     RecordIndexer().process_bulk_queue()
     current_search.flush_and_refresh(index=deposit_index_name)
     current_search.flush_and_refresh(index=records_index_name)
-    s_dep = current_search.client.search(
-        index=deposit_index_name)['hits']['hits']
-    s_rec = current_search.client.search(
-        index=records_index_name)['hits']['hits']
+    s_dep = RecordsSearch(index=deposit_index_name).execute()['hits']['hits']
+    s_rec = RecordsSearch(index=records_index_name).execute()['hits']['hits']
+
     assert len(s_dep) == 1
     assert len(s_rec) == 1
     assert 'relations' in s_dep[0]['_source']
@@ -124,10 +124,8 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     RecordIndexer().process_bulk_queue()
     current_search.flush_and_refresh(index=deposit_index_name)
     current_search.flush_and_refresh(index=records_index_name)
-    s_dep = current_search.client.search(
-        index=deposit_index_name)['hits']['hits']
-    s_rec = current_search.client.search(
-        index=records_index_name)['hits']['hits']
+    s_dep = RecordsSearch(index=deposit_index_name).execute()['hits']['hits']
+    s_rec = RecordsSearch(index=records_index_name).execute()['hits']['hits']
 
     assert len(s_dep) == 2  # Two deposits should be indexed
     assert len(s_rec) == 1  # One, since record does not exist yet
@@ -193,10 +191,8 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     current_search.flush_and_refresh(index=deposit_index_name)
     current_search.flush_and_refresh(index=records_index_name)
 
-    s_dep = current_search.client.search(
-        index=deposit_index_name)['hits']['hits']
-    s_rec = current_search.client.search(
-        index=records_index_name)['hits']['hits']
+    s_dep = RecordsSearch(index=deposit_index_name).execute()['hits']['hits']
+    s_rec = RecordsSearch(index=records_index_name).execute()['hits']['hits']
     assert len(s_dep) == 2
     assert len(s_rec) == 2
 

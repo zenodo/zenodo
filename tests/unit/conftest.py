@@ -223,6 +223,7 @@ def default_config(tmp_db_path):
                 }
             }
         },
+        SEARCH_INDEX_PREFIX='zenodo-test-',
     )
 
 
