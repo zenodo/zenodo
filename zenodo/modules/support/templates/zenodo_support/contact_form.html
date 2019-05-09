@@ -40,7 +40,7 @@
           {{ form.csrf_token }}
           <div class="contact">
             <div class="row">
-              {{ render_form_field(form.name, input_extras={'disabled': True} if user else {}) }}
+              {{ render_form_field(form.name, input_extras={'disabled': True} if user and user.profile.full_name else {}) }}
             </div>
             <div class="row">
               {{ render_form_field(form.email, input_extras={'disabled': True} if user else {}) }}
