@@ -24,6 +24,11 @@
 
 {%- extends "invenio_theme/page.html" %}
 
+{%- block head_meta %}
+{{super}}
+<meta name="norton-safeweb-site-verification" content="umenay8zh4kswbi568zqp19bqb-jvngusibub1ygib0x3jne9rig0fnmtofm8abb7lkzgltqp5yhm68s5qz4iqqkm39xl2o-p5foixd-1xfq4yig07ugcd1sp5kmyvpe" />
+{%- endblock head_meta %}
+
 {%- block css %}
 {% include "zenodo_theme/css.html" %}
 {%- endblock css %}
