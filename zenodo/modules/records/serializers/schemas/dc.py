@@ -143,7 +143,8 @@ class DublinCoreV1(Schema):
         metadata = obj['metadata']
         subjects = []
         subjects.extend(metadata.get('keywords', []))
-        subjects.extend((s['term'] for s in metadata.get('subjects', [])))
+        subjects.extend((s['term'] for s in metadata.get('subjects', [])
+                         if s.get('term')))
         return subjects
 
     def get_publishers(self, obj):
