@@ -248,6 +248,14 @@ def test_subjects(app, db, minimal_record_model, recid_pid):
     assert set(obj['subjects']) == {'s1', 's2', 'k1', 'k2'}
 
 
+def test_subjects_without_terms(app, db, minimal_record_model, recid_pid):
+    """Test subjects."""
+    minimal_record_model['subjects'] = [{'identifier': 's1'}, {'term': 's2'}]
+    minimal_record_model['keywords'] = ['k1', 'k2']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert set(obj['subjects']) == {'s2', 'k1', 'k2'}
+
+
 def test_dates(app, db, full_record, minimal_record_model, recid_pid):
     """Test dates."""
     minimal_record_model['dates'] = full_record['dates']
