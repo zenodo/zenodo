@@ -22,8 +22,8 @@
     <!-- Version filter-->
     <div class="row filter">
       <input id="version-filter" type="checkbox" ng-checked="!vm.invenioSearchArgs.group_by === 'version'" ng-click="vm.invenioSearchArgs.type=[];
-           vm.invenioSearchArgs.id = (vm.invenioSearchArgs.group_by === 'identity' ? vm.version_id : vm.record_id);
-           vm.invenioSearchArgs.group_by = (vm.invenioSearchArgs.group_by === 'identity' ? 'version' : 'identity');">
+           vm.invenioSearchArgs.group_by = (vm.invenioSearchArgs.group_by === 'identity' ? 'version' : 'identity');
+           vm.invenioSearchArgs.id = (vm.invenioSearchArgs.group_by === 'version' ? vm.version_id : vm.record_id);">
       <label for="version-filter">Citations to this version</label>
     </div>
   </div>
