@@ -107,6 +107,9 @@ class ZenodoGitHubRelease(GitHubRelease):
                     last_deposit = last_deposit.registerconceptdoi()
                     last_recid, last_record = last_deposit.fetch_published()
                 deposit_metadata['conceptdoi'] = last_record['conceptdoi']
+                if last_record.get('communities'):
+                    deposit_metadata.setdefault('communities',
+                                                last_record['communities'])
                 if versioning.draft_child:
                     stashed_draft_child = versioning.draft_child
                     versioning.remove_draft_child()
