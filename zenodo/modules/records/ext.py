@@ -32,7 +32,7 @@ from invenio_pidrelations.contrib.versioning import versioning_blueprint
 from . import config
 from .custom_metadata import CustomMetadataAPI
 from .indexer import indexer_receiver
-from .utils import serialize_record
+from .utils import serialize_record, transform_record
 from .views import blueprint, record_communities
 
 
@@ -54,6 +54,7 @@ class ZenodoRecords(object):
         app.register_blueprint(blueprint)
         # Add global record serializer template filter
         app.add_template_filter(serialize_record, 'serialize_record')
+        app.add_template_filter(transform_record, 'transform_record')
 
         # Register versioning blueprint
         app.register_blueprint(versioning_blueprint)
