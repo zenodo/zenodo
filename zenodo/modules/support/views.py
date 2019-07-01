@@ -61,7 +61,7 @@ def support():
                 'info': form.data,
                 'uap': uap
             }
-            
+
             try:
                 send_support_email(context)
                 send_confirmation_email(context)

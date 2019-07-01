@@ -32,4 +32,4 @@ Device: {{ uap.device }}
 User's browser information not included.
 {%- endif %}
 
-{{ info.description }}
+{{ info.description | safe }}
