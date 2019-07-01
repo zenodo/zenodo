@@ -1040,11 +1040,11 @@ PREVIEWER_PREFERENCE = [
     'csv_dthreejs',
     'iiif_image',
     'simple_image',
-    'json_prismjs',
-    'xml_prismjs',
+    # 'json_prismjs',
+    # 'xml_prismjs',
     'mistune',
     'pdfjs',
-    'ipynb',
+    # 'ipynb',
     'zip',
 ]
 
