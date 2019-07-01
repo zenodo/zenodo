@@ -61,6 +61,21 @@ def is_deposit(record):
     return schema_prefix(record.get('$schema')) == 'deposits'
 
 
+def transform_record(record, pid, serializer, module=None, throws=True,
+                     **kwargs):
+    """Transform a record using a serializer."""
+    if isinstance(record, Record):
+        try:
+            module = module or 'zenodo.modules.records.serializers'
+            serializer = import_string('.'.join((module, serializer)))
+            return serializer.transform_record(pid, record, **kwargs)
+        except Exception:
+            current_app.logger.exception(
+                u'Record transformation failed {}.'.format(str(record.id)))
+            if throws:
+                raise
+
+
 def serialize_record(record, pid, serializer, module=None, throws=True,
                      **kwargs):
     """Serialize record according to the passed serializer."""

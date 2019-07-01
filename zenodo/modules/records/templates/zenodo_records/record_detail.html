@@ -118,9 +118,9 @@
 
 {%- block javascript %}
 {%- block record_jsonld %}
-{% set jsonld_serialization = record | serialize_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
+{% set jsonld_serialization = record | transform_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
 {%- if jsonld_serialization %}
-  <script type='application/ld+json'>{{jsonld_serialization|safe}}</script>
+  <script type='application/ld+json'>{{ jsonld_serialization | tojson }}</script>
 {%- endif %}
 {%- endblock record_jsonld %}
 {{super()}}
