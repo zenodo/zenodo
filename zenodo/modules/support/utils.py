@@ -31,7 +31,8 @@ from flask import current_app, request
 from flask_mail import Message
 from ua_parser import user_agent_parser
 
-from zenodo.modules.records.serializers.fields.html import ATTRS, TAGS
+from zenodo.modules.records.serializers.fields.html import ALLOWED_ATTRS, \
+    ALLOWED_TAGS
 
 from .proxies import current_support_categories
 
@@ -88,8 +89,8 @@ def send_support_email(context):
     """Signal for sending emails after contact form validated."""
     sanitized_description = bleach.clean(
             context['info']['description'],
-            tags=TAGS,
-            attributes=ATTRS,
+            tags=ALLOWED_TAGS,
+            attributes=ALLOWED_ATTRS,
             strip=True,
         ).strip()
     context['info']['description'] = sanitized_description

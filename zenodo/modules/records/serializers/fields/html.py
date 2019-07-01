@@ -30,7 +30,7 @@ import bleach
 
 from .sanitizedunicode import SanitizedUnicode
 
-TAGS = [
+ALLOWED_TAGS = [
             'a',
             'abbr',
             'acronym',
@@ -54,7 +54,7 @@ TAGS = [
             'ul',
         ]
 
-ATTRS = {
+ALLOWED_ATTRS = {
             '*': ['class'],
             'a': ['href', 'title', 'name', 'class', 'rel'],
             'abbr': ['title'],
@@ -68,9 +68,8 @@ class SanitizedHTML(SanitizedUnicode):
     def __init__(self, tags=None, attrs=None, *args, **kwargs):
         """Initialize field."""
         super(SanitizedHTML, self).__init__(*args, **kwargs)
-        self.tags = tags or TAGS
-
-        self.attrs = attrs or ATTRS
+        self.tags = tags or ALLOWED_TAGS
+        self.attrs = attrs or ALLOWED_ATTRS
 
     def _deserialize(self, value, attr, data):
         """Deserialize string by sanitizing HTML."""
