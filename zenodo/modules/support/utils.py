@@ -26,9 +26,12 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import bleach
 from flask import current_app, request
 from flask_mail import Message
 from ua_parser import user_agent_parser
+
+from zenodo.modules.records.serializers.fields.html import ATTRS, TAGS
 
 from .proxies import current_support_categories
 
@@ -83,6 +86,14 @@ def get_support_email_recipients(context):
 
 def send_support_email(context):
     """Signal for sending emails after contact form validated."""
+    sanitized_description = bleach.clean(
+            context['info']['description'],
+            tags=TAGS,
+            attributes=ATTRS,
+            strip=True,
+        ).strip()
+    context['info']['description'] = sanitized_description
+
     msg_body = render_template_to_string(
         current_app.config['SUPPORT_EMAIL_BODY_TEMPLATE'], context)
     msg_title = render_template_to_string(
