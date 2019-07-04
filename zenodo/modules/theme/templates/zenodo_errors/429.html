@@ -1,0 +1,16 @@
+{# -*- coding: utf-8 -*-
+
+  This file is part of Invenio.
+  Copyright (C) 2019 CERN.
+
+  Invenio is free software; you can redistribute it and/or modify it
+  under the terms of the MIT License; see LICENSE file for more details.
+#}
+
+{% extends config.THEME_ERROR_TEMPLATE %}
+
+{% block message %}
+  <h1><i class="fa fa-flash"></i> {{_('Too many requests')}}</h1>
+  <p>{{_('Try logging in if you have not already since we are offering a larger request limit for authenticated users.')}}</p>
+  {% endblock message %}
+

@@ -48,6 +48,8 @@ import os
 from datetime import timedelta
 
 from celery.schedules import crontab
+from flask import request
+from flask_security import current_user
 from invenio_app.config import APP_DEFAULT_SECURE_HEADERS
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
@@ -115,6 +117,7 @@ PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
 DATACITE_UPDATING_RATE_PER_HOUR = 1000
 #: DataCite max description length
 DATACITE_MAX_DESCRIPTION_SIZE = 20000
+
 
 #: Zenodo PID relations
 PIDRELATIONS_RELATION_TYPES = [
@@ -296,6 +299,23 @@ ACCOUNTS_SESSION_REDIS_URL = "redis://localhost:6379/2"
 ACCESS_CACHE = 'invenio_cache:current_cache'
 #: Disable JSON Web Tokens
 ACCOUNTS_JWT_ENABLE = False
+
+# Fine tuning for limiter.
+RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
+RATELIMIT_STRATEGY = 'moving-window'
+
+
+def set_rate_limit():
+    """Set the flask limiter allowed rate."""
+    if request.endpoint in ['zenodo_frontpage.index', 'security.login']:
+        return "10 per second"
+    if current_user.is_authenticated:
+        return "5000 per hour;100 per minute"
+    else:
+        return "1000 per hour;60 per minute"
+
+
+RATELIMIT_APPLICATION = set_rate_limit
 
 # CSL Citation Formatter
 # ======================
@@ -801,6 +821,8 @@ FILES_REST_CHECKSUM_VERIFICATION_URI_PREFIXES = [
 #: URL template for generating URLs outside the application/request context
 FILES_REST_ENDPOINT = '{scheme}://{host}/api/files/{bucket}/{key}'
 
+# Error template
+THEME_429_TEMPLATE = "zenodo_errors/429.html"
 
 #: Records REST API endpoints.
 RECORDS_API = '/api/records/{pid_value}'

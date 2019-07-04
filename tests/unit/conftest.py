@@ -39,10 +39,10 @@ from celery import Task
 from celery.messaging import establish_connection
 from click.testing import CliRunner
 from flask import current_app as flask_current_app
-from flask import url_for
+from flask import request, url_for
 from flask.cli import ScriptInfo
 from flask_celeryext import create_celery_app
-from flask_security import login_user
+from flask_security import current_user, login_user
 from fs.opener import opener
 from helpers import bearer_auth
 from invenio_access.models import ActionUsers
@@ -118,6 +118,22 @@ def tmp_db_path():
     os.remove(os_path)
 
 
+def set_rate_limit():
+    """Set testing rates for flask limiter."""
+    if flask_current_app.config['USE_FLASK_LIMITER']:
+        if current_user.is_authenticated and \
+                current_user.email == 'admin@zenodo.org':
+            return "200 per second"
+        if request.endpoint in ['zenodo_frontpage.index', 'security.login']:
+            return "100 per second"
+        if current_user.is_authenticated:
+            return "4 per second"
+        else:
+            return "2 per second"
+    else:
+        return "1000 per second"
+
+
 @pytest.fixture(scope='session')
 def default_config(tmp_db_path):
     """Default configuration."""
@@ -156,6 +172,9 @@ def default_config(tmp_db_path):
     APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
     return dict(
+        USE_FLASK_LIMITER=False,
+        RATELIMIT_STRATEGY='moving-window',
+        RATELIMIT_APPLICATION=set_rate_limit,
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
         APP_DEFAULT_SECURE_HEADERS=APP_DEFAULT_SECURE_HEADERS,
@@ -1297,3 +1316,11 @@ def mock_datacite_minting(mocker, app):
         'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     yield datacite_mock
     app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig
+
+
+@pytest.fixture
+def use_flask_limiter(app):
+    """Activate flask limiter."""
+    flask_current_app.config['USE_FLASK_LIMITER'] = True
+    yield
+    flask_current_app.config['USE_FLASK_LIMITER'] = False

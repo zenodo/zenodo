@@ -221,6 +221,7 @@ setup(
             'zenodo_exporter = zenodo.modules.exporter.ext:InvenioExporter',
             'zenodo_frontpage = zenodo.modules.frontpage.ext:ZenodoFrontpage',
             'zenodo_stats = zenodo.modules.stats.ext:ZenodoStats',
+            'zenodo_theme = zenodo.modules.theme.ext:ZenodoTheme',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '
