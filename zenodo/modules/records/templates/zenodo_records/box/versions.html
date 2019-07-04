@@ -21,7 +21,7 @@
     {%- endfor %}
     {%- if active_versions|length > 5 %}
       {%- if pid_version_index < active_versions|length - 5 %}
-        {% if pid_version_index < active_versions|length - 6 %}<tr><td colspan="3" align="center">...</tr>{% endif %}
+        {% if pid_version_index < active_versions|length - 6 %}<tr><td colspan="2" align="center">...</tr>{% endif %}
         <tr class="info">
           <td>
             <a href="{{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value) }}">Version {{ record.version or (pid_version_index + 1) }}</a>
@@ -31,7 +31,7 @@
         </tr>
       {% endif %}
       {% set q = {"conceptrecid": record.conceptrecid}|make_query %}
-      <tr><td colspan="3" align="center"><a href="{{url_for('invenio_search_ui.search', q=q, all_versions=True, sort='-version')}}"><small>View all {{active_versions|length}} versions</small></a></tr>
+      <tr><td colspan="2" align="center"><a href="{{url_for('invenio_search_ui.search', q=q, all_versions=True, sort='-version')}}"><small>View all {{active_versions|length}} versions</small></a></tr>
     {%- endif %}
     </table>
     <small>
