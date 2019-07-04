@@ -863,6 +863,9 @@ RECORDS_REST_ENDPOINTS = dict(
 )
 # Default OpenAIRE API endpoints.
 RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
+
+# Add fuzzy matching for licenses
+OPENDEFINITION_REST_ENDPOINTS['od_lic']['suggesters']['text']['completion']['fuzzy'] = True
 RECORDS_REST_ENDPOINTS.update(OPENDEFINITION_REST_ENDPOINTS)
 
 #: Sort options records REST API.
