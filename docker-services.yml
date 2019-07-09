@@ -56,8 +56,17 @@ services:
       - "5672:5672"
   es:
     build: ./docker/es/
-    image: zenodo-es:2.4.6
+    image: zenodo-es:7.1.1
     restart: "always"
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
     ports:
       - "9200:9200"
       - "9300:9300"

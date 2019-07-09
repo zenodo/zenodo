@@ -456,10 +456,10 @@
               },
               "map": {
                 "resultSource": "text.0.options",
-                "valueSource": "payload.id",
-                "nameSource": "text",
+                "valueSource": "_source.id",
+                "nameSource": "_source.title",
                 "valueProperty": "value",
-                "nameProperty": "text"
+                "nameProperty": "_source.title"
               },
               "maxResultDisplay": 10
             },
