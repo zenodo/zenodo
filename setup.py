@@ -66,19 +66,22 @@ extras_require = {
     'elasticsearch2': [
         'invenio-search[elasticsearch2]{}'.format(search_version),
     ],
-    # 'elasticsearch5': [
-    #     'invenio-search[elasticsearch5]{}'.format(search_version),
-    # ],
-    # 'elasticsearch6': [
-    #     'invenio-search[elasticsearch5]{}'.format(search_version),
-    # ],
+    'elasticsearch5': [
+        'invenio-search[elasticsearch5]{}'.format(search_version),
+    ],
+    'elasticsearch6': [
+        'invenio-search[elasticsearch6]{}'.format(search_version),
+    ],
+    'elasticsearch7': [
+        'invenio-search[elasticsearch7]{}'.format(search_version),
+    ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
 for name, reqs in extras_require.items():
     if name in ('postgresql', 'mysql', 'sqlite', 'elasticsearch2',
-                'elasticsearch5', 'elasticsearch6'):
+                'elasticsearch5', 'elasticsearch6', 'elasticsearch7'):
         continue
     extras_require['all'].extend(reqs)
 

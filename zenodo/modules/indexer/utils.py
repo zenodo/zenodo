@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 from flask import current_app
 from invenio_indexer.utils import default_record_to_index
 
+from elasticsearch import VERSION as ES_VERSION
 
 def record_to_index(record):
     """Get the elasticsearch index and doc_type for given record.
@@ -41,6 +42,11 @@ def record_to_index(record):
     :returns: Tuple of (index, doc_type)
     :rtype: (str, str)
     """
-    index, doc_type = default_record_to_index(record)
+    if ES_VERSION[0] < 7:
+        index, doc_type = default_record_to_index(record)
+    if ES_VERSION[0] >= 7:
+        index, doc_type = default_record_to_index(record)
+        doc_type = '_doc'
+
     return index, current_app.config['INDEXER_SCHEMA_TO_INDEX_MAP'].get(
         index, doc_type)
