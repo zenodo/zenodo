@@ -373,6 +373,58 @@ GITHUB_DEPOSIT_CLASS = 'zenodo.modules.deposit.api:ZenodoDeposit'
 GITHUB_PID_FETCHER = 'zenodo_doi_fetcher'
 #: GitHub metdata file
 GITHUB_METADATA_FILE = '.zenodo.json'
+#: GitHub error handlers
+GITHUB_ERROR_HANDLERS = [
+    (
+        'zenodo.modules.deposit.errors.VersioningFilesError',
+        'zenodo.modules.github.error_handlers.versioning_files_error'
+    ),
+    (
+       'github3.exceptions.AuthenticationFailed',
+       'zenodo.modules.github.error_handlers.authentification_failed'
+    ),
+    (
+        'zenodo.modules.deposit.errors.MarshmallowErrors',
+        'zenodo.modules.github.error_handlers.marshmallow_error'
+    ),
+    (
+        Exception,
+        'zenodo.modules.github.error_handlers.default_error'
+    ),
+]
+#   (
+#        'invenio_github.errors.RepositoryAccessError',
+#        'zenodo.modules.github.error_handlers.repository_access_error'
+#    ),
+#    (
+#        'sqlalchemy.lib.sqlalchemy.orm.exc.StaleDataError',
+#        'zenodo.modules.github.error_handlers.stale_data_error'
+#    ),
+#    (
+#        'sqlalchemy.lib.sqlalchemy.exc.InvalidRequestError',
+#        'zenodo.modules.github.error_handlers.invalid_request_error'
+#    ),
+#    (
+#        'elasticsearch.exceptions.ConnectionError',
+#        'zenodo.modules.github.error_handlers.connection_error'
+#    ),
+#    (
+#        'elasticsearch.exceptions.ClientError',
+#        'zenodo.modules.github.error_handlers.client_error'
+#    ),
+#    (
+#        'sqlalchemy.lib.sqlalchemy.exc.IntegrityError',
+#        'zenodo.modules.github.error_handlers.integrity_error'
+#    ),
+#    (
+#        'ForbiddenError',
+#        'zenodo.modules.github.error_handlers.forbidden_error'
+#    ),
+#    (
+#        'ServerError',
+#        'zenodo.modules.github.error_handlers.server_error'
+#    )
+
 #: SIPStore
 SIPSTORE_GITHUB_AGENT_JSONSCHEMA = 'sipstore/agent-githubclient-v1.0.0.json'
 #: Set OAuth client application config.
@@ -895,6 +947,7 @@ RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
 # Add fuzzy matching for licenses
 OPENDEFINITION_REST_ENDPOINTS['od_lic']['suggesters']['text']['completion']['fuzzy'] = True
 RECORDS_REST_ENDPOINTS.update(OPENDEFINITION_REST_ENDPOINTS)
+
 
 #: Sort options records REST API.
 RECORDS_REST_SORT_OPTIONS = dict(

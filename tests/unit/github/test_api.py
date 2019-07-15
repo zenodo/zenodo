@@ -96,7 +96,6 @@ def test_github_publish(mocker, db, users, locations,
     zgh.metadata = deposit_metadata
     zgh.files = (('foobar.txt', None), )
     zgh.model.repository.releases.filter_by().count.return_value = 0
-
     zgh.publish()
 
     # datacite should be called twice - for regular DOI and Concept DOI
