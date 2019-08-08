@@ -45,8 +45,8 @@ tests_require = [
     'selenium>=3.5.0,<3.6.0',
 ]
 
-db_version = '>=1.0.3'
-search_version = '>=1.0.2'
+db_version = '>=1.0.4'
+search_version = '>=1.2.1'
 
 extras_require = {
     'docs': [
@@ -64,16 +64,16 @@ extras_require = {
     ],
     # Elasticsearch version
     'elasticsearch2': [
-        'invenio-search[elasticsearch2]{}'.format(search_version),
+        'invenio-search[elasticsearch2]>={}'.format(search_version),
     ],
     'elasticsearch5': [
-        'invenio-search[elasticsearch5]{}'.format(search_version),
+        'invenio-search[elasticsearch5]>={}'.format(search_version),
     ],
     'elasticsearch6': [
-        'invenio-search[elasticsearch6]{}'.format(search_version),
+        'invenio-search[elasticsearch6]>={}'.format(search_version),
     ],
     'elasticsearch7': [
-        'invenio-search[elasticsearch7]{}'.format(search_version),
+        'invenio-search[elasticsearch7]>={}'.format(search_version),
     ],
     'tests': tests_require,
 }
@@ -134,7 +134,7 @@ install_requires = [
     'invenio-jsonschemas>=1.0.0',
     'invenio-logging>=1.1.0',
     'invenio-mail>=1.0.2',
-    'invenio-marc21>=1.0.0a8',
+    'invenio-marc21>=1.0.0a9',
     'invenio-migrator>=1.0.0a9',
     'invenio-oaiserver>=1.0.3',
     'invenio-oauth2server>=1.0.3',

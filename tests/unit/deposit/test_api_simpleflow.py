@@ -77,6 +77,9 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
         )
     )
 
+    # Fetch grant suggestion
+    # Fetch license suggestion
+
     # Prepare headers
     auth = write_token['auth_header']
     headers = [

@@ -44,9 +44,11 @@ def record_to_index(record):
     """
     if ES_VERSION[0] < 7:
         index, doc_type = default_record_to_index(record)
+
     if ES_VERSION[0] >= 7:
         index, doc_type = default_record_to_index(record)
         doc_type = '_doc'
+        return index, doc_type
 
     return index, current_app.config['INDEXER_SCHEMA_TO_INDEX_MAP'].get(
         index, doc_type)

@@ -72,7 +72,7 @@ services:
       - "9300:9300"
   kibana:
     build: ./docker/kibana/
-    image: zenodo-kibana:4.3
+    image: zenodo-kibana:7.1.1
     restart: "always"
     command: kibana
     ports:
