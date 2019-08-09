@@ -45,8 +45,8 @@ tests_require = [
     'selenium>=3.5.0,<3.6.0',
 ]
 
-db_version = '>=1.0.3'
-search_version = '>=1.0.2'
+db_version = '>=1.0.4'
+search_version = '1.2.1'
 
 extras_require = {
     'docs': [
@@ -151,7 +151,6 @@ install_requires = [
     'invenio-records>=1.1.0',
     'invenio-rest>=1.0.0',
     'invenio-search-ui>=1.0.1,<1.1.0',
-    'invenio-search>=1.0.0',
     'invenio-sipstore>=1.0.0a7',
     'invenio-stats>=1.0.0a10',
     'invenio-theme>=1.0.0,<1.1.0',
