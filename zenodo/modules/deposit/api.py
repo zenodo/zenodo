@@ -478,6 +478,10 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
 
         return deposit
 
+    @classmethod
+    def dump_bucket(cls, data, bucket):
+        pass
+
     @preserve(result=False, fields=PRESERVE_FIELDS)
     def clear(self, *args, **kwargs):
         """Clear only drafts."""

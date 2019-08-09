@@ -51,7 +51,8 @@ def make_file_fixture(filename, text=None):
 
 
 def test_simple_rest_flow(mocker, api, api_client, db, es,
-                          locations, users, write_token, license_record):
+                          locations, users, write_token, license_record,
+                          grant_records, funder_record):
     """Test simple flow using REST API."""
     mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
 
@@ -76,9 +77,16 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
             access_right='open',
         )
     )
-
     # Fetch grant suggestion
+    funder = funder_record['doi']
+    res = client.get("/grants/_suggest?text=open&funder={}".format(funder))
+    grant_id = res.json['text'][0]['options'][0]['_source']['legacy_id']
+    test_data['metadata']['grants'] = [{"id": grant_id}]
+
     # Fetch license suggestion
+    res = client.get('/licenses/_suggest?text=CC0-1.0')
+    test_data['metadata']['license'] = \
+        res.json['text'][0]['options'][0]['_source']['id']
 
     # Prepare headers
     auth = write_token['auth_header']
