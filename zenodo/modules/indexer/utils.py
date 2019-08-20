@@ -26,10 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
+from elasticsearch import VERSION as ES_VERSION
 from flask import current_app
 from invenio_indexer.utils import default_record_to_index
 
-from elasticsearch import VERSION as ES_VERSION
 
 def record_to_index(record):
     """Get the elasticsearch index and doc_type for given record.

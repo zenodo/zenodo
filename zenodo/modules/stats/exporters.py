@@ -33,6 +33,7 @@ from flask import current_app
 from invenio_cache import current_cache
 from invenio_pidstore.errors import PIDDeletedError
 from invenio_search import current_search_client
+from invenio_search.utils import prefix_index
 from six.moves.urllib.parse import urlencode
 
 from zenodo.modules.records.serializers.schemas.common import ui_link_for
@@ -61,7 +62,7 @@ class PiwikExporter:
 
         events = Search(
             using=current_search_client,
-            index='events-stats-*'
+            index=prefix_index('events-stats-*')
         ).filter(
             'range', timestamp=time_range
         ).sort(

@@ -49,12 +49,9 @@ def update_record_statistics(start_date=None, end_date=None):
         start_date = datetime.utcnow()
         end_date = datetime.utcnow()
 
-        for aggr_name in current_stats.enabled_aggregations:
-            aggr_cfg = current_stats.aggregations[aggr_name]
-            aggr = aggr_cfg.aggregator_class(
-                name=aggr_cfg.name, **aggr_cfg.aggregator_config)
-
-            if not Index(aggr.aggregation_alias, using=aggr.client).exists():
+        for aggr_name, aggr_cfg in current_stats.aggregations.items():
+            aggr = aggr_cfg.cls(name=aggr_cfg.name, **aggr_cfg.params)
+            if not Index(aggr.index, using=aggr.client).exists():
                 if not Index(aggr.event_index, using=aggr.client).exists():
                     start_date = min(start_date, datetime.utcnow())
                 else:
@@ -62,12 +59,7 @@ def update_record_statistics(start_date=None, end_date=None):
                         start_date, aggr._get_oldest_event_timestamp())
 
             # Retrieve the last two bookmarks
-            bookmarks = Search(
-                using=aggr.client,
-                index=aggr.aggregation_alias,
-                doc_type=aggr.bookmark_doc_type
-            )[0:2].sort({'date': {'order': 'desc'}}).execute()
-
+            bookmarks = aggr.list_bookmarks(limit=2)
             if len(bookmarks) >= 1:
                 end_date = max(
                     end_date,
@@ -77,29 +69,27 @@ def update_record_statistics(start_date=None, end_date=None):
                     start_date,
                     datetime.strptime(bookmarks[1].date, aggr.doc_id_suffix))
 
-            aggr_configs[aggr.aggregation_alias] = aggr
+            aggr_configs[aggr.index] = aggr
     elif start_date and end_date:
-        for aggr_name in current_stats.enabled_aggregations:
-            aggr_cfg = current_stats.aggregations[aggr_name]
-            aggr = aggr_cfg.aggregator_class(
-                name=aggr_cfg.name, **aggr_cfg.aggregator_config)
-            aggr_configs[aggr.aggregation_alias] = aggr
+        for aggr_name, aggr_cfg in current_stats.aggregations.items():
+            aggr = aggr_cfg.cls(name=aggr_cfg.name, **aggr_cfg.params)
+            aggr_configs[aggr.index] = aggr
     else:
         return
 
     # Get conceptrecids for all the affected records between the two dates
     conceptrecids = set()
-    for aggr_alias, aggr in aggr_configs.items():
+    for aggr_index, aggr in aggr_configs.items():
         query = Search(
             using=aggr.client,
-            index=aggr.aggregation_alias,
-            doc_type=aggr.aggregation_doc_type,
+            index=aggr.index,
+            doc_type=aggr.doc_type,
         ).filter(
             'range', timestamp={
                 'gte': start_date.replace(microsecond=0).isoformat() + '||/d',
                 'lte': end_date.replace(microsecond=0).isoformat() + '||/d'}
         ).extra(_source=False)
-        query.aggs.bucket('ids', 'terms', field='conceptrecid', size=0)
+        query.aggs.bucket('ids', 'terms', field='conceptrecid')
         conceptrecids |= {
             b.key for b in query.execute().aggregations.ids.buckets}
 

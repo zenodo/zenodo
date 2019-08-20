@@ -1,0 +1,99 @@
+{
+  "template": "__SEARCH_INDEX_PREFIX__events-stats-file-download-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "dynamic_templates": [
+      {
+        "date_fields": {
+          "match_mapping_type": "date",
+          "mapping": {
+            "type": "date",
+            "format": "strict_date_hour_minute_second"
+          }
+        }
+      }
+    ],
+    "date_detection": false,
+    "numeric_detection": false,
+    "dynamic": false,
+    "properties": {
+      "timestamp": {
+        "type": "date",
+        "format": "strict_date_hour_minute_second"
+      },
+      "bucket_id": {
+        "type": "keyword"
+      },
+      "file_id": {
+        "type": "keyword"
+      },
+      "file_key": {
+        "type": "keyword"
+      },
+      "pid_type": {
+        "type": "keyword"
+      },
+      "pid_value": {
+        "type": "keyword"
+      },
+      "unique_id": {
+        "type": "keyword"
+      },
+      "country": {
+        "type": "keyword"
+      },
+      "visitor_id": {
+        "type": "keyword"
+      },
+      "size": {
+        "type": "double"
+      },
+      "is_machine": {
+        "type": "boolean"
+      },
+      "is_robot": {
+        "type": "boolean"
+      },
+      "record_id": {
+        "type": "keyword"
+      },
+      "recid": {
+        "type": "keyword"
+      },
+      "conceptrecid": {
+        "type": "keyword"
+      },
+      "doi": {
+        "type": "keyword"
+      },
+      "conceptdoi": {
+        "type": "keyword"
+      },
+      "resource_type": {
+        "type": "object"
+      },
+      "access_right": {
+        "type": "keyword"
+      },
+      "communities": {
+        "type": "keyword"
+      },
+      "owners": {
+        "type": "integer"
+      },
+      "unique_session_id": {
+        "type": "keyword"
+      },
+      "referrer": {
+        "type": "keyword"
+      }
+    }
+  },
+  "aliases": {
+    "__SEARCH_INDEX_PREFIX__events-stats-file-download": {}
+  }
+}

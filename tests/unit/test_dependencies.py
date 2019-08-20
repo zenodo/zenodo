@@ -24,7 +24,7 @@
 
 """Basics tests to ensure DB and Elasticsearch is running."""
 
-from invenio_search import current_search_client, current_search
+from invenio_search import current_search, current_search_client
 
 
 def test_es_running(app):

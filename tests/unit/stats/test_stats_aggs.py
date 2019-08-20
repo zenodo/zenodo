@@ -25,10 +25,8 @@
 from datetime import datetime, timedelta
 
 from elasticsearch_dsl import Search
-from invenio_search.api import RecordsSearch
-from stats_helpers import create_stats_fixtures
-
 from elasticsearch_dsl.query import Ids
+from stats_helpers import create_stats_fixtures
 
 
 def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
@@ -61,7 +59,7 @@ def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
     assert search.index(prefix + 'stats-record-view').count() == 30
 
     # 2bm + 2bm
-    assert search.index(prefix + 'bookmark-index').count() == 4
+    assert search.index(prefix + 'stats-bookmarks').count() == 4
 
     # Records index
     for _, record, _ in records:
@@ -112,8 +110,6 @@ def test_large_stats(app, db, es, locations, event_queues, minimal_record):
     q = search.index(prefix + 'stats-record-view')
     q = q.doc_type('record-view-day-aggregation')
     assert q.count() == 915  # 61 days * 15 records
-
-    # import wdb; wdb.set_trace()
 
     # Reords index
     for _, record, _ in records:

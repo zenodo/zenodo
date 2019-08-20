@@ -101,7 +101,7 @@ def build_record_stats(recid, conceptrecid):
     for query_name, cfg in stats_sources.items():
         try:
             query_cfg = current_stats.queries[query_name]
-            query = query_cfg.query_class(**query_cfg.query_config)
+            query = query_cfg.cls(name=query_name, **query_cfg.params)
             result = query.run(**cfg['params'])
             for dst, src in cfg['fields'].items():
                 stats[dst] = result.get(src)

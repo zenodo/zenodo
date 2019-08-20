@@ -296,14 +296,6 @@ setup(
             'records = zenodo.modules.records.mappings',
             'deposits = zenodo.modules.deposit.mappings',
         ],
-        'invenio_stats.aggregations': [
-            'zenodo_stats = '
-            'zenodo.modules.stats.registrations:register_aggregations'
-        ],
-        'invenio_stats.queries': [
-            'zenodo_stats = '
-            'zenodo.modules.stats.registrations:register_queries'
-        ],
         'invenio_oauth2server.scopes': [
             ('deposit_extra_formats = '
              'zenodo.modules.deposit.scopes:extra_formats_scope'),

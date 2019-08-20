@@ -31,10 +31,10 @@ from os.path import dirname, join
 
 from flask import current_app
 from invenio_db import db
+from invenio_indexer.utils import schema_to_index
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
-from invenio_search.utils import schema_to_index
 from lxml import etree
 from sqlalchemy import or_
 from werkzeug.utils import import_string
@@ -48,7 +48,7 @@ def schema_prefix(schema):
     if not schema:
         return None
     index, doctype = schema_to_index(
-        schema, index_names=current_search.mappings.keys(), prefixed=False)
+        schema, index_names=current_search.mappings.keys())
     return index.split('-')[0]
 
 

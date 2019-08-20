@@ -48,6 +48,8 @@ import os
 from datetime import timedelta
 
 from celery.schedules import crontab
+from flask_principal import ActionNeed
+from invenio_access.permissions import Permission
 from invenio_app.config import APP_DEFAULT_SECURE_HEADERS
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
@@ -63,6 +65,9 @@ from invenio_pidrelations.config import RelationType
 from invenio_records_rest.facets import terms_filter
 from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
+from invenio_stats.aggregations import StatAggregator
+from invenio_stats.processors import EventsIndexer
+from invenio_stats.queries import ESTermsQuery
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
 from zenodo.modules.records.facets import custom_metadata_filter, \
@@ -1329,7 +1334,8 @@ STATS_EVENTS = {
             'zenodo.modules.stats.event_builders:skip_deposit',
             'zenodo.modules.stats.event_builders:add_record_metadata',
         ],
-        'processor_config': {
+        'cls': EventsIndexer,
+        'params': {
             'preprocessors': [
                 'invenio_stats.processors:flag_robots',
                 # Don't index robot events
@@ -1352,7 +1358,8 @@ STATS_EVENTS = {
             'zenodo.modules.stats.event_builders:skip_deposit',
             'zenodo.modules.stats.event_builders:add_record_metadata',
         ],
-        'processor_config': {
+        'cls': EventsIndexer,
+        'params': {
             'preprocessors': [
                 'invenio_stats.processors:flag_robots',
                 # Don't index robot events
@@ -1370,44 +1377,221 @@ STATS_EVENTS = {
 }
 #: Enabled aggregations from 'zenoodo.modules.stats.registrations'
 STATS_AGGREGATIONS = {
-    'record-download-agg': {},
-    'record-download-all-versions-agg': {},
-    # NOTE: Since the "record-view-agg" aggregations is already registered in
-    # "invenio_stasts.contrib.registrations", we have to overwrite the
-    # configuration here
     'record-view-agg': dict(
         templates='zenodo.modules.stats.templates.aggregations',
-        aggregator_config=dict(
+        cls=StatAggregator,
+        params=dict(
             client=current_stats_search_client,
             event='record-view',
-            aggregation_field='recid',
-            aggregation_interval='day',
-            batch_size=1,
+            field='recid',
+            interval='day',
+            index_interval='month',
             copy_fields=dict(
                 record_id='record_id',
                 recid='recid',
                 conceptrecid='conceptrecid',
                 doi='doi',
                 conceptdoi='conceptdoi',
-                communities=lambda d, _: (list(d.communities)
-                                          if d.communities else None),
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: False
             ),
-            metric_aggregation_fields=dict(
+            metric_fields=dict(
                 unique_count=('cardinality', 'unique_session_id',
                               {'precision_threshold': 1000}),
             )
         )
     ),
-    'record-view-all-versions-agg': {},
+    'record-view-all-versions-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        cls=StatAggregator,
+        params=dict(
+            client=current_stats_search_client,
+            event='record-view',
+            field='conceptrecid',
+            interval='day',
+            index_interval='month',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: True
+            ),
+            metric_fields=dict(
+                unique_count=(
+                    'cardinality', 'unique_session_id',
+                    {'precision_threshold': 1000}),
+            )
+        )
+    ),
+    'record-download-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        cls=StatAggregator,
+        params=dict(
+            client=current_stats_search_client,
+            event='file-download',
+            field='recid',
+            interval='day',
+            index_interval='month',
+            copy_fields=dict(
+                bucket_id='bucket_id',
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: False
+            ),
+            metric_fields=dict(
+                unique_count=('cardinality', 'unique_session_id',
+                              {'precision_threshold': 1000}),
+                volume=('sum', 'size', {}),
+            )
+        )
+    ),
+    'record-download-all-versions-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        cls=StatAggregator,
+        params=dict(
+            client=current_stats_search_client,
+            event='file-download',
+            field='conceptrecid',
+            interval='day',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: True
+            ),
+            metric_fields=dict(
+                unique_count=(
+                    'cardinality', 'unique_session_id',
+                    {'precision_threshold': 1000}),
+                volume=('sum', 'size', {}),
+            )
+        )
+    ),
 }
+
+
+def stats_queries_permission_factory(query_name, params):
+    """Queries permission factory."""
+    return Permission(ActionNeed('admin-access'))
+
+
 #: Enabled queries from 'zenoodo.modules.stats.registrations'
 STATS_QUERIES = {
-    'record-view': {},
-    'record-view-all-versions': {},
-    'record-download': {},
-    'record-download-all-versions': {},
+    'record-view': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-record-view',
+            doc_type='record-view-day-aggregation',
+            copy_fields=dict(
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            required_filters=dict(
+                recid='recid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+            )
+        )
+    ),
+    'record-view-all-versions': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-record-view',
+            doc_type='record-view-day-aggregation',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            query_modifiers=[
+                lambda query, **_: query.filter('term', is_parent=True)
+            ],
+            required_filters=dict(
+                conceptrecid='conceptrecid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+            )
+        )
+    ),
+    'record-download': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-file-download',
+            doc_type='file-download-day-aggregation',
+            copy_fields=dict(
+                bucket_id='bucket_id',
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            required_filters=dict(
+                recid='recid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+                volume=('sum', 'volume', {}),
+            )
+        ),
+    ),
+    'record-download-all-versions': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-file-download',
+            doc_type='file-download-day-aggregation',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            query_modifiers=[
+                lambda query, **_: query.filter('term', is_parent=True)
+            ],
+            required_filters=dict(
+                conceptrecid='conceptrecid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+                volume=('sum', 'volume', {}),
+            )
+        )
+    ),
 }
 
 # Queues
