@@ -28,6 +28,8 @@ from elasticsearch_dsl import Search
 from invenio_search.api import RecordsSearch
 from stats_helpers import create_stats_fixtures
 
+from elasticsearch_dsl.query import Ids
+
 
 def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
     """Test basic statistics results."""
@@ -40,22 +42,34 @@ def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
         start_date=datetime(2018, 1, 1, 13),
         end_date=datetime(2018, 1, 1, 15),
         interval=timedelta(minutes=30))
+
     # Events indices
+    prefix = app.config['SEARCH_INDEX_PREFIX']
+
     # 2 versions * 10 records * 3 files * 4 events -> 240
-    assert search.index('events-stats-file-download').count() == 240
+    assert search.index(prefix + 'events-stats-file-download').count() == 240
     # 2 versions * 10 records * 4 events -> 80
-    assert search.index('events-stats-record-view').count() == 80
+    assert search.index(prefix + 'events-stats-record-view').count() == 80
 
     # Aggregations indices
     # (2 versions + 1 concept) * 10 records -> 30 documents + 2 bookmarks
-    assert search.index('stats-file-download').count() == 32  # 2bm + 30d
-    assert search.index('stats-record-view').count() == 32  # 2bm + 30d
 
-    # Reords index
+    # 30d
+    assert search.index(prefix + 'stats-file-download').count() == 30
+
+    # 30d
+    assert search.index(prefix + 'stats-record-view').count() == 30
+
+    # 2bm + 2bm
+    assert search.index(prefix + 'bookmark-index').count() == 4
+
+    # Records index
     for _, record, _ in records:
-        doc = (
-            RecordsSearch().get_record(record.id)
-            .source(include='_stats').execute()[0])
+        query = search.index(prefix + '*') \
+            .query(Ids(values=[str(record.id)])) \
+            .source(include='_stats')
+
+        doc = (query.execute()[0])
         assert doc['_stats'] == {
             # 4 view events
             'views': 4.0, 'version_views': 8.0,
@@ -83,25 +97,30 @@ def test_large_stats(app, db, es, locations, event_queues, minimal_record):
         interval=timedelta(hours=12))
 
     # Events indices
+    prefix = app.config['SEARCH_INDEX_PREFIX']
+
     # 4 versions * 3 records * 2 files * 122 events -> 2928
-    assert search.index('events-stats-file-download').count() == 2928
+    assert search.index(prefix + 'events-stats-file-download').count() == 2928
     # 4 versions * 3 records * 122 events -> 1464
-    assert search.index('events-stats-record-view').count() == 1464
+    assert search.index(prefix + 'events-stats-record-view').count() == 1464
 
     # Aggregations indices
     # (4 versions + 1 concept) * 3 records -> 15 documents + 2 bookmarks
-    q = search.index('stats-file-download')
+    q = search.index(prefix + 'stats-file-download')
     q = q.doc_type('file-download-day-aggregation')
     assert q.count() == 915  # 61 days * 15 records
-    q = search.index('stats-record-view')
+    q = search.index(prefix + 'stats-record-view')
     q = q.doc_type('record-view-day-aggregation')
     assert q.count() == 915  # 61 days * 15 records
 
+    # import wdb; wdb.set_trace()
+
     # Reords index
     for _, record, _ in records:
-        doc = (
-            RecordsSearch().get_record(record.id)
-            .source(include='_stats').execute()[0])
+        query = search.index(prefix + '*') \
+            .query(Ids(values=[str(record.id)])) \
+            .source(include='_stats')
+        doc = (query.execute()[0])
         assert doc['_stats'] == {
             # 4 view events
             'views': 122.0, 'version_views': 488.0,

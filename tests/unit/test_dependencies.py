@@ -93,8 +93,6 @@ def test_es_state(app, es):
             {'stats-record-view'},
             {
                 'record-view-day-aggregation',
-                'record-view-agg-bookmark',
-                'record-view-all-versions-agg-bookmark',
             },
 
         ),
@@ -105,8 +103,6 @@ def test_es_state(app, es):
             {
                 '_default_',
                 'file-download-day-aggregation',
-                'record-download-agg-bookmark',
-                'record-download-all-versions-agg-bookmark',
             },
         ),
     }
