@@ -152,6 +152,7 @@ class PersonSchemaV1(Schema, StrictKeysMixin):
     orcid = PersistentId(scheme='ORCID')
 
     @post_dump(pass_many=False)
+    @post_load(pass_many=False)
     def clean(self, data):
         """Clean empty values."""
         return clean_empty(data, ['orcid', 'gnd', 'affiliation'])
