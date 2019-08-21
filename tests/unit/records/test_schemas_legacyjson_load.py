@@ -249,6 +249,14 @@ def test_creators():
         dict(name="Smith, Jane", affiliation="Atlantis")
     ]
 
+    assert s.load(d(creators=[
+        dict(name="Doe, John", affiliation=" "),
+        dict(name="Smith, Jane", affiliation="")
+    ])).data['creators'] == [
+        dict(name="Doe, John"),
+        dict(name="Smith, Jane")
+    ]
+
     # Min length required
     pytest.raises(
         ValidationError,
