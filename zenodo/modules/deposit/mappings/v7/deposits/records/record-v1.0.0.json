@@ -232,7 +232,7 @@
         "type": "text"
       },
       "keywords": {
-        "type": "text"
+        "type": "keyword"
       },
       "subjects": {
         "type" : "nested",

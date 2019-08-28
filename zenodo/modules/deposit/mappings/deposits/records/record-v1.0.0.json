@@ -270,7 +270,8 @@
           "type": "string"
         },
         "keywords": {
-          "type": "string"
+          "type": "string",
+          "index": "not_analyzed"
         },
         "subjects": {
           "type" : "nested",
