@@ -563,13 +563,13 @@ DEPOSIT_UI_RESPONSE_MESSAGES = dict(
         message="Saved successfully."
     ),
     delete=dict(
-        message="Deleted succesfully."
+        message="Deleted successfully."
     ),
     discard=dict(
-        message="Changes discarded succesfully."
+        message="Changes discarded successfully."
     ),
     publish=dict(
-        message="Published succesfully."
+        message="Published successfully."
     ),
 )
 
