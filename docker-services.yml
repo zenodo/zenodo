@@ -55,8 +55,7 @@ services:
       - "15672:15672"
       - "5672:5672"
   es:
-    build: ./docker/es/
-    image: zenodo-es:7.1.1
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.3.0
     restart: "always"
     environment:
       - bootstrap.memory_lock=true
@@ -71,10 +70,8 @@ services:
       - "9200:9200"
       - "9300:9300"
   kibana:
-    build: ./docker/kibana/
-    image: zenodo-kibana:4.3
+    image: docker.elastic.co/kibana/kibana-oss:7.3.0
     restart: "always"
-    command: kibana
     ports:
       - "5601:5601"
     environment:
