@@ -113,9 +113,9 @@ install_requires = [
     'invenio-access>=1.1.0',
     'invenio-accounts>=1.1.1',
     'invenio-admin>=1.0.1,<1.1.0',
-    'invenio-app>=1.1.0',
+    'invenio-app>=1.2.2',
     'invenio-assets>=1.0.0,<1.1.0',
-    'invenio-base>=1.0.2',
+    'invenio-base>=1.2.0',
     'invenio-cache>=1.0.0',
     'invenio-celery>=1.0.1',
     'invenio-communities>=1.0.0a19',
@@ -221,6 +221,7 @@ setup(
             'zenodo_exporter = zenodo.modules.exporter.ext:InvenioExporter',
             'zenodo_frontpage = zenodo.modules.frontpage.ext:ZenodoFrontpage',
             'zenodo_stats = zenodo.modules.stats.ext:ZenodoStats',
+            'zenodo_theme = zenodo.modules.theme.ext:ZenodoTheme',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '

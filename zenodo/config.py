@@ -1396,3 +1396,10 @@ INDEXER_SCHEMA_TO_INDEX_MAP = {
     'deposits-records-record-v1.0.0': 'deposit-record-v1.0.0',
     'funders-funder-v1.0.0': 'funder-v1.0.0',
 }
+
+
+# Configuration for limiter.
+RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
+
+# Error template
+THEME_429_TEMPLATE = "zenodo_errors/429.html"
