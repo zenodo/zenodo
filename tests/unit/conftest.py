@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import json
 import os
 import shutil
+import sys
 import tempfile
 from copy import deepcopy
 from datetime import date, datetime, timedelta
@@ -48,6 +49,7 @@ from helpers import bearer_auth
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
 from invenio_admin.permissions import action_admin_access
+from invenio_app.config import set_rate_limit
 from invenio_communities.models import Community
 from invenio_db import db as db_
 from invenio_deposit.permissions import \
@@ -82,6 +84,29 @@ from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
 
 
+def wrap_rate_limit():
+    """Wrap rate limiter function to avoid affecting other tests."""
+    if flask_current_app.config.get('USE_FLASK_LIMITER'):
+        return set_rate_limit()
+    else:
+        return "1000 per second"
+
+
+@pytest.fixture
+def use_flask_limiter(app):
+    """Activate flask limiter."""
+    flask_current_app.config.update(dict(
+        USE_FLASK_LIMITER=True,
+        RATELIMIT_GUEST_USER='2 per second',
+        RATELIMIT_AUTHENTICATED_USER='4 per second',
+        RATELIMIT_PER_ENDPOINT={
+            'zenodo_frontpage.index': '10 per second',
+            'security.login': '10 per second'
+        }))
+    yield
+    flask_current_app.config['USE_FLASK_LIMITER'] = False
+
+
 @pytest.yield_fixture(scope='session')
 def instance_path():
     """Default instance path."""
@@ -104,6 +129,9 @@ def env_config(instance_path):
     os.environ.update(
         INVENIO_INSTANCE_PATH=os.environ.get(
             'INSTANCE_PATH', instance_path),
+        # To avoid rebuilding the assets during test time we provide our
+        # prebuilt assets folder.
+        INVENIO_STATIC_FOLDER=os.path.join(sys.prefix, 'var/instance/static')
     )
 
     return os.environ
@@ -156,6 +184,7 @@ def default_config(tmp_db_path):
     APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
     return dict(
+        RATELIMIT_APPLICATION=wrap_rate_limit,
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
         APP_DEFAULT_SECURE_HEADERS=APP_DEFAULT_SECURE_HEADERS,
