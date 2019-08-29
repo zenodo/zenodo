@@ -112,6 +112,7 @@
       initialization="{{ config.DEPOSIT_SEARCH_API }}"
       {%- endif %}
       files='{{record|tofilesjs|tojson}}'
+      extra-params='{"autoStartUpload": true}'
       >
     <invenio-records
       {%- if pid %}
