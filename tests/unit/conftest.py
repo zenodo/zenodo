@@ -35,9 +35,10 @@ from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
+from celery import Task
 from celery.messaging import establish_connection
 from click.testing import CliRunner
-from elasticsearch.exceptions import RequestError
+from flask import current_app as flask_current_app
 from flask import url_for
 from flask.cli import ScriptInfo
 from flask_celeryext import create_celery_app
@@ -73,6 +74,7 @@ from zenodo.config import APP_DEFAULT_SECURE_HEADERS
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
+from zenodo.modules.deposit.scopes import extra_formats_scope
 from zenodo.modules.fixtures.records import loadsipmetadatatypes
 from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
@@ -177,6 +179,29 @@ def default_config(tmp_db_path):
         TESTING=True,
         THEME_SITEURL='http://localhost',
         WTF_CSRF_ENABLED=False,
+        ZENODO_EXTRA_FORMATS_MIMETYPE_WHITELIST={
+            'application/foo+xml': 'Test 1',
+            'application/bar+xml': 'Test 2',
+        },
+        ZENODO_CUSTOM_METADATA_VOCABULARIES={
+            'dwc': {
+                '@context': 'http://rs.tdwg.org/dwc/terms/',
+                'attributes': {
+                    'family': {
+                        'type': 'keyword',
+                        'multiple': False
+                    },
+                    'genus': {
+                        'type': 'keyword',
+                        'multiple': True
+                    },
+                    'behavior': {
+                        'type': 'text',
+                        'multiple': False
+                    }
+                }
+            }
+        },
     )
 
 
@@ -192,6 +217,19 @@ def app(env_config, default_config):
     cca = cca._get_current_object()
     delattr(cca, "flask_app")
     celery_app = create_celery_app(app)
+
+    # FIXME: When https://github.com/inveniosoftware/flask-celeryext/issues/35
+    # is closed and Flask-CeleryExt is released, this can be removed.
+    class _TestAppContextTask(Task):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            if flask_current_app:
+                return Task.__call__(self, *args, **kwargs)
+            with self.app.flask_app.app_context():
+                return Task.__call__(self, *args, **kwargs)
+
+    celery_app.Task = _TestAppContextTask
     celery_app.set_current()
 
     with app.app_context():
@@ -438,6 +476,30 @@ def write_token(app, db, oauth2_client, users):
 
 
 @pytest.fixture
+def extra_token(app, db, oauth2_client, users):
+    """Create token."""
+    with db.session.begin_nested():
+        token_ = Token(
+            client_id=oauth2_client,
+            user_id=users[0]['id'],
+            access_token='dev_access_2',
+            refresh_token='dev_refresh_2',
+            expires=datetime.utcnow() + timedelta(hours=10),
+            is_personal=False,
+            is_internal=True,
+            _scopes=' '.join([extra_formats_scope.id, write_scope.id])
+        )
+        db.session.add(token_)
+    db.session.commit()
+    return dict(
+        token=token_,
+        auth_header=[
+            ('Authorization', 'Bearer {0}'.format(token_.access_token)),
+        ]
+    )
+
+
+@pytest.fixture
 def minimal_record():
     """Minimal record."""
     return {
@@ -658,7 +720,16 @@ def full_record():
                 {'name': 'Smith, Professor'},
             ],
         },
+        dates=[
+            {'type': 'Valid', 'start': '2019-01-01', 'description': 'Bongo'},
+            {'type': 'Collected', 'end': '2019-01-01'},
+            {'type': 'Withdrawn', 'start': '2019-01-01', 'end': '2019-01-01'},
+            {'type': 'Collected', 'start': '2019-01-01', 'end': '2019-02-01'},
+        ],
         owners=[1, ],
+        method='microscopic supersampling',
+        locations=[{"lat": 2.35, "lon": 1.534, "place": "my place"},
+                   {'place': 'New York'}],
         _oai={
             'id': 'oai:zenodo.org:1',
             'sets': ['user-zenodo', 'user-ecfunded'],
@@ -696,9 +767,22 @@ def full_record():
 
 
 @pytest.fixture
+def custom_metadata():
+    """Custom metadata dictionary."""
+    return {
+        'dwc:family': 'Felidae',
+        'dwc:genus': 'Felis',
+        'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
+    }
+
+
+@pytest.fixture
 def record_with_bucket(db, full_record, bucket, sip_metadata_types):
     """Create a bucket."""
     record = ZenodoRecord.create(full_record)
+    record['_buckets']['record'] = str(bucket.id)
+    record['_files'][0]['bucket'] = str(bucket.id)
+    record.commit()
     RecordsBuckets.create(bucket=bucket, record=record.model)
     pid = PersistentIdentifier.create(
         pid_type='recid', pid_value=12345, object_type='rec',
@@ -931,6 +1015,24 @@ def auth_headers(write_token):
     It uses the token associated with the first user.
     """
     return bearer_auth([], write_token)
+
+
+@pytest.fixture
+def extra_auth_headers(extra_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth([], extra_token)
+
+
+@pytest.fixture
+def json_extra_auth_headers(json_headers, extra_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth(json_headers, extra_token)
 
 
 @pytest.fixture
@@ -1184,3 +1286,14 @@ def sample_identifiers():
         'urn': ('urn:nbn:de:101:1-201102033592',
                 'https://nbn-resolving.org/urn:nbn:de:101:1-201102033592'),
     }
+
+
+@pytest.fixture
+def mock_datacite_minting(mocker, app):
+    """DOI registration enabled and DataCite calls mocked."""
+    orig = app.config['DEPOSIT_DATACITE_MINTING_ENABLED']
+    app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = True
+    datacite_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
+    yield datacite_mock
+    app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig

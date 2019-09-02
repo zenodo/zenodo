@@ -71,10 +71,10 @@ def test_github_creators_metadata(mocker, defaults, contribs, owner, output):
 
 
 def test_github_publish(mocker, db, users, locations,
-                        deposit_metadata, sip_metadata_types):
+                        deposit_metadata, sip_metadata_types,
+                        mock_datacite_minting):
     """Test basic GitHub payload."""
-    datacite_mock = mocker.patch(
-        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
+    datacite_mock = mock_datacite_minting
     mocker.patch('zenodo.modules.github.api.ZenodoGitHubRelease.metadata')
     data = b'foobar'
     resp = Mock()

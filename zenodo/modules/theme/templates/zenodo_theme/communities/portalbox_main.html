@@ -1,0 +1,52 @@
+{#
+  # This file is part of Zenodo.
+  # Copyright (C) 2019 CERN.
+  #
+  # Zenodo is free software; you can redistribute it
+  # and/or modify it under the terms of the GNU General Public License as
+  # published by the Free Software Foundation; either version 2 of the
+  # License, or (at your option) any later version.
+  #
+  # Zenodo is distributed in the hope that it will be
+  # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+  # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+  # General Public License for more details.
+  #
+  # You should have received a copy of the GNU General Public License
+  # along with Zenodo; if not, write to the
+  # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+  # MA 02111-1307, USA.
+  #
+  # In applying this license, CERN does not
+  # waive the privileges and immunities granted to it by virtue of its status
+  # as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- if community.logo_ext %}
+<small class="text-muted">{{_("Community")}}</small>
+<div>
+  <br>
+  <img src="{{ community.logo_url }}" style="display: block; margin: auto; max-width: 100%; max-height: 200px;">
+  <br>
+</div>
+<hr>
+{%- endif %}
+<h4>{{community.title}}</h4>
+{%- if community.description %}
+{{ community.description | sanitize_html | safe }}
+{%- endif %}
+{%- if community.page %}
+<a href="{{ url_for('invenio_communities.about', community_id=community.id) }}" class="pull-right">
+  {{ _('Read more') }}
+</a>
+<br />
+{%- endif %}
+<hr />
+<dl>
+  {%- if community.owner.profile and community.owner.profile.username %}
+    <dt>{{ _('Curated by:') }}</dt><dd>{{ community.owner.profile.username }}</dd>
+  {%- endif %}
+  <dt>{{ _('Curation policy:') }}</dt><dd>{{ community.curation_policy | sanitize_html | safe | default(_('Not specified'), true) }}</dd>
+  <dt>{{ _('Created:') }}</dt><dd>{{ community.created|dateformat(format='long') }}</dd>
+  <dt>{{ _('Harvesting API:') }}</dt><dd><a href="{{ community.oaiset_url }}">{{ _('OAI-PMH Interface') }}</a></dd>
+</dl>

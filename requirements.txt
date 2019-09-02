@@ -123,12 +123,12 @@ invenio-db==1.0.3
 invenio-deposit==1.0.0a9
 invenio-files-rest==1.0.0a23.post1
 invenio-formatter==1.0.1
-invenio-github==1.0.0a15
+invenio-github==1.0.0a16
 invenio-i18n==1.0.0
 invenio-iiif==1.0.0a5
 invenio-indexer==1.0.1
 invenio-jsonschemas==1.0.0
-invenio-logging==1.1.0
+invenio-logging==1.1.1
 invenio-mail==1.0.2
 invenio-marc21==1.0.0a8
 invenio-migrator==1.0.0a9
@@ -192,7 +192,7 @@ pbr==5.1.3
 pexpect==4.6.0
 pickleshare==0.7.5
 Pillow==5.4.1
-pluggy==0.9.0
+pluggy==0.12
 poyo==0.4.2
 prompt-toolkit==1.0.15
 psycopg2-binary==2.7.7
@@ -233,7 +233,7 @@ ua-parser==0.8.0
 Unidecode==1.0.22
 uritemplate.py==1.0.1
 uritools==2.2.0
-urllib3==1.24.1
+urllib3==1.24.2
 uWSGI==2.0.18
 uwsgitop==0.11
 validators==0.12.4
@@ -249,4 +249,4 @@ wsgi-statsd==0.3.1
 WTForms==2.2.1
 WTForms-Alchemy==0.16.9
 WTForms-Components==0.10.3
-zenodo-accessrequests==1.0.0a4
+zenodo-accessrequests==1.0.0a5

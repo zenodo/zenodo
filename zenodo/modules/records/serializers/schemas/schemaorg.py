@@ -101,6 +101,25 @@ class Language(Schema):
         return obj
 
 
+class Place(Schema):
+    """Marshmallow schema for schema.org/Place."""
+
+    type_ = fields.Constant('Place', dump_to='@type')
+    geo = fields.Method('get_geo')
+    name = SanitizedUnicode(attribute='place')
+
+    def get_geo(self, obj):
+        """Generate geo field."""
+        if obj.get('lat') and obj.get('lon'):
+            return {
+                '@type': 'GeoCoordinates',
+                'latitude': obj['lat'],
+                'longitude': obj['lon']
+            }
+        else:
+            return missing
+
+
 class CreativeWork(Schema):
     """Schema for schema.org/CreativeWork type."""
 
@@ -117,11 +136,14 @@ class CreativeWork(Schema):
     description = SanitizedHTML(attribute='metadata.description')
     context = fields.Method('get_context', dump_to='@context')
     keywords = fields.List(SanitizedUnicode(), attribute='metadata.keywords')
+    spatial = fields.Nested(Place, many=True, attribute='metadata.locations')
 
     # TODO: What date?
     # dateCreated
     # dateModified
     datePublished = DateString(attribute='metadata.publication_date')
+
+    temporal = fields.Method('get_dates')
 
     # NOTE: could also be  "author"
     creator = fields.Nested(Person, many=True, attribute='metadata.creators')
@@ -156,6 +178,18 @@ class CreativeWork(Schema):
 
     # NOTE: Zenodo communities?
     # sourceOrganization
+
+    def get_dates(self, obj):
+        """Get dates of the record."""
+        dates = []
+        for interval in obj['metadata'].get('dates', []):
+            start = interval.get('start') or '..'
+            end = interval.get('end') or '..'
+            if start != '..' and end != '..' and start == end:
+                dates.append(start)
+            else:
+                dates.append(start + '/' + end)
+        return dates or missing
 
     def get_context(self, obj):
         """Returns the value for '@context' value."""
@@ -224,11 +258,14 @@ class Distribution(Schema):
         """Get URL of the file."""
         return format_files_rest_link(bucket=obj['bucket'], key=obj['key'])
 
+
 class Dataset(CreativeWork):
     """Marshmallow schema for schema.org/Dataset."""
 
     distribution = fields.Nested(
         Distribution, many=True, attribute='metadata._files')
+
+    measurementTechnique = SanitizedUnicode(attribute='metadata.method')
 
     @pre_dump
     def hide_closed_files(self, obj):

@@ -165,7 +165,14 @@ def test_full(db, record_with_bucket, recid_pid):
                 }
             }
         ],
-        "dates": [{"date": "2014-02-27", "dateType": "Issued"}],
+        "dates": [
+            {"date": "2014-02-27", "dateType": "Issued"},
+            {"date": "2019-01-01/", "dateType": "Valid"},
+            # NOTE: "Withdrawn" is not in the DataCite v3.1 dateType vocabulary
+            # {"date": "2019-01-01", "dateType": "Withdrawn"},
+            {"date": "/2019-01-01", "dateType": "Collected"},
+            {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+        ],
         "descriptions": [
             {
                 "description": "Test Description",
@@ -183,10 +190,18 @@ def test_full(db, record_with_bucket, recid_pid):
                     "10.5281/zenodo.34\"]}"
                 ),
                 "descriptionType": "Other"
-            }
+            },
+            {'description': 'microscopic supersampling',
+             'descriptionType': 'Methods'}
         ],
         "identifier": {"identifier": "10.5072/foo", "identifierType": "DOI"},
         "language": "en",
+        "geoLocations": [{
+            "geoLocationPlace": "my place",
+            "geoLocationPoint": "2.35 1.534"
+        }, {
+            'geoLocationPlace': 'New York'
+        }],
         "publicationYear": "2014",
         "publisher": "Zenodo",
         "relatedIdentifiers": [
@@ -347,6 +362,23 @@ def test_full(db, record_with_bucket, recid_pid):
         }
     ]
     expected['fundingReferences'] = []
+    expected["dates"] = [
+        {"date": "2014-02-27", "dateType": "Issued"},
+        {"date": "2019-01-01/", "dateType": "Valid",
+         "dateInformation": "Bongo"},
+        {"date": "/2019-01-01", "dateType": "Collected"},
+        {"date": "2019-01-01", "dateType": "Withdrawn"},
+        {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+    ]
+    expected['geoLocations'] = [{
+        "geoLocationPlace": "my place",
+        "geoLocationPoint": {
+          "pointLatitude": 2.35,
+          "pointLongitude": 1.534
+        }
+    }, {
+        'geoLocationPlace': 'New York'
+    }]
     assert obj == expected
 
 

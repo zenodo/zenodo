@@ -111,6 +111,10 @@
     {"$ref": "https://zenodo.org/objecttypes/image/photo"},
     {"$ref": "https://zenodo.org/objecttypes/image/other"}
   ],
+  "openaire": {
+    "resourceType": "0025",
+    "type": "dataset"
+  },
   "csl": "graphic"
 },
 {
@@ -126,6 +130,10 @@
   "datacite": {"general": "Audiovisual"},
   "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "https://schema.org/MediaObject",
+  "openaire": {
+    "resourceType": "0033",
+    "type": "dataset"
+  },
   "csl": "motion_picture"
 },
 {
@@ -162,7 +170,7 @@
   "schema.org": "https://schema.org/CreativeWork",
   "openaire": {
     "resourceType": "0010",
-    "type": "publication"
+    "type": "other"
   },
   "csl": "speech"
 },
@@ -501,7 +509,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image#"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "figure"
 },
@@ -521,7 +529,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "figure"
 },
@@ -541,7 +549,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "graphic"
 },
@@ -561,7 +569,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "figure"
 },
@@ -581,7 +589,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "graphic"
 },
@@ -601,7 +609,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "graphic"
 },

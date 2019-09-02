@@ -37,7 +37,6 @@
             "DataManager",
             "Distributor",
             "Editor",
-            "Funder",
             "HostingInstitution",
             "Other",
             "Producer",
@@ -47,9 +46,9 @@
             "RegistrationAgency",
             "RegistrationAuthority",
             "RelatedPerson",
+            "Researcher",
             "ResearchGroup",
             "RightsHolder",
-            "Researcher",
             "Sponsor",
             "Supervisor",
             "WorkPackageLeader"
@@ -170,6 +169,10 @@
       "properties": {
         "deposit": {
           "description": "UUID of the deposit bucket.",
+          "type": "string"
+        },
+        "extra_formats": {
+          "description": "UUID of the extra formats bucket.",
           "type": "string"
         },
         "record": {
@@ -524,7 +527,6 @@
               "DataManager",
               "Distributor",
               "Editor",
-              "Funder",
               "HostingInstitution",
               "Other",
               "Producer",
@@ -534,9 +536,9 @@
               "RegistrationAgency",
               "RegistrationAuthority",
               "RelatedPerson",
+              "Researcher",
               "ResearchGroup",
               "RightsHolder",
-              "Researcher",
               "Sponsor",
               "Supervisor",
               "WorkPackageLeader"
@@ -585,6 +587,52 @@
         },
         "required": [
           "name"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "custom": {
+      "additionalProperties": {
+        "items": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "type": "array"
+      },
+      "description": "Custom metadata",
+      "type": "object"
+    },
+    "dates": {
+      "description": "Date interval.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "description": {
+            "description": "Description of the date interval.",
+            "type": "string"
+          },
+          "end": {
+            "description": "End date.",
+            "type": "string"
+          },
+          "start": {
+            "description": "Start date.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the date interval.",
+            "enum": [
+              "Collected",
+              "Valid",
+              "Withdrawn"
+            ]
+          }
+        },
+        "required": [
+          "type"
         ],
         "type": "object"
       },
@@ -676,6 +724,34 @@
       "title": "License",
       "type": "object"
     },
+    "locations": {
+      "description": "Geographical location.",
+      "items": {
+        "properties": {
+          "description": {
+            "description": "Place of the location",
+            "type": "string"
+          },
+          "lat": {
+            "description": "Latitude of the location.",
+            "type": "number"
+          },
+          "lon": {
+            "description": "Longitude of the location.",
+            "type": "number"
+          },
+          "place": {
+            "description": "Description of the location",
+            "type": "string"
+          }
+        },
+        "required": [
+          "place"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "meeting": {
       "description": "Associated meeting.",
       "properties": {
@@ -709,6 +785,10 @@
         }
       },
       "type": "object"
+    },
+    "method": {
+      "description": "Information about the used Method",
+      "type": "string"
     },
     "notes": {
       "description": "Additional notes for record.",

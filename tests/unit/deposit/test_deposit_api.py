@@ -21,8 +21,10 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 from copy import deepcopy
 
+from flask import url_for
 from helpers import publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 
@@ -74,3 +76,134 @@ def test_deposit_versioning_draft_child_unlinking_bug(
     # the edited draft
     assert pv.draft_child_deposit
     assert pv.draft_child
+
+
+def test_deposit_with_custom_field(
+    json_auth_headers, api, api_client, db, es, locations, users,
+        license_record, minimal_deposit, deposit_url,
+        ):
+    """Test deposit with custom field publishing."""
+    auth_headers = json_auth_headers
+
+    # Test wrong term
+    minimal_deposit['metadata']['custom'] = {'dwc:foobar': 'Felidae'}
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message':
+        'Zenodo does not support "dwc:foobar" as a custom metadata term.'}]
+
+    # Test wrong value
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': [12131]
+    }
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Invalid type for term "dwc:family", should be "keyword".'}]
+    # Test multiple values on a non list field
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': ['Felidae', 'Fluffness'],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'The term "dwc:family" accepts only one value.'}]
+
+    # Test data not provided in an array
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': 'Fox'
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Term "dwc:family" should be of type array.'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:genus': None,
+        'dwc:family': ['Felidae'],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Term "dwc:genus" should be of type array.'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': [],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'No values were provided for term "dwc:family".'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': ['Felidae'],
+        'dwc:behavior': ['foobar', None],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Invalid type for term "dwc:behavior", should be "text".'}]
+
+    # Test null data
+    minimal_deposit['metadata']['custom'] = {
+        'dwc:family': ['Felidae'],
+        'dwc:behavior': [None],
+    }
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['errors'] == [{
+        'field': 'metadata.custom',
+        'message': 'Invalid type for term "dwc:behavior", should be "text".'}]
+
+    expected_custom_data = {
+        'dwc:family': ['Felidae'],
+        'dwc:genus': ['Nighty', 'Reddish'],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
+    }
+
+    minimal_deposit['metadata']['custom'] = expected_custom_data
+
+    response = api_client.post(
+        deposit_url, json=minimal_deposit, headers=auth_headers)
+
+    assert response.json['metadata']['custom'] == expected_custom_data
+    links = response.json['links']
+
+    response = api_client.put(
+            links['bucket'] + '/test',
+            data='foo file',
+            headers=auth_headers,
+        )
+    assert response.status_code == 200
+
+    # Publish the record
+    response = api_client.post(links['publish'], headers=auth_headers)
+
+    # Get published record
+    response = api_client.get(response.json['links']['record'])
+    assert response.json['metadata']['custom'] == expected_custom_data

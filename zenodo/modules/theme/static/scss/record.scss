@@ -28,6 +28,11 @@
   p, h1 {
     word-wrap: break-word;
   }
+  .metadata{
+    table {
+          table-layout: fixed;
+    }
+  }
 }
 
 .well {

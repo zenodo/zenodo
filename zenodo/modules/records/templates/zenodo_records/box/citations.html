@@ -26,13 +26,13 @@
 {% set show_citations = current_user.has_role('admin') or config['ZENODO_RECORDS_UI_CITATIONS_ENABLE'] %}
 
 {%- if record.doi and (show_citations or show_betafeature) %}
-{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy", "id": record.doi } %}
+{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy" } %}
 
 <div id="citations">
   <invenio-search
    disable-url-handler="true"
    search-endpoint="{{config['ZENODO_RECORDS_UI_CITATIONS_ENDPOINT'] }}"
-   search-extra-params='{"page": 1, "size": "10", "group_by": "version"}'
+   search-extra-params='{"page": 1, "size": "10", "group_by": "version", "id": "{{record.doi}}"}'
    search-hidden-params='{% if search_hidden_params %}{{search_hidden_params|tojson}}{% endif %}'
    search-headers='{"Accept": "{{ 'application/json'}}"}' >
     <div class="panel panel-default" id="citation">
