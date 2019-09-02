@@ -28,7 +28,6 @@ addons:
   postgresql: "9.4"
   apt:
     packages:
-      - nodejs
       - libfreetype6-dev
   firefox: "55.0"
 
@@ -44,8 +43,6 @@ notifications:
 sudo: false
 
 language: python
-
-
 cache:
   directories:
     - $HOME/.cache/pip
@@ -75,6 +72,7 @@ matrix:
     - env: REQUIREMENTS=latest E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
 
 before_install:
+  - "nvm use 6"
   - "mkdir /tmp/elasticsearch"
   - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.6/elasticsearch-2.4.6.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/plugin install -b mapper-attachments"
