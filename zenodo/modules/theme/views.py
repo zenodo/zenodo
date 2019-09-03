@@ -26,7 +26,11 @@
 
 from __future__ import absolute_import, print_function
 
+import bleach
 from flask import Blueprint
+
+from zenodo.modules.records.serializers.fields.html import ALLOWED_ATTRS, \
+    ALLOWED_TAGS
 
 blueprint = Blueprint(
     'zenodo_theme',
@@ -35,3 +39,14 @@ blueprint = Blueprint(
     static_folder='static',
 )
 """Theme blueprint used to define template and static folders."""
+
+
+@blueprint.app_template_filter('sanitize_html')
+def sanitize_html(value):
+    """Sanitizes HTML using the bleach library."""
+    return bleach.clean(
+        value,
+        tags=ALLOWED_TAGS,
+        attributes=ALLOWED_ATTRS,
+        strip=True,
+    ).strip()

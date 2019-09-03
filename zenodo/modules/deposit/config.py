@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015, 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -28,6 +28,9 @@ from __future__ import absolute_import, print_function
 
 ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
 """Maximum quota per bucket."""
+
+ZENODO_EXTRA_FORMATS_BUCKET_QUOTA_SIZE = 100 * 1000 * 1000  # 100 MB
+"""Maximum quota per extra formats bucket."""
 
 ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
 """Maximum file size accepted."""

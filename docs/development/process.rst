@@ -152,7 +152,7 @@ requirements files which broadly fall in two categories:
    to either problems in Zenodo or problems in the related packages.
  - ``requirements.txt``: Base requirements for all installations (includes all above requirements files as well).
 
-.. _updateing_requirements:
+.. _updating_requirements:
 
 Updating Python requirements
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -167,87 +167,105 @@ a clean virtual environment and install the current requirements.
 
 .. code-block:: console
 
-    $ mkvirtualenv zenodo-req
-    (zenodo-req)$ cdvirtualenv
+    $ mkvirtualenv zenodo-current
+    (zenodo-current)$ cdvirtualenv
     # Install current requirements
-    (zenodo-req)$ pip install -r <path to>/src/zenodo/requirements.txt
-    (zenodo-req)$ pip freeze > req-current.txt
+    (zenodo-current)$ pip install -r <path to>/src/zenodo/requirements.txt
+    (zenodo-current)$ pip freeze > reqs-current.txt
+    # Delete the virtualenv
+    (zenodo-current)$ deactivate
+    $ rmvirtualenv zenodo-current
 
-Next we use ``pip-tools`` to review and install all updated requirements.
-Please be aware that requirements in
+The quickest way to update the packages is to create a new virtualenv and to
+install the latest package versions. Please be aware that requirements in
 ``src/zenodo/requirements.pinned.txt`` should not be updated without also
 fixing the issues in Zenodo or the related package.
 
 .. code-block:: console
 
-    (zenodo-req)$ pip install pip-tools
-    (zenodo-req)$ pip-review --interactive
-    (zenodo-req)$ pip freeze > req-new.txt
+    $ mkvirtualenv zenodo-update
+    # Install from setup.py, to get latest versions of dependencies
+    (zenodo-update)$ pip install -e .[postgres,elasticsearch2]
+    (zenodo-update)$ pip freeze > reqs-update.txt
     # Diff current vs new requirements
-    (zenodo-req)$ diff req-current.txt req-new.txt
+    (zenodo-update)$ diff reqs-current.txt reqs-update.txt
 
-Now manually update ``src/zenodo/requirements.txt`` with changes displayed
-in the diff.
+Now manually review the diff and update ``src/zenodo/requirements.txt``. Things
+to keep in mind:
 
-If an upgraded package causes issues, and the problem cannot easily be fixed,
-it should be moved from ``requirements.txt`` into
-``requirements.pinned.txt`` so it is clear which packages can easily be
-updated and which cannot.
+- If a dependency has a major or minor version bump (i.e. ``1.3.0 -> 2.0.0`` or
+  ``1.3.0`` -> ``1.5.0``), check the package's changelog for breaking changes,
+  deprecations and fixes.
+- If a dependency introduces a breaking change/feature that cannot easily be
+  fixed on our side, try to update only the minor/patch version and pin
+  appropriately in setup.py (e.g. if Flask ``1.1.x`` breaks something, put
+  ``'Flask>=1.0.0,<1.1.0'`` in ``install_requires``).
+
+If you want to have a closer look at the changes and dependency relationships,
+use ``pip-tools`` to review and install all updated requirements.
+
+.. code-block:: console
+
+    (zenodo-update)$ pip install pip-tools
+    (zenodo-update)$ pip-compile
 
 Expanding Zenodo metadata checklist
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Here you will find a short checklist/guide on how to add a new field to the metadata model, and what are the related
-files and models (ES mappings, UI deposit form), that need to be taken into consideration when such a change is made.
+Here you will find a short checklist/guide on how to add a new field to the
+metadata model, and what are the related files and models (ES mappings, UI
+deposit form), that need to be taken into consideration when such a change is
+made.
 
-1. Update the **Record** JSONSchema and ES mapping
-
-    a) Modify the Record JSONSchema files:
-
-        - Files JSONSchema - `records/jsonschemas/records/file_src-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file_src-v1.0.0.json>`_
-        - Base JSONSchema (subschema of Record and Deposit) - `records/jsonschemas/records/base-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/base-v1.0.0.json>`_
-
-    b) **DO NOT** modify the following JSONSchemas by hand, as they need to be compiled from the sources (see point *a* above):
-
-        - Compile `records/jsonschemas/records/file-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/file-v1.0.0.json>`_ by running ``zenodo jsonschemas compilefile -d``.
-          **Optional - this step is necessary only if you modified the Files JSONSchema**.
-        - Compile `records/jsonschemas/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/jsonschemas/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compilerecord -d``
-        - Compile `deposit/jsonschemas/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/jsonschemas/deposits/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compiledeposit -d``
-
-    c) Update ES mappings
-
-        - Record ES mapping - `records/mappings/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/mappings/records/record-v1.0.0.json>`_
-        - Deposit ES mapping - `deposit/mappings/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/mappings/deposits/records/record-v1.0.0.json>`_
-
+1. Update the Record and Deposit JSONSchemas and ES mappings
+    a) To update any JSONSchema, you have to modify `records/jsonschemas/records/base-v1.0.0 <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/jsonschemas/records/base-v1.0.0.json>`_ and then compile the rest of the JSONSchemas via the ``zenodo jsonschemas ...`` commands. **DO NOT** modify the following JSONSchemas by hand (unless you know what you're doing), as they need to be compiled from their sources (if you mess up there are tests in place that will catch any inconsistencies though)
+        - **Deposit**: Compile `deposit/jsonschemas/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/deposit/jsonschemas/deposits/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compiledeposit -d``
+        - **Record**: Compile `records/jsonschemas/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/jsonschemas/records/record-v1.0.0.json>`_ by running ``zenodo jsonschemas compilerecord -d``
+    b) Update ES mappings by editing them directly
+        - **Record**: `records/mappings/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/mappings/records/record-v1.0.0.json>`_
+        - **Deposit**: `deposit/mappings/deposits/records/record-v1.0.0.json <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/deposit/mappings/deposits/records/record-v1.0.0.json>`_
 2. Update Deposit and Record REST API (JSON serialisers/deserialisers)
-
-    - Common - `records/serializers/schemas/common.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/common.py>`_
-    - Deposit/Legacy - `records/serializers/schemas/legacyjson.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/legacyjson.py>`_
-    - New - `records/serializers/schemas/json.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/json.py>`_
-
+    - **Common**: `records/serializers/schemas/common.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/common.py>`_
+    - **Deposit/Legacy**: `records/serializers/schemas/legacyjson.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/legacyjson.py>`_
+    - **New**: `records/serializers/schemas/json.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/json.py>`_
 3. Add to UI form (need to decide exactly where on how it should be displayed)
-
-    - Deposit Form JSONSchema - `deposit/static/json/zenodo_deposit/deposit_form.json <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/static/json/zenodo_deposit/deposit_form.json>`_
-    - Check if there are any Angular templates/directives: `deposit/static/templates/zenodo_deposit <https://github.com/zenodo/zenodo/tree/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/deposit/static/templates/zenodo_deposit>`_ modifications required to implement the functionality of the new fields on the deposit form page
-
+    - **Deposit Form JSONSchema**: `deposit/static/json/zenodo_deposit/deposit_form.json <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/deposit/static/json/zenodo_deposit/deposit_form.json>`_
+    - Check if there are any **Angular templates/directives** `deposit/static/templates/zenodo_deposit <https://github.com/zenodo/zenodo/tree/master/zenodo/modules/deposit/static/templates/zenodo_deposit>`_ modifications required to implement the functionality of the new fields on the deposit form page
 4. Serialization format updates
-
-    - DataCite - `records/serializers/schemas/datacite.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/datacite.py>`_
-
+    - **DataCite**: `records/serializers/schemas/datacite.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/datacite.py>`_
         - `DataCite Metadata Schema v3.1 <https://schema.datacite.org/meta/kernel-3.1/>`_
-
-    - OpenAIRE JSON- `openaire/schema.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/openaire/schema.py>`_
-
-        - `OpenAIRE Schema <https://www.openaire.eu/schema/1.0/oaf-result-1.0.xsd>`_
-
-    - DublinCore - `records/serializers/schemas/dc.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/dc.py>`_
-
+        - `DataCite Metadata Schema v4.1 <https://schema.datacite.org/meta/kernel-4.1/>`_
+    - **DublinCore**: `records/serializers/schemas/dc.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/dc.py>`_
         - `DCMI Metadata Terms <http://dublincore.org/documents/dcmi-terms/>`_
-
-    - CSL - `records/serializers/schemas/csl.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/csl.py>`_
+    - **OpenAIRE JSON**: `openaire/schema.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/openaire/schema.py>`_
+        - `OpenAIRE Schema <https://www.openaire.eu/schema/1.0/oaf-result-1.0.xsd>`_
+    - **CSL**: `records/serializers/schemas/csl.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/csl.py>`_
         - `CSL Terms <http://docs.citationstyles.org/en/stable/specification.html#appendix-ii-terms>`_
-    - BibTex - `records/serializers/bibtex.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/bibtex.py>`_
+    - **BibTex**: `records/serializers/bibtex.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/bibtex.py>`_
         - `BibTeX documentation <http://ctan.math.washington.edu/tex-archive/biblio/bibtex/base/btxdoc.pdf>`_
-    - MARC21 - `records/serializers/schemas/marc21.py <https://github.com/zenodo/zenodo/blob/cce944e91e05720d0efbeb2bbe60cbf76d1a2286/zenodo/modules/records/serializers/schemas/marc21.py>`_
+    - **MARC21**: `records/serializers/schemas/marc21.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/marc21.py>`_
+    - **JSON-LD (schema.org)**: `records/serializers/schemas/schemaorg.py <https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/serializers/schemas/schemaorg.py>`_
+5. Update `deposit REST API documentation <https://github.com/zenodo/developers.zenodo.org/blob/master/source/includes/resources/deposit/_representation.md>`_
 
-5. Update `deposit REST API documentation <https://github.com/zenodo/developers.zenodo.org/blob/31497bdc1b0eb23f2a61c5858cddddc9a4955ae7/source/includes/resources/deposit/_representation.md>`_
+Adding Resource Types
+^^^^^^^^^^^^^^^^^^^^^
+
+Resource types follow a two-level hierarchy of ``<type> -> <sub-type>`` (e.g.
+"Image" -> "Figure"). Especially when adding (or updating) resource types (e.g.
+a new "Publication" sub-type), besides checking the above places, you have to
+also update the `records/data/objecttypes.json
+<https://github.com/zenodo/zenodo/blob/master/zenodo/modules/records/data/objecttypes.json>`_
+file accordingly with a new entry:
+
+- **internal_id**: Unique internal ID for the type. Basically ``<type>`` (e.g. ``software``) or ``<type>-<sub-type>`` (e.g. ``image-figure``).
+- **id**: JSONSchema ID field. Basically ``https://zenodo.org/objecttypes/<type>`` or ``https://zenodo.org/objecttypes/<type>/<sub-type>``. Example ``https://zenodo.org/objecttypes/publication/softwaredocumentation#``
+- **parent**: If a ``sub-type``, this points to the ``type``'s ``id``. Example: ``{"$ref": "https://zenodo.org/objecttypes/publication"}``
+- **title**: Title for the type. Example: ``{"en": "Software documentation"}``
+- **title_plural**: Title in plural. Example: ``{"en": "Software documentation"}``
+- **schema.org**: Schema.org DataType, should be CreativeWork or one of its appropriate subtypes (`vocabulary <https://schema.org/CreativeWork#subtypes>`__). Example: ``https://schema.org/CreativeWork``
+- **datacite**: DataCite ResourceType (`vocabulary <https://schema.datacite.org/meta/kernel-4.1/>`__). Example: ``{"general": "Text", "type": "Software documentation"}``
+- **eurepo**: ``info-eu-repo`` type (`vocabulary <https://wiki.surfnet.nl/display/standards/info-eu-repo#info-eu-repo-Publicationtypes>`__). Example: ``info:eu-repo/semantics/technicalDocumentation``
+- **openaire**: OpenAIRE-specific fields
+    - **resourceType**: OpenAIRE resource type code (`vocabulary <https://issue.openaire.research-infrastructures.eu/issues/2938>`__). Example: ``0009``
+    - **type**: OpenAIRE type used for direct indexing. Can be ``publication``, ``dataset``, ``software`` or ``other``
+- **csl**: Citation Style Language type (`vocabulary <http://docs.citationstyles.org/en/stable/specification.html#appendix-iii-types>`__). Example: ``article``

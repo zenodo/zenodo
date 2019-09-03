@@ -22,11 +22,12 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+dist: trusty
+
 addons:
   postgresql: "9.4"
   apt:
     packages:
-      - nodejs
       - libfreetype6-dev
   firefox: "55.0"
 
@@ -42,7 +43,6 @@ notifications:
 sudo: false
 
 language: python
-
 cache:
   directories:
     - $HOME/.cache/pip
@@ -72,8 +72,9 @@ matrix:
     - env: REQUIREMENTS=latest E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
 
 before_install:
+  - "nvm use 6"
   - "mkdir /tmp/elasticsearch"
-  - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.3.5/elasticsearch-2.3.5.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
+  - "wget -O - https://download.elasticsearch.org/elasticsearch/release/org/elasticsearch/distribution/tar/elasticsearch/2.4.6/elasticsearch-2.4.6.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/plugin install -b mapper-attachments"
   - "/tmp/elasticsearch/bin/elasticsearch > /tmp/local-es.log &"
   - "travis_retry pip install --upgrade pip setuptools py"

@@ -29,14 +29,18 @@
         <i class="fa fa-file-o"></i> Save
       </button>
     </li>
+    <!-- Before publishing the record we also display the warning modal -->
     <li>
       <button
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#warningModal"
         ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
-        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
-        ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' || 'Publish the record'}}">
+        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading || (filesVM.files | checkAllFilesUploaded) || filesVM.files.length == 0"
+        ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' 
+        || (filesVM.files | checkAllFilesUploaded) && 'There are pending files to be uploaded' 
+        || (filesVM.files.length == 0) && 'You need to upload at least one file' 
+        || 'Publish the record'}}">
         <i class="fa fa-check"></i> Publish
       </button>
     </li>

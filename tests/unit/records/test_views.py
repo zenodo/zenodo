@@ -147,8 +147,15 @@ def test_relation_logo(app):
     ]
 
 
-def test_pid_url(app):
+def test_pid_url(app, sample_identifiers):
     """Test pid_url."""
+    # All types of identifiers
+    for scheme, (_id, url) in sample_identifiers.items():
+        assert render_template_string(
+            "{{{{ '{_id}'|pid_url(scheme='{scheme}') }}}}"
+            .format(_id=_id, scheme=scheme)) == url
+
+    # Specific cases and parameters
     assert render_template_string(
         "{{ '10.123/foo'|pid_url }}") == "https://doi.org/10.123/foo"
     assert render_template_string(

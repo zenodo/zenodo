@@ -73,7 +73,6 @@
             "DataManager",
             "Distributor",
             "Editor",
-            "Funder",
             "HostingInstitution",
             "Other",
             "Producer",
@@ -83,9 +82,9 @@
             "RegistrationAgency",
             "RegistrationAuthority",
             "RelatedPerson",
+            "Researcher",
             "ResearchGroup",
             "RightsHolder",
-            "Researcher",
             "Sponsor",
             "Supervisor",
             "WorkPackageLeader"
@@ -101,28 +100,33 @@
       "description": "Persistent identifier scheme.",
       "type": "string",
       "enum": [
+        "ads",
         "ark",
         "arxiv",
+        "bioproject",
+        "biosample",
         "doi",
-        "bibcode",
-        "ean8",
         "ean13",
-        "eissn",
+        "ean8",
+        "ensembl",
+        "genome",
+        "gnd",
+        "hal",
         "handle",
         "isbn",
+        "isni",
         "issn",
         "istc",
-        "lissn",
         "lsid",
-        "pmid",
-        "pmcid",
-        "purl",
-        "upc",
-        "url",
-        "urn",
         "orcid",
-        "gnd",
-        "ads"
+        "pmcid",
+        "pmid",
+        "purl",
+        "refseq",
+        "sra",
+        "uniprot",
+        "url",
+        "urn"
       ]
     },
     "relation": {
@@ -192,7 +196,7 @@
           "description": "Specific resource type.",
           "type": "string"
         },
-        "openaire_subtype" : {
+        "openaire_subtype": {
           "description": "OpenAIRE-specific resource type.",
           "type": "string"
         }
@@ -216,6 +220,39 @@
         "$ref": "#/definitions/person_or_org"
       }
     },
+    "dates": {
+      "description": "Date interval.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "start": {
+            "description": "Start date.",
+            "type": "string"
+          },
+          "end": {
+            "description": "End date.",
+            "type": "string"
+          },
+          "type": {
+            "description": "Type of the date interval.",
+            "enum": [
+              "Collected",
+              "Valid",
+              "Withdrawn"
+            ]
+          },
+          "description": {
+            "description": "Description of the date interval.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
     "description": {
       "description": "Description/abstract for record.",
       "type": "string"
@@ -228,6 +265,34 @@
         "title": "Keyword",
         "type": "string"
       }
+    },
+    "locations": {
+      "description": "Geographical location.",
+      "items": {
+        "properties": {
+          "lat": {
+            "description": "Latitude of the location.",
+            "type": "number"
+          },
+          "lon": {
+            "description": "Longitude of the location.",
+            "type": "number"
+          },
+          "place": {
+            "description": "Description of the location",
+            "type": "string"
+          },
+          "description": {
+            "description": "Place of the location",
+            "type": "string"
+          }
+        },
+        "required": [
+          "place"
+        ],
+        "type": "object"
+      },
+      "type": "array"
     },
     "subjects": {
       "description": "Subjects from specific vocabularies.",
@@ -492,6 +557,10 @@
         "type": "number"
       }
     },
+    "method": {
+      "description": "Information about the used Method",
+      "type": "string"
+    },
     "_oai": {
       "description": "OAI-PMH specific information.",
       "type": "object",
@@ -513,6 +582,19 @@
           "type": "string"
         }
       }
+    },
+    "custom": {
+      "additionalProperties": {
+        "items": {
+          "type": [
+            "string",
+            "number"
+          ]
+        },
+        "type": "array"
+      },
+      "description": "Custom metadata",
+      "type": "object"
     },
     "_internal": {
       "description": "Metadata for internal use only.",

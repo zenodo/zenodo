@@ -26,9 +26,10 @@
 
 from flask_principal import ActionNeed
 from invenio_access.permissions import Permission
-from invenio_search import current_search_client
 from invenio_stats.aggregations import StatAggregator
 from invenio_stats.queries import ESTermsQuery
+
+from .proxies import current_stats_search_client
 
 
 def register_aggregations():
@@ -38,10 +39,11 @@ def register_aggregations():
         templates='zenodo.modules.stats.templates.aggregations',
         aggregator_class=StatAggregator,
         aggregator_config=dict(
-            client=current_search_client,
+            client=current_stats_search_client,
             event='file-download',
             aggregation_field='recid',
             aggregation_interval='day',
+            batch_size=1,
             copy_fields=dict(
                 bucket_id='bucket_id',
                 record_id='record_id',
@@ -65,10 +67,11 @@ def register_aggregations():
             templates='zenodo.modules.stats.templates.aggregations',
             aggregator_class=StatAggregator,
             aggregator_config=dict(
-                client=current_search_client,
+                client=current_stats_search_client,
                 event='file-download',
                 aggregation_field='conceptrecid',
                 aggregation_interval='day',
+                batch_size=1,
                 copy_fields=dict(
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',
@@ -91,10 +94,11 @@ def register_aggregations():
             templates='zenodo.modules.stats.templates.aggregations',
             aggregator_class=StatAggregator,
             aggregator_config=dict(
-                client=current_search_client,
+                client=current_stats_search_client,
                 event='record-view',
                 aggregation_field='conceptrecid',
                 aggregation_interval='day',
+                batch_size=1,
                 copy_fields=dict(
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',

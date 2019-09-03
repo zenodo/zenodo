@@ -61,7 +61,7 @@ class OAIAudit(Audit):
         if current_app.config.get('CACHE_TYPE') != 'redis':
             raise Exception('OAIAudit: Redis cache type required.')
 
-        self.cache = current_cache.cache._client
+        self.cache = current_cache.cache._write_client
         self.cache_prefix = 'zenodo.auditor.oai:{}'.format(str(self.audit_id))
 
         record_oai_sets = (

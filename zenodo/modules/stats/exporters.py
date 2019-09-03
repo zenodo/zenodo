@@ -47,6 +47,10 @@ class PiwikExporter:
         """Run export job."""
         if start_date is None:
             bookmark = current_cache.get('piwik_export:bookmark')
+            if bookmark is None:
+                msg = 'Bookmark not found, and no start date specified.'
+                current_app.logger.warning(msg)
+                return
             start_date = dateutil_parse(bookmark) if bookmark else None
 
         time_range = {}
@@ -128,13 +132,14 @@ class PiwikExporter:
             _id=visitor_id,
             cid=visitor_id,
             cvar=cvar,
-            country=event.country,
             cdt=event.timestamp,
             urlref=event.referrer,
             action_name=action_name
         )
 
-        if 'file_key' in event:
+        if event.to_dict().get('country'):
+            params['country'] = event.country.lower()
+        if event.to_dict().get('file_key'):
             params['url'] = ui_link_for('record_file', id=event.recid,
                                         filename=event.file_key)
             params['download'] = params['url']

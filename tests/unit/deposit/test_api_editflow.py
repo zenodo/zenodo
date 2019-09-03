@@ -231,6 +231,12 @@ def test_edit_flow(mocker, api, api_client, db, es, locations,
         RecordSIP.created.desc()).first().sip
     archive_task_mock.delay.assert_called_with(str(sip2.id))
 
+    # Get newversion url before editing the record
+    data = get_json(client.get(links['self'], headers=auth_headers), code=200)
+    new_version_url = data['links']['newversion']
+    assert new_version_url ==\
+        'http://localhost/deposit/depositions/2/actions/newversion'
+
     # Edit
     data = get_json(client.post(links['edit'], headers=auth_headers), code=201)
 
@@ -249,6 +255,54 @@ def test_edit_flow(mocker, api, api_client, db, es, locations,
     # Get and assert metadata
     data = get_json(client.get(links['self'], headers=auth_headers), code=200)
     assert data['title'] == postedit_data['title']
+
+    # New Version
+    data = get_json(
+        client.post(new_version_url, headers=auth_headers),
+        code=201)
+    links = data['links']
+
+    # Check if UI new version link is correct
+    assert links['latest_draft_html'] ==\
+        'http://localhost/deposit/3'
+
+    # Get latest version
+    data = get_json(
+        client.get(links['latest_draft'], headers=auth_headers),
+        code=200)
+    links = data['links']
+
+    # Update new version
+    data = dict(metadata=data['metadata'])
+    data['metadata'].update(dict(title='This is the new version'))
+    resdata = get_json(client.put(
+        links['self'], data=json.dumps(data), headers=headers
+    ), code=200)
+    links = resdata['links']
+
+    # Add a file to the new deposit
+    res = get_json(client.put(
+        links['bucket'] + '/newfile.txt',
+        input_stream=BytesIO(b'newfile'),
+        headers=auth_headers,
+    ), code=200)
+
+    # Publish the new record
+    response = client.post(links['publish'], headers=auth_headers)
+    data = get_json(response, code=202)
+    links = data['links']
+
+    # Get the new record
+    data = get_json(
+        client.get(
+            links['record'],
+            headers=auth_headers
+            ),
+        code=200
+    )
+
+    # See that the title is updated accordingly
+    assert data['metadata']['title'] == 'This is the new version'
 
     # Change the config back
     api.config['SIPSTORE_ARCHIVER_WRITING_ENABLED'] = orig
@@ -349,6 +403,14 @@ def test_edit_doi(api_client, db, es, locations, json_auth_headers,
     data['metadata']['doi'] = ''
     res = client.put(links['self'], data=json.dumps(data), headers=headers)
     assert res.status_code == 400
+
+    # Update api accepts data with no doi field
+    del data['metadata']['doi']
+    res = client.put(links['self'], data=json.dumps(data), headers=headers)
+    assert res.status_code == 200
+    data = get_json(res, code=200)
+    assert data['doi'] == '10.1234/bar'
+    assert data['metadata']['doi'] == '10.1234/bar'
 
     # Update
     data['metadata']['doi'] = '10.4321/foo'

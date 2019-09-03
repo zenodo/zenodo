@@ -176,6 +176,17 @@ def test_related_alternate_identifiers():
     ]
 
 
+def test_identifier_schemes(app, db, es, locations, license_record,
+                            sample_identifiers):
+    """Test supported identifier schemes."""
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
+    result = s.load(d(related_identifiers=[
+        {'identifier': _id, 'scheme': scheme, 'relation': 'references'}
+        for scheme, (_id, _) in sample_identifiers.items()
+    ]))
+    ZenodoDeposit.create(result.data).validate()
+
+
 @pytest.mark.parametrize('relation', [
     'IsCitedBy',
     'invalid',
@@ -236,6 +247,14 @@ def test_creators():
         dict(name="Doe, John", affiliation="Atlantis",
              orcid="0000-0002-1825-0097", gnd="170118215"),
         dict(name="Smith, Jane", affiliation="Atlantis")
+    ]
+
+    assert s.load(d(creators=[
+        dict(name="Doe, John", affiliation=" "),
+        dict(name="Smith, Jane", affiliation="")
+    ])).data['creators'] == [
+        dict(name="Doe, John"),
+        dict(name="Smith, Jane")
     ]
 
     # Min length required

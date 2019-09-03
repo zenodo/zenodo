@@ -102,6 +102,17 @@ function communitiesSelect($http, $q, openAIRE) {
     initCommunities();
 
     // Methods
+    function getOpenAIRECommunities() {
+      var modelCommunities = $scope.model.communities || [];
+      var openaireComms = [];
+      _.each(modelCommunities, function(comm) {
+        if (comm.identifier in $scope.openAIRECommunitiesMapping) {
+          openaireComms = openaireComms.concat($scope.openAIRECommunitiesMapping[comm.identifier]);
+        }
+      });
+      return _.uniq(openaireComms);
+    }
+
     $scope.refreshCommunityResults = function(data) {
       var data = data || $scope.communityResults;
       $scope.communityResults = _.filter(data, function(comm){
@@ -129,8 +140,18 @@ function communitiesSelect($http, $q, openAIRE) {
       $scope.model.communities = _.filter($scope.model.communities, function(comm){
         return comm.identifier !== commId;
       });
-      // Unset the OpenAIRE subtype
-      $scope.model.openaire_type = undefined;
+      // Unset the OpenAIRE subtype if it belongs to the unselected community
+      var openaireComms = getOpenAIRECommunities();
+      var commTypes = _.pick($scope.openAIRECommunities, openaireComms)
+      var oaTypes = [];
+      _.each(commTypes, function(comm) {
+        _.each(comm.types[uploadType] || [], function(type) {
+          oaTypes.push({ id: type.id, name: type.name, commName: comm.name })
+        })
+      })
+      if(!($scope.model.openaire_type in oaTypes)) {
+        $scope.model.openaire_type = undefined;
+      }
       $scope.refreshCommunityResults()
     }
   }
@@ -162,7 +183,7 @@ function openaireSubtype(openAIRE) {
       var openaireComms = [];
       _.each(modelCommunities, function(comm) {
         if (comm.identifier in $scope.openAIRECommunitiesMapping) {
-          openaireComms.push($scope.openAIRECommunitiesMapping[comm.identifier]);
+          openaireComms = openaireComms.concat($scope.openAIRECommunitiesMapping[comm.identifier]);
         }
       });
       return _.uniq(openaireComms);

@@ -23,7 +23,9 @@
     {"$ref": "https://zenodo.org/objecttypes/publication/thesis"},
     {"$ref": "https://zenodo.org/objecttypes/publication/technicalnote"},
     {"$ref": "https://zenodo.org/objecttypes/publication/workingpaper"},
-    {"$ref": "https://zenodo.org/objecttypes/publication/other"}
+    {"$ref": "https://zenodo.org/objecttypes/publication/other"},
+    {"$ref": "https://zenodo.org/objecttypes/publication/datamanagementplan"},
+    {"$ref": "https://zenodo.org/objecttypes/publication/annotationcollection"}
   ],
   "openaire": {
     "resourceType": "0001",
@@ -109,6 +111,10 @@
     {"$ref": "https://zenodo.org/objecttypes/image/photo"},
     {"$ref": "https://zenodo.org/objecttypes/image/other"}
   ],
+  "openaire": {
+    "resourceType": "0025",
+    "type": "dataset"
+  },
   "csl": "graphic"
 },
 {
@@ -124,6 +130,10 @@
   "datacite": {"general": "Audiovisual"},
   "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "https://schema.org/MediaObject",
+  "openaire": {
+    "resourceType": "0033",
+    "type": "dataset"
+  },
   "csl": "motion_picture"
 },
 {
@@ -138,6 +148,10 @@
   },
   "datacite": {"general": "Software"},
   "eurepo": "info:eu-repo/semantics/other",
+  "openaire": {
+    "resourceType": "0029",
+    "type": "software"
+  },
   "schema.org": "https://schema.org/SoftwareSourceCode",
   "csl": "article"
 },
@@ -156,7 +170,7 @@
   "schema.org": "https://schema.org/CreativeWork",
   "openaire": {
     "resourceType": "0010",
-    "type": "publication"
+    "type": "other"
   },
   "csl": "speech"
 },
@@ -175,7 +189,7 @@
   "schema.org": "https://schema.org/CreativeWork",
   "openaire": {
     "resourceType": "0020",
-    "type": "publication"
+    "type": "other"
   },
   "csl": "article"
 },
@@ -495,7 +509,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image#"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "figure"
 },
@@ -515,7 +529,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "figure"
 },
@@ -535,7 +549,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "graphic"
 },
@@ -555,7 +569,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "figure"
 },
@@ -575,7 +589,7 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "graphic"
 },
@@ -595,7 +609,47 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/image"},
   "openaire": {
     "resourceType": "0025",
-    "type": "publication"
+    "type": "dataset"
   },
   "csl": "graphic"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-datamanagementplan",
+  "id": "https://zenodo.org/objecttypes/publication/datamanagementplan#",
+  "title": {
+    "en": "Data management plan"
+  },
+  "title_plural": {
+    "en": "Data management plans"
+  },
+  "schema.org": "https://schema.org/CreativeWork",
+  "datacite": {"general": "Text", "type": "Data Management Plan"},
+  "eurepo": "info:eu-repo/semantics/technicalDocumentation",
+  "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0009",
+    "type": "publication"
+  },
+  "csl": "report"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-annotationcollection",
+  "id": "https://zenodo.org/objecttypes/publication/annotationcollection#",
+  "title": {
+    "en": "Annotation Collection"
+  },
+  "title_plural": {
+    "en": "Annotation Collections"
+  },
+  "schema.org": "https://schema.org/Collection",
+  "datacite": {"general": "Collection"},
+  "eurepo": "info:eu-repo/semantics/technicalDocumentation",
+  "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0009",
+    "type": "publication"
+  },
+  "csl": "report"
 }]

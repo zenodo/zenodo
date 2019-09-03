@@ -29,15 +29,17 @@ from __future__ import absolute_import, print_function, unicode_literals
 import json
 import os
 import shutil
+import sys
 import tempfile
 from copy import deepcopy
 from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
 
 import pytest
+from celery import Task
 from celery.messaging import establish_connection
 from click.testing import CliRunner
-from elasticsearch.exceptions import RequestError
+from flask import current_app as flask_current_app
 from flask import url_for
 from flask.cli import ScriptInfo
 from flask_celeryext import create_celery_app
@@ -47,6 +49,7 @@ from helpers import bearer_auth
 from invenio_access.models import ActionUsers
 from invenio_accounts.testutils import create_test_user
 from invenio_admin.permissions import action_admin_access
+from invenio_app.config import set_rate_limit
 from invenio_communities.models import Community
 from invenio_db import db as db_
 from invenio_deposit.permissions import \
@@ -73,11 +76,35 @@ from zenodo.config import APP_DEFAULT_SECURE_HEADERS
 from zenodo.factory import create_app
 from zenodo.modules.deposit.api import ZenodoDeposit as Deposit
 from zenodo.modules.deposit.minters import zenodo_deposit_minter
+from zenodo.modules.deposit.scopes import extra_formats_scope
 from zenodo.modules.fixtures.records import loadsipmetadatatypes
 from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
+
+
+def wrap_rate_limit():
+    """Wrap rate limiter function to avoid affecting other tests."""
+    if flask_current_app.config.get('USE_FLASK_LIMITER'):
+        return set_rate_limit()
+    else:
+        return "1000 per second"
+
+
+@pytest.fixture
+def use_flask_limiter(app):
+    """Activate flask limiter."""
+    flask_current_app.config.update(dict(
+        USE_FLASK_LIMITER=True,
+        RATELIMIT_GUEST_USER='2 per second',
+        RATELIMIT_AUTHENTICATED_USER='4 per second',
+        RATELIMIT_PER_ENDPOINT={
+            'zenodo_frontpage.index': '10 per second',
+            'security.login': '10 per second'
+        }))
+    yield
+    flask_current_app.config['USE_FLASK_LIMITER'] = False
 
 
 @pytest.yield_fixture(scope='session')
@@ -102,6 +129,9 @@ def env_config(instance_path):
     os.environ.update(
         INVENIO_INSTANCE_PATH=os.environ.get(
             'INSTANCE_PATH', instance_path),
+        # To avoid rebuilding the assets during test time we provide our
+        # prebuilt assets folder.
+        INVENIO_STATIC_FOLDER=os.path.join(sys.prefix, 'var/instance/static')
     )
 
     return os.environ
@@ -136,7 +166,7 @@ def default_config(tmp_db_path):
         },
         'bar': {
             'name': 'Bar Association Resources',
-            'communities': ['c3', ],
+            'communities': ['c3', 'c1'],
             'types': {
                 'software': [
                     {'id': 'bar:t3', 'name': 'Bar sft type three'},
@@ -154,6 +184,7 @@ def default_config(tmp_db_path):
     APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
     return dict(
+        RATELIMIT_APPLICATION=wrap_rate_limit,
         CFG_SITE_NAME="testserver",
         DEBUG_TB_ENABLED=False,
         APP_DEFAULT_SECURE_HEADERS=APP_DEFAULT_SECURE_HEADERS,
@@ -177,6 +208,29 @@ def default_config(tmp_db_path):
         TESTING=True,
         THEME_SITEURL='http://localhost',
         WTF_CSRF_ENABLED=False,
+        ZENODO_EXTRA_FORMATS_MIMETYPE_WHITELIST={
+            'application/foo+xml': 'Test 1',
+            'application/bar+xml': 'Test 2',
+        },
+        ZENODO_CUSTOM_METADATA_VOCABULARIES={
+            'dwc': {
+                '@context': 'http://rs.tdwg.org/dwc/terms/',
+                'attributes': {
+                    'family': {
+                        'type': 'keyword',
+                        'multiple': False
+                    },
+                    'genus': {
+                        'type': 'keyword',
+                        'multiple': True
+                    },
+                    'behavior': {
+                        'type': 'text',
+                        'multiple': False
+                    }
+                }
+            }
+        },
     )
 
 
@@ -192,6 +246,19 @@ def app(env_config, default_config):
     cca = cca._get_current_object()
     delattr(cca, "flask_app")
     celery_app = create_celery_app(app)
+
+    # FIXME: When https://github.com/inveniosoftware/flask-celeryext/issues/35
+    # is closed and Flask-CeleryExt is released, this can be removed.
+    class _TestAppContextTask(Task):
+        abstract = True
+
+        def __call__(self, *args, **kwargs):
+            if flask_current_app:
+                return Task.__call__(self, *args, **kwargs)
+            with self.app.flask_app.app_context():
+                return Task.__call__(self, *args, **kwargs)
+
+    celery_app.Task = _TestAppContextTask
     celery_app.set_current()
 
     with app.app_context():
@@ -438,6 +505,30 @@ def write_token(app, db, oauth2_client, users):
 
 
 @pytest.fixture
+def extra_token(app, db, oauth2_client, users):
+    """Create token."""
+    with db.session.begin_nested():
+        token_ = Token(
+            client_id=oauth2_client,
+            user_id=users[0]['id'],
+            access_token='dev_access_2',
+            refresh_token='dev_refresh_2',
+            expires=datetime.utcnow() + timedelta(hours=10),
+            is_personal=False,
+            is_internal=True,
+            _scopes=' '.join([extra_formats_scope.id, write_scope.id])
+        )
+        db.session.add(token_)
+    db.session.commit()
+    return dict(
+        token=token_,
+        auth_header=[
+            ('Authorization', 'Bearer {0}'.format(token_.access_token)),
+        ]
+    )
+
+
+@pytest.fixture
 def minimal_record():
     """Minimal record."""
     return {
@@ -658,7 +749,16 @@ def full_record():
                 {'name': 'Smith, Professor'},
             ],
         },
+        dates=[
+            {'type': 'Valid', 'start': '2019-01-01', 'description': 'Bongo'},
+            {'type': 'Collected', 'end': '2019-01-01'},
+            {'type': 'Withdrawn', 'start': '2019-01-01', 'end': '2019-01-01'},
+            {'type': 'Collected', 'start': '2019-01-01', 'end': '2019-02-01'},
+        ],
         owners=[1, ],
+        method='microscopic supersampling',
+        locations=[{"lat": 2.35, "lon": 1.534, "place": "my place"},
+                   {'place': 'New York'}],
         _oai={
             'id': 'oai:zenodo.org:1',
             'sets': ['user-zenodo', 'user-ecfunded'],
@@ -696,9 +796,22 @@ def full_record():
 
 
 @pytest.fixture
+def custom_metadata():
+    """Custom metadata dictionary."""
+    return {
+        'dwc:family': 'Felidae',
+        'dwc:genus': 'Felis',
+        'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
+    }
+
+
+@pytest.fixture
 def record_with_bucket(db, full_record, bucket, sip_metadata_types):
     """Create a bucket."""
     record = ZenodoRecord.create(full_record)
+    record['_buckets']['record'] = str(bucket.id)
+    record['_files'][0]['bucket'] = str(bucket.id)
+    record.commit()
     RecordsBuckets.create(bucket=bucket, record=record.model)
     pid = PersistentIdentifier.create(
         pid_type='recid', pid_value=12345, object_type='rec',
@@ -934,6 +1047,24 @@ def auth_headers(write_token):
 
 
 @pytest.fixture
+def extra_auth_headers(extra_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth([], extra_token)
+
+
+@pytest.fixture
+def json_extra_auth_headers(json_headers, extra_token):
+    """Authentication headers (with a valid oauth2 token).
+
+    It uses the token associated with the first user.
+    """
+    return bearer_auth(json_headers, extra_token)
+
+
+@pytest.fixture
 def get_json():
     """Function for extracting json from response."""
     def inner(response, code=None):
@@ -1130,3 +1261,68 @@ def g_tester_id(app, db):
     )
     db.session.commit()
     return tester.id
+
+
+@pytest.fixture
+def sample_identifiers():
+    """Sample of various identifiers."""
+    return {
+        'ads': ('ads:2011ApJS..192...18K',
+                'https://ui.adsabs.harvard.edu/#abs/2011ApJS..192...18K'),
+        'ark': ('ark:/13030/tqb3kh97gh8w', ''),
+        'arxiv': ('hep-th/1601.07616',
+                  'https://arxiv.org/abs/arXiv:1601.07616'),
+        'bioproject': ('PRJNA224116',
+                       'https://www.ebi.ac.uk/ena/data/view/PRJNA224116'),
+        'biosample': ('SAMN08289383',
+                      'https://www.ebi.ac.uk/ena/data/view/SAMN08289383'),
+        'doi': ('10.1002/example',
+                'https://doi.org/10.1002/example'),
+        'ean13': ('4006381333931', ''),
+        'ean8': ('73513537', ''),
+        'ensembl': ('ENSMUST00000017290',
+                    'https://www.ensembl.org/id/ENSMUST00000017290'),
+        'genome': ('GCF_000001405.38',
+                   'https://www.ncbi.nlm.nih.gov/assembly/GCF_000001405.38'),
+        'gnd': ('4079154-3',
+                'https://d-nb.info/gnd/4079154-3'),
+        'hal': ('mem_13102590',
+                'https://hal.archives-ouvertes.fr/mem_13102590'),
+        'handle': ('10013/epic.10033',
+                   'https://hdl.handle.net/10013/epic.10033'),
+        'isbn': ('0-9752298-0-X', ''),
+        'isni': ('1422-4586-3573-0476', ''),
+        'issn': ('1188-1534', ''),
+        'istc': ('0A9 2002 12B4A105 7', ''),
+        'lsid': ('urn:lsid:ubio.org:namebank:11815', ''),
+        'orcid': ('0000-0002-1694-233X',
+                  'https://orcid.org/0000-0002-1694-233X'),
+        'pmcid': ('PMC2631623',
+                  'https://www.ncbi.nlm.nih.gov/pmc/PMC2631623'),
+        'pmid': ('pmid:12082125',
+                 'https://www.ncbi.nlm.nih.gov/pubmed/12082125'),
+        'purl': ('http://purl.oclc.org/foo/bar',
+                 'http://purl.oclc.org/foo/bar'),
+        'refseq': ('NZ_JXSL01000036.1',
+                   'https://www.ncbi.nlm.nih.gov/entrez/viewer.fcgi'
+                   '?val=NZ_JXSL01000036.1'),
+        'sra': ('SRR6437777',
+                'https://www.ebi.ac.uk/ena/data/view/SRR6437777'),
+        'uniprot': ('Q9GYV0',
+                    'https://purl.uniprot.org/uniprot/Q9GYV0'),
+        'url': ('http://www.heatflow.und.edu/index2.html',
+                'http://www.heatflow.und.edu/index2.html'),
+        'urn': ('urn:nbn:de:101:1-201102033592',
+                'https://nbn-resolving.org/urn:nbn:de:101:1-201102033592'),
+    }
+
+
+@pytest.fixture
+def mock_datacite_minting(mocker, app):
+    """DOI registration enabled and DataCite calls mocked."""
+    orig = app.config['DEPOSIT_DATACITE_MINTING_ENABLED']
+    app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = True
+    datacite_mock = mocker.patch(
+        'invenio_pidstore.providers.datacite.DataCiteMDSClient')
+    yield datacite_mock
+    app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig

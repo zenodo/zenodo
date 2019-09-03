@@ -44,6 +44,7 @@ EXPORTER_JOBS = {
         ),
         'resultstream_cls': BZip2ResultStream,
         'pid_fetcher': zenodo_record_fetcher,
+        'query': "+_exists_:recid +_missing_:removal_reason"
     }
 }
 """Export jobs definitions."""

@@ -54,6 +54,7 @@ class RecordSchemaOpenAIREJSON(Schema):
     resourceType = fields.Method('get_resource_type', required=True)
     language = fields.Str(attribute='metadata.language')
     version = fields.Str(attribute='metadata.version')
+    contexts = fields.Method('get_communities')
 
     licenseCode = fields.Method('get_license_code', required=True)
     embargoEndDate = DateString(attribute='metadata.embargo_date')
@@ -97,6 +98,14 @@ class RecordSchemaOpenAIREJSON(Schema):
     def get_datasource_id(self, obj):
         """Get OpenAIRE datasouce identifier."""
         return openaire_datasource_id(obj.get('metadata')) or missing
+
+    def get_communities(self, obj):
+        """Get record's communities."""
+        communities = []
+        if obj.get('metadata').get('communities'):
+            for comm in obj.get('metadata').get('communities'):
+                communities.append("https://zenodo.org/communities/{}".format(comm))
+        return communities or missing
 
     # Mapped from: http://api.openaire.eu/vocabularies/dnet:access_modes
     LICENSE_MAPPING = {

@@ -26,6 +26,16 @@
 
 {%- block search_loading %}{% endblock %}
 
+{%- block search_sort_select %}
+Sort by:
+<invenio-search-select-box
+   sort-key="sort"
+   available-options='{{ sort_options|filter_sort_options|format_sortoptions|safe }}'
+   template="{{ url_for('static', filename=config.SEARCH_UI_JSTEMPLATE_SELECT_BOX) }}"
+  >
+</invenio-search-select-box>
+{%- endblock search_sort_select %}
+
 {%- block javascript %}
   {% assets "zenodo_theme_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
   {% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}

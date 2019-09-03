@@ -583,3 +583,59 @@ def test_format_publication_default(full_record):
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
     assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_long_title(full_record):
+    """Test."""
+    full_record['title'] = (
+        "This is a very long title with whitespaces at "
+        "the end that used to bring us discomfort"
+    )
+    full_record['resource_type']['subtype'] = 'article'
+    bibtex = ("""@article{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Doe, Jane and\n"""
+              """                  Smith, John and\n"""
+              """                  Nowak, Jack},\n"""
+              """  title        = {{This is a very long title """
+              """with whitespaces at the \n"""
+              """                   end that used to """
+              """bring us discomfort}},\n"""
+              """  journal      = {Bam},\n"""
+              """  year         = 2014,\n"""
+              """  volume       = 20,\n"""
+              """  number       = 2,\n"""
+              """  pages        = 20,\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_long_title_with_trailing_whitespace(full_record):
+    """Test."""
+    full_record['title'] = (
+        "This is a very long title with whitespaces"
+        "                                                      "
+    )
+    full_record['resource_type']['subtype'] = 'article'
+    bibtex = ("""@article{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Doe, Jane and\n"""
+              """                  Smith, John and\n"""
+              """                  Nowak, Jack},\n"""
+              """  title        = {This is a very long title """
+              """with whitespaces},\n"""
+              """  journal      = {Bam},\n"""
+              """  year         = 2014,\n"""
+              """  volume       = 20,\n"""
+              """  number       = 2,\n"""
+              """  pages        = 20,\n"""
+              """  month        = feb,\n"""
+              """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()

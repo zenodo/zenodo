@@ -118,9 +118,9 @@
 
 {%- block javascript %}
 {%- block record_jsonld %}
-{% set jsonld_serialization = record | serialize_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
+{% set jsonld_serialization = record | transform_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
 {%- if jsonld_serialization %}
-  <script type='application/ld+json'>{{jsonld_serialization|safe}}</script>
+  <script type='application/ld+json'>{{ jsonld_serialization | tojson }}</script>
 {%- endif %}
 {%- endblock record_jsonld %}
 {{super()}}
@@ -139,9 +139,18 @@
     ], function(typeahead, Bloodhound) {
       angular.element(document).ready(function() {
 
-        angular.bootstrap(document.getElementById("search-citations"), [
+        // FIXME: This is already defined in js/zenodo_deposit/filters.js.
+        // It should be moved to a common place...
+        angular.module('zenodo.filters').filter('limitToEllipsis', function () {
+          return function(text, n) {
+            return (text.length > n) ? text.substr(0, n-1) + '&hellip;' : text;
+          };
+        });
+
+        angular.bootstrap(document.getElementById("citations"), [
             'invenioSearch',
-            'zenodo.filters'
+            'zenodo.filters',
+            'mgcrea.ngStrap.tooltip',
           ]
         );
 

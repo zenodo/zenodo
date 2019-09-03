@@ -22,8 +22,26 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+set -e
+
 CWD=`pwd`
 SOURCE=${1:-"package.pinned.json"}
+
+# Checking node version
+node_version="$(node --version)"
+if [[ -z "$node_version" ]]
+then
+    echo "Node is not installed"
+elif [[ ! $node_version = *v7* ]] && [[ ! $node_version = *v6* ]]
+then
+    echo >&2 "Sorry, you are using node version $node_version, which is incompatible. Please install node 7.4.0"; exit 1;
+fi
+
+# Checking binaries
+if [[ -z "$(which cleancss)" || -z "$(which node-sass)" || -z "$(which uglifyjs)" || -z "$(which r_js)" ]] 
+then
+    echo "Please run ./setup-npm"; exit 1; 
+fi
 
 zenodo npm --pinned-file ${SOURCE}
 cd ${VIRTUAL_ENV}/var/instance/static

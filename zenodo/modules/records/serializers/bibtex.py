@@ -301,6 +301,8 @@ class Bibtex(object):
 
     def _format_output_row(self, field, value):
         out = ""
+        if isinstance(value, six.string_types):
+            value = value.strip()
         if field == "author":
             if len(value) == 1:
                 out += u"  {0:<12} = {{{1}}},\n".format(field, value[0])
@@ -310,9 +312,7 @@ class Bibtex(object):
                 for line in value[1:-1]:
                     out += u" {0:<16} {1:<} and\n".format("", line)
                 out += u" {0:<16} {1:<}}},\n".format("", value[-1])
-        elif len(value) >= 50:
-            if isinstance(value, six.string_types):
-                value = value.strip()
+        elif len(value) > 50:
             wrapped = textwrap.wrap(value, 50)
             out += u"  {0:<12} = {{{{{1} \n".format(field, wrapped[0])
             for line in wrapped[1:-1]:

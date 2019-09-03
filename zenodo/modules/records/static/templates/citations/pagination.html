@@ -1,4 +1,4 @@
-<ul class="pagination citationsPagination" ng-if="vm.invenioSearchResults.hits.total">
+<ul class="pagination citationsPagination" ng-if="vm.invenioSearchResults.hits.total > 0">
   <li ng-show="showGoToFirstLast" ng-class="paginationHelper.getFirstClass()">
     <a ng-click="paginationHelper.changePage(1)" aria-label="First">
       <span aria-hidden="true"><<</span>

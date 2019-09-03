@@ -34,6 +34,8 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.models import PersistentIdentifier
 
+from zenodo.modules.records.utils import build_record_custom_fields
+
 from .api import ZenodoDeposit
 
 
@@ -55,7 +57,6 @@ def indexer_receiver(sender, json=None, record=None, index=None,
     """
     if not index.startswith('deposits-records-'):
         return
-
     if not isinstance(record, ZenodoDeposit):
         record = ZenodoDeposit(record, model=record.model)
 
@@ -97,6 +98,13 @@ def indexer_receiver(sender, json=None, record=None, index=None,
             relations = {'version': [{'is_last': True, 'index': 0}, ]}
         if relations:
             json['relations'] = relations
+
+    for loc in json.get('locations', []):
+        loc['point'] = {'lat': loc['lat'], 'lon': loc['lon']}
+
+    custom_es_fields = build_record_custom_fields(json)
+    for es_field, es_value in custom_es_fields.items():
+        json[es_field] = es_value
 
 
 def index_versioned_record_siblings(sender, action=None, pid=None,

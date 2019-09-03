@@ -24,7 +24,7 @@
 
 {%- set communities_in = record|zenodo_community_branding_links %}
 {%- set published_in = record|zenodo_related_links(all_pending_comms + all_accepted_comms) %}
-{%- set is_openaire = record|is_openaire_publication or record|is_openaire_dataset %}
+{%- set is_openaire = record|openaire_type %}
 
 {%- if communities_in or published_in or is_openaire %}
 <div class="well metadata">
