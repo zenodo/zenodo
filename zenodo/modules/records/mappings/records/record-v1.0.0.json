@@ -630,6 +630,24 @@
         "updated": {
           "type": "date"
         },
+        "dates": {
+          "type": "object",
+          "properties": {
+            "start": {
+              "type": "date"
+            },
+            "end": {
+              "type": "date"
+            },
+            "type": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "description": {
+              "type": "string"
+            }
+          }
+        },
         "_oai": {
           "properties": {
             "id": {
@@ -645,6 +663,76 @@
             }
           },
           "type": "object"
+        },
+        "_stats": {
+          "properties": {
+            "views": {
+              "type": "integer"
+            },
+            "unique_views": {
+              "type": "integer"
+            },
+            "downloads": {
+              "type": "integer"
+            },
+            "unique_downloads": {
+              "type": "integer"
+            },
+            "volume": {
+              "type": "double"
+            },
+            "version_volume": {
+              "type": "double"
+            },
+            "version_views": {
+              "type": "integer"
+            },
+            "version_unique_views": {
+              "type": "integer"
+            },
+            "version_downloads": {
+              "type": "integer"
+            },
+            "version_unique_downloads": {
+              "type": "integer"
+            }
+          }
+        },
+        "method": {
+          "type": "string"
+        },
+        "locations": {
+          "type": "object",
+          "properties": {
+            "place": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "point": {
+              "type": "geo_point"
+            }
+          }
+        },
+        "custom": {
+          "type": "object",
+          "dynamic": false,
+          "enabled": false
+        },
+        "custom_keywords": {
+          "type" : "nested",
+          "properties": {
+            "key": {"type": "string", "index": "not_analyzed"},
+            "value": {"type": "string", "index": "not_analyzed"}
+          }
+        },
+        "custom_text": {
+          "type" : "nested",
+          "properties": {
+            "key": {"type": "string", "index": "not_analyzed"},
+            "value": {"type": "string"}
+          }
         }
       }
     }

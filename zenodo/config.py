@@ -61,12 +61,16 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_pidrelations.config import RelationType
 from invenio_records_rest.facets import terms_filter
+from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
+from zenodo.modules.records.facets import custom_metadata_filter, \
+    geo_bounding_box_filter
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
+from zenodo.modules.stats import current_stats_search_client
 
 
 def _(x):
@@ -109,6 +113,8 @@ PIDSTORE_DATACITE_USERNAME = "CERN.ZENODO"
 PIDSTORE_DATACITE_PASSWORD = "CHANGE_ME"
 #: DataCite updating rate.
 DATACITE_UPDATING_RATE_PER_HOUR = 1000
+#: DataCite max description length
+DATACITE_MAX_DESCRIPTION_SIZE = 20000
 
 #: Zenodo PID relations
 PIDRELATIONS_RELATION_TYPES = [
@@ -161,6 +167,7 @@ CELERY_TASK_ROUTES = {
     'zenodo.modules.sipstore.tasks.archive_sip': {'queue': 'low'},
     'zenodo_migrator.tasks.migrate_concept_recid_sips': {'queue': 'low'},
     'invenio_openaire.tasks.register_grant': {'queue': 'low'},
+    'invenio_indexer.tasks.process_bulk_queue': {'queue': 'celery-indexer'}
 }
 #: Beat schedule
 CELERY_BEAT_SCHEDULE = {
@@ -171,10 +178,13 @@ CELERY_BEAT_SCHEDULE = {
     'indexer': {
         'task': 'invenio_indexer.tasks.process_bulk_queue',
         'schedule': timedelta(minutes=5),
+        'kwargs': {
+            'es_bulk_kwargs': {'raise_on_error': False},
+        },
     },
     'openaire-updater': {
         'task': 'zenodo.modules.utils.tasks.update_search_pattern_sets',
-        'schedule': timedelta(hours=2),
+        'schedule': timedelta(hours=12),
     },
     'cleanup-indexed-deposits': {
         'task': 'zenodo.modules.deposit.tasks.cleanup_indexed_deposits',
@@ -237,6 +247,32 @@ CELERY_BEAT_SCHEDULE = {
             'job_id': 'records',
         }
     },
+    # Stats
+    'stats-process-events': {
+        'task': 'invenio_stats.tasks.process_events',
+        'schedule': timedelta(minutes=30),
+        'args': [('record-view', 'file-download')],
+    },
+    'stats-aggregate-events': {
+        'task': 'invenio_stats.tasks.aggregate_events',
+        'schedule': timedelta(hours=3),
+        'args': [(
+            'record-view-agg', 'record-view-all-versions-agg',
+            'record-download-agg', 'record-download-all-versions-agg',
+        )],
+    },
+    'stats-update-record-statistics': {
+        'task': 'zenodo.modules.stats.tasks.update_record_statistics',
+        'schedule': crontab(minute=0, hour=1),  # Every day at 01:00 UTC
+    },
+    'stats-export': {
+        'task': 'zenodo.modules.stats.tasks.export_stats',
+        'schedule': crontab(minute=0, hour=4),
+        'kwargs': {
+            'retry': True,
+        }
+    },
+
 }
 
 # Cache
@@ -392,20 +428,27 @@ OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
 OPENAIRE_ZENODO_IDS = {
     'publication': 'opendoar____::2659',
     'dataset': 're3data_____::r3d100010468',
+    'software': 're3data_____::r3d100010468',
+    'other': 're3data_____::r3d100010468'
 }
 #: OpenAIRE ID namespace prefixes for Zenodo.
 OPENAIRE_NAMESPACE_PREFIXES = {
     'publication': 'od______2659',
     'dataset': 'r37b0ad08687',
+    'software': 'r37b0ad08687',
+    'other': 'r37b0ad08687'
 }
 #: OpenAIRE API endpoint.
-OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc'
+OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc/api/results'
+OPENAIRE_API_URL_BETA = None
 #: OpenAIRE API endpoint username.
 OPENAIRE_API_USERNAME = None
 #: OpenAIRE API endpoint password.
 OPENAIRE_API_PASSWORD = None
 #: URL to OpenAIRE portal.
-OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
+OPENAIRE_PORTAL_URL = 'https://explore.openaire.eu'
+#: OpenAIRE community identifier prefix.
+OPENAIRE_COMMUNITY_IDENTIFIER_PREFIX = 'https://openaire.eu/communities'
 #: Enable sending published records for direct indexing at OpenAIRE.
 OPENAIRE_DIRECT_INDEXING_ENABLED = False
 
@@ -471,11 +514,27 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Data collector', marc='col', datacite='DataCollector'),
     dict(label='Data curator', marc='cur', datacite='DataCurator'),
     dict(label='Data manager', marc='dtm', datacite='DataManager'),
+    dict(label='Distributor', marc='dst', datacite='Distributor'),
     dict(label='Editor', marc='edt', datacite='Editor'),
+    dict(label='Hosting institution', marc='his',
+         datacite='HostingInstitution'),
+    dict(label='Other', marc='oth', datacite='Other'),
+    dict(label='Producer', marc='pro', datacite='Producer'),
+    dict(label='Project leader', marc='pdr', datacite='ProjectLeader'),
+    dict(label='Project manager', marc='rth', datacite='ProjectManager'),
+    dict(label='Project member', marc='rtm', datacite='ProjectMember'),
+    dict(label='Registration agency', marc='cor',
+         datacite='RegistrationAgency'),
+    dict(label='Registration authority', marc='cor',
+         datacite='RegistrationAuthority'),
+    dict(label='Related person', marc='oth', datacite='RelatedPerson'),
+    dict(label='Research group', marc='rtm', datacite='ResearchGroup'),
     dict(label='Researcher', marc='res', datacite='Researcher'),
     dict(label='Rights holder', marc='cph', datacite='RightsHolder'),
     dict(label='Sponsor', marc='spn', datacite='Sponsor'),
-    dict(label='Other', marc='oth', datacite='Other'),
+    dict(label='Supervisor', marc='dgs', datacite='Supervisor'),
+    dict(label='Work package leader', marc='led',
+         datacite='WorkPackageLeader'),
 ]
 DEPOSIT_CONTRIBUTOR_MARC2DATACITE = {
     x['marc']: x['datacite'] for x in DEPOSIT_CONTRIBUTOR_TYPES
@@ -504,13 +563,13 @@ DEPOSIT_UI_RESPONSE_MESSAGES = dict(
         message="Saved successfully."
     ),
     delete=dict(
-        message="Deleted succesfully."
+        message="Deleted successfully."
     ),
     discard=dict(
-        message="Changes discarded succesfully."
+        message="Changes discarded successfully."
     ),
     publish=dict(
-        message="Published succesfully."
+        message="Published successfully."
     ),
 )
 
@@ -663,6 +722,19 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='Citation',
         serializer='zenodo.modules.records.serializers.citeproc_v1',
     ),
+    # Generic serializer
+    'ef': dict(
+        title='Formats',
+        serializer='zenodo.modules.records.serializers.extra_formats_v1',
+    ),
+    'geojson': dict(
+        title='GeoJSON',
+        serializer='zenodo.modules.records.serializers.geojson_v1',
+    ),
+    'dcat': dict(
+        title='DCAT',
+        serializer='zenodo.modules.records.serializers.dcat_v1',
+    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
@@ -764,8 +836,12 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.dc_v1_response'),
             'application/vnd.citationstyles.csl+json': (
                 'zenodo.modules.records.serializers.csl_v1_response'),
+            'application/dcat+xml': (
+                'zenodo.modules.records.serializers.dcat_response'),
             'text/x-bibliography': (
                 'zenodo.modules.records.serializers.citeproc_v1_response'),
+            'application/vnd.geo+json': (
+                'zenodo.modules.records.serializers.geojson_v1_response'),
         },
         search_serializers={
             'application/json': (
@@ -787,6 +863,9 @@ RECORDS_REST_ENDPOINTS = dict(
 )
 # Default OpenAIRE API endpoints.
 RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
+
+# Add fuzzy matching for licenses
+OPENDEFINITION_REST_ENDPOINTS['od_lic']['suggesters']['text']['completion']['fuzzy'] = True
 RECORDS_REST_ENDPOINTS.update(OPENDEFINITION_REST_ENDPOINTS)
 
 #: Sort options records REST API.
@@ -795,6 +874,12 @@ RECORDS_REST_SORT_OPTIONS = dict(
         bestmatch=dict(
             fields=['-_score'],
             title='Best match',
+            default_order='asc',
+            order=1,
+        ),
+        mostviewed=dict(
+            fields=['-_stats.version_views'],
+            title='Most viewed',
             default_order='asc',
             order=1,
         ),
@@ -832,6 +917,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=6,
         ),
+        distance=dict(
+            title='Distance',
+            fields=[geolocation_sort('location.point', 'center', 'km')],
+            default_order='asc',
+            display=False,
+            order=2,
+        ),
         version=dict(
             # TODO: There are a lot of implications when sorting record results
             # by versions and using the `_score`... Maybe there's some
@@ -846,6 +938,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
 )
 DEPOSIT_REST_SORT_OPTIONS['deposits'].update(
     dict(
+        distance=dict(
+            title=_('Distance'),
+            fields=[geolocation_sort('location.point', 'center', 'km')],
+            default_order='asc',
+            display=False,
+            order=2,
+        ),
         version=dict(
             # FIXME: No `_score` in deposit search response...
             fields=['conceptrecid', 'relations.version.index'],
@@ -889,7 +988,10 @@ RECORDS_REST_FACETS = dict(
         ),
         filters=dict(
             communities=terms_filter('communities'),
+            custom=custom_metadata_filter('custom'),
             provisional_communities=terms_filter('provisional_communities'),
+            bounds=geo_bounding_box_filter(
+                'bounds', 'locations.point', type='indexed'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
@@ -900,6 +1002,17 @@ RECORDS_REST_FACETS = dict(
         )
     )
 )
+
+#: Update deposit facets as well
+DEPOSIT_REST_FACETS['deposits'].setdefault('filters', {})
+DEPOSIT_REST_FACETS['deposits']['filters'].update(dict(
+    communities=terms_filter('communities'),
+    custom=custom_metadata_filter('custom'),
+    provisional_communities=terms_filter('provisional_communities'),
+    locations=geo_bounding_box_filter(
+        'locations', 'locations.point', type='indexed'),
+))
+
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
@@ -930,11 +1043,11 @@ PREVIEWER_PREFERENCE = [
     'csv_dthreejs',
     'iiif_image',
     'simple_image',
-    'json_prismjs',
-    'xml_prismjs',
+    # 'json_prismjs',
+    # 'xml_prismjs',
     'mistune',
     'pdfjs',
-    'ipynb',
+    # 'ipynb',
     'zip',
 ]
 
@@ -991,6 +1104,11 @@ OAISERVER_METADATA_FORMATS = {
         'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v41',
     },
+    'dcat': {
+        'namespace': 'https://www.w3.org/ns/dcat',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_dcat_v1',
+    },
     'oai_datacite': {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
@@ -1000,6 +1118,12 @@ OAISERVER_METADATA_FORMATS = {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
+    },
+    'oai_datacite4': {
+        'namespace': 'http://datacite.org/schema/kernel-4',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer':
+            'zenodo.modules.records.serializers.oaipmh_oai_datacite_v41',
     },
     'oai_dc': {
         'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
@@ -1047,6 +1171,9 @@ SECURITY_PASSWORD_SCHEMES = [
     'pbkdf2_sha512', 'sha512_crypt', 'invenio_aes_encrypted_email']
 SECURITY_DEPRECATED_PASSWORD_SCHEMES = [
     'sha512_crypt', 'invenio_aes_encrypted_email']
+
+#: Session and User ID headers
+ACCOUNTS_USERINFO_HEADERS = True
 
 # Search
 # ======
@@ -1099,7 +1226,7 @@ COMMUNITIES_REQUEST_EMAIL_SENDER = SUPPORT_EMAIL
 #: Default site name.
 THEME_SITENAME = _("Zenodo")
 #: Default site URL (used only when not in a context - e.g. like celery tasks).
-THEME_SITEURL = "https://zenodo.org"
+THEME_SITEURL = "http://localhost:5000"
 #: Endpoint for breadcrumb root.
 THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
 #: Twitter handle.
@@ -1155,6 +1282,102 @@ STATSD_PORT = 8125
 #: Default StatsD port
 STATSD_PREFIX = "zenodo"
 
+# Stats
+# =====
+STATS_EVENTS = {
+    'file-download': {
+        'signal': 'invenio_files_rest.signals.file_downloaded',
+        'templates': 'zenodo.modules.stats.templates.events',
+        'event_builders': [
+            'invenio_stats.contrib.event_builders.file_download_event_builder',
+            'zenodo.modules.stats.event_builders:skip_deposit',
+            'zenodo.modules.stats.event_builders:add_record_metadata',
+        ],
+        'processor_config': {
+            'preprocessors': [
+                'invenio_stats.processors:flag_robots',
+                # Don't index robot events
+                lambda doc: doc if not doc['is_robot'] else None,
+                'invenio_stats.processors:flag_machines',
+                'invenio_stats.processors:anonymize_user',
+                'invenio_stats.contrib.event_builders:build_file_unique_id',
+            ],
+            # Keep only 1 file download for each file and user every 30 sec
+            'double_click_window': 30,
+            # Create one index per month which will store file download events
+            'suffix': '%Y-%m',
+        },
+    },
+    'record-view': {
+        'signal': 'invenio_records_ui.signals.record_viewed',
+        'templates': 'zenodo.modules.stats.templates.events',
+        'event_builders': [
+            'invenio_stats.contrib.event_builders.record_view_event_builder',
+            'zenodo.modules.stats.event_builders:skip_deposit',
+            'zenodo.modules.stats.event_builders:add_record_metadata',
+        ],
+        'processor_config': {
+            'preprocessors': [
+                'invenio_stats.processors:flag_robots',
+                # Don't index robot events
+                lambda doc: doc if not doc['is_robot'] else None,
+                'invenio_stats.processors:flag_machines',
+                'invenio_stats.processors:anonymize_user',
+                'invenio_stats.contrib.event_builders:build_record_unique_id',
+            ],
+            # Keep only 1 file download for each file and user every 30 sec
+            'double_click_window': 30,
+            # Create one index per month which will store file download events
+            'suffix': '%Y-%m',
+        },
+    },
+}
+#: Enabled aggregations from 'zenoodo.modules.stats.registrations'
+STATS_AGGREGATIONS = {
+    'record-download-agg': {},
+    'record-download-all-versions-agg': {},
+    # NOTE: Since the "record-view-agg" aggregations is already registered in
+    # "invenio_stasts.contrib.registrations", we have to overwrite the
+    # configuration here
+    'record-view-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        aggregator_config=dict(
+            client=current_stats_search_client,
+            event='record-view',
+            aggregation_field='recid',
+            aggregation_interval='day',
+            batch_size=1,
+            copy_fields=dict(
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (list(d.communities)
+                                          if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: False
+            ),
+            metric_aggregation_fields=dict(
+                unique_count=('cardinality', 'unique_session_id',
+                              {'precision_threshold': 1000}),
+            )
+        )
+    ),
+    'record-view-all-versions-agg': {},
+}
+#: Enabled queries from 'zenoodo.modules.stats.registrations'
+STATS_QUERIES = {
+    'record-view': {},
+    'record-view-all-versions': {},
+    'record-download': {},
+    'record-download-all-versions': {},
+}
+
+# Queues
+# ======
+QUEUES_BROKER_URL = CELERY_BROKER_URL
+
 # Proxy configuration
 #: Number of proxies in front of application.
 WSGI_PROXIES = 0
@@ -1173,3 +1396,10 @@ INDEXER_SCHEMA_TO_INDEX_MAP = {
     'deposits-records-record-v1.0.0': 'deposit-record-v1.0.0',
     'funders-funder-v1.0.0': 'funder-v1.0.0',
 }
+
+
+# Configuration for limiter.
+RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
+
+# Error template
+THEME_429_TEMPLATE = "zenodo_errors/429.html"

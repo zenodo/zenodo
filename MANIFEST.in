@@ -49,6 +49,7 @@ recursive-include misc *.py
 recursive-include misc *.rst
 recursive-include scripts *.py
 recursive-include scripts *.sh
+recursive-include tests *.gz
 recursive-include tests *.py
 recursive-include zenodo *.html
 recursive-include zenodo *.jpeg

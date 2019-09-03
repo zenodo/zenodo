@@ -27,9 +27,10 @@
 from __future__ import absolute_import, print_function
 
 import lxml.html
-from marshmallow import Schema, fields
+from marshmallow import Schema, fields, missing
 
 from ...models import ObjectType
+from .common import ui_link_for
 
 
 class DublinCoreV1(Schema):
@@ -48,6 +49,7 @@ class DublinCoreV1(Schema):
     types = fields.Method('get_types')
     sources = fields.Method('get_sources')
     languages = fields.Function(lambda o: [o['metadata'].get('language', u'')])
+    coverage = fields.Method('get_locations')
 
     def get_identifiers(self, obj):
         """Get identifiers."""
@@ -87,6 +89,9 @@ class DublinCoreV1(Schema):
                     a['scheme'],
                     a['identifier']))
 
+        # Zenodo community identifiers
+        for comm in obj['metadata'].get('communities', []):
+            rels.append(u'url:{}'.format(ui_link_for('community', id=comm)))
         return rels
 
     def get_rights(self, obj):
@@ -106,6 +111,13 @@ class DublinCoreV1(Schema):
             dates.append(
                 u'info:eu-repo/date/embargoEnd/{0}'.format(
                     obj['metadata']['embargo_date']))
+        for interval in obj['metadata'].get('dates', []):
+            start = interval.get('start') or ''
+            end = interval.get('end') or ''
+            if start != '' and end != '' and start == end:
+                dates.append(start)
+            else:
+                dates.append(start + '/' + end)
 
         return dates
 
@@ -116,11 +128,24 @@ class DublinCoreV1(Schema):
             descriptions.append(
                 lxml.html.document_fromstring(obj['metadata']['description'])
                 .text_content().replace(u"\xa0", u" "))
+        if obj['metadata'].get('notes', '').strip():
+            descriptions.append(
+                lxml.html.document_fromstring(obj['metadata']['notes'])
+                .text_content().replace(u"\xa0", u" "))
+        if obj['metadata'].get('method', '').strip():
+            descriptions.append(
+                lxml.html.document_fromstring(obj['metadata']['method'])
+                .text_content().replace(u"\xa0", u" "))
         return descriptions
 
     def get_subjects(self, obj):
         """Get subjects."""
-        return obj['metadata'].get('keywords', [])
+        metadata = obj['metadata']
+        subjects = []
+        subjects.extend(metadata.get('keywords', []))
+        subjects.extend((s['term'] for s in metadata.get('subjects', [])
+                         if s.get('term')))
+        return subjects
 
     def get_publishers(self, obj):
         """Get publishers."""
@@ -182,3 +207,13 @@ class DublinCoreV1(Schema):
             items.append(', '.join([x for x in parts if x]))
 
         return items
+
+    def get_locations(self, obj):
+        """Get locations."""
+        locations = []
+        for location in obj['metadata'].get('locations', []):
+            if location.get('lat') and location.get('lon'):
+                locations.append(
+                    'name={place}; east={lon}; north={lat}'.format(**location)
+                )
+        return locations or missing

@@ -26,16 +26,20 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from datetime import datetime
+
 import requests
 from celery import shared_task
 from flask import current_app
+from invenio_cache import current_cache
 
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.serializers import openaire_json_v1
 
 from .errors import OpenAIRERequestError
-from .helpers import is_openaire_dataset, is_openaire_publication, \
-    openaire_datasource_id, openaire_original_id, openaire_type
+from .helpers import is_openaire_dataset, is_openaire_other, \
+    is_openaire_publication, is_openaire_software, openaire_datasource_id, \
+    openaire_original_id, openaire_type
 
 
 def _openaire_request_factory(headers=None, auth=None):
@@ -65,17 +69,35 @@ def openaire_direct_index(record_uuid):
 
         # Bail out if not an OpenAIRE record.
         if not (is_openaire_publication(record) or
-                is_openaire_dataset(record)):
+                is_openaire_dataset(record) or
+                is_openaire_software(record) or
+                is_openaire_other(record)):
             return
 
         data = openaire_json_v1.serialize(record.pid, record)
-        url = '{}/api/results/feedObject'.format(
+        url = '{}/feedObject'.format(
             current_app.config['OPENAIRE_API_URL'])
         req = _openaire_request_factory()
         res = req.post(url, data=data)
+
         if not res.ok:
             raise OpenAIRERequestError(res.text)
+
+        res_beta = None
+        if current_app.config['OPENAIRE_API_URL_BETA']:
+            url_beta = '{}/feedObject'.format(
+                current_app.config['OPENAIRE_API_URL_BETA'])
+            res_beta = req.post(url_beta, data=data)
+
+        if res_beta and not res_beta.ok:
+            raise OpenAIRERequestError(res_beta.text)
+        else:
+            recid = record.get('recid')
+            current_cache.delete('openaire_direct_index:{}'.format(recid))
     except Exception as exc:
+        recid = record.get('recid')
+        current_cache.set('openaire_direct_index:{}'.format(recid),
+                          datetime.now(), timeout=-1)
         openaire_direct_index.retry(exc=exc)
 
 
@@ -100,10 +122,14 @@ def openaire_delete(record_uuid=None, original_id=None, datasource_id=None):
             datasource_id = openaire_datasource_id(record)
 
         params = {'originalId': original_id, 'collectedFromId': datasource_id}
-        url = '{}/api/results'.format(current_app.config['OPENAIRE_API_URL'])
         req = _openaire_request_factory()
-        res = req.delete(url, params=params)
-        if not res.ok:
+        res = req.delete(current_app.config['OPENAIRE_API_URL'], params=params)
+        res_beta = None
+        if current_app.config['OPENAIRE_API_URL_BETA']:
+            res_beta = req.delete(current_app.config['OPENAIRE_API_URL_BETA'],
+                                  params=params)
+
+        if not res.ok or (res_beta and not res_beta.ok):
             raise OpenAIRERequestError(res.text)
     except Exception as exc:
         openaire_delete.retry(exc=exc)

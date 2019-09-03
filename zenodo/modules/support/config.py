@@ -116,7 +116,7 @@ SUPPORT_ISSUE_CATEGORIES = [
             'dataset.</li>'
             '<li>Information on the currently in-review or future papers that '
             'will cite this dataset (if applicable). If possible specify the '
-            'journal or conferece.</li>'
+            'journal or conference.</li>'
             '</ol>'
         ),
         'recipients': ['info@zenodo.org'],

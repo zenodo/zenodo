@@ -32,7 +32,7 @@ from invenio_assets import NpmBundle
 css = NpmBundle(
     Bundle(
         'scss/styles.scss',
-        filters='node-scss',
+        filters='node-scss, cleancss',
         depends=('scss/*.scss', ),
     ),
     Bundle(

@@ -27,5 +27,5 @@
 from __future__ import absolute_import, print_function
 
 from .api import Exporter
-from .streams import ResultStream, BZip2ResultStream
+from .streams import BZip2ResultStream, ResultStream
 from .writers import BucketWriter, filename_factory

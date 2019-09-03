@@ -99,6 +99,7 @@ def test_full(app, db, full_oai_record, recid_pid):
         'title': 'Test title',
         'type': 'publication',
         'url': 'https://zenodo.org/record/12345',
+        'contexts': ['https://zenodo.org/communities/zenodo'],
         'version': '1.2.5'
     }
 

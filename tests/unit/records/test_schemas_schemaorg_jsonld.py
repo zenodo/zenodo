@@ -102,7 +102,7 @@ def test_person():
     assert data == {'name': 'Doe, John',
                     'affiliation': 'CERN',
                     '@type': 'Person',
-                    '@id': 'http://d-nb.info/gnd/170118215'}
+                    '@id': 'https://d-nb.info/gnd/170118215'}
 
     # Add ORCID - it should supersede GND as the identifier
     simple_person['orcid'] = '0000-0002-1825-0097'
@@ -190,11 +190,11 @@ def test_full_record(record_with_files_creation):
                 u'@type': u'CreativeWork'
             },
             {
-                u'@id': 'http://arxiv.org/abs/arXiv:1234.4321',
+                u'@id': 'https://arxiv.org/abs/arXiv:1234.4321',
                 u'@type': u'CreativeWork'
             },
             {
-                '@id': 'http://arxiv.org/abs/arXiv:1234.4328',
+                '@id': 'https://arxiv.org/abs/arXiv:1234.4328',
                 '@type': 'CreativeWork'
             }
         ],
@@ -235,7 +235,7 @@ def test_full_record(record_with_files_creation):
                 u'name': u'Smith, John'
             },
             {
-                u'@id': 'http://d-nb.info/gnd/170118215',
+                u'@id': 'https://d-nb.info/gnd/170118215',
                 u'@type': u'Person',
                 u'affiliation': u'CERN',
                 u'name': u'Nowak, Jack'
@@ -252,8 +252,8 @@ def test_full_record(record_with_files_creation):
             u'name': u'English'
         },
         u'sameAs': [
-            u'http://arxiv.org/abs/arXiv:1234.4325',
-            u'http://adsabs.harvard.edu/abs/2011ApJS..192...18K',
+            u'https://arxiv.org/abs/arXiv:1234.4325',
+            u'https://ui.adsabs.harvard.edu/#abs/2011ApJS..192...18K',
             u'https://doi.org/10.1234/alternate.doi',
         ],
         u'isPartOf': [
@@ -272,18 +272,36 @@ def test_full_record(record_with_files_creation):
         u'license': u'https://creativecommons.org/licenses/by/4.0/',
         u'name': u'Test title',
         u'url': u'http://localhost/record/12345',
-        u'version': u'1.2.5'
+        u'version': u'1.2.5',
+        u'temporal': [
+            '2019-01-01/..',
+            '../2019-01-01',
+            '2019-01-01',
+            '2019-01-01/2019-02-01',
+        ],
+        u'spatial': [{
+            u'@type': u'Place',
+            u'geo': {
+                u'@type': u'GeoCoordinates',
+                u'latitude': 2.35,
+                u'longitude': 1.534
+            },
+            u'name': u'my place'
+        }, {
+            '@type': 'Place', 'name': 'New York'
+        }]
     }
     assert data == expected
 
 
-def test_dataset_with_files(app, users, minimal_record_model, recid_pid):
+def test_dataset(app, users, minimal_record_model, recid_pid):
     """Testing the dumping of files in Open Access datasets."""
     with app.test_request_context():
         datastore = app.extensions['security'].datastore
         login_user(datastore.get_user(users[0]['email']))
         assert minimal_record_model['access_right'] == 'open'
         minimal_record_model['resource_type'] = dict(type='dataset')
+        minimal_record_model['method'] = 'microscopic supersampling'
         minimal_record_model['_files'] = [
             {
                 'bucket': '22222222-2222-2222-2222-222222222222',
@@ -322,6 +340,7 @@ def test_dataset_with_files(app, users, minimal_record_model, recid_pid):
                 u'fileFormat': u'pdf'
             }
         ]
+        assert data['measurementTechnique'] == 'microscopic supersampling'
         for right in ['closed', 'embargoed', 'restricted']:
 
             minimal_record_model['access_right'] = right

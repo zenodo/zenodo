@@ -32,8 +32,17 @@ from invenio_records_rest.serializers.datacite import OAIDataCiteSerializer
 from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
+from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
+from zenodo.modules.records.serializers.datacite import ZenodoDataCite31Serializer, \
+    ZenodoDataCite41Serializer
+from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
+from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
+
 from .bibtex import BibTeXSerializer
+from .dcat import DCATSerializer
+from .extra_formats import ExtraFormatsSerializer
 from .files import files_responsify
+from .geojson import ZenodoGeoJSONSerializer as GeoJSONSerializer
 from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
 from .schemaorg import ZenodoSchemaOrgSerializer
@@ -41,14 +50,9 @@ from .schemas.csl import RecordSchemaCSLJSON
 from .schemas.datacite import DataCiteSchemaV1, DataCiteSchemaV4
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
-from .schemas.legacyjson import FileSchemaV1, GitHubRecordSchemaV1, \
-    LegacyRecordSchemaV1, DepositFormSchemaV1
+from .schemas.legacyjson import DepositFormSchemaV1, FileSchemaV1, \
+    GitHubRecordSchemaV1, LegacyRecordSchemaV1
 from .schemas.marc21 import RecordSchemaMARC21
-from zenodo.modules.records.serializers.datacite import \
-    ZenodoDataCite31Serializer, ZenodoDataCite41Serializer
-from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
-from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
-from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
 
 # Serializers
 # ===========
@@ -73,12 +77,19 @@ marcxml_v1 = ZenodoMARCXMLSerializer(
     to_marc21, schema_class=RecordSchemaMARC21, replace_refs=True)
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
-#: DataCite serializer
+#: DataCite serializers
 datacite_v31 = ZenodoDataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
 datacite_v41 = ZenodoDataCite41Serializer(DataCiteSchemaV4, replace_refs=True)
+#: DCAT serializer
+dcat_v1 = DCATSerializer(datacite_v41)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     serializer=datacite_v31,
+    datacentre='CERN.ZENODO',
+)
+#: OAI DataCite 4.1 serializer
+oai_datacite_v41 = OAIDataCiteSerializer(
+    serializer=datacite_v41,
     datacentre='CERN.ZENODO',
 )
 #: Dublin Core serializer
@@ -91,7 +102,10 @@ citeproc_v1 = CiteprocSerializer(csl_v1)
 openaire_json_v1 = JSONSerializer(RecordSchemaOpenAIREJSON, replace_refs=True)
 #: JSON-LD serializer
 schemaorg_jsonld_v1 = ZenodoSchemaOrgSerializer(replace_refs=True)
-
+#: Extra formats serializer
+extra_formats_v1 = ExtraFormatsSerializer()
+#: GeoJSON serializer
+geojson_v1 = GeoJSONSerializer(replace_refs=False)
 
 # Records-REST serializers
 # ========================
@@ -109,6 +123,9 @@ datacite_v31_response = record_responsify(
 #: DataCite v4.1 record serializer for individual records.
 datacite_v41_response = record_responsify(
     datacite_v41, 'application/x-datacite-v41+xml')
+#: DCAT v4.1 record serializer for individual records.
+dcat_response = record_responsify(
+    dcat_v1, 'application/rdf+xml')
 #: DublinCore record serializer for individual records.
 dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 #: CSL-JSON record serializer for individual records.
@@ -136,7 +153,10 @@ datacite_v31_search = search_responsify(
     datacite_v31, 'application/x-datacite+xml')
 #: DublinCore record serializer for search records.
 dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
-schemaorg_jsonld_v1_search = record_responsify(schemaorg_jsonld_v1, 'application/ld+json')
+schemaorg_jsonld_v1_search = record_responsify(
+    schemaorg_jsonld_v1, 'application/ld+json')
+#: GeoJSON record serializer for search records.
+geojson_v1_response = record_responsify(geojson_v1, 'application/vnd.geo+json')
 
 # Deposit serializers
 # ===================
@@ -164,7 +184,11 @@ oaipmh_marc21_v1 = marcxml_v1.serialize_oaipmh
 oaipmh_datacite_v41 = datacite_v41.serialize_oaipmh
 #: OAI-PMH DataCite record serializer.
 oaipmh_datacite_v31 = datacite_v31.serialize_oaipmh
+#: OAI-PMH DCAT record serializer.
+oaipmh_dcat_v1 = dcat_v1.serialize_oaipmh
 #: OAI-PMH OAI DataCite record serializer.
 oaipmh_oai_datacite = oai_datacite.serialize_oaipmh
+#: OAI-PMH OAI DataCite 4.1 record serializer.
+oaipmh_oai_datacite_v41 = oai_datacite_v41.serialize_oaipmh
 #: OAI-PMH OAI Dublin Core record serializer.
 oaipmh_oai_dc = dc_v1.serialize_oaipmh

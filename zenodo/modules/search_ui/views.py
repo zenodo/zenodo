@@ -34,3 +34,9 @@ blueprint = Blueprint(
     template_folder='templates',
     static_folder='static',
 )
+
+
+@blueprint.app_template_filter()
+def filter_sort_options(sort_options):
+    """Filters the search sort options based on the "display" key."""
+    return {k: v for k, v in sort_options.items() if v.get('display', True)}

@@ -1,0 +1,30 @@
+<div class="row">
+  <div class="col-sm-3">Show only:</div>
+  <div class="col-sm-9" style="margin-left:-35px">
+    <!-- Type filter-->
+    <div class="row">
+      <span class="titlecase filter" ng-repeat="item in vm.invenioSearchResults.aggregations.type.buckets track by $index">
+        <input id="facet-{{ item.key }}" type="checkbox" ng-checked="handler.type.indexOf(item.key) > -1" ng-click="handleClick('type', item.key)">
+        <label for="facet-{{ item.key }}">
+          {{ item.key }} ({{ item.doc_count }})
+        </label>
+        </input>
+      </span>
+      <span class="titlecase filter" ng-if="vm.invenioSearchResults.aggregations.type.buckets.length != 4" ng-repeat="type in vm.invenioSearchResults.aggregations.type.buckets | missingTypes track by $index">
+        <input type="checkbox" class="disabled" disabled>
+        <label>{{ type }} (0)</label>
+        </input>
+      </span>
+
+      </span>
+
+    </div>
+    <!-- Version filter-->
+    <div class="row filter">
+      <input id="version-filter" type="checkbox" ng-checked="!vm.invenioSearchArgs.group_by === 'version'" ng-click="vm.invenioSearchArgs.type=[];
+           vm.invenioSearchArgs.group_by = (vm.invenioSearchArgs.group_by === 'identity' ? 'version' : 'identity');
+           vm.invenioSearchArgs.id = (vm.invenioSearchArgs.group_by === 'version' ? vm.version_id : vm.record_id);">
+      <label for="version-filter">Citations to this version</label>
+    </div>
+  </div>
+</div>

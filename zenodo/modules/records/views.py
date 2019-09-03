@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
+import json
 from operator import itemgetter
 
 import idutils
@@ -39,15 +40,19 @@ from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
+from invenio_records_ui.signals import record_viewed
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.deposit.extra_formats import ExtraFormats
 from zenodo.modules.records.utils import is_doi_locally_managed
+from zenodo.modules.stats.utils import get_record_stats
 
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
+from .serializers.json import ZenodoJSONSerializer
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -75,6 +80,12 @@ def is_embargoed(embargo_date, accessright=None):
     if embargo_date is not None:
         return AccessRight.is_embargoed(embargo_date)
     return False
+
+
+@blueprint.app_template_filter('extra_formats_title')
+def extra_formats_title(mimetype):
+    """Return a dict of a record's available extra formats and their title."""
+    return ExtraFormats.mimetype_whitelist.get(mimetype, '')
 
 
 @blueprint.app_template_filter('pidstatus')
@@ -149,7 +160,7 @@ def zenodo_related_links(record, communities):
     """Get logos for related links."""
     def apply_rule(item, rule):
         r = copy.deepcopy(rule)
-        r['link'] = idutils.to_url(item['identifier'], item['scheme'])
+        r['link'] = idutils.to_url(item['identifier'], item['scheme'], 'https')
         return r
 
     def match_rules(item):
@@ -186,6 +197,7 @@ def zenodo_community_branding_links(record):
             comm_model = Community.query.get(comm)
             ret.append((comm, comm_model.logo_url))
     return ret
+
 
 #
 # Object type template filters and tests.
@@ -231,6 +243,22 @@ def select_preview_file(files):
     except KeyError:
         pass
     return selected
+
+
+#
+# Stats filters
+#
+
+@blueprint.app_template_filter()
+def record_stats(record):
+    """Fetch record statistics from Elasticsearch."""
+    return get_record_stats(record.id, False)
+
+
+@blueprint.app_template_filter()
+def stats_num_format(num):
+    """Format a statistics value."""
+    return '{:,.0f}'.format(num or 0)
 
 
 #
@@ -328,19 +356,32 @@ def records_ui_export(pid, record, template=None, **kwargs):
             'zenodo_records/records_export_unsupported.html'), 410
     else:
         serializer = import_string(formats[fmt]['serializer'])
-        data = serializer.serialize(pid, record)
+        # Pretty print if JSON
+        if isinstance(serializer, ZenodoJSONSerializer):
+            json_data = serializer.transform_record(pid, record)
+            data = json.dumps(json_data, indent=2, separators=(', ', ': '))
+        else:
+            data = serializer.serialize(pid, record)
         if isinstance(data, six.binary_type):
             data = data.decode('utf8')
 
+        # emit record_viewed event
+        record_viewed.send(
+            current_app._get_current_object(),
+            pid=pid,
+            record=record,
+        )
         return render_template(
             template, pid=pid, record=record,
-            data=data, format_title=formats[fmt]['title'])
+            data=data, format_code=fmt, format_title=formats[fmt]['title'])
 
 
 def _can_curate(community, user, record, accepted=False):
     """Determine whether user can curate given community."""
-    if (community.id_user == user.get_id()) or \
-            (accepted and (user.get_id() in record.get('owners', []))):
+    if user.is_anonymous:
+        return False
+    if (community.id_user == int(user.get_id())) or \
+            (accepted and (int(user.get_id()) in record.get('owners', []))):
         return True
     return False
 

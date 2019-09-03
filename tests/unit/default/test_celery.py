@@ -33,4 +33,3 @@ def test_celery():
     celery.loader.import_default_modules()
     assert 'invenio_accounts.tasks.send_security_email' in celery.tasks
     assert 'invenio_mail.tasks.send_email' in celery.tasks
-    assert 'invenio_records.tasks.api.create_record' in celery.tasks

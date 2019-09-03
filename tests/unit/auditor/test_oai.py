@@ -37,6 +37,7 @@ from mock import MagicMock
 
 from zenodo.modules.auditor.oai import OAIAudit, OAICorrespondenceCheck, \
     OAISetResultCheck
+from zenodo.modules.records.resolvers import record_resolver
 
 oai_set_result_count_params = (
     ([], [], [], []),
@@ -121,14 +122,14 @@ def test_oai_set_result_count(mocker, audit_records, db, es, communities,
     db_records, es_records, oai2d_records = oai_sources
 
     for recid in db_records:
-        record = audit_records[recid]
+        _, record = record_resolver.resolve(recid)
         record['_oai']['sets'] = ['user-c1']
         record.commit()
     db.session.commit()
 
     indexer = RecordIndexer()
     for recid in es_records:
-        record = audit_records[recid]
+        _, record = record_resolver.resolve(recid)
         record['_oai']['sets'] = ['user-c1']
         indexer.index(record)
     current_search.flush_and_refresh(index='records')
@@ -143,6 +144,7 @@ def test_oai_set_result_count(mocker, audit_records, db, es, communities,
     oai2d_ids_mock = mocker.patch(
         'zenodo.modules.auditor.oai.OAISetResultCheck'
         '._oai2d_endpoint_identifiers', new=oai2d_ids_mock)
+
     audit = OAIAudit('testAudit', logging.getLogger('auditorTesting'), [])
     check = OAISetResultCheck(audit, Community.get('c1'))
     check.perform()
@@ -152,4 +154,4 @@ def test_oai_set_result_count(mocker, audit_records, db, es, communities,
     db_issues, es_issues, api_issues = issues
     assert set(result_issues.get('db', [])) == set(db_issues)
     assert set(result_issues.get('es', [])) == set(es_issues)
-    assert set(result_issues.get('api', [])) == set(api_issues)
+    assert set(result_issues.get('oai2d', [])) == set(api_issues)

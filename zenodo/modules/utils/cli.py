@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import json
 import os
 from io import SEEK_END, SEEK_SET
 
@@ -41,6 +42,8 @@ from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
+from .grants import OpenAIREGrantsDump
+from .openaire import OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
     sync_record_oai, update_oaisets_cache, update_search_pattern_sets
 
@@ -363,3 +366,41 @@ def repair_corrupted_metadata(eager, uuid):
 def update_search_pattern_sets_cli():
     """Update records belonging to all search-pattern OAISets."""
     update_search_pattern_sets.delay()
+
+
+@utils.command('split_openaire_grants_dump')
+@click.argument('source', type=click.Path(exists=True, dir_okay=False))
+@click.argument('target_prefix')
+@click.option('--grants-per-file', '-n', type=int, default=None)
+@click.option('--sqlite-write-rows-buffer', type=int, default=None)
+@with_appcontext
+def split_openaire_grants_dump(source, target_prefix, grants_per_file=None,
+                               sqlite_write_rows_buffer=None):
+    """Split an OpenAIRE grants dump into multiple SQLite files.
+
+    The file can then be imported via ``zenodo openaire loadgrants ...``.
+    """
+    grants_dump = OpenAIREGrantsDump(
+        source, rows_write_chunk_size=sqlite_write_rows_buffer)
+    split_files = grants_dump.split(
+        target_prefix, grants_per_file=grants_per_file)
+    total_rows = 0
+    for filepath, row_count in split_files:
+        total_rows += row_count
+        click.secho('{0} - {1} (Total: {2})'
+                    .format(filepath, row_count, total_rows),
+                    fg='blue')
+
+
+@utils.command('update_openaire_communities')
+@click.argument('path', type=click.Path(exists=True, dir_okay=False))
+@with_appcontext
+def update_openaire_communities(path):
+    """Get the updated mapping between OpenAIRE and Zenodo communities."""
+    mapping_updater = OpenAIRECommunitiesMappingUpdater(path)
+    mapping, unresolved_communities = mapping_updater\
+        .update_communities_mapping()
+    click.secho('Communities not found:\n{0}'.format(json.dumps(
+        unresolved_communities, indent=4, separators=(', ', ': '))))
+    click.secho('{0}'.format(json.dumps(mapping, indent=4,
+                                        separators=(', ', ': '))), fg='blue')

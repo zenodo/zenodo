@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -25,6 +25,7 @@
 zenodo db create
 zenodo index queue init
 zenodo index init
+zenodo queues declare
 zenodo fixtures init
 zenodo fixtures loadlicenses
 zenodo fixtures loadfunders
@@ -32,3 +33,5 @@ zenodo fixtures loadfp6grants
 zenodo fixtures loadsipmetadatatypes
 zenodo fixtures loadusers
 zenodo fixtures loadcommunities
+zenodo index reindex -t od_lic -t frdoi -t grant --yes-i-know
+zenodo index run

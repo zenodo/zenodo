@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function
 
 from datetime import datetime
 
+import idutils
 import pytest
 from invenio_records.api import Record
 from jsonschema.exceptions import ValidationError
@@ -77,3 +78,14 @@ def test_contributors(app, db, minimal_record):
         {'name': 'test', 'affiliation': 'test', 'type': 'Invalid'}
     ]
     pytest.raises(ValidationError, Record.create, minimal_record)
+
+
+def test_identifier_schemes(app, db, minimal_record):
+    """Test supported identifier schemes."""
+    supported_schemes = [s for s, _ in idutils.PID_SCHEMES]
+    minimal_record['related_identifiers'] = [
+        {'scheme': scheme, 'relation': 'references', 'identifier': 'foobar'}
+        for scheme in supported_schemes
+    ]
+    # JSONSchema validation should allow all supported schemes
+    Record.create(minimal_record)

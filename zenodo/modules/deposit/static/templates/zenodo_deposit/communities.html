@@ -11,17 +11,20 @@
             refresh="searchCommunities($select.search)"
             repeat="item in communityResults">
             <div class="community-results-item">
-              <div>
-                <div>
-                  <img class="openaire-logo" ng-if="openAIRECommunitiesMapping[item.id]" src="/static/img/openaire_logo_small.png"/>
-                  <span ng-bind-html="(item.title|limitToEllipsis:80|highlight:$select.search)"></span>
-                </div>
+              <div class="community-logo col-xs-1">
+                <img ng-src="{{item.logo_url}}" ng-if="item.logo_url"/>
+              </div>
+              <div class="col-sm-10 col-xs-8">
+                <span ng-bind-html="(item.title|limitToEllipsis:80|highlight:$select.search)"></span>
                 <div ng-if="item.description">
                   <span class="muted" ng-bind-html="'<small>' + (item.description|striptags|limitToEllipsis:180|highlight:$select.search) + '</small>'"></span>
                 </div>
-              </div>
-              <div class="community-logo" ng-if="item.logo_url">
-                <img ng-src="{{item.logo_url}}"/>
+                <div ng-if="!item.description" class="no-description">
+                  <span class="muted"><small><em>No description</em></small></span>
+                </div>
+                <div ng-if="openAIRECommunitiesMapping[item.id]" class="openaire-community">
+                  <span ng-bind-html="('<small>' + 'Indexed in OpenAIRE ' + (openAIRECommunitiesMapping[item.id] | formatOpenAIRECommunities:openAIRECommunities)|limitToEllipsis:150|highlight:$select.search + '</small>')"></span>
+                </div>
               </div>
             </div>
           </ui-select-choices>
@@ -51,4 +54,5 @@
         </div>
       </div>
     </div>
+  </div>
 </communities-select>

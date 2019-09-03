@@ -1,0 +1,8 @@
+<div ng-if="vm.invenioSearchResults.hits.total > 0">
+  Page size:
+  <select name="select-{{ data.sortParameter }}" ng-model="data.selectedOption" ng-change="handleFieldChange()">
+    <option ng-repeat="option in data.availableOptions.options"
+     value="{{ option.value }}"
+     ng-selected="isSelected(option.value)">{{ option.title }}</option>
+  </select>
+</div>

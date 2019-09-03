@@ -28,8 +28,8 @@ from __future__ import absolute_import, print_function
 
 import os
 
-from flask import Blueprint, current_app, flash, render_template, \
-    request, send_from_directory, session
+from flask import Blueprint, current_app, flash, render_template, request, \
+    send_from_directory, session
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
 

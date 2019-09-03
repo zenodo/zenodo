@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -56,7 +56,7 @@ def test_invalid_create(api_client, es, json_auth_headers, deposit_url,
 
 
 def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
-                      license_record, grant_record, locations):
+                      license_record, grant_records, locations, communities):
     """Rough validation of input against output data."""
     client = api_client
     headers = json_auth_headers
@@ -64,7 +64,7 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
     test_data = dict(
         metadata=dict(
             access_right='embargoed',
-            communities=[{'identifier': 'cfa'}],
+            communities=[{'identifier': 'c1'}],
             conference_acronym='Some acronym',
             conference_dates='Some dates',
             conference_place='Some place',
@@ -153,7 +153,7 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
 
 
 def test_unicode(api_client, es, locations, json_auth_headers, deposit_url,
-                 get_json, license_record, grant_record, auth_headers,
+                 get_json, license_record, grant_records, auth_headers,
                  communities):
     """Rough validation of input against output data."""
     client = api_client
@@ -244,7 +244,7 @@ def test_unicode(api_client, es, locations, json_auth_headers, deposit_url,
 
 
 def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
-                    license_record, grant_record, auth_headers):
+                    license_record, grant_records, auth_headers):
     """Test validation."""
     client = api_client
     headers = json_auth_headers
@@ -255,7 +255,9 @@ def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
         doi='not a doi',
         publication_date='not a date',
         title='',
-        upload_type='notvalid'
+        upload_type='notvalid',
+        communities=[{'identifier': 'non-existent-community-id'}],
+        grants=[{'id': 'non-existent-grant-id'}],
     ))
 
     data = get_json(
@@ -270,6 +272,8 @@ def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
         'metadata.publication_date',
         'metadata.title',
         'metadata.upload_type',
+        'metadata.grants',
+        'metadata.communities',
     ])
 
     for e in expected_field_errors:

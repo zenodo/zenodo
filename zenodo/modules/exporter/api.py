@@ -27,8 +27,10 @@
 from __future__ import absolute_import, print_function
 
 from elasticsearch_dsl import Q
+from flask import current_app
 from invenio_search.api import RecordsSearch
 
+from .errors import FailedExportJobError
 from .streams import ResultStream
 
 
@@ -56,7 +58,7 @@ class Exporter(object):
         """Get Elasticsearch search instance."""
         s = self._search_cls(index=self._index)
         if self._query:
-            s.query(Q('query_string', query=self._query))
+            s = s.query(Q('query_string', query=self._query))
         return s
 
     def run(self, progress_updater=None):
@@ -65,5 +67,8 @@ class Exporter(object):
         try:
             fp.write(self._resultstream_cls(
                 self.search, self._pid_fetcher, self._serializer))
+        except FailedExportJobError as e:
+            current_app.logger.exception(e.message)
+            fp.close()
         finally:
             fp.close()

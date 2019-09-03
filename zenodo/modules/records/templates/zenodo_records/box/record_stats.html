@@ -1,0 +1,111 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2018 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+#}
+
+{%- from "zenodo_records/macros/altmetric.html" import altmetric_badge -%}
+{%- set stats = record|record_stats or {} %}
+{%- set show_version_stats = record.doi and record.doi is local_doi -%}
+
+{%- macro tooltip_icon(title, icon='question-circle', _class='text-muted', placement='top') -%}
+<i class="fa fa-{{ icon }} {{ _class }}" data-toggle="tooltip" tooltip data-placement="{{ placement }}" title="{{ title }}" data-original-title="{{ title }}"></i>
+{%- endmacro -%}
+
+<!-- Stats -->
+<div class="row stats-box">
+  <div id="accordion">
+    <!-- Banner -->
+    {%- set banner_views = stats.version_views if show_version_stats else stats.views -%}
+    {%- set banner_downloads = stats.version_downloads if show_version_stats else stats.downloads -%}
+    <div class="row">
+      <div class="col-sm-6">
+        <span class="stats-data">{{ banner_views|stats_num_format }}</span>
+      </div>
+      <div class="col-sm-6">
+        <span class="stats-data">{{ banner_downloads|stats_num_format }}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-sm-6">
+        {{ tooltip_icon('Total views.', icon='eye', _class='') }} views
+      </div>
+      <div class="col-sm-6">
+        {{ tooltip_icon('Total downloads.', icon='download', _class='') }} downloads
+      </div>
+    </div>
+
+    <!-- Collapsed details -->
+    <div id="toggle-stats" class="row">
+      <div class="col-sm-12">
+        <a style="cursor: pointer;" class="panel-toggle" data-toggle="collapse" data-target="#collapse-stats" aria-expanded="true" aria-controls="collapse-stats">
+          See more details...
+        </a>
+      </div>
+    </div>
+    <div id="collapse-stats" class="collapse" aria-labelledby="toggle-stats" data-parent="#accordion">
+      <table class="table stats-table">
+        <!-- Skip table header if no versions -->
+        {%- if show_version_stats -%}
+        <tr>
+          <th></th>
+          <th>All versions</th>
+          <th>This version</th>
+        </tr>
+        {%- endif -%}
+        <tr>
+          <td>Views {{ tooltip_icon('Total views.') }}</td>
+          {%- if show_version_stats -%}<td>{{ stats.version_views|stats_num_format }}</td>{%- endif -%}
+          <td>{{ stats.views|stats_num_format }}</td>
+        </tr>
+        <tr>
+          <td>Downloads {{ tooltip_icon('Total downloads.') }}</td>
+          {%- if show_version_stats -%}<td>{{ stats.version_downloads|stats_num_format }}</td>{%- endif -%}
+          <td>{{ stats.downloads|stats_num_format }}</td>
+        </tr>
+        <tr>
+          <td>Data volume {{ tooltip_icon('Total download volume.') }}</td>
+          {%- if show_version_stats -%}<td>{{ (stats.version_volume or 0)|filesizeformat }}</td>{%- endif -%}
+          <td>{{ (stats.volume or 0)|filesizeformat }}</td>
+        </tr>
+        <tr>
+          <td>Unique views {{ tooltip_icon('Views in one hour user-sessions are counted only once.') }}</td>
+          {%- if show_version_stats -%}<td>{{ stats.version_unique_views|stats_num_format }}</td>{%- endif -%}
+          <td>{{ stats.unique_views|stats_num_format }}</td>
+        </tr>
+        <tr>
+          <td>Unique downloads {{ tooltip_icon('Downloads in one hour user-sessions are counted only once.') }}</td>
+          {%- if show_version_stats -%}<td>{{ stats.version_unique_downloads|stats_num_format }}</td>{%- endif -%}
+          <td>{{ stats.unique_downloads|stats_num_format }}</td>
+        </tr>
+      </table>
+      <div class="row">
+        <a href="https://help.zenodo.org/#statistics">More info on how stats are collected.</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Altmetric -->
+{%- if record.doi %}
+  {{ altmetric_badge(record.doi) }}
+{%- endif %}
+

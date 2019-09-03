@@ -26,7 +26,6 @@
 
 {%- from "zenodo_records/macros/accessright.html" import accessright_label -%}
 {%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
-{%- from "zenodo_records/macros/altmetric.html" import almetric_badge -%}
 {%- from "zenodo_records/macros/authors.html" import authors, contributors -%}
 
 
@@ -87,6 +86,7 @@
       {%-  include "zenodo_records/box/references.html" %}
       {%-  include "zenodo_records/box/citations.html" %}
       {%- endblock record_body_extra %}
+
     </div>
     <div class="col-sm-4 col-md-4 col-right">
       {%- include "zenodo_records/box/edit.html" %}
@@ -96,9 +96,9 @@
         {%- include "zenodo_records/box/curate.html" %}
       </div>
       {% endif %}
-      {%- if record.doi %}
-        {{ almetric_badge(record.doi, css_class='well') }}
-      {%- endif %}
+      <div class="well">
+        {%- include "zenodo_records/box/record_stats.html" %}
+      </div>
       {%- include "zenodo_records/box/publishedin.html" %}
       {%- set resolved_record = record.replace_refs() %}
       <div class="well metadata">
@@ -116,7 +116,14 @@
 </div>
 {%- endblock %}
 
-{%- block javascript %}{{super()}}
+{%- block javascript %}
+{%- block record_jsonld %}
+{% set jsonld_serialization = record | transform_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
+{%- if jsonld_serialization %}
+  <script type='application/ld+json'>{{ jsonld_serialization | tojson }}</script>
+{%- endif %}
+{%- endblock record_jsonld %}
+{{super()}}
 {% assets "zenodo_search_js" %}<script src="{{ ASSET_URL }}"></script>{% endassets %}
 <script type="text/javascript">var addthis_config = {"data_track_addressbar": true};</script>
 <script type="text/javascript">
@@ -132,9 +139,18 @@
     ], function(typeahead, Bloodhound) {
       angular.element(document).ready(function() {
 
-        angular.bootstrap(document.getElementById("search-citations"), [
+        // FIXME: This is already defined in js/zenodo_deposit/filters.js.
+        // It should be moved to a common place...
+        angular.module('zenodo.filters').filter('limitToEllipsis', function () {
+          return function(text, n) {
+            return (text.length > n) ? text.substr(0, n-1) + '&hellip;' : text;
+          };
+        });
+
+        angular.bootstrap(document.getElementById("citations"), [
             'invenioSearch',
-            'zenodo.filters'
+            'zenodo.filters',
+            'mgcrea.ngStrap.tooltip',
           ]
         );
 
@@ -165,8 +181,5 @@
 </script>
 <script type="text/javascript" src="//s7.addthis.com/js/300/addthis_widget.js#pubid=ra-5137aff66ad9c2a1"></script>
 <script type='text/javascript' src='https://d1bxh8uas1mnw7.cloudfront.net/assets/embed.js'></script>
-{% set jsonld_serialization = record | serialize_record(pid, 'schemaorg_jsonld_v1', throws=False)%}
-{%- if jsonld_serialization %}
-<script type='application/ld+json'>{{ jsonld_serialization|safe }}</script>
-{%- endif %}
+
 {%- endblock %}

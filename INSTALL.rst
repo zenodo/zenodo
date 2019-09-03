@@ -4,7 +4,7 @@ Installation
 Zenodo depends on PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ.
 
 If you are only interested in running Zenodo locally, follow the Docker
-installation guide below. If you plan to eventually develop Zenodo code you
+installation guide below. If you plan to eventually develop Zenodo code 
 continue further to Development installation to find out how to set up the
 local instance for easy code development.
 
@@ -34,8 +34,8 @@ build all docker images and boot them up using ``docker-compose``:
     $ git clone https://github.com/zenodo/zenodo.git
     $ cd ~/src/zenodo
     $ git checkout master
-    $ docker-compose build
-    $ docker-compose up
+    $ docker-compose -f docker-compose.full.yml build
+    $ docker-compose -f docker-compose.full.yml up -d
 
 
 .. note::
@@ -51,17 +51,7 @@ and some data fixtures:
 .. code-block:: console
 
     $ cd ~/src/zenodo
-    $ docker-compose run --rm web bash /code/zenodo/scripts/init.sh
-    $ docker-compose run --rm web bash /code/zenodo/scripts/index.sh
-
-Next, load the demo records and index them:
-
-.. code-block:: console
-
-    $ docker-compose run --rm web zenodo fixtures loaddemorecords
-    $ docker-compose run --rm web zenodo migration recordsrun
-    $ docker-compose run --rm web zenodo index reindex -t recid
-    $ docker-compose run --rm web zenodo index run -d
+    $ docker-compose -f docker-compose.full.yml run --rm web bash /code/zenodo/scripts/init.sh
 
 Now visit the following URL in your browser:
 
@@ -117,13 +107,14 @@ installed.
     ports on localhost, make sure you are not running PostgreSQL,
     Redis, RabbitMQ or Elasticsearch on those ports in your system.
 
-Similarly to how we previously ran ``docker-compose up`` to run full-stack
+Similarly to how we previously ran
+``docker-compose -f docker-compose.full.yml up -d`` to run full-stack
 Zenodo, this time we run only four docker nodes with the database,
 Elasticsearch, Redis and RabbitMQ:
 
 .. code-block:: console
 
-    $ docker-compose up db es cache mq
+    $ docker-compose up -d
 
 Keep the docker-compose session above alive and in a separate shell, create a
 new Python virtual environment using virtualenvwrapper
@@ -242,7 +233,7 @@ To run only the essential services using docker, execute the following:
 .. code-block:: console
 
     $ cd ~/src/zenodo
-    $ docker-compose up db es mq cache
+    $ docker-compose up -d
 
 This should bring up four docker nodes with PostgreSQL (db), Elasticsearch (es),
 RabbitMQ (mq), and Redis (cache). Keep this shell session alive.
@@ -252,13 +243,22 @@ Initialization
 Now that the services are running, it's time to initialize the Zenodo database
 and the Elasticsearch index.
 
-Create the database and Elasticsearch indices in a new shell session:
+Create the database, Elasticsearch indices, messages queues and various
+fixtures for licenses, grants, communities and users in a new shell session:
 
 .. code-block:: console
 
    $ cd ~/src/zenodo
    $ workon zenodo
    (zenodo)$ ./scripts/init.sh
+
+Let's also run the Celery worker on a different shell session:
+
+.. code-block:: console
+
+   $ cd ~/src/zenodo
+   $ workon zenodo
+   (zenodo)$ celery worker -A zenodo.celery -l INFO --purge
 
 .. note::
 
@@ -277,60 +277,34 @@ Create the database and Elasticsearch indices in a new shell session:
     (available since Docker v1.12) if possible,
     which binds docker to localhost by default.
 
-Demo records
+Loading data
 ~~~~~~~~~~~~
-Next, load some demo data (licenses, funders, grants, records).
-Loading of the demo data is done asynchronusly with Celery.
-To do that, you need to first run a Celery worker:
+
+Next, let's load some external data (only licenses for the time being). Loading
+of this demo data is done asynchronusly with Celery, but depends on internet
+access since it involves harvesting external OAI-PMH or REST APIs.
+
+Make sure you keep the session with Celery worker alive. Launch the data
+loading commands in a separate shell:
 
 .. code-block:: console
 
    $ cd ~/src/zenodo
    $ workon zenodo
-   (zenodo)$ celery worker -A zenodo.celery -l INFO --purge
+   (zenodo)$ zenodo opendefinition loadlicenses -s opendefinition
+   (zenodo)$ zenodo opendefinition loadlicenses -s spdx
+   (zenodo)$ ./scripts/index.sh
 
-Keep the session with Celery worker alive.
-Launch the data loading scripts in a separate shell:
-
-.. code-block:: console
-
-   $ cd ~/src
-   $ git clone https://github.com/inveniosoftware/invenio-openaire.git
-   $ cd zenodo
-   $ workon zenodo
-   (zenodo)$ zenodo opendefinition loadlicenses
-   (zenodo)$ zenodo fixtures loadlicenses
-   (zenodo)$ zenodo fixtures loadfunders
-   (zenodo)$ zenodo openaire loadgrants --setspec=FP7Projects
-   (zenodo)$ zenodo openaire loadgrants --setspec=H2020Projects
-   (zenodo)$ zenodo fixtures loaddemorecords
-   (zenodo)$ zenodo migration recordsrun
-   (zenodo)$ zenodo index reindex -t recid
-   (zenodo)$ zenodo index run -d
-
-Finally, run the Zenodo application:
+Finally, run the Zenodo development server in debug mode. You can do that by
+setting up the environment flag:
 
 .. code-block:: console
 
+    (zenodo)$ export FLASK_DEBUG=True
     (zenodo)$ zenodo run
 
 If you go to http://localhost:5000, you should see an instance of Zenodo,
 similar to the production instance at https://zenodo.org.
-
-.. note::
-
-    When running the development server, it's sometimes convenient to run
-    it in ``debug`` mode. You can do that by setting up the evironment flag:
-
-    .. code-block:: console
-
-        (zenodo)$ export FLASK_DEBUG=True
-        (zenodo)$ zenodo run  --reload --with-threads
-
-    Additionally, the flags ``--reload`` (already on when in debug mode)
-    and ``--with-threads`` which allows you to have the application reload
-    automatically to any detected changes in the code as well as run the
-    development server with multithreading (see ``zenodo run --help``).
 
 Badges
 ~~~~~~

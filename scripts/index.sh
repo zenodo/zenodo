@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016 CERN.
+# Copyright (C) 2015-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -24,9 +24,5 @@
 
 zenodo index destroy --force --yes-i-know
 zenodo index init --force
-zenodo index reindex -t od_lic
-zenodo index reindex -t frdoi
-zenodo index reindex -t grant
-zenodo index reindex -t recid
-zenodo index reindex -t depid
+zenodo index reindex -t od_lic -t frdoi -t grant -t recid -t depid --yes-i-know
 zenodo index run -c 4 -d

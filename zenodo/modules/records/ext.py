@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015-2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -30,8 +30,9 @@ from invenio_indexer.signals import before_record_index
 from invenio_pidrelations.contrib.versioning import versioning_blueprint
 
 from . import config
+from .custom_metadata import CustomMetadataAPI
 from .indexer import indexer_receiver
-from .utils import serialize_record
+from .utils import serialize_record, transform_record
 from .views import blueprint, record_communities
 
 
@@ -53,9 +54,15 @@ class ZenodoRecords(object):
         app.register_blueprint(blueprint)
         # Add global record serializer template filter
         app.add_template_filter(serialize_record, 'serialize_record')
+        app.add_template_filter(transform_record, 'transform_record')
 
         # Register versioning blueprint
         app.register_blueprint(versioning_blueprint)
+
+        self.custom_metadata = CustomMetadataAPI(
+            term_types=app.config.get('ZENODO_CUSTOM_METADATA_TERM_TYPES'),
+            vocabularies=app.config.get('ZENODO_CUSTOM_METADATA_VOCABULARIES'),
+        )
 
         before_record_index.connect(indexer_receiver, sender=app)
         app.extensions['zenodo-records'] = self

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -181,8 +181,18 @@ def test_types(app, db, minimal_record_model, recid_pid):
     ]
 
 
+def test_community_relations(db, minimal_record_model, recid_pid):
+    """Test communities."""
+    for communities in (['zenodo'], ['c1', 'c2', 'c3']):
+        minimal_record_model['communities'] = communities
+        obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+        for comm in communities:
+            assert ('url:http://localhost/communities/{}'.format(comm)
+                    in obj['relations'])
+
+
 def test_sources(app, db, minimal_record_model, recid_pid):
-    """"Test contributors."""
+    """Test contributors."""
     minimal_record_model.update({
         'journal': {
             'title': 'CAP',
@@ -228,3 +238,47 @@ def test_description(app, db, minimal_record_model, recid_pid):
     minimal_record_model['description'] = ''
     obj = dc_v1.transform_record(recid_pid, minimal_record_model)
     assert obj['descriptions'] == []
+
+
+def test_subjects(app, db, minimal_record_model, recid_pid):
+    """Test subjects."""
+    minimal_record_model['subjects'] = [{'term': 's1'}, {'term': 's2'}]
+    minimal_record_model['keywords'] = ['k1', 'k2']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert set(obj['subjects']) == {'s1', 's2', 'k1', 'k2'}
+
+
+def test_subjects_without_terms(app, db, minimal_record_model, recid_pid):
+    """Test subjects."""
+    minimal_record_model['subjects'] = [{'identifier': 's1'}, {'term': 's2'}]
+    minimal_record_model['keywords'] = ['k1', 'k2']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert set(obj['subjects']) == {'s2', 'k1', 'k2'}
+
+
+def test_dates(app, db, full_record, minimal_record_model, recid_pid):
+    """Test dates."""
+    minimal_record_model['dates'] = full_record['dates']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert obj['dates'] == [
+        datetime.utcnow().date().isoformat(),
+        '2019-01-01/',
+        '/2019-01-01',
+        '2019-01-01',
+        '2019-01-01/2019-02-01',
+    ]
+
+
+def test_method(app, db, full_record, minimal_record_model, recid_pid):
+    """Test method."""
+    minimal_record_model['method'] = full_record['method']
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert 'microscopic supersampling' in obj['descriptions']
+
+
+def test_locations(app, db, minimal_record_model, recid_pid):
+    """Test locations."""
+    minimal_record_model['locations'] = [
+        {"lat": 2.35, "lon": 1.534, "place": "my place"}]
+    obj = dc_v1.transform_record(recid_pid, minimal_record_model)
+    assert set(obj['coverage']) == {'name=my place; east=1.534; north=2.35'}

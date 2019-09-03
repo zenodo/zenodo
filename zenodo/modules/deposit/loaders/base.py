@@ -58,16 +58,23 @@ def marshmallow_loader(schema_class, **kwargs):
         # DOI validation context
         if request and request.view_args.get('pid_value'):
             managed_prefix = current_app.config['PIDSTORE_DATACITE_DOI_PREFIX']
-
             _, record = request.view_args.get('pid_value').data
+
             context['recid'] = record['recid']
             if record.has_minted_doi() or record.get('conceptdoi'):
+                # if record has Zenodo DOI it's not allowed to change
                 context['required_doi'] = record['doi']
             elif not record.is_published():
                 context['allowed_dois'] = [doi_generator(record['recid'])]
-            else:
-                # Ensure we cannot change to e.g. empty string.
+            if record.is_published() or record.get('conceptdoi'):
+                # if the record is published or this is a new version 
+                # of a published record then the DOI is required
                 context['doi_required'] = True
+                data.setdefault('metadata', {})
+                if 'doi' not in data['metadata']:
+                    # if the payload doesn't contain the DOI field
+                    #  for the record keep the existing one
+                    data['metadata']['doi'] = record['doi']
 
             context['managed_prefixes'] = [managed_prefix]
             context['banned_prefixes'] = \
