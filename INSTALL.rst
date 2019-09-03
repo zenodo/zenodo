@@ -4,7 +4,7 @@ Installation
 Zenodo depends on PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ.
 
 If you are only interested in running Zenodo locally, follow the Docker
-installation guide below. If you plan to eventually develop Zenodo code you
+installation guide below. If you plan to eventually develop Zenodo code 
 continue further to Development installation to find out how to set up the
 local instance for easy code development.
 
