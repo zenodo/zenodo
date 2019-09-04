@@ -39,13 +39,12 @@ services:
     ports:
       - "6379:6379"
   db:
-    build: ./docker/postgres/
-    image: zenodo-postgres
-    command: postgres
+    image: postgres:9.6
     restart: "always"
     environment:
-      - "POSTGRES_PASSWORD=postgres"
-      - "POSTGRES_USER=admin"
+      - "POSTGRES_USER=zenodo"
+      - "POSTGRES_PASSWORD=zenodo"
+      - "POSTGRES_DB=zenodo"
     ports:
       - "5432:5432"
   mq:
