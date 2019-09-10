@@ -763,6 +763,12 @@ RECORDS_UI_ENDPOINTS = dict(
         view_imp='invenio_previewer.views.preview',
         record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
+    recid_thumbnail=dict(
+        pid_type='recid',
+        route='/record/<pid_value>/thumbnail/<thumbnail>',
+        view_imp='zenodo.modules.records.views.record_thumbnail',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
+    ),
     recid_files=dict(
         pid_type='recid',
         route='/record/<pid_value>/files/<path:filename>',
@@ -1403,3 +1409,11 @@ RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
 
 # Error template
 THEME_429_TEMPLATE = "zenodo_errors/429.html"
+
+# Precached thumbnails
+CACHED_THUMBNAILS = {
+        'thumb5': '5,',
+        'thumb50': '50,',
+        'thumb100': '100,',
+        'thumb250': '250,',
+    }

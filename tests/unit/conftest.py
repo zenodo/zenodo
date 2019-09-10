@@ -34,6 +34,7 @@ import tempfile
 from copy import deepcopy
 from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
+from pkg_resources import resource_stream
 
 import pytest
 from celery import Task
@@ -828,6 +829,23 @@ def record_with_files_creation(db, record_with_bucket):
     record.files[filename] = BytesIO(b'v1')
     record.files[filename]['type'] = 'pdf'
     record.commit()
+    db.session.commit()
+
+    record_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value)
+
+    return pid, record, record_url
+
+
+@pytest.fixture
+def record_with_image_creation(db, record_with_bucket):
+    """Creation of a full record with files in database."""
+    pid, record = record_with_bucket
+    filename = 'Test.png'
+    record.files[filename] = resource_stream(
+            'zenodo.modules.theme', 'static/img/eu.png')
+    record.files[filename]['type'] = 'png'
+    record.commit()
+    db.session.commit()
 
     record_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value)
 

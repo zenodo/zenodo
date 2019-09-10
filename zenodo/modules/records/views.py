@@ -32,7 +32,7 @@ from operator import itemgetter
 
 import idutils
 import six
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, current_app, render_template, request, abort
 from flask_principal import ActionNeed
 from invenio_access.permissions import Permission
 from invenio_communities.models import Community
@@ -42,6 +42,9 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
 from werkzeug.utils import import_string
+from flask_iiif.restful import IIIFImageAPI
+from invenio_iiif.utils import iiif_image_key
+from flask_security import current_user
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.extra_formats import ExtraFormats
@@ -423,3 +426,36 @@ def community_curation(record, user):
 def record_communities():
     """Context processor for community curation for given record."""
     return dict(community_curation=community_curation)
+
+
+def record_thumbnail(pid, record, thumbnail, **kwargs):
+    """Provide easy access to the thumbnail of a record for predefined sizes.
+
+    We consider the thumbnail of the record as the first image in the files
+    iterator or the one set as the default.
+    """
+    if not has_record_perm(current_user, record, 'read-files'):
+        abort(404)
+    precached_size = current_app.config['CACHED_THUMBNAILS'].get(thumbnail)
+    if not precached_size:
+        abort(400, 'The selected thumbnail has not been precached')
+    selected = None
+    for file in record.files:
+        if(file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
+            continue
+        elif not selected:
+            selected = file
+        elif file['default']:
+            selected = file
+            break
+    if selected:
+        return IIIFImageAPI().get(
+                version='v2',
+                uuid=str(iiif_image_key(selected)),
+                region='full',
+                size=precached_size,
+                rotation='0',
+                quality='default',
+                image_format=str(file['type']))
+    else:
+        abort(404, 'This record has no thumbnails')
