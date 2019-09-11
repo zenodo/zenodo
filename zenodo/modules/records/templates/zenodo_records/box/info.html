@@ -168,31 +168,88 @@
     {%- if loop.first %}
     <dt>{{ _('Related identifiers') }}:</dt>
     {%- endif %}
-    <dd>{{group.grouper|relation_title}}:<br />
+    <dd>{{group.grouper|relation_title}}<br />
+    <ul style="list-style-type: none; margin-left: -40px;">
     {%- for related_id in group.list %}
       {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}
       {%- if related_url %}
-      <a href="{{related_url}}">{{related_id.identifier}}</a>{%- if not loop.last %}, {% endif %}
+      <li><a href="{{related_url}}">{{related_id.identifier}}</a></li>
       {%- else %}
-      <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}){%- if not loop.last %}, {% endif %}
+      <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}})
       {%- endif %}
     {%- endfor %}
+    </ul>
     </dd>
   {%- endfor %}
 
   {%- if record.alternate_identifiers %}
     <dt>{{ _('Alternate identifiers') }}:</dt>
     <dd>
+    <ul style="list-style-type: none; margin-left: -40px;">
     {%- for alt_id in record.alternate_identifiers %}
       {%- set alt_url = alt_id.identifier|pid_url(scheme=alt_id.scheme) %}
       {%- if alt_url %}
-        <a href="{{alt_url}}">{{alt_id.identifier}}</a>
+        <li><a href="{{alt_url}}">{{alt_id.identifier}}</a></li>
       {%- else %}
         <i>{{alt_id.identifier}}</i> ({{alt_id.scheme|upper}})
       {%- endif %}
-      {%- if not loop.last %}, {% endif %}
     {%- endfor %}
     </dd>
+  {%- endif %}
+
+  {%- if record.custom %}
+    <dt>{{ _('Custom keywords') }}:</dt>
+    <dd>
+    <ul style="list-style-type: none; margin-left:-40px;">
+    {%- for keywords in record.custom %}
+      {{keywords}}
+      {%- set keyword_url = keywords|keyword_url %}
+      <a class="label-external-link" href="{{keyword_url}}">
+      <i style="color:black;" data-toggle="tooltip" data-title="{{keyword_url}}" class="fa fa-fw fa-external-link" data-original-title="" title=""></i>
+      </a><br />
+      <div style="margin-left:10px;">
+      {%- for keyword in record.custom[keywords] %}
+        {%- set q = {"custom": keyword}|make_query %}
+        <a class="" href="http://localhost:5000/search?custom=[{{keywords}}]:{{keyword}}">
+        {{keyword}}</a>{%- if not loop.last %}, {% endif %}
+        {# <li><a href="{{url_for('invenio_search_ui.search', custom=custom)}}">{{keyword}}</a></li> #}
+        {%- if loop.last %} <div class="spacer" style="height:15px;"></div>{% endif %}
+      {%- endfor %}
+      </div>
+    {%- endfor %}
+    </ul>
+    </dd>
+  {%- endif %}
+
+  {%- if record.locations %}
+    <dt>{{ _('Locations') }}:</dt>
+    <dd>
+    <table style="border-spacing:5px 0rem; border-collapse:separate;">
+    {%- for location in record.locations %}
+      <tr><td >{{location.place}}</td><td><a href="http://www.google.com/maps/place/{{location.lat}},{{location.lon}}">[{{location.lat}}, {{location.lon}}]</td></tr>
+      <tr><td colspan="2"><i style="font-size:10px;">{{location.description}}</i></tr></td>
+      <tr class="spacer" style="height:15px;"><td colspan="2"></td></tr>
+    {%- endfor %}
+    </table>
+    </dd>
+  {%- endif %}
+
+
+
+
+
+  {%- if record.dates %}
+  {%- for group in record.dates|groupby('type') %}
+    {%- if loop.first %}
+    <b>{{ _('Dates') }}:</b>
+  {%- endif %}
+    <dd>{{group.grouper}}<br />
+    <ul style="list-style-type: none; margin-left: -30px;">
+    {%- for date in group.list %}
+      <li>{{date|format_date_range}}</li>
+    {%- endfor %}
+    </ul>
+    {%- endfor %}
   {%- endif %}
 
   {%- if all_accepted_comms %}
