@@ -1062,6 +1062,17 @@ PREVIEWER_PREFERENCE = [
 #: Improve quality of image resampling using better algorithm
 IIIF_RESIZE_RESAMPLE = 'PIL.Image:BICUBIC'
 
+# Redis storage for thumbnails caching.
+IIIF_CACHE_REDIS_URL = CACHE_REDIS_URL
+
+# Precached thumbnails
+CACHED_THUMBNAILS = {
+    'thumb5': '5,',
+    'thumb50': '50,',
+    'thumb100': '100,',
+    'thumb250': '250,',
+}
+
 # OAI-PMH
 # =======
 #: Index to use for the OAI-PMH server.
@@ -1407,18 +1418,10 @@ INDEXER_SCHEMA_TO_INDEX_MAP = {
 # Configuration for limiter.
 RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
 
+RATELIMIT_PER_ENDPOINT = {
+    'zenodo_frontpage.index': '10 per second',
+    'security.login': '10 per second'
+}
+
 # Error template
 THEME_429_TEMPLATE = "zenodo_errors/429.html"
-
-# Precached thumbnails
-CACHED_THUMBNAILS = {
-        'thumb5': '5,',
-        'thumb50': '50,',
-        'thumb100': '100,',
-        'thumb250': '250,',
-    }
-
-RATELIMIT_PER_ENDPOINT = {
-        'zenodo_frontpage.index': '10 per second',
-        'security.login': '10 per second'
-    }
