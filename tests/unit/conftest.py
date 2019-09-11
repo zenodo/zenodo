@@ -34,7 +34,6 @@ import tempfile
 from copy import deepcopy
 from datetime import date, datetime, timedelta
 from uuid import UUID, uuid4
-from pkg_resources import resource_stream
 
 import pytest
 from celery import Task
@@ -70,6 +69,7 @@ from invenio_records.models import RecordMetadata
 from invenio_records_files.api import RecordsBuckets
 from invenio_search import current_search, current_search_client
 from invenio_sipstore import current_sipstore
+from pkg_resources import resource_stream
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
 

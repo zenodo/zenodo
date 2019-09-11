@@ -32,19 +32,19 @@ from operator import itemgetter
 
 import idutils
 import six
-from flask import Blueprint, current_app, render_template, request, abort
+from flask import Blueprint, abort, current_app, render_template, request
+from flask_iiif.restful import IIIFImageAPI
 from flask_principal import ActionNeed
+from flask_security import current_user
 from invenio_access.permissions import Permission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
+from invenio_iiif.utils import iiif_image_key
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
 from werkzeug.utils import import_string
-from flask_iiif.restful import IIIFImageAPI
-from invenio_iiif.utils import iiif_image_key
-from flask_security import current_user
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.extra_formats import ExtraFormats

@@ -72,6 +72,7 @@ URLS = {
     'record_file': '{base}/record/{id}/files/{filename}',
     'record': '{base}/records/{id}',
     'thumbnail': '{base}{path}',
+    'thumbs': '{base}/record/{id}/thumb{size}',
     'community': '{base}/communities/{id}',
 }
 
@@ -604,6 +605,19 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             )
         )
 
+    def _thumbnail_urls(self, recid):
+        """Create the thumbnail URL for an image."""
+        thumbnail_urls = {}
+        cached_sizes = current_app.config.get('CACHED_THUMBNAILS')
+        for size in cached_sizes:
+            thumbnail_urls[size] = link_for(
+                current_app.config.get('THEME_SITEURL'),
+                'thumbs',
+                id=recid,
+                size=size
+            )
+        return thumbnail_urls
+
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
         links = {}
@@ -623,8 +637,9 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         for f in files:
             if f.get('type') in thumbnail_exts:
                 try:
-                    links['thumb250'] = self._thumbnail_url(f, 250)
                     # First previewable image is used for preview.
+                    links['thumbs'] = self._thumbnail_urls(m.get('recid'))
+                    links['thumb250'] = self._thumbnail_url(f, 250)
                 except RuntimeError:
                     pass
                 break
