@@ -139,6 +139,14 @@ def accessright_icon(value, embargo_date=None):
     """Get icon for access right."""
     return AccessRight.as_icon(AccessRight.get(value, embargo_date))
 
+# FILTER TO TAKE CONFIG
+@blueprint.app_template_filter()
+def keyword_url(keyword):
+    """."""
+    family, suffix = keyword.split(':')
+    base_url = current_app.config['ZENODO_CUSTOM_METADATA_VOCABULARIES'][family]['@context']
+    return '{}{}'.format(base_url, suffix)
+
 
 @blueprint.app_template_filter()
 def accessright_description(value, embargo_date=None):
@@ -293,6 +301,22 @@ def citation(record, pid, style=None, ln=None):
             'Citation formatting for record {0} failed.'
             .format(str(record.id)))
         return None
+
+from datetime import datetime as dt
+@blueprint.app_template_filter('format_date_range')
+def format_date_range(date):
+    """."""
+    if date.get('start') and date.get('end'):
+        date_start = dt.strptime(date['start'], "%Y-%m-%d")
+        date_end = dt.strptime(date['end'], "%Y-%m-%d")
+        if date_start == date_end:
+            return '{}'.format(date['start'])
+        else:
+            return 'From {} to {}'.format(date['start'], date['end'])
+    elif date.get('end'):
+        return 'Until {}'.format(date['end'])
+    elif date.get('start'):
+        return 'From {}'.format(date['start'])
 
 
 @blueprint.app_template_filter('pid_url')
