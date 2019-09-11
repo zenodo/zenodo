@@ -37,7 +37,7 @@ def test_filename_factory():
     """Test filename factory."""
     pytest.raises(KeyError, filename_factory())
 
-    fname = filename_factory(index='records', format='json')()
+    fname = filename_factory(name='records', format='json')()
     assert fname.startswith('records-')
     assert fname.endswith('.json')
 
