@@ -1417,3 +1417,8 @@ CACHED_THUMBNAILS = {
         'thumb100': '100,',
         'thumb250': '250,',
     }
+
+RATELIMIT_PER_ENDPOINT = {
+        'zenodo_frontpage.index': '10 per second',
+        'security.login': '10 per second'
+    }
