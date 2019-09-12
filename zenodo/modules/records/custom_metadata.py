@@ -66,10 +66,7 @@ class CustomMetadataAPI(object):
             for attr in cfg['attributes']:
                 term = '{}:{}'.format(vocab, attr)
                 term_conf = cfg['attributes'][attr]
-                result[term] = {
-                    'term_type': term_conf['type'],
-                    'multiple': term_conf['multiple']
-                }
+                result[term] = {'term_type': term_conf['type']}
         return result
 
     def _validate(self):

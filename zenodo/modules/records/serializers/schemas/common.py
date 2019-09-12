@@ -494,12 +494,6 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                         'Invalid type for term "{0}", should be "{1}".'
                         .format(term, valid_terms[term]['term_type']),
                         field_names=['custom'])
-            multiple_values = valid_terms[term]['multiple']
-            if len(values) > 1 and not multiple_values:
-                raise ValidationError(
-                    'The term "{0}" accepts only one value.'
-                    .format(term),
-                    field_names=['custom'])
         return obj
 
     def dump_custom(self, data):
