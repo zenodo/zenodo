@@ -129,12 +129,16 @@
             "name": "Software documentation"
           },
           {
-            "value": "thesis",
-            "name": "Thesis"
+            "value": "taxonomictreatment",
+            "name": "Taxonomic treatment"
           },
           {
             "value": "technicalnote",
             "name": "Technical note"
+          },
+          {
+            "value": "thesis",
+            "name": "Thesis"
           },
           {
             "value": "workingpaper",
