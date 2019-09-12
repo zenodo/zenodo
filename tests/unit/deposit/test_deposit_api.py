@@ -103,18 +103,6 @@ def test_deposit_with_custom_field(
     assert response.json['errors'] == [{
         'field': 'metadata.custom',
         'message': 'Invalid type for term "dwc:family", should be "keyword".'}]
-    # Test multiple values on a non list field
-    minimal_deposit['metadata']['custom'] = {
-        'dwc:family': ['Felidae', 'Fluffness'],
-        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
-    }
-
-    response = api_client.post(
-        deposit_url, json=minimal_deposit, headers=auth_headers)
-
-    assert response.json['errors'] == [{
-        'field': 'metadata.custom',
-        'message': 'The term "dwc:family" accepts only one value.'}]
 
     # Test data not provided in an array
     minimal_deposit['metadata']['custom'] = {

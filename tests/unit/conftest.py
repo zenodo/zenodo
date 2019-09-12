@@ -217,18 +217,9 @@ def default_config(tmp_db_path):
             'dwc': {
                 '@context': 'http://rs.tdwg.org/dwc/terms/',
                 'attributes': {
-                    'family': {
-                        'type': 'keyword',
-                        'multiple': False
-                    },
-                    'genus': {
-                        'type': 'keyword',
-                        'multiple': True
-                    },
-                    'behavior': {
-                        'type': 'text',
-                        'multiple': False
-                    }
+                    'family': {'type': 'keyword', },
+                    'genus': {'type': 'keyword', },
+                    'behavior': {'type': 'text', }
                 }
             }
         },
@@ -842,7 +833,7 @@ def record_with_image_creation(db, record_with_bucket):
     pid, record = record_with_bucket
     filename = 'Test.png'
     record.files[filename] = resource_stream(
-            'zenodo.modules.theme', 'static/img/eu.png')
+        'zenodo.modules.theme', 'static/img/eu.png')
     record.files[filename]['type'] = 'png'
     record.commit()
     db.session.commit()
