@@ -305,21 +305,22 @@ def test_record_thumbnail(app, record_with_image_creation):
         with app.test_client() as client:
             res = client.get(url_for(
                 'invenio_records_ui.recid_thumbnail',
-                pid_value=pid.pid_value, thumbnail=cached_thumbnail))
+                pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
         assert res.status_code == 200
     with app.test_client() as client:
         res = client.get(url_for(
             'invenio_records_ui.recid_thumbnail',
-            pid_value=pid.pid_value, thumbnail='nonvalid'))
+            pid_value=pid.pid_value, thumbnail_size='nonvalid'))
     assert res.status_code == 400
 
 
 def test_record_thumbnail_without_images(app, record_with_files_creation):
     """Test cached thumbnails on record without images."""
     pid, record, record_url = record_with_files_creation
-    cached_thumbnail = list(current_app.config['CACHED_THUMBNAILS'])[0]
+    thumbnail_config = current_app.config['CACHED_THUMBNAILS']
+    cached_thumbnail = list(thumbnail_config)[0]
     with app.test_client() as client:
         res = client.get(url_for(
             'invenio_records_ui.recid_thumbnail',
-            pid_value=pid.pid_value, thumbnail=cached_thumbnail))
+            pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
     assert res.status_code == 404

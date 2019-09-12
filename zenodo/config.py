@@ -765,7 +765,7 @@ RECORDS_UI_ENDPOINTS = dict(
     ),
     recid_thumbnail=dict(
         pid_type='recid',
-        route='/record/<pid_value>/thumbnail/<thumbnail>',
+        route='/record/<pid_value>/thumb<thumbnail_size>',
         view_imp='zenodo.modules.records.views.record_thumbnail',
         record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
@@ -1067,11 +1067,13 @@ IIIF_CACHE_REDIS_URL = CACHE_REDIS_URL
 
 # Precached thumbnails
 CACHED_THUMBNAILS = {
-    'thumb5': '5,',
-    'thumb50': '50,',
-    'thumb100': '100,',
-    'thumb250': '250,',
-}
+    '10': '10,',
+    '50': '50,',
+    '100': '100,',
+    '250': '250,',
+    '750': '750,',
+    '1200': '1200,'
+    }
 
 # OAI-PMH
 # =======
