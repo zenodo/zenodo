@@ -428,7 +428,7 @@ def record_communities():
     return dict(community_curation=community_curation)
 
 
-def record_thumbnail(pid, record, thumbnail, **kwargs):
+def record_thumbnail(pid, record, thumbnail_size, **kwargs):
     """Provide easy access to the thumbnail of a record for predefined sizes.
 
     We consider the thumbnail of the record as the first image in the files
@@ -436,10 +436,11 @@ def record_thumbnail(pid, record, thumbnail, **kwargs):
     """
     if not has_record_perm(current_user, record, 'read-files'):
         abort(404)
-    precached_size = current_app.config['CACHED_THUMBNAILS'].get(thumbnail)
-    if not precached_size:
-        abort(400, 'The selected thumbnail has not been precached')
+    cached_thumbnails = current_app.config['CACHED_THUMBNAILS']
+    if thumbnail_size not in cached_thumbnails:
+        abort(400, 'The selected thumbnail has not been cached')
     selected = None
+    thumbnail_size = cached_thumbnails[thumbnail_size]
     for file in record.files:
         if(file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
             continue
@@ -453,9 +454,9 @@ def record_thumbnail(pid, record, thumbnail, **kwargs):
                 version='v2',
                 uuid=str(iiif_image_key(selected)),
                 region='full',
-                size=precached_size,
+                size=thumbnail_size,
                 rotation='0',
                 quality='default',
-                image_format=str(file['type']))
+                image_format=file['type'])
     else:
         abort(404, 'This record has no thumbnails')
