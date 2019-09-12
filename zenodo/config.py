@@ -991,6 +991,9 @@ RECORDS_REST_FACETS = dict(
             keywords=dict(
                 terms=dict(field="keywords"),
             ),
+            communities=dict(
+                terms=dict(field="communities"),
+            ),
         ),
         filters=dict(
             communities=terms_filter('communities'),
