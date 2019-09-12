@@ -314,7 +314,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     keywords = fields.List(SanitizedUnicode())
     locations = fields.List(
         fields.Nested(LocationSchemaV1), validate=validate.Length(min=1))
-    notes = SanitizedUnicode()
+    notes = SanitizedHTML()
     version = SanitizedUnicode()
     language = SanitizedUnicode()
     access_right = fields.Str(validate=validate.OneOf(

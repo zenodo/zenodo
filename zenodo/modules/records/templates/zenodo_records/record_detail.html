@@ -75,7 +75,7 @@
       <p>{{ record.description|safe }}</p>
       {%- if record.notes %}
       <div class="alert alert-warning">
-        {{ record.notes}}
+        {{ record.notes|safe}}
       </div>
       {%- endif %}
       {%- endblock record_body %}
