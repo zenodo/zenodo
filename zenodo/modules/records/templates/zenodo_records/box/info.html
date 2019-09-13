@@ -201,18 +201,17 @@
     <dt>{{ _('Custom keywords') }}:</dt>
     <dd>
     <ul style="list-style-type: none; margin-left:-40px;">
-    {%- for keywords in record.custom %}
-      {{keywords}}
-      {%- set keyword_url = keywords|keyword_url %}
-      <a class="label-external-link" href="{{keyword_url}}">
-      <i style="color:black;" data-toggle="tooltip" data-title="{{keyword_url}}" class="fa fa-fw fa-external-link" data-original-title="" title=""></i>
-      </a><br />
+    {%- for custom_field, custom_field_values in record.custom.items() %}
+      {{ custom_field }}
+      {%- set custom_field_url_value = custom_field | custom_field_url %}
+      <a class="label-external-link" href="{{custom_field_url_value}}">
+      <i style="color:black;" data-toggle="tooltip" data-title="{{custom_field_url_value}}" class="fa fa-fw fa-external-link"></i>
+      </a><br/>
       <div style="margin-left:10px;">
-      {%- for keyword in record.custom[keywords] %}
-        {%- set q = {"custom": keyword}|make_query %}
-        <a class="" href="http://localhost:5000/search?custom=[{{keywords}}]:{{keyword}}">
-        {{keyword}}</a>{%- if not loop.last %}, {% endif %}
-        {# <li><a href="{{url_for('invenio_search_ui.search', custom=custom)}}">{{keyword}}</a></li> #}
+      {%- for custom_val in custom_field_values %}
+        {%- set custom_search_param = '[' + custom_field + ']:' + custom_val %}
+        <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
+        {{ custom_val }}</a>{%- if not loop.last %}, {% endif %}
         {%- if loop.last %} <div class="spacer" style="height:15px;"></div>{% endif %}
       {%- endfor %}
       </div>
@@ -226,17 +225,13 @@
     <dd>
     <table style="border-spacing:5px 0rem; border-collapse:separate;">
     {%- for location in record.locations %}
-      <tr><td >{{location.place}}</td><td><a href="http://www.google.com/maps/place/{{location.lat}},{{location.lon}}">[{{location.lat}}, {{location.lon}}]</td></tr>
-      <tr><td colspan="2"><i style="font-size:10px;">{{location.description}}</i></tr></td>
+      <tr><td >{{location.place}}</td><td><a href="https://www.google.com/maps/place/{{location.lat}},{{location.lon}}">[{{location.lat}}, {{location.lon}}]</td></tr>
+      <tr><td colspan="2"><small>{{location.description}}</small></tr></td>
       <tr class="spacer" style="height:15px;"><td colspan="2"></td></tr>
     {%- endfor %}
     </table>
     </dd>
   {%- endif %}
-
-
-
-
 
   {%- if record.dates %}
   {%- for group in record.dates|groupby('type') %}

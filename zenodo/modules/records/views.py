@@ -139,13 +139,14 @@ def accessright_icon(value, embargo_date=None):
     """Get icon for access right."""
     return AccessRight.as_icon(AccessRight.get(value, embargo_date))
 
-# FILTER TO TAKE CONFIG
+
 @blueprint.app_template_filter()
-def keyword_url(keyword):
-    """."""
-    family, suffix = keyword.split(':')
-    base_url = current_app.config['ZENODO_CUSTOM_METADATA_VOCABULARIES'][family]['@context']
-    return '{}{}'.format(base_url, suffix)
+def custom_field_url(custom_field):
+    """Return the a vocabulary field's URL."""
+    context, value = custom_field.split(':', 1)
+    vocabularies = current_app.config['ZENODO_CUSTOM_METADATA_VOCABULARIES']
+    base_url = vocabularies[context]['@context']
+    return u'{}{}'.format(base_url, value)
 
 
 @blueprint.app_template_filter()
