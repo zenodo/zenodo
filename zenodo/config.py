@@ -1065,6 +1065,9 @@ PREVIEWER_PREFERENCE = [
 #: Improve quality of image resampling using better algorithm
 IIIF_RESIZE_RESAMPLE = 'PIL.Image:BICUBIC'
 
+
+IIIF_CACHE_HANDLER = 'flask_iiif.cache.redis:ImageRedisCache'
+
 # Redis storage for thumbnails caching.
 IIIF_CACHE_REDIS_URL = CACHE_REDIS_URL
 
