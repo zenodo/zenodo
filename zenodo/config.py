@@ -71,6 +71,7 @@ from zenodo.modules.records.permissions import deposit_delete_permission_factory
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
 from zenodo.modules.stats import current_stats_search_client
+from zenodo.modules.theme.ext import useragent_and_ip_limit_key
 
 
 def _(x):
@@ -1430,6 +1431,8 @@ RATELIMIT_PER_ENDPOINT = {
     'zenodo_frontpage.index': '10 per second',
     'security.login': '10 per second'
 }
+
+RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
 
 # Error template
 THEME_429_TEMPLATE = "zenodo_errors/429.html"
