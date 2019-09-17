@@ -33,7 +33,4 @@
   <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='geojson') }}">GeoJSON</a></li>
   <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='xm') }}">MARCXML</a></li>
   <li><a href="https://www.mendeley.com/import/?url={{ url_for('invenio_records_ui.recid', pid_value=pid.pid_value, _external=True) }}"><i class="fa fa-external-link"></i> Mendeley</a></li>
-  {%- for extra_format in (record.extra_formats or []) %}
-    <li><a href="{{ url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='ef', mimetype=extra_format.key) }}">{{ extra_format.key | extra_formats_title }}</a></li>
-  {%- endfor %}
 </ul>
