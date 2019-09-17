@@ -381,6 +381,22 @@
           },
           "scheme": {
             "$ref": "#/definitions/scheme"
+          },
+          "resource_type": {
+            "additionalProperties": false,
+            "description": "Record resource type.",
+            "properties": {
+              "subtype": {
+                "description": "Specific resource type.",
+                "type": "string"
+              },
+              "type": {
+                "default": "publication",
+                "description": "General resource type.",
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
         "required": [
@@ -403,6 +419,22 @@
           },
           "scheme": {
             "$ref": "#/definitions/scheme"
+          },
+          "resource_type": {
+            "additionalProperties": false,
+            "description": "Record resource type.",
+            "properties": {
+              "subtype": {
+                "description": "Specific resource type.",
+                "type": "string"
+              },
+              "type": {
+                "default": "publication",
+                "description": "General resource type.",
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
         "required": [
