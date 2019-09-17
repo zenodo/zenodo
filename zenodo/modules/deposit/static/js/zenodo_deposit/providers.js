@@ -37,5 +37,17 @@ function openAIRE() {
   };
 }
 
+//Resource types configuration
+function resourceTypes() {
+  var resourceTypesList = [];
+  return {
+    setResourceTypes: function(values) { resourceTypesList = values; },
+    $get: function() {
+      return {resourceTypesList: resourceTypesList};
+    }
+  };
+}
+
 angular.module('invenioRecords.providers')
-  .provider('openAIRE', openAIRE);
+  .provider('openAIRE', openAIRE)
+  .provider('resourceTypes', resourceTypes);

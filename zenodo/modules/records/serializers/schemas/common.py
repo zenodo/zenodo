@@ -42,10 +42,11 @@ from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
 from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
+from six import string_types
 
 from zenodo.modules.records import current_custom_metadata
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
-from zenodo.modules.records.models import AccessRight
+from zenodo.modules.records.models import AccessRight, ObjectType
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
@@ -244,11 +245,45 @@ class IdentifierSchemaV1(Schema, StrictKeysMixin):
             )
 
 
-class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
+class ResourceTypeMixin(object):
+    """Schema for resource type."""
+
+    resource_type = fields.Method('dump_resource_type', 'load_resource_type')
+
+    def load_resource_type(self, data):
+        """Split the resource type and into seperate keys."""
+        if not isinstance(data, string_types):
+            raise ValidationError(
+                'Not a string.', field_names=['resource_type'])
+        if not ObjectType.validate_internal_id(data):
+            raise ValidationError(
+                'Not a valid type.', field_names=['resource_type'])
+        serialized_object = {}
+        split_data = data.split('-')
+        if len(split_data) == 2:
+            serialized_object['type'], serialized_object['subtype'] = \
+                 split_data
+        else:
+            serialized_object['type'] = split_data[0]
+        return serialized_object
+
+    def dump_resource_type(self, data):
+        """Dump resource type metadata."""
+        resource_type = data.get('resource_type')
+        if resource_type:
+            if resource_type.get('subtype'):
+                return resource_type['type'] + '-' + resource_type['subtype']
+            else:
+                return resource_type['type']
+        else:
+            return missing
+
+
+class AlternateIdentifierSchemaV1(IdentifierSchemaV1, ResourceTypeMixin):
     """Schema for an alternate identifier."""
 
 
-class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
+class RelatedIdentifierSchemaV1(IdentifierSchemaV1, ResourceTypeMixin):
     """Schema for a related identifier."""
 
     relation = fields.Str(

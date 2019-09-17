@@ -21,6 +21,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+{%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
 {%- from "invenio_pidrelations/macros/pid_versions.html" import pid_versions_dropdown -%}
   <dl>
   {%- if record.publication_date %}
@@ -171,12 +172,17 @@
     <dd>{{group.grouper|relation_title}}<br />
     <ul style="list-style-type: none; margin-left: -40px;">
     {%- for related_id in group.list %}
-      {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}
-      {%- if related_url %}
-      <li><a href="{{related_url}}">{{related_id.identifier}}</a></li>
-      {%- else %}
-      <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}})
+      {%- if related_id.resource_type %}
+        {% set resource_type_title %}({{(related_id.resource_type|objecttype).title.en}}){% endset %}
       {%- endif %}
+      {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}
+      <li>
+      {%- if related_url %}
+      <a href="{{related_url}}">{{related_id.identifier}}</a> {{resource_type_title}}
+      {%- else %}
+      <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}) {{resource_type_title}}
+      {%- endif %}
+      </li>
     {%- endfor %}
     </ul>
     </dd>
@@ -187,12 +193,17 @@
     <dd>
     <ul style="list-style-type: none; margin-left: -40px;">
     {%- for alt_id in record.alternate_identifiers %}
+      <li>
+      {%- if alt_id.resource_type %}
+        {% set resource_type_title %}({{(alt_id.resource_type|objecttype).title.en}}){% endset %}
+      {%- endif %}
       {%- set alt_url = alt_id.identifier|pid_url(scheme=alt_id.scheme) %}
       {%- if alt_url %}
-        <li><a href="{{alt_url}}">{{alt_id.identifier}}</a></li>
+        <a href="{{alt_url}}">{{alt_id.identifier}}</a> {{resource_type_title}}
       {%- else %}
-        <i>{{alt_id.identifier}}</i> ({{alt_id.scheme|upper}})
+        <i>{{alt_id.identifier}}</i> ({{alt_id.scheme|upper}}) {{resource_type_title}}
       {%- endif %}
+      </li>
     {%- endfor %}
     </dd>
   {%- endif %}

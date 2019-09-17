@@ -599,7 +599,10 @@
         "fa_cls": "fa-barcode",
         "description": "",
         "sortOptions": {
-          "disabled": true
+          "disabled": false,
+          "handle": "i.sort-handle",
+          "cursor": "move",
+          "axis": "y"
         },
         "add": "Add another related identifier",
         "inline": true,
@@ -682,6 +685,12 @@
                 "name": "is an alternate identifier of this upload"
               }
             ]
+          },
+          {
+            "type": "template",
+            "templateUrl": "/static/templates/zenodo_deposit/resource-type-selector.html",
+            "key": "related_identifiers[].resource_type",
+            "description": "Optional. Resource type of the related identifier."
           }
         ]
       }

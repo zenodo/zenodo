@@ -682,9 +682,15 @@ def full_record():
             {'identifier': '1234.4328', 'scheme':
                 'arxiv', 'relation': 'references'},
             {'identifier': '10.1234/zenodo.4321', 'scheme':
-                'doi', 'relation': 'isPartOf'},
+                'doi', 'relation': 'isPartOf',
+                'resource_type': {
+                    'type': 'software'}},
             {'identifier': '10.1234/zenodo.1234', 'scheme':
-                'doi', 'relation': 'hasPart'},
+                'doi', 'relation': 'hasPart',
+                'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }},
         ],
         alternate_identifiers=[
             {'identifier': 'urn:lsid:ubio.org:namebank:11815',
@@ -694,7 +700,11 @@ def full_record():
             {'identifier': '0317-8471',
              'scheme': 'issn', },
             {'identifier': '10.1234/alternate.doi',
-             'scheme': 'doi', },
+             'scheme': 'doi',
+             'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }},
         ],
         contributors=[
             {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
