@@ -228,12 +228,14 @@ def test_full(db, record_with_bucket, recid_pid):
             {
                 "relationType": "IsPartOf",
                 "relatedIdentifier": "10.1234/zenodo.4321",
-                "relatedIdentifierType": "DOI"
+                "relatedIdentifierType": "DOI",
+                "resourceTypeGeneral": "Software"
             },
             {
                 "relationType": "HasPart",
                 "relatedIdentifier": "10.1234/zenodo.1234",
-                "relatedIdentifierType": "DOI"
+                "relatedIdentifierType": "DOI",
+                "resourceTypeGeneral": "Text"
             },
             {
                 "relationType": "IsPartOf",
@@ -681,6 +683,10 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
                 'identifier': '1234',
                 'scheme': t,
                 'relation': 'isCitedBy',
+                'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }
             }, {
                 'identifier': '1234',
                 'scheme': 'invalid',
@@ -688,11 +694,13 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
             }],
         })
         obj = serializer.transform_record(recid_pid, minimal_record_model)
-        assert obj['relatedIdentifiers'] == [{
+        expected_result = [{
             'relatedIdentifier': '1234',
             'relatedIdentifierType': dc_t,
             'relationType': 'IsCitedBy',
+            'resourceTypeGeneral': 'Text'
         }]
+        assert obj['relatedIdentifiers'] == expected_result
 
 
 @pytest.mark.parametrize("serializer", [
