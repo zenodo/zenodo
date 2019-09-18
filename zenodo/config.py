@@ -1066,8 +1066,10 @@ PREVIEWER_PREFERENCE = [
 #: Improve quality of image resampling using better algorithm
 IIIF_RESIZE_RESAMPLE = 'PIL.Image:BICUBIC'
 
-
-IIIF_CACHE_HANDLER = 'flask_iiif.cache.redis:ImageRedisCache'
+#: Use the Redis storage backend for caching IIIF images
+# TODO: Fix Python 3 caching key issue to enable:
+#   https://github.com/inveniosoftware/flask-iiif/issues/66
+# IIIF_CACHE_HANDLER = 'flask_iiif.cache.redis:ImageRedisCache'
 
 # Redis storage for thumbnails caching.
 IIIF_CACHE_REDIS_URL = CACHE_REDIS_URL
