@@ -42,7 +42,7 @@
     </thead>
     <tbody>
     {%- for extra_format in (record.extra_formats or []) %}
-    {%- set extra_url = url_for('invenio_records_ui.recid_export', pid_value=pid.pid_value, format='ef', mimetype=extra_format.key) %}
+    {%- set extra_url = url_for('invenio_records_ui.recid_extra_formats', pid_value=pid.pid_value, mimetype=extra_format.key) %}
       <tr>
         <td>
           <a class="filename" href="{{extra_url}}">{{ extra_format.key | extra_formats_title }}</a>
