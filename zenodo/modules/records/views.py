@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 import json
+from datetime import datetime as dt
 from operator import itemgetter
 
 import idutils
@@ -303,7 +304,6 @@ def citation(record, pid, style=None, ln=None):
             .format(str(record.id)))
         return None
 
-from datetime import datetime as dt
 @blueprint.app_template_filter('format_date_range')
 def format_date_range(date):
     """."""
