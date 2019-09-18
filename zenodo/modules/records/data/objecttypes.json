@@ -666,7 +666,7 @@
     "en": "Taxonomic treatments"
   },
   "schema.org": "https://schema.org/ScholarlyArticle",
-  "datacite": {"general": "Text"},
+  "datacite": {"general": "Text", "type": "Taxonomic treatment"},
   "eurepo": "info:eu-repo/semantics/other",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
