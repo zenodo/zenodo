@@ -91,6 +91,15 @@
         color: $brand-primary;
       }
     }
+
+    &.custom-keywords, &.dates, &.locations {
+      li {
+        padding-bottom: 5px;
+        div {
+          padding-left: 10px;
+        }
+      }
+    }
   }
 }
 
