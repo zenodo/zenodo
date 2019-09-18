@@ -49,6 +49,7 @@ from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.extra_formats import ExtraFormats
+from zenodo.modules.deposit.views_rest import pass_extra_formats_mimetype
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
 
@@ -485,3 +486,12 @@ def record_thumbnail(pid, record, thumbnail_size, **kwargs):
                 image_format=file['type'])
     else:
         abort(404, 'This record has no thumbnails')
+
+
+@pass_extra_formats_mimetype(from_query_string=True, from_accept=True)
+def record_extra_formats(pid, record, mimetype=None, **kwargs):
+    """Get extra format."""
+    if mimetype in record.extra_formats:
+        fileobj = record.extra_formats[mimetype]
+        return fileobj.obj.send_file(trusted=True, as_attachment=True)
+    return abort(404, 'No extra format "{}".'.format(mimetype))

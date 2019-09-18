@@ -776,6 +776,12 @@ RECORDS_UI_ENDPOINTS = dict(
         view_imp='invenio_records_files.utils.file_download_ui',
         record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
+    recid_extra_formats=dict(
+        pid_type='recid',
+        route='/record/<pid_value>/formats',
+        view_imp='zenodo.modules.records.views.record_extra_formats',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
+    ),
 )
 RECORDS_UI_ENDPOINTS.update(ACCESSREQUESTS_RECORDS_UI_ENDPOINTS)
 
