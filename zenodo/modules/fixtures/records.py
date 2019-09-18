@@ -26,18 +26,17 @@
 
 from __future__ import absolute_import, print_function
 
+from uuid import uuid4
+
+from flask import current_app
+from flask_security import login_user
 from invenio_db import db
 from invenio_sipstore.models import SIPMetadataType
+from six import BytesIO
 
 from zenodo.modules.deposit.api import ZenodoDeposit
-from zenodo.modules.deposit.minters import zenodo_deposit_minter
 from zenodo.modules.deposit.loaders import legacyjson_v1
-
-from flask_security import login_user
-from flask import current_app
-
-from uuid import uuid4
-from six import BytesIO
+from zenodo.modules.deposit.minters import zenodo_deposit_minter
 
 
 def loaddemorecords(records, owner):
