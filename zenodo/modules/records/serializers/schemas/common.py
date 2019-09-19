@@ -40,9 +40,9 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
+from six import string_types
 from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
-from six import string_types
 
 from zenodo.modules.records import current_custom_metadata
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
@@ -457,6 +457,9 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
             # If the DOI exists, check if it's been assigned to this record
             # by fetching the recid and comparing both PIDs record UUID
             try:
+                # If the deposit has not been created yet, raise
+                if not self.context.get('recid'):
+                    raise err
                 recid_pid = PersistentIdentifier.get(
                     'recid', self.context['recid'])
             except PIDDoesNotExistError:
