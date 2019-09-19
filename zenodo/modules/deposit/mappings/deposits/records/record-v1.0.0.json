@@ -357,6 +357,19 @@
             "relation": {
               "type": "string",
               "index": "not_analyzed"
+            },
+            "resource_type": {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "subtype": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              },
+              "type": "object"
             }
           }
         },
@@ -370,6 +383,19 @@
             "scheme": {
               "type": "string",
               "index": "not_analyzed"
+            },
+            "resource_type": {
+              "properties": {
+                "subtype": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "type": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              },
+              "type": "object"
             }
           }
         },

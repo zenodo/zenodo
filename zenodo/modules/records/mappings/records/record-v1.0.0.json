@@ -375,7 +375,23 @@
             },
             "relation": {
               "type": "string",
-              "index": "not_analyzed"
+              "index": "not_analyzed",
+              "copy_to": "related.relation"
+            },
+            "resource_type": {
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "index": "not_analyzed",
+                  "copy_to": "related.resource_type.type"
+                },
+                "subtype": {
+                  "type": "string",
+                  "index": "not_analyzed",
+                  "copy_to": "related.resource_type.subtype"
+                }
+              },
+              "type": "object"
             }
           }
         },
@@ -389,6 +405,22 @@
             "scheme": {
               "type": "string",
               "index": "not_analyzed"
+            },
+            "relation": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
+            "resource_type": {
+              "properties": {
+                "subtype": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
+                "type": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                }
+              }
             }
           }
         },
