@@ -56,7 +56,7 @@ services:
       - "5672:5672"
   es:
     build: ./docker/es/
-    image: zenodo-es:2.3
+    image: zenodo-es:2.4.6
     restart: "always"
     ports:
       - "9200:9200"

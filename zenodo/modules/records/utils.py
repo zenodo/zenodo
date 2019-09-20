@@ -40,6 +40,7 @@ from sqlalchemy import or_
 from werkzeug.utils import import_string
 
 from zenodo.modules.openaire import current_openaire
+from zenodo.modules.records import current_custom_metadata
 
 
 def schema_prefix(schema):
@@ -155,3 +156,28 @@ def xsd41():
     )
 
     httpretty.disable()
+
+
+def build_record_custom_fields(record):
+    """Build the custom metadata fields for ES indexing."""
+    valid_terms = current_custom_metadata.terms
+    es_custom_fields = dict(
+        custom_keywords=[],
+        custom_text=[]
+    )
+    custom_fields_mapping = {
+        'keyword': 'custom_keywords',
+        'text': 'custom_text',
+    }
+
+    custom_metadata = record.get('custom', {})
+    for term, value in custom_metadata.items():
+        term_type = valid_terms.get(term)['term_type']
+        if term_type:
+            # TODO: in the futurem also add "community"
+            es_object = {'key': term, 'value': value}
+            es_custom_field = custom_fields_mapping[term_type]
+            es_custom_fields[es_custom_field].append(es_object)
+
+    return {k: es_custom_fields[k] for k in es_custom_fields
+            if es_custom_fields[k]}

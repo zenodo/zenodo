@@ -224,7 +224,26 @@ openaireSubtype.$inject = [
 ];
 
 
+function selectResourceTypes(resourceTypes) {
+  function link($scope, elem, attrs, vm) {
+    // Locals
+    $scope.resourceTypesList = [{'title': 'N/A'}].concat(resourceTypes.resourceTypesList);
+    $scope.vm = vm;
+  }
+  return {
+    scope: false,
+    restrict: 'AE',
+    require: '^invenioRecords',
+    link: link,
+  };
+}
+
+selectResourceTypes.$inject = [
+  'resourceTypes',
+];
+
 angular.module('invenioRecords.directives')
   .directive('prereserveButton', prereserveButton)
   .directive('communitiesSelect', communitiesSelect)
-  .directive('openaireSubtype', openaireSubtype);
+  .directive('openaireSubtype', openaireSubtype)
+  .directive('selectResourceTypes', selectResourceTypes);

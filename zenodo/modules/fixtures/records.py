@@ -26,15 +26,34 @@
 
 from __future__ import absolute_import, print_function
 
+from uuid import uuid4
+
+from flask import current_app
+from flask_security import login_user
 from invenio_db import db
-from invenio_migrator.tasks.records import import_record
 from invenio_sipstore.models import SIPMetadataType
+from six import BytesIO
+
+from zenodo.modules.deposit.api import ZenodoDeposit
+from zenodo.modules.deposit.loaders import legacyjson_v1
+from zenodo.modules.deposit.minters import zenodo_deposit_minter
 
 
-def loaddemorecords(records):
+def loaddemorecords(records, owner):
     """Load demo records."""
-    for item in records:
-        import_record.delay(item, source_type='json'),
+    with current_app.test_request_context():
+        login_user(owner)
+        for record in records:
+            deposit_data = legacyjson_v1(record)
+            deposit_id = uuid4()
+            zenodo_deposit_minter(deposit_id, deposit_data)
+            deposit = ZenodoDeposit.create(deposit_data, id_=deposit_id)
+            db.session.commit()
+            filename = record['files'][0]
+            deposit.files[filename] = BytesIO(filename)
+            db.session.commit()
+            deposit.publish()
+            db.session.commit()
 
 
 def loadsipmetadatatypes(types):

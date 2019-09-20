@@ -46,10 +46,10 @@ def datacite_register_after_publish(sender, action=None, pid=None,
 def openaire_direct_index_after_publish(sender, action=None, pid=None,
                                         deposit=None):
     """Send published record for direct indexing at OpenAIRE."""
-    if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED']:
+    if action == 'publish' and \
+            current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED']:
         _, record = deposit.fetch_published()
-        if action in 'publish':
-            openaire_direct_index.delay(record_uuid=str(record.id))
+        openaire_direct_index.delay(record_uuid=str(record.id))
 
 
 def sipstore_write_files_after_publish(sender, action=None, pid=None,

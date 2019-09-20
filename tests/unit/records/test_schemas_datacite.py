@@ -165,7 +165,14 @@ def test_full(db, record_with_bucket, recid_pid):
                 }
             }
         ],
-        "dates": [{"date": "2014-02-27", "dateType": "Issued"}],
+        "dates": [
+            {"date": "2014-02-27", "dateType": "Issued"},
+            {"date": "2019-01-01/", "dateType": "Valid"},
+            # NOTE: "Withdrawn" is not in the DataCite v3.1 dateType vocabulary
+            # {"date": "2019-01-01", "dateType": "Withdrawn"},
+            {"date": "/2019-01-01", "dateType": "Collected"},
+            {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+        ],
         "descriptions": [
             {
                 "description": "Test Description",
@@ -183,10 +190,18 @@ def test_full(db, record_with_bucket, recid_pid):
                     "10.5281/zenodo.34\"]}"
                 ),
                 "descriptionType": "Other"
-            }
+            },
+            {'description': 'microscopic supersampling',
+             'descriptionType': 'Methods'}
         ],
         "identifier": {"identifier": "10.5072/foo", "identifierType": "DOI"},
         "language": "en",
+        "geoLocations": [{
+            "geoLocationPlace": "my place",
+            "geoLocationPoint": "2.35 1.534"
+        }, {
+            'geoLocationPlace': 'New York'
+        }],
         "publicationYear": "2014",
         "publisher": "Zenodo",
         "relatedIdentifiers": [
@@ -213,12 +228,14 @@ def test_full(db, record_with_bucket, recid_pid):
             {
                 "relationType": "IsPartOf",
                 "relatedIdentifier": "10.1234/zenodo.4321",
-                "relatedIdentifierType": "DOI"
+                "relatedIdentifierType": "DOI",
+                "resourceTypeGeneral": "Software"
             },
             {
                 "relationType": "HasPart",
                 "relatedIdentifier": "10.1234/zenodo.1234",
-                "relatedIdentifierType": "DOI"
+                "relatedIdentifierType": "DOI",
+                "resourceTypeGeneral": "Text"
             },
             {
                 "relationType": "IsPartOf",
@@ -347,6 +364,23 @@ def test_full(db, record_with_bucket, recid_pid):
         }
     ]
     expected['fundingReferences'] = []
+    expected["dates"] = [
+        {"date": "2014-02-27", "dateType": "Issued"},
+        {"date": "2019-01-01/", "dateType": "Valid",
+         "dateInformation": "Bongo"},
+        {"date": "/2019-01-01", "dateType": "Collected"},
+        {"date": "2019-01-01", "dateType": "Withdrawn"},
+        {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+    ]
+    expected['geoLocations'] = [{
+        "geoLocationPlace": "my place",
+        "geoLocationPoint": {
+          "pointLatitude": 2.35,
+          "pointLongitude": 1.534
+        }
+    }, {
+        'geoLocationPlace': 'New York'
+    }]
     assert obj == expected
 
 
@@ -649,6 +683,10 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
                 'identifier': '1234',
                 'scheme': t,
                 'relation': 'isCitedBy',
+                'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }
             }, {
                 'identifier': '1234',
                 'scheme': 'invalid',
@@ -656,11 +694,13 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
             }],
         })
         obj = serializer.transform_record(recid_pid, minimal_record_model)
-        assert obj['relatedIdentifiers'] == [{
+        expected_result = [{
             'relatedIdentifier': '1234',
             'relatedIdentifierType': dc_t,
             'relationType': 'IsCitedBy',
+            'resourceTypeGeneral': 'Text'
         }]
+        assert obj['relatedIdentifiers'] == expected_result
 
 
 @pytest.mark.parametrize("serializer", [

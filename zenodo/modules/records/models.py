@@ -187,6 +187,12 @@ class ObjectType(object):
                     cls.types.add(objtype['internal_id'])
 
     @classmethod
+    def validate_internal_id(cls, id):
+        """Check if the provided ID corresponds to the internal ones."""
+        cls._load_data()
+        return id in cls.index_internal_id
+
+    @classmethod
     def _jsonloader(cls, uri, **dummy_kwargs):
         """Local JSON loader for JsonRef."""
         cls._load_data()

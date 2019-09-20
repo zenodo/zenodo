@@ -26,27 +26,27 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-from functools import partial
-
 import arrow
 import idutils
 import jsonref
 import pycountry
-from flask import current_app, has_request_context, request
+from flask import current_app, has_request_context
 from flask_babelex import lazy_gettext as _
 from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
-from invenio_iiif.utils import iiif_image_key, ui_iiif_image_url
+from invenio_iiif.utils import ui_iiif_image_url
 from invenio_pidrelations.serializers.utils import serialize_relations
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
-from marshmallow import Schema, ValidationError, fields, post_dump, \
+from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
-from six.moves.urllib.parse import quote, urlparse
+from six import string_types
+from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
 
+from zenodo.modules.records import current_custom_metadata
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
-from zenodo.modules.records.models import AccessRight
+from zenodo.modules.records.models import AccessRight, ObjectType
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
@@ -73,6 +73,7 @@ URLS = {
     'record_file': '{base}/record/{id}/files/{filename}',
     'record': '{base}/records/{id}',
     'thumbnail': '{base}{path}',
+    'thumbs': '{base}/record/{id}/thumb{size}',
     'community': '{base}/communities/{id}',
 }
 
@@ -153,6 +154,7 @@ class PersonSchemaV1(Schema, StrictKeysMixin):
     orcid = PersistentId(scheme='ORCID')
 
     @post_dump(pass_many=False)
+    @post_load(pass_many=False)
     def clean(self, data):
         """Clean empty values."""
         return clean_empty(data, ['orcid', 'gnd', 'affiliation'])
@@ -243,11 +245,45 @@ class IdentifierSchemaV1(Schema, StrictKeysMixin):
             )
 
 
-class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
+class ResourceTypeMixin(object):
+    """Schema for resource type."""
+
+    resource_type = fields.Method('dump_resource_type', 'load_resource_type')
+
+    def load_resource_type(self, data):
+        """Split the resource type and into seperate keys."""
+        if not isinstance(data, string_types):
+            raise ValidationError(
+                'Not a string.', field_names=['resource_type'])
+        if not ObjectType.validate_internal_id(data):
+            raise ValidationError(
+                'Not a valid type.', field_names=['resource_type'])
+        serialized_object = {}
+        split_data = data.split('-')
+        if len(split_data) == 2:
+            serialized_object['type'], serialized_object['subtype'] = \
+                 split_data
+        else:
+            serialized_object['type'] = split_data[0]
+        return serialized_object
+
+    def dump_resource_type(self, data):
+        """Dump resource type metadata."""
+        resource_type = data.get('resource_type')
+        if resource_type:
+            if resource_type.get('subtype'):
+                return resource_type['type'] + '-' + resource_type['subtype']
+            else:
+                return resource_type['type']
+        else:
+            return missing
+
+
+class AlternateIdentifierSchemaV1(IdentifierSchemaV1, ResourceTypeMixin):
     """Schema for an alternate identifier."""
 
 
-class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
+class RelatedIdentifierSchemaV1(IdentifierSchemaV1, ResourceTypeMixin):
     """Schema for a related identifier."""
 
     relation = fields.Str(
@@ -264,6 +300,40 @@ class SubjectSchemaV1(IdentifierSchemaV1):
     term = SanitizedUnicode()
 
 
+class DateSchemaV1(Schema):
+    """Schema for date intervals."""
+
+    start = DateString()
+    end = DateString()
+    type = fields.Str(required=True)
+    description = fields.Str()
+
+
+class LocationSchemaV1(Schema):
+    """Schema for geographical locations."""
+
+    lat = fields.Float()
+    lon = fields.Float()
+    place = SanitizedUnicode(required=True)
+    description = SanitizedUnicode()
+
+    @validates('lat')
+    def validate_latitude(self, value):
+        """Validate that location exists."""
+        if not (-90 <= value <= 90):
+            raise ValidationError(
+                _('Latitude must be between -90 and 90.')
+            )
+
+    @validates('lon')
+    def validate_longitude(self, value):
+        """Validate that location exists."""
+        if not (-180 <= value <= 180):
+            raise ValidationError(
+                _('Longitude must be between -180 and 180.')
+            )
+
+
 class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     """Common metadata schema."""
 
@@ -272,10 +342,14 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     title = SanitizedUnicode(required=True, validate=validate.Length(min=3))
     creators = fields.Nested(
         PersonSchemaV1, many=True, validate=validate.Length(min=1))
+    dates = fields.List(
+        fields.Nested(DateSchemaV1), validate=validate.Length(min=1))
     description = SanitizedHTML(
         required=True, validate=validate.Length(min=3))
     keywords = fields.List(SanitizedUnicode())
-    notes = SanitizedUnicode()
+    locations = fields.List(
+        fields.Nested(LocationSchemaV1), validate=validate.Length(min=1))
+    notes = SanitizedHTML()
     version = SanitizedUnicode()
     language = SanitizedUnicode()
     access_right = fields.Str(validate=validate.OneOf(
@@ -295,6 +369,17 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
         AlternateIdentifierSchemaV1, many=True)
+    method = SanitizedUnicode()
+
+    @validates('locations')
+    def validate_locations(self, value):
+        """Validate that there should be both latitude and longitude."""
+        for location in value:
+            if (location.get('lon') and not location.get('lat')) or \
+                (location.get('lat') and not location.get('lon')):
+                raise ValidationError(
+                    _('There should be both latitude and longitude.'),
+                    field_names=['locations'])
 
     @validates('language')
     def validate_language(self, value):
@@ -304,6 +389,26 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 _('Language must be a lower-cased 3-letter ISO 639-3 string.'),
                 field_name=['language']
             )
+
+    @validates('dates')
+    def validate_dates(self, value):
+        """Validate that start date is before the corresponding end date."""
+        for interval in value:
+            start = arrow.get(interval.get('start'), 'YYYY-MM-DD').date() \
+                if interval.get('start') else None
+            end = arrow.get(interval.get('end'), 'YYYY-MM-DD').date() \
+                if interval.get('end') else None
+
+            if not start and not end:
+                raise ValidationError(
+                    _('There must be at least one date.'),
+                    field_names=['dates']
+                )
+            if start and end and start > end:
+                raise ValidationError(
+                    _('"start" date must be before "end" date.'),
+                    field_names=['dates']
+                )
 
     @validates('embargo_date')
     def validate_embargo_date(self, value):
@@ -352,6 +457,9 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
             # If the DOI exists, check if it's been assigned to this record
             # by fetching the recid and comparing both PIDs record UUID
             try:
+                # If the deposit has not been created yet, raise
+                if not self.context.get('recid'):
+                    raise err
                 recid_pid = PersistentIdentifier.get(
                     'recid', self.context['recid'])
             except PIDDoesNotExistError:
@@ -386,6 +494,50 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 _('Required when access right is restricted.'),
                 field_names=['access_conditions']
             )
+
+    custom = fields.Method('dump_custom', 'load_custom')
+
+    def load_custom(self, obj):
+        """Validate the custom metadata according to config."""
+        if not obj:
+            return missing
+
+        if not isinstance(obj, dict):
+            raise ValidationError('Not an object.', field_names=['custom'])
+
+        valid_vocabulary = current_custom_metadata.available_vocabulary_set
+        term_types = current_custom_metadata.term_types
+        valid_terms = current_custom_metadata.terms
+        for term, values in obj.items():
+            if term not in valid_vocabulary:
+                raise ValidationError(
+                    'Zenodo does not support "{0}" as a custom metadata term.'
+                    .format(term),
+                    field_names=['custom'])
+
+            # Validate term type
+            term_type = term_types[valid_terms[term]['term_type']]
+            if not isinstance(values, list):
+                raise ValidationError(
+                        'Term "{0}" should be of type array.'
+                        .format(term),
+                        field_names=['custom'])
+            if len(values) == 0:
+                raise ValidationError(
+                        'No values were provided for term "{0}".'
+                        .format(term),
+                        field_names=['custom'])
+            for value in values:
+                if not isinstance(value, term_type):
+                    raise ValidationError(
+                        'Invalid type for term "{0}", should be "{1}".'
+                        .format(term, valid_terms[term]['term_type']),
+                        field_names=['custom'])
+        return obj
+
+    def dump_custom(self, data):
+        """Dump custom metadata."""
+        return data.get('custom', missing)
 
     @pre_load()
     def preload_accessrights(self, data):
@@ -473,7 +625,7 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             pass
         return links
 
-    def _thumbnail_url(self, fileobj , thumbnail_size):
+    def _thumbnail_url(self, fileobj, thumbnail_size):
         """Create the thumbnail URL for an image."""
         return link_for(
             current_app.config.get('THEME_SITEURL'),
@@ -484,6 +636,19 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
                 image_format='png' if fileobj['type'] == 'png' else 'jpg',
             )
         )
+
+    def _thumbnail_urls(self, recid):
+        """Create the thumbnail URL for an image."""
+        thumbnail_urls = {}
+        cached_sizes = current_app.config.get('CACHED_THUMBNAILS')
+        for size in cached_sizes:
+            thumbnail_urls[size] = link_for(
+                current_app.config.get('THEME_SITEURL'),
+                'thumbs',
+                id=recid,
+                size=size
+            )
+        return thumbnail_urls
 
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
@@ -504,8 +669,9 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         for f in files:
             if f.get('type') in thumbnail_exts:
                 try:
-                    links['thumb250'] = self._thumbnail_url(f, 250)
                     # First previewable image is used for preview.
+                    links['thumbs'] = self._thumbnail_urls(m.get('recid'))
+                    links['thumb250'] = self._thumbnail_url(f, 250)
                 except RuntimeError:
                     pass
                 break

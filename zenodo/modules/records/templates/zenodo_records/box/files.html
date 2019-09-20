@@ -24,7 +24,7 @@
 {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
 {%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
 {%- if record._files -%}
-<div class="panel panel-{{state}}" id="files">
+<div class="panel panel-{{state}} files-box" id="files">
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
       {{ _("Files") }}

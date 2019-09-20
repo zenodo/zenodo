@@ -28,22 +28,28 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 import json
+from datetime import datetime as dt
 from operator import itemgetter
 
 import idutils
 import six
-from flask import Blueprint, current_app, render_template, request
+from flask import Blueprint, abort, current_app, render_template, request
+from flask_iiif.restful import IIIFImageAPI
 from flask_principal import ActionNeed
+from flask_security import current_user
 from invenio_access.permissions import Permission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
+from invenio_iiif.utils import iiif_image_key
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.deposit.extra_formats import ExtraFormats
+from zenodo.modules.deposit.views_rest import pass_extra_formats_mimetype
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
 
@@ -79,6 +85,12 @@ def is_embargoed(embargo_date, accessright=None):
     if embargo_date is not None:
         return AccessRight.is_embargoed(embargo_date)
     return False
+
+
+@blueprint.app_template_filter('extra_formats_title')
+def extra_formats_title(mimetype):
+    """Return a dict of a record's available extra formats and their title."""
+    return ExtraFormats.mimetype_whitelist.get(mimetype, '')
 
 
 @blueprint.app_template_filter('pidstatus')
@@ -128,6 +140,15 @@ def accessright_title(value, embargo_date=None):
 def accessright_icon(value, embargo_date=None):
     """Get icon for access right."""
     return AccessRight.as_icon(AccessRight.get(value, embargo_date))
+
+
+@blueprint.app_template_filter()
+def custom_field_url(custom_field):
+    """Return the a vocabulary field's URL."""
+    context, value = custom_field.split(':', 1)
+    vocabularies = current_app.config['ZENODO_CUSTOM_METADATA_VOCABULARIES']
+    base_url = vocabularies[context]['@context']
+    return u'{}{}'.format(base_url, value)
 
 
 @blueprint.app_template_filter()
@@ -284,6 +305,21 @@ def citation(record, pid, style=None, ln=None):
             .format(str(record.id)))
         return None
 
+@blueprint.app_template_filter('format_date_range')
+def format_date_range(date):
+    """."""
+    if date.get('start') and date.get('end'):
+        date_start = dt.strptime(date['start'], "%Y-%m-%d")
+        date_end = dt.strptime(date['end'], "%Y-%m-%d")
+        if date_start == date_end:
+            return '{}'.format(date['start'])
+        else:
+            return 'From {} to {}'.format(date['start'], date['end'])
+    elif date.get('end'):
+        return 'Until {}'.format(date['end'])
+    elif date.get('start'):
+        return 'From {}'.format(date['start'])
+
 
 @blueprint.app_template_filter('pid_url')
 def pid_url(identifier, scheme=None, url_scheme='https'):
@@ -366,7 +402,7 @@ def records_ui_export(pid, record, template=None, **kwargs):
         )
         return render_template(
             template, pid=pid, record=record,
-            data=data, format_title=formats[fmt]['title'])
+            data=data, format_code=fmt, format_title=formats[fmt]['title'])
 
 
 def _can_curate(community, user, record, accepted=False):
@@ -416,3 +452,46 @@ def community_curation(record, user):
 def record_communities():
     """Context processor for community curation for given record."""
     return dict(community_curation=community_curation)
+
+
+def record_thumbnail(pid, record, thumbnail_size, **kwargs):
+    """Provide easy access to the thumbnail of a record for predefined sizes.
+
+    We consider the thumbnail of the record as the first image in the files
+    iterator or the one set as the default.
+    """
+    if not has_record_perm(current_user, record, 'read-files'):
+        abort(404)
+    cached_thumbnails = current_app.config['CACHED_THUMBNAILS']
+    if thumbnail_size not in cached_thumbnails:
+        abort(400, 'The selected thumbnail has not been cached')
+    selected = None
+    thumbnail_size = cached_thumbnails[thumbnail_size]
+    for file in record.files:
+        if(file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
+            continue
+        elif not selected:
+            selected = file
+        elif file['default']:
+            selected = file
+            break
+    if selected:
+        return IIIFImageAPI().get(
+                version='v2',
+                uuid=str(iiif_image_key(selected)),
+                region='full',
+                size=thumbnail_size,
+                rotation='0',
+                quality='default',
+                image_format=file['type'])
+    else:
+        abort(404, 'This record has no thumbnails')
+
+
+@pass_extra_formats_mimetype(from_query_string=True, from_accept=True)
+def record_extra_formats(pid, record, mimetype=None, **kwargs):
+    """Get extra format."""
+    if mimetype in record.extra_formats:
+        fileobj = record.extra_formats[mimetype]
+        return fileobj.obj.send_file(trusted=True, as_attachment=True)
+    return abort(404, 'No extra format "{}".'.format(mimetype))

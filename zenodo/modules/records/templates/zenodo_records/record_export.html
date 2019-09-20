@@ -37,7 +37,12 @@
 <a href="{{canonical_url}}"><h1>{{ record.title }}</h1></a>
 <p>{{ authors(record.creators) }}</p>
 <hr />
+{% set extra_format_mimetype = request.args.get('mimetype') %}
+{% if format_code == 'ef' and extra_format_mimetype %}
+<h3>{{ extra_format_mimetype | extra_formats_title }} Export</h3>
+{% else %}
 <h3>{{ format_title }} Export</h3>
+{% endif %}
 <pre style="white-space: pre-wrap;">{{data}}</pre>
 {% endblock record_body %}
 {% block record_body_extra %}{% endblock record_body_extra %}
