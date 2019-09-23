@@ -1437,7 +1437,9 @@ RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
 
 RATELIMIT_PER_ENDPOINT = {
     'zenodo_frontpage.index': '10 per second',
-    'security.login': '10 per second'
+    'security.login': '10 per second',
+    'zenodo_redirector.contact': '10 per second',
+    'zenodo_support.support': '10 per second'
 }
 
 RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
