@@ -305,6 +305,8 @@ def test_format_inbook(full_record):
               """  month        = feb,\n"""
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
+              """  publisher    = {Jol},\n"""
+              """  version      = {1.2.5},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -559,6 +561,8 @@ def test_format_default_type(full_record):
               """  month        = feb,\n"""
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
+              """  publisher    = {Jol},\n"""
+              """  version      = {1.2.5},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -578,6 +582,8 @@ def test_format_publication_default(full_record):
               """  month        = feb,\n"""
               """  year         = 2014,\n"""
               """  note         = {notes},\n"""
+              """  publisher    = {Jol},\n"""
+              """  version      = {1.2.5},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
@@ -634,6 +640,46 @@ def test_format_long_title_with_trailing_whitespace(full_record):
               """  pages        = 20,\n"""
               """  month        = feb,\n"""
               """  note         = {notes},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_software_type(full_record):
+    """Test."""
+    full_record['resource_type']['type'] = 'software'
+    bibtex = ("""@software{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Doe, Jane and\n"""
+              """                  Smith, John and\n"""
+              """                  Nowak, Jack},\n"""
+              """  title        = {Test title},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  publisher    = {Jol},\n"""
+              """  version      = {1.2.5},\n"""
+              """  doi          = {10.1234/foo.bar},\n"""
+              """  url          = {https://doi.org/10.1234/foo.bar}\n"""
+              """}""")
+    assert bibtex == Bibtex(full_record).format()
+
+
+def test_format_dataset_type(full_record):
+    """Test."""
+    full_record['resource_type']['type'] = 'dataset'
+    bibtex = ("""@dataset{doe_2014_12345,\n"""
+              """  author       = {Doe, John and\n"""
+              """                  Doe, Jane and\n"""
+              """                  Smith, John and\n"""
+              """                  Nowak, Jack},\n"""
+              """  title        = {Test title},\n"""
+              """  month        = feb,\n"""
+              """  year         = 2014,\n"""
+              """  note         = {notes},\n"""
+              """  publisher    = {Jol},\n"""
+              """  version      = {1.2.5},\n"""
               """  doi          = {10.1234/foo.bar},\n"""
               """  url          = {https://doi.org/10.1234/foo.bar}\n"""
               """}""")
