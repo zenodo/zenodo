@@ -264,6 +264,15 @@
             "placeholder": "ORCID (e.g.: 0000-0002-1825-0097)",
             "description": "Optional.",
             "notitle": true
+          },
+          {
+            "type": "text",
+            "key": "creators[].github",
+            "fieldHtmlClass": "github-field",
+            "placeholder": "GitHub handle",
+            "description": "Optional.",
+            "notitle": true,
+            "condition": "model.upload_type == 'software' || model.upload_type == 'dataset'"
           }
         ]
       },
