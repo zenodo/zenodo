@@ -13,6 +13,10 @@
           "description": "Family name of person if known.",
           "type": "string"
         },
+        "github": {
+          "description": "Github profile url.",
+          "type": "string"
+        },
         "givennames": {
           "description": "Given names of person if known.",
           "type": "string"
@@ -71,6 +75,10 @@
         },
         "familyname": {
           "description": "Family name of person if known.",
+          "type": "string"
+        },
+        "github": {
+          "description": "Github profile url.",
           "type": "string"
         },
         "givennames": {
@@ -435,6 +443,22 @@
             "description": "Identifier of research output.",
             "type": "string"
           },
+          "resource_type": {
+            "additionalProperties": false,
+            "description": "Record resource type.",
+            "properties": {
+              "subtype": {
+                "description": "Specific resource type.",
+                "type": "string"
+              },
+              "type": {
+                "default": "publication",
+                "description": "General resource type.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
           "scheme": {
             "description": "Persistent identifier scheme.",
             "enum": [
@@ -469,22 +493,6 @@
               "ascl"
             ],
             "type": "string"
-          },
-          "resource_type": {
-            "additionalProperties": false,
-            "description": "Record resource type.",
-            "properties": {
-              "subtype": {
-                "description": "Specific resource type.",
-                "type": "string"
-              },
-              "type": {
-                "default": "publication",
-                "description": "General resource type.",
-                "type": "string"
-              }
-            },
-            "type": "object"
           }
         },
         "required": [
@@ -521,6 +529,10 @@
           },
           "familyname": {
             "description": "Family name of person if known.",
+            "type": "string"
+          },
+          "github": {
+            "description": "Github profile url.",
             "type": "string"
           },
           "givennames": {
@@ -586,6 +598,10 @@
           },
           "familyname": {
             "description": "Family name of person if known.",
+            "type": "string"
+          },
+          "github": {
+            "description": "Github profile url.",
             "type": "string"
           },
           "givennames": {
@@ -906,6 +922,22 @@
             ],
             "type": "string"
           },
+          "resource_type": {
+            "additionalProperties": false,
+            "description": "Record resource type.",
+            "properties": {
+              "subtype": {
+                "description": "Specific resource type.",
+                "type": "string"
+              },
+              "type": {
+                "default": "publication",
+                "description": "General resource type.",
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
           "scheme": {
             "description": "Persistent identifier scheme.",
             "enum": [
@@ -940,22 +972,6 @@
               "ascl"
             ],
             "type": "string"
-          },
-          "resource_type": {
-            "additionalProperties": false,
-            "description": "Record resource type.",
-            "properties": {
-              "subtype": {
-                "description": "Specific resource type.",
-                "type": "string"
-              },
-              "type": {
-                "default": "publication",
-                "description": "General resource type.",
-                "type": "string"
-              }
-            },
-            "type": "object"
           }
         },
         "required": [
@@ -1026,6 +1042,10 @@
               },
               "familyname": {
                 "description": "Family name of person if known.",
+                "type": "string"
+              },
+              "github": {
+                "description": "Github profile url.",
                 "type": "string"
               },
               "givennames": {
