@@ -456,6 +456,12 @@ class PersonSchemav4(Schema):
                 "nameIdentifier": obj.get('gnd'),
                 "nameIdentifierScheme": "GND",
             })
+        if obj.get('github'):
+            name_identifiers.append({
+                "nameIdentifier": u"http://github.com/{}"
+                .format(obj['github']),
+                "nameIdentifierScheme": "URL"
+            })
         return name_identifiers
 
 
