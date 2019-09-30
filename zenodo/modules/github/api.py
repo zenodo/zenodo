@@ -45,6 +45,7 @@ from zenodo.modules.records.api import ZenodoRecord
 
 from ..deposit.loaders import legacyjson_v1_translator
 from ..jsonschemas.utils import current_jsonschemas
+from zenodo.modules.github.tasks import send_github_event
 
 
 class ZenodoGitHubRelease(GitHubRelease):
@@ -162,8 +163,14 @@ class ZenodoGitHubRelease(GitHubRelease):
             if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
                 datacite_register.delay(recid_pid.pid_value, record_id)
 
+            if current_app.config['GITHUB_ASCLEPIAS_BROKER_EVENTS_ENABLED']:
+                release_payload = self.event.payload
+                task = send_github_event.si(deposit_metadata=deposit_metadata, release_payload=release_payload)
+                task.apply_async()
+
             # Index the record
             RecordIndexer().index_by_id(record_id)
+
         except Exception:
             db.session.rollback()
             # Remove deposit from index since it was not commited.

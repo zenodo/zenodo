@@ -261,6 +261,7 @@ setup(
             'zenodo_sitemap = zenodo.modules.sitemap.tasks',
             'zenodo_exporter = zenodo.modules.exporter.tasks',
             'zenodo_stats = zenodo.modules.stats.tasks',
+            'zenodo_github = zenodo.modules.github.tasks',
         ],
         'invenio_config.module': [
             'zenodo = zenodo.config',

@@ -358,6 +358,8 @@ GITHUB_DEPOSIT_CLASS = 'zenodo.modules.deposit.api:ZenodoDeposit'
 GITHUB_PID_FETCHER = 'zenodo_doi_fetcher'
 #: GitHub metdata file
 GITHUB_METADATA_FILE = '.zenodo.json'
+#: Asclepias broker event endpoint
+ZENODO_ASCLEPIAS_BROKER_EVENT_ENDPOINT = 'https://zenodo-broker-qa.web.cern.ch/api/relationships'
 #: SIPStore
 SIPSTORE_GITHUB_AGENT_JSONSCHEMA = 'sipstore/agent-githubclient-v1.0.0.json'
 #: Set OAuth client application config.
