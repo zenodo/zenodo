@@ -30,6 +30,7 @@ import arrow
 import idutils
 import jsonref
 import pycountry
+import re
 from flask import current_app, has_request_context
 from flask_babelex import lazy_gettext as _
 from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
@@ -145,6 +146,20 @@ class RefResolverMixin(object):
             return False
 
 
+username_regex = re.compile(
+    r"""
+    ^                       # beginning of string
+    (?!_$)                  # no only _
+    (?![-.])                # no - or . at the beginning
+    (?!.*[_.-]{2})          # no __ or _. or ._ or .. or -- inside
+    [a-zA-Z0-9_.-]+         # allowed characters, atleast one must be present
+    (?<![.-])               # no - or . at the end
+    $                       # end of string
+    """,
+    re.X,
+)
+
+
 class PersonSchemaV1(Schema, StrictKeysMixin):
     """Schema for a person."""
 
@@ -152,12 +167,13 @@ class PersonSchemaV1(Schema, StrictKeysMixin):
     affiliation = SanitizedUnicode()
     gnd = PersistentId(scheme='GND')
     orcid = PersistentId(scheme='ORCID')
+    github = SanitizedUnicode()
 
     @post_dump(pass_many=False)
     @post_load(pass_many=False)
     def clean(self, data):
         """Clean empty values."""
-        return clean_empty(data, ['orcid', 'gnd', 'affiliation'])
+        return clean_empty(data, ['github', 'orcid', 'gnd', 'affiliation'])
 
     @post_load(pass_many=False)
     def remove_gnd_prefix(self, data):
@@ -175,6 +191,15 @@ class PersonSchemaV1(Schema, StrictKeysMixin):
                 _('Name is required.'),
                 field_names=['name']
             )
+
+        github = data.get('github')
+        if github:
+            # check Github username
+            if not re.match(username_regex, github):
+                raise ValidationError(
+                    _('Invalid GitHub username.'),
+                    field_names=['github']
+                )
 
 
 class ContributorSchemaV1(PersonSchemaV1):
