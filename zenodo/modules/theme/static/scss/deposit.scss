@@ -225,6 +225,16 @@
         background-image: url("/static/img/orcid.svg");
     }
 
+    .github-field {
+        padding-left: 32px;
+        background-size: 18px;
+        background-repeat: no-repeat;
+        background-attachment: scroll;
+        background-position-y: 7px;
+        background-position-x: 7px;
+        background-image: url("/static/img/github.svg");
+    }
+
     .form-grant-select {
         .funder-field {
             width: 40%;
