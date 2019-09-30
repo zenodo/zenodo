@@ -45,6 +45,10 @@
             "description": "Affiliation for the purpose of this specific record.",
             "type": "string"
           },
+          "github": {
+            "description": "Github profile url.",
+            "type": "string"
+          },
           "gnd": {
             "description": "Gemeinsame Normdatei identifier for creator.",
             "type": "string"
@@ -96,6 +100,10 @@
         "properties": {
           "affiliation": {
             "description": "Affiliation for the purpose of this specific record.",
+            "type": "string"
+          },
+          "github": {
+            "description": "Github profile url.",
             "type": "string"
           },
           "gnd": {

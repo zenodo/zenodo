@@ -19,6 +19,10 @@
           "description": "Family name of person if known.",
           "type": "string"
         },
+        "github": {
+          "description": "Github profile url.",
+          "type": "string"
+        },
         "givennames": {
           "description": "Given names of person if known.",
           "type": "string"
@@ -50,6 +54,10 @@
         },
         "familyname": {
           "description": "Family name of person if known.",
+          "type": "string"
+        },
+        "github": {
+          "description": "Github profile url.",
           "type": "string"
         },
         "givennames": {

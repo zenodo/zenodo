@@ -260,6 +260,10 @@
               "type": "string",
               "index": "not_analyzed"
             },
+            "github": {
+              "type": "string",
+              "index": "not_analyzed"
+            },
             "orcid": {
               "type": "string",
               "index": "not_analyzed"
@@ -414,6 +418,10 @@
             },
             "familyname": {
               "type": "string"
+            },
+            "github": {
+              "type": "string",
+              "index": "not_analyzed"
             },
             "givennames": {
               "type": "string"
