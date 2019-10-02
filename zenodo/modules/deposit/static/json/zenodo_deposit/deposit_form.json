@@ -653,12 +653,28 @@
                 "name": "is new version of this upload"
               },
               {
+                "value": "isContinuedBy",
+                "name": "continues this upload"
+              },
+              {
+                "value": "continues",
+                "name": "is continued by this upload"
+              },
+              {
                 "value": "isPartOf",
                 "name": "has this upload as part"
               },
               {
                 "value": "hasPart",
                 "name": "is part of this upload"
+              },
+              {
+                "value": "isReviewedBy",
+                "name": "reviews this upload"
+              },
+              {
+                "value": "reviews",
+                "name": "is reviewed this upload"
               },
               {
                 "value": "isDocumentedBy",
@@ -675,6 +691,14 @@
               {
                 "value": "isCompiledBy",
                 "name": "compiled/created this upload"
+              },
+              {
+                "value": "isDerivedFrom",
+                "name": "is the source this upload is derived from"
+              },
+              {
+                "value": "isSourceOf",
+                "name": "has this upload as its source"
               },
               {
                 "value": "isIdenticalTo",
