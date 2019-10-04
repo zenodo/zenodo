@@ -40,6 +40,9 @@
               "type": "date",
               "ignore_malformed": true
             },
+            "id": {
+              "type": "long"
+            },
             "funder": {
               "type": "object",
               "properties": {
@@ -65,6 +68,43 @@
                 "country": {
                   "type": "string",
                   "index": "not_analyzed"
+                },
+                "parent": {
+                  "properties": {
+                      "$schema": {
+                          "type": "string"
+                      },
+                      "acronyms": {
+                          "type": "string"
+                      },
+                      "country": {
+                          "type": "string"
+                      },
+                      "doi": {
+                          "type": "string"
+                      },
+                      "identifiers": {
+                          "type": "object"
+                      },
+                      "name": {
+                          "type": "string"
+                      },
+                      "parent": {
+                          "type": "object"
+                      },
+                      "remote_created": {
+                          "type": "string"
+                      },
+                      "remote_modified": {
+                          "type": "string"
+                      },
+                      "subtype": {
+                          "type": "string"
+                      },
+                      "type": {
+                          "type": "string"
+                      }
+                    }
                 },
                 "type": {
                   "type": "string",
@@ -106,6 +146,9 @@
                 "eurepo": {
                   "type": "string",
                   "index": "not_analyzed"
+                },
+                "oaf": {
+                  "type": "string"
                 }
               }
             },
@@ -146,6 +189,9 @@
         "resource_type": {
           "type" : "object",
           "properties": {
+            "openaire_subtype": {
+              "type": "string"
+            },
             "type": {
               "type": "string",
               "index": "not_analyzed",
@@ -224,6 +270,22 @@
             },
             "owners": {
               "type": "integer"
+            },
+            "pid": {
+              "properties": {
+                "revision_id": {
+                    "type": "long"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "value": {
+                    "type": "string"
+                }
+              }
+            },
+            "status": {
+              "type": "string"
             }
           }
         },
@@ -316,24 +378,62 @@
         },
         "license": {
           "properties": {
-            "identifier": {
-              "type": "string",
-              "index": "not_analyzed"
-            },
-            "license": {
-              "type": "string",
-              "index": "not_analyzed"
-            },
-            "source": {
-              "type": "string",
-              "index": "not_analyzed"
-            },
-            "url": {
-              "type": "string",
-              "index": "not_analyzed"
-            }
-          },
-          "type": "object"
+              "$schema": {
+                  "type": "string"
+              },
+              "domain_content": {
+                  "type": "boolean"
+              },
+              "domain_data": {
+                  "type": "boolean"
+              },
+              "domain_software": {
+                  "type": "boolean"
+              },
+              "family": {
+                  "type": "string"
+              },
+              "id": {
+                  "type": "string"
+              },
+              "identifier": {
+                  "type": "string",
+                  "index": "not_analyzed"
+              },
+              "is_generic": {
+                  "type": "boolean"
+              },
+              "legacy_ids": {
+                  "type": "string"
+              },
+              "license": {
+                  "type": "string",
+                  "index": "not_analyzed"
+              },
+              "maintainer": {
+                  "type": "string"
+              },
+              "od_conformance": {
+                  "type": "string"
+              },
+              "osd_conformance": {
+                  "type": "string"
+              },
+              "source": {
+                  "type": "string",
+                  "index": "not_analyzed"
+              },
+              "status": {
+                  "type": "string"
+              },
+              "title": {
+                  "type": "string"
+              },
+              "url": {
+                  "type": "string",
+                  "index": "not_analyzed"
+              }
+          }
         },
         "communities": {
           "type": "string",
@@ -543,6 +643,19 @@
             }
           }
         },
+        "_buckets": {
+          "properties": {
+              "deposit": {
+                  "type": "string"
+              },
+              "extra_formats": {
+                  "type": "string"
+              },
+              "record": {
+                  "type": "string"
+              }
+          }
+        },
         "_files": {
           "type": "object",
           "properties": {
@@ -554,6 +667,9 @@
               "type": "string",
               "index": "not_analyzed",
               "copy_to": "filename"
+            },
+            "file_id": {
+              "type": "string"
             },
             "version_id": {
               "type": "string",
@@ -594,6 +710,56 @@
         "owners": {
           "type": "integer",
           "index": "not_analyzed"
+        },
+        "_internal": {
+          "properties": {
+              "comments": {
+                  "properties": {
+                      "comment": {
+                          "type": "string"
+                      },
+                      "timestamp": {
+                          "type": "string"
+                      },
+                      "user_id": {
+                          "type": "string"
+                      }
+                  }
+              },
+              "source": {
+                  "properties": {
+                      "agents": {
+                          "properties": {
+                              "email": {
+                                  "type": "string"
+                              },
+                              "role": {
+                                  "type": "string"
+                              },
+                              "user_id": {
+                                  "type": "string"
+                              },
+                              "username": {
+                                  "type": "string"
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+        },
+        "_oai": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "sets": {
+                    "type": "string"
+                },
+                "updated": {
+                    "type": "string"
+                }
+            }
         },
         "_created": {
           "type": "date",
@@ -643,6 +809,10 @@
               "type": "geo_point"
             }
           }
+        },
+        "version": {
+          "type": "string",
+          "index": "not_analyzed"
         },
         "custom": {
           "type": "object",
