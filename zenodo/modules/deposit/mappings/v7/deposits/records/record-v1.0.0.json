@@ -4,13 +4,15 @@
     "numeric_detection": false,
     "properties": {
       "$schema": {
-        "type": "keyword"
+        "type": "keyword",
+        "index": false
       },
       "grants": {
         "type": "object",
         "properties": {
           "$schema": {
-            "type": "keyword"
+            "type": "keyword",
+            "index": false
           },
           "internal_id": {
             "type": "keyword"
@@ -21,11 +23,8 @@
           "title": {
             "type": "text"
           },
-          "version": {
-            "type": "text"
-          },
           "acronym": {
-            "type": "text"
+            "type": "keyword"
           },
           "startdate": {
             "type": "date",
@@ -34,6 +33,9 @@
           "enddate": {
             "type": "date",
             "ignore_malformed": true
+          },
+          "id": {
+            "type": "keyword"
           },
           "funder": {
             "type": "object",
@@ -53,7 +55,7 @@
                 "type": "text"
               },
               "acronyms": {
-                "type": "text"
+                "type": "keyword"
               },
               "country": {
                 "type": "keyword"
@@ -65,36 +67,46 @@
                 "type": "keyword"
               },
               "remote_created": {
-                "type": "date"
+                "type": "date",
+                "ignore_malformed": true
               },
               "remote_modified": {
-                "type": "date"
+                "type": "date",
+                "ignore_malformed": true
+              },
+              "parent": {
+                "type": "object",
+                "enabled": false,
+                "dynamic": false
               }
             }
+          }
+        }
+      },
+      "program": {
+        "type": "text"
+      },
+      "remote_modified": {
+        "type": "date",
+        "ignore_malformed": true
+      },
+      "url": {
+        "type": "keyword"
+      },
+      "identifiers": {
+        "type": "object",
+        "properties": {
+          "oai_id": {
+            "type": "keyword"
           },
-          "program": {
-            "type": "text"
+          "purl": {
+            "type": "keyword"
           },
-          "remote_modified": {
-            "type": "date",
-            "ignore_malformed": true
+          "eurepo": {
+            "type": "keyword"
           },
-          "url": {
-            "type": "text"
-          },
-          "identifiers": {
-            "type": "object",
-            "properties": {
-              "oai_id": {
-                "type": "keyword"
-              },
-              "purl": {
-                "type": "keyword"
-              },
-              "eurepo": {
-                "type": "keyword"
-              }
-            }
+          "oaf": {
+            "type": "keyword"
           }
         }
       },
@@ -110,19 +122,17 @@
       "doi": {
         "type": "keyword"
       },
-      "isbn": {
-        "type": "keyword"
-      },
       "resource_type": {
-        "type" : "object",
+        "type": "object",
         "properties": {
+          "openaire_subtype": {
+            "type": "keyword"
+          },
           "type": {
-            "type": "keyword",
-            "copy_to": "type"
+            "type": "keyword"
           },
           "subtype": {
-            "type": "keyword",
-            "copy_to": "type"
+            "type": "keyword"
           }
         }
       },
@@ -136,7 +146,7 @@
                 "type": "object",
                 "properties": {
                   "pid_type": {
-                    "type": "text"
+                    "type": "keyword"
                   },
                   "pid_value": {
                     "type": "keyword"
@@ -147,7 +157,7 @@
                 "type": "object",
                 "properties": {
                   "pid_type": {
-                    "type": "text"
+                    "type": "keyword"
                   },
                   "pid_value": {
                     "type": "keyword"
@@ -158,7 +168,7 @@
                 "type": "object",
                 "properties": {
                   "pid_type": {
-                    "type": "text"
+                    "type": "keyword"
                   },
                   "pid_value": {
                     "type": "keyword"
@@ -182,24 +192,33 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "text"
+            "type": "keyword"
           },
           "created_by": {
             "type": "integer"
           },
           "owners": {
             "type": "integer"
+          },
+          "pid": {
+            "properties": {
+              "revision_id": {
+                "type": "long"
+              },
+              "type": {
+                "type": "keyword"
+              },
+              "value": {
+                "type": "keyword"
+              }
+            }
+          },
+          "status": {
+            "type": "keyword"
           }
         }
       },
-      "type": {
-        "type": "keyword"
-      },
       "publication_date": {
-        "type": "date",
-        "copy_to": "publicationdate"
-      },
-      "publicationdate": {
         "type": "date"
       },
       "title": {
@@ -235,10 +254,10 @@
         "type": "keyword"
       },
       "subjects": {
-        "type" : "nested",
+        "type": "nested",
         "properties": {
           "term": {
-            "type": "text"
+            "type": "keyword"
           },
           "identifier": {
             "type": "keyword"
@@ -255,17 +274,9 @@
         "type": "keyword"
       },
       "access_right": {
-        "type": "keyword",
-        "copy_to": "accessrights"
-      },
-      "accessrights": {
         "type": "keyword"
       },
       "embargo_date": {
-        "type": "date",
-        "copy_to": "embargodate"
-      },
-      "embargodate": {
         "type": "date"
       },
       "access_conditions": {
@@ -419,18 +430,18 @@
             "type": "text"
           },
           "isbn": {
-            "type": "text"
+            "type": "keyword"
           }
         }
       },
       "thesis": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "university": {
             "type": "text"
           },
           "supervisors": {
-            "type": "nested",
+            "type": "object",
             "properties": {
               "name": {
                 "type": "text"
@@ -454,10 +465,26 @@
           }
         }
       },
+      "_buckets": {
+        "properties": {
+          "deposit": {
+            "type": "keyword"
+          },
+          "extra_formats": {
+            "type": "keyword"
+          },
+          "record": {
+            "type": "keyword"
+          }
+        }
+      },
       "_files": {
         "type": "object",
         "properties": {
           "bucket": {
+            "type": "keyword"
+          },
+          "file_id": {
             "type": "keyword"
           },
           "key": {
@@ -542,6 +569,12 @@
           },
           "point": {
             "type": "geo_point"
+          },
+          "lat": {
+            "type": "double"
+          },
+          "lon": {
+            "type": "double"
           }
         }
       },
@@ -551,17 +584,78 @@
         "enabled": false
       },
       "custom_keywords": {
-        "type" : "nested",
+        "type": "nested",
         "properties": {
-          "key": {"type": "keyword"},
-          "value": {"type":"keyword"}
+          "key": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "keyword"
+          }
         }
       },
       "custom_text": {
-        "type" : "nested",
+        "type": "nested",
         "properties": {
-          "key": {"type": "keyword"},
-          "value": {"type": "text"}
+          "key": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "text"
+          }
+        }
+      },
+      "version": {
+        "type": "keyword"
+      },
+      "_internal": {
+        "properties": {
+          "comments": {
+            "properties": {
+              "comment": {
+                "type": "keyword"
+              },
+              "timestamp": {
+                "type": "keyword"
+              },
+              "user_id": {
+                "type": "keyword"
+              }
+            }
+          },
+          "source": {
+            "properties": {
+              "agents": {
+                "properties": {
+                  "email": {
+                    "type": "keyword"
+                  },
+                  "role": {
+                    "type": "keyword"
+                  },
+                  "user_id": {
+                    "type": "keyword"
+                  },
+                  "username": {
+                    "type": "keyword"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "_oai": {
+        "properties": {
+          "id": {
+            "type": "keyword"
+          },
+          "sets": {
+            "type": "keyword"
+          },
+          "updated": {
+            "type": "date"
+          }
         }
       }
     }
