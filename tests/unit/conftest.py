@@ -901,7 +901,7 @@ def funder_record(db):
 
 
 @pytest.fixture
-def grant_records(db, funder_record):
+def grant_records(db, es, funder_record):
     """Create grant records."""
     grants = [
         Record.create({
@@ -941,7 +941,7 @@ def grant_records(db, funder_record):
 
 
 @pytest.fixture
-def license_record(db, sip_metadata_types):
+def license_record(db, es, sip_metadata_types):
     """Create a license record."""
     licenses = [
         Record.create({

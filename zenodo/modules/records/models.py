@@ -149,7 +149,7 @@ class AccessRight(object):
                 datetime.utcnow().isoformat()
             ),
             allow_leading_wildcard=False
-        ).fields([])
+        ).source(False)
 
         return [hit.meta.id for hit in s.scan()]
 

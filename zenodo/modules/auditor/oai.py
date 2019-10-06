@@ -163,10 +163,8 @@ class OAISetResultCheck(Check):
                   filter=Q('exists', field='_oai.id'),
                   must=Q('match', **{'_oai.sets': self.community.oaiset_spec}))
         index = current_app.config['OAISERVER_RECORD_INDEX']
-        fields = ['_oai.id']
-        search = RecordsSearch(index=index).fields(fields).query(query)
-        return {int(r.meta.fields['_oai.id'][0].rsplit(':', 1)[-1])
-                for r in search.scan()}
+        search = RecordsSearch(index=index).source(['_oai.id']).query(query)
+        return {int(r._oai.id.rsplit(':', 1)[-1]) for r in search.scan()}
 
     def _oai2d_endpoint_identifiers(self):
         """Return a set of the Community OAI Set recids from OAI endpoint."""

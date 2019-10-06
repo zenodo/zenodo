@@ -118,7 +118,7 @@ def cleanup_indexed_deposits():
     search = RecordsSearch(index='deposits')
     q = (search
          .query('term', **{'_deposit.status': 'draft'})
-         .fields(['_deposit.id']))
+         .source(['_deposit.id']))
     res = q.scan()
     es_depids_info = [(d.to_dict().get('_deposit.id', [None])[0], d.meta.id,
                        d.meta.index, d.meta.doc_type) for d in res]
