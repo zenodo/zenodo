@@ -54,7 +54,7 @@ services:
       - "15672:15672"
       - "5672:5672"
   es:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.3.0
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
     restart: "always"
     environment:
       - bootstrap.memory_lock=true
@@ -69,7 +69,7 @@ services:
       - "9200:9200"
       - "9300:9300"
   kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.3.0
+    image: docker.elastic.co/kibana/kibana-oss:7.1.1
     restart: "always"
     ports:
       - "5601:5601"

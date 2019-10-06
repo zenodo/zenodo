@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2016, 2017, 2018 CERN.
+# Copyright (C) 2015-2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -45,44 +45,15 @@ tests_require = [
     'selenium>=3.5.0,<3.6.0',
 ]
 
-db_version = '>=1.0.4'
-search_version = '1.2.1'
-
 extras_require = {
     'docs': [
         'Sphinx>=1.5,<1.6',
-    ],
-    # Database version
-    'postgresql': [
-        'invenio-db[postgresql,versioning]{}'.format(db_version),
-    ],
-    'mysql': [
-        'invenio-db[mysql,versioning]{}'.format(db_version),
-    ],
-    'sqlite': [
-        'invenio-db[versioning]{}'.format(db_version),
-    ],
-    # Elasticsearch version
-    'elasticsearch2': [
-        'invenio-search[elasticsearch2]{}'.format(search_version),
-    ],
-    'elasticsearch5': [
-        'invenio-search[elasticsearch5]{}'.format(search_version),
-    ],
-    'elasticsearch6': [
-        'invenio-search[elasticsearch6]{}'.format(search_version),
-    ],
-    'elasticsearch7': [
-        'invenio-search[elasticsearch7]{}'.format(search_version),
     ],
     'tests': tests_require,
 }
 
 extras_require['all'] = []
 for name, reqs in extras_require.items():
-    if name in ('postgresql', 'mysql', 'sqlite', 'elasticsearch2',
-                'elasticsearch5', 'elasticsearch6', 'elasticsearch7'):
-        continue
     extras_require['all'].extend(reqs)
 
 # Do not include in all requirement
@@ -121,38 +92,40 @@ install_requires = [
     'invenio-base>=1.2.0',
     'invenio-cache>=1.0.0',
     'invenio-celery>=1.0.1',
-    'invenio-communities>=1.0.0a19',
+    'invenio-communities>=1.0.0a22',
     'invenio-config>=1.0.1',
     'invenio-csl-rest>=1.0.0a1',
-    'invenio-deposit>=1.0.0a9',
-    'invenio-files-rest>=1.0.0a23.post1',
+    'invenio-db[postgresql,versioning]>=1.0.4',
+    'invenio-deposit>=1.0.0a11',
+    'invenio-files-rest>=1.0.0a23.post2',
     'invenio-formatter>=1.0.1',
     'invenio-github>=1.0.0a16',
     'invenio-i18n>=1.0.0,<1.1.0',
     'invenio-iiif>=1.0.0a5',
-    'invenio-indexer>=1.0.1',
+    'invenio-indexer>=1.1.0',
     'invenio-jsonschemas>=1.0.0',
     'invenio-logging>=1.1.1',
     'invenio-mail>=1.0.2',
     'invenio-marc21>=1.0.0a8',
     'invenio-migrator>=1.0.0a9',
-    'invenio-oaiserver>=1.0.3',
+    'invenio-oaiserver>=1.1.1',
     'invenio-oauth2server>=1.0.3',
     'invenio-oauthclient[github]>=1.1.2',
-    'invenio-openaire>=1.0.0a13',
-    'invenio-opendefinition>=1.0.0a8',
-    'invenio-pidrelations>=1.0.0a4',
+    'invenio-openaire>=1.0.0a14',
+    'invenio-opendefinition>=1.0.0a9',
+    'invenio-pidrelations==1.0.0a4',  # next versions require upgrades
     'invenio-pidstore>=1.0.0',
     'invenio-previewer>=1.0.0a11',
     'invenio-queues>=1.0.0a1',
     'invenio-records-files>=1.0.0a11',
-    'invenio-records-rest>=1.4.0',
+    'invenio-records-rest>=1.6.2',
     'invenio-records-ui>=1.0.1',
-    'invenio-records>=1.1.0',
-    'invenio-rest>=1.0.0',
+    'invenio-records>=1.3.0',
+    'invenio-rest>=1.1.2',
+    'invenio-search[elasticsearch7]>=1.2.2',
     'invenio-search-ui>=1.0.1,<1.1.0',
     'invenio-sipstore>=1.0.0a7',
-    'invenio-stats>=1.0.0a10',
+    'invenio-stats>=1.0.0a11',
     'invenio-theme>=1.0.0,<1.1.0',
     'invenio-userprofiles>=1.0.1',
     'invenio-webhooks>=1.0.0a4',

@@ -17,3 +17,8 @@ services:
     extends:
       file: docker-services.yml
       service: es
+    volumes:
+    - esdata:/usr/share/elasticsearch/data
+volumes:
+  esdata:
+    driver: local
