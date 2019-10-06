@@ -1605,19 +1605,6 @@ WSGI_PROXIES = 0
 #: Set the session cookie to be secure - should be set to true in production.
 SESSION_COOKIE_SECURE = False
 
-# Indexer
-# =======
-#: Provide a custom record_to_index function for invenio-indexer
-INDEXER_RECORD_TO_INDEX = "zenodo.modules.indexer.utils.record_to_index"
-INDEXER_SCHEMA_TO_INDEX_MAP = {
-    'records-record-v1.0.0': 'record-v1.0.0',
-    'licenses-license-v1.0.0': 'license-v1.0.0',
-    'grants-grant-v1.0.0': 'grant-v1.0.0',
-    'deposits-records-record-v1.0.0': 'deposit-record-v1.0.0',
-    'funders-funder-v1.0.0': 'funder-v1.0.0',
-}
-
-
 # Configuration for limiter.
 RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
 
