@@ -8,6 +8,19 @@
           "type": "string",
           "index": "not_analyzed"
         },
+        "_buckets": {
+          "properties": {
+              "deposit": {
+                  "type": "string"
+              },
+              "extra_formats": {
+                  "type": "string"
+              },
+              "record": {
+                  "type": "string"
+              }
+          }
+        },
         "grants": {
           "type": "object",
           "properties": {
@@ -46,6 +59,46 @@
             "funder": {
               "type": "object",
               "properties": {
+                "$schema": {
+                  "type": "string"
+                },
+                "parent": {
+                  "properties": {
+                      "$schema": {
+                          "type": "string"
+                      },
+                      "acronyms": {
+                          "type": "string"
+                      },
+                      "country": {
+                          "type": "string"
+                      },
+                      "doi": {
+                          "type": "string"
+                      },
+                      "identifiers": {
+                          "type": "object"
+                      },
+                      "name": {
+                          "type": "string"
+                      },
+                      "parent": {
+                          "type": "object"
+                      },
+                      "remote_created": {
+                          "type": "string"
+                      },
+                      "remote_modified": {
+                          "type": "string"
+                      },
+                      "subtype": {
+                          "type": "string"
+                      },
+                      "type": {
+                          "type": "string"
+                      }
+                  }
+                },
                 "doi": {
                   "type": "string",
                   "index": "not_analyzed"
@@ -98,6 +151,10 @@
             "identifiers": {
               "type": "object",
               "properties": {
+                "oaf": {
+                  "type": "string",
+                  "index": "not_analyzed"
+                },
                 "oai_id": {
                   "type": "string",
                   "index": "not_analyzed"
@@ -149,6 +206,9 @@
         "resource_type": {
           "type" : "object",
           "properties": {
+            "openaire_subtype": {
+              "type": "string"
+            },
             "type": {
               "type": "string",
               "index": "not_analyzed",
@@ -219,6 +279,9 @@
         "_deposit": {
           "type": "object",
           "properties": {
+            "status": {
+              "type": "string"
+            },
             "id": {
               "type": "string"
             },
@@ -227,6 +290,19 @@
             },
             "owners": {
               "type": "integer"
+            },
+            "pid": {
+              "properties": {
+                  "revision_id": {
+                      "type": "long"
+                  },
+                  "type": {
+                      "type": "string"
+                  },
+                  "value": {
+                      "type": "string"
+                  }
+              }
             }
           }
         },
@@ -348,7 +424,46 @@
             "url": {
               "type": "string",
               "index": "not_analyzed"
-            }
+            },
+            "$schema": {
+              "type": "string"
+          },
+          "domain_content": {
+              "type": "boolean"
+          },
+          "domain_data": {
+              "type": "boolean"
+          },
+          "domain_software": {
+              "type": "boolean"
+          },
+          "family": {
+              "type": "string"
+          },
+          "id": {
+              "type": "string"
+          },
+          "is_generic": {
+              "type": "boolean"
+          },
+          "legacy_ids": {
+              "type": "string"
+          },
+          "maintainer": {
+              "type": "string"
+          },
+          "od_conformance": {
+              "type": "string"
+          },
+          "osd_conformance": {
+              "type": "string"
+          },
+          "status": {
+              "type": "string"
+          },
+          "title": {
+              "type": "string"
+          }
           },
           "type": "object"
         },
@@ -431,6 +546,16 @@
               "type": "string",
               "index": "not_analyzed",
               "copy_to": "alternate.identifier"
+            },
+            "resource_type": {
+              "properties": {
+                  "subtype": {
+                      "type": "string"
+                  },
+                  "type": {
+                      "type": "string"
+                  }
+              }
             },
             "scheme": {
               "type": "string",
@@ -603,6 +728,9 @@
               "type": "string",
               "index": "not_analyzed"
             },
+            "file_id": {
+              "type": "string"
+            },
             "key": {
               "type": "string",
               "index": "not_analyzed",
@@ -765,7 +893,16 @@
             "key": {"type": "string", "index": "not_analyzed"},
             "value": {"type": "string"}
           }
-        }
+        },
+        "version": {
+          "type": "string"
+      },
+      "removal_reason": {
+        "type": "string"
+      },
+      "removed_by": {
+          "type": "long"
+      }
       }
     }
   }
