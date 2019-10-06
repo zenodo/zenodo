@@ -37,72 +37,60 @@ def test_es_state(app, es):
     prefix = app.config['SEARCH_INDEX_PREFIX']
     suffix = current_search._current_suffix
 
-    assert current_search_client.indices.get_aliases() == {
+    assert current_search_client.indices.get_alias() == {
             prefix + 'grants-grant-v1.0.0' + suffix: {
                 'aliases': {
                     prefix + 'grants': {},
                     prefix + 'grants-grant-v1.0.0': {}
                 }
-            }, prefix + 'records-record-v1.0.0' + suffix: {
+            },
+            prefix + 'records-record-v1.0.0' + suffix: {
                 'aliases': {
                     prefix + 'records': {},
                     prefix + 'records-record-v1.0.0': {}
                 }
-            }, prefix + 'deposits-records-record-v1.0.0' + suffix: {
+            },
+            prefix + 'deposits-records-record-v1.0.0' + suffix: {
                 'aliases': {
                     prefix + 'deposits-records-record-v1.0.0': {},
                     prefix + 'deposits': {},
                     prefix + 'deposits-records': {}
                 }
-            },  # leftover from invenio-deposit
-            prefix + 'deposits-deposit-v1.0.0' + suffix: {
-                'aliases': {
-                    prefix + 'deposits': {},
-                    prefix + 'deposits-deposit-v1.0.0': {}
-                }
-            }, prefix + 'licenses-license-v1.0.0' + suffix: {
+            },
+            prefix + 'licenses-license-v1.0.0' + suffix: {
                 'aliases': {
                     prefix + 'licenses-license-v1.0.0': {},
                     prefix + 'licenses': {}
                 }
-            }, prefix + 'funders-funder-v1.0.0' + suffix: {
+            },
+            prefix + 'funders-funder-v1.0.0' + suffix: {
                 'aliases': {
                     prefix + 'funders': {},
                     prefix + 'funders-funder-v1.0.0': {}
                 }
-            }
+            },
         }
 
     templates = {
-        k: (v['template'], set(v['aliases'].keys()), set(v['mappings'].keys()))
+        k: (set(v['index_patterns']), set(v['aliases'].keys()))
         for k, v in current_search_client.indices.get_template().items()
     }
     assert templates == {
-        prefix + 'stats-templates-events/v2-record-view-v1.0.0': (
-            prefix + 'events-stats-record-view-*',
-            {'events-stats-record-view'},
-            {'stats-record-view'},
+        prefix + 'stats-templates-events/v7-record-view-v1.0.0': (
+            {prefix + 'events-stats-record-view-*'},
+            {prefix + 'events-stats-record-view'},
         ),
-        prefix + 'stats-templates-events/v2-file-download-v1.0.0': (
-            prefix + 'events-stats-file-download-*',
-            {'events-stats-file-download'},
-            {'_default_', 'stats-file-download'},
+        prefix + 'stats-templates-events/v7-file-download-v1.0.0': (
+            {prefix + 'events-stats-file-download-*'},
+            {prefix + 'events-stats-file-download'},
         ),
-        prefix + 'stats-templates-aggregations/v2-aggr-record-view-v1.0.0': (
-            prefix + 'stats-record-view-*',
-            {'stats-record-view'},
-            {
-                'record-view-day-aggregation',
-            },
-
+        prefix + 'stats-templates-aggregations/v7-aggr-record-view-v1.0.0': (
+            {prefix + 'stats-record-view-*'},
+            {prefix + 'stats-record-view'},
         ),
-        prefix + 'stats-templates-aggregations/v2-aggr-record-download-v1.0.0':
+        prefix + 'stats-templates-aggregations/v7-aggr-record-download-v1.0.0':
             (
-            prefix + 'stats-file-download-*',
-            {'stats-file-download'},
-            {
-                '_default_',
-                'file-download-day-aggregation',
-            },
+            {prefix + 'stats-file-download-*'},
+            {prefix + 'stats-file-download'},
         ),
     }
