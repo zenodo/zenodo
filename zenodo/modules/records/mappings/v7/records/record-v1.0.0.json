@@ -4,13 +4,28 @@
     "numeric_detection": false,
     "properties": {
       "$schema": {
-        "type": "keyword"
+        "type": "keyword",
+        "index": false
+      },
+      "_buckets": {
+        "properties": {
+          "deposit": {
+            "type": "keyword"
+          },
+          "extra_formats": {
+            "type": "keyword"
+          },
+          "record": {
+            "type": "keyword"
+          }
+        }
       },
       "grants": {
         "type": "object",
         "properties": {
           "$schema": {
-            "type": "keyword"
+            "type": "keyword",
+            "index": false
           },
           "internal_id": {
             "type": "keyword"
@@ -21,14 +36,8 @@
           "title": {
             "type": "text"
           },
-          "version": {
-            "type": "text"
-          },
-          "language": {
-            "type": "text"
-          },
           "acronym": {
-            "type": "text"
+            "type": "keyword"
           },
           "startdate": {
             "type": "date",
@@ -41,6 +50,15 @@
           "funder": {
             "type": "object",
             "properties": {
+              "$schema": {
+                "type": "keyword",
+                "index": false
+              },
+              "parent": {
+                "type": "object",
+                "enabled": false,
+                "dynamic": false
+              },
               "doi": {
                 "type": "keyword"
               },
@@ -56,7 +74,7 @@
                 "type": "text"
               },
               "acronyms": {
-                "type": "text"
+                "type": "keyword"
               },
               "country": {
                 "type": "keyword"
@@ -68,10 +86,12 @@
                 "type": "keyword"
               },
               "remote_created": {
-                "type": "date"
+                "type": "date",
+                "ignore_malformed": true
               },
               "remote_modified": {
-                "type": "date"
+                "type": "date",
+                "ignore_malformed": true
               }
             }
           },
@@ -83,12 +103,15 @@
             "ignore_malformed": true
           },
           "url": {
-            "type": "text"
+            "type": "keyword"
           },
           "identifiers": {
             "type": "object",
             "properties": {
               "oai_id": {
+                "type": "keyword"
+              },
+              "oaf": {
                 "type": "keyword"
               },
               "purl": {
@@ -113,19 +136,17 @@
       "doi": {
         "type": "keyword"
       },
-      "isbn": {
-        "type": "keyword"
-      },
       "resource_type": {
-        "type" : "object",
+        "type": "object",
         "properties": {
+          "openaire_subtype": {
+            "type": "keyword"
+          },
           "type": {
-            "type": "keyword",
-            "copy_to": "type"
+            "type": "keyword"
           },
           "subtype": {
-            "type": "keyword",
-            "copy_to": "type"
+            "type": "keyword"
           }
         }
       },
@@ -139,7 +160,7 @@
                 "type": "object",
                 "properties": {
                   "pid_type": {
-                    "type": "text"
+                    "type": "keyword"
                   },
                   "pid_value": {
                     "type": "keyword"
@@ -150,7 +171,7 @@
                 "type": "object",
                 "properties": {
                   "pid_type": {
-                    "type": "text"
+                    "type": "keyword"
                   },
                   "pid_value": {
                     "type": "keyword"
@@ -161,7 +182,7 @@
                 "type": "object",
                 "properties": {
                   "pid_type": {
-                    "type": "text"
+                    "type": "keyword"
                   },
                   "pid_value": {
                     "type": "keyword"
@@ -185,24 +206,33 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "text"
+            "type": "keyword"
           },
           "created_by": {
             "type": "integer"
           },
           "owners": {
             "type": "integer"
+          },
+          "status": {
+            "type": "keyword"
+          },
+          "pid": {
+            "properties": {
+              "revision_id": {
+                "type": "long"
+              },
+              "type": {
+                "type": "keyword"
+              },
+              "value": {
+                "type": "keyword"
+              }
+            }
           }
         }
       },
-      "type": {
-        "type": "keyword"
-      },
       "publication_date": {
-        "type": "date",
-        "copy_to": "publicationdate"
-      },
-      "publicationdate": {
         "type": "date"
       },
       "title": {
@@ -238,10 +268,10 @@
         "type": "keyword"
       },
       "subjects": {
-        "type" : "nested",
+        "type": "nested",
         "properties": {
           "term": {
-            "type": "text",
+            "type": "keyword",
             "copy_to": "subject.term"
           },
           "identifier": {
@@ -257,7 +287,7 @@
         "type": "object",
         "properties": {
           "term": {
-            "type": "text"
+            "type": "keyword"
           },
           "identifier": {
             "type": "keyword"
@@ -271,17 +301,9 @@
         "type": "keyword"
       },
       "access_right": {
-        "type": "keyword",
-        "copy_to": "accessrights"
-      },
-      "accessrights": {
         "type": "keyword"
       },
       "embargo_date": {
-        "type": "date",
-        "copy_to": "embargodate"
-      },
-      "embargodate": {
         "type": "date"
       },
       "access_conditions": {
@@ -289,17 +311,51 @@
       },
       "license": {
         "properties": {
+          "$schema": {
+            "type": "keyword",
+            "index": false
+          },
           "identifier": {
-            "type": "keyword"
-          },
-          "license": {
-            "type": "keyword"
-          },
-          "source": {
             "type": "keyword"
           },
           "url": {
             "type": "keyword"
+          },
+          "domain_content": {
+            "type": "boolean"
+          },
+          "domain_data": {
+            "type": "boolean"
+          },
+          "domain_software": {
+            "type": "boolean"
+          },
+          "family": {
+            "type": "keyword"
+          },
+          "id": {
+            "type": "keyword"
+          },
+          "is_generic": {
+            "type": "boolean"
+          },
+          "legacy_ids": {
+            "type": "keyword"
+          },
+          "maintainer": {
+            "type": "keyword"
+          },
+          "od_conformance": {
+            "type": "keyword"
+          },
+          "osd_conformance": {
+            "type": "keyword"
+          },
+          "status": {
+            "type": "keyword"
+          },
+          "title": {
+            "type": "text"
           }
         },
         "type": "object"
@@ -322,7 +378,20 @@
             "copy_to": "related.scheme"
           },
           "relation": {
-            "type": "keyword"
+            "type": "keyword",
+            "copy_to": "related.relation"
+          },
+          "resource_type": {
+            "properties": {
+              "subtype": {
+                "type": "keyword",
+                "copy_to": "related.resource_type.subtype"
+              },
+              "type": {
+                "type": "keyword",
+                "copy_to": "related.resource_type.type"
+              }
+            }
           }
         }
       },
@@ -334,6 +403,19 @@
           },
           "scheme": {
             "type": "keyword"
+          },
+          "relation": {
+            "type": "keyword"
+          },
+          "resource_type": {
+            "properties": {
+              "subtype": {
+                "type": "keyword"
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
           }
         }
       },
@@ -347,6 +429,16 @@
           "scheme": {
             "type": "keyword",
             "copy_to": "alternate.scheme"
+          },
+          "resource_type": {
+            "properties": {
+              "subtype": {
+                "type": "keyword"
+              },
+              "type": {
+                "type": "keyword"
+              }
+            }
           }
         }
       },
@@ -461,18 +553,18 @@
             "type": "text"
           },
           "isbn": {
-            "type": "text"
+            "type": "keyword"
           }
         }
       },
       "thesis": {
-        "type": "nested",
+        "type": "object",
         "properties": {
           "university": {
             "type": "text"
           },
           "supervisors": {
-            "type": "nested",
+            "type": "object",
             "properties": {
               "name": {
                 "type": "text"
@@ -632,6 +724,12 @@
           },
           "point": {
             "type": "geo_point"
+          },
+          "lat": {
+            "type": "double"
+          },
+          "lon": {
+            "type": "double"
           }
         }
       },
@@ -641,18 +739,29 @@
         "enabled": false
       },
       "custom_keywords": {
-        "type" : "nested",
+        "type": "nested",
         "properties": {
-          "key": {"type": "keyword"},
-          "value": {"type": "keyword"}
+          "key": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "keyword"
+          }
         }
       },
       "custom_text": {
-        "type" : "nested",
+        "type": "nested",
         "properties": {
-          "key": {"type": "keyword"},
-          "value": {"type": "text"}
+          "key": {
+            "type": "keyword"
+          },
+          "value": {
+            "type": "text"
+          }
         }
+      },
+      "version": {
+        "type": "keyword"
       }
     }
   }
