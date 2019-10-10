@@ -368,19 +368,19 @@
         "type": "object",
         "properties": {
           "issue": {
-            "type": "text"
+            "type": "keyword"
           },
           "title": {
             "type": "text"
           },
           "pages": {
-            "type": "text"
+            "type": "keyword"
           },
           "volume": {
-            "type": "text"
+            "type": "keyword"
           },
           "year": {
-            "type": "text"
+            "type": "keyword"
           }
         }
       },
