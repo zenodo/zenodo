@@ -913,11 +913,6 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=3,
         ),
-        title=dict(
-            fields=['title', ],
-            title='Title',
-            order=4,
-        ),
         conference_session=dict(
             fields=['meeting.session', '-meeting.session_part'],
             title='Conference session',
