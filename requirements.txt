@@ -27,6 +27,7 @@
 
 # Requirements not on PyPI
 -e git+https://github.com/zenodo/zenodo-migrator.git#egg=zenodo-migrator
+-e git+https://github.com/inveniosoftware/invenio-index-migrator.git@7dfa368#egg=invenio-index-migrator
 
 # PyPI requirements
 alembic==1.0.8
@@ -146,7 +147,7 @@ invenio-records-files==1.0.0a11
 invenio-records-rest==1.6.2
 invenio-records-ui==1.0.1
 invenio-rest==1.1.2
-invenio-search==1.2.2
+invenio-search==1.2.3
 invenio-search-ui==1.0.1
 invenio-sipstore==1.0.0a7
 invenio-stats==1.0.0a11
