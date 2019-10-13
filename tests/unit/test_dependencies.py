@@ -76,20 +76,19 @@ def test_es_state(app, es):
         for k, v in current_search_client.indices.get_template().items()
     }
     assert templates == {
-        prefix + 'stats-templates-events/v7-record-view-v1.0.0': (
+        prefix + 'record-view-v1.0.0': (
             {prefix + 'events-stats-record-view-*'},
             {prefix + 'events-stats-record-view'},
         ),
-        prefix + 'stats-templates-events/v7-file-download-v1.0.0': (
+        prefix + 'file-download-v1.0.0': (
             {prefix + 'events-stats-file-download-*'},
             {prefix + 'events-stats-file-download'},
         ),
-        prefix + 'stats-templates-aggregations/v7-aggr-record-view-v1.0.0': (
+        prefix + 'aggr-record-view-v1.0.0': (
             {prefix + 'stats-record-view-*'},
             {prefix + 'stats-record-view'},
         ),
-        prefix + 'stats-templates-aggregations/v7-aggr-record-download-v1.0.0':
-            (
+        prefix + 'aggr-record-download-v1.0.0': (
             {prefix + 'stats-file-download-*'},
             {prefix + 'stats-file-download'},
         ),
