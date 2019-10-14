@@ -42,11 +42,20 @@
       var app = angular.module('invenioRecords');
       app.requires.push('invenioRecords.providers');
 
-      // Configure OpenAIRE types and communities
-      app.config(['openAIREProvider', function(openAIREProvider){
+      // Configure OpenAIRE types and communities and Resource Types
+      app.config(['openAIREProvider', 'resourceTypesProvider', function(openAIREProvider, resourceTypesProvider){
         openAIREProvider.setCommunities({{current_openaire.openaire_communities|tojson}});
         openAIREProvider.setCommunitiesMapping({{current_openaire.inverse_openaire_community_map|tojson}});
+        resourceTypesProvider.setResourceTypes({{current_zenodo_records.resource_types|tojson}});
       }]);
+
+      {% set deposit_form_json = (record | transform_record(pid, "deposit_formjson_v1")) %}
+      {% if community %}
+        window.record = {{ (deposit_form_json or {"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]}) | tojson }};
+      {% else %}
+        // window.record = {{ deposit_form_json | tojson }};
+        window.record = {{ (deposit_form_json or {"publication_date": current_date.isoformat()}) | tojson }};
+      {% endif %}
 
       angular.bootstrap(
         document.getElementById('invenio-records'), [
@@ -115,11 +124,6 @@
       {%- endif %}
       extra-params='{"headers":{"Content-Type": "application/json"}}'
       template-params='{{ deposit_template_params | tojson }}'
-      {% if community %}
-      record='{{ record | serialize_record(pid, "deposit_formjson_v1") or ({"publication_date": current_date.isoformat(), "communities": [{"identifier": community.id}]} | tojson) }}'
-      {% else %}
-      record='{{ record | serialize_record(pid, "deposit_formjson_v1") or ({"publication_date": current_date.isoformat()} | tojson) }}'
-      {% endif %}
       form="{{ url_for('static', filename=config.DEPOSIT_DEFAULT_SCHEMAFORM) }}"
       schema="{{ url_for('invenio_jsonschemas.get_schema', schema_path=config.DEPOSIT_FORM_JSONSCHEMA) }}"
     >

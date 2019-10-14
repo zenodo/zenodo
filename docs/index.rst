@@ -51,6 +51,16 @@ This part of the documentation will show you how to get started in running Zenod
    installation
    usage
 
+Architecture
+------------
+
+This part of the documentation describes the architecture of Zenodo.
+
+.. toctree::
+   :maxdepth: 2
+
+   architecture/statistics
+
 API Reference
 -------------
 

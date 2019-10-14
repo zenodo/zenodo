@@ -24,7 +24,7 @@
 {%- set state = record.access_right|accessright_category(record.embargo_date, success='default') %}
 {%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
 {%- if record._files -%}
-<div class="panel panel-{{state}}" id="files">
+<div class="panel panel-{{state}} files-box" id="files">
   <div class="panel-heading">
     <a class="panel-toggle" data-toggle="collapse" href="#collapseTwo">
       {{ _("Files") }}
@@ -54,7 +54,7 @@
     </thead>
     <tbody>
     {%- for file in files|sort(attribute='key') -%}
-    {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key) %}
+    {%- set file_url = url_for('invenio_records_ui.recid_files', pid_value=pid.pid_value, filename=file.key, download=1) %}
       <tr>
         <td>
           <a class="filename" href="{{file_url}}">{{ file.key }}</a>

@@ -28,14 +28,16 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 from flask_babelex import lazy_gettext as _
 from invenio_pidrelations.serializers.utils import serialize_relations
+from invenio_pidstore.models import PersistentIdentifier
 from marshmallow import Schema, ValidationError, fields, missing, \
     validates_schema
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records.utils import is_deposit
+from zenodo.modules.stats.utils import get_record_stats
 
-from . import common
 from ...models import AccessRight, ObjectType
+from . import common
 
 
 class StrictKeysSchema(Schema):
@@ -247,6 +249,19 @@ class RecordSchemaV1(common.CommonRecordSchemaV1):
         fields.Integer, attribute='metadata.owners', dump_only=True)
     revision = fields.Integer(dump_only=True)
     updated = fields.Str(dump_only=True)
+
+    stats = fields.Method('dump_stats')
+
+    def dump_stats(self, obj):
+        """Dump the stats to a dictionary."""
+        if '_stats' in obj.get('metadata', {}):
+            return obj['metadata'].get('_stats', {})
+        else:
+            pid = self.context.get('pid')
+            if isinstance(pid, PersistentIdentifier):
+                return get_record_stats(pid.object_uuid, False)
+            else:
+                return None
 
 
 class DepositSchemaV1(RecordSchemaV1):

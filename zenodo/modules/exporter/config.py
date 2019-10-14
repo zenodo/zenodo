@@ -40,10 +40,11 @@ EXPORTER_JOBS = {
         'serializer': json_v1,
         'writer': BucketWriter(
             bucket_id=EXPORTER_BUCKET_UUID,
-            key=filename_factory(index='records', format='json.bz2'),
+            key=filename_factory(name='records', format='json.bz2'),
         ),
         'resultstream_cls': BZip2ResultStream,
         'pid_fetcher': zenodo_record_fetcher,
+        'query': "+_exists_:recid +_missing_:removal_reason"
     }
 }
 """Export jobs definitions."""

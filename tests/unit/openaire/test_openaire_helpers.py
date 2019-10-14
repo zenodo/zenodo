@@ -33,8 +33,12 @@ from zenodo.modules.openaire.helpers import openaire_id, openaire_link, \
 def test_openaire_type(app, minimal_record):
     """Test OpenAIRE type."""
     r = minimal_record
-    # Default zenodo type is software which has no OpenAIRE type.
-    assert openaire_type(r) is None
+    # Default zenodo type is software.
+    assert openaire_type(r) == 'software'
+
+    # Other type
+    r['resource_type']['type'] = 'other'
+    assert openaire_type(r) == 'other'
 
     # Datasets just map to datasets.
     r['resource_type']['type'] = 'dataset'
@@ -65,8 +69,12 @@ def test_openaire_id(app, minimal_record):
     r['doi'] = u'10.5281/zenodo.123'
     r['_oai'] = {'id': u'oai:zenodo.org:123'}
 
-    # Default zenodo type is software which has no OpenAIRE type.
-    assert openaire_id(r) is None
+    # Default zenodo type is software
+    assert openaire_id(r) == 'r37b0ad08687::47287d1800c112499a117ca17aa1909d'
+
+    # Other type
+    r['resource_type']['type'] = 'other'
+    assert openaire_id(r) == 'r37b0ad08687::47287d1800c112499a117ca17aa1909d'
 
     # Dataset ID
     r['resource_type']['type'] = 'dataset'
@@ -83,17 +91,25 @@ def test_openaire_link(app, minimal_record):
     r['doi'] = u'10.5281/zenodo.123'
     r['_oai'] = {'id': u'oai:zenodo.org:123'}
 
-    # Default zenodo type is software which has no OpenAIRE type.
-    assert openaire_link(r) is None
+    # Default zenodo type is software
+    assert openaire_link(r) ==\
+        'https://explore.openaire.eu/search/software?' \
+        'softwareId=r37b0ad08687::47287d1800c112499a117ca17aa1909d'
+
+    # Other type
+    r['resource_type']['type'] = 'other'
+    assert openaire_link(r) == \
+        'https://explore.openaire.eu/search/other?' \
+        'orpId=r37b0ad08687::47287d1800c112499a117ca17aa1909d'
 
     # Dataset ID
     r['resource_type']['type'] = 'dataset'
     assert openaire_link(r) == \
-        'https://beta.openaire.eu/search/dataset' \
+        'https://explore.openaire.eu/search/dataset' \
         '?datasetId=r37b0ad08687::204007f516ddcf0a452c2f22d48695ca'
 
     # Publication ID
     r['resource_type']['type'] = 'publication'
     assert openaire_link(r) == \
-        'https://beta.openaire.eu/search/publication' \
+        'https://explore.openaire.eu/search/publication' \
         '?articleId=od______2659::47287d1800c112499a117ca17aa1909d'

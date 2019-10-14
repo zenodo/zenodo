@@ -33,6 +33,8 @@ _ = make_lazy_gettext(lambda: gettext)
 
 ZENODO_RECORDS_UI_CITATIONS_ENDPOINT = 'https://zenodo-broker-qa.web.cern.ch/api/relationships'
 
+ZENODO_RECORDS_UI_CITATIONS_ENABLE = False
+
 ZENODO_RELATION_RULES = {
     'f1000research': [{
         'prefix': '10.12688/f1000research',
@@ -84,12 +86,18 @@ ZENODO_RELATION_TYPES = [
     ('isReferencedBy', _('Referenced by')),
     ('isNewVersionOf', _('Previous versions')),
     ('isPreviousVersionOf', _('New versions')),
+    ('isContinuedBy', _('Continued by')),
+    ('continues', _('Continues')),
     ('isPartOf', _('Part of')),
     ('hasPart', _('Has part')),
+    ('isReviewedBy', _('Reviewed by')),
+    ('reviews', _('Reviews')),
     ('isDocumentedBy', _('Documented by')),
     ('documents', _('Documents')),
     ('compiles', _('Compiles')),
     ('isCompiledBy', _('Compiled by')),
+    ('isDerivedFrom', _('Derived from')),
+    ('isSourceOf', _('Source of')),
     ('isIdenticalTo', _('Identical to')),
 ]
 
@@ -112,3 +120,9 @@ ZENODO_DOIID4RECID = {
 Wrong DOIs were minted for a short period in 2013 due to mistake in the legacy
 system.
 """
+
+ZENODO_CUSTOM_METADATA_TERM_TYPES = {
+    'keyword': 'six.string_types',
+    'text': 'six.string_types',
+}
+"""Custom metadata term types mapping."""

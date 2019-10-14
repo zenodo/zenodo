@@ -1,2 +1,2 @@
--r requirements.txt
+-r ../requirements.txt
 -e .[all,sqlite,elasticsearch2]

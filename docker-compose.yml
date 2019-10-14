@@ -1,55 +1,5 @@
 version: '2.1'
 services:
-  # Application
-  web:
-    extends:
-      file: docker-services.yml
-      service: app
-    command: zenodo run -h 0.0.0.0 -p 5000
-    environment:
-      - "INVENIO_SESSION_COOKIE_SECURE=False"
-      - "INVENIO_STATSD_HOST="
-    ports:
-      - "5000:5000"
-    links:
-      - cache
-      - es
-      - mq
-      - db
-    volumes_from:
-      - static
-  worker:
-    extends:
-      file: docker-services.yml
-      service: app
-    restart: "always"
-    command: "celery worker -A zenodo.celery --loglevel=INFO"
-    links:
-      - cache
-      - es
-      - mq
-      - db
-    volumes_from:
-      - static
-  static:
-    extends:
-      file: docker-services.yml
-      service: app
-    restart: "no"
-    command: tail -f /var/log/faillog
-    user: zenodo
-    volumes:
-      - "/usr/local/var/instance/static"
-      - "/usr/local/lib/python3.5/site-packages"
-      - "/usr/local/var/data"
-      - ".:/code/zenodo"
-  # Monitoring
-  flower:
-    extends:
-      file: docker-services.yml
-      service: flower
-    links:
-      - mq
   # Base services
   cache:
     extends:
@@ -67,3 +17,8 @@ services:
     extends:
       file: docker-services.yml
       service: es
+    volumes:
+    - esdata:/usr/share/elasticsearch/data
+volumes:
+  esdata:
+    driver: local

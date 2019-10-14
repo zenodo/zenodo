@@ -70,7 +70,7 @@ def test_title_invalid(val):
     )
 
 
-def test_upload_type(app):
+def test_upload_type(app, communities):
     """Test upload type deserialization."""
     s = legacyjson.LegacyMetadataSchemaV1(
         partial=['upload_type', 'publication_type', 'image_type',
@@ -91,12 +91,12 @@ def test_upload_type(app):
     assert s.load(d(
         upload_type='software',
         openaire_type='foo:t1',
-        communities=['c1']
-        )).data['resource_type'] == {'type': 'software',
-                                     'openaire_subtype': 'foo:t1'}
+        communities=[{'identifier': 'c1'}],
+    )).data['resource_type'] == {'type': 'software',
+                                 'openaire_subtype': 'foo:t1'}
 
 
-def test_upload_type_invalid(app):
+def test_upload_type_invalid(app, communities):
     """Test upload type deserialization."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
 
@@ -126,22 +126,22 @@ def test_upload_type_invalid(app):
 
     # OpenAIRE subtype and community mismatch
     obj.update(dict(upload_type='software', openaire_type='foo:t1',
-                    communities=['foobar']))
+                    communities=[{'identifier': 'foobar'}]))
     pytest.raises(ValidationError, s.load, obj)
 
     # OpenAIRE subtype invalid format (no prefix)
     obj.update(dict(upload_type='software', openaire_type='invalid',
-                    communities=['c1']))
+                    communities=[{'identifier': 'c1'}]))
     pytest.raises(ValidationError, s.load, obj)
 
     # OpenAIRE subtype not found (wrong prefix)
     obj.update(dict(upload_type='software', openaire_type='xxx:t1',
-                    communities=['c1']))
+                    communities=[{'identifier': 'c1'}]))
     pytest.raises(ValidationError, s.load, obj)
 
     # OpenAIRE subtype not found (good prefix, wrong type)
     obj.update(dict(upload_type='software', openaire_type='foo:invalid',
-                    communities=['c1']))
+                    communities=[{'identifier': 'c1'}]))
     pytest.raises(ValidationError, s.load, obj)
 
 
@@ -174,6 +174,17 @@ def test_related_alternate_identifiers():
             identifier='2011ApJS..192...18K',
             scheme='ads'),
     ]
+
+
+def test_identifier_schemes(app, db, es, locations, license_record,
+                            sample_identifiers):
+    """Test supported identifier schemes."""
+    s = legacyjson.LegacyMetadataSchemaV1(strict=True)
+    result = s.load(d(related_identifiers=[
+        {'identifier': _id, 'scheme': scheme, 'relation': 'references'}
+        for scheme, (_id, _) in sample_identifiers.items()
+    ]))
+    ZenodoDeposit.create(result.data).validate()
 
 
 @pytest.mark.parametrize('relation', [
@@ -236,6 +247,14 @@ def test_creators():
         dict(name="Doe, John", affiliation="Atlantis",
              orcid="0000-0002-1825-0097", gnd="170118215"),
         dict(name="Smith, Jane", affiliation="Atlantis")
+    ]
+
+    assert s.load(d(creators=[
+        dict(name="Doe, John", affiliation=" "),
+        dict(name="Smith, Jane", affiliation="")
+    ])).data['creators'] == [
+        dict(name="Doe, John"),
+        dict(name="Smith, Jane")
     ]
 
     # Min length required
@@ -683,28 +702,30 @@ def test_license_refresolver(app, db, license_record):
     }
 
 
-def test_grants():
+def test_grants(grant_records):
     """Test grants."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     loaded_grants = s.load(d(
-        grants=[dict(id='283595'), dict(id='10.13039/501100000780::643410')],
+        grants=[dict(id='282896'), dict(id='10.13039/501100000780::027819')],
     )).data['grants']
     assert {
-        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::283595'
+        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::282896'
     } in loaded_grants
     assert {
-        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::643410'
+        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::027819'
     } in loaded_grants
 
 
-def test_grants_refresolver(app, db, grant_record, license_record):
+def test_grants_refresolver(app, db, grant_records, license_record):
     """Test license."""
     s = legacyjson.LegacyMetadataSchemaV1(
         strict=True, context=dict(replace_refs=True))
     assert s.load(d(
         grants=[dict(id='282896'), dict(id='10.13039/501100000780::282896')],
         license='CC0-1.0'
-    ))
+    )).data['grants'] == [{
+        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::282896'
+    }]
     # Invalid grant raises
     pytest.raises(ValidationError, s.load, d(
         grants=[dict(id='invalid')],
@@ -713,19 +734,17 @@ def test_grants_refresolver(app, db, grant_record, license_record):
 
     # Without ref resolving
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
-    assert s.load(
-        d(grants=[dict(id='invalid')], license='CC0-1.0')
-    ).data['grants'] == [{
-        '$ref': 'https://dx.zenodo.org/grants/10.13039/501100000780::invalid'
-    }]
+    pytest.raises(ValidationError, s.load, d(
+        grants=[dict(id='invalid')], license='CC0-1.0'
+    ))
 
 
-def test_communities():
+def test_communities(communities):
     """Test communities."""
     s = legacyjson.LegacyMetadataSchemaV1(strict=True)
     assert s.load(d(
         communities=[
-            dict(identifier='zenodo'), dict(), dict(identifier='ecfunded'),
+            dict(identifier='zenodo'), dict(identifier='ecfunded'),
         ],
     )).data['communities'] == ['ecfunded', 'zenodo']
 
@@ -734,7 +753,9 @@ def test_communities():
     1234,
     [1234],
     'zenodo',
-    {'dict': 'test'}
+    {'dict': 'test'},
+    ['zenodo'],
+    [{'dict': 'test'}, {}],
 ])
 def test_communities_invalid(comms):
     """Test communities."""
@@ -745,13 +766,14 @@ def test_communities_invalid(comms):
     )
 
 
-def test_legacyjson_to_record_translation(app, db, es, grant_record,
-                                          license_record, locations):
+def test_legacyjson_to_record_translation(app, db, es, grant_records,
+                                          license_record, locations,
+                                          communities):
     """Test the translator legacy_zenodo and zenodo_legacy."""
     test_data = dict(
         metadata=dict(
             access_right='embargoed',
-            communities=[{'identifier': 'cfa'}],
+            communities=[{'identifier': 'c1'}],
             conference_acronym='Some acronym',
             conference_dates='Some dates',
             conference_place='Some place',
@@ -837,7 +859,7 @@ invalid_unicode_chars_params = (
 
 
 @pytest.mark.parametrize('unicode_char', invalid_unicode_chars_params)
-def test_invalid_unicode_characters(app, db, es, grant_record, license_record,
+def test_invalid_unicode_characters(app, db, es, grant_records, license_record,
                                     locations, unicode_char):
     assert (legacyjson.LegacyMetadataSchemaV1(strict=True).load(
             d(description=u'Invalid character: [{}]'.format(unicode_char)))

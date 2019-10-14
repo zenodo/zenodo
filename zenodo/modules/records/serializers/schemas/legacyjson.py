@@ -29,6 +29,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 import six
 from flask import current_app, url_for
 from flask_babelex import lazy_gettext as _
+from invenio_communities.models import Community
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
 from werkzeug.routing import BuildError
@@ -36,9 +38,9 @@ from werkzeug.routing import BuildError
 from zenodo.modules.records.models import AccessRight, ObjectType
 from zenodo.modules.records.utils import is_valid_openaire_type
 
-from . import common
 from ...minters import doi_generator
 from ..fields import DOILink, SanitizedUnicode, SanitizedUrl
+from . import common
 
 
 class FileSchemaV1(Schema):
@@ -186,7 +188,8 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
         """Load grants."""
         if not isinstance(data, list):
             raise ValidationError(_('Not a list.'))
-        res = set()
+        result = set()
+        errors = set()
         for g in data:
             if not isinstance(g, dict):
                 raise ValidationError(_('Element not an object.'))
@@ -196,23 +199,45 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             # FP7 project grant
             if not g.startswith('10.13039/'):
                 g = '10.13039/501100000780::{0}'.format(g)
-            res.add(g)
+            # Check that the PID exists
+            grant_pid = PersistentIdentifier.query.filter_by(
+                pid_type='grant', pid_value=g).one_or_none()
+            if not grant_pid or grant_pid.status != PIDStatus.REGISTERED:
+                errors.add(g)
+                continue
+            result.add(g)
+        if errors:
+            raise ValidationError(
+                'Invalid grant ID(s): {0}'.format(', '.join(errors)),
+                field_names='grants')
         return [{'$ref': 'https://dx.zenodo.org/grants/{0}'.format(grant_id)}
-                for grant_id in res] or missing
+                for grant_id in result] or missing
 
     def dump_communities(self, obj):
         """Dump communities type."""
         return [dict(identifier=x) for x in obj.get('communities', [])] \
             or missing
 
-
     def load_communities(self, data):
         """Load communities type."""
         if not isinstance(data, list):
             raise ValidationError(_('Not a list.'))
-        return list(sorted([
+        invalid_format_comms = [
+            c for c in data if not (isinstance(c, dict) and 'identifier' in c)]
+        if invalid_format_comms:
+            raise ValidationError(
+                'Invalid community format: {}.'.format(invalid_format_comms),
+                field_names='communities')
+
+        comm_ids = list(sorted([
             x['identifier'] for x in data if x.get('identifier')
-        ])) or missing
+        ]))
+        errors = {c for c in comm_ids if not Community.get(c)}
+        if errors:
+            raise ValidationError(
+                'Invalid communities: {0}'.format(', '.join(errors)),
+                field_names='communities')
+        return comm_ids or missing
 
     def dump_prereservedoi(self, obj):
         """Dump pre-reserved DOI."""

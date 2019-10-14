@@ -51,7 +51,8 @@ def make_file_fixture(filename, text=None):
 
 
 def test_simple_rest_flow(mocker, api, api_client, db, es,
-                          locations, users, write_token, license_record):
+                          locations, users, write_token, license_record,
+                          grant_records, funder_record):
     """Test simple flow using REST API."""
     mocker.patch('invenio_pidstore.providers.datacite.DataCiteMDSClient')
 
@@ -73,9 +74,19 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
             ],
             description='Test Description',
             publication_date='2013-05-08',
-            access_right='open'
+            access_right='open',
         )
     )
+    # Fetch grant suggestion
+    funder = funder_record['doi']
+    res = client.get("/grants/_suggest?text=open&funder={}".format(funder))
+    grant_id = res.json['text'][0]['options'][0]['_source']['legacy_id']
+    test_data['metadata']['grants'] = [{"id": grant_id}]
+
+    # Fetch license suggestion
+    res = client.get('/licenses/_suggest?text=CC0-1.0')
+    test_data['metadata']['license'] = \
+        res.json['text'][0]['options'][0]['_source']['id']
 
     # Prepare headers
     auth = write_token['auth_header']
@@ -127,6 +138,9 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
     record_id = get_json(response, code=202)['record_id']
     recid_pid = PersistentIdentifier.get('recid', str(record_id))
 
+    # Pass doi to record
+    test_data['metadata']['doi'] = get_json(response, code=202)['doi']
+
     # Check that same id is being used for both deposit and record.
     assert deposit_id == record_id
 
@@ -150,7 +164,7 @@ def test_simple_rest_flow(mocker, api, api_client, db, es,
 
     # Not allowed to delete
     response = client.delete(
-        links['self'], data=json.dumps(test_data), headers=auth)
+        links['self'], headers=auth)
     assert response.status_code == 403
 
     # Not allowed to sort files

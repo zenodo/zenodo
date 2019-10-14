@@ -6,6 +6,8 @@ services:
     environment:
       - "INVENIO_ACCOUNTS_SESSION_REDIS_URL=redis://cache:6379/1"
       - "INVENIO_BROKER_URL=amqp://guest:guest@mq:5672//"
+      - "INVENIO_CELERY_BROKER_URL=amqp://guest:guest@mq:5672//"
+      - "INVENIO_QUEUES_BROKER_URL=amqp://guest:guest@mq:5672//"
       - "INVENIO_CACHE_REDIS_URL=redis://cache:6379/0"
       - "INVENIO_CACHE_TYPE=redis"
       - "INVENIO_CELERY_RESULT_BACKEND=redis://cache:6379/2"
@@ -37,13 +39,12 @@ services:
     ports:
       - "6379:6379"
   db:
-    build: ./docker/postgres/
-    image: zenodo-postgres
-    command: postgres
+    image: postgres:9.6
     restart: "always"
     environment:
-      - "POSTGRES_PASSWORD=postgres"
-      - "POSTGRES_USER=admin"
+      - "POSTGRES_USER=zenodo"
+      - "POSTGRES_PASSWORD=zenodo"
+      - "POSTGRES_DB=zenodo"
     ports:
       - "5432:5432"
   mq:
@@ -53,12 +54,27 @@ services:
       - "15672:15672"
       - "5672:5672"
   es:
-    build: ./docker/es/
-    image: zenodo-es:2.3
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
     restart: "always"
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
     ports:
       - "9200:9200"
       - "9300:9300"
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:7.1.1
+    restart: "always"
+    ports:
+      - "5601:5601"
+    environment:
+      - "ELASTICSEARCH_URL=http://es:9200"
   flower:
     image: mher/flower
     command: --broker=amqp://guest:guest@mq:5672// --broker_api=http://guest:guest@mq:15672/api/

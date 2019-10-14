@@ -52,7 +52,6 @@ def get_public_bucket_uuids():
     return [current_app.config[k] for k in buckets]
 
 
-
 def files_permission_factory(obj, action=None):
     """Permission for files are always based on the type of bucket.
 
@@ -79,9 +78,21 @@ def files_permission_factory(obj, action=None):
             return PublicBucketPermission(action)
 
         # Record or deposit bucket
-        rb = RecordsBuckets.query.filter_by(bucket_id=bucket_id).one_or_none()
-        if rb is not None:
+        rbs = RecordsBuckets.query.filter_by(bucket_id=bucket_id).all()
+        if len(rbs) >= 2:  # Extra formats bucket or bad records-buckets state
+            # Only admins should access. Users use the ".../formats" endpoints
+            return Permission(ActionNeed('admin-access'))
+        rb = next(iter(rbs), None)  # Use first bucket
+        if rb:
             record = Record.get_record(rb.record_id)
+            # "Cache" the file's record in the request context (e.g for stats)
+            if record and request:
+                setattr(request, 'current_file_record', record)
+
+            # Bail if extra formats bucket
+            if str(bucket_id) == \
+                    record.get('_buckets', {}).get('extra_formats'):
+                return Permission(ActionNeed('admin-access'))
             if is_record(record):
                 return RecordFilesPermission.create(record, action)
             elif is_deposit(record):

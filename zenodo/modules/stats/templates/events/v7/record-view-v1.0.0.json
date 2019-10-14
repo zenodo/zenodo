@@ -1,0 +1,76 @@
+{
+  "template": "__SEARCH_INDEX_PREFIX__events-stats-record-view-*",
+  "settings": {
+    "index": {
+      "refresh_interval": "5s"
+    }
+  },
+  "mappings": {
+    "date_detection": false,
+    "numeric_detection": false,
+    "dynamic": false,
+    "properties": {
+      "timestamp": {
+        "type": "date",
+        "format": "strict_date_hour_minute_second"
+      },
+      "record_id": {
+        "type": "keyword"
+      },
+      "pid_type": {
+        "type": "keyword"
+      },
+      "pid_value": {
+        "type": "keyword"
+      },
+      "unique_id": {
+        "type": "keyword"
+      },
+      "country": {
+        "type": "keyword"
+      },
+      "visitor_id": {
+        "type": "keyword"
+      },
+      "is_machine": {
+        "type": "boolean"
+      },
+      "is_robot": {
+        "type": "boolean"
+      },
+      "recid": {
+        "type": "keyword"
+      },
+      "conceptrecid": {
+        "type": "keyword"
+      },
+      "doi": {
+        "type": "keyword"
+      },
+      "conceptdoi": {
+        "type": "keyword"
+      },
+      "resource_type": {
+        "type": "object"
+      },
+      "access_right": {
+        "type": "keyword"
+      },
+      "communities": {
+        "type": "keyword"
+      },
+      "owners": {
+        "type": "integer"
+      },
+      "unique_session_id": {
+        "type": "keyword"
+      },
+      "referrer": {
+        "type": "keyword"
+      }
+    }
+  },
+  "aliases": {
+    "__SEARCH_INDEX_PREFIX__events-stats-record-view": {}
+  }
+}

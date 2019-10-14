@@ -48,7 +48,7 @@ The beginning of each sprint cycle roughly follows the following pattern:
     - Move open milestone issues to backlog (``1 - Todo`` -> ``0 - Backlog``).
     - Close milestone (progress should be 100%).
 * Requirements update
-    - Update Python package requirements. Needed in order to ensure security fixes from packages are integrated (see :ref:`updateing_requirements`).
+    - Update Python package requirements. Needed in order to ensure security fixes from packages are integrated (see :ref:`updating_requirements`).
 * Sprint planning
     - Create new milestone and assign end-date.
     - Assign issues to milestone (see below).

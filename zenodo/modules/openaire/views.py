@@ -28,8 +28,7 @@ from __future__ import absolute_import, print_function
 
 from flask import Blueprint
 
-from .helpers import is_openaire_dataset, is_openaire_publication, \
-    openaire_link
+from .helpers import openaire_link, openaire_type
 
 blueprint = Blueprint(
     'zenodo_openaire',
@@ -37,19 +36,13 @@ blueprint = Blueprint(
 )
 
 
-@blueprint.app_template_filter('is_openaire_publication')
-def is_publication(record):
-    """Test if record is an OpenAIRE publication."""
-    return is_openaire_publication(record)
-
-
-@blueprint.app_template_filter('is_openaire_dataset')
-def is_dataset(record):
-    """Test if record is an OpenAIRE dataset."""
-    return is_openaire_dataset(record)
-
-
 @blueprint.app_template_filter('openaire_link')
 def link(record):
     """Generate an OpenAIRE link."""
     return openaire_link(record)
+
+
+@blueprint.app_template_filter('openaire_type')
+def openaire_type_filter(record):
+    """Generate an OpenAIRE link."""
+    return openaire_type(record)

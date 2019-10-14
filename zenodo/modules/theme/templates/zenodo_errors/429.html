@@ -1,0 +1,6 @@
+{% extends config.THEME_ERROR_TEMPLATE %}
+
+{% block message %}
+  <h1><i class="fa fa-flash"></i> {{_('Too many requests')}}</h1>
+  <p>{{_('Try logging in if you have not already since we are offering a larger request limit for authenticated users.')}}</p>
+  {% endblock message %}

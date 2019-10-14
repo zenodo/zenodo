@@ -107,6 +107,9 @@ class ZenodoGitHubRelease(GitHubRelease):
                     last_deposit = last_deposit.registerconceptdoi()
                     last_recid, last_record = last_deposit.fetch_published()
                 deposit_metadata['conceptdoi'] = last_record['conceptdoi']
+                if last_record.get('communities'):
+                    deposit_metadata.setdefault('communities',
+                                                last_record['communities'])
                 if versioning.draft_child:
                     stashed_draft_child = versioning.draft_child
                     versioning.remove_draft_child()
@@ -156,7 +159,8 @@ class ZenodoGitHubRelease(GitHubRelease):
             db.session.commit()
 
             # Send Datacite DOI registration task
-            datacite_register.delay(recid_pid.pid_value, record_id)
+            if current_app.config['DEPOSIT_DATACITE_MINTING_ENABLED']:
+                datacite_register.delay(recid_pid.pid_value, record_id)
 
             # Index the record
             RecordIndexer().index_by_id(record_id)

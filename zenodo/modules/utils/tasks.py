@@ -202,8 +202,8 @@ def repair_record_metadata(uuid):
 def remove_oaiset_spec(record_uuid, spec):
     """Remove the OAI spec from the record and commit."""
     rec = Record.get_record(record_uuid)
-    rec['_oai']['sets'] = sorted([s for s in rec['_oai'].get('sets', [])
-                                  if s != spec])
+    rec['_oai']['sets'] = sorted(set([s for s in rec['_oai'].get('sets', [])
+                                      if s != spec]))
     rec['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
     if not rec['_oai']['sets']:
         del rec['_oai']['sets']
@@ -216,7 +216,7 @@ def remove_oaiset_spec(record_uuid, spec):
 def add_oaiset_spec(record_uuid, spec):
     """Add the OAI spec to the record and commit."""
     rec = Record.get_record(record_uuid)
-    rec['_oai']['sets'] = sorted(rec['_oai'].get('sets', []) + [spec, ])
+    rec['_oai']['sets'] = sorted(set(rec['_oai'].get('sets', []) + [spec, ]))
     rec['_oai']['updated'] = datetime_to_datestamp(datetime.utcnow())
     rec.commit()
     db.session.commit()
@@ -237,7 +237,7 @@ def iter_record_oai_tasks(query, spec, func):
         index=current_app.config['OAISERVER_RECORD_INDEX'],
     ).query(query)
     for result in search.scan():
-        yield func.s(result.meta.id, spec)
+        yield func.si(result.meta.id, spec)
 
 
 def make_oai_task_group(oais):

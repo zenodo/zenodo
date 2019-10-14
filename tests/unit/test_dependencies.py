@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -24,9 +24,72 @@
 
 """Basics tests to ensure DB and Elasticsearch is running."""
 
-from invenio_search import current_search_client
+from invenio_search import current_search, current_search_client
 
 
 def test_es_running(app):
     """Test search view."""
     assert current_search_client.ping()
+
+
+def test_es_state(app, es):
+    """Test generated mappings, templates and aliases on ElasticSearch."""
+    prefix = app.config['SEARCH_INDEX_PREFIX']
+    suffix = current_search._current_suffix
+
+    assert current_search_client.indices.get_alias() == {
+            prefix + 'grants-grant-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'grants': {},
+                    prefix + 'grants-grant-v1.0.0': {}
+                }
+            },
+            prefix + 'records-record-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'records': {},
+                    prefix + 'records-record-v1.0.0': {}
+                }
+            },
+            prefix + 'deposits-records-record-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'deposits-records-record-v1.0.0': {},
+                    prefix + 'deposits': {},
+                    prefix + 'deposits-records': {}
+                }
+            },
+            prefix + 'licenses-license-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'licenses-license-v1.0.0': {},
+                    prefix + 'licenses': {}
+                }
+            },
+            prefix + 'funders-funder-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'funders': {},
+                    prefix + 'funders-funder-v1.0.0': {}
+                }
+            },
+        }
+
+    templates = {
+        k: (set(v['index_patterns']), set(v['aliases'].keys()))
+        for k, v in current_search_client.indices.get_template().items()
+    }
+    assert templates == {
+        prefix + 'record-view-v1.0.0': (
+            {prefix + 'events-stats-record-view-*'},
+            {prefix + 'events-stats-record-view'},
+        ),
+        prefix + 'file-download-v1.0.0': (
+            {prefix + 'events-stats-file-download-*'},
+            {prefix + 'events-stats-file-download'},
+        ),
+        prefix + 'aggr-record-view-v1.0.0': (
+            {prefix + 'stats-record-view-*'},
+            {prefix + 'stats-record-view'},
+        ),
+        prefix + 'aggr-record-download-v1.0.0': (
+            {prefix + 'stats-file-download-*'},
+            {prefix + 'stats-file-download'},
+        ),
+    }

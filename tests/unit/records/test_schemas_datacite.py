@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2018 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -41,10 +41,10 @@ def today():
 
 def test_minimal(db, minimal_record_model, recid_pid):
     """Test minimal."""
-    minimal_record_model['doi'] = '10.1234/foo'
+    minimal_record_model['doi'] = '10.5072/foo'
     obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
     assert obj == {
-        'identifier': {'identifier': '10.1234/foo', 'identifierType': 'DOI'},
+        'identifier': {'identifier': '10.5072/foo', 'identifierType': 'DOI'},
         'creators': [{'creatorName': 'Test', 'nameIdentifier': {}}],
         'titles': [{'title': 'Test'}],
         'publisher': 'Zenodo',
@@ -67,10 +67,23 @@ def test_minimal(db, minimal_record_model, recid_pid):
     }
 
 
+def test_non_local_doi(db, minimal_record_model, recid_pid):
+    """Test non-local DOI."""
+    minimal_record_model['doi'] = '10.1234/foo'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['identifier'] == {'identifier': 'http://localhost/record/123',
+                                 'identifierType': 'URL'}
+    assert obj['relatedIdentifiers'] == [{
+        'relatedIdentifier': '10.1234/foo',
+        'relatedIdentifierType': 'DOI',
+        'relationType': 'IsIdenticalTo',
+    }]
+
+
 def test_full(db, record_with_bucket, recid_pid):
     """Test full record metadata."""
     _, full_record_model = record_with_bucket
-    full_record_model['doi'] = '10.1234/foo'
+    full_record_model['doi'] = '10.5072/foo'
     obj = datacite_v31.transform_record(recid_pid, full_record_model)
     expected = {
         "alternateIdentifiers": [
@@ -152,7 +165,14 @@ def test_full(db, record_with_bucket, recid_pid):
                 }
             }
         ],
-        "dates": [{"date": "2014-02-27", "dateType": "Issued"}],
+        "dates": [
+            {"date": "2014-02-27", "dateType": "Issued"},
+            {"date": "2019-01-01/", "dateType": "Valid"},
+            # NOTE: "Withdrawn" is not in the DataCite v3.1 dateType vocabulary
+            # {"date": "2019-01-01", "dateType": "Withdrawn"},
+            {"date": "/2019-01-01", "dateType": "Collected"},
+            {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+        ],
         "descriptions": [
             {
                 "description": "Test Description",
@@ -170,10 +190,18 @@ def test_full(db, record_with_bucket, recid_pid):
                     "10.5281/zenodo.34\"]}"
                 ),
                 "descriptionType": "Other"
-            }
+            },
+            {'description': 'microscopic supersampling',
+             'descriptionType': 'Methods'}
         ],
-        "identifier": {"identifier": "10.1234/foo", "identifierType": "DOI"},
+        "identifier": {"identifier": "10.5072/foo", "identifierType": "DOI"},
         "language": "en",
+        "geoLocations": [{
+            "geoLocationPlace": "my place",
+            "geoLocationPoint": "2.35 1.534"
+        }, {
+            'geoLocationPlace': 'New York'
+        }],
         "publicationYear": "2014",
         "publisher": "Zenodo",
         "relatedIdentifiers": [
@@ -200,12 +228,19 @@ def test_full(db, record_with_bucket, recid_pid):
             {
                 "relationType": "IsPartOf",
                 "relatedIdentifier": "10.1234/zenodo.4321",
-                "relatedIdentifierType": "DOI"
+                "relatedIdentifierType": "DOI",
+                "resourceTypeGeneral": "Software"
             },
             {
                 "relationType": "HasPart",
                 "relatedIdentifier": "10.1234/zenodo.1234",
-                "relatedIdentifierType": "DOI"
+                "relatedIdentifierType": "DOI",
+                "resourceTypeGeneral": "Text"
+            },
+            {
+                "relationType": "IsPartOf",
+                "relatedIdentifier": "http://localhost/communities/zenodo",
+                "relatedIdentifierType": "URL"
             }
         ],
         "resourceType": {
@@ -231,7 +266,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "subjectScheme": "url"
             }
         ],
-        "titles": [{"title": "Test Title"}],
+        "titles": [{"title": "Test title"}],
         "version": "1.2.5"
     }
     assert obj == expected
@@ -329,6 +364,23 @@ def test_full(db, record_with_bucket, recid_pid):
         }
     ]
     expected['fundingReferences'] = []
+    expected["dates"] = [
+        {"date": "2014-02-27", "dateType": "Issued"},
+        {"date": "2019-01-01/", "dateType": "Valid",
+         "dateInformation": "Bongo"},
+        {"date": "/2019-01-01", "dateType": "Collected"},
+        {"date": "2019-01-01", "dateType": "Withdrawn"},
+        {"date": "2019-01-01/2019-02-01", "dateType": "Collected"},
+    ]
+    expected['geoLocations'] = [{
+        "geoLocationPlace": "my place",
+        "geoLocationPoint": {
+          "pointLatitude": 2.35,
+          "pointLongitude": 1.534
+        }
+    }, {
+        'geoLocationPlace': 'New York'
+    }]
     assert obj == expected
 
 
@@ -631,6 +683,10 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
                 'identifier': '1234',
                 'scheme': t,
                 'relation': 'isCitedBy',
+                'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }
             }, {
                 'identifier': '1234',
                 'scheme': 'invalid',
@@ -638,11 +694,31 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
             }],
         })
         obj = serializer.transform_record(recid_pid, minimal_record_model)
-        assert obj['relatedIdentifiers'] == [{
+        expected_result = [{
             'relatedIdentifier': '1234',
             'relatedIdentifierType': dc_t,
             'relationType': 'IsCitedBy',
+            'resourceTypeGeneral': 'Text'
         }]
+        assert obj['relatedIdentifiers'] == expected_result
+
+
+@pytest.mark.parametrize("serializer", [
+    datacite_v31,
+    datacite_v41,
+])
+def test_communities_rel_ids(db, minimal_record_model, recid_pid, serializer):
+    """Test communities in related identifiers."""
+    for communities in (['zenodo'], ['c1', 'c2', 'c3']):
+        minimal_record_model['communities'] = communities
+        obj = serializer.transform_record(recid_pid, minimal_record_model)
+        for comm in communities:
+            assert {
+                'relatedIdentifier':
+                    'http://localhost/communities/{}'.format(comm),
+                'relatedIdentifierType': 'URL',
+                'relationType': 'IsPartOf',
+            } in obj['relatedIdentifiers']
 
 
 @pytest.mark.parametrize("serializer", [
@@ -674,7 +750,7 @@ def test_rights(db, minimal_record_model, recid_pid, serializer):
     datacite_v41,
 ])
 def test_descriptions(db, minimal_record_model, recid_pid, serializer):
-    """Test language."""
+    """Test descriptions."""
     minimal_record_model.update({
         'description': 'test',
         'notes': 'again',
@@ -691,6 +767,15 @@ def test_descriptions(db, minimal_record_model, recid_pid, serializer):
         'description': json.dumps({'references': ['A']}),
         'descriptionType': 'Other',
     }]
+
+    minimal_record_model.update({
+        'description': (20000 * 'A') + 'BBB',
+        'notes': (20000 * 'A') + 'BBB',
+        'references': [{'raw_reference': (20000 * 'A') + 'BBB'}],
+    })
+    obj = serializer.transform_record(recid_pid, minimal_record_model)
+    assert all(len(d['description']) == 20000 and 'B' not in d['description']
+               for d in obj['descriptions'])
 
 
 def test_funding_ref_v4(db, minimal_record_model, recid_pid):
@@ -736,3 +821,15 @@ def test_funding_ref_v4(db, minimal_record_model, recid_pid):
         }
 
     ]
+
+
+def test_titles(db, minimal_record_model, recid_pid):
+    """Test title."""
+    # NOTE: There used to be a bug which was modifying the case of the title
+    minimal_record_model['title'] = 'a lower-case title'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['titles'] == [{'title': 'a lower-case title'}]
+
+    minimal_record_model['title'] = 'Mixed-caSe titLE'
+    obj = datacite_v31.transform_record(recid_pid, minimal_record_model)
+    assert obj['titles'] == [{'title': 'Mixed-caSe titLE'}]

@@ -29,12 +29,14 @@ from __future__ import absolute_import, print_function
 import json
 from datetime import datetime, timedelta
 
-from flask import render_template_string, url_for
+import pytest
+from flask import current_app, render_template, render_template_string, url_for
 from helpers import login_user_via_session
 from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
+from mock import Mock, patch
 
 from zenodo.modules.records.views import zenodo_related_links
 
@@ -145,8 +147,15 @@ def test_relation_logo(app):
     ]
 
 
-def test_pid_url(app):
+def test_pid_url(app, sample_identifiers):
     """Test pid_url."""
+    # All types of identifiers
+    for scheme, (_id, url) in sample_identifiers.items():
+        assert render_template_string(
+            "{{{{ '{_id}'|pid_url(scheme='{scheme}') }}}}"
+            .format(_id=_id, scheme=scheme)) == url
+
+    # Specific cases and parameters
     assert render_template_string(
         "{{ '10.123/foo'|pid_url }}") == "https://doi.org/10.123/foo"
     assert render_template_string(
@@ -218,3 +227,100 @@ def test_citation_formatter_citeproc_get(api, api_client, es, db, full_record,
     assert 'Doe, J.' in res.get_data(as_text=True)
     assert 'Test title (Version 1.2.5).' in res.get_data(as_text=True)
     assert '(2014).' in res.get_data(as_text=True)
+
+
+@pytest.mark.parametrize(('stats', 'expected_result'), [
+    (None, {
+        'version_views': '0', 'views': '0',
+        'version_downloads': '0', 'downloads': '0',
+        'version_volume': '0 Bytes', 'volume': '0 Bytes',
+        'version_unique_views': '0', 'unique_views': '0',
+        'version_unique_downloads': '0', 'unique_downloads': '0'
+    }),
+    ({
+        'version_views': 31200, 'views': 2130,
+        'version_downloads': 54, 'downloads': 28,
+        'version_volume': 213000, 'volume': 2000,
+        'version_unique_views': 280, 'unique_views': 27,
+        'version_unique_downloads': 180, 'unique_downloads': 25
+    }, {
+         'version_views': '31,200', 'views': '2,130',
+         'version_downloads': '54', 'downloads': '28',
+         'version_volume': '213.0 kB', 'volume': '2.0 kB',
+         'version_unique_views': '280', 'unique_views': '27',
+         'version_unique_downloads': '180', 'unique_downloads': '25'
+    }),
+    ({
+        'version_views': 31200, 'views': 2130,
+        'version_downloads': 54, 'downloads': 28,
+        'version_volume': None, 'volume': 2000
+    }, {
+        'version_views': '31,200', 'views': '2,130',
+        'version_downloads': '54', 'downloads': '28',
+        'version_volume': '0 Bytes', 'volume': '2.0 kB',
+        'version_unique_views': '0', 'unique_views': '0',
+        'version_unique_downloads': '0', 'unique_downloads': '0'
+    })
+])
+def test_stats(app, db, minimal_record, stats, expected_result):
+    """Test record stats."""
+    record = Record.create(minimal_record)
+
+    with patch('zenodo.modules.records.views.get_record_stats',
+               return_value=stats) as m:
+        # local DOI
+        record['doi'] = '10.5072/foo'
+        template = render_template('zenodo_records/box/record_stats.html',
+                                   record=record)
+
+        assert expected_result['views'] in template
+        assert expected_result['downloads'] in template
+        assert expected_result['volume'] in template
+        assert expected_result['unique_views'] in template
+        assert expected_result['unique_downloads'] in template
+        assert 'All versions' in template
+        assert expected_result['version_views'] in template
+        assert expected_result['version_downloads'] in template
+        assert expected_result['version_volume'] in template
+        assert expected_result['version_unique_views'] in template
+        assert expected_result['version_unique_downloads'] in template
+
+        # not local DOI
+        record['doi'] = '.dsfsdf'
+        template = render_template('zenodo_records/box/record_stats.html',
+                                   record=record)
+
+        assert expected_result['views'] in template
+        assert expected_result['downloads'] in template
+        assert expected_result['volume'] in template
+        assert expected_result['unique_views'] in template
+        assert expected_result['unique_downloads'] in template
+        assert 'All versions' not in template
+
+
+def test_record_thumbnail(app, record_with_image_creation):
+    """Test cached record thumbnails."""
+    pid, record, record_url = record_with_image_creation
+    for cached_thumbnail in current_app.config['CACHED_THUMBNAILS']:
+        with app.test_client() as client:
+            res = client.get(url_for(
+                'invenio_records_ui.recid_thumbnail',
+                pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
+        assert res.status_code == 200
+    with app.test_client() as client:
+        res = client.get(url_for(
+            'invenio_records_ui.recid_thumbnail',
+            pid_value=pid.pid_value, thumbnail_size='nonvalid'))
+    assert res.status_code == 400
+
+
+def test_record_thumbnail_without_images(app, record_with_files_creation):
+    """Test cached thumbnails on record without images."""
+    pid, record, record_url = record_with_files_creation
+    thumbnail_config = current_app.config['CACHED_THUMBNAILS']
+    cached_thumbnail = list(thumbnail_config)[0]
+    with app.test_client() as client:
+        res = client.get(url_for(
+            'invenio_records_ui.recid_thumbnail',
+            pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
+    assert res.status_code == 404

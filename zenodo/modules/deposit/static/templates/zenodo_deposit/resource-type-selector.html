@@ -1,0 +1,8 @@
+<div class="form-group schema-form-select col-sm-12">
+  <select-resource-types>
+    <select class="form-control" ng-model="$$value$$" sf-changed="form" schema-validate="form"
+      ng-options="item.id as item.title group by item.type for item in resourceTypesList">
+    </select>
+  </select-resource-types>
+  <div class="help-block" sf-message="form.description"></div>
+</div>

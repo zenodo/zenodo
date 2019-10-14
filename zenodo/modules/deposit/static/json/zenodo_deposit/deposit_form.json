@@ -77,6 +77,10 @@
         "condition": "model.upload_type == 'publication'",
         "titleMap": [
           {
+            "value": "annotationcollection",
+            "name": "Annotation collection"
+          },
+          {
             "value": "book",
             "name": "Book"
           },
@@ -87,6 +91,10 @@
           {
             "value": "conferencepaper",
             "name": "Conference paper"
+          },
+          {
+            "value": "datamanagementplan",
+            "name": "Data management plan"
           },
           {
             "value": "article",
@@ -121,12 +129,16 @@
             "name": "Software documentation"
           },
           {
-            "value": "thesis",
-            "name": "Thesis"
+            "value": "taxonomictreatment",
+            "name": "Taxonomic treatment"
           },
           {
             "value": "technicalnote",
             "name": "Technical note"
+          },
+          {
+            "value": "thesis",
+            "name": "Thesis"
           },
           {
             "value": "workingpaper",
@@ -435,7 +447,7 @@
           {
             "type": "uiselect",
             "key": "license",
-            "description": "Required. Selected license applies to all of your files displayed on the top of the form. If you want to upload some of your files under different licenses, please do so in separate uploads. If you cannot find the license you're looking for, include a relevant LICENSE file in your record and choose one of the 'Other' licenses available ('Other (Open)', 'Other (Attribution)', etc.). The supported open licenses in the list are harvested from <a target='_blank' rel='noopener noreferrer' href='http://opendefinition.org'><i class='fa fa-external-link'></i> opendefinition.org</a>. If you think that an open license is missing from the list, please <a target='_blank' rel='noopener noreferrer' href='https://zenodo.org/support'>contact us</a>.",
+            "description": "Required. Selected license applies to all of your files displayed on the top of the form. If you want to upload some of your files under different licenses, please do so in separate uploads. If you cannot find the license you're looking for, include a relevant LICENSE file in your record and choose one of the <i>Other</i> licenses available (<i>Other (Open)</i>, <i>Other (Attribution)</i>, etc.). The supported licenses in the list are harvested from <a target='_blank' rel='noopener noreferrer' href='https://opendefinition.org'>opendefinition.org <i class='fa fa-external-link'></i></a> and <a target='_blank' rel='noopener noreferrer' href='https://spdx.org'>spdx.org <i class='fa fa-external-link'></i></a>. If you think that a license is missing from the list, please <a target='_blank' rel='noopener noreferrer' href='https://zenodo.org/support'>contact us</a>.",
             "fa_cls": "fa-certificate",
             "placeholder": "Start typing a license name...",
             "required": true,
@@ -443,15 +455,17 @@
               "asyncCallback": "autocompleteSuggest",
               "url": "/api/licenses/_suggest",
               "urlParameters": {
-                "text": "value"
+                "text": "value",
+                "size": 10
               },
               "map": {
                 "resultSource": "text.0.options",
-                "valueSource": "payload.id",
-                "nameSource": "text",
+                "valueSource": "_source.id",
+                "nameSource": "_source.title",
                 "valueProperty": "value",
-                "nameProperty": "text"
-              }
+                "nameProperty": "_source.title"
+              },
+              "maxResultDisplay": 10
             },
             "condition": "model.access_right == 'open' || model.access_right == 'embargoed'"
           }
@@ -498,8 +512,8 @@
                   },
                   "map": {
                     "resultSource": "text.0.options",
-                    "valueSource": "payload.legacy_id",
-                    "nameSource": "payload",
+                    "valueSource": "_source.legacy_id",
+                    "nameSource": "_source",
                     "valueProperty": "value",
                     "nameProperty": "text"
                   }
@@ -539,12 +553,20 @@
                     "name": "National Health and Medical Research Council (AU)"
                   },
                   {
+                    "value": "10.13039/100000002",
+                    "name": "National Institutes of Health (US)"
+                  },
+                  {
                     "value": "10.13039/100000001",
                     "name": "National Science Foundation (US)"
                   },
                   {
                     "value": "10.13039/501100003246",
                     "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NL)"
+                  },
+                  {
+                    "value": "10.13039/501100000690",
+                    "name": "Research Councils (UK)"
                   },
                   {
                     "value": "10.13039/501100001711",
@@ -581,7 +603,10 @@
         "fa_cls": "fa-barcode",
         "description": "",
         "sortOptions": {
-          "disabled": true
+          "disabled": false,
+          "handle": "i.sort-handle",
+          "cursor": "move",
+          "axis": "y"
         },
         "add": "Add another related identifier",
         "inline": true,
@@ -632,12 +657,28 @@
                 "name": "is new version of this upload"
               },
               {
+                "value": "isContinuedBy",
+                "name": "continues this upload"
+              },
+              {
+                "value": "continues",
+                "name": "is continued by this upload"
+              },
+              {
                 "value": "isPartOf",
                 "name": "has this upload as part"
               },
               {
                 "value": "hasPart",
                 "name": "is part of this upload"
+              },
+              {
+                "value": "isReviewedBy",
+                "name": "reviews this upload"
+              },
+              {
+                "value": "reviews",
+                "name": "is reviewed this upload"
               },
               {
                 "value": "isDocumentedBy",
@@ -649,11 +690,19 @@
               },
               {
                 "value": "compiles",
-                "name": "is compiled/create by this upload"
+                "name": "is compiled/created by this upload"
               },
               {
                 "value": "isCompiledBy",
                 "name": "compiled/created this upload"
+              },
+              {
+                "value": "isDerivedFrom",
+                "name": "is the source this upload is derived from"
+              },
+              {
+                "value": "isSourceOf",
+                "name": "has this upload as its source"
               },
               {
                 "value": "isIdenticalTo",
@@ -664,6 +713,12 @@
                 "name": "is an alternate identifier of this upload"
               }
             ]
+          },
+          {
+            "type": "template",
+            "templateUrl": "/static/templates/zenodo_deposit/resource-type-selector.html",
+            "key": "related_identifiers[].resource_type",
+            "description": "Optional. Resource type of the related identifier."
           }
         ]
       }
@@ -732,8 +787,52 @@
                 "name": "Data manager"
               },
               {
+                "value": "Distributor",
+                "name": "Distributor"
+              },
+              {
                 "value": "Editor",
                 "name": "Editor"
+              },
+              {
+                "value": "HostingInstitution",
+                "name": "Hosting institution"
+              },
+              {
+                "value": "Other",
+                "name": "Other"
+              },
+              {
+                "value": "Producer",
+                "name": "Producer"
+              },
+              {
+                "value": "ProjectLeader",
+                "name": "Project leader"
+              },
+              {
+                "value": "ProjectManager",
+                "name": "Project manager"
+              },
+              {
+                "value": "ProjectMember",
+                "name": "Project member"
+              },
+              {
+                "value": "RegistrationAgency",
+                "name": "Registration agency"
+              },
+              {
+                "value": "RegistrationAuthority",
+                "name": "Registration authority"
+              },
+              {
+                "value": "RelatedPerson",
+                "name": "Related person"
+              },
+              {
+                "value": "ResearchGroup",
+                "name": "Research group"
               },
               {
                 "value": "Researcher",
@@ -748,8 +847,12 @@
                 "name": "Sponsor"
               },
               {
-                "value": "Other",
-                "name": "Other"
+                "value": "Supervisor",
+                "name": "Supervisor"
+              },
+              {
+                "value": "WorkPackageLeader",
+                "name": "Work package leader"
               }
             ]
           }

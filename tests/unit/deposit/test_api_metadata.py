@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016, 2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -30,6 +30,7 @@ import json
 from datetime import datetime, timedelta
 
 from flask import url_for
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_search import current_search
 from six import BytesIO
 
@@ -56,7 +57,7 @@ def test_invalid_create(api_client, es, json_auth_headers, deposit_url,
 
 
 def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
-                      license_record, grant_record, locations):
+                      license_record, grant_records, locations, communities):
     """Rough validation of input against output data."""
     client = api_client
     headers = json_auth_headers
@@ -64,7 +65,7 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
     test_data = dict(
         metadata=dict(
             access_right='embargoed',
-            communities=[{'identifier': 'cfa'}],
+            communities=[{'identifier': 'c1'}],
             conference_acronym='Some acronym',
             conference_dates='Some dates',
             conference_place='Some place',
@@ -110,11 +111,13 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
                 dict(identifier='10.1234/foo.bar2', relation='isCitedBy',
                      scheme='doi'),
                 dict(identifier='10.1234/foo.bar3', relation='cites',
-                     scheme='doi'),
+                     scheme='doi',
+                     resource_type='dataset'),
                 dict(
                     identifier='2011ApJS..192...18K',
                     relation='isAlternateIdentifier',
-                    scheme='ads'),
+                    scheme='ads',
+                    resource_type='publication-article'),
             ],
             thesis_supervisors=[
                 dict(name="Doe Sr., John", affiliation="Atlantis"),
@@ -153,7 +156,7 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
 
 
 def test_unicode(api_client, es, locations, json_auth_headers, deposit_url,
-                 get_json, license_record, grant_record, auth_headers,
+                 get_json, license_record, grant_records, auth_headers,
                  communities):
     """Rough validation of input against output data."""
     client = api_client
@@ -244,7 +247,7 @@ def test_unicode(api_client, es, locations, json_auth_headers, deposit_url,
 
 
 def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
-                    license_record, grant_record, auth_headers):
+                    license_record, grant_records, auth_headers):
     """Test validation."""
     client = api_client
     headers = json_auth_headers
@@ -255,7 +258,9 @@ def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
         doi='not a doi',
         publication_date='not a date',
         title='',
-        upload_type='notvalid'
+        upload_type='notvalid',
+        communities=[{'identifier': 'non-existent-community-id'}],
+        grants=[{'id': 'non-existent-grant-id'}],
     ))
 
     data = get_json(
@@ -270,7 +275,25 @@ def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
         'metadata.publication_date',
         'metadata.title',
         'metadata.upload_type',
+        'metadata.grants',
+        'metadata.communities',
     ])
 
     for e in expected_field_errors:
         assert e in field_errors
+
+
+def test_existing_doi(db, api_client, json_auth_headers, deposit_url,
+                      minimal_deposit, get_json):
+    """Test deposit creation with existing non-local DOI."""
+    # Create a DOI
+    doi_value = '10.1234/foo.bar'
+    PersistentIdentifier.create(pid_type='doi', pid_value=doi_value)
+    db.session.commit()
+
+    # Try to use the DOI for a new deposit
+    minimal_deposit['metadata']['doi'] = doi_value
+    resp = api_client.post(
+        deposit_url, data=json.dumps(minimal_deposit),
+        headers=json_auth_headers)
+    assert resp.status_code == 400

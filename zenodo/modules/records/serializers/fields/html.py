@@ -30,14 +30,7 @@ import bleach
 
 from .sanitizedunicode import SanitizedUnicode
 
-
-class SanitizedHTML(SanitizedUnicode):
-    """String field which strips sanitizes HTML using the bleach library."""
-
-    def __init__(self, tags=None, attrs=None, *args, **kwargs):
-        """Initialize field."""
-        super(SanitizedHTML, self).__init__(*args, **kwargs)
-        self.tags = tags or [
+ALLOWED_TAGS = [
             'a',
             'abbr',
             'acronym',
@@ -61,12 +54,22 @@ class SanitizedHTML(SanitizedUnicode):
             'ul',
         ]
 
-        self.attrs = attrs or {
+ALLOWED_ATTRS = {
             '*': ['class'],
             'a': ['href', 'title', 'name', 'class', 'rel'],
             'abbr': ['title'],
             'acronym': ['title'],
         }
+
+
+class SanitizedHTML(SanitizedUnicode):
+    """String field which strips sanitizes HTML using the bleach library."""
+
+    def __init__(self, tags=None, attrs=None, *args, **kwargs):
+        """Initialize field."""
+        super(SanitizedHTML, self).__init__(*args, **kwargs)
+        self.tags = tags or ALLOWED_TAGS
+        self.attrs = attrs or ALLOWED_ATTRS
 
     def _deserialize(self, value, attr, data):
         """Deserialize string by sanitizing HTML."""

@@ -31,15 +31,16 @@ from os.path import dirname, join
 
 from flask import current_app
 from invenio_db import db
+from invenio_indexer.utils import schema_to_index
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
-from invenio_search.utils import schema_to_index
 from lxml import etree
 from sqlalchemy import or_
 from werkzeug.utils import import_string
 
 from zenodo.modules.openaire import current_openaire
+from zenodo.modules.records import current_custom_metadata
 
 
 def schema_prefix(schema):
@@ -59,6 +60,21 @@ def is_record(record):
 def is_deposit(record):
     """Determine if a record is a deposit record."""
     return schema_prefix(record.get('$schema')) == 'deposits'
+
+
+def transform_record(record, pid, serializer, module=None, throws=True,
+                     **kwargs):
+    """Transform a record using a serializer."""
+    if isinstance(record, Record):
+        try:
+            module = module or 'zenodo.modules.records.serializers'
+            serializer = import_string('.'.join((module, serializer)))
+            return serializer.transform_record(pid, record, **kwargs)
+        except Exception:
+            current_app.logger.exception(
+                u'Record transformation failed {}.'.format(str(record.id)))
+            if throws:
+                raise
 
 
 def serialize_record(record, pid, serializer, module=None, throws=True,
@@ -140,3 +156,28 @@ def xsd41():
     )
 
     httpretty.disable()
+
+
+def build_record_custom_fields(record):
+    """Build the custom metadata fields for ES indexing."""
+    valid_terms = current_custom_metadata.terms
+    es_custom_fields = dict(
+        custom_keywords=[],
+        custom_text=[]
+    )
+    custom_fields_mapping = {
+        'keyword': 'custom_keywords',
+        'text': 'custom_text',
+    }
+
+    custom_metadata = record.get('custom', {})
+    for term, value in custom_metadata.items():
+        term_type = valid_terms.get(term)['term_type']
+        if term_type:
+            # TODO: in the future also add "community"
+            es_object = {'key': term, 'value': value}
+            es_custom_field = custom_fields_mapping[term_type]
+            es_custom_fields[es_custom_field].append(es_object)
+
+    return {k: es_custom_fields[k] for k in es_custom_fields
+            if es_custom_fields[k]}
