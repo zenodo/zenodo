@@ -24,7 +24,7 @@
 
 """Basics tests to ensure DB and Elasticsearch is running."""
 
-from invenio_search import current_search_client
+from invenio_search import current_search, current_search_client
 
 
 def test_es_running(app):
@@ -34,53 +34,62 @@ def test_es_running(app):
 
 def test_es_state(app, es):
     """Test generated mappings, templates and aliases on ElasticSearch."""
-    assert current_search_client.indices.get_aliases() == {
-        'deposits-deposit-v1.0.0': {  # leftover from invenio-deposit
-            'aliases': {'deposits': {}}},
-        'deposits-records-record-v1.0.0': {
-            'aliases': {'deposits': {}, 'deposits-records': {}}},
-        'funders-funder-v1.0.0': {
-            'aliases': {'funders': {}}},
-        'grants-grant-v1.0.0': {
-            'aliases': {'grants': {}}},
-        'licenses-license-v1.0.0': {
-            'aliases': {'licenses': {}}},
-        'records-record-v1.0.0': {
-            'aliases': {'records': {}}},
-    }
+    prefix = app.config['SEARCH_INDEX_PREFIX']
+    suffix = current_search._current_suffix
+
+    assert current_search_client.indices.get_alias() == {
+            prefix + 'grants-grant-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'grants': {},
+                    prefix + 'grants-grant-v1.0.0': {}
+                }
+            },
+            prefix + 'records-record-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'records': {},
+                    prefix + 'records-record-v1.0.0': {}
+                }
+            },
+            prefix + 'deposits-records-record-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'deposits-records-record-v1.0.0': {},
+                    prefix + 'deposits': {},
+                    prefix + 'deposits-records': {}
+                }
+            },
+            prefix + 'licenses-license-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'licenses-license-v1.0.0': {},
+                    prefix + 'licenses': {}
+                }
+            },
+            prefix + 'funders-funder-v1.0.0' + suffix: {
+                'aliases': {
+                    prefix + 'funders': {},
+                    prefix + 'funders-funder-v1.0.0': {}
+                }
+            },
+        }
+
     templates = {
-        k: (v['template'], set(v['aliases'].keys()), set(v['mappings'].keys()))
+        k: (set(v['index_patterns']), set(v['aliases'].keys()))
         for k, v in current_search_client.indices.get_template().items()
     }
     assert templates == {
-        'stats-templates-events/v2-record-view-v1.0.0': (
-            'events-stats-record-view-*',
-            {'events-stats-record-view'},
-            {'stats-record-view'},
+        prefix + 'record-view-v1.0.0': (
+            {prefix + 'events-stats-record-view-*'},
+            {prefix + 'events-stats-record-view'},
         ),
-        'stats-templates-events/v2-file-download-v1.0.0': (
-            'events-stats-file-download-*',
-            {'events-stats-file-download'},
-            {'_default_', 'stats-file-download'},
+        prefix + 'file-download-v1.0.0': (
+            {prefix + 'events-stats-file-download-*'},
+            {prefix + 'events-stats-file-download'},
         ),
-        'stats-templates-aggregations/v2-aggr-record-view-v1.0.0': (
-            'stats-record-view-*',
-            {'stats-record-view'},
-            {
-                'record-view-day-aggregation',
-                'record-view-agg-bookmark',
-                'record-view-all-versions-agg-bookmark',
-            },
-
+        prefix + 'aggr-record-view-v1.0.0': (
+            {prefix + 'stats-record-view-*'},
+            {prefix + 'stats-record-view'},
         ),
-        'stats-templates-aggregations/v2-aggr-record-download-v1.0.0': (
-            'stats-file-download-*',
-            {'stats-file-download'},
-            {
-                '_default_',
-                'file-download-day-aggregation',
-                'record-download-agg-bookmark',
-                'record-download-all-versions-agg-bookmark',
-            },
+        prefix + 'aggr-record-download-v1.0.0': (
+            {prefix + 'stats-file-download-*'},
+            {prefix + 'stats-file-download'},
         ),
     }

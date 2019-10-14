@@ -21,6 +21,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
+{%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
 {%- from "invenio_pidrelations/macros/pid_versions.html" import pid_versions_dropdown -%}
   <dl>
   {%- if record.publication_date %}
@@ -168,30 +169,98 @@
     {%- if loop.first %}
     <dt>{{ _('Related identifiers') }}:</dt>
     {%- endif %}
-    <dd>{{group.grouper|relation_title}}:<br />
+    <dd>{{group.grouper|relation_title}}<br />
+    <ul class="list-unstyled">
     {%- for related_id in group.list %}
-      {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}
-      {%- if related_url %}
-      <a href="{{related_url}}">{{related_id.identifier}}</a>{%- if not loop.last %}, {% endif %}
-      {%- else %}
-      <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}){%- if not loop.last %}, {% endif %}
+      {%- if related_id.resource_type %}
+        {% set resource_type_title %}({{(related_id.resource_type|objecttype).title.en}}){% endset %}
       {%- endif %}
+      {%- set related_url = related_id.identifier|pid_url(scheme=related_id.scheme) %}
+      <li>
+        {%- if related_url %}
+        <a href="{{related_url}}">{{related_id.identifier}}</a> {{resource_type_title}}
+        {%- else %}
+        <i>{{related_id.identifier}}</i> ({{related_id.scheme|upper}}) {{resource_type_title}}
+      {%- endif %}
+      </li>
     {%- endfor %}
+    </ul>
     </dd>
   {%- endfor %}
 
   {%- if record.alternate_identifiers %}
     <dt>{{ _('Alternate identifiers') }}:</dt>
     <dd>
-    {%- for alt_id in record.alternate_identifiers %}
-      {%- set alt_url = alt_id.identifier|pid_url(scheme=alt_id.scheme) %}
-      {%- if alt_url %}
-        <a href="{{alt_url}}">{{alt_id.identifier}}</a>
-      {%- else %}
-        <i>{{alt_id.identifier}}</i> ({{alt_id.scheme|upper}})
-      {%- endif %}
-      {%- if not loop.last %}, {% endif %}
+      <ul class="list-unstyled">
+      {%- for alt_id in record.alternate_identifiers %}
+        <li>
+        {%- if alt_id.resource_type %}
+          {% set resource_type_title %}({{(alt_id.resource_type|objecttype).title.en}}){% endset %}
+        {%- endif %}
+        {%- set alt_url = alt_id.identifier|pid_url(scheme=alt_id.scheme) %}
+        {%- if alt_url %}
+          <a href="{{alt_url}}">{{alt_id.identifier}}</a> {{resource_type_title}}
+        {%- else %}
+          <i>{{alt_id.identifier}}</i> ({{alt_id.scheme|upper}}) {{resource_type_title}}
+        {%- endif %}
+        </li>
+      {%- endfor %}
+      </ul>
+    </dd>
+  {%- endif %}
+
+  {%- if record.custom %}
+    <dt>{{ _('Custom keywords') }}:</dt>
+    <dd class="custom-keywords">
+      <ul class="list-unstyled">
+      {%- for custom_field, custom_field_values in record.custom.items() %}
+        <li>
+          {{ custom_field }}
+          {%- set custom_field_url_value = custom_field | custom_field_url %}
+          <a href="{{ custom_field_url_value }}"><i data-toggle="tooltip" data-title="{{ custom_field_url_value }}" class="fa fa-fw fa-external-link "></i>
+          </a><br/>
+          <div>
+          {%- for custom_val in custom_field_values %}
+            {%- set custom_search_param = '[' + custom_field + ']:' + custom_val %}
+            <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
+            {{ custom_val }}</a>{%- if not loop.last %}, {% endif %}
+          {%- endfor %}
+          </div>
+        </li>
+      {%- endfor %}
+      </ul>
+    </dd>
+  {%- endif %}
+
+  {%- if record.locations %}
+    <dt>{{ _('Locations') }}:</dt>
+    <dd class="locations">
+      <ul class="list-unstyled">
+        {%- for location in record.locations %}
+          <li>
+            {{location.place}} {%- if location.lat and location.lon %} (<a href="https://google.com/maps/place/{{location.lat}},{{location.lon}}">{{ location.lat }}, {{ location.lon }} <i class="fa fa-fw fa-external-link"></i></a>){% endif %}<br/>
+            <small>{{location.description}}</small>
+          </li>
+        {%- endfor %}
+      </ul>
+    </dd>
+  {%- endif %}
+
+  {%- if record.dates %}
+    <dt>{{ _('Dates') }}:</dt>
+    <dd class="dates">
+    <ul class="list-unstyled">
+    {%- for group in record.dates | groupby('type') %}
+      <li>
+        {{ group.grouper }}<br/>
+        <div>
+          {%- for date in group.list %}
+            {{ date | format_date_range }}<br/>
+          {%- endfor %}
+        </div>
+      </li>
     {%- endfor %}
+    </ul>
     </dd>
   {%- endif %}
 

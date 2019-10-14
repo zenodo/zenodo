@@ -112,6 +112,8 @@ class RelatedIdentifierSchema(Schema):
     relatedIdentifierType = fields.Method('get_type')
     relationType = fields.Function(
         lambda o: o['relation'][0].upper() + o['relation'][1:])
+    resourceTypeGeneral = fields.Method(
+        'get_resource_type', attribute='resource_type')
 
     def get_type(self, obj):
         """Get type."""
@@ -123,6 +125,15 @@ class RelatedIdentifierSchema(Schema):
             return 'arXiv'
         else:
             return obj['scheme'].upper()
+
+    def get_resource_type(self, obj):
+        """Resource type."""
+        resource_type = obj.get('resource_type')
+        if resource_type:
+            t = ObjectType.get_by_dict(resource_type)
+            return t['datacite']['general']
+        else:
+            return missing
 
 
 class DataCiteSchema(Schema):

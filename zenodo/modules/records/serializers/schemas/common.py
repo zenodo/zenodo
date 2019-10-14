@@ -40,12 +40,13 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
+from six import string_types
 from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
 
 from zenodo.modules.records import current_custom_metadata
 from zenodo.modules.records.config import ZENODO_RELATION_TYPES
-from zenodo.modules.records.models import AccessRight
+from zenodo.modules.records.models import AccessRight, ObjectType
 
 from ...utils import is_deposit, is_record
 from ..fields import DOI as DOIField
@@ -72,6 +73,7 @@ URLS = {
     'record_file': '{base}/record/{id}/files/{filename}',
     'record': '{base}/records/{id}',
     'thumbnail': '{base}{path}',
+    'thumbs': '{base}/record/{id}/thumb{size}',
     'community': '{base}/communities/{id}',
 }
 
@@ -243,11 +245,45 @@ class IdentifierSchemaV1(Schema, StrictKeysMixin):
             )
 
 
-class AlternateIdentifierSchemaV1(IdentifierSchemaV1):
+class ResourceTypeMixin(object):
+    """Schema for resource type."""
+
+    resource_type = fields.Method('dump_resource_type', 'load_resource_type')
+
+    def load_resource_type(self, data):
+        """Split the resource type and into seperate keys."""
+        if not isinstance(data, string_types):
+            raise ValidationError(
+                'Not a string.', field_names=['resource_type'])
+        if not ObjectType.validate_internal_id(data):
+            raise ValidationError(
+                'Not a valid type.', field_names=['resource_type'])
+        serialized_object = {}
+        split_data = data.split('-')
+        if len(split_data) == 2:
+            serialized_object['type'], serialized_object['subtype'] = \
+                 split_data
+        else:
+            serialized_object['type'] = split_data[0]
+        return serialized_object
+
+    def dump_resource_type(self, data):
+        """Dump resource type metadata."""
+        resource_type = data.get('resource_type')
+        if resource_type:
+            if resource_type.get('subtype'):
+                return resource_type['type'] + '-' + resource_type['subtype']
+            else:
+                return resource_type['type']
+        else:
+            return missing
+
+
+class AlternateIdentifierSchemaV1(IdentifierSchemaV1, ResourceTypeMixin):
     """Schema for an alternate identifier."""
 
 
-class RelatedIdentifierSchemaV1(IdentifierSchemaV1):
+class RelatedIdentifierSchemaV1(IdentifierSchemaV1, ResourceTypeMixin):
     """Schema for a related identifier."""
 
     relation = fields.Str(
@@ -313,7 +349,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
     keywords = fields.List(SanitizedUnicode())
     locations = fields.List(
         fields.Nested(LocationSchemaV1), validate=validate.Length(min=1))
-    notes = SanitizedUnicode()
+    notes = SanitizedHTML()
     version = SanitizedUnicode()
     language = SanitizedUnicode()
     access_right = fields.Str(validate=validate.OneOf(
@@ -421,6 +457,9 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
             # If the DOI exists, check if it's been assigned to this record
             # by fetching the recid and comparing both PIDs record UUID
             try:
+                # If the deposit has not been created yet, raise
+                if not self.context.get('recid'):
+                    raise err
                 recid_pid = PersistentIdentifier.get(
                     'recid', self.context['recid'])
             except PIDDoesNotExistError:
@@ -494,12 +533,6 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                         'Invalid type for term "{0}", should be "{1}".'
                         .format(term, valid_terms[term]['term_type']),
                         field_names=['custom'])
-            multiple_values = valid_terms[term]['multiple']
-            if len(values) > 1 and not multiple_values:
-                raise ValidationError(
-                    'The term "{0}" accepts only one value.'
-                    .format(term),
-                    field_names=['custom'])
         return obj
 
     def dump_custom(self, data):
@@ -604,6 +637,19 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
             )
         )
 
+    def _thumbnail_urls(self, recid):
+        """Create the thumbnail URL for an image."""
+        thumbnail_urls = {}
+        cached_sizes = current_app.config.get('CACHED_THUMBNAILS')
+        for size in cached_sizes:
+            thumbnail_urls[size] = link_for(
+                current_app.config.get('THEME_SITEURL'),
+                'thumbs',
+                id=recid,
+                size=size
+            )
+        return thumbnail_urls
+
     def _dump_common_links(self, obj):
         """Dump common links for deposits and records."""
         links = {}
@@ -623,8 +669,9 @@ class CommonRecordSchemaV1(Schema, StrictKeysMixin):
         for f in files:
             if f.get('type') in thumbnail_exts:
                 try:
-                    links['thumb250'] = self._thumbnail_url(f, 250)
                     # First previewable image is used for preview.
+                    links['thumbs'] = self._thumbnail_urls(m.get('recid'))
+                    links['thumb250'] = self._thumbnail_url(f, 250)
                 except RuntimeError:
                     pass
                 break

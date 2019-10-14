@@ -30,6 +30,7 @@ import json
 from datetime import datetime, timedelta
 
 from flask import url_for
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_search import current_search
 from six import BytesIO
 
@@ -110,11 +111,13 @@ def test_input_output(api_client, es, json_auth_headers, deposit_url, get_json,
                 dict(identifier='10.1234/foo.bar2', relation='isCitedBy',
                      scheme='doi'),
                 dict(identifier='10.1234/foo.bar3', relation='cites',
-                     scheme='doi'),
+                     scheme='doi',
+                     resource_type='dataset'),
                 dict(
                     identifier='2011ApJS..192...18K',
                     relation='isAlternateIdentifier',
-                    scheme='ads'),
+                    scheme='ads',
+                    resource_type='publication-article'),
             ],
             thesis_supervisors=[
                 dict(name="Doe Sr., John", affiliation="Atlantis"),
@@ -278,3 +281,19 @@ def test_validation(api_client, es, json_auth_headers, deposit_url, get_json,
 
     for e in expected_field_errors:
         assert e in field_errors
+
+
+def test_existing_doi(db, api_client, json_auth_headers, deposit_url,
+                      minimal_deposit, get_json):
+    """Test deposit creation with existing non-local DOI."""
+    # Create a DOI
+    doi_value = '10.1234/foo.bar'
+    PersistentIdentifier.create(pid_type='doi', pid_value=doi_value)
+    db.session.commit()
+
+    # Try to use the DOI for a new deposit
+    minimal_deposit['metadata']['doi'] = doi_value
+    resp = api_client.post(
+        deposit_url, data=json.dumps(minimal_deposit),
+        headers=json_auth_headers)
+    assert resp.status_code == 400

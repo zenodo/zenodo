@@ -69,6 +69,7 @@ from invenio_records.models import RecordMetadata
 from invenio_records_files.api import RecordsBuckets
 from invenio_search import current_search, current_search_client
 from invenio_sipstore import current_sipstore
+from pkg_resources import resource_stream
 from six import BytesIO, b
 from sqlalchemy_utils.functions import create_database, database_exists
 
@@ -216,21 +217,13 @@ def default_config(tmp_db_path):
             'dwc': {
                 '@context': 'http://rs.tdwg.org/dwc/terms/',
                 'attributes': {
-                    'family': {
-                        'type': 'keyword',
-                        'multiple': False
-                    },
-                    'genus': {
-                        'type': 'keyword',
-                        'multiple': True
-                    },
-                    'behavior': {
-                        'type': 'text',
-                        'multiple': False
-                    }
+                    'family': {'type': 'keyword', },
+                    'genus': {'type': 'keyword', },
+                    'behavior': {'type': 'text', }
                 }
             }
         },
+        SEARCH_INDEX_PREFIX='zenodo-test-',
     )
 
 
@@ -690,9 +683,15 @@ def full_record():
             {'identifier': '1234.4328', 'scheme':
                 'arxiv', 'relation': 'references'},
             {'identifier': '10.1234/zenodo.4321', 'scheme':
-                'doi', 'relation': 'isPartOf'},
+                'doi', 'relation': 'isPartOf',
+                'resource_type': {
+                    'type': 'software'}},
             {'identifier': '10.1234/zenodo.1234', 'scheme':
-                'doi', 'relation': 'hasPart'},
+                'doi', 'relation': 'hasPart',
+                'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }},
         ],
         alternate_identifiers=[
             {'identifier': 'urn:lsid:ubio.org:namebank:11815',
@@ -702,7 +701,11 @@ def full_record():
             {'identifier': '0317-8471',
              'scheme': 'issn', },
             {'identifier': '10.1234/alternate.doi',
-             'scheme': 'doi', },
+             'scheme': 'doi',
+             'resource_type': {
+                    'type': 'publication',
+                    'subtype': 'section'
+                }},
         ],
         contributors=[
             {'affiliation': 'CERN', 'name': 'Smith, Other', 'type': 'Other',
@@ -828,6 +831,23 @@ def record_with_files_creation(db, record_with_bucket):
     record.files[filename] = BytesIO(b'v1')
     record.files[filename]['type'] = 'pdf'
     record.commit()
+    db.session.commit()
+
+    record_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value)
+
+    return pid, record, record_url
+
+
+@pytest.fixture
+def record_with_image_creation(db, record_with_bucket):
+    """Creation of a full record with files in database."""
+    pid, record = record_with_bucket
+    filename = 'Test.png'
+    record.files[filename] = resource_stream(
+        'zenodo.modules.theme', 'static/img/eu.png')
+    record.files[filename]['type'] = 'png'
+    record.commit()
+    db.session.commit()
 
     record_url = url_for('invenio_records_ui.recid', pid_value=pid.pid_value)
 
@@ -881,79 +901,90 @@ def funder_record(db):
 
 
 @pytest.fixture
-def grant_records(db, funder_record):
+def grant_records(db, es, funder_record):
     """Create grant records."""
     grants = [
-        Record.create(dict(
-            internal_id='10.13039/501100000780::282896',
-            funder={'$ref': 'https://dx.doi.org/10.13039/501100000780'},
-            identifiers=dict(
-                eurepo='info:eu-repo/grantAgreement/EC/FP7/282896',
-            ),
-            code='282896',
-            title='Open Access Research Infrastructure in Europe',
-            acronym='OpenAIREplus',
-            program='FP7',
-        )),
-        Record.create(dict(
-            internal_id='10.13039/501100000780::027819',
-            funder={'$ref': 'https://dx.doi.org/10.13039/501100000780'},
-            identifiers=dict(
-                eurepo='info:eu-repo/grantAgreement/EC/FP6/027819',
-            ),
-            code='027819',
-            title='Integrating cognition, emotion and autonomy',
-            acronym='ICEA',
-            program='FP6',
-        )),
+        Record.create({
+            '$schema': 'https://zenodo.org/schemas/grants/grant-v1.0.0.json',
+            'internal_id': '10.13039/501100000780::282896',
+            'funder': {'$ref': 'https://dx.doi.org/10.13039/501100000780'},
+            'identifiers': {
+                'eurepo': 'info:eu-repo/grantAgreement/EC/FP7/282896',
+            },
+            'code': '282896',
+            'title': 'Open Access Research Infrastructure in Europe',
+            'acronym': 'OpenAIREplus',
+            'program': 'FP7',
+        }),
+        Record.create({
+            '$schema': 'https://zenodo.org/schemas/grants/grant-v1.0.0.json',
+            'internal_id': '10.13039/501100000780::027819',
+            'funder': {'$ref': 'https://dx.doi.org/10.13039/501100000780'},
+            'identifiers': {
+                'eurepo': 'info:eu-repo/grantAgreement/EC/FP6/027819',
+            },
+            'code': '027819',
+            'title': 'Integrating cognition, emotion and autonomy',
+            'acronym': 'ICEA',
+            'program': 'FP6',
+        }),
     ]
     for g in grants:
         PersistentIdentifier.create(
             pid_type='grant', pid_value=g['internal_id'], object_type='rec',
             object_uuid=g.id, status='R')
     db.session.commit()
+    for g in grants:
+        RecordIndexer().index_by_id(g.id)
+    current_search.flush_and_refresh(index='grants')
     return grants
 
 
 @pytest.fixture
-def license_record(db, sip_metadata_types):
+def license_record(db, es, sip_metadata_types):
     """Create a license record."""
-    license = Record.create({
-        "$schema": "https://zenodo.org/schemas/licenses/license-v1.0.0.json",
-        "domain_content": True,
-        "domain_data": True,
-        "domain_software": True,
-        "family": "",
-        "id": "CC-BY-4.0",
-        "maintainer": "Creative Commons",
-        "od_conformance": "approved",
-        "osd_conformance": "not reviewed",
-        "status": "active",
-        "title": "Creative Commons Attribution International 4.0",
-        "url": "https://creativecommons.org/licenses/by/4.0/"
-    })
-    PersistentIdentifier.create(
-        pid_type='od_lic', pid_value=license['id'], object_type='rec',
-        object_uuid=license.id, status='R')
-    license = Record.create({
-        "$schema": "https://zenodo.org/schemas/licenses/license-v1.0.0.json",
-        "domain_content": True,
-        "domain_data": True,
-        "domain_software": True,
-        "family": "",
-        "id": "CC0-1.0",
-        "maintainer": "Creative Commons",
-        "od_conformance": "approved",
-        "osd_conformance": "not reviewed",
-        "status": "active",
-        "title": "CC0 1.0",
-        "url": "https://creativecommons.org/publicdomain/zero/1.0/"
-    })
-    PersistentIdentifier.create(
-        pid_type='od_lic', pid_value=license['id'], object_type='rec',
-        object_uuid=license.id, status='R')
+    licenses = [
+        Record.create({
+            "$schema":
+                "https://zenodo.org/schemas/licenses/license-v1.0.0.json",
+            "domain_content": True,
+            "domain_data": True,
+            "domain_software": True,
+            "family": "",
+            "id": "CC-BY-4.0",
+            "maintainer": "Creative Commons",
+            "od_conformance": "approved",
+            "osd_conformance": "not reviewed",
+            "status": "active",
+            "title": "Creative Commons Attribution International 4.0",
+            "url": "https://creativecommons.org/licenses/by/4.0/"
+        }),
+        Record.create({
+            "$schema":
+                "https://zenodo.org/schemas/licenses/license-v1.0.0.json",
+            "domain_content": True,
+            "domain_data": True,
+            "domain_software": True,
+            "family": "",
+            "id": "CC0-1.0",
+            "maintainer": "Creative Commons",
+            "od_conformance": "approved",
+            "osd_conformance": "not reviewed",
+            "status": "active",
+            "title": "CC0 1.0",
+            "url": "https://creativecommons.org/publicdomain/zero/1.0/"
+        })
+    ]
+    for license in licenses:
+        PersistentIdentifier.create(
+            pid_type='od_lic', pid_value=license['id'], object_type='rec',
+            object_uuid=license.id, status='R')
+
     db.session.commit()
-    return license
+    for license in licenses:
+        RecordIndexer().index_by_id(license.id)
+    current_search.flush_and_refresh(index='licenses')
+    return licenses[1]
 
 
 @pytest.fixture

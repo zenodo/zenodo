@@ -39,13 +39,12 @@ services:
     ports:
       - "6379:6379"
   db:
-    build: ./docker/postgres/
-    image: zenodo-postgres
-    command: postgres
+    image: postgres:9.6
     restart: "always"
     environment:
-      - "POSTGRES_PASSWORD=postgres"
-      - "POSTGRES_USER=admin"
+      - "POSTGRES_USER=zenodo"
+      - "POSTGRES_PASSWORD=zenodo"
+      - "POSTGRES_DB=zenodo"
     ports:
       - "5432:5432"
   mq:
@@ -55,17 +54,23 @@ services:
       - "15672:15672"
       - "5672:5672"
   es:
-    build: ./docker/es/
-    image: zenodo-es:2.4.6
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
     restart: "always"
+    environment:
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - discovery.type=single-node
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
     ports:
       - "9200:9200"
       - "9300:9300"
   kibana:
-    build: ./docker/kibana/
-    image: zenodo-kibana:4.3
+    image: docker.elastic.co/kibana/kibana-oss:7.1.1
     restart: "always"
-    command: kibana
     ports:
       - "5601:5601"
     environment:

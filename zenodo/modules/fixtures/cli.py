@@ -31,6 +31,7 @@ from os.path import dirname, join
 
 import click
 from flask.cli import with_appcontext
+from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_communities.utils import initialize_communities_bucket
 from invenio_db import db
@@ -47,7 +48,7 @@ from .users import loaduser
 from .utils import read_json
 
 
-@click.group()
+@click.group(chain=True)
 def fixtures():
     """Command for loading fixture data."""
 
@@ -112,23 +113,20 @@ def loadfunders_cli():
 
 
 @fixtures.command('loaddemorecords')
+@click.option('--records-file', type=click.File(),
+              default=join(dirname(__file__), 'data/records.json'))
+@click.option('--owner', default='info@zenodo.org')
 @with_appcontext
-def loaddemorecords_cli():
+def loaddemorecords_cli(records_file=None, owner=None):
     """Load demo records."""
-    click.echo('Loading demo data...')
-    with open(join(dirname(__file__), 'data/records.json'), 'r') as fp:
-        data = json.load(fp)
+    # Resolve the user
+    if owner.isdigit():  # user ID passed
+        owner = User.query.get(int(owner))
+    else:
+        owner = User.query.filter_by(email=owner).one()
 
-    click.echo('Sending tasks to queue...')
-    with click.progressbar(data) as records:
-        loaddemorecords(records)
-
-    click.echo("1. Start Celery:")
-    click.echo("     celery worker -A zenodo.celery -l INFO")
-    click.echo("2. After tasks have been processed start reindexing:")
-    click.echo("     zenodo migration recordsrun")
-    click.echo("     zenodo index reindex -t recid")
-    click.echo("     zenodo index run -d -c 4")
+    with click.progressbar(json.load(records_file)) as records:
+        loaddemorecords(records, owner)
 
 
 @fixtures.command('loadsipmetadatatypes')

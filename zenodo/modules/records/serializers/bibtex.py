@@ -85,12 +85,12 @@ class Bibtex(object):
     def format(self):
         """Return BibTeX export for single record."""
         formats = {
-            'dataset': self._format_misc,
+            'dataset': self._format_dataset,
             'image': self._format_misc,
             'poster': self._format_misc,
             'presentation': self._format_misc,
             'publication': self._format_publication,
-            'software': self._format_misc,
+            'software': self._format_software,
             'video': self._format_misc,
             'default': self._format_misc,
         }
@@ -256,7 +256,31 @@ class Bibtex(object):
         """
         name = "misc"
         req_fields = []
-        opt_fields = ['author', 'title', 'month', 'year', 'note']
+        opt_fields = [
+            'author', 'title', 'month', 'year', 'note', 'publisher', 'version'
+            ]
+        ign_fields = ['doi', 'url']
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
+
+    def _format_software(self):
+        """Format software entry type."""
+        name = 'software'
+        req_fields = []
+        opt_fields = [
+            'author', 'title', 'month', 'year', 'note', 'publisher', 'version'
+            ]
+        ign_fields = ['doi', 'url']
+        return self._format_entry(name, req_fields,
+                                  opt_fields, ign_fields)
+
+    def _format_dataset(self):
+        """Format dataset entry type."""
+        name = 'dataset'
+        req_fields = []
+        opt_fields = [
+            'author', 'title', 'month', 'year', 'note', 'publisher', 'version'
+            ]
         ign_fields = ['doi', 'url']
         return self._format_entry(name, req_fields,
                                   opt_fields, ign_fields)
@@ -280,7 +304,8 @@ class Bibtex(object):
             'venue': self._get_venue,
             'volume': self._get_volume,
             'year': self._get_year,
-            'doi': self._get_doi
+            'doi': self._get_doi,
+            'version': self._get_version
         }
         out = ""
         for field in req_fields:
@@ -496,3 +521,7 @@ class Bibtex(object):
     def _get_volume(self):
         """Return the volume of a journal or multi-volume book."""
         return self.record.get("journal", {}).get("volume", "")
+
+    def _get_version(self):
+        """Return the version of a record."""
+        return self.record.get('version', "")

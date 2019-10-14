@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2016 CERN.
+# Copyright (C) 2016-2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,25 +22,4 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Zenodo-specific InvenioIndexer utility functions."""
-
-from __future__ import absolute_import, print_function
-
-from flask import current_app
-from invenio_indexer.utils import default_record_to_index
-
-
-def record_to_index(record):
-    """Get the elasticsearch index and doc_type for given record.
-
-    Construct the index name from the `record['$schema']`, which is then
-    mapped with an elastisearch document type (fixed difinition in the config).
-
-    :param record: The record object.
-    :type record: `invenio_records.api.Record`
-    :returns: Tuple of (index, doc_type)
-    :rtype: (str, str)
-    """
-    index, doc_type = default_record_to_index(record)
-    return index, current_app.config['INDEXER_SCHEMA_TO_INDEX_MAP'].get(
-        index, doc_type)
+"""Elasticsearch v7 index templates for stats aggregations."""

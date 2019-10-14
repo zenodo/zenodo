@@ -44,6 +44,7 @@ from invenio_records_ui.signals import record_viewed
 
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.openaire import current_openaire
+from zenodo.modules.records import current_zenodo_records
 from zenodo.modules.records.permissions import record_permission_factory
 
 from .api import ZenodoDeposit

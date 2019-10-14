@@ -30,7 +30,7 @@ import json
 from datetime import datetime, timedelta
 
 import pytest
-from flask import render_template, render_template_string, url_for
+from flask import current_app, render_template, render_template_string, url_for
 from helpers import login_user_via_session
 from invenio_indexer.api import RecordIndexer
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
@@ -296,3 +296,31 @@ def test_stats(app, db, minimal_record, stats, expected_result):
         assert expected_result['unique_views'] in template
         assert expected_result['unique_downloads'] in template
         assert 'All versions' not in template
+
+
+def test_record_thumbnail(app, record_with_image_creation):
+    """Test cached record thumbnails."""
+    pid, record, record_url = record_with_image_creation
+    for cached_thumbnail in current_app.config['CACHED_THUMBNAILS']:
+        with app.test_client() as client:
+            res = client.get(url_for(
+                'invenio_records_ui.recid_thumbnail',
+                pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
+        assert res.status_code == 200
+    with app.test_client() as client:
+        res = client.get(url_for(
+            'invenio_records_ui.recid_thumbnail',
+            pid_value=pid.pid_value, thumbnail_size='nonvalid'))
+    assert res.status_code == 400
+
+
+def test_record_thumbnail_without_images(app, record_with_files_creation):
+    """Test cached thumbnails on record without images."""
+    pid, record, record_url = record_with_files_creation
+    thumbnail_config = current_app.config['CACHED_THUMBNAILS']
+    cached_thumbnail = list(thumbnail_config)[0]
+    with app.test_client() as client:
+        res = client.get(url_for(
+            'invenio_records_ui.recid_thumbnail',
+            pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
+    assert res.status_code == 404

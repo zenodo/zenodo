@@ -40,7 +40,7 @@ def test_update_record_statistics(app, db, es, locations, event_queues,
     records = create_stats_fixtures(
         metadata=minimal_record, n_records=1, n_versions=5, n_files=3,
         event_data={'user_id': '1'},
-        # 4 event timestamps
+        # 4 event timestamps (half-hours between 13:00-15:00)
         start_date=datetime(2018, 1, 1, 13),
         end_date=datetime(2018, 1, 1, 15),
         interval=timedelta(minutes=30),

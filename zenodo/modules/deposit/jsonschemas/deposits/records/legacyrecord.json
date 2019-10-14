@@ -309,6 +309,9 @@
               "urn"
             ],
             "type": "string"
+          },
+          "resource_type": {
+            "type": "string"
           }
         },
         "type": "object"
@@ -356,6 +359,7 @@
           "workingpaper",
           "datamanagementplan",
           "annotationcollection",
+          "taxonomictreatment",
           "other"
         ],
         "type": "string"

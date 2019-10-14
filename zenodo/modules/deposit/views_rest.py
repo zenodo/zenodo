@@ -74,7 +74,7 @@ def pass_extra_formats_mimetype(from_query_string=None, from_content_type=None,
 
     def decorator(f):
         @wraps(f)
-        def inner(self, *args, **kwargs):
+        def inner(*args, **kwargs):
             mimetype = None
             if from_query_string:
                 mimetype = request.args.get('mimetype')
@@ -85,7 +85,7 @@ def pass_extra_formats_mimetype(from_query_string=None, from_content_type=None,
             if mimetype not in ExtraFormats.mimetype_whitelist:
                 abort(400, '"{}" is not an acceptable MIMEType.'
                       .format(mimetype))
-            return f(self, *args, mimetype=mimetype, **kwargs)
+            return f(*args, mimetype=mimetype, **kwargs)
         return inner
     return decorator
 

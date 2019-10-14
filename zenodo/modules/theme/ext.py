@@ -26,12 +26,23 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import current_app, render_template
+import base64
+import hashlib
+
+from flask import current_app, render_template, request
 
 
 def too_many_requests(e):
     """Error handler to show a 429.html page in case of a 429 error."""
     return render_template(current_app.config['THEME_429_TEMPLATE']), 429
+
+
+def useragent_and_ip_limit_key():
+    """Create key for the rate limiting."""
+    ua_hash = hashlib.sha256(str(request.user_agent).encode('utf8')).digest()
+    return u'{}:{}'.format(
+        base64.b64encode(ua_hash).decode('ascii'), request.remote_addr
+    )
 
 
 class ZenodoTheme(object):

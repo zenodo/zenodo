@@ -61,7 +61,7 @@ class BucketWriter(object):
 
 def filename_factory(**kwargs):
     """Get a function which generates a filename with a timestamp."""
-    return lambda: '{index}-{timestamp}.{format}'.format(
+    return lambda: '{name}-{timestamp}.{format}'.format(
         timestamp=datetime.utcnow().replace(microsecond=0).isoformat(),
         **kwargs
     )

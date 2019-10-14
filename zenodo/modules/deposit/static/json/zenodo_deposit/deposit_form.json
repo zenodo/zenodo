@@ -129,12 +129,16 @@
             "name": "Software documentation"
           },
           {
-            "value": "thesis",
-            "name": "Thesis"
+            "value": "taxonomictreatment",
+            "name": "Taxonomic treatment"
           },
           {
             "value": "technicalnote",
             "name": "Technical note"
+          },
+          {
+            "value": "thesis",
+            "name": "Thesis"
           },
           {
             "value": "workingpaper",
@@ -456,10 +460,10 @@
               },
               "map": {
                 "resultSource": "text.0.options",
-                "valueSource": "payload.id",
-                "nameSource": "text",
+                "valueSource": "_source.id",
+                "nameSource": "_source.title",
                 "valueProperty": "value",
-                "nameProperty": "text"
+                "nameProperty": "_source.title"
               },
               "maxResultDisplay": 10
             },
@@ -508,8 +512,8 @@
                   },
                   "map": {
                     "resultSource": "text.0.options",
-                    "valueSource": "payload.legacy_id",
-                    "nameSource": "payload",
+                    "valueSource": "_source.legacy_id",
+                    "nameSource": "_source",
                     "valueProperty": "value",
                     "nameProperty": "text"
                   }
@@ -561,6 +565,10 @@
                     "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NL)"
                   },
                   {
+                    "value": "10.13039/501100000690",
+                    "name": "Research Councils (UK)"
+                  },
+                  {
                     "value": "10.13039/501100001711",
                     "name": "Schweizerischer Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung (CH)"
                   },
@@ -595,7 +603,10 @@
         "fa_cls": "fa-barcode",
         "description": "",
         "sortOptions": {
-          "disabled": true
+          "disabled": false,
+          "handle": "i.sort-handle",
+          "cursor": "move",
+          "axis": "y"
         },
         "add": "Add another related identifier",
         "inline": true,
@@ -646,12 +657,28 @@
                 "name": "is new version of this upload"
               },
               {
+                "value": "isContinuedBy",
+                "name": "continues this upload"
+              },
+              {
+                "value": "continues",
+                "name": "is continued by this upload"
+              },
+              {
                 "value": "isPartOf",
                 "name": "has this upload as part"
               },
               {
                 "value": "hasPart",
                 "name": "is part of this upload"
+              },
+              {
+                "value": "isReviewedBy",
+                "name": "reviews this upload"
+              },
+              {
+                "value": "reviews",
+                "name": "is reviewed this upload"
               },
               {
                 "value": "isDocumentedBy",
@@ -670,6 +697,14 @@
                 "name": "compiled/created this upload"
               },
               {
+                "value": "isDerivedFrom",
+                "name": "is the source this upload is derived from"
+              },
+              {
+                "value": "isSourceOf",
+                "name": "has this upload as its source"
+              },
+              {
                 "value": "isIdenticalTo",
                 "name": "is identical to this upload"
               },
@@ -678,6 +713,12 @@
                 "name": "is an alternate identifier of this upload"
               }
             ]
+          },
+          {
+            "type": "template",
+            "templateUrl": "/static/templates/zenodo_deposit/resource-type-selector.html",
+            "key": "related_identifiers[].resource_type",
+            "description": "Optional. Resource type of the related identifier."
           }
         ]
       }

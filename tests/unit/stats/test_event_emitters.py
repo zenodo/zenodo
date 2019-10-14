@@ -47,7 +47,8 @@ def test_record_page(app, db, es, event_queues, full_record):
     process_events(['record-view'])
     current_search.flush_and_refresh(index='events-stats-record-view')
 
-    search = Search(using=es, index='events-stats-record-view')
+    prefix = app.config['SEARCH_INDEX_PREFIX']
+    search = Search(using=es, index=prefix+'events-stats-record-view')
     assert search.count() == 1
     doc = search.execute()[0]
     assert doc['doi'] == '10.1234/foo.bar'
@@ -79,7 +80,8 @@ def test_file_download(app, db, es, event_queues, record_with_files_creation):
     process_events(['file-download'])
     current_search.flush_and_refresh(index='events-stats-file-download')
 
-    search = Search(using=es, index='events-stats-file-download')
+    prefix = app.config['SEARCH_INDEX_PREFIX']
+    search = Search(using=es, index=prefix+'events-stats-file-download')
     assert search.count() == 1
     doc = search.execute()[0]
     assert doc['doi'] == '10.1234/foo.bar'

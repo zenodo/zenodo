@@ -31,10 +31,10 @@ from os.path import dirname, join
 
 from flask import current_app
 from invenio_db import db
+from invenio_indexer.utils import schema_to_index
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
-from invenio_search.utils import schema_to_index
 from lxml import etree
 from sqlalchemy import or_
 from werkzeug.utils import import_string
@@ -174,7 +174,7 @@ def build_record_custom_fields(record):
     for term, value in custom_metadata.items():
         term_type = valid_terms.get(term)['term_type']
         if term_type:
-            # TODO: in the futurem also add "community"
+            # TODO: in the future also add "community"
             es_object = {'key': term, 'value': value}
             es_custom_field = custom_fields_mapping[term_type]
             es_custom_fields[es_custom_field].append(es_object)

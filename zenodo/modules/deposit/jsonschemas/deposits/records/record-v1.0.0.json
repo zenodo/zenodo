@@ -449,6 +449,22 @@
               "urn"
             ],
             "type": "string"
+          },
+          "resource_type": {
+            "additionalProperties": false,
+            "description": "Record resource type.",
+            "properties": {
+              "subtype": {
+                "description": "Specific resource type.",
+                "type": "string"
+              },
+              "type": {
+                "default": "publication",
+                "description": "General resource type.",
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"
@@ -877,6 +893,22 @@
               "urn"
             ],
             "type": "string"
+          },
+          "resource_type": {
+            "additionalProperties": false,
+            "description": "Record resource type.",
+            "properties": {
+              "subtype": {
+                "description": "Specific resource type.",
+                "type": "string"
+              },
+              "type": {
+                "default": "publication",
+                "description": "General resource type.",
+                "type": "string"
+              }
+            },
+            "type": "object"
           }
         },
         "type": "object"

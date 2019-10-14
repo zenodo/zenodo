@@ -75,7 +75,7 @@
       <p>{{ record.description|safe }}</p>
       {%- if record.notes %}
       <div class="alert alert-warning">
-        {{ record.notes}}
+        {{ record.notes|safe}}
       </div>
       {%- endif %}
       {%- endblock record_body %}
@@ -83,6 +83,7 @@
       {%- set files = record.files if current_user|has_record_perm(record, 'read-files') else [] %}
       {%-  include "zenodo_records/box/preview.html" %}
       {%-  include "zenodo_records/box/files.html" %}
+      {%-  include "zenodo_records/box/files_extra.html" %}
       {%-  include "zenodo_records/box/references.html" %}
       {%-  include "zenodo_records/box/citations.html" %}
       {%- endblock record_body_extra %}

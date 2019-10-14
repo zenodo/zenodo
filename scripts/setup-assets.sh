@@ -38,13 +38,14 @@ then
 fi
 
 # Checking binaries
-if [[ -z "$(which cleancss)" || -z "$(which node-sass)" || -z "$(which uglifyjs)" || -z "$(which r_js)" ]] 
+if [[ -z "$(which cleancss)" || -z "$(which node-sass)" || -z "$(which uglifyjs)" || -z "$(which r_js)" ]]
 then
-    echo "Please run ./setup-npm"; exit 1; 
+    echo "Please run ./setup-npm"; exit 1;
 fi
 
 zenodo npm --pinned-file ${SOURCE}
 cd ${VIRTUAL_ENV}/var/instance/static
+rm -rf gen .webassets-cache
 npm install
 cd ${CWD}
 zenodo collect -v
