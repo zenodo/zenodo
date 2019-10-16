@@ -9,7 +9,7 @@
     <i ng-if="form.fa_cls" class="fa fa-fw {{ form.fa_cls }}"></i>&nbsp;{{ form.title }}
   </label>
   <div
-    class="col-sm-9"
+    class="{{showTitle() ? 'col-sm-9' : 'col-sm-12'}} "
     ng-class="{'input-group': (form.fieldAddonLeft || form.fieldAddonRight)}">
     <span
       ng-if="form.fieldAddonLeft"
