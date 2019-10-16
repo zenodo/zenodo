@@ -1100,5 +1100,164 @@
         ]
       }
     ]
+  },
+  {
+    "type": "fieldset",
+    "title": "Dataset",
+    "description": "Specify descriptive metadata for the upload, regarding its temporal or geographical attributes.",
+    "fieldhint": "optional",
+    "collapsed": true,
+    "items": [
+      {
+        "type": "array",
+        "key": "locations",
+        "title": "Locations",
+        "fa_cls": "fa-map-marker",
+        "description": "",
+        "add": "Add another location",
+        "sortOptions": {
+          "disabled": false,
+          "handle": "i.sort-handle",
+          "cursor": "move",
+          "axis": "y"
+        },
+        "destroyStrategy": "empty",
+        "items": [
+          {
+            "type": "array",
+            "notitle": true,
+            "description": "",
+            "inline": true,
+            "add": null,
+            "remove": null,
+            "key": "nokey",
+            "destroyStrategy": "retain",
+            "items": [
+              {
+                "key": "locations[].place",
+                "notitle": true,
+                "description": "Place",
+                "placeholder": "",
+                "feedback": false
+              },
+              {
+                "key": "locations[].lat",
+                "notitle": true,
+                "description": "Latitude",
+                "placeholder": "",
+                "feedback": false
+              },
+              {
+                "key": "locations[].lon",
+                "notitle": true,
+                "description": "Longitude",
+                "placeholder": "",
+                "feedback": false
+              }
+            ]
+          },
+          {
+            "fieldHtmlClass": "description",
+            "key": "locations[].description",
+            "notitle": true,
+            "description": "Description",
+            "feedback": false
+          },
+          {
+            "type": "help",
+            "helpvalue": "<hr>"
+          }
+        ]
+      },
+      {
+        "type": "array",
+        "key": "dates",
+        "title": "Date interval",
+        "fa_cls": "fa-calendar",
+        "description": "",
+        "add": "Add another date",
+        "sortOptions": {
+          "disabled": false,
+          "handle": "i.sort-handle",
+          "cursor": "move",
+          "axis": "y"
+        },
+        "destroyStrategy": "empty",
+        "items": [
+          {
+            "type": "array",
+            "notitle": true,
+            "description": "",
+            "inline": true,
+            "add": null,
+            "remove": null,
+            "key": "nokey",
+            "destroyStrategy": "retain",
+            "items": [
+          {
+            "type": "select",
+            "key": "dates[].type",
+            "notitle": true,
+            "description": "Type",
+            "placeholder": "Place",
+            "titleMap": [
+              {
+                "value": "Collected",
+                "name": "Collected"
+              },
+              {
+                "value": "Valid",
+                "name": "Valid"
+              },
+              {
+                "value": "Withdrawn",
+                "name": "Withdrawn"
+              }
+            ]
+          },
+          {
+            "type": "template",
+            "key": "dates[].start",
+            "notitle": true,
+            "description": "Start Date",
+            "placeholder": "e.g.: 2013-05-08",
+            "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
+            "format": "yyyy-MM-dd"
+          },
+          {
+            "type": "template",
+            "key": "dates[].end",
+            "notitle": true,
+            "description": "End Date (Optional)",
+            "placeholder": "e.g.: 2013-05-08",
+            "templateUrl": "/static/templates/zenodo_deposit/datepicker.html",
+            "format": "yyyy-MM-dd"
+
+          }
+        ]
+      },
+      {
+        "fieldHtmlClass": "description",
+        "key": "dates[].description",
+        "notitle": true,
+        "description": "Description",
+        "feedback": false
+      },
+      {
+        "type": "help",
+        "helpvalue": "<hr>"
+      }
+      ]
+      },
+      {
+
+        "type": "textarea",
+        "key": "method",
+        "title": "Method",
+        "description": "Description of the methodology used for the study or research. Optional.",
+        "fa_cls": "fa-pencil",
+        "required": false
+      }
+    ]
   }
 ]
