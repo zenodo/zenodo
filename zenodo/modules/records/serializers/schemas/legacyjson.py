@@ -197,7 +197,7 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             if not g:
                 continue
             # FP7 project grant
-            if not g.startswith('10.13039/'):
+            if not str(g).startswith('10.13039/'):
                 g = '10.13039/501100000780::{0}'.format(g)
             # Check that the PID exists
             grant_pid = PersistentIdentifier.query.filter_by(
