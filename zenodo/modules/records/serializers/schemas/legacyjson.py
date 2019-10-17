@@ -197,6 +197,8 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             if not g:
                 continue
             # FP7 project grant
+            if not isinstance(g, str):
+                raise ValidationError(_('Grant ID should be of type string.'))
             if not g.startswith('10.13039/'):
                 g = '10.13039/501100000780::{0}'.format(g)
             # Check that the PID exists
