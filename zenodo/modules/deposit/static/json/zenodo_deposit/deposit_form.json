@@ -435,6 +435,7 @@
           "removePlugins": "elementspath",
           "removeButtons": ""
         },
+        "required": true,
         "fa_cls": "fa-pencil",
         "description": "Specify the conditions under which you grant users access to the files in your upload. User requesting access will be asked to justify how they fulfil the conditions. Based on the justification, you decide who to grant/deny access. You are not allowed to charge users for granting access to data hosted on Zenodo.",
         "condition": "model.access_right == 'restricted'"
