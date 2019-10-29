@@ -77,6 +77,7 @@ from zenodo.modules.records.permissions import deposit_delete_permission_factory
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
 from zenodo.modules.stats import current_stats_search_client
+from zenodo.modules.stats.utils import build_other_aggregations
 from zenodo.modules.theme.ext import useragent_and_ip_limit_key
 
 
@@ -1457,6 +1458,7 @@ STATS_AGGREGATIONS = {
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: False
             ),
+            other_aggregations=build_other_aggregations,
             metric_fields=dict(
                 unique_count=('cardinality', 'unique_session_id',
                               {'precision_threshold': 1000}),
@@ -1480,6 +1482,7 @@ STATS_AGGREGATIONS = {
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: True
             ),
+            other_aggregations=build_other_aggregations,
             metric_fields=dict(
                 unique_count=(
                     'cardinality', 'unique_session_id',
@@ -1509,6 +1512,7 @@ STATS_AGGREGATIONS = {
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: False
             ),
+            other_aggregations=build_other_aggregations,
             metric_fields=dict(
                 unique_count=('cardinality', 'unique_session_id',
                               {'precision_threshold': 1000}),
@@ -1532,6 +1536,7 @@ STATS_AGGREGATIONS = {
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: True
             ),
+            other_aggregations=build_other_aggregations,
             metric_fields=dict(
                 unique_count=(
                     'cardinality', 'unique_session_id',

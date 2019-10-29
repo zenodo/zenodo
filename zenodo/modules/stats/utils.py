@@ -27,7 +27,9 @@
 import itertools
 
 from elasticsearch.exceptions import NotFoundError
+from elasticsearch_dsl import Search
 from flask import request
+from invenio_search import current_search_client
 from invenio_search.api import RecordsSearch
 from invenio_search.proxies import current_search_client
 from invenio_search.utils import build_alias_name
@@ -152,3 +154,39 @@ def fetch_record_file(recid, filename):
     """Cached record file fetch."""
     _, record = fetch_record(recid)
     return record.files[filename].obj
+
+
+def build_other_aggregations(base_aggregation, index):
+    """."""
+
+    is_machine_bucket = base_aggregation.bucket(
+        'is_machine_bucket', 'terms', field='is_machine',
+        size=2
+    )
+
+    is_machine_bucket.bucket(
+        'country_bucket', 'terms', field='country',
+        size=get_bucket_size(index, 'country')
+    )
+
+    return base_aggregation
+
+
+def get_bucket_size(index, agg_field):
+    """Function to help us define the size for our search query."""
+    from math import ceil
+
+    body = {
+        "aggs": {
+            "size_count": {
+                "cardinality": {
+                    "field": agg_field
+                }
+            }
+        }
+    }
+    search = Search(using=current_search_client, index=index)
+    search.update_from_dict(body)
+    count = search.count()
+    # NOTE: we increase the count by 10% in order to be safe
+    return int(ceil(count + count * 0.1))
