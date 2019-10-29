@@ -52,6 +52,9 @@
       "conceptdoi": {
         "type": "keyword"
       },
+      "revision_id": {
+        "type": "keyword"
+      },
       "communities": {
         "type": "keyword"
       },

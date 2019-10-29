@@ -90,6 +90,9 @@
       },
       "referrer": {
         "type": "keyword"
+      },
+      "revision_id": {
+        "type": "keyword"
       }
     }
   },
