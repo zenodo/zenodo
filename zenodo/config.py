@@ -1434,7 +1434,7 @@ STATS_EVENTS = {
         },
     },
 }
-#: Enabled aggregations from 'zenoodo.modules.stats.registrations'
+#: Enabled aggregations
 STATS_AGGREGATIONS = {
     'record-view-agg': dict(
         templates='zenodo.modules.stats.templates.aggregations',
@@ -1451,6 +1451,7 @@ STATS_AGGREGATIONS = {
                 conceptrecid='conceptrecid',
                 doi='doi',
                 conceptdoi='conceptdoi',
+                revision_id='revision_id',
                 communities=lambda d, _: (
                     list(d.communities) if d.communities else None),
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
@@ -1502,6 +1503,7 @@ STATS_AGGREGATIONS = {
                 conceptrecid='conceptrecid',
                 doi='doi',
                 conceptdoi='conceptdoi',
+                revision_id='revision_id',
                 communities=lambda d, _: (
                     list(d.communities) if d.communities else None),
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
