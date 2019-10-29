@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2018 CERN.
+# Copyright (C) 2018-2019 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -24,6 +24,7 @@
 
 """Zenodo stats exporters."""
 
+import datetime
 import json
 
 import requests
@@ -38,11 +39,11 @@ from six.moves.urllib.parse import urlencode
 
 from zenodo.modules.records.serializers.schemas.common import ui_link_for
 from zenodo.modules.stats.errors import PiwikExportRequestError
-from zenodo.modules.stats.utils import chunkify, fetch_record
+from zenodo.modules.stats.utils import chunkify, fetch_record, get_bucket_size
 
 
 class PiwikExporter:
-    """Events exporter."""
+    """Export events to OpenAIRE's Piwik instance."""
 
     def run(self, start_date=None, end_date=None, update_bookmark=True):
         """Run export job."""
@@ -146,3 +147,65 @@ class PiwikExporter:
             params['download'] = params['url']
 
         return '?{}'.format(urlencode(params, 'utf-8'))
+
+
+class DataCiteReportExporter:
+    """Export stats report to DataCite."""
+
+    def run(self, start_date=None, update_bookmark=True):
+        """Run export job."""
+
+        if start_date is None:
+            bookmark = current_cache.get('datacite_export:bookmark')
+            if bookmark is None:
+                msg = 'Bookmark not found, and no start date specified.'
+                current_app.logger.warning(msg)
+                return
+            year, month = bookmark.split('-')
+            today = datetime.datetime.now()
+            new_date = dateutil_parse('{}-{}-01'.format(year, month + 1))
+            if new_date < today:
+                start_date = new_date
+
+        end_date = start_date.replace(month=start_date.month + 1) - \
+            datetime.timedelta(days=1)  # end of the month
+
+        stats = get_stats(start_date, end_date)
+
+        # TODO
+        # 1) search query: aggregate DOIs + separate between views,
+        # unique_views, download, unique_downloads
+        # + aggregate machine/non-machine + aggregate countries
+        # 2) format the report
+
+
+def get_stats(start_date=None, end_date=None):
+    """."""
+    time_range = {}
+    if start_date is not None:
+        time_range['gte'] = start_date.replace(microsecond=0).isoformat()
+    if end_date is not None:
+        time_range['lte'] = end_date.replace(microsecond=0).isoformat()
+
+    # index = 'stats-record-view-*, stats-file-download-*'
+    index = 'events-stats-record-view-*, events-stats-file-download-*'
+
+    events_query = Search(
+        using=current_search_client,
+        index=index,
+    ).filter(
+        'range', timestamp=time_range
+    )
+    doi_bucket = events_query.aggs.bucket(
+        'doi_bucket', 'terms', field='doi',
+        size=get_bucket_size(index, 'doi')
+    )
+
+    doi_bucket.metric('count', 'sum', field='count')
+    doi_bucket.metric('unique_count', 'sum', field='unique_count')
+    doi_bucket.metric('volume', 'sum', field='volume')  # only for downloads
+
+    # aggregations are not supported with search_type=scan
+    return events_query.execute()
+
+
