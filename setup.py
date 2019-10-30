@@ -111,7 +111,7 @@ install_requires = [
     'invenio-oaiserver>=1.1.1',
     'invenio-oauth2server>=1.0.3',
     'invenio-oauthclient[github]>=1.1.2',
-    'invenio-openaire>=1.0.0a14',
+    'invenio-openaire>=1.0.0a15',
     'invenio-opendefinition>=1.0.0a9',
     'invenio-pidrelations==1.0.0a4',  # next versions require upgrades
     'invenio-pidstore>=1.0.0',
