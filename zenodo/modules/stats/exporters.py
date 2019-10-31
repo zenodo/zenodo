@@ -24,7 +24,11 @@
 
 """Zenodo stats exporters."""
 
+import datetime
 import json
+import uuid
+import zlib
+from copy import deepcopy
 
 import requests
 from dateutil.parser import parse as dateutil_parse
@@ -146,3 +150,81 @@ class PiwikExporter:
             params['download'] = params['url']
 
         return '?{}'.format(urlencode(params, 'utf-8'))
+
+
+class DataciteStatisticsCLient:
+    """Datactite Statistics Client exporter."""
+
+    _DEFAULT_HEADER = {
+        "report-id": "DSR",
+        "release": "rd1",
+        "report-name": "dataset report"
+    }
+
+    _COMPRESSED_REPORT_EXCEPTIONS_HEADER = {
+        "code": 69,
+        "severity": "warning",
+        "message": "Report is compressed using gzip",
+        "help-url": "https://github.com/datacite/sashimi",
+        "data": "usage data needs to be uncompressed",
+    }
+
+    def __init__(self, url, jwt, chunk_size=50000, report_header_values=None):
+        """Initializes DataciteStatisticsClient object."""
+        self.url = url
+        self.jwt = jwt
+        self.chunk_size = chunk_size
+        self.report_header_values = report_header_values
+        self.request_headers = {
+            "content-type": "application/gzip",
+            "content-encoding": "gzip",
+            "accept": "gzip",
+            "authorization": "Bearer " + self.jwt,
+        }
+
+    def _build_report_header(self, start_date, end_date):
+        report_header = deepcopy(self._DEFAULT_HEADER)
+        report_header.update(self.report_header_values)
+        report_header.setdefault("exceptions", [])
+        report_header["exceptions"].append(
+            [deepcopy(self._COMPRESSED_REPORT_EXCEPTIONS_HEADER)]
+        )
+        report_header['reporting-period'] = {
+            'end-date': end_date,
+            'begin-date': start_date
+        }
+        report_header['created'] = datetime.datetime.now().isoformat()
+        return report_header
+
+    def _compress_payload(self, payload):
+        return zlib.compress(json.dumps(payload).encode("utf_8"))
+
+    def send(self, start_date, end_date, datasets, report_header=None):
+        """
+        Send statistic report to Datacite.
+
+        :param str start_date: ISO formatted date
+        :param str end_date: ISO formatted date
+        :param dict datasets: statistics of the specified period
+        :param dict report_header: metadata of the statistic report
+        """
+        id_ = str(uuid.uuid4())
+        report_header = report_header or\
+            self._build_report_header(start_date, end_date)
+        report = {'report-header': report_header}
+        report['id'] = id_
+        report['report-datasets'] = []
+
+        response = requests.put(
+            self.url + '/{}'.format(id_),
+            headers=self.request_headers,
+            data=self._compress_payload(report)
+        )
+
+        for dataset_chunk in chunkify(datasets, self.chunk_size):
+            report['report-datasets'] = dataset_chunk
+            requests.post(
+                url=self.url,
+                headers=self.request_headers,
+                data=self._compress_payload(report)
+            )
