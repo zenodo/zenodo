@@ -94,7 +94,7 @@ def serialize_record(record, pid, serializer, module=None, throws=True,
 
 def is_doi_locally_managed(doi_value):
     """Determine if a DOI value is locally managed."""
-    return any(doi_value.startswith(prefix) for prefix in
+    return any(doi_value.startswith(prefix + '/') for prefix in
                current_app.config['ZENODO_LOCAL_DOI_PREFIXES'])
 
 
@@ -130,7 +130,7 @@ def find_registered_doi_pids(from_date, until_date, prefixes):
         PersistentIdentifier.updated.between(from_date, until_date)
     )
 
-    query.filter(or_(PersistentIdentifier.pid_value.like(prefix + '%') for prefix in prefixes))
+    query.filter(or_(PersistentIdentifier.pid_value.like(prefix + '/' + '%') for prefix in prefixes))
 
     query.order_by(PersistentIdentifier.updated)
 
