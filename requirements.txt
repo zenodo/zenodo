@@ -27,7 +27,7 @@
 
 # Requirements not on PyPI
 -e git+https://github.com/zenodo/zenodo-migrator.git#egg=zenodo-migrator
--e git+https://github.com/inveniosoftware/invenio-index-migrator.git@7dfa368#egg=invenio-index-migrator
+-e git+https://github.com/inveniosoftware/invenio-index-migrator.git@993f1f8#egg=invenio-index-migrator
 
 # PyPI requirements
 alembic==1.0.8
@@ -136,7 +136,7 @@ invenio-migrator==1.0.0a9
 invenio-oaiserver==1.1.1
 invenio-oauth2server==1.0.3
 invenio-oauthclient==1.1.2
-invenio-openaire==1.0.0a14
+invenio-openaire==1.0.0a15
 invenio-opendefinition==1.0.0a9
 invenio-pidrelations==1.0.0a4
 invenio-pidstore==1.0.0
