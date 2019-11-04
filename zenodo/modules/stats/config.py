@@ -28,8 +28,27 @@ ZENODO_STATS_PIWIK_EXPORTER = {
     'id_site': 1,
     'url': 'https://analytics.openaire.eu/piwik.php',
     'token_auth': 'api-token',
-    'chunk_size': 85  # [max piwik payload size = 64k] / [max querystring size = 750]
+    'chunk_size': 50  # [max piwik payload size = 64k] / [max querystring size = 1268]
 }
+
+# max querystring size:
+# idsite=17 		        # 6+2=8
+# rec=1			            # 3+1=4
+# url=<url>			        # 3+41(file URL)+252(max file name)=296
+#                           (x2 in case of file download)
+# _id=<visitor_id>          # 3+57=60
+# cid=<visitor_id>	        # 3+57=60
+# cvar=<cvar>		        # 4+150=154
+# cdt=event.timestamp	    # 3+20=23
+# urlref=event.referrer	    # 6+150=156
+# action_name=action_name	# 11+150=161
+#
+# \ -> 30
+# & -> 9
+# ? -> 1
+# = -> 10
+#
+# tot: 1268
 
 ZENODO_STATS_PIWIK_EXPORT_ENABLED = True
 

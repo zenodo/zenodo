@@ -70,6 +70,10 @@
       },
       "revision_id": {
         "type": "keyword"
+      },
+      "publication_date": {
+        "type": "date",
+        "format": "strict_date_hour_minute_second"
       }
     }
   },

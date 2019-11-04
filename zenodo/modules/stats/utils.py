@@ -62,7 +62,8 @@ def extract_event_record_metadata(record):
         resource_type=record.get('resource_type'),
         communities=record.get('communities'),
         owners=record.get('owners'),
-        revision_id=record.get('revision_id')
+        revision_id=record.get('revision_id'),
+        publication_date=record.get('publication_date')
     )
 
 
