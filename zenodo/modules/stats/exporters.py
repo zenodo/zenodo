@@ -124,7 +124,12 @@ class PiwikExporter:
         visitor_id = event.visitor_id[0:16]
         _, record = fetch_record(event.recid)
         oai = record.get('_oai', {}).get('id')
-        cvar = json.dumps({'1': ['oaipmhID', oai]})
+        cvar = json.dumps({'1': ['oaipmhID', oai],
+                           '2': ['volume', event.to_dict().get('volume')],
+                           '3': ['pub_date', event.publication_date],
+                           '4': ['version', event.revision_id],
+                           '5': ['is_machine', 1 if event.is_machine else 0]
+                           })
         action_name = record.get('title')[:150]  # max 150 characters
 
         params = dict(
