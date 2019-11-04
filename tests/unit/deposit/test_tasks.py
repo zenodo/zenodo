@@ -148,28 +148,44 @@ def test_datacite_register_fail(mocker, app, db, es, minimal_record):
 
 def test_cleanup_indexed_deposits(app, db, es, locations, users,
                                   deposit_metadata, sip_metadata_types):
+    second_deposit_metadata = deepcopy(deposit_metadata)
     with app.test_request_context():
         datastore = app.extensions['security'].datastore
         login_user(datastore.get_user(users[0]['email']))
         id_ = uuid4()
         depid = zenodo_deposit_minter(id_, deposit_metadata)
         ZenodoDeposit.create(deposit_metadata, id_=id_)
+    depid_value = depid.pid_value
+    depid_type = depid.pid_type
+    db.session.commit()
+
+    with app.test_request_context():
+        datastore = app.extensions['security'].datastore
+        login_user(datastore.get_user(users[0]['email']))
+        second_id_ = uuid4()
+        second_depid = zenodo_deposit_minter(
+            second_id_, second_deposit_metadata)
+        ZenodoDeposit.create(second_deposit_metadata, id_=second_id_)
 
     # Emulate a database "failure", which would wipe any models in the session
     db.session.remove()
     current_search.flush_and_refresh(index='deposits')
 
-    # Deposit has been indexed in ES, but not commimted in DB
+    # Deposit has been indexed in ES, but not commited in DB
     assert PersistentIdentifier.query.filter(
-        PersistentIdentifier.pid_type == depid.pid_type,
-        PersistentIdentifier.pid_value == depid.pid_value).count() == 0
-    assert (RecordsSearch(index='deposits').get_record(id_).execute()[0]
-            ._deposit.id == depid.pid_value)
+        PersistentIdentifier.pid_type == second_depid.pid_type,
+        PersistentIdentifier.pid_value == second_depid.pid_value).count() == 0
+    assert (RecordsSearch(index='deposits').get_record(second_id_).execute()[0]
+            ._deposit.id == second_depid.pid_value)
+    # Deposit has been indexed in ES and is also commited in DB
+    assert PersistentIdentifier.query.filter(
+        PersistentIdentifier.pid_type == depid_type,
+        PersistentIdentifier.pid_value == depid_value).count() == 1
 
     cleanup_indexed_deposits.apply()
     current_search.flush_and_refresh(index='deposits')
 
-    assert PersistentIdentifier.query.filter(
-        PersistentIdentifier.pid_type == depid.pid_type,
-        PersistentIdentifier.pid_value == depid.pid_value).count() == 0
-    assert len(RecordsSearch(index='deposits').get_record(id_).execute()) == 0
+    assert len(
+        RecordsSearch(index='deposits').get_record(second_id_).execute()) == 0
+    assert (RecordsSearch(index='deposits').get_record(id_).execute()[0]
+            ._deposit.id == depid_value)

@@ -111,7 +111,7 @@ def cleanup_indexed_deposits():
     .. note:: This task exists because of deposit REST API calls sometimes
         failing after the deposit has already been sent for indexing to ES,
         leaving an inconsistent state of a deposit existing in ES and not in
-        the database. It should be removed once a proper signal mechanism has
+        the database. It should be removed once a proper  signal mechanism has
         been implemented in the ``invenio-records-rest`` and
         ``invenio-deposit`` modules.
     """
@@ -120,9 +120,14 @@ def cleanup_indexed_deposits():
          .query('term', **{'_deposit.status': 'draft'})
          .source(['_deposit.id']))
     res = q.scan()
-    es_depids_info = [(d.to_dict().get('_deposit.id', [None])[0], d.meta.id,
-                       d.meta.index, d.meta.doc_type) for d in res]
-    es_depids = {p[0] for p in es_depids_info}
+    failed_depids, es_depids_info = [], []
+    for d in res:
+        try:
+            es_depids_info.append((d.to_dict()['_deposit']['id'], d.meta.id,
+                                   d.meta.index, d.meta.doc_type))
+            es_depids = {p[0] for p in es_depids_info}
+        except Exception:
+            failed_depids.append(d.meta.id)
     db_depids_query = PersistentIdentifier.query.filter(
         PersistentIdentifier.pid_type == 'depid',
         PersistentIdentifier.pid_value.in_(es_depids))
@@ -136,3 +141,9 @@ def cleanup_indexed_deposits():
             id=str(deposit_id),
             index=index,
             doc_type=doc_type)
+
+    if failed_depids:
+        current_app.logger.warning(
+            'Missing depids from metadata',
+            extra={'failed deposits': failed_depids}
+        )
