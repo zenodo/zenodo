@@ -116,7 +116,7 @@ install_requires = [
     'invenio-pidrelations==1.0.0a4',  # next versions require upgrades
     'invenio-pidstore>=1.0.0',
     'invenio-previewer>=1.0.0a11',
-    'invenio-queues>=1.0.0a1',
+    'invenio-queues>=1.0.0a2',
     'invenio-records-files>=1.0.0a11',
     'invenio-records-rest>=1.6.2',
     'invenio-records-ui>=1.0.1',
@@ -125,7 +125,7 @@ install_requires = [
     'invenio-search[elasticsearch7]>=1.2.2',
     'invenio-search-ui>=1.0.1,<1.1.0',
     'invenio-sipstore>=1.0.0a7',
-    'invenio-stats>=1.0.0a11',
+    'invenio-stats>=1.0.0a14',
     'invenio-theme>=1.0.0,<1.1.0',
     'invenio-userprofiles>=1.0.1',
     'invenio-webhooks>=1.0.0a4',
