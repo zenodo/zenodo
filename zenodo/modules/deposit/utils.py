@@ -49,6 +49,7 @@ from zenodo.modules.openaire.helpers import openaire_datasource_id, \
     openaire_original_id, openaire_type
 from zenodo.modules.openaire.tasks import openaire_delete
 from zenodo.modules.records.api import ZenodoRecord
+from zenodo.modules.records.minters import is_local_doi
 
 
 def file_id_to_key(value):
@@ -196,10 +197,13 @@ def delete_record(record_uuid, reason, user):
     for ghr in record.model.github_releases:
         ghr.status = ReleaseStatus.DELETED
 
+    if not is_local_doi(doi.pid_value):
+        db.session.delete(doi)
     db.session.commit()
 
     # After successful DB commit, sync the DOIs with DataCite
-    datacite_inactivate.delay(doi.pid_value)
+    if is_local_doi(doi.pid_value):
+        datacite_inactivate.delay(doi.pid_value)
     if conceptdoi_value:
         if new_last_child:
             # Update last child (updates also conceptdoi)
