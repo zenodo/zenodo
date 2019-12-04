@@ -119,7 +119,7 @@
     {% if j.title %}
     <dt>{{_('Published in')}}:</dt>
     <dd>
-      {{j.title}}:{% if j.volume %} {{j.volume}}{% endif%}{% if j.year %} ({{j.year}}){% endif %}{% if j.number %} no. {{j.number}},{% endif %}{% if j.pages %} pp. {{j.pages}}{% endif %}.
+      {{j.title}}:{% if j.volume %} {{j.volume}}{% endif%}{% if j.year %} ({{j.year}}){% endif %}{% if j.number %} no. {{j.number}},{% endif %}{% if j.pages %} pp. {{j.pages}}{% endif %}{% if j.issue %} ({{j.issue}}){% endif %}.
     </dd>
     {% endif %}
   {%- endwith %}
