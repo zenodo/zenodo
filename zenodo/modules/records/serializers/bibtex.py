@@ -144,10 +144,10 @@ class Bibtex(object):
         return out
 
     def _clean_input(self, input):
-        unsupported_char = ['&']
+        unsupported_chars = ['&', '%', '$', '_', '#']
         chars = list(input)
         for index, char in enumerate(chars):
-            if char in unsupported_char:
+            if char in unsupported_chars:
                 chars[index] = "\\" + chars[index]
         return ''.join(chars)
 

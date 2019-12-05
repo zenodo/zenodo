@@ -212,13 +212,13 @@ def test_get_volume(bibtex_records):
 def test_clean_input(full_record):
     """Test."""
     full_record['resource_type']['subtype'] = 'article'
-    full_record['title'] = "Test title & escaped character"
+    full_record['title'] = "Title & escaped chars % $ _ #"
     bibtex = ("""@article{doe_2014_12345,\n"""
               """  author       = {Doe, John and\n"""
               """                  Doe, Jane and\n"""
               """                  Smith, John and\n"""
               """                  Nowak, Jack},\n"""
-              """  title        = {Test title \& escaped character},\n"""
+              """  title        = {Title \& escaped chars \% \$ \_ \#},\n"""
               """  journal      = {Bam},\n"""
               """  year         = 2014,\n"""
               """  volume       = 20,\n"""
