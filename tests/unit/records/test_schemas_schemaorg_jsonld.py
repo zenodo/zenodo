@@ -331,13 +331,13 @@ def test_dataset(app, users, minimal_record_model, recid_pid):
                 u'@type': u'DataDownload',
                 u'contentUrl': u'https://localhost/api/files/'
                                u'22222222-2222-2222-2222-222222222222/test',
-                u'fileFormat': u'txt'
+                u'encodingFormat': u'txt'
             },
             {
                 u'@type': u'DataDownload',
                 u'contentUrl': u'https://localhost/api/files/'
                                u'22222222-2222-2222-2222-222222222222/test2',
-                u'fileFormat': u'pdf'
+                u'encodingFormat': u'pdf'
             }
         ]
         assert data['measurementTechnique'] == 'microscopic supersampling'
