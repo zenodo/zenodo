@@ -125,7 +125,7 @@ install_requires = [
     'invenio-search[elasticsearch7]>=1.2.2',
     'invenio-search-ui>=1.0.1,<1.1.0',
     'invenio-sipstore>=1.0.0a7',
-    'invenio-stats==1.0.0a14',
+    'invenio-stats==1.0.0a14.post1',
     'invenio-theme>=1.0.0,<1.1.0',
     'invenio-userprofiles>=1.0.1',
     'invenio-webhooks>=1.0.0a4',
