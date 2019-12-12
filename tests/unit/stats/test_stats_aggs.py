@@ -83,7 +83,7 @@ def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
 
 
 def test_large_stats(app, db, es, locations, event_queues, minimal_record):
-    """Test record page view event import."""
+    """Test a larger number of events, aggregations, and results."""
     search = Search(using=es)
     records = create_stats_fixtures(
         # (3 * 4) -> 12 records and (3 * 4 * 2) -> 24 files

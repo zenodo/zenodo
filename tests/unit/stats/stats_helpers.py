@@ -25,8 +25,9 @@
 from collections import defaultdict
 from contextlib import contextmanager
 from copy import deepcopy
-from datetime import timedelta
+from datetime import datetime, timedelta
 from types import MethodType
+from mock import patch
 
 from flask import current_app
 from invenio_db import db
@@ -44,6 +45,18 @@ from six import BytesIO
 
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.stats.tasks import update_record_statistics
+
+
+def mock_date(*date_parts):
+    """Mocked 'datetime.utcnow()'."""
+    class MockDate(datetime):
+        """datetime.datetime mock."""
+
+        @classmethod
+        def utcnow(cls):
+            """Override to return 'current_date'."""
+            return cls(*date_parts)
+    return MockDate
 
 
 def _create_records(base_metadata, total, versions, files):
@@ -151,10 +164,12 @@ def create_stats_fixtures(metadata, n_records, n_versions, n_files,
         current_search.flush_and_refresh(index='events-stats-*')
 
     if do_aggregate_events:
-        aggregate_events(
-            ['record-view-agg', 'record-view-all-versions-agg',
-             'record-download-agg', 'record-download-all-versions-agg'])
-        current_search.flush_and_refresh(index='stats-*')
+        with patch('invenio_stats.aggregations.datetime',
+                   mock_date(*end_date.timetuple()[:3])):
+            aggregate_events(
+                ['record-view-agg', 'record-view-all-versions-agg',
+                 'record-download-agg', 'record-download-all-versions-agg'])
+            current_search.flush_and_refresh(index='stats-*')
 
     if do_update_record_statistics:
         update_record_statistics(start_date=start_date.isoformat(),
