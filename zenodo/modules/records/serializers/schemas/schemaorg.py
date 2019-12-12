@@ -251,7 +251,7 @@ class Distribution(Schema):
     """Marshmallow schema for schema.org/Distribution."""
 
     type_ = fields.Constant('DataDownload', dump_to='@type')
-    fileFormat = SanitizedUnicode(attribute='type')
+    encodingFormat = SanitizedUnicode(attribute='type')
     contentUrl = fields.Method('get_content_url')
 
     def get_content_url(self, obj):
