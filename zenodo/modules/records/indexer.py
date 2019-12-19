@@ -53,9 +53,10 @@ def indexer_receiver(sender, json=None, record=None, index=None,
         json['size'] = sum([f.get('size', 0) for f in files])
 
     pid = PersistentIdentifier.query.filter(
+        PersistentIdentifier.pid_value == str(record['recid']),
+        PersistentIdentifier.pid_type == 'recid',
         PersistentIdentifier.object_uuid == record.id,
-        PersistentIdentifier.pid_type == current_pidrelations.primary_pid_type,
-        ).one_or_none()
+    ).one_or_none()
     if pid:
         pv = PIDVersioning(child=pid)
         if pv.exists:
