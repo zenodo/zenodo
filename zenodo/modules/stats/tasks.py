@@ -88,10 +88,8 @@ def update_record_statistics(start_date=None, end_date=None):
             'range', timestamp={
                 'gte': start_date.replace(microsecond=0).isoformat() + '||/d',
                 'lte': end_date.replace(microsecond=0).isoformat() + '||/d'}
-        ).extra(_source=False)
-        query.aggs.bucket('ids', 'terms', field='conceptrecid')
-        conceptrecids |= {
-            b.key for b in query.execute().aggregations.ids.buckets}
+        ).source(include='conceptrecid')
+        conceptrecids |= {b.conceptrecid for b in query.scan()}
 
     indexer = RecordIndexer()
     for concpetrecid_val in conceptrecids:
