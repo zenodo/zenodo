@@ -1607,7 +1607,13 @@ RATELIMIT_PER_ENDPOINT = {
     'zenodo_frontpage.index': '10 per second',
     'security.login': '10 per second',
     'zenodo_redirector.contact': '10 per second',
-    'zenodo_support.support': '10 per second'
+    'zenodo_support.support': '10 per second',
+    # Badge endpoints
+    'invenio_github_badge.latest_doi_old': '10 per second',
+    'invenio_github_badge.latest_doi': '10 per second',
+    'invenio_github_badge.index': '10 per second',
+    'invenio_github_badge.index_old': '10 per second',
+    'invenio_formatter_badges.badge': '10 per second',
 }
 
 RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
