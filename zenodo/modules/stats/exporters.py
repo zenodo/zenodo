@@ -37,8 +37,9 @@ from invenio_search.utils import build_alias_name
 from six.moves.urllib.parse import urlencode
 
 from zenodo.modules.records.serializers.schemas.common import ui_link_for
-from zenodo.modules.stats.errors import PiwikExportRequestError
-from zenodo.modules.stats.utils import chunkify, fetch_record
+from zenodo.modules.stats.errors import PiwikExportRequestError,\
+    TimeRangeError
+from zenodo.modules.stats.utils import fetch_record
 
 
 class PiwikExporter:
@@ -46,6 +47,62 @@ class PiwikExporter:
 
     def run(self, start_date=None, end_date=None, update_bookmark=True):
         """Run export job."""
+        time_range = self._get_time_range(start_date, end_date)
+
+        if time_range is None:
+            msg = 'Invalid time range.'
+            raise TimeRangeError(msg)
+
+        events = Search(
+            using=current_search_client,
+            index=build_alias_name('events-stats-*')
+        ).filter(
+            'range', timestamp=time_range
+        ).sort(
+            {'timestamp': {'order': 'asc'}}
+        ).params(preserve_order=True).scan()
+
+        payload_size = current_app.config['ZENODO_STATS_PIWIK_EXPORTER']\
+            .get('payload_size', 0)
+
+        query_strings = []
+        size = 0
+        for event in events:
+            if 'recid' not in event:
+                continue
+
+            if size is 0:
+                begin_event_timestamp = event.timestamp
+                end_event_timestamp = event.timestamp
+
+            try:
+                query_string = self._build_query_string(event)
+                size = size + len(query_string)
+            except PIDDeletedError:
+                continue
+
+            if size <= payload_size:
+                query_strings.append(query_string)
+                end_event_timestamp = event.timestamp
+
+            else:
+                # Note that in this case the current event won't be part of the payload
+                self._export_events(query_strings, begin_event_timestamp, end_event_timestamp, update_bookmark)
+
+                # reset size and query_strings
+                size = 0
+                query_strings = []
+
+                # add the query string of the current event (which is not part of the payload)
+                query_strings.append(query_string)
+                size = size + len(query_string)
+                begin_event_timestamp = event.timestamp
+                end_event_timestamp = event.timestamp
+
+        if size != 0:
+            self._export_events(query_strings, begin_event_timestamp, end_event_timestamp, update_bookmark)
+
+    def _get_time_range(self, start_date, end_date):
         if start_date is None:
             bookmark = current_cache.get('piwik_export:bookmark')
             if bookmark is None:
@@ -60,61 +117,7 @@ class PiwikExporter:
         if end_date is not None:
             time_range['lte'] = end_date.replace(microsecond=0).isoformat()
 
-        events = Search(
-            using=current_search_client,
-            index=build_alias_name('events-stats-*')
-        ).filter(
-            'range', timestamp=time_range
-        ).sort(
-            {'timestamp': {'order': 'asc'}}
-        ).params(preserve_order=True).scan()
-
-        url = current_app.config['ZENODO_STATS_PIWIK_EXPORTER'].get('url', None)
-        token_auth = current_app.config['ZENODO_STATS_PIWIK_EXPORTER'] \
-            .get('token_auth', None)
-        chunk_size = current_app.config['ZENODO_STATS_PIWIK_EXPORTER']\
-            .get('chunk_size', 0)
-
-        for event_chunk in chunkify(events, chunk_size):
-            query_strings = []
-            for event in event_chunk:
-                if 'recid' not in event:
-                    continue
-                try:
-                    query_string = self._build_query_string(event)
-                    query_strings.append(query_string)
-                except PIDDeletedError:
-                    pass
-
-            payload = {
-                'requests': query_strings,
-                'token_auth': token_auth
-            }
-
-            res = requests.post(url, json=payload)
-
-            # Failure: not 200 or not "success"
-            content = res.json() if res.ok else None
-            if res.status_code == 200 and content.get('status') == 'success':
-                if content.get('invalid') != 0:
-                    msg = 'Invalid events in Piwik export request.'
-                    info = {
-                        'begin_event_timestamp': event_chunk[0].timestamp,
-                        'end_event_timestamp': event_chunk[-1].timestamp,
-                        'invalid_events': content.get('invalid')
-                    }
-                    current_app.logger.warning(msg, extra=info)
-                elif update_bookmark is True:
-                    current_cache.set('piwik_export:bookmark',
-                                      event_chunk[-1].timestamp,
-                                      timeout=-1)
-            else:
-                msg = 'Invalid events in Piwik export request.'
-                info = {
-                    'begin_event_timestamp': event_chunk[0].timestamp,
-                    'end_event_timestamp': event_chunk[-1].timestamp,
-                }
-                raise PiwikExportRequestError(msg, export_info=info)
+        return time_range
 
     def _build_query_string(self, event):
         id_site = current_app.config['ZENODO_STATS_PIWIK_EXPORTER']\
@@ -146,3 +149,39 @@ class PiwikExporter:
             params['download'] = params['url']
 
         return '?{}'.format(urlencode(params, 'utf-8'))
+
+    def _export_events(self, query_strings, begin_event_timestamp,
+                       end_event_timestamp, update_bookmark):
+        url = current_app.config['ZENODO_STATS_PIWIK_EXPORTER'].get('url', None)
+        token_auth = current_app.config['ZENODO_STATS_PIWIK_EXPORTER'] \
+            .get('token_auth', None)
+
+        payload = {
+            'requests': query_strings,
+            'token_auth': token_auth
+        }
+
+        res = requests.post(url, json=payload)
+
+        # Failure: not 200 or not "success"
+        content = res.json() if res.ok else None
+        if res.status_code == 200 and content.get('status') == 'success':
+            if content.get('invalid') != 0:
+                msg = 'Invalid events in Piwik export request.'
+                info = {
+                    'begin_event_timestamp': begin_event_timestamp,
+                    'end_event_timestamp': end_event_timestamp,
+                    'invalid_events': content.get('invalid')
+                }
+                current_app.logger.warning(msg, extra=info)
+            elif update_bookmark is True:
+                current_cache.set('piwik_export:bookmark',
+                                  end_event_timestamp,
+                                  timeout=-1)
+        else:
+            msg = 'Invalid events in Piwik export request.'
+            info = {
+                'begin_event_timestamp': begin_event_timestamp,
+                'end_event_timestamp': end_event_timestamp,
+            }
+            raise PiwikExportRequestError(msg, export_info=info)

@@ -29,7 +29,7 @@ from mock import mock
 from stats_helpers import create_stats_fixtures
 
 from zenodo.modules.stats.exporters import PiwikExporter, \
-    PiwikExportRequestError
+    PiwikExportRequestError, TimeRangeError
 
 
 class MockResponse:
@@ -152,8 +152,7 @@ def test_piwik_exporter_no_bookmark(app, db, es, locations, event_queues,
     bookmark = current_cache.get('piwik_export:bookmark')
     assert bookmark is None
 
-    with mock.patch('zenodo.modules.stats.exporters.requests.post') as mocked:
+    with pytest.raises(TimeRangeError):
         PiwikExporter().run()
-        mocked.assert_not_called()
     bookmark = current_cache.get('piwik_export:bookmark')
     assert bookmark is None
