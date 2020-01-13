@@ -27,6 +27,8 @@ from datetime import datetime, timedelta
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Ids
 from stats_helpers import create_stats_fixtures
+from invenio_search.proxies import current_search_client
+from invenio_search.utils import build_alias_name
 
 
 def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
@@ -63,12 +65,13 @@ def test_basic_stats(app, db, es, locations, event_queues, minimal_record):
 
     # Records index
     for _, record, _ in records:
-        query = search.index(prefix + '*') \
-            .query(Ids(values=[str(record.id)])) \
-            .source(include='_stats')
-
-        doc = (query.execute()[0])
-        assert doc['_stats'] == {
+        doc = \
+             current_search_client.get(
+                index=build_alias_name('records'),
+                id=str(record.id),
+                params={'_source_includes': '_stats'}
+                )
+        assert doc['_source']['_stats'] == {
             # 4 view events
             'views': 4.0, 'version_views': 8.0,
             # 4 view events over 2 different hours
@@ -111,13 +114,15 @@ def test_large_stats(app, db, es, locations, event_queues, minimal_record):
     q = q.doc_type('record-view-day-aggregation')
     assert q.count() == 915  # 61 days * 15 records
 
-    # Reords index
+    # Records index
     for _, record, _ in records:
-        query = search.index(prefix + '*') \
-            .query(Ids(values=[str(record.id)])) \
-            .source(include='_stats')
-        doc = (query.execute()[0])
-        assert doc['_stats'] == {
+        doc = \
+             current_search_client.get(
+                index=build_alias_name('records'),
+                id=str(record.id),
+                params={'_source_includes': '_stats'}
+                )
+        assert doc['_source']['_stats'] == {
             # 4 view events
             'views': 122.0, 'version_views': 488.0,
             # 4 view events over 2 different hours

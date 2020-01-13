@@ -27,8 +27,12 @@
 import itertools
 
 from flask import request
+from elasticsearch.exceptions import NotFoundError
+
 from invenio_search.api import RecordsSearch
 from invenio_stats import current_stats
+from invenio_search.proxies import current_search_client
+from invenio_search.utils import build_alias_name
 
 from zenodo.modules.records.resolvers import record_resolver
 
@@ -113,11 +117,15 @@ def build_record_stats(recid, conceptrecid):
 def get_record_stats(recordid, throws=True):
     """Fetch record statistics from Elasticsearch."""
     try:
-        res = (RecordsSearch(index='records')
-               .source(include='_stats')  # only include "_stats" field
-               .get_record(recordid)
-               .execute())
-        return res[0]._stats.to_dict() if res else None
+        res = \
+             current_search_client.get(
+                index=build_alias_name('records'),
+                id=recordid,
+                params={'_source_includes': '_stats'}
+                )
+        return res['_source']['_stats']
+    except NotFoundError:
+        return None
     except Exception:
         if throws:
             raise
