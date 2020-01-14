@@ -117,12 +117,11 @@ def build_record_stats(recid, conceptrecid):
 def get_record_stats(recordid, throws=True):
     """Fetch record statistics from Elasticsearch."""
     try:
-        res = \
-             current_search_client.get(
-                index=build_alias_name('records'),
-                id=recordid,
-                params={'_source_includes': '_stats'}
-                )
+        res = current_search_client.get(
+            index=build_alias_name('records'),
+            id=recordid,
+            params={'_source_includes': '_stats'},
+        )
         return res['_source']['_stats']
     except NotFoundError:
         return None
