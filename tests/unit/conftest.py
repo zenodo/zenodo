@@ -1345,6 +1345,10 @@ def sample_identifiers():
                 'http://www.heatflow.und.edu/index2.html'),
         'urn': ('urn:nbn:de:101:1-201102033592',
                 'https://nbn-resolving.org/urn:nbn:de:101:1-201102033592'),
+        'swh': ('swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2',
+                'https://archive.softwareheritage.org/'
+                'swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2'),
+        'ascl': ('ascl:1908.011', 'http://ascl.net/1908.011'),
     }
 
 
