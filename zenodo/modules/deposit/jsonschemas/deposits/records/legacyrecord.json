@@ -306,7 +306,9 @@
               "sra",
               "uniprot",
               "url",
-              "urn"
+              "urn",
+              "swh",
+              "ascl"
             ],
             "type": "string"
           },

@@ -126,7 +126,9 @@
         "sra",
         "uniprot",
         "url",
-        "urn"
+        "urn",
+        "swh",
+        "ascl"
       ]
     },
     "relation": {

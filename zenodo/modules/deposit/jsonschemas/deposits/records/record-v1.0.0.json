@@ -155,7 +155,9 @@
         "sra",
         "uniprot",
         "url",
-        "urn"
+        "urn",
+        "swh",
+        "ascl"
       ],
       "type": "string"
     }
@@ -446,7 +448,9 @@
               "sra",
               "uniprot",
               "url",
-              "urn"
+              "urn",
+              "swh",
+              "ascl"
             ],
             "type": "string"
           },
@@ -890,7 +894,9 @@
               "sra",
               "uniprot",
               "url",
-              "urn"
+              "urn",
+              "swh",
+              "ascl"
             ],
             "type": "string"
           },
