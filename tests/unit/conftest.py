@@ -1348,7 +1348,7 @@ def sample_identifiers():
         'swh': ('swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2',
                 'https://archive.softwareheritage.org/'
                 'swh:1:cnt:94a9ed024d3859793618152ea559a168bbcbb5e2'),
-        'ascl': ('ascl:1908.011', 'http://ascl.net/1908.011'),
+        'ascl': ('ascl:1908.011', 'https://ascl.net/1908.011'),
     }
 
 
