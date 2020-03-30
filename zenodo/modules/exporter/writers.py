@@ -54,9 +54,26 @@ class BucketWriter(object):
         """Write the data stream to the object."""
         self.obj.set_contents(stream)
 
-    def close(self,):
+    def close(self):
         """Close bucket file."""
         db.session.commit()
+
+
+class NullWriter(object):
+    """Export writer that does not write anywhere."""
+
+    def __init__(self, **kwargs):
+        """Initialize writer."""
+
+    def open(self):
+        """Dummy open."""
+        return self
+
+    def write(self, stream):
+        """Dummy write."""
+
+    def close(self):
+        """Dummy close."""
 
 
 def filename_factory(**kwargs):

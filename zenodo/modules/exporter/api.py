@@ -69,6 +69,5 @@ class Exporter(object):
                 self.search, self._pid_fetcher, self._serializer))
         except FailedExportJobError as e:
             current_app.logger.exception(e.message)
-            fp.close()
         finally:
             fp.close()
