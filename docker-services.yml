@@ -20,7 +20,6 @@ services:
   lb:
     build: ./docker/haproxy/
     image: zenodo-lb:latest
-    restart: "always"
     ports:
       - "80:80"
       - "443:443"
@@ -28,19 +27,16 @@ services:
   frontend:
     build: ./docker/nginx/
     image: zenodo-frontend:latest
-    restart: "always"
     ports:
       - "81:80"
       - "444:443"
   cache:
     image: redis
-    restart: "always"
     read_only: true
     ports:
       - "6379:6379"
   db:
     image: postgres:9.6
-    restart: "always"
     environment:
       - "POSTGRES_USER=zenodo"
       - "POSTGRES_PASSWORD=zenodo"
@@ -49,13 +45,11 @@ services:
       - "5432:5432"
   mq:
     image: rabbitmq:3-management
-    restart: "always"
     ports:
       - "15672:15672"
       - "5672:5672"
   es:
     image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
-    restart: "always"
     environment:
       - bootstrap.memory_lock=true
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
@@ -70,7 +64,6 @@ services:
       - "9300:9300"
   kibana:
     image: docker.elastic.co/kibana/kibana-oss:7.1.1
-    restart: "always"
     ports:
       - "5601:5601"
     environment:
