@@ -32,9 +32,11 @@ from flask import Blueprint, current_app, flash, render_template, request, \
     send_from_directory, session
 from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
+from invenio_communities.models import FeaturedCommunity
 
 from .api import FrontpageRecordsSearch
 from .decorators import cached_unless_authenticated_or_flashes
+from ..records.resolvers import record_resolver
 
 blueprint = Blueprint(
     'zenodo_frontpage',
@@ -70,9 +72,21 @@ def index():
         flash(msg, category=current_app.config.get(
             'FRONTPAGE_MESSAGE_CATEGORY', 'info'))
 
+    featured_comms_count = current_app.config.get(
+        'ZENODO_FRONTPAGE_FEATURED_COMMUNITIES_COUNT', 3)
+    featured_communities = [
+        fc.community for fc in FeaturedCommunity.query.order_by(
+            FeaturedCommunity.start_date.desc()).limit(featured_comms_count)
+    ]
+    featured_recids = current_app.config.get(
+        'ZENODO_FRONTPAGE_FEATURED_RECORDS', [])
+    featured_records = [record_resolver.resolve(r) for r in featured_recids]
+
     return render_template(
         'zenodo_frontpage/index.html',
         records=FrontpageRecordsSearch()[:10].sort('-_created').execute(),
+        featured_communities=featured_communities,
+        featured_records=featured_records,
     )
 
 
