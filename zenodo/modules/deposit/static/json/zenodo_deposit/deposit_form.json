@@ -687,7 +687,7 @@
               },
               {
                 "value": "reviews",
-                "name": "is reviewed this upload"
+                "name": "is reviewed by this upload"
               },
               {
                 "value": "isDocumentedBy",
