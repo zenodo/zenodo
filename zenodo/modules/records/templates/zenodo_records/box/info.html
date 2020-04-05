@@ -38,12 +38,14 @@
 
   {%- if record.doi %}
     {%- set is_local_doi = "doi" in record and (record.doi|doi_locally_managed) %}
+    {%- set doi_badge_img_url = url_for('invenio_formatter_badges.badge', title='DOI', value=record.doi, ext='svg') %}
     <dt>{{_('DOI')}}:</dt>
     <dd>
-      <span class="get-badge" data-toggle="toolt  ip" data-placement="bottom"
+      {%- if is_local_doi %}
+      <span class="get-badge" data-toggle="`tooltip" data-placement="bottom"
             title="Get the DOI badge!">
         <img data-toggle="modal" data-target="[data-modal='{{ record.doi }}']"
-              src="{{ url_for('invenio_formatter_badges.badge', title='DOI', value=record.doi, ext='svg') }}" alt="{{ record.doi }}">
+              src="{{ doi_badge_img_url }}" alt="{{ record.doi }}">
         </img>
       </span>
       <div class="modal fade badge-modal" data-modal="{{ record.doi }}">
@@ -63,6 +65,11 @@
           </div>
         </div>
       </div>
+      {%- else %}
+      <a href="{{record.doi|pid_url(scheme='doi')}}">
+        <img src="{{ doi_badge_img_url }}" alt="{{ record.doi }}"></img>
+      </a>
+      {%- endif %}
     </dd>
   {%- endif %}
   {%- if record.imprint and record.imprint.isbn %}
