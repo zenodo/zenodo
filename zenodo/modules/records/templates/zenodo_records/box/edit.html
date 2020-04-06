@@ -65,8 +65,13 @@
     {%- endif %}
     <li role="separator" class="divider"></li>
     <li><a href="{{ url_for('zenodo_deposit.delete', pid_value=pid.pid_value) }}" type="submit">
-      <span class="text-danger"><i class="fa fa-trash"></i> Delete ...</span>
+      <span class="text-danger"><i class="fa fa-trash"></i> Delete record ...</span>
     </a></li>
+    {% if record._deposit.created_by %}
+    <li><a href="{{ url_for('zenodo_spam.delete', user_id=record._deposit.created_by) }}" type="submit">
+      <span class="text-danger"><i class="fa fa-trash"></i> Delete user ...</span>
+    </a></li>
+    {%- endif %}
   </ul>
 </div>
 {%- endif %}
