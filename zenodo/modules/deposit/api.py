@@ -34,7 +34,8 @@ from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, index, preserve
 from invenio_deposit.utils import mark_as_action
-from invenio_files_rest.models import Bucket, MultipartObject, Part
+from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion, \
+    Part
 from invenio_pidrelations.contrib.records import RecordDraft, index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
@@ -71,6 +72,55 @@ PRESERVE_FIELDS = (
     'conceptdoi',
 )
 """Fields which will not be overwritten on edit."""
+
+
+def sync_buckets(src_bucket, dest_bucket, delete_extras=False):
+    """Sync source bucket ObjectVersions to the destination bucket.
+
+    The bucket is fully mirrored with the destination bucket following the
+    logic:
+
+        * same ObjectVersions are not touched
+        * new ObjectVersions are added to destination
+        * deleted ObjectVersions are deleted in destination
+        * extra ObjectVersions in dest are deleted if `delete_extras` param is
+          True
+
+    :param src_bucket: Source bucket.
+    :param dest_bucket: Destination bucket.
+    :param delete_extras: Delete extra ObjectVersions in destination if True.
+    :returns: The bucket with an exact copy of ObjectVersions in `
+        `src_bucket``.
+    """
+    assert not dest_bucket.locked
+
+    src_ovs = ObjectVersion.query.filter(
+        ObjectVersion.bucket_id == src_bucket.id,
+        ObjectVersion.is_head.is_(True)
+    ).all()
+    dest_ovs = ObjectVersion.query.filter(
+        ObjectVersion.bucket_id == dest_bucket.id,
+        ObjectVersion.is_head.is_(True)
+    ).all()
+
+    # transform into a dict { key: object version }
+    src_keys = {ov.key: ov for ov in src_ovs}
+    dest_keys = {ov.key: ov for ov in dest_ovs}
+
+    for key, ov in src_keys.items():
+        if not ov.deleted:
+            if key not in dest_keys or \
+                    ov.file_id != dest_keys[key].file_id:
+                ov.copy(bucket=dest_bucket)
+        elif key in dest_keys and not dest_keys[key].deleted:
+            ObjectVersion.delete(dest_bucket, key)
+
+    if delete_extras:
+        for key, ov in dest_keys.items():
+            if key not in src_keys:
+                ObjectVersion.delete(dest_bucket, key)
+
+    return dest_bucket
 
 
 class ZenodoDeposit(Deposit, ZenodoFilesMixin):
@@ -159,6 +209,10 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
             del data['resource_type']['openaire_subtype']
         if not data['communities']:
             del data['communities']
+
+        # If non-Zenodo DOI unlock the bucket to allow file-editing
+        if not is_doi_locally_managed(data['doi']):
+            self.files.bucket.locked = False
         return data
 
     @staticmethod
@@ -387,6 +441,24 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
         for k in preserve_record_fields:
             if k in record:
                 edited_record[k] = record[k]
+
+        # If non-Zenodo DOIs also sync files
+        if not is_doi_locally_managed(self['doi']):
+            record_bucket = edited_record.files.bucket
+            # Unlock the record's bucket
+            record_bucket.locked = False
+            sync_buckets(
+                src_bucket=self.files.bucket,
+                dest_bucket=record_bucket,
+                delete_extras=True,
+            )
+
+            # Update the record's metadata
+            edited_record['_files'] = self.files.dumps(bucket=record_bucket.id)
+
+            # Lock both record and deposit buckets
+            record_bucket.locked = True
+            self.files.bucket.locked = True
 
         zenodo_doi_updater(edited_record.id, edited_record)
 
