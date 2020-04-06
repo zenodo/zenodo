@@ -175,7 +175,7 @@ lxml==4.3.3
 Mako==1.0.8
 MarkupSafe==1.1.1
 marshmallow==2.20.5
-maxminddb==1.4.1
+maxminddb==1.5.2
 maxminddb-geolite2==2018.703
 mistune==0.8.4
 mock==2.0.0
