@@ -34,9 +34,9 @@ from flask_babelex import lazy_gettext as _
 from flask_menu import current_menu
 from invenio_communities.models import FeaturedCommunity
 
+from ..records.resolvers import record_resolver
 from .api import FrontpageRecordsSearch
 from .decorators import cached_unless_authenticated_or_flashes
-from ..records.resolvers import record_resolver
 
 blueprint = Blueprint(
     'zenodo_frontpage',

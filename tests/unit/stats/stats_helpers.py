@@ -27,7 +27,6 @@ from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timedelta
 from types import MethodType
-from mock import patch
 
 from flask import current_app
 from invenio_db import db
@@ -41,6 +40,7 @@ from invenio_records_ui.signals import record_viewed
 from invenio_search import current_search
 from invenio_stats import current_stats
 from invenio_stats.tasks import aggregate_events, process_events
+from mock import patch
 from six import BytesIO
 
 from zenodo.modules.records.api import ZenodoRecord

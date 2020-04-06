@@ -26,9 +26,9 @@ from datetime import datetime, timedelta
 
 from elasticsearch_dsl import Search
 from elasticsearch_dsl.query import Ids
-from stats_helpers import create_stats_fixtures
 from invenio_search.proxies import current_search_client
 from invenio_search.utils import build_alias_name
+from stats_helpers import create_stats_fixtures
 
 
 def test_basic_stats(app, db, es, locations, event_queues, minimal_record):

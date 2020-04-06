@@ -26,13 +26,12 @@
 
 import itertools
 
-from flask import request
 from elasticsearch.exceptions import NotFoundError
-
+from flask import request
 from invenio_search.api import RecordsSearch
-from invenio_stats import current_stats
 from invenio_search.proxies import current_search_client
 from invenio_search.utils import build_alias_name
+from invenio_stats import current_stats
 
 from zenodo.modules.records.resolvers import record_resolver
 
