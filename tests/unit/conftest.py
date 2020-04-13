@@ -83,6 +83,7 @@ from zenodo.modules.github.cli import github
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.models import AccessRight
 from zenodo.modules.records.serializers.bibtex import Bibtex
+from zenodo.modules.tokens.scopes import tokens_generate_scope
 
 
 def wrap_rate_limit():
@@ -516,6 +517,29 @@ def extra_token(app, db, oauth2_client, users):
             is_personal=False,
             is_internal=True,
             _scopes=' '.join([extra_formats_scope.id, write_scope.id])
+        )
+        db.session.add(token_)
+    db.session.commit()
+    return dict(
+        token=token_,
+        auth_header=[
+            ('Authorization', 'Bearer {0}'.format(token_.access_token)),
+        ]
+    )
+
+
+@pytest.fixture
+def rat_generate_token(app, db, oauth2_client, users):
+    """Create token."""
+    with db.session.begin_nested():
+        token_ = Token(
+            client_id=oauth2_client,
+            user_id=users[0]['id'],
+            access_token='rat_token',
+            expires=datetime.utcnow() + timedelta(hours=10),
+            is_personal=False,
+            is_internal=True,
+            _scopes=tokens_generate_scope.id,
         )
         db.session.add(token_)
     db.session.commit()

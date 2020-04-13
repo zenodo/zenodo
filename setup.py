@@ -196,6 +196,7 @@ setup(
             'zenodo_frontpage = zenodo.modules.frontpage.ext:ZenodoFrontpage',
             'zenodo_stats = zenodo.modules.stats.ext:ZenodoStats',
             'zenodo_theme = zenodo.modules.theme.ext:ZenodoTheme',
+            'zenodo_tokens = zenodo.modules.tokens.ext:ResourceAccessTokens',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '
@@ -204,6 +205,7 @@ setup(
             'zenodo_openaire = zenodo.modules.openaire.ext:ZenodoOpenAIRE',
             'zenodo_records = zenodo.modules.records.ext:ZenodoRecords',
             'zenodo_exporter = zenodo.modules.exporter.ext:InvenioExporter',
+            'zenodo_tokens = zenodo.modules.tokens.ext:ResourceAccessTokens',
         ],
         'invenio_base.blueprints': [
             'zenodo_communities = zenodo.modules.communities.views:blueprint',
@@ -271,6 +273,9 @@ setup(
         'invenio_oauth2server.scopes': [
             ('deposit_extra_formats = '
              'zenodo.modules.deposit.scopes:extra_formats_scope'),
+            ('tokens_generate = '
+             'zenodo.modules.tokens.scopes:tokens_generate_scope'),
+
         ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
