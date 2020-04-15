@@ -36,7 +36,10 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
+from invenio_rest.errors import RESTException
 from zenodo_accessrequests.models import SecretLink
+
+from zenodo.modules.tokens import decode_rat
 
 from .api import ZenodoRecord
 from .models import AccessRight
@@ -347,6 +350,14 @@ def has_read_files_permission(user, record):
     if token and SecretLink.validate_token(
             token, dict(recid=int(record['recid']))):
         return True
+
+    # Check for a resource access token
+    rat_token = request.args.get('token')
+    if rat_token:
+        rat_signer, payload = decode_rat(rat_token)
+        deposit_id = record.get('_deposit', {}).get('id')
+        if payload['deposit_id'] == deposit_id:
+            return has_update_permission(rat_signer, record)
 
     return has_update_permission(user, record)
 

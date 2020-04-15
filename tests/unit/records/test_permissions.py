@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import jwt
+from datetime import datetime
 import pytest
 from flask import url_for
 from flask_principal import ActionNeed
@@ -85,3 +87,52 @@ def test_file_permissions(app, db, record_with_files_creation,
 
         res = client.get(file_url)
         assert res.status_code == expected
+
+
+def test_rat_token(app, db, rat_generate_token, closed_access_record):
+    """Test access via RAT."""
+    rat_generate_token = rat_generate_token['token']
+    record = closed_access_record
+    record['owners'] = [rat_generate_token.user_id]
+    record['_deposit']['owners'] = [rat_generate_token.user_id]
+    record.commit()
+    db.session.commit()
+
+    rat_token = jwt.encode(
+        payload={
+            'iat': datetime.utcnow(),
+            'sub': {'deposit_id': record['_deposit']['id']},
+        },
+        key=rat_generate_token.access_token,
+        algorithm='HS256',
+        headers={'kid': str(rat_generate_token.id)},
+    )
+
+    with app.test_client() as client:
+        file_url = url_for(
+            'invenio_records_ui.recid_files',
+            pid_value=record['recid'],
+            filename='Test.pdf',
+        )
+        res = client.get(file_url)
+        assert res.status_code == 404
+
+        res = client.get(file_url, query_string={'token': rat_token})
+        assert res.status_code == 200
+
+    # Change record owner
+    record['owners'] = [123]
+    record['_deposit']['owners'] = [123]
+    record.commit()
+    db.session.commit()
+
+    with app.test_client() as client:
+        file_url = url_for(
+            'invenio_records_ui.recid_files',
+            pid_value=record['recid'],
+            filename='Test.pdf',
+        )
+        res = client.get(file_url)
+        assert res.status_code == 404
+        res = client.get(file_url, query_string={'token': rat_token})
+        assert res.status_code == 404
