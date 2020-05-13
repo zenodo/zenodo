@@ -34,3 +34,15 @@ ZENODO_EXTRA_FORMATS_BUCKET_QUOTA_SIZE = 100 * 1000 * 1000  # 100 MB
 
 ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
 """Maximum file size accepted."""
+
+ZENODO_USER_BUCKET_QUOTAS = {}
+"""Custom per-user quotas.
+
+A dictionary with user ID as key and their default deposit quotas as values.
+
+.. code-block:: python
+
+    ZENODO_USER_BUCKET_QUOTAS = {
+        12345: (80 * 1000 * 1000 * 1000),  # 80GB
+    }
+"""

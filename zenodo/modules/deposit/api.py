@@ -30,6 +30,7 @@ from contextlib import contextmanager
 from copy import copy
 
 from flask import current_app
+from flask_security import current_user
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, index, preserve
@@ -523,16 +524,31 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
         archiver.save_bagit_metadata()
         return deposit
 
+    @staticmethod
+    def _get_bucket_settings():
+        """Return bucket creation config."""
+        res = {
+            'quota_size': current_app.config['ZENODO_BUCKET_QUOTA_SIZE'],
+            'max_file_size': current_app.config['ZENODO_MAX_FILE_SIZE'],
+        }
+
+        # Determine bucket quota per-user
+        user_quotas = current_app.config.get('ZENODO_USER_BUCKET_QUOTAS') or {}
+        if current_user and current_user.is_authenticated:
+            creator_id = int(current_user.get_id())
+            if creator_id in user_quotas:
+                res['quota_size'] = user_quotas[creator_id]
+                res['max_file_size'] = res['quota_size']
+
+        return res
+
     @classmethod
     def create(cls, data, id_=None):
         """Create a deposit.
 
         Adds bucket creation immediately on deposit creation.
         """
-        bucket = Bucket.create(
-            quota_size=current_app.config['ZENODO_BUCKET_QUOTA_SIZE'],
-            max_file_size=current_app.config['ZENODO_MAX_FILE_SIZE'],
-        )
+        bucket = Bucket.create(**cls._get_bucket_settings())
         data['_buckets'] = {'deposit': str(bucket.id)}
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
 
