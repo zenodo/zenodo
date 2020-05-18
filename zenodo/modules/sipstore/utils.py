@@ -27,7 +27,10 @@
 from __future__ import absolute_import, unicode_literals
 
 import arrow
+from invenio_sipstore.api import SIP
 from invenio_sipstore.archivers.utils import chunks
+
+build_agent_info = SIP._build_agent_info
 
 
 def generate_bag_path(recid, iso_timestamp):
