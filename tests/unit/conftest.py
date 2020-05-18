@@ -558,27 +558,27 @@ def minimal_deposit():
 
 
 @pytest.fixture
-def minimal_record_model(db, minimal_record, sip_metadata_types):
+def minimal_record_model(db, minimal_record, sip_metadata_types, recid_pid):
     """Minimal record."""
-    model = RecordMetadata()
+    model = RecordMetadata(id=str(recid_pid.object_uuid))
     model.created = datetime.utcnow() - timedelta(days=1)
     model.updated = model.created + timedelta(days=1)
     model.version_id = 0
     rec = ZenodoRecord(minimal_record, model=model)
 
-    PersistentIdentifier.create(
-        'recid', '123', status=PIDStatus.REGISTERED, object_type='rec',
-        object_uuid=rec.id)
     db.session.commit()
+
     return rec
 
 
 @pytest.fixture
-def recid_pid():
+def recid_pid(db):
     """PID for minimal record."""
-    return PersistentIdentifier(
+    pid = PersistentIdentifier.create(
         pid_type='recid', pid_value='123', status='R', object_type='rec',
         object_uuid=uuid4())
+    db.session.commit()
+    return pid
 
 
 @pytest.fixture
@@ -611,11 +611,14 @@ def test_object(db, bucket):
 
 
 @pytest.fixture
-def depid_pid():
+def depid_pid(db):
     """PID for minimal record."""
-    return PersistentIdentifier(
+    pid = PersistentIdentifier.create(
         pid_type='depid', pid_value='321', status='R', object_type='rec',
         object_uuid=uuid4())
+
+    db.session.commit()
+    return pid
 
 
 @pytest.fixture
