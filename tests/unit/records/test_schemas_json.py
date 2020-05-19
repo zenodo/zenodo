@@ -45,8 +45,9 @@ def test_json_v1(app, db, minimal_record, recid_pid):
     with patch('zenodo.modules.records.serializers.schemas.json'
                '.get_record_stats',
                return_value=stats) as m:
-        obj = json_v1.transform_record(recid_pid,
-                                       Record.create(minimal_record))
+        record = Record.create(minimal_record)
+        db.session.commit()
+        obj = json_v1.transform_record(recid_pid, record)
         assert m.called
         assert obj['stats'] == stats
 
