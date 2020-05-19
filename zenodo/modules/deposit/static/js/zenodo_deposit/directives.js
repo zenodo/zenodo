@@ -121,7 +121,7 @@ function communitiesSelect($http, $q, openAIRE) {
     };
 
     $scope.searchCommunities = function(query) {
-      $http.get('/api/communities', {params: {q: query, size: 7} })
+      $http.get('/api/communities', {params: {q: query, size: 15} })
       .then(function(res){
         $scope.refreshCommunityResults(res.data.hits.hits);
       });
