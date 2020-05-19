@@ -278,6 +278,10 @@ CELERY_BEAT_SCHEDULE = {
             'retry': True,
         }
     },
+    'github-tokens-refresh': {
+        'task': 'invenio_github.tasks.refresh_accounts',
+        'schedule': crontab(minute=0, hour=3),
+    },
 
 }
 
