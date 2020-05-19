@@ -49,11 +49,15 @@
           <div class="col-sm-11" style="margin-top: 5px;">
             <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
               {{_('Citations')}}
-              <small class="text-muted">
-                <invenio-search-count
-                template="{{ url_for('static', filename='templates/citations/count.html') }}">
-                </invenio-search-count>
-              </small>
+            </a>
+            <a href="https://help.zenodo.org/#citations" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-question-circle"></i>
+            </a>
+            <small class="text-muted">
+              <invenio-search-count template="{{ url_for('static', filename='templates/citations/count.html') }}">
+              </invenio-search-count>
+            </small>
+            <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
               <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
               <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
             </a>
