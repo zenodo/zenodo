@@ -290,6 +290,12 @@ class ImageObject(CreativeWork):
     pass
 
 
+class Collection(CreativeWork):
+    """Marshmallow schema for schema.org/Collection."""
+
+    pass
+
+
 class Book(CreativeWork):
     """Marshmallow schema for schema.org/Book."""
 
