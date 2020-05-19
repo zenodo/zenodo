@@ -61,7 +61,8 @@ env:
   - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
   - REQUIREMENTS=latest E2E="no" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
   - REQUIREMENTS=prod E2E="no" SQLALCHEMY_DATABASE_URI="sqlite:///zenodo.db"
-  - REQUIREMENTS=prod E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
+  # TODO: Fix and enable
+  # - REQUIREMENTS=prod E2E="yes" SQLALCHEMY_DATABASE_URI="postgresql+psycopg2://postgres@localhost:5432/zenodo"
 
 python:
   - "2.7"
