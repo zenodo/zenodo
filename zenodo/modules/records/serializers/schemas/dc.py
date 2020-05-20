@@ -214,6 +214,6 @@ class DublinCoreV1(Schema):
         for location in obj['metadata'].get('locations', []):
             if location.get('lat') and location.get('lon'):
                 locations.append(
-                    'name={place}; east={lon}; north={lat}'.format(**location)
+                    u'name={place}; east={lon}; north={lat}'.format(**location)
                 )
         return locations or missing
