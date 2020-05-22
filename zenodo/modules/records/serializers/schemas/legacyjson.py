@@ -47,7 +47,8 @@ class FileSchemaV1(Schema):
     """Schema for files depositions."""
 
     id = fields.String(attribute='file_id', dump_only=True)
-    filename = SanitizedUnicode(attribute='key', dump_only=True)
+    filename = SanitizedUnicode(
+        attribute='key', dump_only=True, validate=validate.Length(max=128))
     filesize = fields.Integer(attribute='size', dump_only=True)
     checksum = fields.Method('dump_checksum', dump_only=True)
     links = fields.Method('dump_links', dump_only=True)
@@ -118,28 +119,44 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
 
     prereserve_doi = fields.Method('dump_prereservedoi', 'load_prereservedoi')
 
-    journal_title = SanitizedUnicode(attribute='journal.title')
-    journal_volume = SanitizedUnicode(attribute='journal.volume')
-    journal_issue = SanitizedUnicode(attribute='journal.issue')
-    journal_pages = SanitizedUnicode(attribute='journal.pages')
+    journal_title = SanitizedUnicode(
+        attribute='journal.title', validate=validate.Length(max=256))
+    journal_volume = SanitizedUnicode(
+        attribute='journal.volume', validate=validate.Length(max=256))
+    journal_issue = SanitizedUnicode(
+        attribute='journal.issue', validate=validate.Length(max=256))
+    journal_pages = SanitizedUnicode(
+        attribute='journal.pages', validate=validate.Length(max=256))
 
-    conference_title = SanitizedUnicode(attribute='meeting.title')
-    conference_acronym = SanitizedUnicode(attribute='meeting.acronym')
-    conference_dates = SanitizedUnicode(attribute='meeting.dates')
-    conference_place = SanitizedUnicode(attribute='meeting.place')
-    conference_url = SanitizedUrl(attribute='meeting.url')
-    conference_session = SanitizedUnicode(attribute='meeting.session')
+    conference_title = SanitizedUnicode(
+        attribute='meeting.title', validate=validate.Length(max=256))
+    conference_acronym = SanitizedUnicode(
+        attribute='meeting.acronym', validate=validate.Length(max=32))
+    conference_dates = SanitizedUnicode(
+        attribute='meeting.dates', validate=validate.Length(max=32))
+    conference_place = SanitizedUnicode(
+        attribute='meeting.place', validate=validate.Length(max=128))
+    conference_url = SanitizedUrl(
+        attribute='meeting.url', validate=validate.Length(max=128))
+    conference_session = SanitizedUnicode(
+        attribute='meeting.session', validate=validate.Length(max=64))
     conference_session_part = SanitizedUnicode(
-        attribute='meeting.session_part')
+        attribute='meeting.session_part', validate=validate.Length(max=64))
 
-    imprint_isbn = SanitizedUnicode(attribute='imprint.isbn')
-    imprint_place = SanitizedUnicode(attribute='imprint.place')
-    imprint_publisher = SanitizedUnicode(attribute='imprint.publisher')
+    imprint_isbn = SanitizedUnicode(
+        attribute='imprint.isbn', validate=validate.Length(max=64))
+    imprint_place = SanitizedUnicode(
+        attribute='imprint.place', validate=validate.Length(max=64))
+    imprint_publisher = SanitizedUnicode(
+        attribute='imprint.publisher', validate=validate.Length(max=64))
 
-    partof_pages = SanitizedUnicode(attribute='part_of.pages')
-    partof_title = SanitizedUnicode(attribute='part_of.title')
+    partof_pages = SanitizedUnicode(
+        attribute='part_of.pages', validate=validate.Length(max=64))
+    partof_title = SanitizedUnicode(
+        attribute='part_of.title', validate=validate.Length(max=64))
 
-    thesis_university = SanitizedUnicode(attribute='thesis.university')
+    thesis_university = SanitizedUnicode(
+        attribute='thesis.university', validate=validate.Length(max=128))
     thesis_supervisors = fields.Nested(
         common.PersonSchemaV1, many=True, attribute='thesis.supervisors')
 
@@ -384,14 +401,18 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
 class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
     """Legacy JSON schema (used by deposit)."""
 
-    doi_url = DOILink(attribute='metadata.doi', dump_only=True)
+    doi_url = DOILink(
+        attribute='metadata.doi',
+        dump_only=True,
+        validate=validate.Length(max=128))
     files = fields.List(
         fields.Nested(FileSchemaV1), dump_only=True)
     metadata = fields.Nested(LegacyMetadataSchemaV1)
     modified = fields.Str(attribute='updated', dump_only=True)
     owner = fields.Method('dump_owners', dump_only=True)
     record_id = fields.Integer(attribute='metadata.recid', dump_only=True)
-    record_url = fields.String(dump_only=True)
+    record_url = fields.String(
+        dump_only=True, validate=validate.Length(max=128))
     state = fields.Method('dump_state', dump_only=True)
     submitted = fields.Function(
         lambda o: o['metadata'].get(
@@ -399,7 +420,10 @@ class LegacyRecordSchemaV1(common.CommonRecordSchemaV1):
         dump_only=True
     )
     title = SanitizedUnicode(
-        attribute='metadata.title', default='', dump_only=True)
+        attribute='metadata.title',
+        default='',
+        dump_only=True,
+        validate=validate.Length(max=256))
 
     def dump_state(self, o):
         """Get state of deposit."""
