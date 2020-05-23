@@ -66,7 +66,7 @@
         </div>
       </div>
       {%- else %}
-      <a href="{{record.doi|pid_url(scheme='doi')}}">
+      <a href="{{record.doi|pid_url(scheme='doi')}}" target="_blank">
         <img src="{{ doi_badge_img_url }}" alt="{{ record.doi }}"></img>
       </a>
       {%- endif %}
