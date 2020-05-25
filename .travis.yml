@@ -78,7 +78,7 @@ before_install:
   - "wget -O - https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-oss-7.1.1-linux-x86_64.tar.gz | tar xz --directory=/tmp/elasticsearch --strip-components=1"
   - "/tmp/elasticsearch/bin/elasticsearch > /tmp/local-es.log &"
   - "travis_retry pip install --upgrade pip setuptools py"
-  - "travis_retry pip install wheel coveralls requirements-builder"
+  - "travis_retry pip install wheel coveralls requirements-builder configparser"
   - "./scripts/setup-npm.sh"
   - "cat requirements.txt > .travis-prod-requirements.txt"
   - "requirements-builder --level=pypi setup.py > .travis-latest-requirements.txt"
