@@ -123,7 +123,7 @@ invenio-db==1.0.4
 invenio-deposit==1.0.0a11
 invenio-files-rest==1.0.0a23.post2
 invenio-formatter==1.0.1
-invenio-github==1.0.0a17
+invenio-github==1.0.0a18
 invenio-i18n==1.0.0
 invenio-iiif==1.0.0a5
 invenio-indexer==1.1.1
