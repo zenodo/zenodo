@@ -281,6 +281,12 @@ CELERY_BEAT_SCHEDULE = {
     'github-tokens-refresh': {
         'task': 'invenio_github.tasks.refresh_accounts',
         'schedule': crontab(minute=0, hour=3),
+        'kwargs': {
+            'expiration_threshold': {
+                # TODO: Remove when invenio-github v1.0.0a19 is released
+                'days': 6 * 30,
+            },
+        }
     },
 
 }
