@@ -40,7 +40,7 @@ from .custom_metadata import CustomMetadataAPI
 from .indexer import indexer_receiver
 from .proxies import current_zenodo_records
 from .utils import serialize_record, transform_record
-from .views import blueprint, record_communities
+from .views import blueprint, record_jinja_context
 
 
 class ZenodoRecords(object):
@@ -78,7 +78,7 @@ class ZenodoRecords(object):
         self.init_config(app)
 
         # Register context processors
-        app.context_processor(record_communities)
+        app.context_processor(record_jinja_context)
         app.context_processor(
             lambda: dict(current_zenodo_records=current_zenodo_records))
         # Register blueprint

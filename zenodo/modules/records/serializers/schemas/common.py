@@ -511,27 +511,27 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         for term, values in obj.items():
             if term not in valid_vocabulary:
                 raise ValidationError(
-                    'Zenodo does not support "{0}" as a custom metadata term.'
+                    u'Zenodo does not support "{0}" as a custom metadata term.'
                     .format(term),
                     field_names=['custom'])
 
             # Validate term type
-            term_type = term_types[valid_terms[term]['term_type']]
+            term_type = term_types[valid_terms[term]['type']]
             if not isinstance(values, list):
                 raise ValidationError(
-                        'Term "{0}" should be of type array.'
+                        u'Term "{0}" should be of type array.'
                         .format(term),
                         field_names=['custom'])
             if len(values) == 0:
                 raise ValidationError(
-                        'No values were provided for term "{0}".'
+                        u'No values were provided for term "{0}".'
                         .format(term),
                         field_names=['custom'])
             for value in values:
                 if not isinstance(value, term_type):
                     raise ValidationError(
-                        'Invalid type for term "{0}", should be "{1}".'
-                        .format(term, valid_terms[term]['term_type']),
+                        u'Invalid type for term "{0}", should be "{1}".'
+                        .format(term, term_type),
                         field_names=['custom'])
         return obj
 

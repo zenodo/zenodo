@@ -55,7 +55,7 @@ class CustomMetadataAPI(object):
         vocabulary = []
         for scheme in self.vocabularies:
             for value in self.vocabularies[scheme]['attributes']:
-                vocabulary.append(scheme+':'+value)
+                vocabulary.append(u'{}:{}'.format(scheme, value))
         return set(vocabulary)
 
     @cached_property
@@ -63,16 +63,19 @@ class CustomMetadataAPI(object):
         """Term-to-fieldtype lookup."""
         result = {}
         for vocab, cfg in self.vocabularies.items():
+            vocab_url = cfg['@context']
             for attr in cfg['attributes']:
-                term = '{}:{}'.format(vocab, attr)
+                term = u'{}:{}'.format(vocab, attr)
                 term_conf = cfg['attributes'][attr]
-                result[term] = {'term_type': term_conf['type']}
+                result[term] = dict(
+                    term_conf,
+                    url=u'{}{}'.format(vocab_url, attr)
+                )
         return result
 
     def _validate(self):
         """Validates term types, vocabularies and definitions."""
         valid_term_types = set(self.term_types.keys())
-        valid_terms = set(self.terms.keys())
         assert all(
             (v['@context'] and v['attributes'] and
              set([k['type'] for k in v['attributes'].values()]) <=

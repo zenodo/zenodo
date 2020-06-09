@@ -58,6 +58,7 @@ from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .serializers import citeproc_v1
 from .serializers.json import ZenodoJSONSerializer
+from .proxies import current_custom_metadata
 
 blueprint = Blueprint(
     'zenodo_records',
@@ -140,15 +141,6 @@ def accessright_title(value, embargo_date=None):
 def accessright_icon(value, embargo_date=None):
     """Get icon for access right."""
     return AccessRight.as_icon(AccessRight.get(value, embargo_date))
-
-
-@blueprint.app_template_filter()
-def custom_field_url(custom_field):
-    """Return the a vocabulary field's URL."""
-    context, value = custom_field.split(':', 1)
-    vocabularies = current_app.config['ZENODO_CUSTOM_METADATA_VOCABULARIES']
-    base_url = vocabularies[context]['@context']
-    return u'{}{}'.format(base_url, value)
 
 
 @blueprint.app_template_filter()
@@ -449,9 +441,12 @@ def community_curation(record, user):
         )
 
 
-def record_communities():
-    """Context processor for community curation for given record."""
-    return dict(community_curation=community_curation)
+def record_jinja_context():
+    """Jinja context processor for records."""
+    return dict(
+        community_curation=community_curation,
+        custom_metadata=current_custom_metadata,
+    )
 
 
 def record_thumbnail(pid, record, thumbnail_size, **kwargs):
