@@ -163,21 +163,32 @@ def build_record_custom_fields(record):
     valid_terms = current_custom_metadata.terms
     es_custom_fields = dict(
         custom_keywords=[],
-        custom_text=[]
+        custom_text=[],
+        custom_relationships=[],
     )
     custom_fields_mapping = {
         'keyword': 'custom_keywords',
         'text': 'custom_text',
+        'relationship': 'custom_relationships',
     }
 
     custom_metadata = record.get('custom', {})
     for term, value in custom_metadata.items():
-        term_type = valid_terms.get(term)['term_type']
-        if term_type:
-            # TODO: in the future also add "community"
-            es_object = {'key': term, 'value': value}
-            es_custom_field = custom_fields_mapping[term_type]
-            es_custom_fields[es_custom_field].append(es_object)
+        term_type = valid_terms.get(term)['type']
+
+        es_custom_field = custom_fields_mapping[term_type]
+        if term_type in ('text', 'keyword'):
+            es_custom_fields[es_custom_field].append({
+                'key': term,
+                'value': value
+            })
+        elif term_type == 'relationship':
+            for rel in value:
+                es_custom_fields[es_custom_field].append({
+                    'key': term,
+                    'subject': rel['subject'],
+                    'object': rel['object'],
+                })
 
     return {k: es_custom_fields[k] for k in es_custom_fields
             if es_custom_fields[k]}

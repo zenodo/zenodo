@@ -112,52 +112,71 @@ def custom_metadata_filter(field):
     def inner(values):
         terms = current_custom_metadata.terms
         available_terms = current_custom_metadata.available_vocabulary_set
-
-        must_conditions = []
+        conditions = []
 
         for value in values:
             # Matches this:
-            #   [vocabulary:term]:value
-            parsed = re.match(r'\[([-\w]+\:[-\w]+)\]\:(.+)', value)
+            #   [vocabulary:term]:[value]
+            parsed = re.match(
+                r'^\[(?P<key>[-\w]+\:[-\w]+)\]\:\[(?P<val>.+)\]$', value)
             if not parsed:
                 raise RESTValidationError(
                     errors=[FieldError(
                         field, 'The parameter should have the format: '
-                               'custom=[field_name]:field_value.')])
+                               'custom=[term]:[value].')])
 
-            search_key, search_value = parsed.groups()
+            parsed = parsed.groupdict()
+            search_key = parsed['key']
+            search_value = parsed['val']
 
             if search_key not in available_terms:
                 raise RESTValidationError(
                     errors=[FieldError(
-                        field, 'The "{}" term is not supported.'
+                        field, u'The "{}" term is not supported.'
                         .format(search_key))])
 
-            # TODO: check if the search value has the correct type
-            # for now we have only 'keyword' and 'text'
-
-            # TODO: move this to a central place
-            # get the elasticsearch custom field name
             custom_fields_mapping = dict(
                 keyword='custom_keywords',
-                text='custom_text'
+                text='custom_text',
+                relationship='custom_relationships',
             )
 
-            custom_type = terms[search_key]['term_type']
-            es_field = custom_fields_mapping[custom_type]
+            term_type = terms[search_key]['type']
+            es_field = custom_fields_mapping[term_type]
 
-            must_conditions.append({
+            nested_clauses = [
+                {'term': {'{}.key'.format(es_field): search_key}},
+            ]
+
+            if term_type in ('text', 'keyword'):
+                nested_clauses.append({
+                    'query_string': {
+                        'fields': ['{}.value'.format(es_field)],
+                        'query': search_value,
+                    }
+                })
+            elif term_type == 'relationship':
+                if ':' not in search_value:
+                    raise RESTValidationError(
+                        errors=[
+                            FieldError(field, (
+                                'Relatinship terms serach values should '
+                                'follow the format "<sub>:<obj>".'))
+                        ])
+
+                sub, obj = search_value.split(':', 1)
+                if sub:
+                    nested_clauses.append({'query_string': {
+                        'fields': [es_field + '.subject'], 'query': sub}})
+                if obj:
+                    nested_clauses.append({'query_string': {
+                        'fields': [es_field + '.object'], 'query': obj}})
+
+            conditions.append({
                 'nested': {
                     'path': es_field,
-                    # 'score_mode': 'avg',
-                    'query': {
-                        'bool': {'must': [
-                            {'match': {es_field + '.key': search_key}},
-                            {'match': {es_field + '.value': search_value}}
-                            # TODO: in the future also filter ".community"
-                        ]}
-                    }
+                    'query': {'bool': {'must': nested_clauses}},
                 }
             })
-        return Q('bool', must=must_conditions)
+        return Q('bool', must=conditions)
     return inner

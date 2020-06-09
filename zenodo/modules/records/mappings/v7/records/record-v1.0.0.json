@@ -760,6 +760,20 @@
           }
         }
       },
+      "custom_relationships": {
+        "type": "nested",
+        "properties": {
+          "key": {
+            "type": "keyword"
+          },
+          "subject": {
+            "type": "keyword"
+          },
+          "object": {
+            "type": "keyword"
+          }
+        }
+      },
       "version": {
         "type": "keyword"
       }

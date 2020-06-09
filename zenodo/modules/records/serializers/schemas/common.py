@@ -531,7 +531,7 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
                 if not isinstance(value, term_type):
                     raise ValidationError(
                         u'Invalid type for term "{0}", should be "{1}".'
-                        .format(term, term_type),
+                        .format(term, valid_terms[term]['type']),
                         field_names=['custom'])
         return obj
 

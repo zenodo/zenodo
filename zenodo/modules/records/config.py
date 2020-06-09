@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import six
 from flask_babelex import gettext
 from speaklater import make_lazy_gettext
 
@@ -122,7 +123,33 @@ system.
 """
 
 ZENODO_CUSTOM_METADATA_TERM_TYPES = {
-    'keyword': 'six.string_types',
-    'text': 'six.string_types',
+    'keyword': six.string_types,
+    'text': six.string_types,
+    'relationship': dict,
 }
 """Custom metadata term types mapping."""
+
+ZENODO_CUSTOM_METADATA_VOCABULARIES = {}
+"""Custom metadata vocabularies.
+
+..code-block:: python
+
+    ZENODO_CUSTOM_METADATA_VOCABULARIES = {
+        'dwc': {
+            '@context': 'http://rs.tdwg.org/dwc/terms/',
+            'attributes': {
+                'family': {'type': 'keyword', 'label': 'Family'},
+                'genus': {'type': 'keyword', 'label': 'Genus'},
+                'behavior': {'type': 'text', 'label': 'Behaviour'}
+            }
+        },
+        'obo': {
+            '@context': 'http://purl.obolibrary.org/obo/',
+            'attributes': {
+                'RO_0002453': {'type': 'relationship', 'label': 'hostOf'},
+            }
+        },
+    },
+
+
+"""

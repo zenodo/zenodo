@@ -221,7 +221,13 @@ def default_config(tmp_db_path):
                     'genus': {'type': 'keyword', },
                     'behavior': {'type': 'text', }
                 }
-            }
+            },
+            'obo': {
+                '@context': 'http://purl.obolibrary.org/obo/',
+                'attributes': {
+                    'RO_0002453': {'type': 'relationship', 'label': 'hostOf'},
+                }
+            },
         },
         SEARCH_INDEX_PREFIX='zenodo-test-',
     )
@@ -805,9 +811,15 @@ def full_record():
 def custom_metadata():
     """Custom metadata dictionary."""
     return {
-        'dwc:family': 'Felidae',
-        'dwc:genus': 'Felis',
-        'dwc:behavior': 'Plays with yarn, sleeps in cardboard box.',
+        'dwc:family': ['Felidae'],
+        'dwc:genus': ['Felis'],
+        'dwc:behavior': ['Plays with yarn, sleeps in cardboard box.'],
+        'obo:RO_0002453': [
+            {
+                'subject': ['Cat', 'Felis catus'],
+                'object': ['Ctenocephalides felis', 'Cat flea'],
+            },
+        ],
     }
 
 

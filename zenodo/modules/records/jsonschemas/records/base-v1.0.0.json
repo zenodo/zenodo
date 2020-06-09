@@ -618,17 +618,25 @@
       }
     },
     "custom": {
+      "type": "object",
       "additionalProperties": {
+        "type": "array",
         "items": {
-          "type": [
-            "string",
-            "number"
+          "oneOf": [
+            {"type": "string"},
+            {"type": "number"},
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+              	"subject": {"type": "array", "items": {"type": "string"}},
+                "object": {"type": "array", "items": {"type": "string"}}
+              }
+            }
           ]
-        },
-        "type": "array"
+        }
       },
-      "description": "Custom metadata",
-      "type": "object"
+      "description": "Custom metadata"
     },
     "_internal": {
       "description": "Metadata for internal use only.",

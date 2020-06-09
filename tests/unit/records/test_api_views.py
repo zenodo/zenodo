@@ -91,18 +91,18 @@ def test_geographical_search(es, api, json_headers, record_with_bucket):
 
 
 @pytest.mark.parametrize(('val', 'status', 'error_message'), [
-    ('[dwc:family]:Felidae', 200, None),
-    ('[dwc:foobar]:Felidae', 400, 'The "dwc:foobar" term is not supported.'),
+    ('[dwc:family]:[Felidae]', 200, None),
+    ('[dwc:foobar]:[Felidae]', 400, 'The "dwc:foobar" term is not supported.'),
+    ('[dwc:family]:Felidae', 400, 'The parameter should have the '
+     'format: custom=[term]:[value].'),
     ('[dwc:family]', 400, 'The parameter should have the '
-     'format: custom=[field_name]:field_value.'),
+     'format: custom=[term]:[value].'),
     (':Felidae', 400, 'The parameter should have the '
-     'format: custom=[field_name]:field_value.')
+     'format: custom=[term]:[value].')
 ])
-def test_custom_search_validation(es, api, json_headers, record_with_bucket,
-                                  val, status, error_message):
+def test_custom_search_validation(
+        es, api, json_headers, val, status, error_message):
     """Test custom metadata search validation."""
-    pid, record = record_with_bucket
-    RecordIndexer().index(record)
     with api.test_request_context():
         with api.test_client() as client:
             res = client.get(
@@ -118,8 +118,14 @@ def test_custom_search_validation(es, api, json_headers, record_with_bucket,
 
 
 @pytest.mark.parametrize(('query', 'result'), [
-    ('[dwc:family]:Felidae', 1),
-    ('[dwc:family]:foobar', 0)
+    ('[dwc:family]:[Felidae]', 1),
+    ('[dwc:family]:[foobar]', 0),
+    ('[obo:RO_0002453]:[Cat:]', 1),
+    ('[obo:RO_0002453]:[:"Cat flea"]', 1),
+    ('[obo:RO_0002453]:[foobar:]', 0),
+    ('[obo:RO_0002453]:[(foobar OR "Felis catus"):]', 1),
+    ('[obo:RO_0002453]:["Felis catus":"Cat flea"]', 1),
+    ('[obo:RO_0002453]:["Felis catus":foobar]', 0),
 ])
 def test_custom_search(es, api, json_headers, record_with_bucket,
                        custom_metadata, query, result):
