@@ -24,13 +24,38 @@
 
 {%- extends "invenio_accounts/login_user.html" %}
 
+{% macro safe_render_field(field, icon="", autofocus=False, errormsg=True, size="form-group-lg") %}
+  <div class="form-group {{size}}{% if icon %} has-feedback{% endif %}{% if field.errors and errormsg %} has-error{% endif %}">
+    {%- set extras = dict(autofocus="") if autofocus else dict() %}
+    {{field(class_="form-control", placeholder=_(field.label.text | string), **extras)}}
+    {%- if icon %}
+    <i class="{{icon}} form-control-feedback" aria-hidden="true" ></i>
+    {%- endif%}
+  </div>
+  {%- if field.errors and errormsg %}
+  <div class="text-danger text-left" role="alert">
+    {%- for error in field.errors %}
+    <p>{{error}}</p>
+    {%- endfor %}
+  </div>
+  {%- endif %}
+{% endmacro %}
+
 {%- block form_outer %}
   <div class="social-signup">
     <a href="{{url_for('invenio_oauthclient.login', remote_app='github', next=(request.args.get('next') or request.referrer))}}" class="btn btn-default btn-lg btn-block"><i class="fa fa-github"></i> {{_('Log in with GitHub')}}</a>
     <a href="{{url_for('invenio_oauthclient.login', remote_app='orcid', next=(request.args.get('next') or request.referrer))}}" class="btn btn-default btn-lg btn-block"><img src="{{ url_for('static', filename='img/orcid.svg')}}" height="18px"> {{_('Log in with ORCID')}}</a>
     <h3 align="center">&mdash; OR &mdash;</h3>
   </div>
-  {{ super () }}
+  {%- with form = login_user_form %}
+    <form action="{{ url_for_security('login') }}" method="POST" name="login_user_form">
+      {{ form.hidden_tag() }}
+      {{ form_errors(form) }}
+      {{ safe_render_field(form.email, icon="fa fa-user", autofocus=True, errormsg=False) }}
+      {{ safe_render_field(form.password, icon="fa fa-lock", errormsg=False) }}
+      <button type="submit" class="btn btn-primary btn-lg btn-block"><i class="fa fa-sign-in"></i> {{_('Log In')}}</button>
+    </form>
+  {%- endwith %}
 {% endblock %}
 
 {%- block recoverable %}
