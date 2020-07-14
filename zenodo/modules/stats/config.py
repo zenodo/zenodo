@@ -55,3 +55,43 @@ ZENODO_STATS_PIWIK_EXPORT_ENABLED = True
 # Queries performed when processing aggregations might take more time than
 # usual. This is fine though, since this is happening during Celery tasks.
 ZENODO_STATS_ELASTICSEARCH_CLIENT_CONFIG = {'timeout': 60}
+
+ZENODO_STATS_DATACITE_API_URL = 'https://api.test.datacite.org/reports/'
+"""DataCite usage statistics reports endpoint."""
+
+ZENODO_STATS_DATACITE_TOKEN = None
+"""DataCite usage statistics API token."""
+
+ZENODO_STATS_DATACITE_REPORT_MAX_ITEMS = 50000
+"""Max items to send per report."""
+
+ZENODO_STATS_DATACITE_REPORT_HEADER = {
+    'created-by': 'Zenodo',
+    'report-name': 'dataset report',
+    'report-id': 'DSR',
+    'release': 'rd1',
+}
+"""DataCite usage statistics report header fields."""
+
+ZENODO_STATS_LOCAL_PUBLISHER = {
+    'name': 'Zenodo',
+    'grid': 'grid.9132.9',  # CERN GRID identifier
+}
+"""Publisher information for DataCite statistics report."""
+
+ZENODO_STATS_DOI_PREFIX_PUBLISHERS = {}
+"""Mapping between DOI prefixes and publisher information.
+
+Used in DataCite statistics report for foreign DOIs. Example config:
+
+..code-block:: python
+
+    ZENODO_STATS_DOI_PREFIX_PUBLISHERS = {
+        '10.1234': {
+            'name': 'Foo publisher',  # required
+            # at least one of "grid", "isni", "urn", "orcid" is required
+            'grid': 'grid.12345.6',
+            'isni': '000000012146438X',
+        },
+    }
+"""

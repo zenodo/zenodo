@@ -24,13 +24,16 @@
 
 """Statistics utilities."""
 
+import math
 import itertools
+
+from flask.globals import current_app
+from zenodo.modules.records.api import ZenodoRecord
 
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch_dsl import Search
 from flask import request
-from invenio_search import current_search_client
-from invenio_search.api import RecordsSearch
+from invenio_pidstore.models import PersistentIdentifier
 from invenio_search.proxies import current_search_client
 from invenio_search.utils import build_alias_name
 from invenio_stats import current_stats
@@ -145,6 +148,19 @@ def chunkify(iterable, n):
 
 
 @lru_cache(maxsize=1024)
+def fetch_record_by_doi(doi):
+    """Cached record fetch."""
+    doi = PersistentIdentifier.query.filter_by(
+        pid_type='doi', pid_value=doi).one_or_none()
+    try:
+        return ZenodoRecord.get_record(doi.object_uuid)
+    except Exception:
+        current_app.logger.warning(
+            'Could not fetch record by DOI.', exc_info=True)
+        return None
+
+
+@lru_cache(maxsize=1024)
 def fetch_record(recid):
     """Cached record fetch."""
     return record_resolver.resolve(recid)
@@ -157,37 +173,29 @@ def fetch_record_file(recid, filename):
     return record.files[filename].obj
 
 
-def build_other_aggregations(base_aggregation, index):
-    """."""
+def get_bucket_size(client, index, agg_field, start_date=None, end_date=None):
+    """Function to help us define the size for our search query.
 
-    is_machine_bucket = base_aggregation.bucket(
-        'is_machine_bucket', 'terms', field='is_machine',
-        size=2
-    )
+    :param client: search client
+    :param str index: prefixed search index
+    :param str agg_field: aggregation field
+    :param str start_date: string containing a formatted start date
+    :param str end_date: string containing a formatted end date
 
-    is_machine_bucket.bucket(
-        'country_bucket', 'terms', field='country',
-        size=get_bucket_size(index, 'country')
-    )
+    """
+    time_range = {}
+    if start_date is not None:
+        time_range['gte'] = start_date
+    if end_date is not None:
+        time_range['lte'] = end_date
 
-    return base_aggregation
+    search = Search(using=client, index=index)
+    if time_range:
+        search = search.filter('range', timestamp=time_range)
+    search.aggs.metric('unique_values', 'cardinality', field=agg_field)
 
+    result = search.execute()
+    unique_values = result.aggregations.unique_values.value
 
-def get_bucket_size(index, agg_field):
-    """Function to help us define the size for our search query."""
-    from math import ceil
-
-    body = {
-        "aggs": {
-            "size_count": {
-                "cardinality": {
-                    "field": agg_field
-                }
-            }
-        }
-    }
-    search = Search(using=current_search_client, index=index)
-    search.update_from_dict(body)
-    count = search.count()
     # NOTE: we increase the count by 10% in order to be safe
-    return int(ceil(count + count * 0.1))
+    return int(math.ceil(unique_values + unique_values * 0.1))
