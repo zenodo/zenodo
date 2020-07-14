@@ -28,7 +28,6 @@
 
 {%- from "zenodo_records/macros/accessright.html" import accessright_label -%}
 {%- from "zenodo_records/macros/objecttype.html" import objecttype_label -%}
-{%- from "zenodo_records/macros/altmetric.html" import almetric_badge -%}
 {%- from "zenodo_records/macros/authors.html" import authors -%}
 
 {%- block page_body %}
@@ -167,11 +166,6 @@
       <div class="col-md-4">
         <div class="row record-elem">
           <div class="col-xs-12">
-            {%- if fr.doi %}
-              <span class="pull-right hidden-xs">
-                  <br><div class="altmetric-embed altmetric-hidden" data-badge-type="donut" data-badge-popover="left" data-hide-no-mentions="true" data-doi="{{fr.doi}}"></div>
-              </span>
-            {% endif %}
             <div class="pull-left">
               <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}{{ (' (v' ~ record_version ~ ')') if record_version else '' }}</span>
               {{ objecttype_label(object_type, lang=current_i18n.language) }}
@@ -223,11 +217,6 @@
             <div class="pull-right view-record hidden-xs">
               <a href="{{ record_url }}" class="btn btn-default">{{_('View')}}</a>
             </div>
-            {%- if r.doi %}
-              <span class="pull-right hidden-xs">
-                  <br><div class="altmetric-embed altmetric-hidden" data-badge-type="donut" data-badge-popover="left" data-hide-no-mentions="true" data-doi="{{r.doi}}"></div>
-              </span>
-            {% endif %}
             <div class="pull-left">
               <span class="label label-info" data-toggle="tooltip" title="{{_('Publication date')}}">{{ publication_date|dateformat(format='long') }}{{ (' (v' ~ record_version ~ ')') if record_version else '' }}</span>
               {{ objecttype_label(object_type, lang=current_i18n.language) }}
