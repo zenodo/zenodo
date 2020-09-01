@@ -26,8 +26,9 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
-import jwt
 from datetime import datetime
+
+import jwt
 import pytest
 from flask import url_for
 from flask_principal import ActionNeed

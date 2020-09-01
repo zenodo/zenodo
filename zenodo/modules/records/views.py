@@ -56,9 +56,9 @@ from zenodo.modules.stats.utils import get_record_stats
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
+from .proxies import current_custom_metadata
 from .serializers import citeproc_v1
 from .serializers.json import ZenodoJSONSerializer
-from .proxies import current_custom_metadata
 
 blueprint = Blueprint(
     'zenodo_records',

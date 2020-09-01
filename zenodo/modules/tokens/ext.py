@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function
 
 from . import config
 
+
 class ResourceAccessTokens(object):
     """Resource access tokens extension."""
 
