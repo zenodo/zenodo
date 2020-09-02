@@ -34,6 +34,8 @@ from flask import url_for
 from invenio_search import current_search
 from six import BytesIO
 
+from zenodo.modules.deposit.resolvers import deposit_resolver
+
 
 def get_data(**kwargs):
     """Get test data."""
@@ -293,6 +295,7 @@ def test_rat_deposit_files_access(
     assert res.status_code == 401
 
     # Change record owner
+    depid, deposit = deposit_resolver.resolve(depid)
     deposit['owners'] = [123]
     deposit['_deposit']['owners'] = [123]
     deposit.commit()
