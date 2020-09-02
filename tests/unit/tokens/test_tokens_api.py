@@ -46,7 +46,6 @@ def _rat_gen(token, payload=None, headers=None):
 def test_decoding(app, write_token, rat_generate_token):
     """Test decoding a resource access token."""
     write_token = write_token['token']
-    rat_generate_token = rat_generate_token['token']
 
     with pytest.raises(MissingTokenIDError):
         decode_rat(_rat_gen(rat_generate_token, headers={}))

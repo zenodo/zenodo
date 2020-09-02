@@ -249,7 +249,6 @@ def test_rat_deposit_files_access(
         json_auth_headers, license_record, rat_generate_token):
     """Test deposit files access via RATs."""
     client = api_client
-    rat_generate_token = rat_generate_token['token']
     depid = deposit['_deposit']['id']
     deposit['owners'] = [rat_generate_token.user_id]
     deposit['_deposit']['owners'] = [rat_generate_token.user_id]
