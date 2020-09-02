@@ -30,11 +30,13 @@ from contextlib import contextmanager
 from copy import copy
 
 from flask import current_app
+from flask_security import current_user
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, index, preserve
 from invenio_deposit.utils import mark_as_action
-from invenio_files_rest.models import Bucket, MultipartObject, Part
+from invenio_files_rest.models import Bucket, MultipartObject, ObjectVersion, \
+    Part
 from invenio_pidrelations.contrib.records import RecordDraft, index_siblings
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
@@ -47,7 +49,7 @@ from invenio_sipstore.models import RecordSIP as RecordSIPModel
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
-    ZenodoRecord
+    ZenodoFilesMixin, ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
     zenodo_concept_doi_minter, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed, \
@@ -73,7 +75,56 @@ PRESERVE_FIELDS = (
 """Fields which will not be overwritten on edit."""
 
 
-class ZenodoDeposit(Deposit):
+def sync_buckets(src_bucket, dest_bucket, delete_extras=False):
+    """Sync source bucket ObjectVersions to the destination bucket.
+
+    The bucket is fully mirrored with the destination bucket following the
+    logic:
+
+        * same ObjectVersions are not touched
+        * new ObjectVersions are added to destination
+        * deleted ObjectVersions are deleted in destination
+        * extra ObjectVersions in dest are deleted if `delete_extras` param is
+          True
+
+    :param src_bucket: Source bucket.
+    :param dest_bucket: Destination bucket.
+    :param delete_extras: Delete extra ObjectVersions in destination if True.
+    :returns: The bucket with an exact copy of ObjectVersions in `
+        `src_bucket``.
+    """
+    assert not dest_bucket.locked
+
+    src_ovs = ObjectVersion.query.filter(
+        ObjectVersion.bucket_id == src_bucket.id,
+        ObjectVersion.is_head.is_(True)
+    ).all()
+    dest_ovs = ObjectVersion.query.filter(
+        ObjectVersion.bucket_id == dest_bucket.id,
+        ObjectVersion.is_head.is_(True)
+    ).all()
+
+    # transform into a dict { key: object version }
+    src_keys = {ov.key: ov for ov in src_ovs}
+    dest_keys = {ov.key: ov for ov in dest_ovs}
+
+    for key, ov in src_keys.items():
+        if not ov.deleted:
+            if key not in dest_keys or \
+                    ov.file_id != dest_keys[key].file_id:
+                ov.copy(bucket=dest_bucket)
+        elif key in dest_keys and not dest_keys[key].deleted:
+            ObjectVersion.delete(dest_bucket, key)
+
+    if delete_extras:
+        for key, ov in dest_keys.items():
+            if key not in src_keys:
+                ObjectVersion.delete(dest_bucket, key)
+
+    return dest_bucket
+
+
+class ZenodoDeposit(Deposit, ZenodoFilesMixin):
     """Define API for changing deposit state."""
 
     file_cls = ZenodoFileObject
@@ -159,6 +210,10 @@ class ZenodoDeposit(Deposit):
             del data['resource_type']['openaire_subtype']
         if not data['communities']:
             del data['communities']
+
+        # If non-Zenodo DOI unlock the bucket to allow file-editing
+        if not is_doi_locally_managed(data['doi']):
+            self.files.bucket.locked = False
         return data
 
     @staticmethod
@@ -263,6 +318,11 @@ class ZenodoDeposit(Deposit):
             db.session.add(RecordsBuckets(
                 record_id=record_id, bucket_id=snapshot.id
             ))
+            # Add extra_formats bucket
+            if 'extra_formats' in self['_buckets']:
+                db.session.add(RecordsBuckets(
+                    record_id=record_id, bucket_id=self.extra_formats.bucket.id
+                ))
         else:
             yield data
 
@@ -383,6 +443,24 @@ class ZenodoDeposit(Deposit):
             if k in record:
                 edited_record[k] = record[k]
 
+        # If non-Zenodo DOIs also sync files
+        if not is_doi_locally_managed(self['doi']):
+            record_bucket = edited_record.files.bucket
+            # Unlock the record's bucket
+            record_bucket.locked = False
+            sync_buckets(
+                src_bucket=self.files.bucket,
+                dest_bucket=record_bucket,
+                delete_extras=True,
+            )
+
+            # Update the record's metadata
+            edited_record['_files'] = self.files.dumps(bucket=record_bucket.id)
+
+            # Lock both record and deposit buckets
+            record_bucket.locked = True
+            self.files.bucket.locked = True
+
         zenodo_doi_updater(edited_record.id, edited_record)
 
         edited_record = self._sync_communities(dep_comms, rec_comms,
@@ -446,16 +524,31 @@ class ZenodoDeposit(Deposit):
         archiver.save_bagit_metadata()
         return deposit
 
+    @staticmethod
+    def _get_bucket_settings():
+        """Return bucket creation config."""
+        res = {
+            'quota_size': current_app.config['ZENODO_BUCKET_QUOTA_SIZE'],
+            'max_file_size': current_app.config['ZENODO_MAX_FILE_SIZE'],
+        }
+
+        # Determine bucket quota per-user
+        user_quotas = current_app.config.get('ZENODO_USER_BUCKET_QUOTAS') or {}
+        if current_user and current_user.is_authenticated:
+            creator_id = int(current_user.get_id())
+            if creator_id in user_quotas:
+                res['quota_size'] = user_quotas[creator_id]
+                res['max_file_size'] = res['quota_size']
+
+        return res
+
     @classmethod
     def create(cls, data, id_=None):
         """Create a deposit.
 
         Adds bucket creation immediately on deposit creation.
         """
-        bucket = Bucket.create(
-            quota_size=current_app.config['ZENODO_BUCKET_QUOTA_SIZE'],
-            max_file_size=current_app.config['ZENODO_MAX_FILE_SIZE'],
-        )
+        bucket = Bucket.create(**cls._get_bucket_settings())
         data['_buckets'] = {'deposit': str(bucket.id)}
         deposit = super(ZenodoDeposit, cls).create(data, id_=id_)
 
@@ -524,9 +617,11 @@ class ZenodoDeposit(Deposit):
                 pid_type='recid', pid_value=self['conceptrecid'])
             if concept_recid.status == PIDStatus.RESERVED:
                 db.session.delete(concept_recid)
-
         # Completely remove bucket
         bucket = self.files.bucket
+        extra_formats_bucket = None
+        if 'extra_formats' in self['_buckets']:
+            extra_formats_bucket = self.extra_formats.bucket
         with db.session.begin_nested():
             # Remove Record-Bucket link
             RecordsBuckets.query.filter_by(record_id=self.id).delete()
@@ -537,6 +632,8 @@ class ZenodoDeposit(Deposit):
                     MultipartObject.upload_id).subquery())
             ).delete(synchronize_session='fetch')
             mp_q.delete(synchronize_session='fetch')
+        if extra_formats_bucket:
+            extra_formats_bucket.remove()
         bucket.locked = False
         bucket.remove()
 
@@ -616,11 +713,17 @@ class ZenodoDeposit(Deposit):
                     # Create snapshot from the record's bucket and update data
                     snapshot = latest_record.files.bucket.snapshot(lock=False)
                     snapshot.locked = False
-                # FIXME: `snapshot.id` might not be present because we need to
-                # commit first to the DB.
-                # db.session.commit()
+                    if 'extra_formats' in latest_record['_buckets']:
+                        extra_formats_snapshot = \
+                            latest_record.extra_formats.bucket.snapshot(
+                                lock=False)
                 deposit['_buckets'] = {'deposit': str(snapshot.id)}
                 RecordsBuckets.create(record=deposit.model, bucket=snapshot)
+                if 'extra_formats' in latest_record['_buckets']:
+                    deposit['_buckets']['extra_formats'] = \
+                        str(extra_formats_snapshot.id)
+                    RecordsBuckets.create(
+                        record=deposit.model, bucket=extra_formats_snapshot)
                 deposit.commit()
         return self
 

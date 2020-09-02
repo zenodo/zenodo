@@ -31,6 +31,7 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
+from invenio_search.api import RecordsSearch
 from six import BytesIO, b
 
 from zenodo.modules.deposit.api import ZenodoDeposit
@@ -65,7 +66,7 @@ def test_deposit_index(db, es):
     })
     db.session.commit()
     current_search.flush_and_refresh(deposit_index_name)
-    res = current_search.client.search(index=deposit_index_name)
+    res = RecordsSearch(index=deposit_index_name).execute()
     # Make sure the 'title' was indexed from record
     assert res['hits']['hits'][0]['_source']['title'] == 'One'
 
@@ -84,10 +85,9 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     RecordIndexer().process_bulk_queue()
     current_search.flush_and_refresh(index=deposit_index_name)
     current_search.flush_and_refresh(index=records_index_name)
-    s_dep = current_search.client.search(
-        index=deposit_index_name)['hits']['hits']
-    s_rec = current_search.client.search(
-        index=records_index_name)['hits']['hits']
+    s_dep = RecordsSearch(index=deposit_index_name).execute()['hits']['hits']
+    s_rec = RecordsSearch(index=records_index_name).execute()['hits']['hits']
+
     assert len(s_dep) == 1
     assert len(s_rec) == 1
     assert 'relations' in s_dep[0]['_source']
@@ -124,19 +124,16 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     RecordIndexer().process_bulk_queue()
     current_search.flush_and_refresh(index=deposit_index_name)
     current_search.flush_and_refresh(index=records_index_name)
-    s_dep = current_search.client.search(
-        index=deposit_index_name)['hits']['hits']
-    s_rec = current_search.client.search(
-        index=records_index_name)['hits']['hits']
+    s_dep = RecordsSearch(index=deposit_index_name).execute()['hits']['hits']
+    s_rec = RecordsSearch(index=records_index_name).execute()['hits']['hits']
 
     assert len(s_dep) == 2  # Two deposits should be indexed
     assert len(s_rec) == 1  # One, since record does not exist yet
 
-    s_dep1 = current_search.client.get(
-        index=deposit_index_name, id=deposit_v1.id)
-    s_dep2 = current_search.client.get(
-        index=deposit_index_name, id=deposit_v2.id)
-
+    s_dep1 = RecordsSearch(index=deposit_index_name).get_record(
+        deposit_v1.id).execute()[0].to_dict()
+    s_dep2 = RecordsSearch(index=deposit_index_name).get_record(
+        deposit_v2.id).execute()[0].to_dict()
     expected_d1 = {
         "version": [
             {
@@ -180,8 +177,8 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
         ]
     }
 
-    assert s_dep1['_source']['relations'] == expected_d1
-    assert s_dep2['_source']['relations'] == expected_d2
+    assert s_dep1['relations'] == expected_d1
+    assert s_dep2['relations'] == expected_d2
 
     deposit_v2 = publish_and_expunge(db, deposit_v2)
     recid_v2, record_v2 = deposit_v2.fetch_published()
@@ -193,22 +190,20 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
     current_search.flush_and_refresh(index=deposit_index_name)
     current_search.flush_and_refresh(index=records_index_name)
 
-    s_dep = current_search.client.search(
-        index=deposit_index_name)['hits']['hits']
-    s_rec = current_search.client.search(
-        index=records_index_name)['hits']['hits']
+    s_dep = RecordsSearch(index=deposit_index_name).execute()['hits']['hits']
+    s_rec = RecordsSearch(index=records_index_name).execute()['hits']['hits']
     assert len(s_dep) == 2
     assert len(s_rec) == 2
 
-    s_dep1 = current_search.client.get(
-        index=deposit_index_name, id=deposit_v1.id)
-    s_dep2 = current_search.client.get(
-        index=deposit_index_name, id=deposit_v2.id)
+    s_dep1 = RecordsSearch(index=deposit_index_name).get_record(
+        deposit_v1.id).execute()[0].to_dict()
+    s_dep2 = RecordsSearch(index=deposit_index_name).get_record(
+        deposit_v2.id).execute()[0].to_dict()
 
-    s_rec1 = current_search.client.get(
-        index=records_index_name, id=record_v1.id)
-    s_rec2 = current_search.client.get(
-        index=records_index_name, id=record_v2.id)
+    s_rec1 = RecordsSearch(index=records_index_name).get_record(
+        record_v1.id).execute()[0].to_dict()
+    s_rec2 = RecordsSearch(index=records_index_name).get_record(
+        record_v2.id).execute()[0].to_dict()
 
     expected_d1 = {
         "version": [
@@ -246,8 +241,8 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
             }
         ]
     }
-    assert s_dep1['_source']['relations'] == expected_d1
-    assert s_dep2['_source']['relations'] == expected_d2
+    assert s_dep1['relations'] == expected_d1
+    assert s_dep2['relations'] == expected_d2
 
     expected_r1 = {
         "version": [
@@ -285,5 +280,5 @@ def test_versioning_indexing(db, es, deposit, deposit_file):
             }
         ]
     }
-    assert s_rec1['_source']['relations'] == expected_r1
-    assert s_rec2['_source']['relations'] == expected_r2
+    assert s_rec1['relations'] == expected_r1
+    assert s_rec2['relations'] == expected_r2

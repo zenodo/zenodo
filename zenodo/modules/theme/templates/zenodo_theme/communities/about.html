@@ -28,7 +28,7 @@
   <div class="container">
     <div class="row">
       <div class="col-md-8">
-        {{community.page|safe}}
+        {{ community.page | sanitize_html | safe }}
       </div>
       <div class="col-md-4">{% include "zenodo_theme/communities/sidebar.html" %}</div>
     </div>

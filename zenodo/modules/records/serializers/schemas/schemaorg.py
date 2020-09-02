@@ -46,7 +46,7 @@ def _serialize_identifiers(ids, relations=None):
     """
     relations = relations or []
     ids = [{'@type': 'CreativeWork',
-             '@id': idutils.to_url(i['identifier'], i['scheme'])}
+             '@id': idutils.to_url(i['identifier'], i['scheme'], 'https')}
             for i in ids if (not relations or i['relation'] in relations) and 'scheme' in i]
     return [id_ for id_ in ids if id_['@id']]
 
@@ -54,7 +54,7 @@ def _serialize_identifiers(ids, relations=None):
 def _serialize_subjects(ids):
     """Serialize subjects to URLs."""
     return [{'@type': 'CreativeWork',
-             '@id': idutils.to_url(i['identifier'], i['scheme'])}
+             '@id': idutils.to_url(i['identifier'], i['scheme'], 'https')}
             for i in ids if 'scheme' in i]
 
 
@@ -79,7 +79,7 @@ class Person(Schema):
         if orcid:
             return idutils.to_url(orcid, 'orcid', 'https')
         if gnd:
-            return idutils.to_url(gnd, 'gnd')
+            return idutils.to_url(gnd, 'gnd', 'https')
         return missing
 
 
@@ -92,11 +92,32 @@ class Language(Schema):
 
     def get_name(self, obj):
         """Get the language human-readable name."""
-        return pycountry.languages.get(alpha_3=obj).name
+        lang = pycountry.languages.get(alpha_3=obj)
+        if lang:
+            return lang.name
 
     def get_alternate_name(self, obj):
         """Get the lanugage code."""
         return obj
+
+
+class Place(Schema):
+    """Marshmallow schema for schema.org/Place."""
+
+    type_ = fields.Constant('Place', dump_to='@type')
+    geo = fields.Method('get_geo')
+    name = SanitizedUnicode(attribute='place')
+
+    def get_geo(self, obj):
+        """Generate geo field."""
+        if obj.get('lat') and obj.get('lon'):
+            return {
+                '@type': 'GeoCoordinates',
+                'latitude': obj['lat'],
+                'longitude': obj['lon']
+            }
+        else:
+            return missing
 
 
 class CreativeWork(Schema):
@@ -115,11 +136,14 @@ class CreativeWork(Schema):
     description = SanitizedHTML(attribute='metadata.description')
     context = fields.Method('get_context', dump_to='@context')
     keywords = fields.List(SanitizedUnicode(), attribute='metadata.keywords')
+    spatial = fields.Nested(Place, many=True, attribute='metadata.locations')
 
     # TODO: What date?
     # dateCreated
     # dateModified
     datePublished = DateString(attribute='metadata.publication_date')
+
+    temporal = fields.Method('get_dates')
 
     # NOTE: could also be  "author"
     creator = fields.Nested(Person, many=True, attribute='metadata.creators')
@@ -155,6 +179,18 @@ class CreativeWork(Schema):
     # NOTE: Zenodo communities?
     # sourceOrganization
 
+    def get_dates(self, obj):
+        """Get dates of the record."""
+        dates = []
+        for interval in obj['metadata'].get('dates', []):
+            start = interval.get('start') or '..'
+            end = interval.get('end') or '..'
+            if start != '..' and end != '..' and start == end:
+                dates.append(start)
+            else:
+                dates.append(start + '/' + end)
+        return dates or missing
+
     def get_context(self, obj):
         """Returns the value for '@context' value."""
         return self.CONTEXT
@@ -162,7 +198,7 @@ class CreativeWork(Schema):
     def get_doi(self, obj):
         """Get DOI of the record."""
         data = obj['metadata']
-        return idutils.to_url(data['doi'], 'doi') \
+        return idutils.to_url(data['doi'], 'doi', 'https') \
             if data.get('doi') \
             else missing
 
@@ -215,18 +251,21 @@ class Distribution(Schema):
     """Marshmallow schema for schema.org/Distribution."""
 
     type_ = fields.Constant('DataDownload', dump_to='@type')
-    fileFormat = SanitizedUnicode(attribute='type')
+    encodingFormat = SanitizedUnicode(attribute='type')
     contentUrl = fields.Method('get_content_url')
 
     def get_content_url(self, obj):
         """Get URL of the file."""
         return format_files_rest_link(bucket=obj['bucket'], key=obj['key'])
 
+
 class Dataset(CreativeWork):
     """Marshmallow schema for schema.org/Dataset."""
 
     distribution = fields.Nested(
         Distribution, many=True, attribute='metadata._files')
+
+    measurementTechnique = SanitizedUnicode(attribute='metadata.method')
 
     @pre_dump
     def hide_closed_files(self, obj):
@@ -247,6 +286,12 @@ class ScholarlyArticle(CreativeWork):
 
 class ImageObject(CreativeWork):
     """Marshmallow schema for schema.org/ImageObject."""
+
+    pass
+
+
+class Collection(CreativeWork):
+    """Marshmallow schema for schema.org/Collection."""
 
     pass
 

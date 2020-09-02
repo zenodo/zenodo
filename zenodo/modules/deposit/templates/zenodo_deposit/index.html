@@ -66,3 +66,12 @@
     template="{{ url_for('static', filename='templates/zenodo_deposit/selectstatus.html') }}">
   </invenio-search-facets>
 {%- endblock search_facets %}
+
+{%- block search_sort_select %}
+<invenio-search-select-box
+  sort-key="sort"
+  available-options='{{ sort_options|filter_sort_options|format_sortoptions|safe }}'
+  template="{{ url_for('static', filename='templates/invenio_deposit/selectbox.html') }}"
+  >
+</invenio-search-select-box>
+{%- endblock search_sort_select %}

@@ -27,7 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import json
-from invenio_records_files.api import Record
+from invenio_records.api import Record
 
 from .json import ZenodoJSONSerializer
 

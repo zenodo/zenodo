@@ -116,4 +116,4 @@ class DOILink(fields.Field):
     def _serialize(self, value, attr, obj):
         if value is None:
             return None
-        return idutils.to_url(value, 'doi')
+        return idutils.to_url(value, 'doi', 'https')

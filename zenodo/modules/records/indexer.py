@@ -33,6 +33,7 @@ from invenio_pidstore.models import PersistentIdentifier
 
 from zenodo.modules.records.serializers.pidrelations import \
     serialize_related_identifiers
+from zenodo.modules.records.utils import build_record_custom_fields
 from zenodo.modules.stats.utils import build_record_stats
 
 
@@ -52,9 +53,10 @@ def indexer_receiver(sender, json=None, record=None, index=None,
         json['size'] = sum([f.get('size', 0) for f in files])
 
     pid = PersistentIdentifier.query.filter(
+        PersistentIdentifier.pid_value == str(record['recid']),
+        PersistentIdentifier.pid_type == 'recid',
         PersistentIdentifier.object_uuid == record.id,
-        PersistentIdentifier.pid_type == current_pidrelations.primary_pid_type,
-        ).one_or_none()
+    ).one_or_none()
     if pid:
         pv = PIDVersioning(child=pid)
         if pv.exists:
@@ -68,9 +70,17 @@ def indexer_receiver(sender, json=None, record=None, index=None,
         if rels:
             json.setdefault('related_identifiers', []).extend(rels)
 
+    for loc in json.get('locations', []):
+        if loc.get('lat') and loc.get('lon'):
+            loc['point'] = {'lat': loc['lat'], 'lon': loc['lon']}
+
     # Remove internal data.
     if '_internal' in json:
         del json['_internal']
 
     json['_stats'] = build_record_stats(record['recid'],
                                         record.get('conceptrecid'))
+
+    custom_es_fields = build_record_custom_fields(json)
+    for es_field, es_value in custom_es_fields.items():
+        json[es_field] = es_value

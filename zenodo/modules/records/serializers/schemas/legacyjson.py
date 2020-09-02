@@ -38,9 +38,9 @@ from werkzeug.routing import BuildError
 from zenodo.modules.records.models import AccessRight, ObjectType
 from zenodo.modules.records.utils import is_valid_openaire_type
 
-from . import common
 from ...minters import doi_generator
 from ..fields import DOILink, SanitizedUnicode, SanitizedUrl
+from . import common
 
 
 class FileSchemaV1(Schema):
@@ -197,7 +197,7 @@ class LegacyMetadataSchemaV1(common.CommonMetadataSchemaV1):
             if not g:
                 continue
             # FP7 project grant
-            if not g.startswith('10.13039/'):
+            if not str(g).startswith('10.13039/'):
                 g = '10.13039/501100000780::{0}'.format(g)
             # Check that the PID exists
             grant_pid = PersistentIdentifier.query.filter_by(

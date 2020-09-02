@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+from collections import defaultdict
+
 from werkzeug.utils import cached_property
 
 from . import config
@@ -46,13 +48,12 @@ class _ZenodoOpenAIREState(object):
     def inverse_openaire_community_map(self):
         """Lookup for Zenodo community -> OpenAIRE community."""
         comm_map = self.openaire_communities
-        items = sum([[(z_comm, oa_comm) for z_comm in cfg['communities']] \
-            for oa_comm, cfg in comm_map.items()], [])
-        ditems = dict(items)
-        if len(ditems) < len(items):
-            raise ValueError("Communities defined for given OpenAIRE community"
-                             " must be unique.")
-        return ditems
+        items = defaultdict(list)
+        for oa_comm, cfg in comm_map.items():
+            for z_comm in cfg['communities']:
+                items[z_comm].append(oa_comm)
+        return items
+
 
 class ZenodoOpenAIRE(object):
     """Zenodo OpenAIRE extension."""

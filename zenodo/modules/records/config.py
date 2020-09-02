@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+import six
 from flask_babelex import gettext
 from speaklater import make_lazy_gettext
 
@@ -86,12 +87,18 @@ ZENODO_RELATION_TYPES = [
     ('isReferencedBy', _('Referenced by')),
     ('isNewVersionOf', _('Previous versions')),
     ('isPreviousVersionOf', _('New versions')),
+    ('isContinuedBy', _('Continued by')),
+    ('continues', _('Continues')),
     ('isPartOf', _('Part of')),
     ('hasPart', _('Has part')),
+    ('isReviewedBy', _('Reviewed by')),
+    ('reviews', _('Reviews')),
     ('isDocumentedBy', _('Documented by')),
     ('documents', _('Documents')),
     ('compiles', _('Compiles')),
     ('isCompiledBy', _('Compiled by')),
+    ('isDerivedFrom', _('Derived from')),
+    ('isSourceOf', _('Source of')),
     ('isIdenticalTo', _('Identical to')),
 ]
 
@@ -113,4 +120,36 @@ ZENODO_DOIID4RECID = {
 
 Wrong DOIs were minted for a short period in 2013 due to mistake in the legacy
 system.
+"""
+
+ZENODO_CUSTOM_METADATA_TERM_TYPES = {
+    'keyword': six.string_types,
+    'text': six.string_types,
+    'relationship': dict,
+}
+"""Custom metadata term types mapping."""
+
+ZENODO_CUSTOM_METADATA_VOCABULARIES = {}
+"""Custom metadata vocabularies.
+
+..code-block:: python
+
+    ZENODO_CUSTOM_METADATA_VOCABULARIES = {
+        'dwc': {
+            '@context': 'http://rs.tdwg.org/dwc/terms/',
+            'attributes': {
+                'family': {'type': 'keyword', 'label': 'Family'},
+                'genus': {'type': 'keyword', 'label': 'Genus'},
+                'behavior': {'type': 'text', 'label': 'Behaviour'}
+            }
+        },
+        'obo': {
+            '@context': 'http://purl.obolibrary.org/obo/',
+            'attributes': {
+                'RO_0002453': {'type': 'relationship', 'label': 'hostOf'},
+            }
+        },
+    },
+
+
 """

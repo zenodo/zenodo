@@ -77,6 +77,10 @@
         "condition": "model.upload_type == 'publication'",
         "titleMap": [
           {
+            "value": "annotationcollection",
+            "name": "Annotation collection"
+          },
+          {
             "value": "book",
             "name": "Book"
           },
@@ -87,6 +91,10 @@
           {
             "value": "conferencepaper",
             "name": "Conference paper"
+          },
+          {
+            "value": "datamanagementplan",
+            "name": "Data management plan"
           },
           {
             "value": "article",
@@ -121,12 +129,16 @@
             "name": "Software documentation"
           },
           {
-            "value": "thesis",
-            "name": "Thesis"
+            "value": "taxonomictreatment",
+            "name": "Taxonomic treatment"
           },
           {
             "value": "technicalnote",
             "name": "Technical note"
+          },
+          {
+            "value": "thesis",
+            "name": "Thesis"
           },
           {
             "value": "workingpaper",
@@ -423,6 +435,7 @@
           "removePlugins": "elementspath",
           "removeButtons": ""
         },
+        "required": true,
         "fa_cls": "fa-pencil",
         "description": "Specify the conditions under which you grant users access to the files in your upload. User requesting access will be asked to justify how they fulfil the conditions. Based on the justification, you decide who to grant/deny access. You are not allowed to charge users for granting access to data hosted on Zenodo.",
         "condition": "model.access_right == 'restricted'"
@@ -448,10 +461,10 @@
               },
               "map": {
                 "resultSource": "text.0.options",
-                "valueSource": "payload.id",
-                "nameSource": "text",
+                "valueSource": "_source.id",
+                "nameSource": "_source.title",
                 "valueProperty": "value",
-                "nameProperty": "text"
+                "nameProperty": "_source.title"
               },
               "maxResultDisplay": 10
             },
@@ -500,8 +513,8 @@
                   },
                   "map": {
                     "resultSource": "text.0.options",
-                    "valueSource": "payload.legacy_id",
-                    "nameSource": "payload",
+                    "valueSource": "_source.legacy_id",
+                    "nameSource": "_source",
                     "valueProperty": "value",
                     "nameProperty": "text"
                   }
@@ -519,6 +532,14 @@
                   {
                     "value": "10.13039/501100000780",
                     "name": "European Commission (EU)"
+                  },
+                  {
+                    "value": "10.13039/501100000806",
+                    "name": "European Environment Agency (EU)"
+                  },
+                  {
+                    "value": "10.13039/501100002341",
+                    "name": "Academy of Finland (FI)"
                   },
                   {
                     "value": "10.13039/501100001871",
@@ -551,6 +572,10 @@
                   {
                     "value": "10.13039/501100003246",
                     "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NL)"
+                  },
+                  {
+                    "value": "10.13039/501100000690",
+                    "name": "Research Councils (UK)"
                   },
                   {
                     "value": "10.13039/501100001711",
@@ -587,7 +612,10 @@
         "fa_cls": "fa-barcode",
         "description": "",
         "sortOptions": {
-          "disabled": true
+          "disabled": false,
+          "handle": "i.sort-handle",
+          "cursor": "move",
+          "axis": "y"
         },
         "add": "Add another related identifier",
         "inline": true,
@@ -638,12 +666,28 @@
                 "name": "is new version of this upload"
               },
               {
+                "value": "isContinuedBy",
+                "name": "continues this upload"
+              },
+              {
+                "value": "continues",
+                "name": "is continued by this upload"
+              },
+              {
                 "value": "isPartOf",
                 "name": "has this upload as part"
               },
               {
                 "value": "hasPart",
                 "name": "is part of this upload"
+              },
+              {
+                "value": "isReviewedBy",
+                "name": "reviews this upload"
+              },
+              {
+                "value": "reviews",
+                "name": "is reviewed by this upload"
               },
               {
                 "value": "isDocumentedBy",
@@ -655,11 +699,19 @@
               },
               {
                 "value": "compiles",
-                "name": "is compiled/create by this upload"
+                "name": "is compiled/created by this upload"
               },
               {
                 "value": "isCompiledBy",
                 "name": "compiled/created this upload"
+              },
+              {
+                "value": "isDerivedFrom",
+                "name": "is the source this upload is derived from"
+              },
+              {
+                "value": "isSourceOf",
+                "name": "has this upload as its source"
               },
               {
                 "value": "isIdenticalTo",
@@ -670,6 +722,12 @@
                 "name": "is an alternate identifier of this upload"
               }
             ]
+          },
+          {
+            "type": "template",
+            "templateUrl": "/static/templates/zenodo_deposit/resource-type-selector.html",
+            "key": "related_identifiers[].resource_type",
+            "description": "Optional. Resource type of the related identifier."
           }
         ]
       }
@@ -738,8 +796,52 @@
                 "name": "Data manager"
               },
               {
+                "value": "Distributor",
+                "name": "Distributor"
+              },
+              {
                 "value": "Editor",
                 "name": "Editor"
+              },
+              {
+                "value": "HostingInstitution",
+                "name": "Hosting institution"
+              },
+              {
+                "value": "Other",
+                "name": "Other"
+              },
+              {
+                "value": "Producer",
+                "name": "Producer"
+              },
+              {
+                "value": "ProjectLeader",
+                "name": "Project leader"
+              },
+              {
+                "value": "ProjectManager",
+                "name": "Project manager"
+              },
+              {
+                "value": "ProjectMember",
+                "name": "Project member"
+              },
+              {
+                "value": "RegistrationAgency",
+                "name": "Registration agency"
+              },
+              {
+                "value": "RegistrationAuthority",
+                "name": "Registration authority"
+              },
+              {
+                "value": "RelatedPerson",
+                "name": "Related person"
+              },
+              {
+                "value": "ResearchGroup",
+                "name": "Research group"
               },
               {
                 "value": "Researcher",
@@ -754,8 +856,12 @@
                 "name": "Sponsor"
               },
               {
-                "value": "Other",
-                "name": "Other"
+                "value": "Supervisor",
+                "name": "Supervisor"
+              },
+              {
+                "value": "WorkPackageLeader",
+                "name": "Work package leader"
               }
             ]
           }

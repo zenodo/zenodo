@@ -4,7 +4,7 @@ Installation
 Zenodo depends on PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ.
 
 If you are only interested in running Zenodo locally, follow the Docker
-installation guide below. If you plan to eventually develop Zenodo code you
+installation guide below. If you plan to eventually develop Zenodo code 
 continue further to Development installation to find out how to set up the
 local instance for easy code development.
 
@@ -34,8 +34,8 @@ build all docker images and boot them up using ``docker-compose``:
     $ git clone https://github.com/zenodo/zenodo.git
     $ cd ~/src/zenodo
     $ git checkout master
-    $ docker-compose build
-    $ docker-compose up
+    $ docker-compose -f docker-compose.full.yml build
+    $ docker-compose -f docker-compose.full.yml up -d
 
 
 .. note::
@@ -51,8 +51,7 @@ and some data fixtures:
 .. code-block:: console
 
     $ cd ~/src/zenodo
-    $ docker-compose run --rm web bash /code/zenodo/scripts/init.sh
-    $ docker-compose run --rm web bash /code/zenodo/scripts/index.sh
+    $ docker-compose -f docker-compose.full.yml run --rm web bash /code/zenodo/scripts/init.sh
 
 Now visit the following URL in your browser:
 
@@ -108,13 +107,14 @@ installed.
     ports on localhost, make sure you are not running PostgreSQL,
     Redis, RabbitMQ or Elasticsearch on those ports in your system.
 
-Similarly to how we previously ran ``docker-compose up`` to run full-stack
+Similarly to how we previously ran
+``docker-compose -f docker-compose.full.yml up -d`` to run full-stack
 Zenodo, this time we run only four docker nodes with the database,
 Elasticsearch, Redis and RabbitMQ:
 
 .. code-block:: console
 
-    $ docker-compose up db es cache mq
+    $ docker-compose up -d
 
 Keep the docker-compose session above alive and in a separate shell, create a
 new Python virtual environment using virtualenvwrapper
@@ -233,7 +233,7 @@ To run only the essential services using docker, execute the following:
 .. code-block:: console
 
     $ cd ~/src/zenodo
-    $ docker-compose up db es mq cache
+    $ docker-compose up -d
 
 This should bring up four docker nodes with PostgreSQL (db), Elasticsearch (es),
 RabbitMQ (mq), and Redis (cache). Keep this shell session alive.

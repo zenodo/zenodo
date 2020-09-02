@@ -75,6 +75,10 @@ class ResultStream(object):
 
         return result
 
+    def __iter__(self):
+        """Iterator."""
+        return self
+
     def next(self):
         """Python 2.x compatibility function."""
         return self.__next__()

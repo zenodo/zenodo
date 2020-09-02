@@ -48,6 +48,8 @@ import os
 from datetime import timedelta
 
 from celery.schedules import crontab
+from flask_principal import ActionNeed
+from invenio_access.permissions import Permission
 from invenio_app.config import APP_DEFAULT_SECURE_HEADERS
 from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
     DEPOSIT_REST_FACETS, DEPOSIT_REST_SORT_OPTIONS
@@ -61,13 +63,20 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_pidrelations.config import RelationType
 from invenio_records_rest.facets import terms_filter
+from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
+from invenio_stats.aggregations import StatAggregator
+from invenio_stats.processors import EventsIndexer
+from invenio_stats.queries import ESTermsQuery
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
+from zenodo.modules.records.facets import custom_metadata_filter, \
+    geo_bounding_box_filter
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
     deposit_read_permission_factory, deposit_update_permission_factory, \
     record_create_permission_factory
 from zenodo.modules.stats import current_stats_search_client
+from zenodo.modules.theme.ext import useragent_and_ip_limit_key
 
 
 def _(x):
@@ -269,6 +278,16 @@ CELERY_BEAT_SCHEDULE = {
             'retry': True,
         }
     },
+    'github-tokens-refresh': {
+        'task': 'invenio_github.tasks.refresh_accounts',
+        'schedule': crontab(minute=0, hour=3),
+        'kwargs': {
+            'expiration_threshold': {
+                # TODO: Remove when invenio-github v1.0.0a19 is released
+                'days': 6 * 30,
+            },
+        }
+    },
 
 }
 
@@ -425,20 +444,25 @@ OPENAIRE_JSONRESOLVER_GRANTS_HOST = 'dx.zenodo.org'
 OPENAIRE_ZENODO_IDS = {
     'publication': 'opendoar____::2659',
     'dataset': 're3data_____::r3d100010468',
+    'software': 're3data_____::r3d100010468',
+    'other': 're3data_____::r3d100010468'
 }
 #: OpenAIRE ID namespace prefixes for Zenodo.
 OPENAIRE_NAMESPACE_PREFIXES = {
     'publication': 'od______2659',
     'dataset': 'r37b0ad08687',
+    'software': 'r37b0ad08687',
+    'other': 'r37b0ad08687'
 }
 #: OpenAIRE API endpoint.
-OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc'
+OPENAIRE_API_URL = 'http://dev.openaire.research-infrastructures.eu/is/mvc/api/results'
+OPENAIRE_API_URL_BETA = None
 #: OpenAIRE API endpoint username.
 OPENAIRE_API_USERNAME = None
 #: OpenAIRE API endpoint password.
 OPENAIRE_API_PASSWORD = None
 #: URL to OpenAIRE portal.
-OPENAIRE_PORTAL_URL = 'https://beta.openaire.eu'
+OPENAIRE_PORTAL_URL = 'https://explore.openaire.eu'
 #: OpenAIRE community identifier prefix.
 OPENAIRE_COMMUNITY_IDENTIFIER_PREFIX = 'https://openaire.eu/communities'
 #: Enable sending published records for direct indexing at OpenAIRE.
@@ -506,11 +530,27 @@ DEPOSIT_CONTRIBUTOR_TYPES = [
     dict(label='Data collector', marc='col', datacite='DataCollector'),
     dict(label='Data curator', marc='cur', datacite='DataCurator'),
     dict(label='Data manager', marc='dtm', datacite='DataManager'),
+    dict(label='Distributor', marc='dst', datacite='Distributor'),
     dict(label='Editor', marc='edt', datacite='Editor'),
+    dict(label='Hosting institution', marc='his',
+         datacite='HostingInstitution'),
+    dict(label='Other', marc='oth', datacite='Other'),
+    dict(label='Producer', marc='pro', datacite='Producer'),
+    dict(label='Project leader', marc='pdr', datacite='ProjectLeader'),
+    dict(label='Project manager', marc='rth', datacite='ProjectManager'),
+    dict(label='Project member', marc='rtm', datacite='ProjectMember'),
+    dict(label='Registration agency', marc='cor',
+         datacite='RegistrationAgency'),
+    dict(label='Registration authority', marc='cor',
+         datacite='RegistrationAuthority'),
+    dict(label='Related person', marc='oth', datacite='RelatedPerson'),
+    dict(label='Research group', marc='rtm', datacite='ResearchGroup'),
     dict(label='Researcher', marc='res', datacite='Researcher'),
     dict(label='Rights holder', marc='cph', datacite='RightsHolder'),
     dict(label='Sponsor', marc='spn', datacite='Sponsor'),
-    dict(label='Other', marc='oth', datacite='Other'),
+    dict(label='Supervisor', marc='dgs', datacite='Supervisor'),
+    dict(label='Work package leader', marc='led',
+         datacite='WorkPackageLeader'),
 ]
 DEPOSIT_CONTRIBUTOR_MARC2DATACITE = {
     x['marc']: x['datacite'] for x in DEPOSIT_CONTRIBUTOR_TYPES
@@ -539,13 +579,13 @@ DEPOSIT_UI_RESPONSE_MESSAGES = dict(
         message="Saved successfully."
     ),
     delete=dict(
-        message="Deleted succesfully."
+        message="Deleted successfully."
     ),
     discard=dict(
-        message="Changes discarded succesfully."
+        message="Changes discarded successfully."
     ),
     publish=dict(
-        message="Published succesfully."
+        message="Published successfully."
     ),
 )
 
@@ -634,7 +674,7 @@ MAX_CONTENT_LENGTH = 100 * 1024 * 1024  # 100 MiB
 SIPSTORE_DEFAULT_AGENT_JSONSCHEMA = 'sipstore/agent-webclient-v1.0.0.json'
 
 # Default SIP agent factory
-SIPSTORE_AGENT_FACTORY = 'invenio_sipstore.api.SIP._build_agent_info'
+SIPSTORE_AGENT_FACTORY = 'zenodo.modules.sipstore.utils:build_agent_info'
 
 #: Enable the agent JSON schema
 SIPSTORE_AGENT_JSONSCHEMA_ENABLED = True
@@ -698,6 +738,19 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='Citation',
         serializer='zenodo.modules.records.serializers.citeproc_v1',
     ),
+    # Generic serializer
+    'ef': dict(
+        title='Formats',
+        serializer='zenodo.modules.records.serializers.extra_formats_v1',
+    ),
+    'geojson': dict(
+        title='GeoJSON',
+        serializer='zenodo.modules.records.serializers.geojson_v1',
+    ),
+    'dcat': dict(
+        title='DCAT',
+        serializer='zenodo.modules.records.serializers.dcat_v1',
+    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
@@ -726,10 +779,22 @@ RECORDS_UI_ENDPOINTS = dict(
         view_imp='invenio_previewer.views.preview',
         record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
+    recid_thumbnail=dict(
+        pid_type='recid',
+        route='/record/<pid_value>/thumb<thumbnail_size>',
+        view_imp='zenodo.modules.records.views.record_thumbnail',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
+    ),
     recid_files=dict(
         pid_type='recid',
         route='/record/<pid_value>/files/<path:filename>',
         view_imp='invenio_records_files.utils.file_download_ui',
+        record_class='zenodo.modules.records.api:ZenodoRecord',
+    ),
+    recid_extra_formats=dict(
+        pid_type='recid',
+        route='/record/<pid_value>/formats',
+        view_imp='zenodo.modules.records.views.record_extra_formats',
         record_class='zenodo.modules.records.api:ZenodoRecord',
     ),
 )
@@ -799,8 +864,12 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.dc_v1_response'),
             'application/vnd.citationstyles.csl+json': (
                 'zenodo.modules.records.serializers.csl_v1_response'),
+            'application/dcat+xml': (
+                'zenodo.modules.records.serializers.dcat_response'),
             'text/x-bibliography': (
                 'zenodo.modules.records.serializers.citeproc_v1_response'),
+            'application/vnd.geo+json': (
+                'zenodo.modules.records.serializers.geojson_v1_response'),
         },
         search_serializers={
             'application/json': (
@@ -822,6 +891,9 @@ RECORDS_REST_ENDPOINTS = dict(
 )
 # Default OpenAIRE API endpoints.
 RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
+
+# Add fuzzy matching for licenses
+OPENDEFINITION_REST_ENDPOINTS['od_lic']['suggesters']['text']['completion']['fuzzy'] = True
 RECORDS_REST_ENDPOINTS.update(OPENDEFINITION_REST_ENDPOINTS)
 
 #: Sort options records REST API.
@@ -851,11 +923,6 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=3,
         ),
-        title=dict(
-            fields=['title', ],
-            title='Title',
-            order=4,
-        ),
         conference_session=dict(
             fields=['meeting.session', '-meeting.session_part'],
             title='Conference session',
@@ -873,6 +940,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
             default_order='desc',
             order=6,
         ),
+        distance=dict(
+            title='Distance',
+            fields=[geolocation_sort('location.point', 'center', 'km')],
+            default_order='asc',
+            display=False,
+            order=2,
+        ),
         version=dict(
             # TODO: There are a lot of implications when sorting record results
             # by versions and using the `_score`... Maybe there's some
@@ -887,6 +961,13 @@ RECORDS_REST_SORT_OPTIONS = dict(
 )
 DEPOSIT_REST_SORT_OPTIONS['deposits'].update(
     dict(
+        distance=dict(
+            title=_('Distance'),
+            fields=[geolocation_sort('location.point', 'center', 'km')],
+            default_order='asc',
+            display=False,
+            order=2,
+        ),
         version=dict(
             # FIXME: No `_score` in deposit search response...
             fields=['conceptrecid', 'relations.version.index'],
@@ -927,10 +1008,16 @@ RECORDS_REST_FACETS = dict(
             keywords=dict(
                 terms=dict(field="keywords"),
             ),
+            communities=dict(
+                terms=dict(field="communities"),
+            ),
         ),
         filters=dict(
             communities=terms_filter('communities'),
+            custom=custom_metadata_filter('custom'),
             provisional_communities=terms_filter('provisional_communities'),
+            bounds=geo_bounding_box_filter(
+                'bounds', 'locations.point', type='indexed'),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
@@ -941,6 +1028,17 @@ RECORDS_REST_FACETS = dict(
         )
     )
 )
+
+#: Update deposit facets as well
+DEPOSIT_REST_FACETS['deposits'].setdefault('filters', {})
+DEPOSIT_REST_FACETS['deposits']['filters'].update(dict(
+    communities=terms_filter('communities'),
+    custom=custom_metadata_filter('custom'),
+    provisional_communities=terms_filter('provisional_communities'),
+    locations=geo_bounding_box_filter(
+        'locations', 'locations.point', type='indexed'),
+))
+
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
@@ -971,11 +1069,11 @@ PREVIEWER_PREFERENCE = [
     'csv_dthreejs',
     'iiif_image',
     'simple_image',
-    'json_prismjs',
-    'xml_prismjs',
+    # 'json_prismjs',
+    # 'xml_prismjs',
     'mistune',
     'pdfjs',
-    'ipynb',
+    # 'ipynb',
     'zip',
 ]
 
@@ -983,6 +1081,24 @@ PREVIEWER_PREFERENCE = [
 # ====
 #: Improve quality of image resampling using better algorithm
 IIIF_RESIZE_RESAMPLE = 'PIL.Image:BICUBIC'
+
+#: Use the Redis storage backend for caching IIIF images
+# TODO: Fix Python 3 caching key issue to enable:
+#   https://github.com/inveniosoftware/flask-iiif/issues/66
+# IIIF_CACHE_HANDLER = 'flask_iiif.cache.redis:ImageRedisCache'
+
+# Redis storage for thumbnails caching.
+IIIF_CACHE_REDIS_URL = CACHE_REDIS_URL
+
+# Precached thumbnails
+CACHED_THUMBNAILS = {
+    '10': '10,',
+    '50': '50,',
+    '100': '100,',
+    '250': '250,',
+    '750': '750,',
+    '1200': '1200,'
+    }
 
 # OAI-PMH
 # =======
@@ -1032,6 +1148,11 @@ OAISERVER_METADATA_FORMATS = {
         'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v41',
     },
+    'dcat': {
+        'namespace': 'https://www.w3.org/ns/dcat',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer': 'zenodo.modules.records.serializers.oaipmh_dcat_v1',
+    },
     'oai_datacite': {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
@@ -1041,6 +1162,12 @@ OAISERVER_METADATA_FORMATS = {
         'namespace': 'http://datacite.org/schema/kernel-3',
         'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
+    },
+    'oai_datacite4': {
+        'namespace': 'http://datacite.org/schema/kernel-4',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
+        'serializer':
+            'zenodo.modules.records.serializers.oaipmh_oai_datacite_v41',
     },
     'oai_dc': {
         'namespace': 'http://www.openarchives.org/OAI/2.0/oai_dc/',
@@ -1089,6 +1216,9 @@ SECURITY_PASSWORD_SCHEMES = [
 SECURITY_DEPRECATED_PASSWORD_SCHEMES = [
     'sha512_crypt', 'invenio_aes_encrypted_email']
 
+#: Session and User ID headers
+ACCOUNTS_USERINFO_HEADERS = True
+
 # Search
 # ======
 #: Default API endpoint for search UI.
@@ -1115,6 +1245,8 @@ SEARCH_MAPPINGS = [
     'licenses',
     'records',
 ]
+#: ElasticSearch index prefix
+SEARCH_INDEX_PREFIX = 'zenodo-dev-'
 
 # Communities
 # ===========
@@ -1207,7 +1339,8 @@ STATS_EVENTS = {
             'zenodo.modules.stats.event_builders:skip_deposit',
             'zenodo.modules.stats.event_builders:add_record_metadata',
         ],
-        'processor_config': {
+        'cls': EventsIndexer,
+        'params': {
             'preprocessors': [
                 'invenio_stats.processors:flag_robots',
                 # Don't index robot events
@@ -1230,7 +1363,8 @@ STATS_EVENTS = {
             'zenodo.modules.stats.event_builders:skip_deposit',
             'zenodo.modules.stats.event_builders:add_record_metadata',
         ],
-        'processor_config': {
+        'cls': EventsIndexer,
+        'params': {
             'preprocessors': [
                 'invenio_stats.processors:flag_robots',
                 # Don't index robot events
@@ -1248,44 +1382,221 @@ STATS_EVENTS = {
 }
 #: Enabled aggregations from 'zenoodo.modules.stats.registrations'
 STATS_AGGREGATIONS = {
-    'record-download-agg': {},
-    'record-download-all-versions-agg': {},
-    # NOTE: Since the "record-view-agg" aggregations is already registered in
-    # "invenio_stasts.contrib.registrations", we have to overwrite the
-    # configuration here
     'record-view-agg': dict(
         templates='zenodo.modules.stats.templates.aggregations',
-        aggregator_config=dict(
+        cls=StatAggregator,
+        params=dict(
             client=current_stats_search_client,
             event='record-view',
-            aggregation_field='recid',
-            aggregation_interval='day',
-            batch_size=1,
+            field='recid',
+            interval='day',
+            index_interval='month',
             copy_fields=dict(
                 record_id='record_id',
                 recid='recid',
                 conceptrecid='conceptrecid',
                 doi='doi',
                 conceptdoi='conceptdoi',
-                communities=lambda d, _: (list(d.communities)
-                                          if d.communities else None),
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
                 owners=lambda d, _: (list(d.owners) if d.owners else None),
                 is_parent=lambda *_: False
             ),
-            metric_aggregation_fields=dict(
+            metric_fields=dict(
                 unique_count=('cardinality', 'unique_session_id',
                               {'precision_threshold': 1000}),
             )
         )
     ),
-    'record-view-all-versions-agg': {},
+    'record-view-all-versions-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        cls=StatAggregator,
+        params=dict(
+            client=current_stats_search_client,
+            event='record-view',
+            field='conceptrecid',
+            interval='day',
+            index_interval='month',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: True
+            ),
+            metric_fields=dict(
+                unique_count=(
+                    'cardinality', 'unique_session_id',
+                    {'precision_threshold': 1000}),
+            )
+        )
+    ),
+    'record-download-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        cls=StatAggregator,
+        params=dict(
+            client=current_stats_search_client,
+            event='file-download',
+            field='recid',
+            interval='day',
+            index_interval='month',
+            copy_fields=dict(
+                bucket_id='bucket_id',
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: False
+            ),
+            metric_fields=dict(
+                unique_count=('cardinality', 'unique_session_id',
+                              {'precision_threshold': 1000}),
+                volume=('sum', 'size', {}),
+            )
+        )
+    ),
+    'record-download-all-versions-agg': dict(
+        templates='zenodo.modules.stats.templates.aggregations',
+        cls=StatAggregator,
+        params=dict(
+            client=current_stats_search_client,
+            event='file-download',
+            field='conceptrecid',
+            interval='day',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities=lambda d, _: (
+                    list(d.communities) if d.communities else None),
+                owners=lambda d, _: (list(d.owners) if d.owners else None),
+                is_parent=lambda *_: True
+            ),
+            metric_fields=dict(
+                unique_count=(
+                    'cardinality', 'unique_session_id',
+                    {'precision_threshold': 1000}),
+                volume=('sum', 'size', {}),
+            )
+        )
+    ),
 }
+
+
+def stats_queries_permission_factory(query_name, params):
+    """Queries permission factory."""
+    return Permission(ActionNeed('admin-access'))
+
+
 #: Enabled queries from 'zenoodo.modules.stats.registrations'
 STATS_QUERIES = {
-    'record-view': {},
-    'record-view-all-versions': {},
-    'record-download': {},
-    'record-download-all-versions': {},
+    'record-view': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-record-view',
+            doc_type='record-view-day-aggregation',
+            copy_fields=dict(
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            required_filters=dict(
+                recid='recid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+            )
+        )
+    ),
+    'record-view-all-versions': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-record-view',
+            doc_type='record-view-day-aggregation',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            query_modifiers=[
+                lambda query, **_: query.filter('term', is_parent=True)
+            ],
+            required_filters=dict(
+                conceptrecid='conceptrecid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+            )
+        )
+    ),
+    'record-download': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-file-download',
+            doc_type='file-download-day-aggregation',
+            copy_fields=dict(
+                bucket_id='bucket_id',
+                record_id='record_id',
+                recid='recid',
+                conceptrecid='conceptrecid',
+                doi='doi',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            required_filters=dict(
+                recid='recid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+                volume=('sum', 'volume', {}),
+            )
+        ),
+    ),
+    'record-download-all-versions': dict(
+        cls=ESTermsQuery,
+        permission_factory=stats_queries_permission_factory,
+        params=dict(
+            index='stats-file-download',
+            doc_type='file-download-day-aggregation',
+            copy_fields=dict(
+                conceptrecid='conceptrecid',
+                conceptdoi='conceptdoi',
+                communities='communities',
+                owners='owners',
+                is_parent='is_parent'
+            ),
+            query_modifiers=[
+                lambda query, **_: query.filter('term', is_parent=True)
+            ],
+            required_filters=dict(
+                conceptrecid='conceptrecid',
+            ),
+            metric_fields=dict(
+                count=('sum', 'count', {}),
+                unique_count=('sum', 'unique_count', {}),
+                volume=('sum', 'volume', {}),
+            )
+        )
+    ),
 }
 
 # Queues
@@ -1299,14 +1610,31 @@ WSGI_PROXIES = 0
 #: Set the session cookie to be secure - should be set to true in production.
 SESSION_COOKIE_SECURE = False
 
-# Indexer
-# =======
-#: Provide a custom record_to_index function for invenio-indexer
-INDEXER_RECORD_TO_INDEX = "zenodo.modules.indexer.utils.record_to_index"
-INDEXER_SCHEMA_TO_INDEX_MAP = {
-    'records-record-v1.0.0': 'record-v1.0.0',
-    'licenses-license-v1.0.0': 'license-v1.0.0',
-    'grants-grant-v1.0.0': 'grant-v1.0.0',
-    'deposits-records-record-v1.0.0': 'deposit-record-v1.0.0',
-    'funders-funder-v1.0.0': 'funder-v1.0.0',
+# Configuration for limiter.
+RATELIMIT_STORAGE_URL = CACHE_REDIS_URL
+
+RATELIMIT_PER_ENDPOINT = {
+    'zenodo_frontpage.index': '10 per second',
+    'security.login': '10 per second',
+    'zenodo_redirector.contact': '10 per second',
+    'zenodo_support.support': '10 per second',
+    # Badge endpoints
+    'invenio_github_badge.latest_doi_old': '10 per second',
+    'invenio_github_badge.latest_doi': '10 per second',
+    'invenio_github_badge.index': '10 per second',
+    'invenio_github_badge.index_old': '10 per second',
+    'invenio_formatter_badges.badge': '10 per second',
 }
+
+RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
+
+# Error template
+THEME_429_TEMPLATE = "zenodo_errors/429.html"
+
+failed_login_msg  = (_("Login failed; Invalid user or password."), 'error')
+
+SECURITY_MSG_USER_DOES_NOT_EXIST = failed_login_msg
+SECURITY_MSG_PASSWORD_NOT_SET = failed_login_msg
+SECURITY_MSG_INVALID_PASSWORD = failed_login_msg
+SECURITY_MSG_CONFIRMATION_REQUIRED = failed_login_msg
+SECURITY_MSG_DISABLED_ACCOUNT = failed_login_msg

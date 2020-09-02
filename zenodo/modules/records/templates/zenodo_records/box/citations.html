@@ -23,18 +23,21 @@
 -#}
 
 {% set show_betafeature = 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
-{% set show_citations = current_user.has_role('admin') or config['ZENODO_RECORDS_UI_CITATIONS_ENABLE'] %}
+{% set show_citations = current_user_is_admin() or config['ZENODO_RECORDS_UI_CITATIONS_ENABLE'] %}
 
-{%- if  show_citations or show_betafeature %}
-{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy", "id": record.doi } %}
+{%- if record.doi and (show_citations or show_betafeature) %}
+
+{% set search_extra_params = {"page": 1, "size": 10, "group_by": "version", "id": (record.conceptdoi or record.doi)} %}
+{% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy" } %}
+{% set search_headers = {"Accept": "application/json"} %}
 
 <div id="citations">
   <invenio-search
    disable-url-handler="true"
-   search-endpoint="{{config['ZENODO_RECORDS_UI_CITATIONS_ENDPOINT'] }}"
-   search-extra-params='{"page": 1, "size": "10", "group_by": "version"}'
-   search-hidden-params='{% if search_hidden_params %}{{search_hidden_params|tojson}}{% endif %}'
-   search-headers='{"Accept": "{{ 'application/json'}}"}' >
+   search-endpoint="{{ config['ZENODO_RECORDS_UI_CITATIONS_ENDPOINT'] }}"
+   search-extra-params='{{ search_extra_params|tojson }}'
+   search-hidden-params='{{ search_hidden_params|tojson }}'
+   search-headers='{{ search_headers|tojson }}' >
     <div class="panel panel-default" id="citation">
       <div class="panel-heading">
         <!-- Beta ribbon -->
@@ -49,11 +52,15 @@
           <div class="col-sm-11" style="margin-top: 5px;">
             <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
               {{_('Citations')}}
-              <small class="text-muted">
-                <invenio-search-count
-                template="{{ url_for('static', filename='templates/citations/count.html') }}">
-                </invenio-search-count>
-              </small>
+            </a>
+            <a href="https://help.zenodo.org/#citations" target="_blank" rel="noopener noreferrer">
+              <i class="fa fa-question-circle"></i>
+            </a>
+            <small class="text-muted">
+              <invenio-search-count template="{{ url_for('static', filename='templates/citations/count.html') }}">
+              </invenio-search-count>
+            </small>
+            <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
               <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
               <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
             </a>

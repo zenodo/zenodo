@@ -22,7 +22,6 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 #}
 
-{%- from "zenodo_records/macros/altmetric.html" import altmetric_badge -%}
 {%- set stats = record|record_stats or {} %}
 {%- set show_version_stats = record.doi and record.doi is local_doi -%}
 
@@ -103,9 +102,3 @@
     </div>
   </div>
 </div>
-
-<!-- Altmetric -->
-{%- if record.doi %}
-  {{ altmetric_badge(record.doi) }}
-{%- endif %}
-

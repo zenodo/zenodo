@@ -26,12 +26,6 @@ zenodo db create
 zenodo index queue init
 zenodo index init
 zenodo queues declare
-zenodo fixtures init
-zenodo fixtures loadlicenses
-zenodo fixtures loadfunders
-zenodo fixtures loadfp6grants
-zenodo fixtures loadsipmetadatatypes
-zenodo fixtures loadusers
-zenodo fixtures loadcommunities
+zenodo fixtures init loadlicenses loadfunders loadfp6grants loadsipmetadatatypes loadusers loadcommunities
 zenodo index reindex -t od_lic -t frdoi -t grant --yes-i-know
 zenodo index run

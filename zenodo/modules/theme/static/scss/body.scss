@@ -72,23 +72,6 @@
   margin-bottom: 100px;
 }
 
-// Altmetric CSS to hide/show badge with/without data.
-.altmetric-embed {
-  z-index: 100 !important;
-}
-
-.altmetric-embed .altmetric-popover-content {
-  background-color: transparent !important;
-}
-
-.altmetric-embed:empty {
-  display: none
-}
-
-.altmetric-hidden {
-  display: none;
-}
-
 .nowrap {
   white-space: nowrap;
 }

@@ -29,3 +29,15 @@ from __future__ import absolute_import, print_function
 ZENODO_FRONTPAGE_BETA_FEATURES = [
     'citations'
 ]
+
+ZENODO_FRONTPAGE_FEATURED_COMMUNITIES_COUNT = 3
+"""Number of featured communities to be displayed on frontpage."""
+
+ZENODO_FRONTPAGE_FEATURED_RECORDS = []
+"""Record PIDs for featured records on frontpage."""
+
+ZENODO_FRONTPAGE_FEATURED_TITLE = None
+"""Featured communities and records title (e.g. 'Astrophysics software')."""
+
+ZENODO_FRONTPAGE_FEATURED_COMMUNITY = None
+"""Community used for featured records 'Browse more ...' link."""

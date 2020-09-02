@@ -276,3 +276,104 @@ def test_bucket_new_version(api_client, deposit, json_auth_headers,
 
     res = client.post(dep_v3_publish, headers=auth)
     data = get_json(res, code=400)
+
+
+def test_non_zenodo_doi(api_client, deposit, json_auth_headers,
+                        deposit_url, get_json, license_record,
+                        auth_headers, minimal_deposit, indexer_queue):
+    """Test non-Zenodo DOI bucket operations."""
+    client = api_client
+    headers = json_auth_headers
+    auth = auth_headers
+
+    # Create non-Zenodo DOI deposit
+    minimal_deposit['metadata']['doi'] = '10.1234/nonzenodo'
+    res = client.post(
+        deposit_url, data=json.dumps(minimal_deposit), headers=headers)
+    links = get_json(res, code=201)['links']
+    deposit_bucket = links['bucket']
+    deposit_edit = links['edit']
+    deposit_publish = links['publish']
+
+    # Upload files
+    res = client.put(
+        deposit_bucket + '/test1.txt',
+        input_stream=BytesIO(b'testfile1'), headers=auth)
+    assert res.status_code == 200
+    res = client.put(
+        deposit_bucket + '/test2.txt',
+        input_stream=BytesIO(b'testfile2'), headers=auth)
+    assert res.status_code == 200
+
+    # Publish deposit
+    res = client.post(deposit_publish, headers=auth)
+    links = get_json(res, code=202)['links']
+    record_url = links['record']
+
+    # Deposit bucket shouldn't be editable
+    res = client.put(
+        deposit_bucket + '/test3.txt',
+        input_stream=BytesIO(b'testfile3'), headers=auth)
+    assert res.status_code == 403
+
+    # Get record
+    res = client.get(record_url)
+    record_bucket = get_json(res, code=200)['links']['bucket']
+
+    # Record bucket shouldn't be editable either
+    res = client.put(
+        record_bucket + '/test3.txt',
+        input_stream=BytesIO(b'testfile3'), headers=auth)
+    assert res.status_code == 404
+
+    # Keep the record files around for later comparison
+    res = client.get(record_bucket, headers=auth)
+    record_files_initial = {
+        (f['key'], f['checksum']) for f in get_json(res, code=200)['contents']}
+
+    # Edit the deposit
+    res = client.post(deposit_edit, headers=auth)
+    assert res.status_code == 201
+
+    # Deposit bucket now should be editable to add files...
+    res = client.put(
+        deposit_bucket + '/test3.txt',
+        input_stream=BytesIO(b'testfile3'), headers=auth)
+    assert res.status_code == 200
+
+    # ...remove files...
+    res = client.delete(deposit_bucket + '/test1.txt', headers=auth)
+    assert res.status_code == 204
+
+    # ...and edit files.
+    res = client.put(
+        deposit_bucket + '/test2.txt',
+        input_stream=BytesIO(b'testfile3_modifed'), headers=auth)
+    assert res.status_code == 200
+
+    # While editing the deposit, record files should be the same
+    res = client.get(record_bucket, headers=auth)
+    record_files = {
+        (f['key'], f['checksum']) for f in get_json(res, code=200)['contents']}
+    assert record_files == record_files_initial
+
+    # Publish deposit with changed files
+    res = client.post(deposit_publish, headers=auth)
+    assert res.status_code == 202
+
+    # Deposit bucket should be closed again
+    res = client.put(
+        deposit_bucket + '/test4.txt',
+        input_stream=BytesIO(b'testfile4'), headers=auth)
+    assert res.status_code == 403
+
+    # Check that record files were updated
+    res = client.get(deposit_bucket, headers=auth)
+    deposit_files = {
+        (f['key'], f['checksum']) for f in get_json(res, code=200)['contents']}
+    res = client.get(record_bucket, headers=auth)
+    record_files = {
+        (f['key'], f['checksum']) for f in get_json(res, code=200)['contents']}
+
+    assert deposit_files == record_files
+    assert record_files != record_files_initial

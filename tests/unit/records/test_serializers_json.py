@@ -27,25 +27,23 @@
 import json
 
 import pytest
-from flask import url_for
+from flask import current_app, url_for
 from helpers import login_user_via_session
 
 
-@pytest.mark.parametrize('user_info, bucket_link, files', [
+@pytest.mark.parametrize('user_info, file_info_visible', [
     # anonymous user
-    (None, None, 0),
+    (None, False),
     # owner
-    (dict(email='info@zenodo.org', password='tester'),
-     'http://localhost/files/22222222-2222-2222-2222-222222222222', 1),
+    (dict(email='info@zenodo.org', password='tester'), True),
     # not owner
-    (dict(email='test@zenodo.org', password='tester2'), None, 0),
+    (dict(email='test@zenodo.org', password='tester2'), False),
     # admin user
-    (dict(email='admin@zenodo.org', password='admin'),
-     'http://localhost/files/22222222-2222-2222-2222-222222222222', 1),
+    (dict(email='admin@zenodo.org', password='admin'), True),
 ])
 def test_closed_access_record_serializer(api, users, json_headers,
                                          closed_access_record,
-                                         user_info, bucket_link, files):
+                                         user_info, file_info_visible):
     """Test closed access record serialisation using records API."""
     with api.test_request_context():
         with api.test_client() as client:
@@ -58,8 +56,9 @@ def test_closed_access_record_serializer(api, users, json_headers,
                 headers=json_headers
             )
             r = json.loads(res.data.decode('utf-8'))
-            assert r['links'].get('bucket', None) == bucket_link
-            assert len(r.get('files', [])) == files
+
+            assert (r['links'].get('bucket') is not None) == file_info_visible
+            assert (r.get('files') is not None) == file_info_visible
 
 
 @pytest.mark.parametrize('user_info', [
@@ -72,8 +71,8 @@ def test_closed_access_record_serializer(api, users, json_headers,
     # admin user
     dict(email='admin@zenodo.org', password='admin'),
 ])
-def test_closed_access_record_serializer(api, users, json_headers, user_info,
-                                         closed_access_record):
+def test_closed_access_record_search_serializer(
+        api, users, json_headers, user_info, closed_access_record):
     """Test closed access record serialisation of the search result."""
     with api.test_request_context():
         with api.test_client() as client:
@@ -88,3 +87,17 @@ def test_closed_access_record_serializer(api, users, json_headers, user_info,
             r = json.loads(res.data.decode('utf-8'))
             assert r[0]['links'].get('bucket', None) is None
             assert len(r[0].get('files', [])) == 0
+
+
+def test_record_thumbnails_serializer(api, record_with_image_creation):
+    """Test closed access record serialisation using records API."""
+    pid, record, record_url = record_with_image_creation
+    cached_thumbnails = current_app.config['CACHED_THUMBNAILS']
+    with api.test_request_context():
+        with api.test_client() as client:
+            res = client.get(url_for(
+                'invenio_records_rest.recid_item', pid_value=pid.pid_value))
+        for thumbnail in cached_thumbnails:
+            assert res.json['links']['thumbs'][thumbnail] == \
+                'http://localhost/record/12345/thumb{}'.format(thumbnail)
+        assert res.json['links']['thumb250']

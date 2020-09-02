@@ -45,8 +45,8 @@
     </form>
   {%- endif %}
 {%- endif %}
-{%- if current_user|has_record_perm(record, 'delete') %}
-<!-- Single button -->
+{# Admin menu #}
+{%- if current_user_is_admin() %}
 <div class="btn-group btn-block">
   <button type="button" class="btn btn-xs btn-block btn-default  dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
     Admin <span class="caret"></span>
@@ -65,8 +65,13 @@
     {%- endif %}
     <li role="separator" class="divider"></li>
     <li><a href="{{ url_for('zenodo_deposit.delete', pid_value=pid.pid_value) }}" type="submit">
-      <span class="text-danger"><i class="fa fa-trash"></i> Delete ...</span>
+      <span class="text-danger"><i class="fa fa-trash"></i> Delete record ...</span>
     </a></li>
+    {% if record._deposit.created_by %}
+    <li><a href="{{ url_for('zenodo_spam.delete', user_id=record._deposit.created_by) }}" type="submit">
+      <span class="text-danger"><i class="fa fa-trash"></i> Delete user ...</span>
+    </a></li>
+    {%- endif %}
   </ul>
 </div>
 {%- endif %}

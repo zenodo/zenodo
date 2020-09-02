@@ -28,6 +28,11 @@
   p, h1 {
     word-wrap: break-word;
   }
+  .metadata{
+    table {
+          table-layout: fixed;
+    }
+  }
 }
 
 .well {
@@ -86,6 +91,15 @@
         color: $brand-primary;
       }
     }
+
+    &.custom-keywords, &.dates, &.locations {
+      li {
+        padding-bottom: 5px;
+        div {
+          padding-left: 10px;
+        }
+      }
+    }
   }
 }
 
@@ -97,18 +111,19 @@
     border: none
 }
 
-#files {
+.files-box {
     .table {
         margin-bottom: 0px;
     }
+
+    a.filename {
+        word-break: break-all;
+        word-wrap: break-word;
+        overflow-wrap: break-word;
+        display: block;
+    }
 }
 
-#files a.filename {
-    word-break: break-all;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
-    display: block;
-}
 
 .record-elem {
     h4 {

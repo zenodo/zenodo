@@ -31,15 +31,16 @@ from os.path import dirname, join
 
 from flask import current_app
 from invenio_db import db
+from invenio_indexer.utils import schema_to_index
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
-from invenio_search.utils import schema_to_index
 from lxml import etree
 from sqlalchemy import or_
 from werkzeug.utils import import_string
 
 from zenodo.modules.openaire import current_openaire
+from zenodo.modules.records import current_custom_metadata
 
 
 def schema_prefix(schema):
@@ -61,6 +62,21 @@ def is_deposit(record):
     return schema_prefix(record.get('$schema')) == 'deposits'
 
 
+def transform_record(record, pid, serializer, module=None, throws=True,
+                     **kwargs):
+    """Transform a record using a serializer."""
+    if isinstance(record, Record):
+        try:
+            module = module or 'zenodo.modules.records.serializers'
+            serializer = import_string('.'.join((module, serializer)))
+            return serializer.transform_record(pid, record, **kwargs)
+        except Exception:
+            current_app.logger.exception(
+                u'Record transformation failed {}.'.format(str(record.id)))
+            if throws:
+                raise
+
+
 def serialize_record(record, pid, serializer, module=None, throws=True,
                      **kwargs):
     """Serialize record according to the passed serializer."""
@@ -78,7 +94,7 @@ def serialize_record(record, pid, serializer, module=None, throws=True,
 
 def is_doi_locally_managed(doi_value):
     """Determine if a DOI value is locally managed."""
-    return any(doi_value.startswith(prefix) for prefix in
+    return any(doi_value.startswith(prefix + '/') for prefix in
                current_app.config['ZENODO_LOCAL_DOI_PREFIXES'])
 
 
@@ -114,7 +130,7 @@ def find_registered_doi_pids(from_date, until_date, prefixes):
         PersistentIdentifier.updated.between(from_date, until_date)
     )
 
-    query.filter(or_(PersistentIdentifier.pid_value.like(prefix + '%') for prefix in prefixes))
+    query.filter(or_(PersistentIdentifier.pid_value.like(prefix + '/' + '%') for prefix in prefixes))
 
     query.order_by(PersistentIdentifier.updated)
 
@@ -140,3 +156,39 @@ def xsd41():
     )
 
     httpretty.disable()
+
+
+def build_record_custom_fields(record):
+    """Build the custom metadata fields for ES indexing."""
+    valid_terms = current_custom_metadata.terms
+    es_custom_fields = dict(
+        custom_keywords=[],
+        custom_text=[],
+        custom_relationships=[],
+    )
+    custom_fields_mapping = {
+        'keyword': 'custom_keywords',
+        'text': 'custom_text',
+        'relationship': 'custom_relationships',
+    }
+
+    custom_metadata = record.get('custom', {})
+    for term, value in custom_metadata.items():
+        term_type = valid_terms.get(term)['type']
+
+        es_custom_field = custom_fields_mapping[term_type]
+        if term_type in ('text', 'keyword'):
+            es_custom_fields[es_custom_field].append({
+                'key': term,
+                'value': value
+            })
+        elif term_type == 'relationship':
+            for rel in value:
+                es_custom_fields[es_custom_field].append({
+                    'key': term,
+                    'subject': rel['subject'],
+                    'object': rel['object'],
+                })
+
+    return {k: es_custom_fields[k] for k in es_custom_fields
+            if es_custom_fields[k]}
