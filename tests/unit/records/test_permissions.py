@@ -92,7 +92,6 @@ def test_file_permissions(app, db, record_with_files_creation,
 
 def test_rat_token(app, db, rat_generate_token, closed_access_record):
     """Test access via RAT."""
-    rat_generate_token = rat_generate_token['token']
     record = closed_access_record
     record['owners'] = [rat_generate_token.user_id]
     record['_deposit']['owners'] = [rat_generate_token.user_id]

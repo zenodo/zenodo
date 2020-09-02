@@ -543,12 +543,7 @@ def rat_generate_token(app, db, oauth2_client, users):
         )
         db.session.add(token_)
     db.session.commit()
-    return dict(
-        token=token_,
-        auth_header=[
-            ('Authorization', 'Bearer {0}'.format(token_.access_token)),
-        ]
-    )
+    return token_
 
 
 @pytest.fixture
