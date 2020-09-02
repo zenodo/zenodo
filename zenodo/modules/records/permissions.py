@@ -206,18 +206,32 @@ class DepositFilesPermission(object):
         'multipart-delete',
     ]
 
-    def __init__(self, record, func):
+    rat_actions = [
+        'object-read',
+        'bucket-read',
+    ]
+
+    def __init__(self, record, func, user=None):
         """Initialize a file permission object."""
         self.record = record
         self.func = func
+        self.user = user or current_user
 
     def can(self):
         """Determine access."""
-        return self.func(current_user, self.record)
+        return self.func(self.user, self.record)
 
     @classmethod
     def create(cls, record, action):
         """Record and instance."""
+        rat_token = request.args.get('token')
+        if rat_token and action in cls.rat_actions:
+            rat_signer, payload = decode_rat(rat_token)
+            rat_depost_id = payload.get('deposit_id')
+            rat_access = payload.get('access')
+            deposit_id = record.get('_deposit', {}).get('id')
+            if rat_depost_id == deposit_id and rat_access == 'read':
+                return cls(record, has_update_permission, rat_signer)
         if action in cls.update_actions:
             return cls(record, has_update_permission)
         else:
@@ -355,8 +369,10 @@ def has_read_files_permission(user, record):
     rat_token = request.args.get('token')
     if rat_token:
         rat_signer, payload = decode_rat(rat_token)
+        rat_depost_id = payload.get('deposit_id')
+        rat_access = payload.get('access')
         deposit_id = record.get('_deposit', {}).get('id')
-        if payload['deposit_id'] == deposit_id:
+        if rat_depost_id == deposit_id and rat_access == 'read':
             return has_update_permission(rat_signer, record)
 
     return has_update_permission(user, record)
