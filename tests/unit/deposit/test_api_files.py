@@ -27,7 +27,10 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import json
+from datetime import datetime
 
+import jwt
+from flask import url_for
 from invenio_search import current_search
 from six import BytesIO
 
@@ -238,4 +241,65 @@ def test_deposit_deletion(api_client, deposit, json_auth_headers, deposit_url,
     res = client.get(file_link)
     assert res.status_code == 410
     res = client.get(download_link)
+    assert res.status_code == 404
+
+
+def test_rat_deposit_files_access(
+        app, db, api_client, deposit, deposit_file, deposit_url,
+        json_auth_headers, license_record, rat_generate_token):
+    """Test deposit files access via RATs."""
+    client = api_client
+    rat_generate_token = rat_generate_token['token']
+    depid = deposit['_deposit']['id']
+    deposit['owners'] = [rat_generate_token.user_id]
+    deposit['_deposit']['owners'] = [rat_generate_token.user_id]
+    deposit.commit()
+    db.session.commit()
+
+    rat_token = jwt.encode(
+        payload={
+            'iat': datetime.utcnow(),
+            'sub': {
+                'deposit_id': depid,
+                'access': 'read',
+            },
+        },
+        key=rat_generate_token.access_token,
+        algorithm='HS256',
+        headers={'kid': str(rat_generate_token.id)},
+    )
+
+    deposit_url += '/' + str(depid)
+    file_url = '/files/{}/test.txt'.format(deposit['_buckets']['deposit'])
+    publish_url = deposit_url + '/actions/publish'
+
+    res = client.get(file_url)
+    assert res.status_code == 404
+
+    res = client.get(file_url, query_string={'token': rat_token})
+    assert res.status_code == 200
+
+    # Try other forbidden operations using the RAT
+    res = client.get(deposit_url, query_string={'token': rat_token})
+    assert res.status_code == 401
+
+    data = json.dumps(get_data())
+    res = client.put(deposit_url, data=data, query_string={'token': rat_token})
+    assert res.status_code == 401
+
+    res = client.put(file_url, data=data, query_string={'token': rat_token})
+    assert res.status_code == 404
+
+    res = client.post(publish_url, query_string={'token': rat_token})
+    assert res.status_code == 401
+
+    # Change record owner
+    deposit['owners'] = [123]
+    deposit['_deposit']['owners'] = [123]
+    deposit.commit()
+    db.session.commit()
+
+    res = client.get(file_url)
+    assert res.status_code == 404
+    res = client.get(file_url, query_string={'token': rat_token})
     assert res.status_code == 404

@@ -102,7 +102,10 @@ def test_rat_token(app, db, rat_generate_token, closed_access_record):
     rat_token = jwt.encode(
         payload={
             'iat': datetime.utcnow(),
-            'sub': {'deposit_id': record['_deposit']['id']},
+            'sub': {
+                'deposit_id': record['_deposit']['id'],
+                'access': 'read',
+            },
         },
         key=rat_generate_token.access_token,
         algorithm='HS256',
