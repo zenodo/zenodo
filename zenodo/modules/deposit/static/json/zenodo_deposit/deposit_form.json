@@ -2,7 +2,8 @@
   {
     "type": "fieldset",
     "title": "Communities",
-    "helptext": "Any user can create a community collection on Zenodo. Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.",
+    "helptext": "Any user can create a community collection on Zenodo. You can do that by clicking on 'Communities' in the header menu and then 'New'",
+    "description": "Specify communities which you wish your upload to appear in. The owner of the community will be notified, and can either accept or reject your request.Please make sure your record complies with the content policy of the communities you add; reported abuse will be followed by account inactivation.",
     "fieldhint": "recommended",
     "items": [
       {
