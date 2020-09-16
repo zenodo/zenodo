@@ -180,6 +180,12 @@ achieve this by using a service such as `ngrok <https://ngrok.com>`_:
           'http://<id>.ngrok.io/' \
           'api/hooks/receivers/github/events/?access_token={token}'
 
+5. Add the public ngrok address to the allowed hosts configuration:
+
+   .. code-block:: python
+
+      APP_ALLOWED_HOSTS = ['<id>.ngrok.io', 'localhost']
+
 
 DataCite DOI minting
 ~~~~~~~~~~~~~~~~~~~~
