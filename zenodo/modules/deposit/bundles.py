@@ -27,9 +27,8 @@
 from flask_assets import Bundle
 from invenio_assets import NpmBundle
 from invenio_deposit.bundles import js_dependecies_autocomplete, \
-    js_dependecies_schema_form, js_dependecies_uploader, \
-    js_dependencies_ckeditor, js_dependencies_jquery, \
-    js_dependencies_ui_sortable, js_main
+    js_dependecies_schema_form, js_dependencies_ckeditor, \
+    js_dependencies_jquery, js_dependencies_ui_sortable, js_main
 
 js_zenodo_deposit = Bundle(
     'js/zenodo_deposit/filters.js',
@@ -42,6 +41,16 @@ js_zenodo_deposit = Bundle(
     ),
 )
 
+# NOTE: Override to use `@inveniosoftware/invenio-files-js v0.0.6`
+js_dependecies_uploader = NpmBundle(
+    'node_modules/ng-file-upload/dist/ng-file-upload-all.js',
+    'node_modules/@inveniosoftware/invenio-files-js/dist/invenio-files-js.js',
+    npm={
+        '@inveniosoftware/invenio-files-js': '~0.0.6',
+        'ng-file-upload': '~12.0.4',
+        'underscore': '~1.8.3',
+    }
+)
 
 js_deposit = NpmBundle(
     js_dependencies_jquery,

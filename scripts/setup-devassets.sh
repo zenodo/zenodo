@@ -37,7 +37,7 @@ ln -s ~/src/invenio-search-js invenio-search-js
 rm -Rf invenio-records-js
 ln -s ~/src/invenio-records-js invenio-records-js
 rm -Rf invenio-files-js
-ln -s ~/src/invenio-files-js invenio-files-js
+ln -s ~/src/invenio-files-js @inveniosoftware/invenio-files-js
 
 # Make sure they are built
 cd ~/src/invenio-search-js
