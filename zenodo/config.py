@@ -70,6 +70,7 @@ from invenio_stats.processors import EventsIndexer
 from invenio_stats.queries import ESTermsQuery
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
+from zenodo.modules.deposit.utils import is_user_verified
 from zenodo.modules.records.facets import custom_metadata_filter, \
     geo_bounding_box_filter
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \
@@ -1684,10 +1685,14 @@ RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
 # Error template
 THEME_429_TEMPLATE = "zenodo_errors/429.html"
 
-failed_login_msg  = (_("Login failed; Invalid user or password."), 'error')
+failed_login_msg = (_("Login failed; Invalid user or password."), 'error')
 
 SECURITY_MSG_USER_DOES_NOT_EXIST = failed_login_msg
 SECURITY_MSG_PASSWORD_NOT_SET = failed_login_msg
 SECURITY_MSG_INVALID_PASSWORD = failed_login_msg
 SECURITY_MSG_CONFIRMATION_REQUIRED = failed_login_msg
 SECURITY_MSG_DISABLED_ACCOUNT = failed_login_msg
+
+CAN_USER_CREATE_DEPOSIT = is_user_verified
+
+BLACKLISTED_EMAIL_DOMAINS = []

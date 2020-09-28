@@ -37,6 +37,7 @@ from invenio_records.api import Record
 from invenio_records_files.api import FileObject
 from invenio_records_files.models import RecordsBuckets
 from invenio_rest.errors import RESTException
+from werkzeug.exceptions import HTTPException
 from zenodo_accessrequests.models import SecretLink
 
 from zenodo.modules.tokens import decode_rat
@@ -312,7 +313,7 @@ class RecordPermission(object):
     def create(cls, record, action, user=None):
         """Create a record permission."""
         if action in cls.create_actions:
-            return cls(record, allow, user)
+            return cls(record, has_create_permission, user)
         elif action in cls.read_actions:
             return cls(record, allow, user)
         elif action in cls.read_files_actions:
@@ -414,4 +415,22 @@ def has_admin_permission(user, record):
     """Check if user has admin access to record."""
     # Allow administrators
     if Permission(ActionNeed('admin-access')):
+        return True
+
+
+class CreatePermissionException(HTTPException):
+    """Exception for users not elligible to create a deposit."""
+
+    code = 403
+
+
+def has_create_permission(user, record):
+    """Check if user has permission to create a record."""
+    can, error_message = current_app.config['CAN_USER_CREATE_DEPOSIT']()
+    if not can:
+        raise CreatePermissionException(
+            error_message.format('profile settings.') +
+            'Alternatively you can link your Zenodo '
+            ' account with either your GitHub or ORCID account.')
+    else:
         return True

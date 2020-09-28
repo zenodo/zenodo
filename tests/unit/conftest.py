@@ -231,6 +231,7 @@ def default_config(tmp_db_path):
             },
         },
         SEARCH_INDEX_PREFIX='zenodo-test-',
+        BLACKLISTED_EMAIL_DOMAINS='evildomain.org',
     )
 
 
@@ -397,10 +398,28 @@ def es(app):
 @pytest.fixture
 def users(app, db):
     """Create users."""
-    user1 = create_test_user(email='info@zenodo.org', password='tester')
-    user2 = create_test_user(email='test@zenodo.org', password='tester2')
-    user_admin = create_test_user(email='admin@zenodo.org',
-                                  password='admin')
+    user1 = create_test_user(
+        email='info@zenodo.org', password='tester', confirmed_at=datetime.now()
+        )
+    user2 = create_test_user(
+        email='test@zenodo.org', password='tester2',
+        confirmed_at=datetime.now()
+    )
+    user_admin = create_test_user(
+        email='admin@zenodo.org', password='admin', confirmed_at=datetime.now()
+    )
+    non_validated_user = create_test_user(
+        email='nonvalidated@zenodo.org', password='tester')
+    user_with_blacklisted_domain = create_test_user(
+        email='validated@evildomain.org',
+        password='tester',
+        confirmed_at=datetime.now()
+    )
+    longtime_validated_user_with_blacklisted_domain = create_test_user(
+        email='longvalidated@evildomain.org',
+        password='tester',
+        confirmed_at=datetime.now() - timedelta(days=40)
+    )
 
     with db.session.begin_nested():
         # set admin permissions
@@ -413,7 +432,16 @@ def users(app, db):
     return [
         {'email': user1.email, 'id': user1.id},
         {'email': user2.email, 'id': user2.id},
-        {'email': user_admin.email, 'id': user_admin.id}
+        {'email': user_admin.email, 'id': user_admin.id},
+        {'email': non_validated_user.email, 'id': non_validated_user.id},
+        {
+            'email': user_with_blacklisted_domain.email,
+            'id': user_with_blacklisted_domain.id
+        },
+        {
+            'email': longtime_validated_user_with_blacklisted_domain.email,
+            'id': longtime_validated_user_with_blacklisted_domain.id
+        },
     ]
 
 
@@ -577,7 +605,8 @@ def minimal_deposit():
             ],
             'description': 'Test Description',
             'publication_date': '2013-05-08',
-            'access_right': 'open'
+            'access_right': 'open',
+            'license': 'CC-BY-4.0'
         }
     }
 

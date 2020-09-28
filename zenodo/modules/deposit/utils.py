@@ -28,10 +28,12 @@ from __future__ import absolute_import, unicode_literals
 
 import itertools
 import uuid
+from datetime import datetime, timedelta
 
 import pycountry
 from elasticsearch.exceptions import NotFoundError
 from flask import abort, current_app, request
+from humanize import naturaldelta
 from invenio_accounts.models import User
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
@@ -245,3 +247,34 @@ def suggest_language(q, limit=5):
     if lut:
         langs = ([lut, ] + [l for l in langs if l != lut])[:limit]
     return langs
+
+
+def is_user_verified(days=7):
+    """
+    Permission function that evaluates if the user can create a deposit.
+
+    This applies in addition to preexisting permissions.
+    """
+    from flask_security import current_user
+    if current_user.external_identifiers:
+        return True
+
+    error_message = (
+        'To create a deposit please verify your email.'
+        'You can resend the verification email from your {}'
+        )
+    if not current_user.confirmed_at:
+        return (False, error_message)
+    error_message = (
+        'You have registered on Zenodo using an email address domain that has '
+        'recently been used to upload spam on Zenodo. Your account needs to '
+        'have been verified for at least {} before you can publish.'
+        .format(
+            naturaldelta(timedelta(days=days))
+    ))
+    if (current_user.email.split('@')[1].lower() in
+            current_app.config.get('BLACKLISTED_EMAIL_DOMAINS', [])) and \
+            current_user.confirmed_at > (datetime.now() - timedelta(
+                days=days)):
+        return (False, error_message)
+    return (True, '')
