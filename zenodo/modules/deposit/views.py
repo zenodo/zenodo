@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from datetime import datetime
 from functools import wraps
 
-from flask import Blueprint, abort, current_app, flash, redirect, \
+from flask import Blueprint, Markup, abort, current_app, flash, redirect, \
     render_template, request, url_for
 from flask_babelex import gettext as _
 from flask_security import current_user, login_required
@@ -100,6 +100,30 @@ def pass_record(action, deposit_cls=ZenodoDeposit):
     return decorator
 
 
+def can_user_create(f):
+    """Check if the user is verified for the appropriate amount of time."""
+    @wraps(f)
+    def inner():
+        can, error_message = current_app.config['CAN_USER_CREATE_DEPOSIT']()
+        if not can:
+            flash(
+                Markup(
+                    error_message.format(
+                        '<a href="{}">profile settings.</a>'.format(
+                        url_for('invenio_userprofiles.profile'))
+                    ) +
+                    'Alternatively, you can <a href="{}">link your Zenodo '
+                    'account with either your GitHub or ORCID</a> account.'
+                    .format(
+                        url_for('invenio_oauthclient_settings.index')
+                    )),
+                category='warning'
+            )
+            abort(403)
+        return f()
+    return inner
+
+
 @login_required
 def legacy_index():
     """Legacy deposit."""
@@ -110,6 +134,7 @@ def legacy_index():
 
 
 @login_required
+@can_user_create
 def new():
     """Create a new deposit."""
     c = Community.get(request.args.get('c', type=str))

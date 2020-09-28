@@ -24,8 +24,9 @@ from __future__ import absolute_import, print_function
 import json
 from copy import deepcopy
 
+import pytest
 from flask import url_for
-from helpers import publish_and_expunge
+from helpers import login_user_via_session, publish_and_expunge
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 
 from zenodo.modules.records.resolvers import record_resolver
@@ -195,3 +196,27 @@ def test_deposit_with_custom_field(
     # Get published record
     response = api_client.get(response.json['links']['record'])
     assert response.json['metadata']['custom'] == expected_custom_data
+
+
+@pytest.mark.parametrize('user_info,status', [
+    # anonymous user
+    (None, 401),
+    # validated user
+    (dict(email='info@zenodo.org', password='tester'), 201),
+    # non validated user
+    (dict(email='nonvalidated@zenodo.org', password='tester'), 403),
+    # validated but with blacklisted domain
+    (dict(email='validated@evildomain.org', password='tester'), 403),
+    # validated for a long time with blacklisted domain
+    (dict(email='longvalidated@evildomain.org', password='tester'), 201),
+])
+def test_deposit_create_permissions(
+        api, api_client, db, es, users, minimal_deposit, license_record,
+        deposit_url, locations, user_info, status):
+    """Test deposit with custom field publishing."""
+    if user_info:
+        login_user_via_session(api_client, email=user_info['email'])
+    # Test wrong term
+    response = api_client.post(
+        deposit_url, json=minimal_deposit)
+    assert response.status_code == status
