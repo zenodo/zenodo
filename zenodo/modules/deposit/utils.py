@@ -257,7 +257,7 @@ def is_user_verified(days=7):
     """
     from flask_security import current_user
     if current_user.external_identifiers:
-        return True
+        return (True, '')
 
     error_message = (
         'To create a deposit please verify your email.'
