@@ -60,7 +60,7 @@ from invenio_github.models import Repository
 from invenio_indexer.api import RecordIndexer
 from invenio_oaiserver.models import OAISet
 from invenio_oauth2server.models import Client, Token
-from invenio_oauthclient.models import RemoteAccount
+from invenio_oauthclient.models import RemoteAccount, UserIdentity
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_pidstore.resolver import Resolver
 from invenio_queues.proxies import current_queues
@@ -420,7 +420,16 @@ def users(app, db):
         password='tester',
         confirmed_at=datetime.now() - timedelta(days=40)
     )
-
+    user_with_blacklisted_domain_and_ext_id = create_test_user(
+        email='external@evildomain.org',
+        password='tester'
+    )
+    ud = UserIdentity(
+        id='1',
+        method='github',
+        id_user=user_with_blacklisted_domain_and_ext_id.id
+    )
+    db.session.add(ud)
     with db.session.begin_nested():
         # set admin permissions
         db.session.add(ActionUsers(action=action_admin_access.value,

@@ -142,9 +142,9 @@ def test_duplicate_owners(record_audit, minimal_record, record_owners, issue):
 
 unresolvable_owners_params = (
     ([1], None),
-    ([1, 2, 3, 4, 5, 6], None),
-    ([7], [7]),
-    ([1, 2, 3, 4, 5, 6, 7], [7]),
+    ([1, 2, 3, 4, 5, 6, 7], None),
+    ([8], [8]),
+    ([1, 2, 3, 4, 5, 6, 7, 8], [8]),
 )
 
 

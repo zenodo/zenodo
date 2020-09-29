@@ -209,6 +209,8 @@ def test_deposit_with_custom_field(
     (dict(email='validated@evildomain.org', password='tester'), 403),
     # validated for a long time with blacklisted domain
     (dict(email='longvalidated@evildomain.org', password='tester'), 201),
+    # non validated with blacklisted domain and external ids
+    (dict(email='external@evildomain.org', password='tester'), 201),
 ])
 def test_deposit_create_permissions(
         api, api_client, db, es, users, minimal_deposit, license_record,
