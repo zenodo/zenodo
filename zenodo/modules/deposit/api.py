@@ -29,8 +29,11 @@ from __future__ import absolute_import, unicode_literals
 from contextlib import contextmanager
 from copy import copy
 
+from elasticsearch_dsl import Q
 from flask import current_app
+from flask_principal import ActionNeed
 from flask_security import current_user
+from invenio_access import Permission
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
 from invenio_deposit.api import Deposit, index, preserve
@@ -42,10 +45,12 @@ from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_pidstore.errors import PIDInvalidAction
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records_files.models import RecordsBuckets
+from invenio_search.api import RecordsSearch
 from invenio_sipstore.api import RecordSIP
 from invenio_sipstore.archivers import BagItArchiver
 from invenio_sipstore.models import SIP as SIPModel
 from invenio_sipstore.models import RecordSIP as RecordSIPModel
+from werkzeug.exceptions import HTTPException
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
@@ -54,6 +59,7 @@ from zenodo.modules.records.minters import doi_generator, is_local_doi, \
     zenodo_concept_doi_minter, zenodo_doi_updater
 from zenodo.modules.records.utils import is_doi_locally_managed, \
     is_valid_openaire_type
+from zenodo.modules.spam.tasks import check_metadata_for_spam
 
 from .errors import MissingCommunityError, MissingFilesError, \
     OngoingMultipartUploadError, VersioningFilesError
@@ -483,11 +489,37 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
             if missing:
                 raise MissingCommunityError(missing)
 
+    def spam_check(self):
+        """Checks deposit metadata for spam content."""
+        try:
+            if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
+                task = check_metadata_for_spam.delay(str(self.id))
+                spam_proba = task.get(timeout=current_app.config[
+                    'ZENODO_SPAM_CHECK_TIMEOUT'])
+            else:
+                spam_proba = 0
+            if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
+                if not Permission(ActionNeed('admin-access')).can():
+                    rs = RecordsSearch(index='records').query(
+                        Q('query_string', query="owners:{}".format(
+                            self['owners'][0])))
+                    if not rs.count():
+                        current_app.config['ZENODO_SPAM_HANDLING_ACTIONS'](
+                            self)
+        except HTTPException:
+            raise
+        except Exception:
+            current_app.logger.exception(u'Could not check deposit for spam')
+
     @mark_as_action
-    def publish(self, pid=None, id_=None, user_id=None, sip_agent=None):
+    def publish(self, pid=None, id_=None, user_id=None, sip_agent=None,
+                spam_check=True):
         """Publish the Zenodo deposit."""
         self['owners'] = self['_deposit']['owners']
         self.validate_publish()
+        if spam_check:
+            self.spam_check()
+
         is_first_publishing = not self.is_published()
 
         deposit = super(ZenodoDeposit, self).publish(pid, id_)

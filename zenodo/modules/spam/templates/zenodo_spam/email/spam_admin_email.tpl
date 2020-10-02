@@ -1,7 +1,6 @@
-# -*- coding: utf-8 -*-
-#
+{#
 # This file is part of Zenodo.
-# Copyright (C) 2017-2020 CERN.
+# Copyright (C) 2020 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -21,12 +20,6 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
 
-"""Spam module."""
-
-from flask import current_app
-from werkzeug.local import LocalProxy
-
-current_spam = LocalProxy(
-    lambda: current_app.extensions['zenodo-spam']
-)
+The deposit https://zenodo.org/deposit/{{ deposit['recid'] }} from the User https://zenodo.org/spam/{{ user.id }}/delete/ has been marked as spam.

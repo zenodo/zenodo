@@ -150,7 +150,9 @@ class ZenodoGitHubRelease(GitHubRelease):
                 'github_id': self.release['author']['id'],
                 'email': self.gh.account.user.email,
             }
-            deposit.publish(user_id=self.event.user_id, sip_agent=sip_agent)
+            deposit.publish(
+                user_id=self.event.user_id, sip_agent=sip_agent,
+                spam_check=False)
             recid_pid, record = deposit.fetch_published()
             self.model.recordmetadata = record.model
             if versioning and stashed_draft_child:

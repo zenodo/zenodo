@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017-2020 CERN.
+# Copyright (C) 2020 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,11 +22,23 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Spam module."""
+"""Forms for spam deletion module."""
 
+from __future__ import absolute_import, print_function
+
+from celery import shared_task
 from flask import current_app
-from werkzeug.local import LocalProxy
+from invenio_records.models import RecordMetadata
 
-current_spam = LocalProxy(
-    lambda: current_app.extensions['zenodo-spam']
-)
+from zenodo.modules.spam import current_spam
+
+
+@shared_task(ignore_result=False)
+def check_metadata_for_spam(dep_id):
+    """Checks metadata of the provided deposit for spam content."""
+    if not current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
+        return 0
+    deposit = RecordMetadata.query.get(dep_id)
+    spam_proba = current_spam.model.predict_proba(
+        [deposit.json['title'] + ' ' + deposit.json['description']])[0][1]
+    return spam_proba
