@@ -120,6 +120,16 @@ class Place(Schema):
             return missing
 
 
+class MeetingEvent(Schema):
+    """Schema for Meeting event."""
+
+    type_ = fields.Constant('Event', dump_to='@type')
+    name = fields.Str(attribute='title')
+    alternateName = fields.Str(attribute='acronym')
+    location = fields.Str(attribute='place')
+    url = fields.Str()
+
+
 class CreativeWork(Schema):
     """Schema for schema.org/CreativeWork type."""
 
@@ -145,7 +155,7 @@ class CreativeWork(Schema):
 
     temporal = fields.Method('get_dates')
 
-    # NOTE: could also be  "author"
+    # NOTE: could also be "author"
     creator = fields.Nested(Person, many=True, attribute='metadata.creators')
 
     version = SanitizedUnicode(attribute='metadata.version')
@@ -164,6 +174,8 @@ class CreativeWork(Schema):
 
     contributor = fields.Nested(
         Person, many=True, attribute='metadata.contributors')
+
+    workFeatured = fields.Nested(MeetingEvent, attribute='metadata.meeting')
 
     # NOTE: editor from "contributors"?
     # editor

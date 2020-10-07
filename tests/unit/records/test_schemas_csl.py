@@ -92,7 +92,9 @@ def test_full(db, full_record, recid_pid):
         "page": "20",
         "container_title": "Bam",
         "id": "123",
-        "ISSN": "0317-8471"
+        "ISSN": "0317-8471",
+        "event": "The 13th Biennial HITRAN Conference (HITRAN13)",
+        "event-place": "Harvard-Smithsonian Center for Astrophysics",
     }
 
 

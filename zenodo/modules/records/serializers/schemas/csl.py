@@ -80,6 +80,26 @@ class RecordSchemaCSLJSON(Schema):
     publisher = fields.Method('get_publisher')
     publisher_place = fields.Str(attribute='metadata.imprint.place')
 
+    event = fields.Method('get_event')
+    event_place = fields.Str(
+        attribute='metadata.meeting.place', dump_to='event-place')
+    # TODO: check if possible to dump in EDTF format
+    # event_date = fields.Str(
+    #     attribute='metadata.meeting.dates', dump_to='event-date')
+
+    def get_event(self, obj):
+        """Get event/meeting title and acronym."""
+        m = obj['metadata']
+        meeting = m.get('meeting', {})
+        if meeting:
+            title = meeting.get('title')
+            acronym = meeting.get('acronym')
+            if title and acronym:
+                return u'{} ({})'.format(title, acronym)
+            elif title or acronym:
+                return title or acronym
+        return missing
+
     def get_journal_or_part_of(self, obj, key):
         """Get journal or part of."""
         m = obj['metadata']

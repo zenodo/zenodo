@@ -289,7 +289,14 @@ def test_full_record(record_with_files_creation):
             u'name': u'my place'
         }, {
             '@type': 'Place', 'name': 'New York'
-        }]
+        }],
+        u'workFeatured': {
+            u'@type': u'Event',
+            u'name': u'The 13th Biennial HITRAN Conference',
+            u'alternateName': u'HITRAN13',
+            u'location': u'Harvard-Smithsonian Center for Astrophysics',
+            u'url': u'http://hitran.org/conferences/hitran-13-2014/',
+        },
     }
     assert data == expected
 
