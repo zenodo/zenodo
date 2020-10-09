@@ -324,64 +324,58 @@
       "additionalProperties": false,
       "default": "publication",
       "description": "Record upload type.",
-      "type": {
-        "enum": [
-          "publication",
-          "poster",
-          "presentation",
-          "dataset",
-          "image",
-          "video",
-          "software",
-          "lesson",
-          "other"
-        ],
-        "type": "string"
-      }
+      "enum": [
+        "publication",
+        "poster",
+        "presentation",
+        "dataset",
+        "image",
+        "video",
+        "software",
+        "lesson",
+        "other"
+      ],
+      "type": "string"
     },
     "publication_type": {
       "additionalProperties": false,
       "description": "Publication type.",
       "default": "article",
-      "type": {
-        "enum": [
-          "book",
-          "section",
-          "conferencepaper",
-          "article",
-          "patent",
-          "preprint",
-          "report",
-          "deliverable",
-          "milestone",
-          "proposal",
-          "softwaredocumentation",
-          "thesis",
-          "technicalnote",
-          "workingpaper",
-          "datamanagementplan",
-          "annotationcollection",
-          "taxonomictreatment",
-          "other"
-        ],
-        "type": "string"
-      }
+      "enum": [
+        "book",
+        "section",
+        "conferencepaper",
+        "article",
+        "patent",
+        "preprint",
+        "report",
+        "deliverable",
+        "milestone",
+        "proposal",
+        "softwaredocumentation",
+        "thesis",
+        "technicalnote",
+        "workingpaper",
+        "datamanagementplan",
+        "annotationcollection",
+        "taxonomictreatment",
+        "other"
+      ],
+      "type": "string"
     },
     "image_type": {
       "additionalProperties": false,
       "default": "figure",
       "description": "Image type.",
-      "type": {
-        "enum": [
-          "figure",
-          "plot",
-          "drawing",
-          "diagram",
-          "photo",
-          "other"
-        ],
-        "type": "string"
-      }
+      "enum": [
+        "figure",
+        "plot",
+        "drawing",
+        "diagram",
+        "photo",
+        "other"
+      ],
+      "type": "string"
     },
     "openaire_type": {
       "type": "string",
