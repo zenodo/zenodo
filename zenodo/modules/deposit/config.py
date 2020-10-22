@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+from zenodo.modules.deposit.utils import is_user_verified
+
 ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
 """Maximum quota per bucket."""
 
@@ -46,3 +48,10 @@ A dictionary with user ID as key and their default deposit quotas as values.
         12345: (80 * 1000 * 1000 * 1000),  # 80GB
     }
 """
+
+
+ZENODO_DEPOSIT_CREATE_PERMISSION = is_user_verified
+"""Deposit create permission."""
+
+ZENODO_BLACKLISTED_EMAIL_DOMAINS = []
+"""List of blacklisted email domains."""

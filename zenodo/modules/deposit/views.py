@@ -45,7 +45,9 @@ from invenio_records_ui.signals import record_viewed
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.openaire import current_openaire
 from zenodo.modules.records import current_zenodo_records
-from zenodo.modules.records.permissions import record_permission_factory
+from zenodo.modules.records.permissions import has_admin_permission, \
+    record_permission_factory
+from zenodo.modules.utils import obj_or_import_string
 
 from .api import ZenodoDeposit
 from .fetchers import zenodo_deposit_fetcher
@@ -103,24 +105,18 @@ def pass_record(action, deposit_cls=ZenodoDeposit):
 def can_user_create(f):
     """Check if the user is verified for the appropriate amount of time."""
     @wraps(f)
-    def inner():
-        can, error_message = current_app.config['CAN_USER_CREATE_DEPOSIT']()
-        if not can:
-            flash(
-                Markup(
-                    error_message.format(
-                        '<a href="{}">profile settings.</a>'.format(
-                        url_for('invenio_userprofiles.profile'))
-                    ) +
-                    'Alternatively, you can <a href="{}">link your Zenodo '
-                    'account with either your GitHub or ORCID</a> account.'
-                    .format(
-                        url_for('invenio_oauthclient_settings.index')
-                    )),
-                category='warning'
-            )
-            abort(403)
-        return f()
+    def inner(*args, **kwargs):
+        can, error_message = True, ''
+        permission_func = obj_or_import_string(current_app.config.get(
+            'ZENODO_DEPOSIT_CREATE_PERMISSION'))
+        if permission_func and callable(permission_func):
+            can, error_message = permission_func()
+
+        if can or has_admin_permission(None, None):
+            return f(*args, **kwargs)
+
+        flash(error_message, category='warning')
+        abort(403)
     return inner
 
 

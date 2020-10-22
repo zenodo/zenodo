@@ -41,6 +41,7 @@ from werkzeug.exceptions import HTTPException
 from zenodo_accessrequests.models import SecretLink
 
 from zenodo.modules.tokens import decode_rat
+from zenodo.modules.utils import obj_or_import_string
 
 from .api import ZenodoRecord
 from .models import AccessRight
@@ -426,11 +427,14 @@ class CreatePermissionException(HTTPException):
 
 def has_create_permission(user, record):
     """Check if user has permission to create a record."""
-    can, error_message = current_app.config['CAN_USER_CREATE_DEPOSIT']()
-    if not can:
-        raise CreatePermissionException(
-            error_message.format('profile settings.') +
-            'Alternatively you can link your Zenodo '
-            ' account with either your GitHub or ORCID account.')
-    else:
+    # by default any authenticated user can create a deposit
+    can, error_message = True, ''
+    permission_func = obj_or_import_string(current_app.config.get(
+        'ZENODO_DEPOSIT_CREATE_PERMISSION'))
+    if permission_func and callable(permission_func):
+        can, error_message = permission_func()
+
+    if can or has_admin_permission(user, record):
         return True
+
+    raise CreatePermissionException(error_message)

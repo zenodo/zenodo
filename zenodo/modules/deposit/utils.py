@@ -33,6 +33,7 @@ from datetime import datetime, timedelta
 import pycountry
 from elasticsearch.exceptions import NotFoundError
 from flask import abort, current_app, request
+from flask_security import current_user
 from humanize import naturaldelta
 from invenio_accounts.models import User
 from invenio_db import db
@@ -249,32 +250,31 @@ def suggest_language(q, limit=5):
     return langs
 
 
-def is_user_verified(days=7):
-    """
-    Permission function that evaluates if the user can create a deposit.
-
-    This applies in addition to preexisting permissions.
-    """
-    from flask_security import current_user
+def is_user_verified(confirmation_period=timedelta(days=7)):
+    """Permission function that evaluates if the user can create a deposit."""
     if current_user.external_identifiers:
-        return (True, '')
+        return True, ''
 
-    error_message = (
-        'To create a deposit please verify your email.'
-        'You can resend the verification email from your {}'
-        )
     if not current_user.confirmed_at:
-        return (False, error_message)
-    error_message = (
-        'You have registered on Zenodo using an email address domain that has '
-        'recently been used to upload spam on Zenodo. Your account needs to '
-        'have been verified for at least {} before you can publish.'
-        .format(
-            naturaldelta(timedelta(days=days))
-    ))
-    if (current_user.email.split('@')[1].lower() in
-            current_app.config.get('BLACKLISTED_EMAIL_DOMAINS', [])) and \
-            current_user.confirmed_at > (datetime.now() - timedelta(
-                days=days)):
-        return (False, error_message)
-    return (True, '')
+        return False, (
+            'To create a deposit please verify your email. You can resend the '
+            'verification email from your profile settings. Alternatively you '
+            'can link your Zenodo account with either your GitHub or ORCID '
+            'account.'
+        )
+
+    if current_user.email:
+        email_domain = current_user.email.rsplit('@', 1)[-1].lower()
+        blacklisted_email_domains = current_app.config.get(
+            'ZENODO_BLACKLISTED_EMAIL_DOMAINS', [])
+        has_blacklisted_domain = email_domain in blacklisted_email_domains
+        matured_confirmation = current_user.confirmed_at > \
+                (datetime.utcnow() - confirmation_period)
+        if has_blacklisted_domain and matured_confirmation:
+            return False, (
+                'You have registered on Zenodo using an email address domain '
+                'that has recently been used to upload spam on Zenodo. Your '
+                'account needs to be verified for at least {} before you can '
+                'publish.'.format(naturaldelta(confirmation_period))
+            )
+    return True, ''
