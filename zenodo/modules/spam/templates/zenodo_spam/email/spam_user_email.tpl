@@ -22,6 +22,6 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-Our spam protection system has classified your upload as a potential spam attempt.
-As preventive measure, we have therefore deactivated your user account.
-If you think this is wrong, please contact us on our support line.
+Our spam protection system has classified your upload as potential spam content. As a preventive measure, we have deactivated your user account.
+
+We sincerely apologize if this was a mistake, in which case, please contact us on our support line at https://zenodo.org/support.

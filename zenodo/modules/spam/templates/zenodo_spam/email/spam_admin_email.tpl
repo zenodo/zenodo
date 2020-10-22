@@ -22,4 +22,4 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-The deposit https://zenodo.org/deposit/{{ deposit['recid'] }} from the User https://zenodo.org/spam/{{ user.id }}/delete/ has been marked as spam.
+The deposit {{ config.THEME_SITEURL }}/deposit/{{ deposit['recid'] }} from the user {{ config.THEME_SITEURL }}/spam/{{ user.id }}/delete/ has been marked as spam.
