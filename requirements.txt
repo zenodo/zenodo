@@ -161,6 +161,7 @@ isbnid-fork==0.5.2
 itsdangerous==1.1.0
 Jinja2==2.10.1
 jinja2-time==0.2.0
+joblib==0.14.1
 jsmin==2.2.2
 jsonpatch==1.23
 jsonpointer==2.0
@@ -184,6 +185,7 @@ nbconvert==5.4.1
 nbformat==4.4.0
 ndg-httpsclient==0.4.4
 node-semver==0.1.1
+numpy==1.16.6
 oauthlib==2.1.0
 pandocfilters==1.4.2
 passlib==1.7.1
@@ -214,6 +216,8 @@ redis==3.2.1
 requests==2.21.0
 requests-oauthlib==1.1.0
 scandir==1.10.0
+scikit-learn==0.20.4
+scipy==1.2.3
 Sickle==0.6.4
 simplegeneric==0.8.1
 simplejson==3.16.0
@@ -250,4 +254,3 @@ WTForms==2.2.1
 WTForms-Alchemy==0.16.9
 WTForms-Components==0.10.3
 zenodo-accessrequests==1.0.0a5
-joblib==0.14.1
