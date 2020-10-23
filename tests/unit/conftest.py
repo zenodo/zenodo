@@ -231,7 +231,7 @@ def default_config(tmp_db_path):
             },
         },
         SEARCH_INDEX_PREFIX='zenodo-test-',
-        BLACKLISTED_EMAIL_DOMAINS='evildomain.org',
+        ZENODO_BLACKLISTED_EMAIL_DOMAINS=['evildomain.org'],
     )
 
 
