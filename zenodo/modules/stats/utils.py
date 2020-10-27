@@ -24,20 +24,19 @@
 
 """Statistics utilities."""
 
-import math
 import itertools
-
-from flask.globals import current_app
-from zenodo.modules.records.api import ZenodoRecord
+import math
 
 from elasticsearch.exceptions import NotFoundError
 from elasticsearch_dsl import Search
 from flask import request
+from flask.globals import current_app
 from invenio_pidstore.models import PersistentIdentifier
 from invenio_search.proxies import current_search_client
 from invenio_search.utils import build_alias_name
 from invenio_stats import current_stats
 
+from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.resolvers import record_resolver
 
 try:

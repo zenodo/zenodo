@@ -28,6 +28,7 @@ import calendar
 import copy
 import datetime
 import gzip
+import io
 import json
 import math
 
@@ -200,6 +201,14 @@ class DataCiteReportExporter:
             year, month = _next_month(year, month)
 
 
+def _compress_report(str_data):
+    """GZIP compress a string of data."""
+    buf = io.BytesIO()
+    with gzip.GzipFile(fileobj=buf, mode='wb') as gf:
+        gf.write(str_data.encode())
+    return buf.getvalue()
+
+
 def send_usage_report(report):
     """Send a DataCite usage statistics report."""
     headers = {
@@ -210,7 +219,7 @@ def send_usage_report(report):
     }
     res = requests.post(
         current_app.config['ZENODO_STATS_DATACITE_API_URL'],
-        data=gzip.compress(json.dumps(report)),
+        data=_compress_report(json.dumps(report)),
         headers=headers,
     )
     if res.ok:
