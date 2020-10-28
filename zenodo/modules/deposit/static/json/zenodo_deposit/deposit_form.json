@@ -65,6 +65,11 @@
             "fa_cls": "fa-graduation-cap"
           },
           {
+            "value": "physicalobject",
+            "name": "Physical object",
+            "fa_cls": "fa-cube"
+          },
+          {
             "value": "other",
             "name": "Other",
             "fa_cls": "fa-asterisk"
