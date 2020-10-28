@@ -62,6 +62,8 @@ ZENODO_TYPE_SUBTYPE_LEGACY = {
 
     'lessons': ('lesson', None),
 
+    'physicalobject': ('physicalobject', None),
+
     'other': ('other', None),
 }
 

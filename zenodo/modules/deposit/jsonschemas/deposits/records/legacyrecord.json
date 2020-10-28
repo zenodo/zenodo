@@ -333,6 +333,7 @@
         "video",
         "software",
         "lesson",
+        "physicalobject",
         "other"
       ],
       "type": "string"
