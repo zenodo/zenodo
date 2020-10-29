@@ -26,9 +26,19 @@
 
 from __future__ import absolute_import, print_function
 
+import mimetypes
+
+import idutils
+from flask import has_request_context
+from flask_security import current_user
+from invenio_records.api import Record
 from lxml import etree as ET
 from pkg_resources import resource_stream
 from werkzeug.utils import cached_property
+
+from zenodo.modules.records.serializers.schemas.common import ui_link_for
+
+from ..permissions import has_read_files_permission
 
 
 class DCATSerializer(object):
@@ -47,19 +57,30 @@ class DCATSerializer(object):
         transform = ET.XSLT(xsl)
         return transform
 
-    def transform_with_xslt(self, pid, record, search_hit=False, **kwargs):
-        """Transform record with XSLT."""
-        if search_hit:
-            record = self.datacite_serializer.transform_search_hit(
-                pid, record, **kwargs)
-        else:
-            record = self.datacite_serializer.transform_record(
-                pid, record, **kwargs)
-        dc_etree = self.datacite_serializer.schema.dump_etree(record)
-        dc_namespace = self.datacite_serializer.schema.ns[None]
-        dc_etree.tag = '{{{0}}}resource'.format(dc_namespace)
-        dcat_etree = self.xslt_transform_func(dc_etree)
-        return dcat_etree
+    FILES_FIELDS = {
+        '{{{dcat}}}downloadURL': lambda f, r: ui_link_for(
+            'record_file', id=r['recid'], filename=f['key']),
+        '{{{dcat}}}mediaType': lambda f, r: mimetypes.guess_type(f['key'])[0],
+        '{{{dcat}}}byteSize': lambda f, r: str(f['size']),
+        '{{{dcat}}}accessURL': lambda f, r: idutils.to_url(
+            r['doi'], 'doi', url_scheme='https'),
+        # TODO: there's also "spdx:checksum", but it's not in the W3C spec yet
+    }
+
+    def _add_files(self, root, files, record):
+        """Add files information via distribution elements."""
+        ns = root.nsmap
+        for f in files:
+            dist_wrapper = ET.SubElement(
+                root[0], '{{{dcat}}}distribution'.format(**ns))
+            dist = ET.SubElement(
+                dist_wrapper, '{{{dcat}}}Distribution'.format(**ns))
+
+            for tag, func in self.FILES_FIELDS.items():
+                val = func(f, record)
+                if val:
+                    el = ET.SubElement(dist, tag.format(**ns))
+                    el.text = val
 
     def _etree_tostring(self, root):
         return ET.tostring(
@@ -68,6 +89,37 @@ class DCATSerializer(object):
             xml_declaration=True,
             encoding='utf-8',
         ).decode('utf-8')
+
+    def transform_with_xslt(self, pid, record, search_hit=False, **kwargs):
+        """Transform record with XSLT."""
+        files_data = None
+        if search_hit:
+            dc_record = self.datacite_serializer.transform_search_hit(
+                pid, record, **kwargs)
+            if '_files' in record['_source']:
+                files_data = record['_source']['_files']
+            elif '_files' in record:
+                files_data = record['_files']
+
+        else:
+            dc_record = self.datacite_serializer.transform_record(
+                pid, record, **kwargs)
+            # for single-record serialization check file read permissions
+            if isinstance(record, Record) and '_files' in record:
+                if not has_request_context() or has_read_files_permission(
+                        current_user, record):
+                    files_data = record['_files']
+
+        dc_etree = self.datacite_serializer.schema.dump_etree(dc_record)
+        dc_namespace = self.datacite_serializer.schema.ns[None]
+        dc_etree.tag = '{{{0}}}resource'.format(dc_namespace)
+        dcat_etree = self.xslt_transform_func(dc_etree).getroot()
+
+        # Inject files in results (since the XSLT can't do that by default)
+        if files_data:
+            self._add_files(dcat_etree, files_data, record)
+
+        return dcat_etree
 
     def serialize(self, pid, record, **kwargs):
         """Serialize a single record.
@@ -96,4 +148,4 @@ class DCATSerializer(object):
 
     def serialize_oaipmh(self, pid, record):
         """Serialize a single record for OAI-PMH."""
-        return self.transform_with_xslt(pid, record, search_hit=True).getroot()
+        return self.transform_with_xslt(pid, record, search_hit=True)

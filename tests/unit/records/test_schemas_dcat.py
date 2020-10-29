@@ -30,7 +30,7 @@ from zenodo.modules.records.serializers import dcat_v1
 
 
 def test_dcat_serializer(db, es, record_with_bucket):
-    """."""
+    """Tests the DCAT XSLT-based serializer."""
     pid, record = record_with_bucket
     serialized_record = dcat_v1.serialize(pid, record)
     assert record['title'] in serialized_record
@@ -39,3 +39,5 @@ def test_dcat_serializer(db, es, record_with_bucket):
     for creator in record['creators']:
         assert creator['familyname'] in serialized_record
         assert creator['givennames'] in serialized_record
+    for f in record['_files']:
+        assert f['key'] in serialized_record
