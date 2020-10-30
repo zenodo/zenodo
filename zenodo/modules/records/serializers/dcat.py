@@ -117,7 +117,11 @@ class DCATSerializer(object):
 
         # Inject files in results (since the XSLT can't do that by default)
         if files_data:
-            self._add_files(dcat_etree, files_data, record)
+            self._add_files(
+                root=dcat_etree,
+                files=files_data,
+                record=(record['_source'] if search_hit else record),
+            )
 
         return dcat_etree
 
