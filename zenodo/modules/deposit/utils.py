@@ -268,9 +268,9 @@ def is_user_verified(confirmation_period=timedelta(days=7)):
         blacklisted_email_domains = current_app.config.get(
             'ZENODO_BLACKLISTED_EMAIL_DOMAINS', [])
         has_blacklisted_domain = email_domain in blacklisted_email_domains
-        matured_confirmation = current_user.confirmed_at > \
+        immature_confirmation = current_user.confirmed_at > \
                 (datetime.utcnow() - confirmation_period)
-        if has_blacklisted_domain and matured_confirmation:
+        if has_blacklisted_domain and immature_confirmation:
             return False, (
                 'You have registered on Zenodo using an email address domain '
                 'that has recently been used to upload spam on Zenodo. Your '
