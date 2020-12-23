@@ -47,7 +47,7 @@ def stale_data_error(release, ex):
 
 def marshmallow_error(release, ex):
     """Handler for MarshmallowFileError."""
-    release.model.errors = {'errors': ex.errors}
+    release.model.errors = {'errors': str(ex.errors)}
 
 
 def repository_access_error(release, ex):
