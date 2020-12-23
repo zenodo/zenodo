@@ -138,7 +138,7 @@ SUPPORT_ISSUE_CATEGORIES = [
             'All questions related to OpenAIRE reporting and grants. '
             'Before sending a request, make sure your problem was not '
             'already resolved, see OpenAIRE '
-            '<a href="https://www.openaire.eu/support/faq">FAQ</a>. '
+            '<a href="https://www.openaire.eu/faqs">FAQ</a>. '
             'For questions unrelated to Zenodo, you should contact OpenAIRE '
             '<a href="https://www.openaire.eu/support/helpdesk">'
             'helpdesk</a> directly.'
