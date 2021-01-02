@@ -1092,6 +1092,9 @@ DEPOSIT_REST_FACETS['deposits']['filters'].update(dict(
         'locations', 'locations.point', type='indexed'),
 ))
 
+# TODO: Remove `grants` aggregations until
+# https://github.com/zenodo/zenodo/issues/1909 is fixed
+OPENAIRE_REST_FACETS.pop('grants', None)
 RECORDS_REST_FACETS.update(OPENAIRE_REST_FACETS)
 RECORDS_REST_FACETS.update(DEPOSIT_REST_FACETS)
 
