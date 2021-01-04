@@ -56,7 +56,16 @@
       <button type="submit" class="btn btn-primary btn-lg btn-block"><i class="fa fa-sign-in"></i> {{_('Log In')}}</button>
     </form>
   {%- endwith %}
-{% endblock %}
+{%- endblock %}
+
+{%- block registerable %}
+{%- if security.registerable %}
+<div class="panel-footer text-center">
+    <h4 class="text-muted">{% trans sitename=config.ACCOUNTS_SITENAME %}New to {{sitename}}?{% endtrans %} <a href="{{url_for('security.register')}}">{{_('Sign Up')}}</a></h4>
+    <a href="https://about.zenodo.org/privacy-policy/">{{_('Privacy notice')}}</a>
+</div>
+{%- endif %}
+{%- endblock %}
 
 {%- block recoverable %}
 <footer>{{super()}}

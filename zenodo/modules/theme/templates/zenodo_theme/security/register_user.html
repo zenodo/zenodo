@@ -78,7 +78,10 @@
       </form>
       {%- block signup_form_footer %}
       <p align="center">
-      {{_('Already have an account?')}} <a href="{{url_for_security('login')}}">{{_('Log In')}}</a>
+        {{_('Already have an account?')}} <a href="{{url_for_security('login')}}">{{_('Log In')}}</a>
+      </p>
+      <p align="center">
+        <small><a href="https://about.zenodo.org/privacy-policy/">{{_('Privacy notice')}}</a></small>
       {%- endblock %}
       </p>
     </div>
