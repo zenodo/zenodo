@@ -21,5 +21,9 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
-
+{% if community %}
+The community {{community.id}} from the user {{ config.THEME_SITEURL }}/spam/{{ user.id }}/delete/ has been marked as spam.
+{% else %}
 The deposit {{ config.THEME_SITEURL }}/deposit/{{ deposit['recid'] }} from the user {{ config.THEME_SITEURL }}/spam/{{ user.id }}/delete/ has been marked as spam.
+{% endif %}
+

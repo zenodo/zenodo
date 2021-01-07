@@ -26,6 +26,10 @@
 
 from __future__ import absolute_import, print_function
 
+from invenio_communities.signals import community_created
+
+from zenodo.modules.spam.utils import check_and_handle_spam
+
 from . import config
 
 
@@ -40,7 +44,7 @@ class ZenodoCommunities(object):
     def init_app(self, app):
         """Flask application initialization."""
         self.init_config(app)
-
+        self.register_signals(app)
         app.extensions['zenodo-communities'] = self
 
     @staticmethod
@@ -49,3 +53,14 @@ class ZenodoCommunities(object):
         for k in dir(config):
             if k.startswith('ZENODO_COMMUNITIES'):
                 app.config.setdefault(k, getattr(config, k))
+
+    @staticmethod
+    def register_signals(app):
+        """Register Zenodo Deposit signals."""
+        community_created.connect(
+            community_spam_checking_receiver, sender=app, weak=False)
+
+
+def community_spam_checking_receiver(sender, community):
+    """Receiver for spam checking of newly created communities."""
+    check_and_handle_spam(community=community)
