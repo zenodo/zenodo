@@ -22,12 +22,12 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 {% if community %}
-{% set content_text = 'the creation of the community with ID: ' + {{ community.id }} %}
+{% set content_text = 'the creation of the community with ID: ' + community.id %}
 {% else %}
-{% set content_text = 'the publication of your deposit titled: ' + {{ deposit.title }} %}
+{% set content_text = 'the publication of your deposit titled: ' + deposit.title %}
 {% endif %}
 
-Our spam protection system has classified {{content_text}} as potential spam content.
+Our spam protection system has classified {{ content_text }} as potential spam content.
 As a preventive measure, we have deactivated your user account.
 
 We sincerely apologize if this was a mistake, in which case, please contact us on our support line at https://zenodo.org/support.

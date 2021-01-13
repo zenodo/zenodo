@@ -35,6 +35,7 @@ from invenio_access import Permission
 from invenio_communities.models import Community
 from invenio_mail.tasks import send_email
 from invenio_search.api import RecordsSearch
+from werkzeug.exceptions import HTTPException
 
 from zenodo.modules.spam.tasks import check_metadata_for_spam
 
@@ -83,15 +84,19 @@ def check_and_handle_spam(community=None, deposit=None):
                 'ZENODO_SPAM_CHECK_TIMEOUT'])
         else:
             spam_proba = 0
+
         if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
             if not Permission(ActionNeed('admin-access')).can():
                 has_records = RecordsSearch(index='records').query(
                     Q('query_string', query="owners:{}".format(
                         community.id_user))).count()
                 has_communities = Community.query.filter_by(
-                        id_user=community.id_user).count()
+                        id_user=community.id_user).count() - 1
+
                 if not (has_records or has_communities):
                     current_app.config['ZENODO_SPAM_HANDLING_ACTIONS'](
                         community=community, deposit=deposit)
+    except HTTPException:
+        raise
     except Exception:
         current_app.logger.exception(u'Could not check for spam')

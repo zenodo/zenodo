@@ -1684,8 +1684,9 @@ RATELIMIT_PER_ENDPOINT = {
 
 RATELIMIT_KEY_FUNC = useragent_and_ip_limit_key
 
-# Error template
+# Error templates
 THEME_429_TEMPLATE = "zenodo_errors/429.html"
+THEME_400_TEMPLATE = "zenodo_errors/400.html"
 
 failed_login_msg = (_("Login failed; Invalid user or password."), 'error')
 
