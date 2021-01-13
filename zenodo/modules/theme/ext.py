@@ -37,6 +37,12 @@ def too_many_requests(e):
     return render_template(current_app.config['THEME_429_TEMPLATE']), 429
 
 
+def bad_request(e):
+    """Error handler to show a 400.html page in case of a 400 error."""
+    return render_template(
+        current_app.config['THEME_400_TEMPLATE'], error=e), 400
+
+
 def useragent_and_ip_limit_key():
     """Create key for the rate limiting."""
     ua_hash = hashlib.sha256(str(request.user_agent).encode('utf8')).digest()
@@ -56,3 +62,4 @@ class ZenodoTheme(object):
     def init_app(self, app):
         """Flask application initialization."""
         app.register_error_handler(429, too_many_requests)
+        app.register_error_handler(400, bad_request)
