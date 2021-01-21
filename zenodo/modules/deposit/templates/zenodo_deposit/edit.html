@@ -88,7 +88,8 @@
   'has_versioning_permissions': has_versioning_permissions or False,
   'has_new_version_deposit': has_new_version_deposit or False,
   'newversionmodal_template': url_for('static', filename='templates/zenodo_deposit/neweversionmodal.html'),
-  'upgradeversioningmodal_template': url_for('static', filename='templates/zenodo_deposit/upgradeversioningmodal.html')
+  'upgradeversioningmodal_template': url_for('static', filename='templates/zenodo_deposit/upgradeversioningmodal.html'),
+  'max_bucket_size': record.files.bucket.quota_size if record.files else 50000000000
 } %}
 
 
