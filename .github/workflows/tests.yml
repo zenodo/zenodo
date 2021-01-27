@@ -1,0 +1,111 @@
+# -*- coding: utf-8 -*-
+#
+# Copyright (C) 2020 CERN.
+#
+# Invenio App RDM is free software; you can redistribute it and/or modify it
+# under the terms of the MIT License; see LICENSE file for more details.
+
+name: CI
+
+on:
+  push:
+    branches: master
+  pull_request:
+    branches: master
+  workflow_dispatch:
+    inputs:
+      reason:
+        description: 'Reason'
+        required: false
+        default: 'Manual trigger'
+
+jobs:
+  Tests:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        python-version: [2.7, 3.5]
+        SQLALCHEMY_DATABASE_URI: [
+          "postgresql+psycopg2://postgres@localhost:5432/zenodo",
+          "sqlite:///zenodo.db"]
+
+    # services:
+      # redis:
+      #   image: redis
+      #   ports:
+      #     - 6379:6379
+      # postgres:
+      #   # Docker Hub image
+      #   image: postgres
+      #   # Provide the password for postgres
+      #   env:
+      #     POSTGRES_USER: zenodo
+      #     POSTGRES_PASSWORD: zenodo
+      #     POSTGRES_DB: zenodo
+      #   options: >-
+      #     --health-cmd pg_isready
+      #     --health-interval 10s
+      #     --health-timeout 5s
+      #     --health-retries 5
+      #   ports:
+      #     - "5432:5432"
+      # rabbitmq:
+      #   image: rabbitmq:3-management
+      #   ports:
+      #     - "15672:15672"
+      #     - "5672:5672"
+      # elasticsearch:
+      #   image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
+      #   ports:
+      #     - "9200:9200"
+      #     - "9300:9300"
+    steps:
+      # - name: Install FFmpeg
+      #   run: |
+      #     sudo apt update
+      #     sudo apt-get install ffmpeg
+
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Use Node.js 6.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 6.x
+
+      - name: Install global Node packages
+        run: |
+          ./scripts/setup-npm.sh
+          rm -f package-lock.json
+
+      - name: Generate dependencies
+        run: |
+          python -m pip install --upgrade "pip>=20,<21" setuptools py
+          python -m pip install wheel coveralls requirements-builder configparser
+          freeze
+          cat requirements.txt > .travis-prod-requirements.txt
+          requirements-builder --level=pypi setup.py > .travis-latest-requirements.txt
+
+      # - name: Cache pip
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: ~/.cache/pip
+      #     key: ${{ runner.os }}-pip-${{ hashFiles('.ci-${{ matrix.python-version }}-requirements.txt') }}
+
+      - name: Install dependencies
+        run: |
+          cat .travis-${REQUIREMENTS}-requirements.txt
+          pip install -r .travis-${REQUIREMENTS}-requirements.txt
+          pip install -e .[all]
+          pip freeze
+          ./scripts/setup-assets.sh
+
+      - name: Run tests
+        run: |
+          docker-compose up -d
+          ./run-tests.sh
