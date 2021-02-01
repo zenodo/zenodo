@@ -46,6 +46,7 @@ from invenio_sipstore.api import RecordSIP
 from invenio_sipstore.archivers import BagItArchiver
 from invenio_sipstore.models import SIP as SIPModel
 from invenio_sipstore.models import RecordSIP as RecordSIPModel
+from sqlalchemy.engine import engine_from_config
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
@@ -398,6 +399,11 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
 
         return record
 
+    @staticmethod
+    def _get_record_files_set(record):
+        """Return a unique set of a record's files and their checksums."""
+        return {(f.key, f.get_version().file.checksum) for f in record.files}
+
     def _publish_new(self, id_=None):
         """Publish new deposit with communities handling."""
         dep_comms = set(self.pop('communities', []))
@@ -406,11 +412,11 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
                                                 record['conceptrecid'])
         pv = PIDVersioning(parent=conceptrecid)
         if pv.children.count() > 1:
-            files_set = set(f.get_version().file.checksum for f in self.files)
+
+            files_set = self._get_record_files_set(self)
             for prev_recid in pv.children.all()[:-1]:
                 rec = ZenodoRecord.get_record(prev_recid.object_uuid)
-                prev_files_set = set(f.get_version().file.checksum for f in
-                                     rec.files)
+                prev_files_set = self._get_record_files_set(rec)
                 if files_set == prev_files_set:
                     raise VersioningFilesError()
 
