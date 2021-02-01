@@ -78,8 +78,10 @@ def check_and_handle_spam(community=None, deposit=None):
             if community:
                 task = check_metadata_for_spam.delay(
                     community_id=community.id)
+                user_id = community.id_user
             if deposit:
                 task = check_metadata_for_spam.delay(dep_id=str(deposit.id))
+                user_id = deposit['owners'][0]
             spam_proba = task.get(timeout=current_app.config[
                 'ZENODO_SPAM_CHECK_TIMEOUT'])
         else:
@@ -89,9 +91,9 @@ def check_and_handle_spam(community=None, deposit=None):
             if not Permission(ActionNeed('admin-access')).can():
                 has_records = RecordsSearch(index='records').query(
                     Q('query_string', query="owners:{}".format(
-                        community.id_user))).count()
+                        user_id))).count()
                 has_communities = Community.query.filter_by(
-                        id_user=community.id_user).count() - 1
+                        id_user=user_id).count() - 1
 
                 if not (has_records or has_communities):
                     current_app.config['ZENODO_SPAM_HANDLING_ACTIONS'](
