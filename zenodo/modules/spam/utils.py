@@ -26,32 +26,79 @@
 
 from __future__ import absolute_import, print_function
 
+from elasticsearch_dsl import Q
 from flask import current_app, render_template
 from flask_babelex import gettext as _
 from flask_mail import Message
+from flask_principal import ActionNeed
+from invenio_access import Permission
+from invenio_communities.models import Community
 from invenio_mail.tasks import send_email
+from invenio_search.api import RecordsSearch
+from werkzeug.exceptions import HTTPException
+
+from zenodo.modules.spam.tasks import check_metadata_for_spam
 
 
-def send_spam_user_email(recipient):
+def send_spam_user_email(recipient, deposit=None, community=None):
     """Send email notification to blocked user after spam detection."""
     msg = Message(
-        _("Your Zenodo Upload has been automatically marked as Spam."),
+        _("Your Zenodo activity has been automatically marked as Spam."),
         sender=current_app.config.get('SUPPORT_EMAIL'),
         recipients=[recipient],
     )
-    msg.body = render_template("zenodo_spam/email/spam_user_email.tpl")
+    msg.body = render_template(
+        "zenodo_spam/email/spam_user_email.tpl",
+        community=community,
+        deposit=deposit
+    )
     send_email.delay(msg.__dict__)
 
 
-def send_spam_admin_email(deposit, user):
+def send_spam_admin_email(user, deposit=None, community=None):
     """Send email notification to admins for a spam detection."""
     msg = Message(
-        _("Zenodo Deposit Marked as Spam."),
+        _("Zenodo activity marked as spam."),
         sender=current_app.config.get('SUPPORT_EMAIL'),
         recipients=[current_app.config.get('ZENODO_ADMIN_EMAIL')],
     )
     msg.body = render_template(
         "zenodo_spam/email/spam_admin_email.tpl",
         user=user,
-        deposit=deposit)
+        deposit=deposit,
+        community=community
+    )
     send_email.delay(msg.__dict__)
+
+
+def check_and_handle_spam(community=None, deposit=None):
+    """Checks community/deposit metadata for spam."""
+    try:
+        if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
+            if community:
+                task = check_metadata_for_spam.delay(
+                    community_id=community.id)
+                user_id = community.id_user
+            if deposit:
+                task = check_metadata_for_spam.delay(dep_id=str(deposit.id))
+                user_id = deposit['owners'][0]
+            spam_proba = task.get(timeout=current_app.config[
+                'ZENODO_SPAM_CHECK_TIMEOUT'])
+        else:
+            spam_proba = 0
+
+        if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
+            if not Permission(ActionNeed('admin-access')).can():
+                has_records = RecordsSearch(index='records').query(
+                    Q('query_string', query="owners:{}".format(
+                        user_id))).count()
+                has_communities = Community.query.filter_by(
+                        id_user=user_id).count() - 1
+
+                if not (has_records or has_communities):
+                    current_app.config['ZENODO_SPAM_HANDLING_ACTIONS'](
+                        community=community, deposit=deposit)
+    except HTTPException:
+        raise
+    except Exception:
+        current_app.logger.exception(u'Could not check for spam')

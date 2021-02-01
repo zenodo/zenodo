@@ -478,7 +478,7 @@ def record_thumbnail(pid, record, thumbnail_size, **kwargs):
                 size=thumbnail_size,
                 rotation='0',
                 quality='default',
-                image_format=file['type'])
+                image_format=selected['type'])
     else:
         abort(404, 'This record has no thumbnails')
 

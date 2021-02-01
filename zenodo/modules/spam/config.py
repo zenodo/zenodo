@@ -32,29 +32,45 @@ from zenodo.modules.spam.utils import send_spam_admin_email, \
     send_spam_user_email
 
 
-def default_spam_handling(deposit):
+def default_spam_handling(deposit=None, community=None):
     """Default actions to counter spam detected record."""
-    user = User.query.get(deposit['_deposit']['owners'][0])
+    if deposit:
+        user = User.query.get(deposit['_deposit']['owners'][0])
+    if community:
+        user = community.owner
+        community.description = '--SPAM--' + community.description
+        if community.oaiset:
+            db.session.delete(community.oaiset)
+        community.delete()
     user.active = False
     delete_user_sessions(user)
     logout_user()
     db.session.add(user)
     db.session.commit()
-    send_spam_user_email(user.email)
+    send_spam_user_email(user.email, deposit=deposit, community=community)
     if current_app.config['ZENODO_SPAM_EMAIL_ADMINS']:
-        send_spam_admin_email(deposit, user)
-    error_message = \
-        ('Our spam protection system has classified your upload as a '
-         'potential spam attempt. As a preventive measure and due to '
-         'significant increase in spam, we have therefore deactivated your '
-         'user account and logged you out of Zenodo. Your upload has not been '
-         'published. If you think this is a mistake, please contact our '
-         'support.')
+        send_spam_admin_email(user, deposit=deposit)
+    if deposit:
+        error_message = \
+            ('Our spam protection system has classified your upload as a '
+             'potential spam attempt. As a preventive measure and due to '
+             'significant increase in spam, we have therefore deactivated '
+             'your user account and logged you out of Zenodo. Your upload has '
+             'not been published. If you think this is a mistake, please  '
+             'contact our support.')
+    if community:
+        error_message = \
+            ('Our spam protection system has classified your community as a '
+             'potential spam attempt. As a preventive measure and due to '
+             'significant increase in spam, we have therefore deactivated '
+             'your user account and logged you out of Zenodo. Your community '
+             'has not been created. If you think this is a mistake, please  '
+             'contact our support.')
     flash(error_message, category='warning')
-    abort(400, error_message,)
+    abort(400, error_message)
 
 
-# Function handling metadata detected as spam when publishing
+# Function handling deposit metadata detected as spam when publishing
 ZENODO_SPAM_HANDLING_ACTIONS = default_spam_handling
 
 # Spam model for record predictions

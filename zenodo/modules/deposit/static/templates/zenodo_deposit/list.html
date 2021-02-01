@@ -56,7 +56,7 @@
         <span ng-hide="f.links.self">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></span>
         <small class="text-muted" ng-show="f.checksum"><br />{{f.checksum}} <i class="fa fa-question-circle" data-placement="top" bs-tooltip data-container="div" data-title="This is the file fingerprint (MD5 checksum), which can be used to verify the file integrity."></i></small>
       </td>
-      <td>{{ f.size | bytesToHumanReadable }}</td>
+      <td>{{ f.size | fileSizeFormat }}</td>
       <td class="text-center">
         <span ng-show="f.progress < 100 && !f.errored">{{ f.progress }} %</span>
         <span ng-show="f.processing && !f.errored">Processing...</span>
@@ -98,8 +98,12 @@
 
   <p class="text-center" ng-hide="collapsed">
     <small class="text-muted">
-    (minimum 1 file required, max 50 GB per dataset - <a target="_blank" rel="noopener noreferrer" href="/contact">contact us</a> for larger datasets)
+      (minimum 1 file required, max {{ recordsVM.invenioRecordsArgs.templateParams.max_bucket_size | fileSizeFormat }} per dataset - <a target="_blank" rel="noopener noreferrer" href="/support">contact us</a> for larger datasets)
     </small>
+  </p>
+  <p class="text-center" ng-hide="collapsed">
+    <small>
+      If you're experiencing issues with uploading larger files, read our <a target="_blank" rel="noopener noreferrer" href="https://help.zenodo.org/">FAQ section</a> on file upload issues.</small>
   </p>
 </div>
 <div
@@ -130,7 +134,7 @@
         <a ng-show="f.links.self" ng-href="{{f.links.self}}">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></a>
         <span ng-hide="f.links.self">{{ f.key | limitTo:50 }} <span ng-show="f.key.length > 50">...</span></span>
       </td>
-      <td>{{ f.size | bytesToHumanReadable }}</td>
+      <td>{{ f.size | fileSizeFormat }}</td>
       <td><small class="text-muted">{{ f.checksum }}</small></td>
     </tr>
     <tr ng-show="(filesVM.files | filter:fileSearch).length == 0">

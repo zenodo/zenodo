@@ -120,6 +120,36 @@ function formatOpenAIRECommunities() {
   };
 }
 
+function fileSizeFormat() {
+
+  function filter(size) {
+    function round(num, precision) {
+      return Math.round(
+        num * Math.pow(10, precision)) / Math.pow(10, precision
+      );
+    }
+    var limit = Math.pow(1000, 4);
+    if (size > limit) {
+      return round(size / limit, 1) + ' TB';
+    } else if (size > (limit/=1000)) {
+      return round(size / limit, 1) + ' GB';
+    } else if (size > (limit/=1000)) {
+      return round(size / limit, 1) + ' MB';
+    } else if (size > 1000) {
+      return Math.round(size / 1000) +  ' kB';
+    }
+    if (size === 1) {
+      return "1 Byte"
+    }
+    return size + ' Bytes';
+  }
+
+  ////////////
+
+  return filter;
+}
+
+
 angular.module('invenioRecords')
   .filter('fieldtitle', fieldtitle)
   .filter('notIn', notIn)
@@ -128,4 +158,5 @@ angular.module('invenioRecords')
   .filter('striptags', striptags)
   .filter('stable', stable)
   .filter('checkAllFilesUploaded',checkAllFilesUploaded)
-  .filter('formatOpenAIRECommunities', formatOpenAIRECommunities);
+  .filter('formatOpenAIRECommunities', formatOpenAIRECommunities)
+  .filter('fileSizeFormat', fileSizeFormat);

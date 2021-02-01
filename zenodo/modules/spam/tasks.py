@@ -28,17 +28,24 @@ from __future__ import absolute_import, print_function
 
 from celery import shared_task
 from flask import current_app
+from invenio_communities.models import Community
 from invenio_records.models import RecordMetadata
 
 from zenodo.modules.spam import current_spam
 
 
 @shared_task(ignore_result=False)
-def check_metadata_for_spam(dep_id):
+def check_metadata_for_spam(community_id=None, dep_id=None):
     """Checks metadata of the provided deposit for spam content."""
     if not current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
         return 0
-    deposit = RecordMetadata.query.get(dep_id)
-    spam_proba = current_spam.model.predict_proba(
-        [deposit.json['title'] + ' ' + deposit.json['description']])[0][1]
+    if community_id:
+        community = Community.query.get(community_id)
+        spam_proba = current_spam.model.predict_proba(
+            [community.title + ' ' + community.description])[0][1]
+    if dep_id:
+        deposit = RecordMetadata.query.get(dep_id)
+        spam_proba = current_spam.model.predict_proba(
+            [deposit.json['title'] + ' ' + deposit.json['description']])[0][1]
+
     return spam_proba

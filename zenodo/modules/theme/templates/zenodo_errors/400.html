@@ -1,0 +1,6 @@
+{% extends config.THEME_ERROR_TEMPLATE %}
+
+{% block message %}
+  <h1><i class="fa fa-flash"></i> {{_('Bad Request')}}</h1>
+  <p>{{ error.description }}</p>
+{% endblock message %}
