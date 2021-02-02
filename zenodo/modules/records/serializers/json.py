@@ -30,6 +30,7 @@ import json
 
 from flask import has_request_context
 from flask_security import current_user
+from invenio_communities.models import Community
 from invenio_pidrelations.contrib.versioning import PIDVersioning
 from invenio_records.api import Record
 from invenio_records_rest.serializers.json import JSONSerializer
@@ -109,3 +110,27 @@ class ZenodoJSONSerializer(JSONSerializer):
         return json.dumps(
             self.transform_search_hit(pid, record)
         ).encode('utf8')  + b'\n'
+
+    def serialize_search(self, pid_fetcher, search_result, links=None,
+                         item_links_factory=None, **kwargs):
+        """Serialize Zenodo search results and aggregations."""
+        aggregations = search_result.get('aggregations', dict())
+        if 'communities' in aggregations:
+            self.enrich_community_aggs(aggregations)
+        return super(ZenodoJSONSerializer, self).serialize_search(
+            pid_fetcher, search_result, links=links,
+            item_links_factory=item_links_factory,
+            **kwargs
+        )
+
+    def enrich_community_aggs(self, aggregations):
+        """Enriches community aggregations with additional information."""
+        comm_aggs = aggregations['communities']['buckets']
+        keys = []
+        for bucket in comm_aggs:
+            keys.append(bucket['key'])
+        comms = Community.query.filter(Community.id.in_(keys)).all()
+        for comm in comms:
+            for bucket in comm_aggs:
+                if bucket['key'] == comm.id:
+                    bucket['title'] = comm.title
