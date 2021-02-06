@@ -66,7 +66,7 @@ decorator==4.4.0
 defusedxml==0.5.0
 dictdiffer==0.8.0
 dojson==1.4.0
-dulwich==0.19.11
+dulwich==0.20.2
 elasticsearch==7.0.5
 elasticsearch-dsl==7.0.0
 entrypoints==0.3
@@ -197,7 +197,7 @@ Pillow==6.2.2
 pluggy==0.12
 poyo==0.4.2
 prompt-toolkit==1.0.15
-psycopg2-binary==2.7.7
+psycopg2-binary==2.8.6
 ptyprocess==0.6.0
 pyasn1==0.4.2
 pycountry==18.12.8
