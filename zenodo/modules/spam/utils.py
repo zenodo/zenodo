@@ -86,7 +86,6 @@ def check_and_handle_spam(community=None, deposit=None):
                 'ZENODO_SPAM_CHECK_TIMEOUT'])
         else:
             spam_proba = 0
-
         if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
             if not Permission(ActionNeed('admin-access')).can():
                 user_records = RecordsSearch(index='records').query(
@@ -97,6 +96,13 @@ def check_and_handle_spam(community=None, deposit=None):
                 if community:
                     # Ignore the newly created community
                     user_communities = user_communities - 1
+                current_app.logger.warning(
+                    u'Found spam upload',
+                    extra={
+                        'depid': deposit.id if deposit else None,
+                        'comid': community.id if community else None
+                    }
+                )
                 if not (user_records + user_communities >
                         current_app.config['ZENODO_SPAM_SKIP_CHECK_NUM']):
                     current_app.config['ZENODO_SPAM_HANDLING_ACTIONS'](
@@ -104,4 +110,10 @@ def check_and_handle_spam(community=None, deposit=None):
     except HTTPException:
         raise
     except Exception:
-        current_app.logger.exception(u'Could not check for spam')
+        current_app.logger.exception(
+            u'Could not check for spam',
+            extra={
+                'depid': deposit.id if deposit else None,
+                'comid': community.id if community else None
+            }
+        )
