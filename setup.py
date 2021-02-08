@@ -88,6 +88,7 @@ install_requires = [
     'invenio-admin>=1.0.1,<1.1.0',
     'invenio-app>=1.2.2',
     'invenio-assets>=1.0.0,<1.1.0',
+    'invenio-banners>=1.0.0a0',
     'invenio-base>=1.2.0',
     'invenio-cache>=1.0.0',
     'invenio-celery>=1.0.1',

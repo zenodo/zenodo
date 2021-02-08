@@ -40,10 +40,16 @@
 {# Banner alert through global variable `banner_messages` #}
 {%- block flashmessages %}
 {{super()}}
+{# TODO: Add support for multiple banners coming from invenio-banners #}
+{%- set extra_banner = get_active_banner() %}
+{%- if extra_banner %}
+  {# NOTE: We add the banner at the very beginning of the list, so it shows up first #}
+  {% set banner_messages = [(extra_banner.category, extra_banner.message|safe)] + banner_messages|d([]) %}
+{%- endif %}
 {%- for category, msg in banner_messages|default([]) %}
   {%- set category = 'info' if category not in ['info', 'danger', 'warning', 'success'] else category %}
   <div class="alert alert-{{category}}">
     <div class="container">{{ msg }}</div>
   </div>
-{% endfor %}
-{% endblock %}
+{%- endfor %}
+{%- endblock %}
