@@ -89,13 +89,16 @@ def check_and_handle_spam(community=None, deposit=None):
 
         if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
             if not Permission(ActionNeed('admin-access')).can():
-                has_records = RecordsSearch(index='records').query(
+                user_records = RecordsSearch(index='records').query(
                     Q('query_string', query="owners:{}".format(
                         user_id))).count()
-                has_communities = Community.query.filter_by(
-                        id_user=user_id).count() - 1
-
-                if not (has_records or has_communities):
+                user_communities = Community.query.filter_by(
+                        id_user=user_id).count()
+                if community:
+                    # Ignore the newly created community
+                    user_communities = user_communities - 1
+                if not (user_records + user_communities >
+                        current_app.config['ZENODO_SPAM_SKIP_CHECK_NUM']):
                     current_app.config['ZENODO_SPAM_HANDLING_ACTIONS'](
                         community=community, deposit=deposit)
     except HTTPException:

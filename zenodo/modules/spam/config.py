@@ -84,3 +84,6 @@ ZENODO_SPAM_EMAIL_ADMINS = True
 
 # Timeout for spam check task before it bypasses the check
 ZENODO_SPAM_CHECK_TIMEOUT = 8
+
+# Number of valid existing records and communities to skip the spam check
+ZENODO_SPAM_SKIP_CHECK_NUM = 5
