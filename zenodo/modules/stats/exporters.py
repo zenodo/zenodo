@@ -91,7 +91,7 @@ class PiwikExporter:
                 'token_auth': token_auth
             }
 
-            res = requests.post(url, json=payload)
+            res = requests.post(url, json=payload, timeout=60)
 
             # Failure: not 200 or not "success"
             content = res.json() if res.ok else None

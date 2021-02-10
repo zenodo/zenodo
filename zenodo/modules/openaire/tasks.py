@@ -78,7 +78,7 @@ def openaire_direct_index(record_uuid):
         url = '{}/feedObject'.format(
             current_app.config['OPENAIRE_API_URL'])
         req = _openaire_request_factory()
-        res = req.post(url, data=data)
+        res = req.post(url, data=data, timeout=10)
 
         if not res.ok:
             raise OpenAIRERequestError(res.text)
@@ -87,7 +87,7 @@ def openaire_direct_index(record_uuid):
         if current_app.config['OPENAIRE_API_URL_BETA']:
             url_beta = '{}/feedObject'.format(
                 current_app.config['OPENAIRE_API_URL_BETA'])
-            res_beta = req.post(url_beta, data=data)
+            res_beta = req.post(url_beta, data=data, timeout=10)
 
         if res_beta and not res_beta.ok:
             raise OpenAIRERequestError(res_beta.text)
