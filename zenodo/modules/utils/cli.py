@@ -94,7 +94,7 @@ def add_file(recid, fp, replace_existing):
         u'  bucket: {bucket}\n'
         u'  size: {size}\n'
         u''.format(
-            key=key,
+            key=key.decode('utf-8'),
             bucket=bucket.id,
             size=size),
         fg='green'))
@@ -155,7 +155,7 @@ def remove_file(recid, key=None, index=None):
         u'  {checksum}\n'
         u'  bucket: {bucket}\n'
         u''.format(
-            key=key,
+            key=key.decode('utf-8'),
             checksum=obj.file.checksum,
             bucket=bucket.id),
         fg='green'))
