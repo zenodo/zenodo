@@ -1052,7 +1052,7 @@ RECORDS_REST_DEFAULT_SORT.update(DEPOSIT_REST_DEFAULT_SORT)
 #: Defined facets for records REST API.
 RECORDS_REST_FACETS = dict(
     records=dict(
-            default_aggs=['access_right', 'type', 'file_type', 'keywords'],
+        default_aggs=['access_right', 'type', 'file_type', 'keywords'],
         aggs=dict(
             type=dict(
                 terms=dict(field='resource_type.type'),
@@ -1074,6 +1074,14 @@ RECORDS_REST_FACETS = dict(
             communities=dict(
                 terms=dict(field='communities'),
             ),
+            related_identifiers_type=dict(
+                terms=dict(field='related.resource_type.type'),
+                aggs=dict(
+                    related_identifiers_subtype=dict(
+                        terms=dict(field='related.resource_type.subtype'),
+                    )
+                )
+            ),
         ),
         filters=dict(
             communities=terms_filter('communities'),
@@ -1088,6 +1096,10 @@ RECORDS_REST_FACETS = dict(
             keywords=terms_filter('keywords'),
             subtype=terms_filter('resource_type.subtype'),
             type=terms_filter('resource_type.type'),
+            related_identifiers_type=terms_filter(
+                'related.resource_type.type'),
+            related_identifiers_subtype=terms_filter(
+                'related.resource_type.subtype'),
         )
     )
 )
