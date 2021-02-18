@@ -64,7 +64,7 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_pidrelations.config import RelationType
-from invenio_records_rest.facets import terms_filter
+from invenio_records_rest.facets import terms_filter, range_filter
 from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
 from invenio_stats.aggregations import StatAggregator
@@ -1082,6 +1082,13 @@ RECORDS_REST_FACETS = dict(
                     )
                 )
             ),
+            publication_date=dict(
+                date_histogram=dict(
+                    field='publication_date',
+                    interval='1y',
+                    format='yyyy'
+                )
+            ),
         ),
         filters=dict(
             communities=terms_filter('communities'),
@@ -1089,6 +1096,10 @@ RECORDS_REST_FACETS = dict(
             provisional_communities=terms_filter('provisional_communities'),
             bounds=geo_bounding_box_filter(
                 'bounds', 'locations.point', type='indexed'),
+            publication_date=range_filter(
+                field='publication_date',
+                format='yyyy'
+            ),
         ),
         post_filters=dict(
             access_right=terms_filter('access_right'),
