@@ -25,7 +25,9 @@
 
 def versioning_files_error(release, ex):
     """Handler for VersioningFileError."""
-    release.model.errors = {'errors': ex.get_errors()[0]['message']}
+    release.model.errors = {
+        'errors': ex.get_errors()[0]['message']
+    }
 
 
 def authentification_failed(release, ex):
@@ -37,7 +39,8 @@ def authentification_failed(release, ex):
             'connecting your GitHub account at our "Linked accounts" settings '
             'page. You can then contact us via our support form to have this '
             'release published.'
-        )}
+        )
+    }
 
 
 def stale_data_error(release, ex):
@@ -89,6 +92,23 @@ def default_error(release, ex):
     """Default error handler acting as a fallback."""
     release.model.errors = {
         'errors': (
-            'Something went wrong when we tried to publish your release, '
+            'Something went wrong when we tried to publish your release. '
+            'If your release has not been published within the next hour, '
             'please contact us via our support form to resolve this issue.'
         )}
+
+
+def invalid_json_error(release, ex):
+    """Error for invalid JSON format."""
+    release.model.errors = {
+        'errors': str(ex),
+    }
+
+
+def invalid_ref_error(release, ex):
+    """Error for invalid JSON reference."""
+    release.model.errors = {
+        'errors': 'The license ID you have selected is not present in our '
+        'system. For the available licenses please check in the following URL '
+        'https://developers.zenodo.org/#licenses',
+    }
