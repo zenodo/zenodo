@@ -22,10 +22,15 @@
 
 """Unit tests Zenodo JSON deserializer."""
 
+from __future__ import absolute_import, print_function
 import pytest
 from flask import url_for
 from invenio_indexer.api import RecordIndexer
 from invenio_search import current_search
+
+from elasticsearch_dsl import Q
+from flask import request
+from invenio_records_rest.query import es_search_factory as _es_search_factory
 
 
 @pytest.mark.parametrize(('val', 'status', 'error_message'), [
@@ -141,3 +146,17 @@ def test_custom_search(es, api, json_headers, record_with_bucket,
                         custom=query),
                 headers=json_headers)
             assert len(res.json) == result
+
+
+@pytest.mark.parametrize(('query', 'result'), [
+    ('[dwc:family]:[Felidae]', 1),
+    ('[dwc:family]:[foobar]', 0),
+    ('[obo:RO_0002453]:[Cat:]', 1),
+    ('[obo:RO_0002453]:[:"Cat flea"]', 1),
+    ('[obo:RO_0002453]:[foobar:]', 0),
+    ('[obo:RO_0002453]:[(foobar OR "Felis catus"):]', 1),
+    ('[obo:RO_0002453]:["Felis catus":"Cat flea"]', 1),
+    ('[obo:RO_0002453]:["Felis catus":foobar]', 0),
+])
+def test_apply_version_filters(es, api, query, result):
+    return 1

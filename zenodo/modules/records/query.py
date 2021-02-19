@@ -30,11 +30,15 @@ from elasticsearch_dsl import Q
 from flask import request
 from invenio_records_rest.query import es_search_factory as _es_search_factory
 
-
 def apply_version_filters(search, urlkwargs):
     """Apply record version filters to search."""
     if request and 'all_versions' in request.values:
-        urlkwargs.add('all_versions', None)
+        if((str(request.values['all_versions']) == "1") or
+                str(request.values['all_versions'].lower()) == "true"):
+            urlkwargs.add('all_versions', "true")
+
+        else:
+            urlkwargs.add('all_versions', str(request.values['all_versions']))
     else:
         search = search.filter(
             Q('term', **{'relations.version.is_last': True}))
@@ -45,3 +49,4 @@ def search_factory(self, search, query_parser=None):
     """Search factory."""
     search, urlkwargs = _es_search_factory(self, search)
     return apply_version_filters(search, urlkwargs)
+    
