@@ -26,6 +26,7 @@ import pytest
 from flask import url_for
 from invenio_indexer.api import RecordIndexer
 from invenio_search import current_search
+from urlparse import urlparse, parse_qs
 
 
 @pytest.mark.parametrize(('val', 'status', 'error_message'), [
@@ -141,3 +142,25 @@ def test_custom_search(es, api, json_headers, record_with_bucket,
                         custom=query),
                 headers=json_headers)
             assert len(res.json) == result
+
+
+@pytest.mark.parametrize(('query', 'result'), [
+    (None, "true"),
+    ("true", "true"),
+    ("True", "true"),
+    ("1", "true"),
+    ("1234", "1234"),
+    ("test", "test"),
+])
+def test_apply_version_filters(es, api, query, result):
+    """Test record version filters to search."""
+    with api.test_request_context():
+        with api.test_client() as client:
+            res = client.get(
+                    url_for('invenio_records_rest.recid_list',
+                            all_versions=query))
+            URL = res.json["links"]["self"]
+            parsed_url = urlparse(URL)
+            parsed_url = parse_qs(parsed_url.query).get("all_versions")
+
+            assert str(parsed_url[0]) == result
