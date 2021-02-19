@@ -159,4 +159,8 @@ def test_custom_search(es, api, json_headers, record_with_bucket,
     ('[obo:RO_0002453]:["Felis catus":foobar]', 0),
 ])
 def test_apply_version_filters(es, api, query, result):
+    print(es)
+    print(api)
+    print(query)
+    print(result)
     return 1
