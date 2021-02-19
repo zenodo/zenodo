@@ -149,18 +149,9 @@ def test_custom_search(es, api, json_headers, record_with_bucket,
 
 
 @pytest.mark.parametrize(('query', 'result'), [
-    ('[dwc:family]:[Felidae]', 1),
+    ('[dwc:family]:[Felidae]', "true"),
     ('[dwc:family]:[foobar]', 0),
     ('[obo:RO_0002453]:[Cat:]', 1),
-    ('[obo:RO_0002453]:[:"Cat flea"]', 1),
-    ('[obo:RO_0002453]:[foobar:]', 0),
-    ('[obo:RO_0002453]:[(foobar OR "Felis catus"):]', 1),
-    ('[obo:RO_0002453]:["Felis catus":"Cat flea"]', 1),
-    ('[obo:RO_0002453]:["Felis catus":foobar]', 0),
 ])
 def test_apply_version_filters(es, api, query, result):
-    print(es)
-    print(api)
-    print(query)
-    print(result)
     return 1
