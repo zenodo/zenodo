@@ -54,7 +54,8 @@ class ZenodoGitHubRelease(GitHubRelease):
     def metadata(self):
         """Return extracted metadata."""
         output = dict(self.defaults)
-        output.update(self.extra_metadata)
+        if self.use_extra_metadata:
+            output.update(self.extra_metadata)
 
         # Add creators if not specified
         if 'creators' not in output:

@@ -47,6 +47,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import os
 from datetime import timedelta
 
+import jsonref
 from celery.schedules import crontab
 from flask_principal import ActionNeed
 from invenio_access.permissions import Permission
@@ -56,6 +57,7 @@ from invenio_deposit.config import DEPOSIT_REST_DEFAULT_SORT, \
 from invenio_deposit.scopes import write_scope
 from invenio_deposit.utils import check_oauth2_scope
 from invenio_github.config import GITHUB_REMOTE_APP
+from invenio_github.errors import CustomGitHubMetadataError
 from invenio_oauthclient.contrib.orcid import REMOTE_APP as ORCID_REMOTE_APP
 from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_ENDPOINTS, OPENAIRE_REST_FACETS, \
@@ -287,8 +289,7 @@ CELERY_BEAT_SCHEDULE = {
                 'days': 6 * 30,
             },
         }
-    },
-
+    }
 }
 
 # Cache
@@ -386,6 +387,14 @@ GITHUB_ERROR_HANDLERS = [
     (
         'zenodo.modules.deposit.errors.MarshmallowErrors',
         'zenodo.modules.github.error_handlers.marshmallow_error'
+    ),
+    (
+        CustomGitHubMetadataError,
+        'zenodo.modules.github.error_handlers.invalid_json_error'
+    ),
+    (
+        jsonref.JsonRefError,
+        'zenodo.modules.github.error_handlers.invalid_ref_error'
     ),
     (
         Exception,
