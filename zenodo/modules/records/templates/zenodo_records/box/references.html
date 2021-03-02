@@ -33,7 +33,7 @@
   <div class="collapse" id="collapseReferences">
     <div class="panel-body">
       <ul>
-        {%- for reference in record.references|sort(attribute='raw_reference') -%}
+        {%- for reference in record.references -%}
           <li><p>{{ reference.raw_reference }}</p></li>
         {%- endfor -%}
       </ul>
