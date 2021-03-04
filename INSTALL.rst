@@ -4,7 +4,7 @@ Installation
 Zenodo depends on PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ.
 
 If you are only interested in running Zenodo locally, follow the Docker
-installation guide below. If you plan to eventually develop Zenodo code 
+installation guide below. If you plan to eventually develop Zenodo code
 continue further to Development installation to find out how to set up the
 local instance for easy code development.
 
@@ -95,35 +95,34 @@ Also the following ports are exposed on the Docker host:
 Development installation
 ------------------------
 
-For the development setup we will reuse the Zenodo docker image from
-previous section to run only essential Zenodo services, and run the
-application code and the Celery worker outside docker - you will want to
-have easy access to the code and the virtual environment in which it will be
-installed.
+For the development setup we will reuse the ``docker-compose.yml`` file from
+the previous section to run only the essential Zenodo services (PostgreSQL,
+ElasticSearch, Redis, etc.) and run the application code and Celery worker in
+our virtualenv - you will want to have easy access to the code and the virtual
+environment in which it will be installed.
 
 .. note::
 
-    Since docker will be mapping the services to the default system
-    ports on localhost, make sure you are not running PostgreSQL,
+    Since Docker will be mapping the services to the default system
+    ports on ``localhost``, make sure you are not running PostgreSQL,
     Redis, RabbitMQ or Elasticsearch on those ports in your system.
 
-Similarly to how we previously ran
-``docker-compose -f docker-compose.full.yml up -d`` to run full-stack
-Zenodo, this time we run only four docker nodes with the database,
-Elasticsearch, Redis and RabbitMQ:
+Similarly to how we previously ran ``docker-compose -f docker-compose.full.yml
+up -d`` to run a "full-stack" version of Zenodo, this time we run only
+four Docker containers with PostgreSQL, ElasticSearch, Redis, and RabbitMQ:
 
 .. code-block:: console
 
+    # NOTE: The "-d" flag runs the containers in the background
     $ docker-compose up -d
 
-Keep the docker-compose session above alive and in a separate shell, create a
-new Python virtual environment using virtualenvwrapper
-(`virtualenvwrapper <https://virtualenvwrapper.readthedocs.io/en/latest/>`_),
-in which we will install Zenodo code and its dependencies:
+Now, create a new Python virtual environment using `virtualenvwrapper
+<https://virtualenvwrapper.readthedocs.io/en/latest/>`_, in which we will
+install the Zenodo application code and its dependencies:
 
 .. code-block:: console
 
-    $ mkvirtualenv zenodo
+    $ mkvirtualenv -p python2.7 zenodo
     (zenodo)$
 
 .. note::
@@ -137,75 +136,50 @@ Next, install Zenodo and code the dependencies:
 .. code-block:: console
 
     (zenodo)$ cd ~/src/zenodo
-    (zenodo)$ pip install -r requirements.txt --src ~/src/ --pre --upgrade
-    (zenodo)$ pip install -e .[all,postgresql,elasticsearch2]
+    (zenodo)$ pip install -r requirements.txt
+    (zenodo)$ pip install -e ".[all]"
 
-.. note::
-
-    ``--src ~/src/`` parameter will checkout the development versions of
-    certain Invenio extensions into ``~/src/``.
-
-.. note::
-
-    Z shell users: wrap the ``.[all,postgresql,elasticsearch2]`` part in quotes:
-
-    .. code-block:: console
-
-        (zenodo)$ pip install -e ".[all,postgresql,elasticsearch2]"
-
-Media assets
-~~~~~~~~~~~~
+Frontend assets
+~~~~~~~~~~~~~~~
 
 Next, we need to build the assets for the Zenodo application.
 
 To compile Zenodo assets we will need to install:
 
 * NodeJS **7.4** and NPM **4.0.5**
-
 * Asset-building dependencies: SASS **3.8.0**, CleanCSS **3.4.19**, UglifyJS **2.7.3** and RequireJS **2.2.0**
 
-If you system packages provide NodeJS and NPM in the versions listed above, you
-can install the asset tools system-wide (with ``sudo``), by executing:
+You can install NodeJS, NPM and other dependencies using NVM (Node Version
+Manager), which is similar to Python's ``pyenv``. To do that, you need to first
+install NVM from `https://github.com/creationix/nvm
+<https://github.com/creationix/nvm/>`_.
+
+Once NVM is installed, set it to use NodeJS version 7.4:
 
 .. code-block:: console
 
-   (zenodo)$ sudo ./scripts/setup-npm.sh
-
-Take a look in the script above to see which commands are being run.
-Use of ``sudo`` is required because of the ``-g`` flag for global installation.
-
-Alternatively, you can install NodeJS, NPM and other dependencies using
-NVM (node version manager), which is similar to Python's virtualenv.
-
-To do that, you need to first install NVM from
-`https://github.com/creationix/nvm <https://github.com/creationix/nvm/>`_
-or from your OS-specific package repository:
-
-* NVM on `Arch Linux AUR <https://aur.archlinux.org/packages/nvm/>`_
-
-* Brew on OS X: ``brew install nvm``
-
-Note: If you install NVM from system packages, you still need to source it
-in your ``.bashrc`` or ``.zshrc``. Refer to NVM repository for more details.
-
-Once NVM is installed, set it to use NodeJS in version 7.4:
-
-.. code-block:: console
-
+   (zenodo)$ nvm install 7.4
    (zenodo)$ nvm use 7.4
    Now using node v7.4.0 (npm v4.0.5)
 
-As before, install the npm requirements, this time without ``sudo``:
+Optionally, if you plan on working for a longer time with Node v7.4, you can
+also set it as the default version, to avoid having to run ``nvm use ...``
+every time:
+
+.. code-block:: console
+
+   (zenodo)$ nvm alias default 7.4
+
+Install the npm requirements:
 
 .. code-block:: console
 
    (zenodo)$ ./scripts/setup-npm.sh
 
-the packages will be installed in your local user's NVM environment.
+The packages will be installed in your local user's NVM environment.
 
-After you've installed the NPM packages system-wide or with NVM, you can
-finally download and build the media assets for Zenodo. There is a script
-which does that:
+After you've installed the NPM packages, you can finally download and build the
+frontend assets for Zenodo, by running the following script:
 
 .. code-block:: console
 
@@ -215,20 +189,10 @@ Running services
 ~~~~~~~~~~~~~~~~
 
 To run Zenodo locally, you will need to have some services running on your
-machine.
-At minimum you must have PostgreSQL, Elasticsearch 2.x, Redis and RabbitMQ.
-You can either install all of those from your system package manager and run
-them directly or better - use the provided docker image as before.
+machine. At minimum you must have PostgreSQL, Elasticsearch 7.x, Redis and
+RabbitMQ.
 
-**The docker image is the recommended method for development.**
-
-.. note::
-
-   If you run the services locally, make sure you're running
-   Elasticsearch **2.x**. Elasticsearch **5.x** is NOT yet supported.
-
-
-To run only the essential services using docker, execute the following:
+To run only the essential services using Docker, execute the following:
 
 .. code-block:: console
 
@@ -240,10 +204,11 @@ RabbitMQ (mq), and Redis (cache). Keep this shell session alive.
 
 Initialization
 ~~~~~~~~~~~~~~
-Now that the services are running, it's time to initialize the Zenodo database
-and the Elasticsearch index.
 
-Create the database, Elasticsearch indices, messages queues and various
+Now that the services are running, it's time to initialize the Zenodo database
+and the ElasticSearch indexes.
+
+Create the database, ElasticSearch indexes, messages queues and various
 fixtures for licenses, grants, communities and users in a new shell session:
 
 .. code-block:: console
@@ -259,23 +224,6 @@ Let's also run the Celery worker on a different shell session:
    $ cd ~/src/zenodo
    $ workon zenodo
    (zenodo)$ celery worker -A zenodo.celery -l INFO --purge
-
-.. note::
-
-    Here we assume all four services (db, es, mq, cache) are bound to localhost
-    (see `zenodo/config.py <https://github.com/zenodo/zenodo/blob/master/zenodo/config.py/>`_).
-    If you fail to connect those services, it is likely
-    you are running docker through ``docker-machine`` and those services are
-    bound to other IP addresses. In this case, you can redirect localhost ports
-    to docker ports as follows.
-
-    ``ssh -L 6379:localhost:6379 -L 5432:localhost:5432 -L 9200:localhost:9200 -L 5672:localhost:5672 docker@$(docker-machine ip)``
-
-    The problem usually occurs among Mac and Windows users. A better solution
-    is to install the native apps `Docker for Mac <https://docs.docker.com/docker-for-mac/>`_
-    or `Docker for Windows <https://docs.docker.com/docker-for-windows/>`_
-    (available since Docker v1.12) if possible,
-    which binds docker to localhost by default.
 
 Loading data
 ~~~~~~~~~~~~
