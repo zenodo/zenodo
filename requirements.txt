@@ -75,7 +75,7 @@ Flask==1.0.4
 Flask-Admin==1.5.3
 Flask-Alembic==2.0.1
 Flask-Assets==0.12
-Flask-BabelEx==0.9.3
+Flask-BabelEx==0.9.4
 Flask-Breadcrumbs==0.4.0
 Flask-Caching==1.6.0
 Flask-CeleryExt==0.3.1
@@ -146,7 +146,7 @@ invenio-records==1.3.2
 invenio-records-files==1.0.0a11
 invenio-records-rest==1.6.6
 invenio-records-ui==1.0.1
-invenio-rest==1.1.2
+invenio-rest==1.1.3
 invenio-search==1.2.3
 invenio-search-ui==1.0.1
 invenio-sipstore==1.0.0a7
