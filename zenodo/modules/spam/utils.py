@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+from celery.exceptions import TimeoutError
 from elasticsearch_dsl import Q
 from flask import current_app, render_template
 from flask_babelex import gettext as _
@@ -71,7 +72,7 @@ def send_spam_admin_email(user, deposit=None, community=None):
     send_email.delay(msg.__dict__)
 
 
-def check_and_handle_spam(community=None, deposit=None):
+def check_and_handle_spam(community=None, deposit=None, retry=True):
     """Checks community/deposit metadata for spam."""
     try:
         if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
@@ -109,6 +110,18 @@ def check_and_handle_spam(community=None, deposit=None):
                         community=community, deposit=deposit)
     except HTTPException:
         raise
+    except TimeoutError:
+        if retry:
+            check_and_handle_spam(
+                community=community, deposit=deposit, retry=False)
+        else:
+            current_app.logger.exception(
+                u'Could not check for spam',
+                extra={
+                    'depid': deposit.id if deposit else None,
+                    'comid': community.id if community else None
+                }
+            )
     except Exception:
         current_app.logger.exception(
             u'Could not check for spam',
