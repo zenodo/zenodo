@@ -123,6 +123,7 @@ def add_file(recid, fp, replace_existing):
     if click.confirm(u'Continue?'):
         bucket.locked = False
         if obj is not None and replace_existing:
+            bucket.size -= obj.file.size
             ObjectVersion.delete(bucket, obj.key)
         ObjectVersion.create(bucket, key, stream=fp, size=size)
         bucket.locked = True
@@ -172,6 +173,7 @@ def remove_file(recid, key=None, index=None):
 
     if click.confirm(u'Continue?'):
         bucket.locked = False
+        bucket.size -= obj.file.size
         ObjectVersion.delete(bucket, obj.key)
         bucket.locked = True
         record.files.flush()
@@ -207,12 +209,13 @@ def rename_file(recid, key, new_key):
     if click.confirm(u'Rename "{key}" to "{new_key}" on bucket {bucket}.'
                      u' Continue?'.format(
                         key=obj.key, new_key=new_key, bucket=bucket.id)):
-        record.files.bucket.locked = False
+        bucket.locked = False
 
         file_id = obj.file.id
+        bucket.size -= obj.file.size
         ObjectVersion.delete(bucket, obj.key)
         ObjectVersion.create(bucket, new_key, _file_id=file_id)
-        record.files.bucket.locked = True
+        bucket.locked = True
         record.files.flush()
         record.commit()
         db.session.commit()
