@@ -1,8 +1,0 @@
-blank_issues_enabled: true
-contact_links:
-  - name: Frequently asked questions 📃
-    url: https://help.zenodo.org
-    about: Questions regarding Zenodo? Take a look at our FAQs
-  - name: Support questions 💬
-    url: https://zenodo.org/support
-    about: Other type of issue? Ask for support
