@@ -7,7 +7,7 @@ assignees: ''
 
 ---
 
-Browser & OS [Discover the exact version of your browser](https://www.whatismybrowser.com/): <Browser>:<OS>
+Browser & OS (see also https://www.whatismybrowser.com/): <Browser>:<OS>
 
 ## Describe the bug
 A clear and concise description of what the bug is.
