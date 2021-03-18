@@ -4,7 +4,7 @@ about: Do you have a suggestion for making Zenodo better? Tell us more about it
 title: ''
 labels:
   - Enhancement
-  - Triage: Pending
+  - "Triage: Pending"
 assignees: ''
 
 ---
