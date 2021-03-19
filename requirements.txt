@@ -160,7 +160,7 @@ ipython==5.8.0
 ipython-genutils==0.2.0
 isbnid-fork==0.5.2
 itsdangerous==1.1.0
-Jinja2==2.10.1
+Jinja2==2.11.3
 jinja2-time==0.2.0
 joblib==0.14.1
 jsmin==2.2.2
