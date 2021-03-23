@@ -43,42 +43,46 @@
     </div>
   </div>
   <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-12" >
       <div class="panel panel-default">
         <div class="panel-heading">User</div>
         <div class="panel-body">
           <ul class="list-group">
-            <li class="list-group-item">
-              <strong>ID:</strong> {{user.id}}
-            </li>
-            <li class="list-group-item">
-              <strong>Email:</strong> {{user.email}}
-            </li>
-            <li class="list-group-item">
+            <div class="list-group-item col-sm-6">
+                <strong>ID:</strong> {{user.id}}
+            </div>
+            <div class="list-group-item col-sm-6">
+                <strong>Email:</strong> {{user.email}}
+            </div>
+            <div class="list-group-item col-sm-6">
+              <strong>Username:</strong> {{user.profile.username}}
+            </div>
+            <div class="list-group-item col-sm-6">
+              <strong>Full name:</strong> {{user.profile.full_name}}
+            </div>
+            <div class="list-group-item col-sm-6">
               <strong>Active?:</strong> {{user.active}}
-            </li>
-            <li class="list-group-item">
+            </div>
+            <div class="list-group-item col-sm-6">
+              <strong>Confirmation Date:</strong> {{user.confirmed_at}}
+            </div>
+            <div class="list-group-item col-sm-6">
               <strong>Last login:</strong> {{user.last_login_at}}
-            </li>
-
-            <li class="list-group-item">
+            </div>
+            <div class="list-group-item col-sm-6">
               <strong>Current login:</strong> {{user.current_login_at}}
-            </li>
-
-            <li class="list-group-item">
+            </div>
+            <div class="list-group-item col-sm-6">
               <strong>Last login IP:</strong> {{user.last_login_ip}}
-            </li>
-
-            <li class="list-group-item">
+            </div>
+            <div class="list-group-item col-sm-6">
               <strong>Current login IP:</strong> {{user.current_login_ip}}
-            </li>
-
-            <li class="list-group-item">
+            </div>
+            <div class="list-group-item col-sm-6">
               <strong>Login count:</strong> {{user.login_count}}
-            </li>
+            </div>
           </ul>
         </div>
-
         <div class="panel-heading">Communities</div>
         <div class="panel-body">
           User has <strong>{{ communities.count() }}</strong> communities.

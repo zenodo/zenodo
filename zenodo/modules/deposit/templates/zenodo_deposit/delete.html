@@ -44,41 +44,103 @@
         <p><h4>Are you ABSOLUTELY sure?</h4> This action <strong>CANNOT</strong> be undone! Deleting a record will
         permanently delete the associated files from disk.</p>
       </div>
+      {% if record.created|date_record_limit %}
+        <div class="alert alert-warning">
+          <p><h4>This record is 1 month old! </h4> This record <strong>SHOULD NOT</strong> be deleted!</p>
+        </div>
+      {% endif %}
     </div>
   </div>
   <div class="row">
     <div class="col-md-12">
       <div class="panel panel-default">
         <div class="panel-heading">Record and associated objects</div>
-        <ul class="list-group">
+          <div class="panel-body">
+          <h5>Owners</h5>
+          <ul class="list-group">
           {% if owners %}
-            <li class="list-group-item">
-              <h5>Owners</h5>
-              <table class="table table-bordered">
-                <tr>
-                  <th>User ID</th>
-                  <th>Email</th>
-                  <th>Username</th>
-                  <th>Full Name</th>
-                </tr>
-                {%- for owner in owners %}
-                <tr>
-                  <td>{{owner.id}}</td>
-                  <td>{{owner.email}}</td>
-                  <td>{{owner.profile and owner.profile.username}}</td>
-                  <td>{{owner.profile and owner.profile.full_name}}</td>
-                </tr>
-                {%- endfor %}
-              </table>
-            </li>
+            {%- for owner in owners %}
+              <div class="list-group-item col-sm-6">
+                  <strong>ID:</strong> {{owner.id}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                  <strong>Email:</strong> {{owner.email}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Username:</strong> {{owner.profile and owner.profile.username}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Full name:</strong> {{owner.profile and owner.profile.full_name}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Active?:</strong> {{owner.profile and owner.active}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Confirmation Date:</strong> {{owner.confirmed_at}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Last login:</strong> {{owner.last_login_at}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Current login:</strong> {{owner.current_login_at}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Last login IP:</strong> {{owner.last_login_ip}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Current login IP:</strong> {{owner.current_login_ip}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Login count:</strong> {{owner.login_count}}
+              </div>
+            {%- endfor %}
           {% endif %}
+          </div>
           <li class="list-group-item">
             <h5>UUID</h5>
-            {{record.id}}, revision {{record.revision_id}} (created: {{record.created}}, updated: {{record.updated}})
+            <table class="table table-bordered">
+              {% if record.created|date_record_limit %}
+                <tr style="background-color:#df6d69">
+                  <th>Record ID</th>
+                  <th>Revision</th>
+                  <th>Creation Date</th>
+                  <th>Updated</th>
+              {% else %}
+                <tr style="background-color:#fbf8e3">
+                  <th>Record ID</th>
+                  <th>Revision</th>
+                  <th>Creation Date</th>
+                  <th>Updated</th>
+                </tr>
+              {% endif %}
+                {%- for owner in owners %}
+                <tr>
+                  <td>{{record.id}}</td>
+                  <td>{{record.revision_id}}</td>
+                  <td>{{record.created}}</td>
+                  <td>{{record.updated}}</td>
+                </tr>
+                {%- endfor %}
+            </table>
           </li>
           <li class="list-group-item">
             <h5>Deposit UUID</h5>
-            {{deposit.id}}, revision {{deposit.revision_id}} (created: {{deposit.created}}, updated: {{deposit.updated}})
+            <table class="table table-bordered">
+              <tr>
+                <th>Deposit ID</th>
+                <th>Revision</th>
+                <th>Creation Date</th>
+                <th>Updated</th>
+              </tr>
+              {%- for owner in owners %}
+              <tr>
+                <td>{{deposit.id}}</td>
+                <td>{{deposit.revision_id}}</td>
+                <td>{{deposit.created}}</td>
+                <td>{{deposit.updated}}</td>
+              </tr>
+              {%- endfor %}
+            </table>
           </li>
           <li class="list-group-item">
             <h5>Persistent identifiers</h5>
@@ -174,8 +236,4 @@
   </div>
 </div>
 
-
-
 {%- endblock page_body %}
-
-
