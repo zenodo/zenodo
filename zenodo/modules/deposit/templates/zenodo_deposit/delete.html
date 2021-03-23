@@ -27,6 +27,29 @@
 {% from "invenio_userprofiles/settings/_macros.html" import render_field %}
 
 {%- block page_body %}
+<script>
+  function datesLimit() {
+
+    var created = document.getElementsByName('created_date')[0].content;
+    
+    // .getTime() to get dates in miliseconds
+    var current_date  = new Date().getTime()
+    var creation_record_date = new Date(created).getTime()
+    var date_difference = current_date-creation_record_date;
+
+    // 30 days in miliseconds
+    var threshold = 2592000000
+    
+    if (date_difference > threshold) { 
+      document.write(created.fontcolor("red") );
+    
+    }
+    else { 
+      document.write(created);
+    }
+
+  }
+</script>
 <div class="container record-admin">
   <div class="row">
     <div class="col-xs-12" align="center">
@@ -74,11 +97,44 @@
           {% endif %}
           <li class="list-group-item">
             <h5>UUID</h5>
-            {{record.id}}, revision {{record.revision_id}} (created: {{record.created}}, updated: {{record.updated}})
+            <table class="table table-bordered">
+              <tr style="background-color:#fbf8e3">
+                <th>Record ID</th>
+                <th>Revision</th>
+                <th>Creation Date</th>
+                <th>Updated</th>
+              </tr>
+              {%- for owner in owners %}
+              <tr>
+                <td>{{record.id}}</td>
+                <td>{{record.revision_id}}</td>
+  
+                <meta name="created_date" content={{record.created}}/>
+                <td><script>datesLimit();</script></td>
+  
+                <td>{{record.updated}}</td>
+              </tr>
+              {%- endfor %}
+            </table>
           </li>
           <li class="list-group-item">
             <h5>Deposit UUID</h5>
-            {{deposit.id}}, revision {{deposit.revision_id}} (created: {{deposit.created}}, updated: {{deposit.updated}})
+            <table class="table table-bordered">
+              <tr>
+                <th>Deposit ID</th>
+                <th>Revision</th>
+                <th>Creation Date</th>
+                <th>Updated</th>
+              </tr>
+              {%- for owner in owners %}
+              <tr>
+                <td>{{deposit.id}}</td>
+                <td>{{deposit.revision_id}}</td>
+                <td>{{deposit.created}}</td>
+                <td>{{deposit.updated}}</td>
+              </tr>
+              {%- endfor %}
+            </table>
           </li>
           <li class="list-group-item">
             <h5>Persistent identifiers</h5>
