@@ -83,6 +83,7 @@
                   <th>Email</th>
                   <th>Username</th>
                   <th>Full Name</th>
+                  <th>Confirmation date</th>
                 </tr>
                 {%- for owner in owners %}
                 <tr>
@@ -90,6 +91,7 @@
                   <td>{{owner.email}}</td>
                   <td>{{owner.profile and owner.profile.username}}</td>
                   <td>{{owner.profile and owner.profile.full_name}}</td>
+                  <td>{{owner.confirmed_at}}</td>
                 </tr>
                 {%- endfor %}
               </table>
