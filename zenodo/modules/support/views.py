@@ -49,6 +49,12 @@ def support():
     """Render contact form."""
     uap = user_agent_information()
     form = contact_form_factory()
+    recid = request.args.get('recid')
+    if recid:
+        form.record_url.data = url_for(
+            'invenio_records_ui.recid',pid_value=recid, _external=True)
+    if request.args.get('category'):
+        form.issue_category.data = request.args.get('category')
     if form.validate_on_submit():
         attachments = request.files.getlist("attachments")
         if attachments and not check_attachment_size(attachments):
@@ -59,7 +65,7 @@ def support():
             context = {
                 'user_id': current_user.get_id(),
                 'info': form.data,
-                'uap': uap
+                'uap': uap,
             }
 
             try:

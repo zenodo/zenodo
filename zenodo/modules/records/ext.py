@@ -39,7 +39,7 @@ from . import config
 from .custom_metadata import CustomMetadataAPI
 from .indexer import indexer_receiver
 from .proxies import current_zenodo_records
-from .utils import serialize_record, transform_record
+from .utils import serialize_record, transform_record, is_date_within_delta
 from .views import blueprint, record_jinja_context
 
 
@@ -81,6 +81,8 @@ class ZenodoRecords(object):
         app.context_processor(record_jinja_context)
         app.context_processor(
             lambda: dict(current_zenodo_records=current_zenodo_records))
+        app.context_processor(
+            lambda: dict(is_date_within_delta=is_date_within_delta))
         # Register blueprint
         app.register_blueprint(blueprint)
         # Add global record serializer template filter

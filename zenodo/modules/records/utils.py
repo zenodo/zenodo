@@ -28,6 +28,7 @@
 from __future__ import absolute_import, print_function
 
 from os.path import dirname, join
+from datetime import datetime
 
 from flask import current_app
 from invenio_db import db
@@ -192,3 +193,9 @@ def build_record_custom_fields(record):
 
     return {k: es_custom_fields[k] for k in es_custom_fields
             if es_custom_fields[k]}
+
+
+
+def is_date_within_delta(date, delta):
+    """Utility to return if the date is within allowed delta."""
+    return date > (datetime.utcnow() - delta)

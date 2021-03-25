@@ -48,7 +48,7 @@ class ContactForm(FlaskForm):
     """Form for contact form."""
 
     field_sets = ['name', 'email', 'subject', 'issue_category', 'description',
-                  'attachments', 'include_os_browser', 'recaptcha']
+                  'record_url', 'attachments', 'include_os_browser', 'recaptcha']
 
     #
     # Methods
@@ -94,6 +94,12 @@ class ContactForm(FlaskForm):
     description = TextAreaField(
         _('How can we help?'),
         description=_('Required.'),
+        filters=[strip_filter],
+    )
+
+    record_url = StringField(
+        _('Record URL'),
+        description=_('URL of related record.'),
         filters=[strip_filter],
     )
 

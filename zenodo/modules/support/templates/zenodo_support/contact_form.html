@@ -72,6 +72,9 @@
               {{ render_form_field(form.subject, input_size=10) }}
             </div>
             <div class="row">
+              {{ render_form_field(form.record_url, input_size=10) }}
+            </div>
+            <div class="row">
               {{ render_form_field(form.description, input_size=10) }}
             </div>
             <div class="row">
@@ -248,6 +251,12 @@ function validateForm() {
       description.length > DESCRIPTION_MAX_LENGTH) {
     errorMessages.description.push(
       'Field must be between ' + DESCRIPTION_MIN_LENGTH + ' and ' + DESCRIPTION_MAX_LENGTH + ' characters long.');
+    isValid = false;
+  }
+
+  var record_url = $('#contact-form :input#record_url').val()
+  if (record_url.length && (category=='file-modification' || category=='record-inactivation')) {
+    errorMessages.description.push('Please provide us with the URL of the record.');
     isValid = false;
   }
 

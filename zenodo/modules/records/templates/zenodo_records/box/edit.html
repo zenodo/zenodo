@@ -38,12 +38,51 @@
     <form action="{{ url_for('zenodo_deposit.newversion', pid_value=record.recid) }}" method="POST">
       <button class="btn btn-success btn-block" type="submit" data-placement="left" data-toggle="tooltip" title="{{_('You should only create a new version if you want to update the files of this upload. Keep in mind that new versions get a new DOI.')}}" {{ 'disabled' if edit_disabled else ''}}>New version</button>
     </form>
+    {%- if is_date_within_delta(record.created, config['ZENODO_RECORD_REMOVAL_GRACE_PERIOD']) %}
+    <a href="{{ url_for('zenodo_support.support', recid=record.recid, category='record-inactivation') }}">
+      <button class="btn  btn-block" type="submit">Remove record</button>
+    </a>
+    {%- else %}
+    <a >
+      <button onclick="displayModal()" class="btn  btn-block" type="submit">Remove record</button>
+    </a>
+    {%- endif %}
+    <div class="modal fade" id="warningModal" tabindex="-1">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title">Warning</h4>
+          </div>
+          <div class="modal-body">
+            <br />
+            Please note that we have a one-month grace period since a records creation for its removal, afterwards, it requires a
+            valid justification.
+            This period has been exceeded for this record so you will need to provide a justification that will be evaluated by our staff.
+            A valid justification can, for instance,
+            be a copyright infringement, exposure of data from human subjects, and/or spam records.
+
+          </div>
+          <div class="modal-footer">
+            <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <a href="{{ url_for('zenodo_support.support', recid=record.recid, category='record-inactivation') }}">
+              <button class="btn btn-danger" type="submit">Request to remove this record</button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
   {# Non-versioned record but can be upgraded #}
   {%- elif current_user|has_record_perm(record, 'newversion') %}
     <form action="{{ url_for('zenodo_deposit.registerconceptdoi', pid_value=record.recid)}}" method="POST">
       <button class="btn btn-success btn-block" type="submit" {{ 'disabled' if edit_disabled else ''}}>Upgrade to versioned record</button>
     </form>
   {%- endif %}
+{%- else %}
+<a href="{{ url_for('zenodo_support.support', recid=record.recid, category='record-inactivation') }}">
+  <button class="btn  btn-block" type="submit">Remove record</button>
+</a>
 {%- endif %}
 {# Admin menu #}
 {%- if current_user_is_admin() %}
@@ -75,3 +114,10 @@
   </ul>
 </div>
 {%- endif %}
+
+<script type="text/javascript">
+
+function displayModal() {
+  $('#warningModal').modal({backdrop: 'static'})
+}
+</script>
