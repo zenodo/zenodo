@@ -156,7 +156,6 @@
           <li><a href="{{ url_for('bucket.edit_view', id=record.files.bucket.id) }}">
             Bucket
           </a></li>
-          {%- endif %}
           <li role="separator" class="divider"></li>
           <li><a href="{{ url_for('zenodo_deposit.delete', pid_value=pid.pid_value) }}" type="submit">
             <span class="text-danger"><i class="fa fa-trash"></i> Delete record ...</span>
