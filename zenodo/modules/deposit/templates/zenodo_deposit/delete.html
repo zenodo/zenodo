@@ -73,30 +73,47 @@
     <div class="col-md-12">
       <div class="panel panel-default">
         <div class="panel-heading">Record and associated objects</div>
-        <ul class="list-group">
+          <div class="panel-body">
+          <h5>Owners</h5>
+          <ul class="list-group">
           {% if owners %}
-            <li class="list-group-item">
-              <h5>Owners</h5>
-              <table class="table table-bordered">
-                <tr>
-                  <th>User ID</th>
-                  <th>Email</th>
-                  <th>Username</th>
-                  <th>Full Name</th>
-                  <th>Confirmation date</th>
-                </tr>
-                {%- for owner in owners %}
-                <tr>
-                  <td>{{owner.id}}</td>
-                  <td>{{owner.email}}</td>
-                  <td>{{owner.profile and owner.profile.username}}</td>
-                  <td>{{owner.profile and owner.profile.full_name}}</td>
-                  <td>{{owner.confirmed_at}}</td>
-                </tr>
-                {%- endfor %}
-              </table>
-            </li>
+            {%- for owner in owners %}
+              <div class="list-group-item col-sm-6">
+                  <strong>ID:</strong> {{owner.id}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                  <strong>Email:</strong> {{owner.email}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Username:</strong> {{owner.profile and owner.profile.username}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Full name:</strong> {{owner.profile and owner.profile.full_name}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Active?:</strong> {{owner.profile and owner.active}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Confirmation Date:</strong> {{owner.confirmed_at}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Last login:</strong> {{owner.last_login_at}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Current login:</strong> {{owner.current_login_at}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Last login IP:</strong> {{owner.last_login_ip}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Current login IP:</strong> {{owner.current_login_ip}}
+              </div>
+              <div class="list-group-item col-sm-6">
+                <strong>Login count:</strong> {{owner.login_count}}
+              </div>
+            {%- endfor %}
           {% endif %}
+          </div>
           <li class="list-group-item">
             <h5>UUID</h5>
             <table class="table table-bordered">
