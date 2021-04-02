@@ -26,7 +26,6 @@
 # fails because npm is not installed. So let's install npm first.
 curl https://nodejs.org/download/release/v7.4.0/node-v7.4.0-linux-x64.tar.gz -o node-v7.4.0-linux-x64.tar.gz
 gunzip node-v7.4.0-linux-x64.tar.gz
-mkdir -p /usr/local/lib/nodejs
 tar xvf node-v7.4.0-linux-x64.tar --strip-components=1 -C /usr/local
 # end of fix
 
