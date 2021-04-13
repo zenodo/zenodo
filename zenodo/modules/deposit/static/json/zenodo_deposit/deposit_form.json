@@ -680,6 +680,14 @@
                 "name": "is continued by this upload"
               },
               {
+                "value": "isDescribedBy",
+                "name": "describes this upload"
+              },
+              {
+                "value": "describes",
+                "name": "is described by this upload"
+              },
+              {
                 "value": "isPartOf",
                 "name": "has this upload as part"
               },
@@ -718,6 +726,22 @@
               {
                 "value": "isSourceOf",
                 "name": "has this upload as its source"
+              },
+              {
+                "value": "requires",
+                "name": "is required by this upload"
+              },
+              {
+                "value": "isRequiredBy",
+                "name": "requires this upload"
+              },
+              {
+                "value": "isObsoletedBy",
+                "name": "replaces this upload"
+              },
+              {
+                "value": "obsoletes",
+                "name": "is replaced by this upload"
               },
               {
                 "value": "isIdenticalTo",

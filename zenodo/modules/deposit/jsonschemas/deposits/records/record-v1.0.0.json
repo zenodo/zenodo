@@ -104,6 +104,8 @@
         "isSupplementedBy",
         "isContinuedBy",
         "continues",
+        "isDescribedBy",
+        "describes",
         "hasMetadata",
         "isMetadataFor",
         "isNewVersionOf",
@@ -122,7 +124,11 @@
         "isReviewedBy",
         "reviews",
         "isDerivedFrom",
-        "isSourceOf"
+        "isSourceOf",
+        "requires",
+        "isRequiredBy",
+        "isObsoletedBy",
+        "obsoletes"
       ],
       "type": "string"
     },
@@ -851,6 +857,8 @@
               "isSupplementedBy",
               "isContinuedBy",
               "continues",
+              "isDescribedBy",
+              "describes",
               "hasMetadata",
               "isMetadataFor",
               "isNewVersionOf",
@@ -869,7 +877,11 @@
               "isReviewedBy",
               "reviews",
               "isDerivedFrom",
-              "isSourceOf"
+              "isSourceOf",
+              "requires",
+              "isRequiredBy",
+              "isObsoletedBy",
+              "obsoletes"
             ],
             "type": "string"
           },
