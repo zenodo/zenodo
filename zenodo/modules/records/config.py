@@ -89,6 +89,8 @@ ZENODO_RELATION_TYPES = [
     ('isPreviousVersionOf', _('New versions')),
     ('isContinuedBy', _('Continued by')),
     ('continues', _('Continues')),
+    ('IsDescribedBy', _('Described by')),
+    ('describes', _('Describes')),
     ('isPartOf', _('Part of')),
     ('hasPart', _('Has part')),
     ('isReviewedBy', _('Reviewed by')),
@@ -99,6 +101,10 @@ ZENODO_RELATION_TYPES = [
     ('isCompiledBy', _('Compiled by')),
     ('isDerivedFrom', _('Derived from')),
     ('isSourceOf', _('Source of')),
+    ('requires', _('Requires')),
+    ('isRequiredBy', _('Required by')),
+    ('isObsoletedBy', _('Obsoleted by')),
+    ('obsoletes', _('Obsoletes')),
     ('isIdenticalTo', _('Identical to')),
 ]
 
