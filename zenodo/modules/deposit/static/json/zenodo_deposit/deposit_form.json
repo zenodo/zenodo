@@ -528,6 +528,14 @@
                 "default_funder": "10.13039/501100000780",
                 "funders_map": [
                   {
+                    "value": "10.13039/501100002341",
+                    "name": "Academy of Finland (FI)"
+                  },
+                  {
+                    "value": "10.13039/501100001665",
+                    "name": "Agence Nationale de la Recherche (FR)"
+                  },
+                  {
                     "value": "10.13039/501100000923",
                     "name": "Australian Research Council (AU)"
                   },
@@ -536,16 +544,16 @@
                     "name": "Austrian Science Fund (AT)"
                   },
                   {
+                    "value": "10.13039/501100000024",
+                    "name": "Canadian Institutes of Health Research (CA)"
+                  },
+                  {
                     "value": "10.13039/501100000780",
                     "name": "European Commission (EU)"
                   },
                   {
                     "value": "10.13039/501100000806",
                     "name": "European Environment Agency (EU)"
-                  },
-                  {
-                    "value": "10.13039/501100002341",
-                    "name": "Academy of Finland (FI)"
                   },
                   {
                     "value": "10.13039/501100001871",
@@ -576,6 +584,10 @@
                     "name": "National Science Foundation (US)"
                   },
                   {
+                    "value": "10.13039/501100000038",
+                    "name": "Natural Sciences and Engineering Research Council of Canada (CA)"
+                  },
+                  {
                     "value": "10.13039/501100003246",
                     "name": "Nederlandse Organisatie voor Wetenschappelijk Onderzoek (NL)"
                   },
@@ -592,8 +604,16 @@
                     "name": "Science Foundation Ireland (IE)"
                   },
                   {
+                    "value": "10.13039/100001345",
+                    "name": "Social Science Research Council (US)"
+                  },
+                  {
                     "value": "10.13039/100004440",
                     "name": "Wellcome Trust (UK)"
+                  },
+                  {
+                    "value": "10.13039/501100000024",
+                    "name": "T\u00fcrkiye Bilimsel ve Teknolojik Ara\u015ftirma Kurumu (TR)"
                   }
                 ]
               }
