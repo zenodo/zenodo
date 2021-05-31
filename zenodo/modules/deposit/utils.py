@@ -28,13 +28,11 @@ from __future__ import absolute_import, unicode_literals
 
 import itertools
 import uuid
-from datetime import datetime, timedelta
 
 import pycountry
 from elasticsearch.exceptions import NotFoundError
 from flask import abort, current_app, request
 from flask_security import current_user
-from humanize import naturaldelta
 from invenio_accounts.models import User
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
@@ -250,8 +248,20 @@ def suggest_language(q, limit=5):
     return langs
 
 
-def is_user_verified(confirmation_period=timedelta(days=7)):
+def is_user_verified():
     """Permission function that evaluates if the user can create a deposit."""
+    if current_user.email:
+        email_domain = current_user.email.rsplit('@', 1)[-1].lower()
+        blacklisted_email_domains = current_app.config.get(
+            'ZENODO_BLACKLISTED_EMAIL_DOMAINS', [])
+        has_blacklisted_domain = email_domain in blacklisted_email_domains
+        if has_blacklisted_domain:
+            return False, (
+                'You have registered on Zenodo using an email address domain '
+                'that has recently been used to upload spam on Zenodo. If '
+                'this is not the case please contact us via our support line.'
+            )
+
     if current_user.external_identifiers:
         return True, ''
 
@@ -262,19 +272,4 @@ def is_user_verified(confirmation_period=timedelta(days=7)):
             'can link your Zenodo account with either your GitHub or ORCID '
             'account.'
         )
-
-    if current_user.email:
-        email_domain = current_user.email.rsplit('@', 1)[-1].lower()
-        blacklisted_email_domains = current_app.config.get(
-            'ZENODO_BLACKLISTED_EMAIL_DOMAINS', [])
-        has_blacklisted_domain = email_domain in blacklisted_email_domains
-        immature_confirmation = current_user.confirmed_at > \
-                (datetime.utcnow() - confirmation_period)
-        if has_blacklisted_domain and immature_confirmation:
-            return False, (
-                'You have registered on Zenodo using an email address domain '
-                'that has recently been used to upload spam on Zenodo. Your '
-                'account needs to be verified for at least {} before you can '
-                'publish.'.format(naturaldelta(confirmation_period))
-            )
     return True, ''
