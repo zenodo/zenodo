@@ -188,15 +188,15 @@ def test_full_record(record_with_files_creation):
         u'citation': [
             {
                 u'@id': 'https://doi.org/10.1234/foo.bar',
-                u'@type': u'CreativeWork'
+                u'@type': u'Dataset'
             },
             {
                 u'@id': 'https://arxiv.org/abs/arXiv:1234.4321',
-                u'@type': u'CreativeWork'
+                u'@type': u'Dataset'
             },
             {
                 '@id': 'https://arxiv.org/abs/arXiv:1234.4328',
-                '@type': 'CreativeWork'
+                '@type': 'Dataset'
             }
         ],
         u'contributor': [
@@ -260,13 +260,13 @@ def test_full_record(record_with_files_creation):
         u'isPartOf': [
             {
                 u'@id': 'https://doi.org/10.1234/zenodo.4321',
-                u'@type': u'CreativeWork'
+                u'@type': u'SoftwareSourceCode'
             }
         ],
         u'hasPart': [
             {
                 u'@id': 'https://doi.org/10.1234/zenodo.1234',
-                u'@type': u'CreativeWork'
+                u'@type': u'ScholarlyArticle'
             }
         ],
         u'keywords': [u'kw1', u'kw2', u'kw3'],

@@ -207,6 +207,7 @@ def test_full(db, record_with_bucket, recid_pid):
         "relatedIdentifiers": [
             {
                 "relationType": "Cites",
+                "resourceTypeGeneral": "Dataset",
                 "relatedIdentifier": "10.1234/foo.bar",
                 "relatedIdentifierType": "DOI"
             },
@@ -217,11 +218,13 @@ def test_full(db, record_with_bucket, recid_pid):
             },
             {
                 "relationType": "Cites",
+                "resourceTypeGeneral": "Dataset",
                 "relatedIdentifier": "1234.4321",
                 "relatedIdentifierType": "arXiv"
             },
             {
                 "relationType": "References",
+                "resourceTypeGeneral": "Dataset",
                 "relatedIdentifier": "1234.4328",
                 "relatedIdentifierType": "arXiv"
             },
