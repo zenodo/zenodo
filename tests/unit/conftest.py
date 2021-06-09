@@ -741,13 +741,19 @@ def full_record():
         ],
         related_identifiers=[
             {'identifier': '10.1234/foo.bar',
-                'scheme': 'doi', 'relation': 'cites'},
+                'scheme': 'doi', 'relation': 'cites',
+             'resource_type': {
+                 'type': 'dataset'}},
             {'identifier': '1234.4325', 'scheme':
                 'arxiv', 'relation': 'isIdenticalTo'},
             {'identifier': '1234.4321', 'scheme':
-                'arxiv', 'relation': 'cites'},
+                'arxiv', 'relation': 'cites',
+             'resource_type': {
+                 'type': 'dataset'}},
             {'identifier': '1234.4328', 'scheme':
-                'arxiv', 'relation': 'references'},
+                'arxiv', 'relation': 'references',
+             'resource_type': {
+                 'type': 'dataset'}},
             {'identifier': '10.1234/zenodo.4321', 'scheme':
                 'doi', 'relation': 'isPartOf',
                 'resource_type': {

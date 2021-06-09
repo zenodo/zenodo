@@ -45,7 +45,7 @@ def _serialize_identifiers(ids, relations=None):
     :rtype dict:
     """
     relations = relations or []
-    ids = [{'@type': 'CreativeWork',
+    ids = [{'@type': ObjectType.get_by_dict(i['resource_type'])['schema.org'][19:] if 'resource_type' in i else 'CreativeWork',
              '@id': idutils.to_url(i['identifier'], i['scheme'], 'https')}
             for i in ids if (not relations or i['relation'] in relations) and 'scheme' in i]
     return [id_ for id_ in ids if id_['@id']]
@@ -248,7 +248,7 @@ class CreativeWork(Schema):
         """Get identical identifiers of the record."""
         relids = obj.get('metadata', {}).get('related_identifiers', [])
         ids = [i['@id']
-                for i in _serialize_identifiers(relids, {'isIdenticalTo'})]
+               for i in _serialize_identifiers(relids, {'isIdenticalTo'})]
         relids = obj.get('metadata', {}).get('alternate_identifiers', [])
         ids += [i['@id'] for i in _serialize_identifiers(relids)]
         return ids or missing
