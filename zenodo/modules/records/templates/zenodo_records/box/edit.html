@@ -67,8 +67,8 @@
     <li><a href="{{ url_for('zenodo_deposit.delete', pid_value=pid.pid_value) }}" type="submit">
       <span class="text-danger"><i class="fa fa-trash"></i> Delete record ...</span>
     </a></li>
-    {% if record._deposit.created_by %}
-    <li><a href="{{ url_for('zenodo_spam.delete', user_id=record._deposit.created_by) }}" type="submit">
+    {% if record._deposit.owners and record._deposit.owners[0] %}
+    <li><a href="{{ url_for('zenodo_spam.delete', user_id=record._deposit.owners[0]) }}" type="submit">
       <span class="text-danger"><i class="fa fa-trash"></i> Delete user ...</span>
     </a></li>
     {%- endif %}
