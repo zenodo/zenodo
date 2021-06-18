@@ -57,30 +57,48 @@ class DCATSerializer(object):
         transform = ET.XSLT(xsl)
         return transform
 
-    FILES_FIELDS = {
-        '{{{dcat}}}downloadURL': lambda f, r: ui_link_for(
-            'record_file', id=r['recid'], filename=f['key']),
-        '{{{dcat}}}mediaType': lambda f, r: mimetypes.guess_type(f['key'])[0],
-        '{{{dcat}}}byteSize': lambda f, r: str(f['size']),
-        '{{{dcat}}}accessURL': lambda f, r: idutils.to_url(
-            r['doi'], 'doi', url_scheme='https'),
-        # TODO: there's also "spdx:checksum", but it's not in the W3C spec yet
-    }
-
     def _add_files(self, root, files, record):
         """Add files information via distribution elements."""
         ns = root.nsmap
+
+        def download_url(file, record):
+            url = ui_link_for('record_file', id=record['recid'], filename=file['key'])
+            return url, {
+                '{{{rdf}}}resource'.format(**ns): url
+            }
+
+        def media_type(file, _):
+            return mimetypes.guess_type(file['key'])[0], None
+
+        def byte_size(file, _):
+            return str(file['size']), None
+
+        def access_url(_, record):
+            return idutils.to_url(record['doi'], 'doi', url_scheme='https'), None
+
+        files_fields = {
+            '{{{dcat}}}downloadURL': download_url,
+            '{{{dcat}}}mediaType': media_type,
+            '{{{dcat}}}byteSize': byte_size,
+            '{{{dcat}}}accessURL': access_url,
+            # TODO: there's also "spdx:checksum", but it's not in the W3C spec yet
+        }
+
         for f in files:
             dist_wrapper = ET.SubElement(
                 root[0], '{{{dcat}}}distribution'.format(**ns))
             dist = ET.SubElement(
                 dist_wrapper, '{{{dcat}}}Distribution'.format(**ns))
 
-            for tag, func in self.FILES_FIELDS.items():
-                val = func(f, record)
-                if val:
+            for tag, func in files_fields.items():
+                text_val, attrs_val = func(f, record)
+
+                if text_val or attrs_val:
                     el = ET.SubElement(dist, tag.format(**ns))
-                    el.text = val
+                    if text_val:
+                        el.text = text_val
+                    if attrs_val:
+                        el.attrib.update(attrs_val)
 
     def _etree_tostring(self, root):
         return ET.tostring(
