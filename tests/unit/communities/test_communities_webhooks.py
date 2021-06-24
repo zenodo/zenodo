@@ -104,7 +104,7 @@ def test_basic_webhooks(
             'token': 'some-token'
         }
         assert call_kwargs['json']['event_type'] == \
-            'community.records.accepted'
+            'community.records.addition'
         assert call_kwargs['json']['context'] == {
             'community': 'c1',
             'user': 1,

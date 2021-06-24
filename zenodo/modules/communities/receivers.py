@@ -44,5 +44,5 @@ def send_record_accepted_webhook(
     dispatch_webhook.delay(
         community_id=str(community.id),
         record_id=str(record.id),
-        event_type='community.records.accepted',
+        event_type='community.records.addition',
     )
