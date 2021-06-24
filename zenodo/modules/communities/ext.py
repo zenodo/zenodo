@@ -26,11 +26,15 @@
 
 from __future__ import absolute_import, print_function
 
-from invenio_communities.signals import community_created
+from invenio_communities.signals import community_created, \
+    inclusion_request_created
 
 from zenodo.modules.spam.utils import check_and_handle_spam
 
 from . import config
+from .receivers import send_inclusion_request_webhook, \
+    send_record_accepted_webhook
+from .signals import record_accepted
 
 
 class ZenodoCommunities(object):
@@ -59,6 +63,10 @@ class ZenodoCommunities(object):
         """Register Zenodo Deposit signals."""
         community_created.connect(
             community_spam_checking_receiver, sender=app, weak=False)
+        inclusion_request_created.connect(
+            send_inclusion_request_webhook, sender=app, weak=False)
+        record_accepted.connect(
+            send_record_accepted_webhook, sender=app, weak=False)
 
 
 def community_spam_checking_receiver(sender, community):

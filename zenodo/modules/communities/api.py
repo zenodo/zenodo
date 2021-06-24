@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import
 
+from flask.globals import current_app
 from invenio_communities.errors import InclusionRequestMissingError
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
@@ -34,6 +35,8 @@ from invenio_pidstore.models import PersistentIdentifier
 from six import string_types, text_type
 
 from zenodo.modules.records.api import ZenodoRecord
+
+from .signals import record_accepted
 
 
 class ZenodoCommunity(object):
@@ -145,6 +148,12 @@ class ZenodoCommunity(object):
                     child.get_assigned_object())
                 self.community.add_record(rec)
                 rec.commit()
+                record_accepted.send(
+                    current_app._get_current_object(),
+                    record=rec,
+                    community=self.community,
+                )
+
             pending_q.delete(synchronize_session=False)
 
     def reject_record(self, record, pid=None):

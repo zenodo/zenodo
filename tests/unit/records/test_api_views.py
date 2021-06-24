@@ -22,11 +22,12 @@
 
 """Unit tests Zenodo JSON deserializer."""
 
+from urlparse import parse_qs, urlparse
+
 import pytest
 from flask import url_for
 from invenio_indexer.api import RecordIndexer
 from invenio_search import current_search
-from urlparse import urlparse, parse_qs
 
 
 @pytest.mark.parametrize(('val', 'status', 'error_message'), [

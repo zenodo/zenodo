@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015 CERN.
+# Copyright (C) 2015-2021 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -40,3 +40,25 @@ ZENODO_COMMUNITIES_REQUEST_IF_GRANTS = ['ecfunded', ]
 
 ZENODO_COMMUNITIES_ADD_IF_GRANTS = []
 """Communities which are to be auto-added if record has grants."""
+
+ZENODO_COMMUNITIES_WEBHOOKS = {}
+"""Webhook sending configurations for community inclusion requests.
+
+Example configuration:
+
+.. code-block:: python
+
+    ZENODO_COMMUNITIES_WEBHOOKS = {
+        'astrophysics': {
+            'example_recipient_id': {
+                'url': 'https://example.org/webhooks/zenodo',
+                'headers': {
+                    'X-Custom-Auth': 'foobar',
+                },
+                'params': {
+                    'token': 'some-token',
+                }
+            },
+        }
+    }
+"""
