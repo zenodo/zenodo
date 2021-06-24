@@ -32,8 +32,8 @@ from .tasks import dispatch_webhook
 def send_inclusion_request_webhook(sender, request=None, **kwargs):
     """Signal receiver to send webhooks after a community inclusion request."""
     dispatch_webhook.delay(
-        community_id=request.id_community,
-        record_id=request.id_record,
+        community_id=str(request.id_community),
+        record_id=str(request.id_record),
         event_type='community.records.inclusion',
     )
 
@@ -42,7 +42,7 @@ def send_record_accepted_webhook(
         sender, record=None, community=None, **kwargs):
     """Signal receiver to send webhooks on a record accepted in a community."""
     dispatch_webhook.delay(
-        community_id=community.id,
+        community_id=str(community.id),
         record_id=str(record.id),
         event_type='community.records.accepted',
     )
