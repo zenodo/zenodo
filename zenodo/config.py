@@ -64,7 +64,7 @@ from invenio_openaire.config import OPENAIRE_REST_DEFAULT_SORT, \
     OPENAIRE_REST_SORT_OPTIONS
 from invenio_opendefinition.config import OPENDEFINITION_REST_ENDPOINTS
 from invenio_pidrelations.config import RelationType
-from invenio_records_rest.facets import terms_filter, range_filter
+from invenio_records_rest.facets import range_filter, terms_filter
 from invenio_records_rest.sorter import geolocation_sort
 from invenio_records_rest.utils import allow_all
 from invenio_stats.aggregations import StatAggregator
