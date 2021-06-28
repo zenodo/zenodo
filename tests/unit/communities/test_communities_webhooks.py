@@ -63,6 +63,7 @@ def test_basic_webhooks(
     with mock.patch(
             'zenodo.modules.communities.tasks.requests.post') as requests_mock:
         published_deposit = publish_and_expunge(db, deposit)
+        import ipdb; ipdb.set_trace()
         recid, record = published_deposit.fetch_published()
         calls = requests_mock.call_args_list
         assert len(calls) == 1

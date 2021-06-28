@@ -36,7 +36,7 @@ from flask import current_app
 from invenio_communities.models import Community
 
 from zenodo.modules.records.api import ZenodoRecord
-from zenodo.modules.records.serializers import json_v1
+from zenodo.modules.records.serializers import legacyjson_v1
 
 
 @shared_task(ignore_results=True)
@@ -50,7 +50,8 @@ def dispatch_webhook(community_id, record_id, event_type):
     # TODO: Extract to a utility?
     record = ZenodoRecord.get_record(record_id)
     community = Community.query.get(community_id)
-    record_payload = json_v1.transform_record(record.pid, record)
+    # TODO: Make configurable
+    record_payload = legacyjson_v1.transform_record(record.pid, record)
     payload = {
         "timestamp": datetime.utcnow().isoformat(),
         "id": str(uuid.uuid4()),
