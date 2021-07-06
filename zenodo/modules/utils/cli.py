@@ -32,6 +32,7 @@ from io import SEEK_END, SEEK_SET
 
 import click
 from flask.cli import with_appcontext
+from invenio_cache import current_cache
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
 from invenio_pidstore.models import PersistentIdentifier
@@ -46,6 +47,8 @@ from .grants import OpenAIREGrantsDump
 from .openaire import OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
     sync_record_oai, update_oaisets_cache, update_search_pattern_sets
+from ..records.resolvers import record_resolver
+from ..openaire.tasks import openaire_direct_index
 
 
 @click.group()
@@ -407,3 +410,33 @@ def update_openaire_communities(path):
         unresolved_communities, indent=4, separators=(', ', ': '))))
     click.secho('{0}'.format(json.dumps(mapping, indent=4,
                                         separators=(', ', ': '))), fg='blue')
+
+def _iter_openaire_direct_index_keys():
+    return current_cache.cache._read_clients.scan_iter(
+        match=(current_cache.cache.key_prefix + 'openaire_direct_index*'))
+
+@utils.command('list_failed_openaire_records')
+@with_appcontext
+def list_failed_openaire_records():
+    """Lists records that failed to get indexed in OpenAIRE."""
+    failed_record_recids = []
+    for key in _iter_openaire_direct_index_keys():
+        recid = key.split('openaire_direct_index:')[1]
+        failed_record_recids.append(key)
+    click.echo('\n'.join(failed_record_recids))
+
+
+@utils.command('index_failed_openaire_records')
+@click.option('--eager', '-e', default=False)
+@with_appcontext
+def retry_indexing_failed_openaire_records(eager):
+    """Retries indexing of records that failed to get indexed in OpenAIRE."""
+    for key in _iter_openaire_direct_index_keys():
+        recid = key.split('openaire_direct_index:')[1]
+        recid, record  = record_resolver.resolve(recid)
+        click.echo("Indexing record with id {}".format(recid))
+        if eager:
+            openaire_direct_index(str(recid.object_uuid), retry=False)
+        else:
+            openaire_direct_index.delay(
+                str(recid.object_uuid), retry=False)

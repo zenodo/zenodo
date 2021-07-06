@@ -58,7 +58,7 @@ def _openaire_request_factory(headers=None, auth=None):
 
 @shared_task(ignore_result=True, max_retries=6,
              default_retry_delay=4 * 60 * 60, rate_limit='100/m')
-def openaire_direct_index(record_uuid):
+def openaire_direct_index(record_uuid, retry=True):
     """Send record for direct indexing at OpenAIRE.
 
     :param record_uuid: Record Metadata UUID.
@@ -98,7 +98,10 @@ def openaire_direct_index(record_uuid):
         recid = record.get('recid')
         current_cache.set('openaire_direct_index:{}'.format(recid),
                           datetime.now(), timeout=-1)
-        openaire_direct_index.retry(exc=exc)
+        if retry:
+            openaire_direct_index.retry(exc=exc)
+        else:
+            raise exc
 
 
 @shared_task(ignore_result=True, max_retries=6,
