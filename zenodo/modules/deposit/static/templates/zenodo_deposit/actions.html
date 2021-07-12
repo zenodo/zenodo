@@ -3,10 +3,11 @@
     <li class="pull-left">
       <button
         class="btn btn-danger"
+        data-toggle="modal"
+        data-target="#warningDeleteModal"
         ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
         ng-disabled="recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self"
-        ng-attr-title="{{(recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self) && 'Record was not saved yet.' || 'Delete the deposit'}}"
-        ng-click="recordsVM.actionHandler(['self', 'DELETE'], recordsVM.invenioRecordsArgs.templateParams.is_new_version ? 'latest_html' : '/deposit')">
+        ng-attr-title="{{(recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self) && 'Record was not saved yet.' || 'Delete the deposit'}}">
         <i class="fa fa-trash-o fa-inverse"></i> {{ recordsVM.invenioRecordsArgs.templateParams.is_new_version ? 'Discard version' : 'Delete' }}
       </button>
     </li>
@@ -35,22 +36,11 @@
         class="btn btn-primary"
         data-toggle="modal"
         data-target="#warningModal"
-        ng-hide="recordsVM.invenioRecordsArgs.templateParams.is_published"
-        ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading || (filesVM.files | checkAllFilesUploaded) || filesVM.files.length == 0"
-        ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' 
-        || (filesVM.files | checkAllFilesUploaded) && 'There are pending files to be uploaded' 
-        || (filesVM.files.length == 0) && 'You need to upload at least one file' 
-        || 'Publish the record'}}">
-        <i class="fa fa-check"></i> Publish
-      </button>
-    </li>
-    <li>
-      <button
-        class="btn btn-primary"
-        ng-hide="!recordsVM.invenioRecordsArgs.templateParams.is_published"
         ng-disabled="depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading"
-        ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' || 'Publish the record'}}"
-        ng-click="recordsVM.actionHandler(['publish', 'POST'], 'record_html')">
+        ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first'
+        || (filesVM.files | checkAllFilesUploaded) && 'There are pending files to be uploaded'
+        || (filesVM.files.length == 0) && 'You need to upload at least one file'
+        || 'Publish the record'}}">
         <i class="fa fa-check"></i> Publish
       </button>
     </li>
@@ -82,6 +72,34 @@
           ng-attr-title="{{(depositionForm.$invalid || depositionForm.$dirty || recordsVM.invenioRecordsLoading) && 'You need to save your deposit first' || 'Publish the record'}}"
           ng-click="recordsVM.actionHandler(['publish', 'POST'], 'record_html')">
           <i class="fa fa-check"></i> I understand
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="warningDeleteModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">Warning</h4>
+      </div>
+      <div class="modal-body">
+        <strong>Once this draft upload is deleted, any reserved DOIs, uploaded files and metadata will be lost.</strong>
+        <br />
+        Please, make sure that this is the correct draft upload you wish to delete before proceeding.
+        <br />
+        <br />
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button
+          class="btn btn-danger"
+          data-dismiss="modal"
+          ng-attr-title="{{(recordsVM.invenioRecordsLoading || !recordsVM.invenioRecordsEndpoints.self) && 'Record was not saved yet.' || 'Delete the deposit'}}"
+          ng-click="recordsVM.actionHandler(['self', 'DELETE'], recordsVM.invenioRecordsArgs.templateParams.is_new_version ? 'latest_html' : '/deposit')">
+          <i class="fa fa-trash-o fa-inverse"></i> Delete
         </button>
       </div>
     </div>
