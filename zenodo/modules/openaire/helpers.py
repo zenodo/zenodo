@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+import urllib
 import hashlib
 
 from flask import current_app
@@ -132,27 +133,27 @@ def openaire_original_id(record, oatype):
 def openaire_link(record):
     """Compute an OpenAIRE link."""
     oatype = openaire_type(record)
-    oaid = _openaire_id(record, oatype)
+    doi = record.get('doi')
 
     if oatype == _OAType.publication:
-        return '{}/search/publication?articleId={}'.format(
+        return '{}/search/publication?pid={}'.format(
             current_app.config['OPENAIRE_PORTAL_URL'],
-            oaid,
+            urllib.quote(doi),
         )
     elif oatype == _OAType.dataset:
-        return '{}/search/dataset?datasetId={}'.format(
+        return '{}/search/dataset?pid={}'.format(
             current_app.config['OPENAIRE_PORTAL_URL'],
-            oaid,
+            urllib.quote(doi),
         )
     elif oatype == _OAType.software:
-        return '{}/search/software?softwareId={}'.format(
+        return '{}/search/software?pid={}'.format(
             current_app.config['OPENAIRE_PORTAL_URL'],
-            oaid,
+            urllib.quote(doi),
         )
     elif oatype == _OAType.other:
-        return '{}/search/other?orpId={}'.format(
+        return '{}/search/other?pid={}'.format(
             current_app.config['OPENAIRE_PORTAL_URL'],
-            oaid,
+            urllib.quote(doi),
         )
     return None
 
