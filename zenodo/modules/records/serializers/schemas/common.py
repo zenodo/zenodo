@@ -68,6 +68,7 @@ URLS = {
     'grant': '{base}/grants/{id}',
     'object': '{base}/files/{bucket}/{key}',
     'deposit_html': '{base}/deposit/{id}',
+    'deposit_file': '{base}/deposit/depositions/{id}/files/{file_id}',
     'deposit': '{base}/deposit/depositions/{id}',
     'record_html': '{base}/record/{id}',
     'record_file': '{base}/record/{id}/files/{filename}',

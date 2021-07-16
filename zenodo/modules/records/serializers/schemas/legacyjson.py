@@ -65,23 +65,18 @@ class FileSchemaV1(Schema):
 
     def dump_links(self, obj):
         """Dump links."""
-        links = {}
-
-        try:
-            links['download'] = url_for(
-                'invenio_files_rest.object_api',
-                bucket_id=obj.get('bucket'),
+        links = {
+            'download': common.api_link_for(
+                'object',
+                bucket=obj.get('bucket'),
                 key=obj.get('key'),
-                _external=True,
-            )
-            links['self'] = url_for(
-                'invenio_deposit_rest.depid_file',
-                pid_value=self.context['pid'].pid_value,
-                key=obj.get('file_id'),
-                _external=True,
-            )
-        except BuildError:
-            pass
+            ),
+            'self': common.api_link_for(
+                'deposit_file',
+                id=self.context['pid'].pid_value,
+                file_id=obj.get('file_id'),
+            ),
+        }
 
         if not links:
             return missing
