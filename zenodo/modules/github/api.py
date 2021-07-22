@@ -56,7 +56,7 @@ class ZenodoGitHubRelease(GitHubRelease):
         output = dict(self.defaults)
         if self.use_extra_metadata:
             output.update(self.extra_metadata)
-
+            output.update(self.citation_metadata)
         # Add creators if not specified
         if 'creators' not in output:
             output['creators'] = get_contributors(self.gh.api,

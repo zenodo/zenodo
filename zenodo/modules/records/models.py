@@ -257,3 +257,12 @@ class ObjectType(object):
         oa_type = value['resource_type'].get('openaire_subtype')
         if oa_type and is_valid_openaire_type(value['resource_type'], comms):
             return 'openaire:' + oa_type
+
+
+    @classmethod
+    def get_cff_type(cls, value):
+        resource_type_obj = cls.index_internal_id
+        for key in resource_type_obj:
+            if value == resource_type_obj[key].get('cff'):
+                return resource_type_obj[key]['internal_id']
+        return None

@@ -46,6 +46,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import os
 from datetime import timedelta
+from functools import partial
 
 import jsonref
 from celery.schedules import crontab
@@ -79,7 +80,7 @@ from zenodo.modules.records.permissions import deposit_delete_permission_factory
     record_create_permission_factory
 from zenodo.modules.stats import current_stats_search_client
 from zenodo.modules.theme.ext import useragent_and_ip_limit_key
-
+from zenodo.modules.github.schemas import CitationMetadataSchema
 
 def _(x):
     """Identity function for string extraction."""
@@ -372,8 +373,13 @@ GITHUB_RELEASE_CLASS = 'zenodo.modules.github.api:ZenodoGitHubRelease'
 GITHUB_DEPOSIT_CLASS = 'zenodo.modules.deposit.api:ZenodoDeposit'
 #: GitHub PID fetcher
 GITHUB_PID_FETCHER = 'zenodo_doi_fetcher'
-#: GitHub metdata file
+#: GitHub metadata file
 GITHUB_METADATA_FILE = '.zenodo.json'
+#: GitHub citation file
+GITHUB_CITATION_FILE = 'CITATION.cff'
+#: Github Citation Metadata Schema
+GITHUB_CITATION_METADATA_SCHEMA = partial(
+    CitationMetadataSchema, context={'replace_refs': True})
 #: GitHub error handlers
 GITHUB_ERROR_HANDLERS = [
     (

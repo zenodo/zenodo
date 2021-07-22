@@ -40,6 +40,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from invenio_records.api import Record
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
+from marshmallow.fields import DateTime
 from six import string_types
 from six.moves.urllib.parse import quote
 from werkzeug.routing import BuildError
