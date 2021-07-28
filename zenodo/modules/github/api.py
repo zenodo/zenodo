@@ -55,8 +55,15 @@ class ZenodoGitHubRelease(GitHubRelease):
         """Return extracted metadata."""
         output = dict(self.defaults)
         if self.use_extra_metadata:
-            output.update(self.extra_metadata)
-            output.update(self.citation_metadata)
+            extra_metadata = self.extra_metadata
+            # If `.zenodo.json` is there use it
+            if extra_metadata:
+                output.update(extra_metadata)
+            # If not check for `CITATION.cff` and use
+            else:
+                citation_metadata = self.citation_metadata
+                if citation_metadata:
+                    output.update(citation_metadata)
         # Add creators if not specified
         if 'creators' not in output:
             output['creators'] = get_contributors(self.gh.api,
