@@ -30,10 +30,12 @@ import idutils
 import pycountry
 from flask import current_app, request
 from marshmallow import Schema, fields, missing, pre_dump
+from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
+from invenio_iiif.utils import ui_iiif_image_url
 
 from ...models import ObjectType
 from ..fields import DateString, SanitizedHTML, SanitizedUnicode
-from .common import ui_link_for
+from .common import api_link_for, ui_link_for
 
 
 def _serialize_identifiers(ids, relations=None):
@@ -299,7 +301,33 @@ class ScholarlyArticle(CreativeWork):
 class ImageObject(CreativeWork):
     """Marshmallow schema for schema.org/ImageObject."""
 
-    pass
+    # The first image file of the record
+    contentUrl = fields.Method('get_content_url')
+    # The thumb250 URL of the record
+    thumbnailUrl = fields.Method('get_thumbnail_url')
+
+    def get_content_url(self, obj):
+        """Dump contentUrl."""
+        files = obj.get('metadata', {}).get('_files', [])
+        for f in files:
+            if f.get('type') in thumbnail_exts:
+                return api_link_for('object', **f)
+        return missing
+
+    def get_thumbnail_url(self, obj):
+        """Dump thumbnailUrl."""
+        files = obj.get('metadata', {}).get('_files', [])
+        for f in files:
+            if f.get('type') in thumbnail_exts:
+                return api_link_for(
+                    'thumbnail',
+                    path=ui_iiif_image_url(
+                        f,
+                        size='{},'.format(250),
+                        image_format='png' if f['type'] == 'png' else 'jpg',
+                    )
+                )
+        return missing
 
 
 class Collection(CreativeWork):
