@@ -356,3 +356,47 @@ def test_dataset(app, users, minimal_record_model, recid_pid):
                 dict(metadata=minimal_record_model))
             assert not err
             assert 'distribution' not in data
+
+
+def test_image(app, users, minimal_record_model, recid_pid):
+    """Testing the dumping of thumbnails in Image objects."""
+    with app.test_request_context():
+        datastore = app.extensions['security'].datastore
+        login_user(datastore.get_user(users[0]['email']))
+        assert minimal_record_model['access_right'] == 'open'
+        minimal_record_model['resource_type'] = dict(
+            type='image', subtype='figure')
+        minimal_record_model['_files'] = [
+            {
+                'bucket': '22222222-2222-2222-2222-222222222222',
+                'version_id': '11111111-1111-1111-1111-111111111111',
+                'file_id': '22222222-3333-4444-5555-666666666666',
+                'checksum': 'md5:11111111111111111111111111111111',
+                'key': 'test',
+                'size': 4,
+                'type': 'txt',
+            },
+            {
+                'bucket': '22222222-2222-2222-2222-222222222222',
+                'version_id': '11111111-1111-1111-1111-111111111112',
+                'file_id': '22222222-3333-4444-5555-666666666667',
+                'checksum': 'md5:11111111111111111111111111111112',
+                'key': 'figure.png',
+                'size': 1000000,
+                'type': 'png',
+            },
+        ]
+
+        data, err = schemaorg.ImageObject().dump(
+            dict(metadata=minimal_record_model))
+        assert not err
+        assert data['contentUrl'] == (
+            u'http://localhost/api/files'
+            u'/22222222-2222-2222-2222-222222222222/figure.png'
+            )
+        assert data['thumbnailUrl'] == (
+            u'http://localhost/api/iiif/v2'
+            u'/22222222-2222-2222-2222-222222222222'
+            u':11111111-1111-1111-1111-111111111112:figure.png'
+            u'/full/250,/0/default.png'
+        )

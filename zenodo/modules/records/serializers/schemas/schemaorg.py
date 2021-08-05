@@ -319,7 +319,7 @@ class ImageObject(CreativeWork):
         files = obj.get('metadata', {}).get('_files', [])
         for f in files:
             if f.get('type') in thumbnail_exts:
-                return api_link_for(
+                return ui_link_for(
                     'thumbnail',
                     path=ui_iiif_image_url(
                         f,
