@@ -25,19 +25,18 @@
 """GitHub schemas."""
 
 from __future__ import absolute_import, print_function, unicode_literals
+
 import arrow
-
-from invenio_records_rest.schemas.fields import GenMethod
+import idutils
 import six
-
-from zenodo.modules.records.serializers.schemas.common import RefResolverMixin
-
+from invenio_records_rest.schemas.fields import GenMethod
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
 
 from zenodo.modules.records.models import ObjectType
-
-from zenodo.modules.records.serializers.fields import DateString, SanitizedHTML, SanitizedUnicode, PersistentId
+from zenodo.modules.records.serializers.fields import DateString, \
+    PersistentId, SanitizedHTML, SanitizedUnicode
+from zenodo.modules.records.serializers.schemas.common import RefResolverMixin
 
 
 class AuthorSchema(Schema):
@@ -84,8 +83,10 @@ class CitationMetadataSchema(Schema, RefResolverMixin):
     notes = SanitizedHTML(load_from='message')
 
     # TODO: Add later
-    # alternate_identifiers = fields.Raw(load_from='identifiers')
-    # related_identifiers = fields.Raw(load_from='references')
+    related_identifiers = fields.Method(
+        deserialize="load_related_identifiers", load_from='references')
+    alternate_identifiers = GenMethod(
+        deserialize="load_alternate_identifiers")
 
     def load_publicationdate(self, data):
         """Default publication date."""
@@ -132,59 +133,58 @@ class CitationMetadataSchema(Schema, RefResolverMixin):
         "website": "other"
     }
 
-    # @pre_load()
-    # def preload_related_identifiers(self, data):
-    #     """Default publication date."""
-    #     final = []
-    #     for reference in data['references']:
-    #         resource_type = reference['type']
-    #         if self.subschema.get(resource_type):
-    #             resource_type = self.subschema[resource_type]
-    #         else:
-    #             resource_type = ObjectType.get_cff_type(resource_type)
-    #         # data-type grab instead?
-    #         for item in reference['identifiers']:
-    #             schemes = idutils.detect_identifier_schemes(item['value'])
-    #             if not schemes or (item['type'] not in schemes):
-    #                 errors = self.context['release'].errors
-    #                 cff_errors = errors.get('CITATION.cff', [])
-    #                 cff_errors.append(
-    #                     'We could not process the identifier: {} in our system'
-    #                     .format(item['value']))
-    #                 errors['CITATION.cff'] = cff_errors
-    #                 continue
-    #             final.append({
-    #                 'identifier': item['value'],
-    #                 'scheme': item['type'],
-    #                 'resource_type': resource_type,
-    #                 'relation': 'references'
-    #             })
-    #     data['references'] = final
+    def load_related_identifiers(self, data):
+        """Default publication date."""
+        final_object = []
+        for reference in data:
+            resource_type = reference.get('type', 'other')
+            if self.subschema.get(resource_type):
+                resource_type = self.subschema[resource_type]
+            else:
+                resource_type = ObjectType.get_cff_type(resource_type)
+            # data-type grab instead?
+            for item in reference.get('identifiers', []):
+                schemes = idutils.detect_identifier_schemes(
+                    item.get('value', 'other'))
+                if not schemes or (item.get('type', 'other') not in schemes):
+                    # errors = self.context['release'].errors
+                    # cff_errors = errors.get('CITATION.cff', [])
+                    # cff_errors.append(
+                    #     'We could not process the identifier: {} in our system'
+                    #     .format(item['value']))
+                    # errors['CITATION.cff'] = cff_errors
+                    continue
+                final_object.append({
+                    'identifier': item['value'],
+                    'scheme': item['type'],
+                    'resource_type': resource_type,
+                    'relation': 'references'
+                })
+        return final_object
 
-    # @pre_load()
-    # def preload_alternate_identifiers(self, data):
-    #     """Default publication date."""
-    #     final = []
-    #     resource_type = data.get('type', 'other')
-    #     if self.subschema.get(resource_type):
-    #         resource_type = self.subschema[resource_type]
-    #     else:
-    #         resource_type = ObjectType.get_cff_type(resource_type)
-    #     # data-type grab instead?
+    def load_alternate_identifiers(self, value, data):
+        """Default publication date."""
+        final_object = []
+        resource_type = data.get('type', 'other')
+        if self.subschema.get(resource_type):
+            resource_type = self.subschema[resource_type]
+        else:
+            resource_type = ObjectType.get_cff_type(resource_type)
+        # data-type grab instead?
 
-    #     for item in data.get('identifiers', []):
-    #         schemes = idutils.detect_identifier_schemes(item['value'])
-    #         if not schemes or (item['type'] not in schemes):
-    #             errors = self.context['release'].errors
-    #             cff_errors = errors.get('CITATION.cff', [])
-    #             cff_errors.append(
-    #                 'We could not process the identifier: {} in our system'
-    #                 .format(item['value']))
-    #             errors['CITATION.cff'] = cff_errors
-    #             continue
-    #         final.append({
-    #             'identifier': item['value'],
-    #             'scheme': item['type'],
-    #             'resource_type': resource_type
-    #             })
-    #     data['identifiers'] = final
+        for item in data.get('identifiers', []):
+            schemes = idutils.detect_identifier_schemes(item.get('value', ''))
+            if not schemes or (item.get('type', 'other') not in schemes):
+                # errors = self.context['release'].errors
+                # cff_errors = errors.get('CITATION.cff', [])
+                # cff_errors.append(
+                #     'We could not process the identifier: {} in our system'
+                #     .format(item['value']))
+                # errors['CITATION.cff'] = cff_errors
+                continue
+            final_object.append({
+                'identifier': item.get('value'),
+                'scheme': item.get('type'),
+                'resource_type': resource_type
+                })
+        return final_object

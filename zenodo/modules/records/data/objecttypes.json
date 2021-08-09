@@ -89,6 +89,7 @@
     "resourceType": "0021",
     "type": "dataset"
   },
+  "cff": "data",
   "csl": "dataset"
 },
 {
@@ -135,6 +136,7 @@
     "resourceType": "0033",
     "type": "dataset"
   },
+  "cff": "video",
   "csl": "motion_picture"
 },
 {
@@ -154,6 +156,7 @@
     "type": "software"
   },
   "schema.org": "https://schema.org/SoftwareSourceCode",
+  "cff": "software",
   "csl": "article"
 },
 {
@@ -211,6 +214,7 @@
     "resourceType": "0020",
     "type": "other"
   },
+  "cff": "other",
   "csl": "article"
 },
 {
@@ -231,6 +235,7 @@
     "resourceType": "0002",
     "type": "publication"
   },
+  "cff": "book",
   "csl": "book"
 },
 {
@@ -271,6 +276,7 @@
     "resourceType": "0004",
     "type": "publication"
   },
+  "cff": "conference-paper",
   "csl": "paper-conference"
 },
 {
@@ -291,6 +297,7 @@
     "resourceType": "0001",
     "type": "publication"
   },
+  "cff": "article",
   "csl": "article-journal"
 },
 {
@@ -351,6 +358,7 @@
     "resourceType": "0017",
     "type": "publication"
   },
+  "cff": "report",
   "csl": "article"
 },
 {
@@ -391,6 +399,7 @@
     "resourceType": "0006",
     "type": "publication"
   },
+  "cff": "thesis",
   "csl": "thesis"
 },
 {

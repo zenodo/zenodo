@@ -36,6 +36,7 @@ from invenio_opendefinition.resolvers import license_resolver
 from invenio_opendefinition.validators import license_validator
 from invenio_pidstore.errors import PIDDoesNotExistError
 from invenio_records.api import Record
+from invenio_pidstore.errors import PIDAlreadyExists
 
 from .utils import read_json
 
@@ -168,9 +169,15 @@ def loadlicenses():
                     pid, record = license_resolver.resolve(alt_pid)
                     license_minter(record.id, lic)
                 except PIDDoesNotExistError:
-                    create_new_license(lic)
+                    try:
+                        create_new_license(lic)
+                    except PIDAlreadyExists:
+                        db.session.rollback()
             else:
-                create_new_license(lic)
+                try:
+                    create_new_license(lic)
+                except PIDAlreadyExists:
+                    db.session.rollback()
         db.session.commit()
     except Exception:
         db.session.rollback()
