@@ -85,6 +85,7 @@ ZENODO_RELATION_TYPES = [
     ('isSupplementedBy', _('Supplementary material')),
     ('references', _('References')),
     ('isReferencedBy', _('Referenced by')),
+    ('isPublishedIn', _('Published in')),
     ('isNewVersionOf', _('Previous versions')),
     ('isPreviousVersionOf', _('New versions')),
     ('isContinuedBy', _('Continued by')),

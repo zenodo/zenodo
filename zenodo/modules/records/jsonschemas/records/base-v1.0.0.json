@@ -165,7 +165,8 @@
         "requires",
         "isRequiredBy",
         "isObsoletedBy",
-        "obsoletes"
+        "obsoletes",
+        "isPublishedIn"
       ]
     }
   },
