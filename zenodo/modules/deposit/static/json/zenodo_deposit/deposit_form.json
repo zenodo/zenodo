@@ -676,6 +676,10 @@
                 "name": "references this upload"
               },
               {
+                "value": "isPublishedIn",
+                "name": "published this upload"
+              },
+              {
                 "value": "isNewVersionOf",
                 "name": "is previous version of this upload"
               },

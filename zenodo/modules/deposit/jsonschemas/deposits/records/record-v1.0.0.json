@@ -128,7 +128,8 @@
         "requires",
         "isRequiredBy",
         "isObsoletedBy",
-        "obsoletes"
+        "obsoletes",
+        "isPublishedIn"
       ],
       "type": "string"
     },
@@ -881,7 +882,8 @@
               "requires",
               "isRequiredBy",
               "isObsoletedBy",
-              "obsoletes"
+              "obsoletes",
+              "isPublishedIn"
             ],
             "type": "string"
           },
