@@ -224,7 +224,7 @@
     "en": "Books"
   },
   "schema.org": "https://schema.org/Book",
-  "datacite": {"general": "Text", "type": "Book"},
+  "datacite": {"general": "Book"},
   "eurepo": "info:eu-repo/semantics/book",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
@@ -244,7 +244,7 @@
     "en": "Book sections"
   },
   "schema.org": "https://schema.org/ScholarlyArticle",
-  "datacite": {"general": "Text", "type": "Book section"},
+  "datacite": {"general": "BookChapter"},
   "eurepo": "info:eu-repo/semantics/bookPart",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
@@ -264,7 +264,7 @@
     "en": "Conference papers"
   },
   "schema.org": "https://schema.org/ScholarlyArticle",
-  "datacite": {"general": "Text", "type": "Conference paper"},
+  "datacite": {"general": "ConferencePaper"},
   "eurepo": "info:eu-repo/semantics/conferencePaper",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
@@ -284,7 +284,7 @@
     "en": "Journal articles"
   },
   "schema.org": "https://schema.org/ScholarlyArticle",
-  "datacite": {"general": "Text", "type": "Journal article"},
+  "datacite": {"general": "JournalArticle"},
   "eurepo": "info:eu-repo/semantics/article",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
@@ -324,7 +324,7 @@
     "en": "Preprints"
   },
   "schema.org": "https://schema.org/ScholarlyArticle",
-  "datacite": {"general": "Text", "type": "Preprint"},
+  "datacite": {"general": "Preprint"},
   "eurepo": "info:eu-repo/semantics/preprint",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
@@ -344,7 +344,7 @@
     "en": "Reports"
   },
   "schema.org": "https://schema.org/ScholarlyArticle",
-  "datacite": {"general": "Text", "type": "Report"},
+  "datacite": {"general": "Report"},
   "eurepo": "info:eu-repo/semantics/report",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
@@ -644,7 +644,7 @@
     "en": "Data management plans"
   },
   "schema.org": "https://schema.org/CreativeWork",
-  "datacite": {"general": "Text", "type": "Data Management Plan"},
+  "datacite": {"general": "OutputManagementPlan"},
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
