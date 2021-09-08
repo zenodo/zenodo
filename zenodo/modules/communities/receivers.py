@@ -41,7 +41,6 @@ def send_inclusion_request_webhook(sender, request=None, **kwargs):
 def send_record_accepted_webhook(
         sender, record=None, community=None, community_id=None, **kwargs):
     """Signal receiver to send webhooks on a record accepted in a community."""
-    import ipdb; ipdb.set_trace()
     dispatch_webhook.delay(
         community_id=community_id or str(community.id),
         record_id=str(record.id),
