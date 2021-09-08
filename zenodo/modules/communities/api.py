@@ -25,6 +25,7 @@
 """Zenodo Communities API."""
 
 from __future__ import absolute_import
+from flask import after_this_request, request
 
 from flask.globals import current_app
 from invenio_communities.errors import InclusionRequestMissingError
@@ -148,11 +149,19 @@ class ZenodoCommunity(object):
                     child.get_assigned_object())
                 self.community.add_record(rec)
                 rec.commit()
-                record_accepted.send(
-                    current_app._get_current_object(),
-                    record=rec,
-                    community=self.community,
-                )
+
+                if request:
+                    @after_this_request
+                    def send_signals(response):
+                        try:
+                            record_accepted.send(
+                                current_app._get_current_object(),
+                                record_id=rec.id,
+                                community_id=self.community.id,
+                            )
+                        except Exception:
+                            pass
+                        return response
 
             pending_q.delete(synchronize_session=False)
 

@@ -29,7 +29,7 @@ from __future__ import absolute_import, unicode_literals
 from contextlib import contextmanager
 from copy import copy
 
-from flask import current_app
+from flask import current_app, after_this_request, request
 from flask_security import current_user
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db
@@ -423,13 +423,9 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
 
         record = self._sync_communities(dep_comms, rec_comms, record)
         record.commit()
+
         new_comms = set(record.get('communities', [])) - (rec_comms or set())
-        for community_id in new_comms:
-            record_accepted.send(
-                current_app._get_current_object(),
-                record=record,
-                community_id=community_id,
-            )
+        self._send_community_signals(record, new_comms)
 
         # Update the concept recid redirection
         pv.update_redirect()
@@ -474,14 +470,26 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
 
         edited_record = self._sync_communities(dep_comms, rec_comms,
                                                edited_record)
+
         new_comms = set(edited_record.get('communities', [])) - (rec_comms or set())
-        for community_id in new_comms:
-            record_accepted.send(
-                current_app._get_current_object(),
-                record=edited_record,
-                community_id=community_id,
-            )
+        self._send_community_signals(edited_record, new_comms)
+
         return edited_record
+
+    def _send_community_signals(self, record, communities):
+        for community_id in communities:
+            if request:
+                @after_this_request
+                def send_record_accepted_signal(response):
+                    try:
+                        record_accepted.send(
+                            current_app._get_current_object(),
+                            record_id=record.id,
+                            community_id=community_id,
+                        )
+                    except Exception:
+                        pass
+                    return response
 
     def validate_publish(self):
         """Validate deposit."""
