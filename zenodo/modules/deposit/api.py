@@ -48,6 +48,7 @@ from invenio_sipstore.models import SIP as SIPModel
 from invenio_sipstore.models import RecordSIP as RecordSIPModel
 
 from zenodo.modules.communities.api import ZenodoCommunity
+from zenodo.modules.communities.signals import record_accepted
 from zenodo.modules.records.api import ZenodoFileObject, ZenodoFilesIterator, \
     ZenodoFilesMixin, ZenodoRecord
 from zenodo.modules.records.minters import doi_generator, is_local_doi, \
@@ -422,6 +423,13 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
 
         record = self._sync_communities(dep_comms, rec_comms, record)
         record.commit()
+        new_comms = set(record.get('communities', [])) - (rec_comms or set())
+        for community_id in new_comms:
+            record_accepted.send(
+                current_app._get_current_object(),
+                record=record,
+                community_id=community_id,
+            )
 
         # Update the concept recid redirection
         pv.update_redirect()
@@ -466,6 +474,13 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
 
         edited_record = self._sync_communities(dep_comms, rec_comms,
                                                edited_record)
+        new_comms = set(edited_record.get('communities', [])) - (rec_comms or set())
+        for community_id in new_comms:
+            record_accepted.send(
+                current_app._get_current_object(),
+                record=edited_record,
+                community_id=community_id,
+            )
         return edited_record
 
     def validate_publish(self):

@@ -26,6 +26,8 @@
 
 from __future__ import absolute_import, print_function
 
+from datetime import date, datetime, time, timedelta
+
 from flask import current_app
 from flask_security.utils import hash_password
 from invenio_access.models import ActionUsers
@@ -38,7 +40,8 @@ def loaduser(user_data):
     kwargs = {
         'email': user_data['email'],
         'password': hash_password(user_data['password']),
-        'active': user_data.get('active', True)
+        'active': user_data.get('active', True),
+        'confirmed_at': datetime.utcnow() - timedelta(days=30),
     }
 
     datastore = current_app.extensions['security'].datastore
