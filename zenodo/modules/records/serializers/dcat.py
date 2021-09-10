@@ -170,4 +170,7 @@ class DCATSerializer(object):
 
     def serialize_oaipmh(self, pid, record):
         """Serialize a single record for OAI-PMH."""
-        return self.transform_with_xslt(pid, record, search_hit=True)
+        if isinstance(record["_source"], Record):
+             return self.transform_with_xslt(pid, record["_source"], search_hit=False)
+        else:
+             return self.transform_with_xslt(pid, record, search_hit=True)
