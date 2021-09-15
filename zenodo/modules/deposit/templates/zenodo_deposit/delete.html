@@ -27,29 +27,6 @@
 {% from "invenio_userprofiles/settings/_macros.html" import render_field %}
 
 {%- block page_body %}
-<script>
-  function datesLimit() {
-
-    var created = document.getElementsByName('created_date')[0].content;
-    
-    // .getTime() to get dates in miliseconds
-    var current_date  = new Date().getTime()
-    var creation_record_date = new Date(created).getTime()
-    var date_difference = current_date-creation_record_date;
-
-    // 30 days in miliseconds
-    var threshold = 2592000000
-    
-    if (date_difference > threshold) { 
-      document.write(created.fontcolor("red") );
-    
-    }
-    else { 
-      document.write(created);
-    }
-
-  }
-</script>
 <div class="container record-admin">
   <div class="row">
     <div class="col-xs-12" align="center">
@@ -67,6 +44,11 @@
         <p><h4>Are you ABSOLUTELY sure?</h4> This action <strong>CANNOT</strong> be undone! Deleting a record will
         permanently delete the associated files from disk.</p>
       </div>
+      {% if record.created|date_record_limit %}
+        <div class="alert alert-warning">
+          <p><h4>This record is 1 month old! </h4> This record <strong>SHOULD NOT</strong> be deleted!</p>
+        </div>
+      {% endif %}
     </div>
   </div>
   <div class="row">
@@ -117,23 +99,28 @@
           <li class="list-group-item">
             <h5>UUID</h5>
             <table class="table table-bordered">
-              <tr style="background-color:#fbf8e3">
-                <th>Record ID</th>
-                <th>Revision</th>
-                <th>Creation Date</th>
-                <th>Updated</th>
-              </tr>
-              {%- for owner in owners %}
-              <tr>
-                <td>{{record.id}}</td>
-                <td>{{record.revision_id}}</td>
-  
-                <meta name="created_date" content={{record.created}}/>
-                <td><script>datesLimit();</script></td>
-  
-                <td>{{record.updated}}</td>
-              </tr>
-              {%- endfor %}
+              {% if record.created|date_record_limit %}
+                <tr style="background-color:#df6d69">
+                  <th>Record ID</th>
+                  <th>Revision</th>
+                  <th>Creation Date</th>
+                  <th>Updated</th>
+              {% else %}
+                <tr style="background-color:#fbf8e3">
+                  <th>Record ID</th>
+                  <th>Revision</th>
+                  <th>Creation Date</th>
+                  <th>Updated</th>
+                </tr>
+              {% endif %}
+                {%- for owner in owners %}
+                <tr>
+                  <td>{{record.id}}</td>
+                  <td>{{record.revision_id}}</td>
+                  <td>{{record.created}}</td>
+                  <td>{{record.updated}}</td>
+                </tr>
+                {%- endfor %}
             </table>
           </li>
           <li class="list-group-item">
@@ -249,8 +236,4 @@
   </div>
 </div>
 
-
-
 {%- endblock page_body %}
-
-
