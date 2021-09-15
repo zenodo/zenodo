@@ -66,7 +66,7 @@ def date_record_limit(creation_record_date):
     """Returns ``True`` if ``date_record_limit`` is 30 days older than the ``datetime.now()``"""
 
     if (datetime.now() - creation_record_date).days>30:
-        return False
+        return True
 
     else:
-        return True
+        return False
