@@ -26,6 +26,10 @@
 
 {% from "invenio_userprofiles/settings/_macros.html" import render_field %}
 
+{%- from "zenodo_records/macros/admin.html" import user_info_table, bucket_list, record_info_table -%}
+
+{% set record_past_deletion_time = record.created is older_than(days=30) %}
+
 {%- block page_body %}
 <div class="container record-admin">
   <div class="row">
@@ -44,41 +48,33 @@
         <p><h4>Are you ABSOLUTELY sure?</h4> This action <strong>CANNOT</strong> be undone! Deleting a record will
         permanently delete the associated files from disk.</p>
       </div>
+      {% if record_past_deletion_time %}
+        <div class="alert alert-danger" align="center"
+          <p><h3> ⚠️ This record is 1 month old! ⚠️ </h3></p>
+        </div>
+      {% endif %}
     </div>
   </div>
   <div class="row">
     <div class="col-md-12">
       <div class="panel panel-default">
         <div class="panel-heading">Record and associated objects</div>
-        <ul class="list-group">
+          <div class="panel-body">
+          <h5>Owners</h5>
+          <ul class="list-group">
           {% if owners %}
-            <li class="list-group-item">
-              <h5>Owners</h5>
-              <table class="table table-bordered">
-                <tr>
-                  <th>User ID</th>
-                  <th>Email</th>
-                  <th>Username</th>
-                  <th>Full Name</th>
-                </tr>
-                {%- for owner in owners %}
-                <tr>
-                  <td>{{owner.id}}</td>
-                  <td>{{owner.email}}</td>
-                  <td>{{owner.profile and owner.profile.username}}</td>
-                  <td>{{owner.profile and owner.profile.full_name}}</td>
-                </tr>
-                {%- endfor %}
-              </table>
-            </li>
+            {%- for owner in owners %}
+              {{ user_info_table(owner) }}
+            {%- endfor %}
           {% endif %}
+          </div>
           <li class="list-group-item">
-            <h5>UUID</h5>
-            {{record.id}}, revision {{record.revision_id}} (created: {{record.created}}, updated: {{record.updated}})
+            <h5>Record</h5>
+              {{ record_info_table(record) }}
           </li>
           <li class="list-group-item">
-            <h5>Deposit UUID</h5>
-            {{deposit.id}}, revision {{deposit.revision_id}} (created: {{deposit.created}}, updated: {{deposit.updated}})
+            <h5>Deposit</h5>
+              {{ record_info_table(deposit) }}
           </li>
           <li class="list-group-item">
             <h5>Persistent identifiers</h5>
@@ -110,20 +106,7 @@
                   <strong>Record bucket ({{record.files.bucket}})</strong>
                 </td>
               </tr>
-              <tr>
-                <th>Object</th>
-                <th>URI</th>
-                <th>Size</th>
-                <th>Checksum</th>
-              </tr>
-              {%- for f in record.files %}
-              <tr>
-                <td>{{f.key}}</td>
-                <td>{{f.file.uri}}</td>
-                <td>{{f.file.size}}</td>
-                <td>{{f.file.checksum}}</td>
-              </tr>
-              {%- endfor %}
+              {{ bucket_list(record) }}
               {%- endif %}
               {%- if deposit.files %}
               <tr>
@@ -131,20 +114,7 @@
                   <strong>Deposit bucket ({{deposit.files.bucket}})</strong>
                 </td>
               </tr>
-              <tr>
-                <th>Object</th>
-                <th>URI</th>
-                <th>Size</th>
-                <th>Checksum</th>
-              </tr>
-              {%- for f in deposit.files %}
-              <tr>
-                <td>{{f.key}}</td>
-                <td>{{f.file.uri}}</td>
-                <td>{{f.file.size}}</td>
-                <td>{{f.file.checksum}}</td>
-              </tr>
-              {%- endfor %}
+              {{ bucket_list(deposit) }}
               {%- endif %}
             </table>
           </li>
@@ -174,8 +144,4 @@
   </div>
 </div>
 
-
-
 {%- endblock page_body %}
-
-

@@ -1,0 +1,93 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2015 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+#}
+
+{%- macro user_info_table(user) %}
+<div class="list-group-item col-sm-6">
+    <strong>ID:</strong> {{user.id}}
+</div>
+<div class="list-group-item col-sm-6">
+    <strong>Email:</strong> {{user.email}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Username:</strong> {{user.profile and user.profile.username}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Full name:</strong> {{user.profile and user.profile.full_name}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Active?:</strong> {{user.profile and user.active}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Confirmation Date:</strong> {{user.confirmed_at}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Last login:</strong> {{user.last_login_at}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Current login:</strong> {{user.current_login_at}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Last login IP:</strong> {{user.last_login_ip}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Current login IP:</strong> {{user.current_login_ip}}
+</div>
+<div class="list-group-item col-sm-6">
+  <strong>Login count:</strong> {{user.login_count}}
+</div>
+{%- endmacro %}
+
+{%- macro bucket_list(record) %}
+<tr>
+  <th>Object</th>
+  <th>URI</th>
+  <th>Size</th>
+  <th>Checksum</th>
+</tr>
+{%- for f in record.files %}
+<tr>
+  <td>{{f.key}}</td>
+  <td>{{f.file.uri}}</td>
+  <td>{{f.file.size}}</td>
+  <td>{{f.file.checksum}}</td>
+</tr>
+{%- endfor %}
+{%- endmacro %}
+
+{%- macro record_info_table(record) %}
+<table class="table table-bordered">
+  <tr>
+    <th>ID</th>
+    <th>Revision</th>
+    <th>Creation Date</th>
+    <th>Updated</th>
+  </tr>
+  <tr>
+    <td>{{record.id}}</td>
+    <td>{{record.revision_id}}</td>
+    <td>{{record.created}}</td>
+    <td>{{record.updated}}</td>
+  </tr>
+</table>
+{%- endmacro %}
