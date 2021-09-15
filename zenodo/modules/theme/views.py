@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import bleach
+from datetime import datetime, timedelta
 from flask import Blueprint
 from flask_principal import ActionNeed
 from invenio_access import Permission
@@ -58,3 +59,14 @@ def sanitize_html(value):
 def current_user_is_admin():
     """Returns ``True`` if current user has the ``admin-access`` permission."""
     return Permission(ActionNeed('admin-access')).can()
+
+
+@blueprint.app_template_test('older_than')
+def older_than(dt, **timedelta_kwargs):
+    """Check if a date is older than a provided timedelta.
+
+    :param dt: The datetime to check.
+    :param timedelta_kwargs: Passed to ``datetime.timedelta(...)``.
+    """
+
+    return (datetime.utcnow() - dt) > timedelta(**timedelta_kwargs)

@@ -26,6 +26,8 @@
 
 {% from "invenio_userprofiles/settings/_macros.html" import render_field %}
 
+{%- from "zenodo_records/macros/admin.html" import user_info_table -%}
+
 {%- block page_body %}
 <div class="container record-admin">
   <div class="row">
@@ -48,37 +50,9 @@
         <div class="panel-heading">User</div>
         <div class="panel-body">
           <ul class="list-group">
-            <li class="list-group-item">
-              <strong>ID:</strong> {{user.id}}
-            </li>
-            <li class="list-group-item">
-              <strong>Email:</strong> {{user.email}}
-            </li>
-            <li class="list-group-item">
-              <strong>Active?:</strong> {{user.active}}
-            </li>
-            <li class="list-group-item">
-              <strong>Last login:</strong> {{user.last_login_at}}
-            </li>
-
-            <li class="list-group-item">
-              <strong>Current login:</strong> {{user.current_login_at}}
-            </li>
-
-            <li class="list-group-item">
-              <strong>Last login IP:</strong> {{user.last_login_ip}}
-            </li>
-
-            <li class="list-group-item">
-              <strong>Current login IP:</strong> {{user.current_login_ip}}
-            </li>
-
-            <li class="list-group-item">
-              <strong>Login count:</strong> {{user.login_count}}
-            </li>
+            {{ user_info_table(user) }}
           </ul>
         </div>
-
         <div class="panel-heading">Communities</div>
         <div class="panel-body">
           User has <strong>{{ communities.count() }}</strong> communities.
