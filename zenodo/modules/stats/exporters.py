@@ -34,7 +34,7 @@ from invenio_cache import current_cache
 from invenio_pidstore.errors import PIDDeletedError
 from invenio_search import current_search_client
 from invenio_search.utils import build_alias_name
-from six.moves.urllib.parse import urlencode
+from six.moves.urllib.parse import urlencode, urlsplit, urlunsplit
 
 from zenodo.modules.records.serializers.schemas.common import ui_link_for
 from zenodo.modules.stats.errors import PiwikExportRequestError
@@ -125,6 +125,13 @@ class PiwikExporter:
         oai = record.get('_oai', {}).get('id')
         cvar = json.dumps({'1': ['oaipmhID', oai]})
         action_name = record.get('title')[:150]  # max 150 characters
+        urlref = None
+        if event.referrer:
+            try:
+                scheme, netloc, path, _, _ = urlsplit(event.referrer)
+                urlref = urlunsplit((scheme, netloc, path, None, None))
+            except Exception:
+                pass
 
         params = dict(
             idsite=id_site,
@@ -134,7 +141,7 @@ class PiwikExporter:
             cid=visitor_id,
             cvar=cvar,
             cdt=event.timestamp,
-            urlref=event.referrer,
+            urlref=urlref,
             action_name=action_name
         )
 
