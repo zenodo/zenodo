@@ -86,11 +86,16 @@ class PiwikExporter:
                 except PIDDeletedError:
                     pass
 
+            # Check and bail if the bookmark has progressed, e.g. from another
+            # duplicate task or manual run of the exporter.
+            bookmark = current_cache.get('piwik_export:bookmark')
+            if event_chunk[-1].timestamp < bookmark:
+                return
+
             payload = {
                 'requests': query_strings,
                 'token_auth': token_auth
             }
-
             res = requests.post(url, json=payload, timeout=60)
 
             # Failure: not 200 or not "success"
