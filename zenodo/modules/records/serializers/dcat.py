@@ -63,9 +63,7 @@ class DCATSerializer(object):
 
         def download_url(file, record):
             url = ui_link_for('record_file', id=record['recid'], filename=file['key'])
-            return url, {
-                '{{{rdf}}}resource'.format(**ns): url
-            }
+            return url, {'{{{rdf}}}resource'.format(**ns): url}
 
         def media_type(file, _):
             return mimetypes.guess_type(file['key'])[0], None
@@ -74,7 +72,8 @@ class DCATSerializer(object):
             return str(file['size']), None
 
         def access_url(_, record):
-            return idutils.to_url(record['doi'], 'doi', url_scheme='https'), None
+            url = idutils.to_url(record['doi'], 'doi', url_scheme='https')
+            return url, {'{{{rdf}}}resource'.format(**ns): url}
 
         files_fields = {
             '{{{dcat}}}downloadURL': download_url,
