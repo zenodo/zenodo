@@ -29,7 +29,6 @@ from __future__ import absolute_import, print_function
 import bleach
 
 from .sanitizedunicode import SanitizedUnicode
-
 ALLOWED_TAGS = [
             'a',
             'abbr',
@@ -38,6 +37,7 @@ ALLOWED_TAGS = [
             'blockquote',
             'br',
             'code',
+            'caption',
             'div',
             'em',
             'i',
@@ -50,13 +50,26 @@ ALLOWED_TAGS = [
             'strong',
             'sub',
             'sup',
+            'table',
+            'tbody',
+            'thead',
+            'th',
+            'td',
+            'tr',
             'u',
             'ul',
         ]
 
 ALLOWED_ATTRS = {
             '*': ['class'],
-            'a': ['href', 'title', 'name', 'class', 'rel'],
+            'a': ['href', 'title', 'name', 'rel'],
+            'table': ['title',  'align', 'summary'],
+            'caption': ['class'],
+            'thead': ['title', 'align'],
+            'tbody': ['title', 'align'],
+            'th': ['title', 'scope'],
+            'td': ['title'],
+            'tr': ['title'],
             'abbr': ['title'],
             'acronym': ['title'],
         }

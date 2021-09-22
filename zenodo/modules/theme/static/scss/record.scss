@@ -305,3 +305,15 @@
     font-size: 36px;
   }
 }
+
+.record-description, .record-notes {
+  table {
+    margin: 1rem 0;
+  }
+
+  th, td {
+    border-style: solid;
+    border-width: thin;
+    padding: 0.5rem 2rem;
+  }
+}
