@@ -289,7 +289,7 @@
                 ["PasteText", "PasteFromWord"],
                 ["Bold", "Italic", "Strike", "Subscript", "Superscript"],
                 ["Link", "Unlink"],
-                ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "CodeSnippet"],
+                ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "Table", "CodeSnippet"],
                 ["Undo", "Redo", "Find", "Replace", "RemoveFormat"],
                 ["Mathjax", "SpecialChar"],
                 ["Source"], ["Maximize"]
@@ -368,12 +368,37 @@
         ]
       },
       {
-        "type": "textarea",
-        "key": "notes",
-        "title": "Additional notes",
-        "description": "Optional.",
-        "fa_cls": "fa-pencil",
-        "required": false
+        "type": "section",
+        "htmlClass": "form-ckeditor",
+        "description": "",
+        "notitle": true,
+        "items": [
+          {
+            "type": "ckeditor",
+            "key": "notes",
+            "title": "Additional notes",
+            "ckeditor": {
+              "height": 200,
+              "toolbar": [
+                ["PasteText", "PasteFromWord"],
+                ["Bold", "Italic", "Strike", "Subscript", "Superscript"],
+                ["Link", "Unlink"],
+                ["NumberedList", "BulletedList", "Outdent", "Indent", "Blockquote", "Table", "CodeSnippet"],
+                ["Undo", "Redo", "Find", "Replace", "RemoveFormat"],
+                ["Mathjax", "SpecialChar"],
+                ["Source"], ["Maximize"]
+              ],
+              "extraPlugins": "codesnippet,blockquote,mathjax",
+              "disableNativeSpellChecker": false,
+              "removePlugins": "elementspath",
+              "removeButtons": ""
+            },
+            "fa_cls": "fa-pencil",
+            "description": "Optional.",
+            "required": false,
+            "minLength": 1
+          }
+        ]
       }
     ]
   },

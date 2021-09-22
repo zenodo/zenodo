@@ -72,9 +72,9 @@
         <h5>{{_('Thesis supervisor(s)')}}</h5>
         <p>{{ authors(record.thesis.supervisors) }}</p>
       {%- endif %}
-      <p>{{ record.description|safe }}</p>
+      <div class="record-description">{{ record.description|safe }}</div>
       {%- if record.notes %}
-      <div class="alert alert-warning">
+      <div class="alert alert-warning record-notes">
         {{ record.notes|safe}}
       </div>
       {%- endif %}
