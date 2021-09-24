@@ -238,7 +238,7 @@ def test_full(db, record_with_bucket, recid_pid):
                 "relationType": "HasPart",
                 "relatedIdentifier": "10.1234/zenodo.1234",
                 "relatedIdentifierType": "DOI",
-                "resourceTypeGeneral": "Text"
+                "resourceTypeGeneral": "BookChapter"
             },
             {
                 "relationType": "IsPartOf",
@@ -247,8 +247,8 @@ def test_full(db, record_with_bucket, recid_pid):
             }
         ],
         "resourceType": {
-            "resourceType": "Book",
-            "resourceTypeGeneral": "Text"
+            "resourceType": None,
+            "resourceTypeGeneral": "Book"
         },
         "rightsList": [
             {
@@ -701,7 +701,7 @@ def test_related_identifiers(db, minimal_record_model, recid_pid, serializer):
             'relatedIdentifier': '1234',
             'relatedIdentifierType': dc_t,
             'relationType': 'IsCitedBy',
-            'resourceTypeGeneral': 'Text'
+            'resourceTypeGeneral': 'BookChapter'
         }]
         assert obj['relatedIdentifiers'] == expected_result
 

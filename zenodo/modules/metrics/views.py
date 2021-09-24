@@ -25,6 +25,7 @@
 """Zenodo module that adds support for prometheus metrics."""
 
 from flask import Blueprint, Response, current_app
+
 from . import utils
 
 blueprint = Blueprint(

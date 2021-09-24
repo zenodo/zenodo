@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from flask import current_app
+
 from . import config
 
 
@@ -53,4 +54,3 @@ class ZenodoMetrics(object):
     @property
     def metrics_start_date(self):
         return current_app.config['ZENODO_METRICS_START_DATE']
-

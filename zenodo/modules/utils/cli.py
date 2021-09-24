@@ -43,12 +43,12 @@ from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.deposit.tasks import datacite_register
 from zenodo.modules.records.resolvers import record_resolver
 
+from ..openaire.tasks import openaire_direct_index
+from ..records.resolvers import record_resolver
 from .grants import OpenAIREGrantsDump
 from .openaire import OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
     sync_record_oai, update_oaisets_cache, update_search_pattern_sets
-from ..records.resolvers import record_resolver
-from ..openaire.tasks import openaire_direct_index
 
 
 @click.group()

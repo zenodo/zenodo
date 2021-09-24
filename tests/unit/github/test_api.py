@@ -56,6 +56,9 @@ def test_github_creators_metadata(mocker, defaults, contribs, owner, output):
         'zenodo.modules.github.api.legacyjson_v1_translator')
     m_get_contributors = mocker.patch(
         'zenodo.modules.github.api.get_contributors')
+    m_citation_metadata = mocker.patch(
+        'invenio_github.api.GitHubRelease.citation_metadata')
+    m_citation_metadata.return_value = {}
     m_get_owner = mocker.patch('zenodo.modules.github.api.get_owner')
     m_get_contributors.return_value = contribs
     m_get_owner.return_value = owner

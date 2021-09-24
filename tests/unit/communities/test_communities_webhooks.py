@@ -26,19 +26,19 @@
 
 from __future__ import absolute_import, print_function
 
+import json
+
 import mock
 import pytest
-from flask import current_app
-from helpers import publish_and_expunge
-
-from zenodo.modules.communities.api import ZenodoCommunity
+from helpers import login_user_via_session
+from six import BytesIO
 
 
 @pytest.fixture
-def use_webhhoks_config(app):
+def use_webhooks_config(app, api):
     """Activate webhooks config."""
-    old_value = current_app.config.pop('ZENODO_COMMUNITIES_WEBHOOKS', None)
-    current_app.config['ZENODO_COMMUNITIES_WEBHOOKS'] = {
+    old_value = app.config.pop('ZENODO_COMMUNITIES_WEBHOOKS', None)
+    webhooks_config = {
         'c1': {
             'c1_recipient': {
                 'url': 'https://example.org/webhooks/zenodo',
@@ -51,66 +51,65 @@ def use_webhhoks_config(app):
             },
         }
     }
+    app.config['ZENODO_COMMUNITIES_WEBHOOKS'] = webhooks_config
+    api.config['ZENODO_COMMUNITIES_WEBHOOKS'] = webhooks_config
     yield
-    current_app.config['ZENODO_COMMUNITIES_WEBHOOKS'] = old_value
+    app.config['ZENODO_COMMUNITIES_WEBHOOKS'] = old_value
+    api.config['ZENODO_COMMUNITIES_WEBHOOKS'] = old_value
 
 
 def test_basic_webhooks(
-        app, db, communities, deposit, deposit_file, use_webhhoks_config):
-    """Test basic webhooks calls."""
-    deposit['communities'] = ['c1']
-    # On publish we're also creating the community inclusion request
+        app, db, communities, deposit, deposit_file, mocker, es, deposit_url,
+        get_json, json_auth_headers, license_record, users, app_client,
+        api_client, use_webhooks_config):
+    """Test community webhooks executions on inclusion request and approval."""
+    test_data = dict(
+        metadata=dict(
+            upload_type='presentation',
+            title='Test title',
+            creators=[
+                dict(name='Doe, John', affiliation='Atlantis'),
+                dict(name='Smith, Jane', affiliation='Atlantis')
+            ],
+            description='Test Description',
+            publication_date='2013-05-08',
+            access_right='open',
+            license='CC0-1.0',
+            communities=[{'identifier': 'c1'}],
+        )
+    )
     with mock.patch(
             'zenodo.modules.communities.tasks.requests.post') as requests_mock:
-        published_deposit = publish_and_expunge(db, deposit)
-        recid, record = published_deposit.fetch_published()
-        calls = requests_mock.call_args_list
-        assert len(calls) == 1
-        call_args, call_kwargs = calls[0]
-        assert call_kwargs['url'] == 'https://example.org/webhooks/zenodo'
-        assert call_kwargs['headers'] == {
-            'User-Agent': 'Zenodo v3.0.0',
-            'X-Custom': 'custom-header',
-        }
-        assert call_kwargs['params'] == {
-            'token': 'some-token'
-        }
-        assert call_kwargs['json']['event_type'] == \
-            'community.records.inclusion'
-        assert call_kwargs['json']['context'] == {
-            'community': 'c1',
-            'user': 1,
+        res = api_client.post(
+            deposit_url, data=json.dumps(test_data), headers=json_auth_headers)
+        links = get_json(res, code=201)['links']
+        recid = get_json(res, code=201)['id']
+        deposit_bucket = links['bucket']
+        deposit_edit = links['edit']
+        deposit_publish = links['publish']
 
-        }
-        assert call_kwargs['json']['payload']['community'] == {
-            'id': 'c1',
-            'owner': {'id': 2},
-        }
+        # Upload files
+        res = api_client.put(
+            deposit_bucket + '/test1.txt',
+            input_stream=BytesIO(b'testfile1'), headers=json_auth_headers)
+        assert res.status_code == 200
+        res = api_client.put(
+            deposit_bucket + '/test2.txt',
+            input_stream=BytesIO(b'testfile2'), headers=json_auth_headers)
+        assert res.status_code == 200
 
-    with mock.patch(
-            'zenodo.modules.communities.tasks.requests.post') as requests_mock:
-        c1_api = ZenodoCommunity('c1')
-        c1_api.accept_record(record, pid=recid)
+        # Publish deposit
+        res = api_client.post(deposit_publish, headers=json_auth_headers)
+        links = get_json(res, code=202)['links']
+        record_url = links['record']
 
         calls = requests_mock.call_args_list
         assert len(calls) == 1
-        call_args, call_kwargs = calls[0]
-        assert call_kwargs['url'] == 'https://example.org/webhooks/zenodo'
-        assert call_kwargs['headers'] == {
-            'User-Agent': 'Zenodo v3.0.0',
-            'X-Custom': 'custom-header',
-        }
-        assert call_kwargs['params'] == {
-            'token': 'some-token'
-        }
-        assert call_kwargs['json']['event_type'] == \
-            'community.records.addition'
-        assert call_kwargs['json']['context'] == {
-            'community': 'c1',
-            'user': 1,
 
-        }
-        assert call_kwargs['json']['payload']['community'] == {
-            'id': 'c1',
-            'owner': {'id': 2},
-        }
+        login_user_via_session(app_client, email=users[1]['email'])
+        res = app_client.post(
+            '/communities/c1/curaterecord/',
+            json={'action': 'accept', 'recid': recid}
+        )
+        assert res.status_code == 200
+        assert len(calls) == 2
