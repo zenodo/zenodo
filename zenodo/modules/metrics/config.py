@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import datetime
+
 from .api import ZenodoMetric
 
 ZENODO_METRICS_START_DATE = datetime.datetime(2021, 01, 01)

@@ -25,8 +25,8 @@
 """Zenodo Communities API."""
 
 from __future__ import absolute_import
-from flask import after_this_request, request
 
+from flask import after_this_request, request
 from flask.globals import current_app
 from invenio_communities.errors import InclusionRequestMissingError
 from invenio_communities.models import Community, InclusionRequest

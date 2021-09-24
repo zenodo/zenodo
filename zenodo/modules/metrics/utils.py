@@ -23,8 +23,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Utilities for metrics module."""
-from flask import current_app
 from copy import deepcopy
+
+from flask import current_app
 from invenio_cache import current_cache
 
 

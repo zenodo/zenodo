@@ -25,19 +25,17 @@
 """GitHub schemas."""
 
 from __future__ import absolute_import, print_function, unicode_literals
+
 import arrow
-
-from invenio_records_rest.schemas.fields import GenMethod
 import six
-
-from zenodo.modules.records.serializers.schemas.common import RefResolverMixin
-
+from invenio_records_rest.schemas.fields import GenMethod
 from marshmallow import Schema, ValidationError, fields, missing, post_dump, \
     post_load, pre_dump, pre_load, validate, validates, validates_schema
 
 from zenodo.modules.records.models import ObjectType
-
-from zenodo.modules.records.serializers.fields import DateString, SanitizedHTML, SanitizedUnicode, PersistentId
+from zenodo.modules.records.serializers.fields import DateString, \
+    PersistentId, SanitizedHTML, SanitizedUnicode
+from zenodo.modules.records.serializers.schemas.common import RefResolverMixin
 
 
 class AuthorSchema(Schema):

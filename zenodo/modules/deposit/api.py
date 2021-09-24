@@ -29,7 +29,7 @@ from __future__ import absolute_import, unicode_literals
 from contextlib import contextmanager
 from copy import copy
 
-from flask import current_app, after_this_request, request
+from flask import after_this_request, current_app, request
 from flask_security import current_user
 from invenio_communities.models import Community, InclusionRequest
 from invenio_db import db

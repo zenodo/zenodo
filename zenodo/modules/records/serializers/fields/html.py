@@ -29,6 +29,7 @@ from __future__ import absolute_import, print_function
 import bleach
 
 from .sanitizedunicode import SanitizedUnicode
+
 ALLOWED_TAGS = [
             'a',
             'abbr',

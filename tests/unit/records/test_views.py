@@ -225,7 +225,8 @@ def test_citation_formatter_citeproc_get(api, api_client, es, db, full_record,
                          headers={'Accept': 'text/x-bibliography'})
     assert res.status_code == 200
     assert 'Doe, J.' in res.get_data(as_text=True)
-    assert 'Test title. In Bam (1.2.5, Vol. 20, Number 2, p. 20) [Computer software].' \
+    assert 'Test title. In Bam (1.2.5, Vol. 20, Number 2, p. 20) ' + \
+        '[Computer software].' \
         in res.get_data(as_text=True)
     assert '(2014).' in res.get_data(as_text=True)
 
