@@ -220,35 +220,40 @@
     <dt>{{ _('Custom keywords') }}:</dt>
     <dd class="custom-keywords">
       <ul class="list-unstyled">
-      {%- for custom_field, custom_field_values in record.custom.items() %}
-        {%- set custom_field_info = custom_metadata.terms[custom_field] %}
-        <li>
-          {{ custom_field_info.label or custom_field }}
-          <a href="{{ custom_field_info.url }}"><i data-toggle="tooltip" data-title="{{ custom_field_info.url }}" class="fa fa-fw fa-external-link "></i>
-          </a><br/>
-          <div>
-          {% if custom_field_info.type in ('text', 'keyword') %}
-            {%- for custom_val in custom_field_values %}
-              {%- set custom_search_param = '[' + custom_field + ']:[' + custom_val + ']' %}
-              <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
-              {{ custom_val }}</a>{%- if not loop.last %}, {% endif %}
-            {%- endfor %}
-          {% elif custom_field_info.type == 'relationship' %}
-            {%- for custom_rel in custom_field_values %}
-              ({% for custom_subject in custom_rel.subject %}
-                {%- set custom_search_param = '[' + custom_field + ']:[' + custom_subject + ':]' %}
+      {% for scheme_name, terms in record.custom | add_custom_keywords_display_info | groupby('scheme_name') %}
+        <b>{{ scheme_name }}:</b>
+        <a href="{{ terms[0].scheme_url }}"><i data-toggle="tooltip" data-title="" class="fa fa-fw fa-external-link "></i>
+            </a><br/>
+        {% for custom_field in terms | sort(attribute='order') %}
+          {%- set custom_field_info = custom_metadata.terms[custom_field.scheme + ':' + custom_field.term] %}
+          <li>
+            {{ custom_field_info.label or custom_field }}
+            <a href="{{ custom_field_info.url }}"><i data-toggle="tooltip" data-title="{{ custom_field_info.url }}" class="fa fa-fw fa-external-link "></i>
+            </a><br/>
+            <div>
+            {% if custom_field_info.type in ('text', 'keyword') %}
+              {%- for custom_val in custom_field.value %}
+                {%- set custom_search_param = '[' + custom_field.scheme + ']:[' + custom_val + ']' %}
                 <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
-                {{ custom_subject }}</a>{%- if not loop.last %}, {% endif %}
-              {% endfor %}) &rarr;
-              ({% for custom_object in custom_rel.object %}
-                {%- set custom_search_param = '[' + custom_field + ']:[:' + custom_object + ']' %}
-                <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
-                {{ custom_object }}</a>{%- if not loop.last %}, {% endif %}
-              {% endfor %})<br/>
-            {%- endfor %}
-          {% endif %}
-          </div>
-        </li>
+                {{ custom_val }}</a>{%- if not loop.last %}, {% endif %}
+              {%- endfor %}
+            {% elif custom_field_info.type == 'relationship' %}
+              {%- for custom_rel in custom_field.value %}
+                ({% for custom_subject in custom_rel.subject %}
+                  {%- set custom_search_param = '[' + custom_field.scheme + ']:[' + custom_subject + ':]' %}
+                  <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
+                  {{ custom_subject }}</a>{%- if not loop.last %}, {% endif %}
+                {% endfor %}) &rarr;
+                ({% for custom_object in custom_rel.object %}
+                  {%- set custom_search_param = '[' + custom_field.scheme + ']:[:' + custom_object + ']' %}
+                  <a href="{{url_for('invenio_search_ui.search', custom=custom_search_param)}}">
+                  {{ custom_object }}</a>{%- if not loop.last %}, {% endif %}
+                {% endfor %})<br/>
+              {%- endfor %}
+            {% endif %}
+            </div>
+          </li>
+        {%- endfor %}
       {%- endfor %}
       </ul>
     </dd>

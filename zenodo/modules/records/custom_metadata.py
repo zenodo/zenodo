@@ -50,6 +50,11 @@ class CustomMetadataAPI(object):
         return self._vocabularies
 
     @cached_property
+    def schemes(self):
+        """Get available schemes."""
+        return self._vocabularies.keys()
+
+    @cached_property
     def available_vocabulary_set(self):
         """Get available vocabularies."""
         vocabulary = []
