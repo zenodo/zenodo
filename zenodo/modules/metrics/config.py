@@ -30,11 +30,17 @@ import datetime
 
 from .api import ZenodoMetric
 
-ZENODO_METRICS_START_DATE = datetime.datetime(2021, 01, 01)
+ZENODO_METRICS_START_DATE = datetime.datetime(2021, 1, 1)
 ZENODO_METRICS_CACHE_TIMEOUT = 3600
 
 ZENODO_METRICS_DATA = {
     'openaire-nexus': [
+        {
+            'name': 'zenodo_data_transfer_bytes_total',
+            'help': 'Bytes of data transferred from/to Zenodo',
+            'type': 'gauge',
+            'value': ZenodoMetric.get_data_transfer
+        },
         {
             'name': 'zenodo_unique_visitors_web_total',
             'help': 'Number of unique visitors in total on Zenodo portal',
