@@ -957,6 +957,12 @@ RECORDS_REST_ENDPOINTS = dict(
         read_permission_factory_imp=allow_all,
     ),
 )
+
+# Add record serializer aliases for use with the "?format=<mimetype>" parameter
+RECORDS_REST_ENDPOINTS['recid']['record_serializers_aliases'] = {
+    s: s for s in RECORDS_REST_ENDPOINTS['recid']['record_serializers']
+}
+
 # Default OpenAIRE API endpoints.
 RECORDS_REST_ENDPOINTS.update(OPENAIRE_REST_ENDPOINTS)
 
@@ -1278,6 +1284,8 @@ OAISERVER_XSL_URL = '/static/xsl/oai2.xsl'
 # ====
 #: Enable CORS support.
 REST_ENABLE_CORS = True
+#: Enable specifying export format via querystring
+REST_MIMETYPE_QUERY_ARG_NAME = 'format'
 
 # OAuth2 Server
 # =============
