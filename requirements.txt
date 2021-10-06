@@ -80,7 +80,7 @@ Flask-Breadcrumbs==0.4.0
 Flask-Caching==1.6.0
 Flask-CeleryExt==0.3.2
 Flask-Collect==1.2.2
-Flask-Cors==3.0.7
+Flask-Cors==3.0.9
 Flask-DebugToolbar==0.10.1
 Flask-IIIF==0.5.0
 Flask-KVSession==0.6.2
