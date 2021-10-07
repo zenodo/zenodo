@@ -45,6 +45,7 @@ jobs:
         SQLALCHEMY_DATABASE_URI: [
           "postgresql+psycopg2://postgres@localhost:5432/zenodo"]
         REQUIREMENTS: ['prod']
+        docker-file: ['docker-compose.yml', 'docker-compose.test.yml']
 
     steps:
       - name: Checkout
@@ -88,5 +89,5 @@ jobs:
 
       - name: Run tests
         run: |
-          docker-compose up -d
+          docker-compose -f ${{ matrix.docker-file }} up -d
           ./run-tests.sh

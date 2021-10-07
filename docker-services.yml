@@ -43,6 +43,14 @@ services:
       - "POSTGRES_DB=zenodo"
     ports:
       - "5432:5432"
+  db-12:
+    image: postgres:12.8
+    environment:
+      - "POSTGRES_USER=zenodo"
+      - "POSTGRES_PASSWORD=zenodo"
+      - "POSTGRES_DB=zenodo"
+    ports:
+      - "5432:5432"
   mq:
     image: rabbitmq:3-management
     ports:
