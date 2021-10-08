@@ -94,22 +94,22 @@ def test_openaire_link(app, minimal_record):
     # Default zenodo type is software
     assert openaire_link(r) ==\
         'https://explore.openaire.eu/search/software?' \
-        'softwareId=r37b0ad08687::47287d1800c112499a117ca17aa1909d'
+        'pid='+r['doi']
 
     # Other type
     r['resource_type']['type'] = 'other'
     assert openaire_link(r) == \
         'https://explore.openaire.eu/search/other?' \
-        'orpId=r37b0ad08687::47287d1800c112499a117ca17aa1909d'
+        'pid='+r['doi']
 
     # Dataset ID
     r['resource_type']['type'] = 'dataset'
     assert openaire_link(r) == \
         'https://explore.openaire.eu/search/dataset' \
-        '?datasetId=r37b0ad08687::204007f516ddcf0a452c2f22d48695ca'
+        '?pid='+r['doi']
 
     # Publication ID
     r['resource_type']['type'] = 'publication'
     assert openaire_link(r) == \
         'https://explore.openaire.eu/search/publication' \
-        '?articleId=od______2659::47287d1800c112499a117ca17aa1909d'
+        '?pid='+r['doi']
