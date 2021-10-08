@@ -94,22 +94,22 @@ def test_openaire_link(app, minimal_record):
     # Default zenodo type is software
     assert openaire_link(r) ==\
         'https://explore.openaire.eu/search/software?' \
-        'pid='+r['doi']
+        'pid=10.5281/zenodo.123'
 
     # Other type
     r['resource_type']['type'] = 'other'
     assert openaire_link(r) == \
         'https://explore.openaire.eu/search/other?' \
-        'pid='+r['doi']
+        'pid=10.5281/zenodo.123'
 
     # Dataset ID
     r['resource_type']['type'] = 'dataset'
     assert openaire_link(r) == \
         'https://explore.openaire.eu/search/dataset' \
-        '?pid='+r['doi']
+        '?pid=10.5281/zenodo.123'
 
     # Publication ID
     r['resource_type']['type'] = 'publication'
     assert openaire_link(r) == \
         'https://explore.openaire.eu/search/publication' \
-        '?pid='+r['doi']
+        '?pid=10.5281/zenodo.123'
