@@ -36,31 +36,46 @@ ZENODO_METRICS_CACHE_TIMEOUT = 3600
 ZENODO_METRICS_DATA = {
     'openaire-nexus': [
         {
-            'name': 'zenodo_data_transfer_bytes_total',
-            'help': 'Bytes of data transferred from/to Zenodo',
-            'type': 'gauge',
+            'name': 'zenodo_nexus_data_transfer_bytes_total',
+            'help': (
+                'Bytes of data transferred from/to Zenodo during the '
+                'OpenAIRE-NEXUS project (i.e. from 2021-01-01).'
+            ),
+            'type': 'counter',
             'value': ZenodoMetric.get_data_transfer
         },
         {
-            'name': 'zenodo_unique_visitors_web_total',
-            'help': 'Number of unique visitors in total on Zenodo portal',
-            'type': 'gauge',
+            'name': 'zenodo_nexus_unique_visitors_web_total',
+            'help': (
+                'Total of daily unique visitors on Zenodo portal during the '
+                'OpenAIRE-NEXUS project (i.e. from 2021-01-01).'
+            ),
+            'type': 'counter',
             'value': ZenodoMetric.get_visitors
         },
         {
-            'name': 'zenodo_researchers_total',
+            'name': 'zenodo_nexus_uptime_ratio',
+            'help': (
+                'Zenodo uptime during the OpenAIRE-NEXUS project '
+                '(i.e. from 2021-01-01).'
+            ),
+            'type': 'gauge',
+            'value': ZenodoMetric.get_uptime
+        },
+        {
+            'name': 'zenodo_researchers',
             'help': 'Number of researchers registered on Zenodo',
             'type': 'gauge',
             'value': ZenodoMetric.get_researchers
         },
         {
-            'name': 'zenodo_files_total',
+            'name': 'zenodo_files',
             'help': 'Number of files hosted on Zenodo',
             'type': 'gauge',
             'value': ZenodoMetric.get_files
         },
         {
-            'name': 'zenodo_communities_total',
+            'name': 'zenodo_communities',
             'help': 'Number of Zenodo communities created',
             'type': 'gauge',
             'value': ZenodoMetric.get_communities

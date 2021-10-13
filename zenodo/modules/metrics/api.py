@@ -66,7 +66,6 @@ class ZenodoMetric(object):
 
         return download_volume + upload_volume
 
-
     @staticmethod
     def get_visitors():
         """Get number of unique zenodo users."""
@@ -88,10 +87,15 @@ class ZenodoMetric(object):
         return result.aggregations.visitors_count.value
 
     @staticmethod
+    def get_uptime():
+        """Get Zenodo uptime."""
+        # TODO: Implement using UptimeRobot API
+        return 1
+
+    @staticmethod
     def get_researchers():
         """Get number of unique zenodo users."""
         return User.query.filter(
-            User.confirmed_at >= current_metrics.metrics_start_date,
             User.confirmed_at.isnot(None),
             User.active.is_(True),
         ).count()
@@ -99,14 +103,11 @@ class ZenodoMetric(object):
     @staticmethod
     def get_files():
         """Get number of files."""
-        return FileInstance.query.filter(
-            FileInstance.created >= current_metrics.metrics_start_date
-        ).count()
+        return FileInstance.query.count()
 
     @staticmethod
     def get_communities():
         """Get number of active communities."""
         return Community.query.filter(
-            Community.created >= current_metrics.metrics_start_date,
             Community.deleted_at.is_(None)
         ).count()
