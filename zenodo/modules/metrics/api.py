@@ -64,7 +64,7 @@ class ZenodoMetric(object):
         result = search[:0].execute().aggregations.to_dict()
         upload_volume = result.get('upload_volume', {}).get('value', 0)
 
-        return download_volume + upload_volume
+        return int(download_volume + upload_volume)
 
     @staticmethod
     def get_visitors():
@@ -84,7 +84,7 @@ class ZenodoMetric(object):
         if 'visitors_count' not in result.aggregations:
             return 0
 
-        return result.aggregations.visitors_count.value
+        return int(result.aggregations.visitors_count.value)
 
     @staticmethod
     def get_uptime():
