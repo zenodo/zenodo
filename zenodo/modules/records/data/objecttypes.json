@@ -196,6 +196,25 @@
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "workflow",
+  "id": "https://zenodo.org/objecttypes/workflow#",
+  "title": {
+    "en": "Workflow"
+  },
+  "title_plural": {
+    "en": "Workflows"
+  },
+  "datacite": {"general": "Workflow"},
+  "eurepo": "info:eu-repo/semantics/other",
+  "schema.org": "https://schema.org/CreativeWork",
+  "openaire": {
+    "resourceType": "0010",
+    "type": "other"
+  },
+  "csl": "graphic"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
   "internal_id": "other",
   "id": "https://zenodo.org/objecttypes/other#",
   "title": {

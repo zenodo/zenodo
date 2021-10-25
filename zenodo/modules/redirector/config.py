@@ -64,6 +64,8 @@ ZENODO_TYPE_SUBTYPE_LEGACY = {
 
     'physicalobject': ('physicalobject', None),
 
+    'workflows': ('workflow', None),
+
     'other': ('other', None),
 }
 
