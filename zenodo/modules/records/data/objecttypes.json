@@ -648,7 +648,7 @@
   "eurepo": "info:eu-repo/semantics/technicalDocumentation",
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
-    "resourceType": "0009",
+    "resourceType": "0045",
     "type": "publication"
   },
   "csl": "report"
