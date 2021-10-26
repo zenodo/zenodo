@@ -42,6 +42,7 @@ tests_require = [
     'pytest-pep8>=1.0.6',
     'pytest>=3.7.0',
     'selenium>=3.5.0,<3.6.0',
+    'docutils>=0.11,<0.17.1',
 ]
 
 extras_require = {
