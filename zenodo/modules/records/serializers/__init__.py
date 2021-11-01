@@ -40,7 +40,6 @@ from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
 
 from .bibtex import BibTeXSerializer
 from .dcat import DCATSerializer
-from .workflow import WorkflowSerializer
 from .extra_formats import ExtraFormatsSerializer
 from .files import files_responsify
 from .geojson import ZenodoGeoJSONSerializer as GeoJSONSerializer
@@ -83,8 +82,6 @@ datacite_v31 = ZenodoDataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
 datacite_v41 = ZenodoDataCite41Serializer(DataCiteSchemaV4, replace_refs=True)
 #: DCAT serializer
 dcat_v1 = DCATSerializer(datacite_v41)
-#: Workflow serializer
-workflow = WorkflowSerializer(RecordSchemaV1)
 #: OAI DataCite serializer
 oai_datacite = OAIDataCiteSerializer(
     serializer=datacite_v31,
