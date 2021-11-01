@@ -208,10 +208,10 @@
   "eurepo": "info:eu-repo/semantics/other",
   "schema.org": "https://schema.org/CreativeWork",
   "openaire": {
-    "resourceType": "0010",
+    "resourceType": "0020",
     "type": "other"
   },
-  "csl": "graphic"
+"csl": "article"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",

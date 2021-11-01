@@ -129,8 +129,6 @@ datacite_v41_response = record_responsify(
 #: DCAT v4.1 record serializer for individual records.
 dcat_response = record_responsify(
     dcat_v1, 'application/rdf+xml')
-#: Workflow record serializer for individual records.
-workflow_response = record_responsify(workflow, 'application/x-workflow')
 #: DublinCore record serializer for individual records.
 dc_v1_response = record_responsify(dc_v1, 'application/x-dc+xml')
 #: CSL-JSON record serializer for individual records.

@@ -819,10 +819,6 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='DCAT',
         serializer='zenodo.modules.records.serializers.dcat_v1',
     ),
-    'workflow': dict(
-        title='reana workflow',
-        serializer='zenodo.modules.records.serializers.workflow',
-    ),
     # Unsupported formats.
     'xe': None,
     'xn': None,
@@ -942,8 +938,6 @@ RECORDS_REST_ENDPOINTS = dict(
                 'zenodo.modules.records.serializers.citeproc_v1_response'),
             'application/vnd.geo+json': (
                 'zenodo.modules.records.serializers.geojson_v1_response'),
-            'application/x-workflow': (
-                'zenodo.modules.records.serializers.workflow_response'),
         },
         search_serializers={
             'application/json': (
@@ -1260,11 +1254,6 @@ OAISERVER_METADATA_FORMATS = {
         'namespace': 'https://www.w3.org/ns/dcat',
         'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_dcat_v1',
-    },
-    'workflow': {
-        'namespace': 'TODO',
-        'schema': 'TODO',
-        'serializer': 'zenodo.modules.records.serializers.workflow',
     },
     'oai_datacite': {
         'namespace': 'http://datacite.org/schema/kernel-3',
