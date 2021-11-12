@@ -140,7 +140,7 @@ invenio-openaire==1.0.0a15
 invenio-opendefinition==1.0.0a9
 invenio-pidrelations==1.0.0a4
 invenio-pidstore==1.1.0
-invenio-previewer==1.0.0a11
+invenio-previewer==1.0.0a12
 invenio-queues==1.0.0a2
 invenio-records==1.3.2
 invenio-records-files==1.0.0a11.post1
