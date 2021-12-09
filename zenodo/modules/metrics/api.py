@@ -26,7 +26,12 @@
 
 from __future__ import absolute_import
 
+import calendar
+from datetime import datetime, timedelta
+
+import requests
 from elasticsearch_dsl import Search
+from flask import current_app
 from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_files_rest.models import FileInstance
@@ -89,8 +94,26 @@ class ZenodoMetric(object):
     @staticmethod
     def get_uptime():
         """Get Zenodo uptime."""
-        # TODO: Implement using UptimeRobot API
-        return 1
+        metrics = current_app.config['ZENODO_METRICS_UPTIME_ROBOT_METRIC_IDS']
+        url = current_app.config['ZENODO_METRICS_UPTIME_ROBOT_URL']
+        api_key = current_app.config['ZENODO_METRICS_UPTIME_ROBOT_API_KEY']
+
+        end = datetime.utcnow().replace(
+            day=1, hour=0, minute=0, second=0, microsecond=0)
+        start = (end - timedelta(days=1)).replace(day=1)
+        end_ts = calendar.timegm(end.utctimetuple())
+        start_ts = calendar.timegm(start.utctimetuple())
+
+        res = requests.post(url, json={
+            'api_key': api_key,
+            'custom_uptime_ranges': '{}_{}'.format(start_ts, end_ts),
+        })
+
+        return sum(
+            float(d['custom_uptime_ranges'])
+            for d in res.json()['monitors']
+            if d['id'] in metrics
+        ) / len(metrics)
 
     @staticmethod
     def get_researchers():

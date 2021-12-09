@@ -26,8 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-import bleach
 from datetime import datetime, timedelta
+
+import bleach
 from flask import Blueprint
 from flask_principal import ActionNeed
 from invenio_access import Permission

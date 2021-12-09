@@ -29,9 +29,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 import idutils
 import pycountry
 from flask import current_app, request
-from marshmallow import Schema, fields, missing, pre_dump
 from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
 from invenio_iiif.utils import ui_iiif_image_url
+from marshmallow import Schema, fields, missing, pre_dump
 
 from ...models import ObjectType
 from ..fields import DateString, SanitizedHTML, SanitizedUnicode

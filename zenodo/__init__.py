@@ -295,17 +295,6 @@ copy files instead of symlinking:
 
    COLLECT_STORAGE = 'flask_collect.storage.file'
 
-
-Metrics
-~~~~~~~
-Zenodo uses the Invenio-Metrics module to compute application KPIs at given
-intervals and send it to the CERN monitoring infrastructure.
-
-.. code-block:: python
-
-   METRICS_XSLS_API_URL = "http://xsls-dev.cern.ch"
-   METRICS_XSLS_SERVICE_ID = "myid"
-
 StatsD
 ~~~~~~
 Zenodo uses StatsD to measure request performance.

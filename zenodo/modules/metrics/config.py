@@ -33,6 +33,10 @@ from .api import ZenodoMetric
 ZENODO_METRICS_START_DATE = datetime.datetime(2021, 1, 1)
 ZENODO_METRICS_CACHE_TIMEOUT = 3600
 
+ZENODO_METRICS_UPTIME_ROBOT_METRIC_IDS = {}
+ZENODO_METRICS_UPTIME_ROBOT_URL = 'https://api.uptimerobot.com/v2/getMonitors'
+ZENODO_METRICS_UPTIME_ROBOT_API_KEY = None
+
 ZENODO_METRICS_DATA = {
     'openaire-nexus': [
         {
@@ -54,11 +58,8 @@ ZENODO_METRICS_DATA = {
             'value': ZenodoMetric.get_visitors
         },
         {
-            'name': 'zenodo_nexus_uptime_ratio',
-            'help': (
-                'Zenodo uptime during the OpenAIRE-NEXUS project '
-                '(i.e. from 2021-01-01).'
-            ),
+            'name': 'zenodo_last_month_uptime_ratio',
+            'help': 'Zenodo uptime percentage for the last month.',
             'type': 'gauge',
             'value': ZenodoMetric.get_uptime
         },
