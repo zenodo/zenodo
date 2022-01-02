@@ -387,7 +387,7 @@
     },
     "openaire_type": {
       "type": "string",
-      "descritpion": "OpenAIRE type."
+      "description": "OpenAIRE type."
     },
     "subjects": {
       "description": "Subjects from specific vocabularies.",
