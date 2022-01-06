@@ -48,7 +48,7 @@ blinker==1.4
 cairocffi==0.9.0
 CairoSVG==1.0.22
 cchardet==2.1.4
-celery==4.1.1
+celery==5.2.2
 certifi==2019.3.9
 cffi==1.12.2
 chardet==3.0.4
