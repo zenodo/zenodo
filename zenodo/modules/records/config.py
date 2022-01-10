@@ -90,7 +90,7 @@ ZENODO_RELATION_TYPES = [
     ('isPreviousVersionOf', _('New versions')),
     ('isContinuedBy', _('Continued by')),
     ('continues', _('Continues')),
-    ('IsDescribedBy', _('Described by')),
+    ('isDescribedBy', _('Described by')),
     ('describes', _('Describes')),
     ('isPartOf', _('Part of')),
     ('hasPart', _('Has part')),
