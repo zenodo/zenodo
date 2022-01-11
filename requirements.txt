@@ -186,7 +186,7 @@ nbconvert==5.4.1
 nbformat==4.4.0
 ndg-httpsclient==0.4.4
 node-semver==0.1.1
-numpy==1.16.6
+numpy==1.21.0
 oauthlib==2.1.0
 pandocfilters==1.4.2
 passlib==1.7.1
