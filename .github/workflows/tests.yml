@@ -62,6 +62,7 @@ jobs:
 
       - name: Install global Node packages
         run: |
+          git config --global url."https://".insteadOf git://
           ./scripts/setup-npm.sh
           rm -f package-lock.json
 
