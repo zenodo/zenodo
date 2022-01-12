@@ -1071,7 +1071,7 @@ RECORDS_REST_FACETS = dict(
                 terms=dict(field='resource_type.type'),
                 aggs=dict(
                     subtype=dict(
-                        terms=dict(field='resource_type.subtype'),
+                        terms=dict(size=20, field='resource_type.subtype'),
                     )
                 )
             ),
