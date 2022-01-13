@@ -43,6 +43,7 @@ from invenio_records_files.models import RecordsBuckets
 from six import string_types, text_type
 from werkzeug.local import LocalProxy
 from werkzeug.routing import PathConverter
+from zenodo_accessrequests.models import AccessRequest, SecretLink
 
 from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.deposit.tasks import datacite_inactivate, datacite_register
@@ -193,6 +194,17 @@ def delete_record(record_uuid, reason, user):
         'removed_by': user_id,
     })
     record.commit()
+
+    # Delete access requests as well as access links
+    secret_links = SecretLink.query.join(AccessRequest).filter(
+        AccessRequest.recid == int(recid.pid_value)
+    )
+    link_ids = [l.id for l in secret_links]
+
+    with db.session.begin_nested():
+        AccessRequest.query.filter(
+            AccessRequest.recid == int(recid.pid_value)).delete()
+        SecretLink.query.filter(SecretLink.id.in_(link_ids)).delete(synchronize_session=False)
 
     # Mark the relevant GitHub Release as deleted
     for ghr in record.model.github_releases:
