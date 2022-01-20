@@ -229,20 +229,6 @@ function validateForm() {
     }
   });
 
-  var name = $('#contact-form :input#name').val();
-  if (name.includes(',')) {
-    errorMessages.name.push(
-      'Field should not contain any comma.');
-    isValid = false;
-  }
-
-  var email = $('#contact-form :input#email').val();
-  if (email.includes(',')) {
-    errorMessages.email.push(
-      'Field should not contain any comma.');
-    isValid = false;
-  }
-
   var description = $('#contact-form :input#description').val()
   if (description.length < DESCRIPTION_MIN_LENGTH ||
       description.length > DESCRIPTION_MAX_LENGTH) {
