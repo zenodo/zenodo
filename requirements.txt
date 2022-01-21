@@ -37,7 +37,7 @@ arrow==0.13.1
 asn1crypto==1.3.0
 attrs==19.1.0
 autosemver==0.5.3
-Babel==2.6.0
+Babel==2.9.1
 backports-abc==0.5
 backports.functools-lru-cache==1.5
 backports.shutil-get-terminal-size==1.0.0
