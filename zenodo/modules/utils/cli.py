@@ -31,19 +31,24 @@ import os
 from io import SEEK_END, SEEK_SET
 
 import click
+from flask import current_app
 from flask.cli import with_appcontext
 from invenio_cache import current_cache
 from invenio_db import db
 from invenio_files_rest.models import ObjectVersion
-from invenio_pidstore.models import PersistentIdentifier
+from invenio_pidstore.errors import PIDDeletedError
+from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_records.models import RecordMetadata
 
 from zenodo.modules.deposit.resolvers import deposit_resolver
 from zenodo.modules.deposit.tasks import datacite_register
+from zenodo.modules.openaire.helpers import openaire_datasource_id, \
+    openaire_original_id, openaire_type
+from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.resolvers import record_resolver
 
-from ..openaire.tasks import openaire_direct_index
+from ..openaire.tasks import _openaire_request_factory, openaire_direct_index
 from ..records.resolvers import record_resolver
 from .grants import OpenAIREGrantsDump
 from .openaire import OpenAIRECommunitiesMappingUpdater
@@ -440,3 +445,45 @@ def retry_indexing_failed_openaire_records(eager):
         else:
             openaire_direct_index.delay(
                 str(recid.object_uuid), retry=False)
+
+
+@utils.command('delete_openaire_records')
+@with_appcontext
+def delete_openaire_records():
+    """Deletes half deleted OpenAIRE records."""
+    for key in _iter_openaire_direct_index_keys():
+        try:
+            RECID = key.split("openaire_direct_index:")[1]
+
+            record_data = PersistentIdentifier.query.filter_by(
+                pid_type="recid", pid_value=str(RECID), status=PIDStatus.DELETED
+            ).one()
+            record = ZenodoRecord.get_record(
+                    record_data.object_uuid, with_deleted=True
+                    )
+            if "removal_reason" in record:
+                last_valid_revision = record.revisions[-2]
+
+            original_id = openaire_original_id(
+                last_valid_revision, openaire_type(last_valid_revision)
+            )[1]
+            datasource_id = openaire_datasource_id(last_valid_revision)
+
+            params = {
+                "originalId": original_id, "collectedFromId": datasource_id
+            }
+            req = _openaire_request_factory()
+            res = req.delete(
+                current_app.config["OPENAIRE_API_URL"], params=params
+            )
+            res_beta = None
+            if current_app.config["OPENAIRE_API_URL_BETA"]:
+                res_beta = req.delete(
+                    current_app.config["OPENAIRE_API_URL_BETA"], params=params
+                )
+
+            if not res.ok or (res_beta and not res_beta.ok):
+                raise OpenAIRERequestError(res.text)
+
+        except:
+            pass
