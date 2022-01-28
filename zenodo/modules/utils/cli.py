@@ -53,7 +53,8 @@ from ..records.resolvers import record_resolver
 from .grants import OpenAIREGrantsDump
 from .openaire import OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
-    sync_record_oai, update_oaisets_cache, update_search_pattern_sets
+    sync_record_oai, update_oaisets_cache, update_search_pattern_sets, \
+    openaire_delete
 
 
 @click.group()
@@ -431,59 +432,52 @@ def list_failed_openaire_records():
     click.echo('\n'.join(failed_record_recids))
 
 
-@utils.command('index_failed_openaire_records')
+@utils.command('index_or_delete_openaire_records')
 @click.option('--eager', '-e', default=False)
 @with_appcontext
-def retry_indexing_failed_openaire_records(eager):
-    """Retries indexing of records that failed to get indexed in OpenAIRE."""
+def retry_indexing_or_delete_openaire_records(eager):
+    """Retries indexing/deleting records that failed to get indexed/deleted
+    in OpenAIRE."""
     for key in _iter_openaire_direct_index_keys():
         recid = key.split('openaire_direct_index:')[1]
-        recid, record  = record_resolver.resolve(recid)
-        click.echo("Indexing record with id {}".format(recid))
-        if eager:
-            openaire_direct_index(str(recid.object_uuid), retry=False)
-        else:
-            openaire_direct_index.delay(
-                str(recid.object_uuid), retry=False)
 
-
-@utils.command('delete_openaire_records')
-@with_appcontext
-def delete_openaire_records():
-    """Deletes half deleted OpenAIRE records."""
-    for key in _iter_openaire_direct_index_keys():
         try:
-            RECID = key.split("openaire_direct_index:")[1]
+            recid, record  = record_resolver.resolve(recid)
 
+        except PIDDeletedError:
             record_data = PersistentIdentifier.query.filter_by(
-                pid_type="recid", pid_value=str(RECID), status=PIDStatus.DELETED
+                pid_type="recid", pid_value=str(recid), status=PIDStatus.DELETED
             ).one()
             record = ZenodoRecord.get_record(
                     record_data.object_uuid, with_deleted=True
                     )
-            if "removal_reason" in record:
-                last_valid_revision = record.revisions[-2]
+
+            try:
+                index = -2
+                last_valid_revision = record.revisions[index]
+                while "resource_type" not in last_valid_revision:
+                    last_valid_revision = record.revisions[index]
+                    index = index -1
+
+            except:
+                click.echo("The record with id {} does not have a valid \
+                            last_valid_revision".format(recid))
+                continue
 
             original_id = openaire_original_id(
                 last_valid_revision, openaire_type(last_valid_revision)
             )[1]
             datasource_id = openaire_datasource_id(last_valid_revision)
 
-            params = {
-                "originalId": original_id, "collectedFromId": datasource_id
-            }
-            req = _openaire_request_factory()
-            res = req.delete(
-                current_app.config["OPENAIRE_API_URL"], params=params
+            click.echo("Deleting record with id {}".format(record_data))
+            openaire_delete(
+                str(record_data.object_uuid), original_id, datasource_id
             )
-            res_beta = None
-            if current_app.config["OPENAIRE_API_URL_BETA"]:
-                res_beta = req.delete(
-                    current_app.config["OPENAIRE_API_URL_BETA"], params=params
-                )
+            continue
 
-            if not res.ok or (res_beta and not res_beta.ok):
-                raise OpenAIRERequestError(res.text)
-
-        except:
-            pass
+        click.echo("Indexing record with id {}".format(recid))
+        if eager:
+            openaire_direct_index(str(recid.object_uuid), retry=False)
+        else:
+            openaire_direct_index.delay(
+                str(recid.object_uuid), retry=False)
