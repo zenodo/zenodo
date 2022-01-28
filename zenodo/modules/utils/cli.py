@@ -53,8 +53,7 @@ from ..records.resolvers import record_resolver
 from .grants import OpenAIREGrantsDump
 from .openaire import OpenAIRECommunitiesMappingUpdater
 from .tasks import has_corrupted_files_meta, repair_record_metadata, \
-    sync_record_oai, update_oaisets_cache, update_search_pattern_sets, \
-    openaire_delete
+    sync_record_oai, update_oaisets_cache, update_search_pattern_sets
 
 
 @click.group()
