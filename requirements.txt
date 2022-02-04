@@ -241,7 +241,7 @@ ua-parser==0.8.0
 Unidecode==1.0.22
 uritemplate.py==1.0.1
 uritools==2.2.0
-urllib3==1.24.2
+urllib3==1.26.5
 uWSGI==2.0.20
 uwsgitop==0.11
 validators==0.12.6
