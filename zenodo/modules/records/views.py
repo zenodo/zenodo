@@ -440,12 +440,32 @@ def community_curation(record, user):
             accepted,
         )
 
+def get_reana_badge(record):
+    img_url = 'https://camo.githubusercontent.com/d03644c923285a64bc2b87926cd327d8e334d4ebb227525a9eb40c401c3891b9/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c61756e63682532306f6e2d5245414e412d666633333336'
+    
+    for file in record.get('_files', []):
+        if str(file["key"]).lower() == "reana.yaml":
+            return {
+                'img_url': img_url,
+                'url': u'https://reana.cern.ch//launch?url=https://zenodo.org/{}/files/{}'.format(record.get('recid'), str(file["key"]))
+            }
+    
+    for item in record.get('related_identifiers', []):
+        if item['scheme'] == "url" and item['identifier'].startswith("https://reana.io/run"):
+            return {
+                'img_url': img_url,
+                'url': item['identifier']
+            }
+
+    return {}
+
 
 def record_jinja_context():
     """Jinja context processor for records."""
     return dict(
         community_curation=community_curation,
         custom_metadata=current_custom_metadata,
+        get_reana_badge=get_reana_badge,
     )
 
 
