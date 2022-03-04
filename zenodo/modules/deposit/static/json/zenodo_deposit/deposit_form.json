@@ -72,7 +72,7 @@
           {
             "value": "workflow",
             "name": "Workflow",
-            "fa_cls": "fa-code"
+            "fa_cls": "fa-code-fork"
           },
           {
             "value": "other",
