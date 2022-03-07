@@ -760,6 +760,8 @@ ZENODO_REMOVAL_REASONS = [
     ('uploader', 'Record removed on request by uploader.'),
     ('takedown', 'Record removed on request by third-party.'),
 ]
+
+REANA_BADGE_IMG_URL = 'https://camo.githubusercontent.com/d03644c923285a64bc2b87926cd327d8e334d4ebb227525a9eb40c401c3891b9/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c61756e63682532306f6e2d5245414e412d666633333336'
 #: Mapping of old export formats to new content type.
 ZENODO_RECORDS_EXPORTFORMATS = {
     'dcite': dict(

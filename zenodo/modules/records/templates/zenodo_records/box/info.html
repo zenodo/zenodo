@@ -73,14 +73,16 @@
     </dd>
   {%- endif %}
 
-  {%- set reana_badge = get_reana_badge(record) %}
-  {%- if reana_badge  %}
-    <dt>{{_('Execute on')}}:</dt>
-    <dd>
-      <a href="{{ reana_badge.url }}" target="_blank" >
-        <img src="{{ reana_badge.img_url }}"></img>
-      </a>
-    </dd>
+  {%- if current_user|has_record_perm(record, 'read-files') %}
+    {%- set reana_badge = get_reana_badge(record) %}
+    {%- if reana_badge  %}
+      <dt>{{_('Execute on')}}:</dt>
+      <dd>
+        <a href="{{ reana_badge.url }}" target="_blank" >
+          <img src="{{ reana_badge.img_url }}"></img>
+        </a>
+      </dd>
+    {%- endif %}
   {%- endif %}
 
   {%- if record.imprint and record.imprint.isbn %}
