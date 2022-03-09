@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 import json
+import re
 from datetime import datetime as dt
 from operator import itemgetter
 
@@ -441,15 +442,18 @@ def community_curation(record, user):
         )
 
 
+
 def get_reana_badge(record):
     """Reana badge creation"""
-
+    p = re.compile('^reana.*\.(yaml|yml)$', re.IGNORECASE)
     if record.files:
-        if "reana.yaml" in record.files:
-            return {
-                'img_url': current_app.config['REANA_BADGE_IMG_URL'],
-                'url': u'https://reana.cern.ch//launch?url=https://zenodo.org/{}/files/reana.yaml'.format(record.get('recid'))
-            }
+        for file in record.files:
+            m = p.match(str(file['key']))
+            if m:
+                return {
+                    'img_url': current_app.config['REANA_BADGE_IMG_URL'],
+                    'url': u'https://reana.cern.ch//launch?url=https://zenodo.org/{}/files/{}'.format(record.get('recid'), m.group())
+                }
     
     for item in record.get('related_identifiers', []):
         if item['scheme'] == "url" and item['identifier'].startswith("https://reana.io/run"):
