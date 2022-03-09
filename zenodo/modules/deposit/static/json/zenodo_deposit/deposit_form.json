@@ -588,6 +588,10 @@
                     "name": "Research Councils (UK)"
                   },
                   {
+                    "value": "10.13039/100014013",
+                    "name": "UK Research and Innovation (UK)"
+                  },
+                  {
                     "value": "10.13039/501100001711",
                     "name": "Schweizerischer Nationalfonds zur F\u00f6rderung der Wissenschaftlichen Forschung (CH)"
                   },
@@ -604,7 +608,7 @@
                     "name": "Wellcome Trust (UK)"
                   },
                   {
-                    "value": "10.13039/501100000024",
+                    "value": "10.13039/501100004410",
                     "name": "T\u00fcrkiye Bilimsel ve Teknolojik Ara\u015ftirma Kurumu (TR)"
                   }
                 ]
