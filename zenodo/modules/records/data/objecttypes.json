@@ -211,7 +211,7 @@
     "resourceType": "0020",
     "type": "other"
   },
-"csl": "article"
+"csl": "software"
 },
 {
   "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
