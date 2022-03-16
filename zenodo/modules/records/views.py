@@ -164,6 +164,7 @@ def has_record_perm(user, record, action):
 @blueprint.app_template_filter('zenodo_related_links')
 def zenodo_related_links(record, communities):
     """Get logos for related links."""
+
     def apply_rule(item, rule):
         r = copy.deepcopy(rule)
         r['link'] = idutils.to_url(item['identifier'], item['scheme'], 'https')
@@ -176,8 +177,8 @@ def zenodo_related_links(record, communities):
                 rules = current_app.config['ZENODO_RELATION_RULES'][c.id]
                 for r in rules:
                     if item['relation'] == r['relation'] and \
-                       item['scheme'] == r['scheme'] and \
-                       item['identifier'].startswith(r['prefix']):
+                        item['scheme'] == r['scheme'] and \
+                        item['identifier'].startswith(r['prefix']):
                         rs.append(r)
         return rs
 
@@ -281,7 +282,7 @@ def local_doi(value):
 def relation_title(relation):
     """Map relation type to title."""
     return dict(current_app.config['ZENODO_RELATION_TYPES']).get(relation) or \
-        relation
+           relation
 
 
 @blueprint.app_template_filter('citation')
@@ -294,8 +295,9 @@ def citation(record, pid, style=None, ln=None):
     except Exception:
         current_app.logger.exception(
             'Citation formatting for record {0} failed.'
-            .format(str(record.id)))
+                .format(str(record.id)))
         return None
+
 
 @blueprint.app_template_filter('format_date_range')
 def format_date_range(date):
@@ -354,6 +356,27 @@ def record_from_pid(recid):
         return {}
 
 
+@blueprint.app_template_filter('add_custom_keywords_display_info')
+def add_custom_keywords_display_info(keywords):
+    cfg = current_app.config.get(
+        'ZENODO_CUSTOM_METADATA_VOCABULARIES')
+    result = []
+
+    for kw, kw_value in keywords.items():
+        (category, index) = kw.split(':')
+        attribute = cfg[category]['attributes'][index]
+        modified_keyword = {'scheme': category,
+                            'scheme_name': cfg[category]['name'],
+                            'scheme_url': cfg[category]['@context'],
+                            'term': index,
+                            'value': kw_value,
+                            'order': attribute.get('order') if attribute.get(
+                                'order') else 'zzzzzzzz'}
+        result.append(modified_keyword)
+
+    return result
+
+
 def records_ui_export(pid, record, template=None, **kwargs):
     """Record serialization view.
 
@@ -402,7 +425,7 @@ def _can_curate(community, user, record, accepted=False):
     if user.is_anonymous:
         return False
     if (community.id_user == int(user.get_id())) or \
-            (accepted and (int(user.get_id()) in record.get('owners', []))):
+        (accepted and (int(user.get_id()) in record.get('owners', []))):
         return True
     return False
 
@@ -463,7 +486,7 @@ def record_thumbnail(pid, record, thumbnail_size, **kwargs):
     selected = None
     thumbnail_size = cached_thumbnails[thumbnail_size]
     for file in record.files:
-        if(file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
+        if (file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
             continue
         elif not selected:
             selected = file
@@ -472,13 +495,13 @@ def record_thumbnail(pid, record, thumbnail_size, **kwargs):
             break
     if selected:
         return IIIFImageAPI().get(
-                version='v2',
-                uuid=str(iiif_image_key(selected)),
-                region='full',
-                size=thumbnail_size,
-                rotation='0',
-                quality='default',
-                image_format=selected['type'])
+            version='v2',
+            uuid=str(iiif_image_key(selected)),
+            region='full',
+            size=thumbnail_size,
+            rotation='0',
+            quality='default',
+            image_format=selected['type'])
     else:
         abort(404, 'This record has no thumbnails')
 
