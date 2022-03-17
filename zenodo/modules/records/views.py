@@ -42,6 +42,7 @@ from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
 from invenio_iiif.utils import iiif_image_key
+from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
@@ -463,7 +464,7 @@ def record_thumbnail(pid, record, thumbnail_size, **kwargs):
     selected = None
     thumbnail_size = cached_thumbnails[thumbnail_size]
     for file in record.files:
-        if(file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
+        if file['type'] not in thumbnail_exts:
             continue
         elif not selected:
             selected = file
