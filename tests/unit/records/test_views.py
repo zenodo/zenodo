@@ -39,6 +39,10 @@ from invenio_search import current_search
 from mock import Mock, patch
 
 from zenodo.modules.records.views import zenodo_related_links
+from zenodo.modules.records.views import get_reana_badge
+from zenodo.modules.records.serializers.schemas.common import api_link_for
+from six.moves.urllib.parse import urlencode
+import urlparse
 
 
 def test_is_valid_access_right(app):
@@ -326,3 +330,27 @@ def test_record_thumbnail_without_images(app, record_with_files_creation):
             'invenio_records_ui.recid_thumbnail',
             pid_value=pid.pid_value, thumbnail_size=cached_thumbnail))
     assert res.status_code == 404
+
+
+def test_record_reana_badge(app, db, minimal_record_for_badge):
+    """Test reana badge and its links"""
+
+    if not (app.config["ZENODO_REANA_BADGES_ENABLED"]):
+        assert not get_reana_badge(minimal_record_for_badge)
+
+    app.config["ZENODO_REANA_BADGES_ENABLED"] = True
+    badge = get_reana_badge(minimal_record_for_badge)
+
+    assert badge
+    assert badge["url"]
+    assert badge["img_url"]
+
+    for file in minimal_record_for_badge.files:
+        break
+
+    file_url = api_link_for("object", **(file.dumps()))
+    badge_url = "{}?{}".format(
+        app.config["ZENODO_REANA_LAUNCH_URL_BASE"],
+        urlencode({"url": file_url})
+    )
+    assert badge_url == badge["url"]

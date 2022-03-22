@@ -476,7 +476,6 @@ def communities(db, users):
 @pytest.fixture
 def oaisets(db, communities):
     """Create custom OAISet objects.
-
     Those should be custom OAISet objects which are not community based.
     """
     oaisets_data = [
@@ -1140,7 +1139,6 @@ def json_headers():
 @pytest.fixture
 def json_auth_headers(json_headers, write_token):
     """Authentication headers (with a valid oauth2 token).
-
     It uses the token associated with the first user.
     """
     return bearer_auth(json_headers, write_token)
@@ -1149,7 +1147,6 @@ def json_auth_headers(json_headers, write_token):
 @pytest.fixture
 def auth_headers(write_token):
     """Authentication headers (with a valid oauth2 token).
-
     It uses the token associated with the first user.
     """
     return bearer_auth([], write_token)
@@ -1158,7 +1155,6 @@ def auth_headers(write_token):
 @pytest.fixture
 def extra_auth_headers(extra_token):
     """Authentication headers (with a valid oauth2 token).
-
     It uses the token associated with the first user.
     """
     return bearer_auth([], extra_token)
@@ -1167,7 +1163,6 @@ def extra_auth_headers(extra_token):
 @pytest.fixture
 def json_extra_auth_headers(json_headers, extra_token):
     """Authentication headers (with a valid oauth2 token).
-
     It uses the token associated with the first user.
     """
     return bearer_auth(json_headers, extra_token)
@@ -1269,7 +1264,6 @@ def oaiset_update_records(minimal_record, db, es):
 @pytest.fixture
 def cli_run(app):
     """Fixture for CLI runner function.
-
     Returns a function accepting a single parameter (CLI command as string).
     """
     runner = CliRunner()
@@ -1439,3 +1433,16 @@ def mock_datacite_minting(mocker, app):
         'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     yield datacite_mock
     app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig
+
+
+@pytest.fixture
+def minimal_record_for_badge(db, record_with_bucket):
+    """Record for reana badge."""
+    pid, record = record_with_bucket
+    filename = "reana.yaml"
+    record.files[filename] = BytesIO(b"v1")
+    record.files[filename]["type"] = "yaml"
+    record.commit()
+    db.session.commit()
+
+    return record
