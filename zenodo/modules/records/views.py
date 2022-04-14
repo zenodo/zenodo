@@ -32,9 +32,6 @@ import re
 from datetime import datetime as dt
 from operator import itemgetter
 
-# import urlparse
-# from urllib import urlencode
-
 import idutils
 import six
 from six.moves.urllib.parse import urlencode, urlunparse
@@ -69,24 +66,24 @@ from .serializers import citeproc_v1
 from .serializers.json import ZenodoJSONSerializer
 
 blueprint = Blueprint(
-    "zenodo_records",
+    'zenodo_records',
     __name__,
-    template_folder="templates",
-    static_folder="static",
-    url_prefix="/search",
+    template_folder='templates',
+    static_folder='static',
+    url_prefix='/search',
 )
 
 
 #
 # Access right template filters and tests.
 #
-@blueprint.app_template_test("accessright")
+@blueprint.app_template_test('accessright')
 def is_valid_accessright(value):
     """Test if access right is valid."""
     return AccessRight.is_valid(value)
 
 
-@blueprint.app_template_test("embargoed")
+@blueprint.app_template_test('embargoed')
 def is_embargoed(embargo_date, accessright=None):
     """Test if date is still embargoed (according to UTC date."""
     if accessright is not None and accessright != AccessRight.EMBARGOED:
@@ -96,13 +93,13 @@ def is_embargoed(embargo_date, accessright=None):
     return False
 
 
-@blueprint.app_template_filter("extra_formats_title")
+@blueprint.app_template_filter('extra_formats_title')
 def extra_formats_title(mimetype):
     """Return a dict of a record's available extra formats and their title."""
-    return ExtraFormats.mimetype_whitelist.get(mimetype, "")
+    return ExtraFormats.mimetype_whitelist.get(mimetype, '')
 
 
-@blueprint.app_template_filter("pidstatus")
+@blueprint.app_template_filter('pidstatus')
 def pidstatus_title(pid):
     """Get access right.
 
@@ -142,7 +139,8 @@ def make_query(values):
 @blueprint.app_template_filter()
 def accessright_title(value, embargo_date=None):
     """Get category for access right."""
-    return AccessRight.as_title(AccessRight.get(value, embargo_date=embargo_date))
+    return AccessRight.as_title(
+        AccessRight.get(value, embargo_date=embargo_date))
 
 
 @blueprint.app_template_filter()
@@ -155,7 +153,8 @@ def accessright_icon(value, embargo_date=None):
 def accessright_description(value, embargo_date=None):
     """Get a description for access right."""
     return AccessRight.as_description(
-        AccessRight.get(value, embargo_date), from_isodate(embargo_date)
+        AccessRight.get(value, embargo_date),
+        from_isodate(embargo_date)
     )
 
 
