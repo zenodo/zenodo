@@ -492,7 +492,6 @@ def record_jinja_context():
     return dict(
         community_curation=community_curation,
         custom_metadata=current_custom_metadata,
-        get_reana_badge=get_reana_badge,
     )
 
 
@@ -502,33 +501,32 @@ def record_thumbnail(pid, record, thumbnail_size, **kwargs):
     We consider the thumbnail of the record as the first image in the files
     iterator or the one set as the default.
     """
-    if not has_record_perm(current_user, record, "read-files"):
+    if not has_record_perm(current_user, record, 'read-files'):
         abort(404)
-    cached_thumbnails = current_app.config["CACHED_THUMBNAILS"]
+    cached_thumbnails = current_app.config['CACHED_THUMBNAILS']
     if thumbnail_size not in cached_thumbnails:
-        abort(400, "The selected thumbnail has not been cached")
+        abort(400, 'The selected thumbnail has not been cached')
     selected = None
     thumbnail_size = cached_thumbnails[thumbnail_size]
     for file in record.files:
-        if file["type"] not in ["jpg", "png", "tif", "tiff"]:
+        if(file['type'] not in ['jpg', 'png', 'tif', 'tiff']):
             continue
         elif not selected:
             selected = file
-        elif file["default"]:
+        elif file['default']:
             selected = file
             break
     if selected:
         return IIIFImageAPI().get(
-            version="v2",
-            uuid=str(iiif_image_key(selected)),
-            region="full",
-            size=thumbnail_size,
-            rotation="0",
-            quality="default",
-            image_format=selected["type"],
-        )
+                version='v2',
+                uuid=str(iiif_image_key(selected)),
+                region='full',
+                size=thumbnail_size,
+                rotation='0',
+                quality='default',
+                image_format=selected['type'])
     else:
-        abort(404, "This record has no thumbnails")
+        abort(404, 'This record has no thumbnails')
 
 
 @pass_extra_formats_mimetype(from_query_string=True, from_accept=True)
