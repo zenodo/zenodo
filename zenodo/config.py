@@ -760,6 +760,12 @@ ZENODO_REMOVAL_REASONS = [
     ('uploader', 'Record removed on request by uploader.'),
     ('takedown', 'Record removed on request by third-party.'),
 ]
+
+ZENODO_REANA_HOSTS = ["reana.cern.ch", "dev.reana.cern.ch", "reana.bnl.gov", "reana.io"]
+ZENODO_REANA_LAUNCH_URL_BASE = "https://reana.cern.ch/launch"
+ZENODO_REANA_BADGE_IMG_URL = "https://camo.githubusercontent.com/d03644c923285a64bc2b87926cd327d8e334d4ebb227525a9eb40c401c3891b9/68747470733a2f2f696d672e736869656c64732e696f2f62616467652f4c61756e63682532306f6e2d5245414e412d666633333336"
+ZENODO_REANA_BADGES_ENABLED = True
+
 #: Mapping of old export formats to new content type.
 ZENODO_RECORDS_EXPORTFORMATS = {
     'dcite': dict(

@@ -492,6 +492,7 @@ def record_jinja_context():
     return dict(
         community_curation=community_curation,
         custom_metadata=current_custom_metadata,
+        get_reana_badge=get_reana_badge,
     )
 
 
