@@ -1439,3 +1439,16 @@ def mock_datacite_minting(mocker, app):
         'invenio_pidstore.providers.datacite.DataCiteMDSClient')
     yield datacite_mock
     app.config['DEPOSIT_DATACITE_MINTING_ENABLED'] = orig
+
+
+@pytest.fixture
+def minimal_record_for_badge(db, record_with_bucket):
+    """Record for reana badge."""
+    pid, record = record_with_bucket
+    filename = "reana.yaml"
+    record.files[filename] = BytesIO(b"v1")
+    record.files[filename]["type"] = "yaml"
+    record.commit()
+    db.session.commit()
+
+    return record

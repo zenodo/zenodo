@@ -28,11 +28,15 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import copy
 import json
+import re
 from datetime import datetime as dt
 from operator import itemgetter
 
 import idutils
 import six
+from six.moves.urllib.parse import urlencode, urlunparse
+import urlparse
+
 from flask import Blueprint, abort, current_app, render_template, request
 from flask_iiif.restful import IIIFImageAPI
 from flask_principal import ActionNeed
@@ -51,6 +55,7 @@ from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.extra_formats import ExtraFormats
 from zenodo.modules.deposit.views_rest import pass_extra_formats_mimetype
 from zenodo.modules.records.utils import is_doi_locally_managed
+from zenodo.modules.records.serializers.schemas.common import api_link_for
 from zenodo.modules.stats.utils import get_record_stats
 
 from .api import ZenodoRecord
@@ -65,7 +70,7 @@ blueprint = Blueprint(
     __name__,
     template_folder='templates',
     static_folder='static',
-    url_prefix='/search'
+    url_prefix='/search',
 )
 
 
@@ -118,7 +123,8 @@ def accessright_get(value, embargo_date=None):
 def accessright_category(value, embargo_date=None, **kwargs):
     """Get category for access right."""
     return AccessRight.as_category(
-        AccessRight.get(value, embargo_date=embargo_date), **kwargs)
+        AccessRight.get(value, embargo_date=embargo_date), **kwargs
+    )
 
 
 @blueprint.app_template_filter()
@@ -441,11 +447,52 @@ def community_curation(record, user):
         )
 
 
+def get_reana_badge(record):
+    """Reana badge creation"""
+    if not current_app.config["ZENODO_REANA_BADGES_ENABLED"]:
+        return None
+
+    p = re.compile("^reana.*\.(yaml|yml)$", re.IGNORECASE)
+    if record.files:
+        for file in record.files:
+            m = p.match(str(file["key"]))
+            if m:
+                file_url = api_link_for("object", **(file.dumps()))
+                reana_url_parts = list(
+                    urlparse.urlparse(
+                        current_app.config["ZENODO_REANA_LAUNCH_URL_BASE"]
+                    )
+                )
+                query = dict(urlparse.parse_qsl(reana_url_parts[4]))
+                query.update({"url": file_url})
+                reana_url_parts[4] = urlencode(query)
+                return {
+                    "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
+                    "url": urlunparse(reana_url_parts),
+                }
+
+    for item in record.get("related_identifiers", []):
+        if item["scheme"] == "url":
+            reana_hosts = current_app.config["ZENODO_REANA_HOSTS"]
+            url_parts = urlparse.urlparse(item["identifier"])
+            if url_parts.netloc in reana_hosts and url_parts.path in [
+                "/launch",
+                "/run",
+            ]:
+                return {
+                    "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
+                    "url": item["identifier"],
+                }
+
+    return None
+
+
 def record_jinja_context():
     """Jinja context processor for records."""
     return dict(
         community_curation=community_curation,
         custom_metadata=current_custom_metadata,
+        get_reana_badge=get_reana_badge,
     )
 
 

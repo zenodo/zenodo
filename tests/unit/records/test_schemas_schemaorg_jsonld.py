@@ -46,6 +46,7 @@ SCHEMA_ORG_TYPES = [
     ('video', None, schemaorg.MediaObject),
     ('software', None, schemaorg.SoftwareSourceCode),
     ('lesson', None, schemaorg.CreativeWork),
+    ('workflow', None, schemaorg.CreativeWork),
     ('physicalobject', None, schemaorg.CreativeWork),
     ('other', None, schemaorg.CreativeWork),
     ('publication', 'book', schemaorg.Book),

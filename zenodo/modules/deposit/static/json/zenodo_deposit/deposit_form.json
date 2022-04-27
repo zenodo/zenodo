@@ -70,6 +70,11 @@
             "fa_cls": "fa-cube"
           },
           {
+            "value": "workflow",
+            "name": "Workflow",
+            "fa_cls": "fa-code-fork"
+          },
+          {
             "value": "other",
             "name": "Other",
             "fa_cls": "fa-asterisk"
