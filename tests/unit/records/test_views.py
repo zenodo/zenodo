@@ -341,16 +341,18 @@ def test_record_reana_badge(app, db, minimal_record_for_badge):
     app.config["ZENODO_REANA_BADGES_ENABLED"] = True
     badge = get_reana_badge(minimal_record_for_badge)
 
+    # TODO: Assert actual values
     assert badge
     assert badge["url"]
     assert badge["img_url"]
 
-    for file in minimal_record_for_badge.files:
-        break
-
+    file = minimal_record_for_badge.files["reana.yaml"]
     file_url = api_link_for("object", **(file.dumps()))
     badge_url = "{}?{}".format(
         app.config["ZENODO_REANA_LAUNCH_URL_BASE"],
-        urlencode({"url": file_url})
+        urlencode({
+            "url": file_url,
+            "name": minimal_record_for_badge["title"],
+        })
     )
     assert badge_url == badge["url"]

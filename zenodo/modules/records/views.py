@@ -466,10 +466,14 @@ def get_reana_badge(record):
                         )
                     )
                     query = dict(urlparse.parse_qsl(reana_url_parts[4]))
-                    query.update({"url": file_url})
+                    query.update({
+                        "url": file_url,
+                        "name": record["title"],
+                    })
                     reana_url_parts[4] = urlencode(query)
                     return {
-                        "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
+                        "img_url":
+                            current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
                         "url": urlunparse(reana_url_parts),
                     }
 
@@ -481,9 +485,15 @@ def get_reana_badge(record):
                     "/launch",
                     "/run",
                 ]:
+                    # Add a "name" if not already there
+                    reana_url_parts = list(url_parts)
+                    query = dict(urlparse.parse_qsl(reana_url_parts[4]))
+                    query.setdefault("name", record["title"])
+                    reana_url_parts[4] = urlencode(query)
                     return {
-                        "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
-                        "url": item["identifier"],
+                        "img_url":
+                            current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
+                        "url": urlunparse(reana_url_parts),
                     }
     except Exception:
         pass
