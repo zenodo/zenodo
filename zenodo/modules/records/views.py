@@ -453,39 +453,40 @@ def get_reana_badge(record):
     if not current_app.config["ZENODO_REANA_BADGES_ENABLED"]:
         return None
 
-    p = re.compile("^reana.*\.(yaml|yml)$", re.IGNORECASE)
-    if record.files:
-        for file in record.files:
-            m = p.match(str(file["key"]))
-            if m:
-                file_url = api_link_for("object", **(file.dumps()))
-                reana_url_parts = list(
-                    urlparse.urlparse(
-                        current_app.config["ZENODO_REANA_LAUNCH_URL_BASE"]
+    try:
+        p = re.compile("^reana.*\.(yaml|yml)$", re.IGNORECASE)
+        if record.files:
+            for file in record.files:
+                m = p.match(file["key"])
+                if m:
+                    file_url = api_link_for("object", **(file.dumps()))
+                    reana_url_parts = list(
+                        urlparse.urlparse(
+                            current_app.config["ZENODO_REANA_LAUNCH_URL_BASE"]
+                        )
                     )
-                )
-                query = dict(urlparse.parse_qsl(reana_url_parts[4]))
-                query.update({"url": file_url})
-                reana_url_parts[4] = urlencode(query)
-                return {
-                    "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
-                    "url": urlunparse(reana_url_parts),
-                }
+                    query = dict(urlparse.parse_qsl(reana_url_parts[4]))
+                    query.update({"url": file_url})
+                    reana_url_parts[4] = urlencode(query)
+                    return {
+                        "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
+                        "url": urlunparse(reana_url_parts),
+                    }
 
-    for item in record.get("related_identifiers", []):
-        if item["scheme"] == "url":
-            reana_hosts = current_app.config["ZENODO_REANA_HOSTS"]
-            url_parts = urlparse.urlparse(item["identifier"])
-            if url_parts.netloc in reana_hosts and url_parts.path in [
-                "/launch",
-                "/run",
-            ]:
-                return {
-                    "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
-                    "url": item["identifier"],
-                }
-
-    return None
+        for item in record.get("related_identifiers", []):
+            if item["scheme"] == "url":
+                reana_hosts = current_app.config["ZENODO_REANA_HOSTS"]
+                url_parts = urlparse.urlparse(item["identifier"])
+                if url_parts.netloc in reana_hosts and url_parts.path in [
+                    "/launch",
+                    "/run",
+                ]:
+                    return {
+                        "img_url": current_app.config["ZENODO_REANA_BADGE_IMG_URL"],
+                        "url": item["identifier"],
+                    }
+    except Exception:
+        pass
 
 
 def record_jinja_context():
