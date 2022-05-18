@@ -543,7 +543,7 @@ def test_contributors(db, minimal_record_model, recid_pid):
 
 
 def test_contributors_v4(db, minimal_record_model, recid_pid):
-    """Test creators."""
+    """Test contributors."""
     minimal_record_model.update({
         'contributors': [{
             'name': 'A, B',
@@ -572,11 +572,12 @@ def test_contributors_v4(db, minimal_record_model, recid_pid):
                 {
                     'nameIdentifier': '0000-0000-0000-0000',
                     'nameIdentifierScheme': 'ORCID',
-                    'schemeURI': 'http://orcid.org/'},
+                    'schemeURI': 'http://orcid.org/'
+                },
                 {
                     'nameIdentifier': '1234',
-                    'nameIdentifierScheme': 'GND'},
-
+                    'nameIdentifierScheme': 'GND'
+                },
             ]
         },
         {
@@ -586,6 +587,30 @@ def test_contributors_v4(db, minimal_record_model, recid_pid):
             'familyName': '',
             'contributorType': 'Supervisor',
             'nameIdentifiers': [],
+        },
+    ]
+
+    # Test without `thesis` field
+    minimal_record_model.pop('thesis', None)
+    obj = datacite_v41.transform_record(recid_pid, minimal_record_model)
+    assert obj['contributors'] == [
+        {
+            'affiliations': ['AA'],
+            'contributorName': 'A, B',
+            'givenName': 'B',
+            'familyName': 'A',
+            'contributorType': 'Researcher',
+            'nameIdentifiers': [
+                {
+                    'nameIdentifier': '0000-0000-0000-0000',
+                    'nameIdentifierScheme': 'ORCID',
+                    'schemeURI': 'http://orcid.org/'
+                },
+                {
+                    'nameIdentifier': '1234',
+                    'nameIdentifierScheme': 'GND'
+                },
+            ]
         },
     ]
 

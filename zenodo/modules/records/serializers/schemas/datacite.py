@@ -515,7 +515,7 @@ class DataCiteSchemaV4(DataCiteSchema):
         contributors = obj['metadata'].get('contributors', [])
         contributors.extend([
             inject_type(c) for c in
-            obj['metadata'].get('thesis').get('supervisors', [])
+            obj['metadata'].get('thesis', {}).get('supervisors', [])
         ])
 
         items = []
