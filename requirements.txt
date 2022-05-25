@@ -204,7 +204,7 @@ pyasn1==0.4.2
 pycountry==18.12.8
 pycparser==2.19
 Pygments==2.3.1
-PyJWT==1.7.1
+PyJWT==2.4.0
 pykerberos==1.2.1
 pyOpenSSL==17.5.0
 python-dateutil==2.8.0
