@@ -27,7 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from elasticsearch_dsl import Q
-from flask import request
+from flask import request, current_app
 from invenio_records_rest.query import es_search_factory as _es_search_factory
 
 
@@ -44,8 +44,16 @@ def apply_version_filters(search, urlkwargs):
         search = search.filter(Q('term', **{'relations.version.is_last': True}))
     return (search, urlkwargs)
 
+def apply_safelist_filter(search, urlkwargs):
+    """Apply safelist filter to search."""
+    if current_app.config.get('ZENODO_RECORDS_SEARCH_SAFELIST', False) and \
+        not urlkwargs.get('q'):
+            search = search.filter(Q('term', _safelisted=True))
+
+    return (search, urlkwargs)
+
 
 def search_factory(self, search, query_parser=None):
     """Search factory."""
     search, urlkwargs = _es_search_factory(self, search)
-    return apply_version_filters(search, urlkwargs)
+    return apply_safelist_filter(*apply_version_filters(search, urlkwargs))

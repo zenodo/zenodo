@@ -56,7 +56,30 @@
 <div class="list-group-item col-sm-6">
   <strong>Login count:</strong> {{user.login_count}}
 </div>
+<div class="list-group-item col-sm-6">
+    <strong style="float: left">Safelisted: </strong>
+  <div class="col-sm-8">
+    {{ safelist_action( user,
+    "delete" if user is safelisted_user else "post")
+    }}
+  </div>
+</div>
 {%- endmacro %}
+
+{%- macro safelist_action(user, action) %}
+  {{user is safelisted_user}}
+  <form action="{{ url_for('zenodo_spam.safelist_add_remove',
+      user_id=user.id) }}" style="float: right;" method="POST">
+    <input name="_method" type="hidden" value="{{ action }}">
+    <input name="next" type="hidden" value="{{ url_for('zenodo_spam.delete',
+      user_id=user.id) }}">
+    <button
+      class="btn btn-{{ "info" if action == "post" else "danger" }}"
+      style="height: 20px;padding: 2px"
+      type="submit">{{ "Add" if action == "post" else "Remove" }}
+    </button>
+  </form>
+{% endmacro %}
 
 {%- macro bucket_list(record) %}
 <tr>
