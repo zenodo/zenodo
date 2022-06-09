@@ -113,8 +113,8 @@ def test_resource_types(app, db, minimal_oai_record, recid_pid):
         recid_pid, Record(minimal_oai_record))
     # Datasets use the DOI
     assert obj['originalId'] == '10.1234/foo'
-    assert obj['collectedFromId'] == 're3data_____::r3d100010468'
-    assert obj['hostedById'] == 're3data_____::r3d100010468'
+    assert obj['collectedFromId'] == 'opendoar____::2659'
+    assert obj['hostedById'] == 'opendoar____::2659'
     assert obj['resourceType'] == '0021'
     assert obj['type'] == 'dataset'
 

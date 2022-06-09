@@ -70,15 +70,15 @@ def test_openaire_id(app, minimal_record):
     r['_oai'] = {'id': u'oai:zenodo.org:123'}
 
     # Default zenodo type is software
-    assert openaire_id(r) == 'r37b0ad08687::47287d1800c112499a117ca17aa1909d'
+    assert openaire_id(r) == 'od______2659::47287d1800c112499a117ca17aa1909d'
 
     # Other type
     r['resource_type']['type'] = 'other'
-    assert openaire_id(r) == 'r37b0ad08687::47287d1800c112499a117ca17aa1909d'
+    assert openaire_id(r) == 'od______2659::47287d1800c112499a117ca17aa1909d'
 
     # Dataset ID
     r['resource_type']['type'] = 'dataset'
-    assert openaire_id(r) == 'r37b0ad08687::204007f516ddcf0a452c2f22d48695ca'
+    assert openaire_id(r) == 'od______2659::204007f516ddcf0a452c2f22d48695ca'
 
     # Publication ID
     r['resource_type']['type'] = 'publication'
