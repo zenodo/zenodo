@@ -28,6 +28,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 
 import json
 
+import re
 import arrow
 import pycountry
 from flask import current_app
@@ -524,12 +525,24 @@ class DataCiteSchemaV4(DataCiteSchema):
 
         return items
 
+    FUNDER_PROGRAM_MATCHES = {
+        '10.13039/100010661': ('^H2020$', '^Horizon 2020',),
+        '10.13039/100011102': ('^FP7$',),
+    }
+
     def get_fundingreferences(self, obj):
         """Get funding references."""
         items = []
         for g in obj['metadata'].get('grants', []):
             funder_name = g.get('funder', {}).get('name')
+
             funder_identifier = g.get('funder', {}).get('doi')
+            award_program = g.get('program')
+            if award_program:
+                for funder_id, regexes in self.FUNDER_PROGRAM_MATCHES.items():
+                    if any(re.match(r, award_program) for r in regexes):
+                        funder_identifier = funder_id
+
             award_number = g.get('code')
             award_title = g.get('title')
 
