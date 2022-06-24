@@ -39,7 +39,7 @@ def test_safelist_add_remove(
         res = client.post(
             url_for('zenodo_spam.safelist_add_remove', user_id=1),
             data={
-              '_method': 'post',
+              'action': 'post',
               'next': url_for('invenio_records_ui.recid',
                               pid_value=full_record['recid'])
             },
@@ -52,7 +52,7 @@ def test_safelist_add_remove(
         res = client.post(
             url_for('zenodo_spam.safelist_add_remove', user_id=1),
             data={
-                '_method': 'delete',
+                'action': 'delete',
                 'next': url_for('invenio_records_ui.recid',
                                 pid_value=full_record['recid']),
             },

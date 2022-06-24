@@ -68,8 +68,6 @@ class SafelistEntry(db.Model):
         except Exception:
             return None
 
-
-
     @classmethod
     def get_by_user_id(cls, user_id):
         """Get entry by user_id."""

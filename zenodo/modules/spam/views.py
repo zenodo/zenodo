@@ -114,7 +114,7 @@ def safelist_add_remove(user_id):
         abort(403)
 
     user = User.query.get(user_id)
-    if request.form['_method'] == 'post':
+    if request.form['action'] == 'post':
         # Create safelist entry
         SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
             current_user.email, current_user.id))

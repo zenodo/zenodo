@@ -70,7 +70,7 @@
   {{user is safelisted_user}}
   <form action="{{ url_for('zenodo_spam.safelist_add_remove',
       user_id=user.id) }}" style="float: right;" method="POST">
-    <input name="_method" type="hidden" value="{{ action }}">
+    <input name="action" type="hidden" value="{{ action }}">
     <input name="next" type="hidden" value="{{ url_for('zenodo_spam.delete',
       user_id=user.id) }}">
     <button

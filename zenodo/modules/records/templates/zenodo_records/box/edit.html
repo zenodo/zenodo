@@ -76,7 +76,7 @@
     <li>
       <form action="{{ url_for('zenodo_spam.safelist_add_remove',
       user_id=record._deposit.owners[0]) }}" method="POST">
-        <input type="hidden" name="_method" value="delete">
+        <input type="hidden" name="action" value="delete">
          <input type="hidden" name="next"
                value="{{ url_for('invenio_records_ui.recid',
                pid_value=pid.pid_value) }}"
@@ -91,7 +91,7 @@
     <li>
       <form action="{{ url_for('zenodo_spam.safelist_add_remove',
        user_id=record._deposit.owners[0]) }}" method="POST">
-        <input type="hidden" name="_method" value="post">
+        <input type="hidden" name="action" value="post">
         <input type="hidden" name="next"
                value="{{ url_for('invenio_records_ui.recid',
                pid_value=pid.pid_value) }}"
