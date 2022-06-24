@@ -1382,7 +1382,7 @@ COMMUNITIES_REQUEST_EMAIL_SENDER = SUPPORT_EMAIL
 #: Default site name.
 THEME_SITENAME = _("Zenodo")
 #: Default site URL (used only when not in a context - e.g. like celery tasks).
-THEME_SITEURL = "http://127.0.0.1:5000"
+THEME_SITEURL = "http://localhost:5000"
 #: Endpoint for breadcrumb root.
 THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
 #: Twitter handle.
@@ -1749,5 +1749,5 @@ SECURITY_MSG_PASSWORD_NOT_SET = failed_login_msg
 SECURITY_MSG_INVALID_PASSWORD = failed_login_msg
 SECURITY_MSG_CONFIRMATION_REQUIRED = failed_login_msg
 
-ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD=1000
-ZENODO_RECORDS_SEARCH_SAFELIST=False
+ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD = 1000
+ZENODO_RECORDS_SEARCH_SAFELIST = False

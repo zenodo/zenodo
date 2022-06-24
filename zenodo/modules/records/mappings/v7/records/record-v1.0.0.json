@@ -778,8 +778,8 @@
         "type": "keyword"
       },
       "_safelisted": {
-                "type": "boolean"
-              }
+        "type": "boolean"
+      }
     }
   }
 }

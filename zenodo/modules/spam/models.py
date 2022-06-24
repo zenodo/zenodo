@@ -65,7 +65,7 @@ class SafelistEntry(db.Model):
             db.session.add(entry)
             db.session.commit()
             return entry
-        except:
+        except Exception:
             return None
 
 
@@ -84,13 +84,13 @@ class SafelistEntry(db.Model):
             entry = cls.query.filter(cls.user_id == user_id).first()
             db.session.delete(entry)
             db.session.commit()
-        except:
+        except Exception:
             pass
 
     @classmethod
     def get_record_status(cls, record):
         """Get entry by user_id."""
-        for owner_id in record["owners"]:
-            if not cls.get_by_user_id(owner_id):
-                return False
-        return True
+        for owner_id in record.get("owners", []):
+            if cls.get_by_user_id(owner_id):
+                return True
+        return False

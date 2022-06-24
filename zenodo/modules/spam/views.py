@@ -108,7 +108,7 @@ def delete(user_id):
 @blueprint.route('/<int:user_id>/safelist', methods=['POST'])
 @login_required
 def safelist_add_remove(user_id):
-    """Add or remove user from spam safelist."""
+    """Add or remove user from the safelist."""
     # Only admin can access this view
     if not Permission(ActionNeed('admin-access')).can():
         abort(403)
@@ -116,7 +116,7 @@ def safelist_add_remove(user_id):
     user = User.query.get(user_id)
     if request.form['_method'] == 'post':
         # Create safelist entry
-        SafelistEntry.create(user_id=user.id, notes='Added by {} ({})'.format(
+        SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
             current_user.email, current_user.id))
 
         flash("Added to safelist", category='success')

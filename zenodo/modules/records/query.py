@@ -46,8 +46,10 @@ def apply_version_filters(search, urlkwargs):
 
 def apply_safelist_filter(search, urlkwargs):
     """Apply safelist filter to search."""
-    if current_app.config.get('ZENODO_RECORDS_SEARCH_SAFELIST', False) and \
-        not urlkwargs.get('q'):
+    safelist_filter_enabled = current_app.config.get(
+        'ZENODO_RECORDS_SEARCH_SAFELIST', False)
+    has_query = urlkwargs.get('q')
+    if safelist_filter_enabled and not has_query:
             search = search.filter(Q('term', _safelisted=True))
 
     return (search, urlkwargs)
