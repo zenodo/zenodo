@@ -34,6 +34,7 @@ from invenio_pidstore.models import PersistentIdentifier
 from zenodo.modules.records.serializers.pidrelations import \
     serialize_related_identifiers
 from zenodo.modules.records.utils import build_record_custom_fields
+from zenodo.modules.spam.models import SafelistEntry
 from zenodo.modules.stats.utils import build_record_stats
 
 
@@ -80,6 +81,8 @@ def indexer_receiver(sender, json=None, record=None, index=None,
 
     json['_stats'] = build_record_stats(record['recid'],
                                         record.get('conceptrecid'))
+
+    json['_safelisted'] = SafelistEntry.get_record_status(record)
 
     custom_es_fields = build_record_custom_fields(json)
     for es_field, es_value in custom_es_fields.items():

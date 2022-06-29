@@ -29,7 +29,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import islice
 
 from elasticsearch_dsl import Q
-from flask import Blueprint, abort, flash, redirect, render_template, url_for
+from flask import Blueprint, abort, current_app, flash, redirect, \
+    render_template, request, url_for
 from flask_login import login_required
 from flask_principal import ActionNeed
 from flask_security import current_user
@@ -38,10 +39,12 @@ from invenio_accounts.admin import _datastore
 from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_db import db
+from invenio_indexer.api import RecordIndexer
 from invenio_search.api import RecordsSearch
 
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.spam.forms import DeleteSpamForm
+from zenodo.modules.spam.models import SafelistEntry
 
 blueprint = Blueprint(
     'zenodo_spam',
@@ -101,3 +104,36 @@ def delete(user_id):
         records = islice(rs.scan(), 10)
         ctx.update(records=records)
         return render_template('zenodo_spam/delete.html', **ctx)
+
+@blueprint.route('/<int:user_id>/safelist', methods=['POST'])
+@login_required
+def safelist_add_remove(user_id):
+    """Add or remove user from the safelist."""
+    # Only admin can access this view
+    if not Permission(ActionNeed('admin-access')).can():
+        abort(403)
+
+    user = User.query.get(user_id)
+    if request.form['action'] == 'post':
+        # Create safelist entry
+        SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
+            current_user.email, current_user.id))
+
+        flash("Added to safelist", category='success')
+    else:
+        # Remove safelist entry
+        SafelistEntry.remove_by_user_id(user.id)
+        flash("Removed from safelist", category='warning')
+
+    rs = RecordsSearch().filter('term', owners=user_id).source(False)
+    index_threshold = current_app.config.get(
+        'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
+    if rs.count() < index_threshold:
+        for record in rs.scan():
+            RecordIndexer().index_by_id(record.meta.id)
+    else:
+        RecordIndexer().bulk_index((
+            record.meta.id for record in rs.scan()
+        ))
+
+    return redirect(request.form['next'])

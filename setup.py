@@ -295,6 +295,8 @@ setup(
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
         ],
+        "invenio_db.alembic": ["zenodo_spam = zenodo.modules.spam:alembic"],
+        "invenio_db.models": ["zenodo_spam = zenodo.modules.spam.models"],
     },
     extras_require=extras_require,
     install_requires=install_requires,

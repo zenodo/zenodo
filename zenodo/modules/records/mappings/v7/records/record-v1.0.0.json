@@ -776,6 +776,9 @@
       },
       "version": {
         "type": "keyword"
+      },
+      "_safelisted": {
+        "type": "boolean"
       }
     }
   }

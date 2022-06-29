@@ -72,6 +72,37 @@
       <span class="text-danger"><i class="fa fa-trash"></i> Delete user ...</span>
     </a></li>
     {%- endif %}
+    {% if record is safelisted_record %}
+    <li>
+      <form action="{{ url_for('zenodo_spam.safelist_add_remove',
+      user_id=record._deposit.owners[0]) }}" method="POST">
+        <input type="hidden" name="action" value="delete">
+         <input type="hidden" name="next"
+               value="{{ url_for('invenio_records_ui.recid',
+               pid_value=pid.pid_value) }}"
+        />
+        <button class="btn btn-link" type="submit" {{
+          'disabled' if edit_disabled else ''}}><div style="color: #f0ad4e">
+          <i class="fa fa-pencil-square-o"></i> Remove from safelist</div>
+        </button>
+      </form>
+    </li>
+    {% else %}
+    <li>
+      <form action="{{ url_for('zenodo_spam.safelist_add_remove',
+       user_id=record._deposit.owners[0]) }}" method="POST">
+        <input type="hidden" name="action" value="post">
+        <input type="hidden" name="next"
+               value="{{ url_for('invenio_records_ui.recid',
+               pid_value=pid.pid_value) }}"
+        />
+        <button class="btn btn-link" type="submit" {{
+          'disabled' if edit_disabled else ''}}><div style="color: #6aa3d5">
+          <i class="fa fa-pencil-square-o"></i> Add to safelist</div>
+        </button>
+      </form>
+    </li>
+    {% endif %}
   </ul>
 </div>
 {%- endif %}
