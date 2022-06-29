@@ -22,15 +22,14 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Models."""
+"""Spam models."""
 
-import uuid
 from datetime import datetime
 
 from invenio_accounts.models import User
 from invenio_db import db
 from sqlalchemy.dialects import mysql
-from sqlalchemy_utils.types import UUIDType
+
 
 class SafelistEntry(db.Model):
     """Defines a message to show to users."""

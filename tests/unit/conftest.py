@@ -933,6 +933,16 @@ def record_with_image_creation(db, record_with_bucket):
 
 
 @pytest.fixture
+def published_record(db, es, record_with_bucket):
+    """Published and indexed record."""
+    _, record = record_with_bucket
+    indexer = RecordIndexer()
+    indexer.index_by_id(str(record.id))
+    current_search.flush_and_refresh(index='records')
+    return record
+
+
+@pytest.fixture
 def closed_access_record(db, es, record_with_files_creation):
     """Creation of a full record with closed access right."""
     _, record, record_url = record_with_files_creation

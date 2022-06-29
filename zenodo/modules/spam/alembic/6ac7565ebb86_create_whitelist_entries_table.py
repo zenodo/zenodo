@@ -25,7 +25,6 @@
 """Create files REST tables."""
 
 import sqlalchemy as sa
-import sqlalchemy_utils
 from alembic import op
 from sqlalchemy.dialects import mysql
 
