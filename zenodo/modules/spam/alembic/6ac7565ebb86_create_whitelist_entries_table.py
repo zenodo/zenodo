@@ -42,7 +42,7 @@ def upgrade():
         'safelist_entries',
         sa.Column('user_id', sa.Integer(), nullable=False),
         sa.ForeignKeyConstraint(
-            ['accounts_user'],
+            ['user_id'],
             [u'accounts_user.id'],
             ondelete='RESTRICT'),
         sa.PrimaryKeyConstraint('user_id'),
