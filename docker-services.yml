@@ -36,7 +36,7 @@ services:
     ports:
       - "6379:6379"
   db:
-    image: postgres:12.5
+    image: postgres:12.10
     environment:
       - "POSTGRES_USER=zenodo"
       - "POSTGRES_PASSWORD=zenodo"
