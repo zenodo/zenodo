@@ -50,7 +50,10 @@ def apply_safelist_filter(search, urlkwargs):
         'ZENODO_RECORDS_SEARCH_SAFELIST', False)
     has_query = urlkwargs.get('q')
     if safelist_filter_enabled and not has_query:
-            search = search.filter(Q('term', _safelisted=True))
+        # Include if safelisted or undetermined (i.e. not indexed yet)
+        search = search.filter(
+            Q('term', _safelisted=True) | ~Q('exists', field='_safelisted')
+        )
 
     return (search, urlkwargs)
 
