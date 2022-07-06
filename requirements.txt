@@ -173,7 +173,7 @@ jupyter-client==5.2.4
 jupyter-core==4.4.0
 kombu==4.4.0
 limits==1.3
-lxml==4.6.2
+lxml==4.9.1
 Mako==1.0.8
 MarkupSafe==1.1.1
 marshmallow==2.20.5
