@@ -82,5 +82,6 @@ REDIRECTOR_EXTERNAL_REDIRECTS = [
     ['/privacy-policy', 'privacy-policy',
      'http://about.zenodo.org/privacy-policy/'],
     ['/terms', 'terms', 'http://about.zenodo.org/terms/'],
-    ['/donate', 'donate', 'https://cernandsocietyfoundation.cern/projects/zenodo'],
+    ['/donate', 'donate',
+     'https://donate.cernandsocietyfoundation.cern/zenodo/~my-donation?_cv=1'],
 ]
