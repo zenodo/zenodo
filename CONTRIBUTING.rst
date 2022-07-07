@@ -39,4 +39,4 @@ Attribution 4.0 International (text content) <https://creativecommons.org/licens
 
 Donate
 ------
-You can donate any amount to Zenodo via the CERN & Society Foundation. For details see https://cernandsocietyfoundation.cern/projects/zenodo.
+You can donate any amount to Zenodo via the CERN & Society Foundation. For details see https://donate.cernandsocietyfoundation.cern/zenodo/~my-donation?_cv=1.
