@@ -1040,6 +1040,19 @@ RECORDS_REST_SORT_OPTIONS = dict(
         )
     )
 )
+
+
+def safelist_sort(_):
+    """Always show safelisted records first."""
+    return {'_safelisted': {'order': 'desc'}}
+
+
+# Apply safelist sorting to all record sorting options
+for k in RECORDS_REST_SORT_OPTIONS['records']:
+    # NOTE: We insert in the beginning
+    RECORDS_REST_SORT_OPTIONS['records'][k]['fields'].insert(0, safelist_sort)
+
+
 DEPOSIT_REST_SORT_OPTIONS['deposits'].update(
     dict(
         distance=dict(
