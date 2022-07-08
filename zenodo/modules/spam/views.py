@@ -125,7 +125,8 @@ def safelist_add_remove(user_id):
         SafelistEntry.remove_by_user_id(user.id)
         flash("Removed from safelist", category='warning')
 
-    rs = RecordsSearch().filter('term', owners=user_id).source(False)
+    rs = RecordsSearch(index='records').filter(
+        'term', owners=user_id).source(False)
     index_threshold = current_app.config.get(
         'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
     if rs.count() < index_threshold:
