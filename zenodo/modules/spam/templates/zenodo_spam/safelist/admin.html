@@ -1,0 +1,203 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2017 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends config.RECORDS_UI_BASE_TEMPLATE %}
+
+{#{% from "invenio_userprofiles/settings/_macros.html" import render_field %}#}
+
+{%- block page_body %}
+<div class="container record-admin">
+  <div class="row">
+    <div class="col-xs-12">
+      <h1>Safelist admin</h1>
+    </div>
+  </div>
+  <div class="row">
+      <h3>Orcid/GitHub Users:</h3>
+      <div class="col-md-12">
+          <table id="external_table" class="table table-striped
+          table-bordered" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Select</th>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Whitelist</th>
+                  <th>Delete</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for user in users.values() %}
+                  {% if user.external_identifiers %}
+                      <tr>
+                        <td></td>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.full_name }}</td>
+                        <td>
+                            <form action="{{
+                                url_for('zenodo_spam.safelist_add_remove',
+                                user_id=user.id) }}" style="float: right;"
+                                  method="POST"
+                            >
+                                <input
+                                  name="action"
+                                  type="hidden"
+                                  value="post">
+                                <input name="next" type="hidden"
+                                       value="{{
+                                         url_for('zenodo_spam.safelist_admin',
+                                         user_id=user.id)
+                                       }}">
+                                <button
+                                  class="btn btn-warning"
+                                  style="height: 20px;padding: 2px"
+                                  type="submit">
+                                  Add
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <a
+                              class="btn btn-danger"
+                              href="
+                              {{ url_for('zenodo_spam.delete',
+                              user_id=user.id)}}"
+                            >Delete</a>
+                        </td>
+                    </tr>
+                  {% endif %}
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                  <th>Select</th>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Whitelist</th>
+                  <th>Delete</th>
+              </tr>
+        </tfoot>
+    </table>
+      </div>
+  </div>
+  <div class="row">
+      <h3>No external login:</h3>
+      <div class="col-md-12">
+          <table id="no_external_table" class="table table-striped
+          table-bordered" style="width:100%">
+          <thead>
+              <tr>
+                  <th>Select</th>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Whitelist</th>
+                  <th>Delete</th>
+              </tr>
+          </thead>
+          <tbody>
+              {% for user in users.values() %}
+                  {% if not user.external_identifiers %}
+                      <tr>
+                        <td></td>
+                        <td>{{ user.id }}</td>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.full_name }}</td>
+                        <td>
+                            <form action="{{
+                                url_for('zenodo_spam.safelist_add_remove',
+                                user_id=user.id) }}" style="float: right;"
+                                  method="POST"
+                            >
+                                <input
+                                  name="action"
+                                  type="hidden"
+                                  value="post">
+                                <input name="next" type="hidden"
+                                       value="{{
+                                         url_for('zenodo_spam.safelist_admin',
+                                         user_id=user.id)
+                                       }}">
+                                <button
+                                  class="btn btn-warning"
+                                  style="height: 20px;padding: 2px"
+                                  type="submit">
+                                  Add
+                                </button>
+                            </form>
+                        </td>
+                        <td>
+                            <a
+                              class="btn btn-danger"
+                              href="
+                              {{ url_for('zenodo_spam.delete',
+                              user_id=user.id)}}"
+                            >Delete</a>
+                        </td>
+                    </tr>
+                  {% endif %}
+              {% endfor %}
+          </tbody>
+          <tfoot>
+              <tr>
+                  <th>Select</th>
+                  <th>ID</th>
+                  <th>Username</th>
+                  <th>Email</th>
+                  <th>Name</th>
+                  <th>Whitelist</th>
+                  <th>Delete</th>
+              </tr>
+        </tfoot>
+    </table>
+      </div>
+  </div>
+</div>
+{%- endblock page_body %}
+
+{%- block javascript %}
+<!-- POC -->
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap.min.js"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
+<script>
+  $(document).ready(function () {
+    $('#external_table').DataTable();
+    $('#no_external_table').DataTable();
+});
+</script>
+
+{%- endblock javascript %}
+

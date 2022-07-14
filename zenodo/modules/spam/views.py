@@ -105,6 +105,73 @@ def delete(user_id):
         ctx.update(records=records)
         return render_template('zenodo_spam/delete.html', **ctx)
 
+def user_info(user_id, last_records):
+    user = User.query.get(user_id)
+    info = {
+        'id': user.id,
+        'email': user.email,
+        'full_name': user.profile.full_name,
+        'username': user.profile.username,
+        'last_records': '',
+        'external_identifiers': ''
+    }
+
+    # TODO maybe make it more beautiful?
+    try:
+        if user.external_ideantifiers:
+            for identifier in user.external_ideantifiers:
+                info['external_identifiers'] = info['external_identifiers'] + \
+                                         identifier.method + ', '
+            info['external_identifiers'] = info['external_identifiers'][:-2]
+
+    except Exception:
+        pass
+
+    if last_records:
+        for record in last_records:
+            info['last_records'] = info['last_records'] + \
+                                   record.title + ', '
+        info['last_records'] = info['last_records'][:-2]
+
+
+    return info
+
+@blueprint.route('/safelist/admin', methods=['GET'])
+@login_required
+def safelist_admin():
+    """Safelist admin."""
+    # Only admin can access this view
+    if not Permission(ActionNeed('admin-access')).can():
+        abort(403)
+
+    # TODO make time range dynamic
+    search = RecordsSearch(index='records')\
+        .filter('range' ,  **{'created': {'gte': 'now-2w' , 'lt': 'now'}})\
+        .filter('term', _safelisted=False) \
+
+    user_agg = search.aggs.bucket('user', 'terms', field='owners', size=1000)
+    user_agg.metric('records', 'top_hits', size=3, _source=['title'])
+    res = search[0:0].execute()
+
+    users = {}
+    for user in res.aggregations.user.buckets:
+        try:
+            owner = user.key
+            if not users.get(owner):
+                users[owner] = \
+                    user_info(
+                        user_id=owner,
+                        last_records=user.records
+                    )
+        except Exception:
+            pass
+
+    ctx = {
+        'users': users,
+    }
+
+    return render_template('zenodo_spam/safelist/admin.html', **ctx)
+
 @blueprint.route('/<int:user_id>/safelist', methods=['POST'])
 @login_required
 def safelist_add_remove(user_id):
