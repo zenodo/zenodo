@@ -35,12 +35,16 @@
   </div>
   <div class="row">
       <h3>Orcid/GitHub Users:</h3>
+      <a id="safelist_bulk_external" class="btn btn-warning" href="#">Bulk
+        Safelist</a>
+      <a id="delete_bulk_external" class="btn btn-danger" href="#">Bulk
+        Delete</a>
       <div class="col-md-12">
           <table id="external_table" class="table table-striped
           table-bordered" style="width:100%">
           <thead>
               <tr>
-                  <th>Select</th>
+                  <th></th>
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
@@ -95,7 +99,7 @@
           </tbody>
           <tfoot>
               <tr>
-                  <th>Select</th>
+                  <th></th>
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
@@ -109,12 +113,16 @@
   </div>
   <div class="row">
       <h3>No external login:</h3>
+      <a id="safelist_bulk_no_external" class="btn btn-warning" href="#">Bulk
+        Safelist</a>
+      <a id="delete_bulk_no_external" class="btn btn-danger" href="#">Bulk
+        Delete</a>
       <div class="col-md-12">
           <table id="no_external_table" class="table table-striped
           table-bordered" style="width:100%">
           <thead>
               <tr>
-                  <th>Select</th>
+                  <th></th>
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
@@ -169,7 +177,7 @@
           </tbody>
           <tfoot>
               <tr>
-                  <th>Select</th>
+                  <th></th>
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
@@ -189,14 +197,60 @@
 
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/select/1.4.0/js/dataTables.select.min.js"></script>
 <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap.min.js"></script>
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href=https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
+
 <script>
   $(document).ready(function () {
-    $('#external_table').DataTable();
-    $('#no_external_table').DataTable();
-});
+    var external_table = $('#external_table').DataTable({
+      columnDefs: [{
+        orderable: false,
+        className: 'select-checkbox',
+        targets: 0
+      }],
+      select: {
+        style: 'os',
+        selector: 'td:first-child'
+      },
+      order: [[1, 'asc']]
+    });
+
+    var no_external_table = $('#no_external_table').DataTable({
+      columnDefs: [{
+        orderable: false,
+        className: 'select-checkbox',
+        targets: 0
+      }],
+      select: {
+        style: 'os',
+        selector: 'td:first-child'
+      },
+      order: [[1, 'asc']]
+    });
+
+    $('#delete_bulk_external').click(function () {
+      {# TODO How to access the multi-selected values
+      https://datatables.net/extensions/select/integration #}
+    alert('Delete users')
+    })
+    $('#safelist_bulk_external').click(function () {
+      {# Suggestion: make safelist_add_remove() also accept list of ids and
+      run according to type #}
+      alert('Safelist users')
+    })
+    $('#delete_bulk_no_external').click(function () {
+      console.log(external_table.rows({selected: true }).data())
+    })
+    $('#safelist_bulk_no_external').click(function () {
+      alert('Safelist users')
+    })
+  });
+
+
 </script>
 
 {%- endblock javascript %}
