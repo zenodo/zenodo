@@ -105,36 +105,50 @@ def delete(user_id):
         ctx.update(records=records)
         return render_template('zenodo_spam/delete.html', **ctx)
 
-def user_info(user_id, last_records):
-    user = User.query.get(user_id)
-    info = {
-        'id': user.id,
-        'email': user.email,
-        'full_name': user.profile.full_name,
-        'username': user.profile.username,
-        'last_records': '',
-        'external_identifiers': ''
-    }
+def user_info(owners):
+    users = (
+        User.query
+        .options(db.joinedload(User.profile), db.joinedload(
+            User.external_identifiers))
+        .filter(User.id.in_(owners))
+    )
 
-    # TODO maybe make it more beautiful?
-    try:
-        if user.external_ideantifiers:
-            for identifier in user.external_ideantifiers:
-                info['external_identifiers'] = info['external_identifiers'] + \
-                                         identifier.method + ', '
-            info['external_identifiers'] = info['external_identifiers'][:-2]
+    data = {}
 
-    except Exception:
-        pass
+    for user in users:
+        info = {
+            "id": user.id,
+            "email": user.email,
+            "full_name": user.profile.full_name,
+            "username": user.profile.username,
+            "last_records": "",
+            "external_identifiers": "",
+        }
 
-    if last_records:
-        for record in last_records:
-            info['last_records'] = info['last_records'] + \
-                                   record.title + ', '
-        info['last_records'] = info['last_records'][:-2]
+        # TODO maybe make it more beautiful?
+        try:
+            if user.external_identifiers:
+                for identifier in user.external_identifiers:
+                    info["external_identifiers"] = (
+                        info["external_identifiers"] + identifier.method + ", "
+                    )
+                info["external_identifiers"] = info["external_identifiers"][
+                    :-2
+                ]
+        except Exception:
+            pass
 
+        last_records = owners[user.id]['last_records']
+        if last_records:
+            for record in last_records:
+                info["last_records"] = (
+                    info["last_records"] + record.title + ", "
+                )
+            info["last_records"] = info["last_records"][:-2]
 
-    return info
+        data[user.id] = info
+
+    return data
 
 @blueprint.route('/safelist/admin', methods=['GET'])
 @login_required
@@ -146,25 +160,25 @@ def safelist_admin():
 
     # TODO make time range dynamic
     search = RecordsSearch(index='records')\
-        .filter('range' ,  **{'created': {'gte': 'now-2w' , 'lt': 'now'}})\
+        .filter('range' ,  **{'created': {'gte': 'now-4w' , 'lt': 'now'}})\
         .filter('term', _safelisted=False) \
 
     user_agg = search.aggs.bucket('user', 'terms', field='owners', size=1000)
     user_agg.metric('records', 'top_hits', size=3, _source=['title'])
     res = search[0:0].execute()
 
-    users = {}
+    owners = {}
     for user in res.aggregations.user.buckets:
         try:
-            owner = user.key
-            if not users.get(owner):
-                users[owner] = \
-                    user_info(
-                        user_id=owner,
-                        last_records=user.records
-                    )
+            if not owners.get(user):
+                owner = user.key
+                owners[owner] = {
+                    'last_records': user.records
+                }
         except Exception:
             pass
+
+    users = user_info(owners=owners)
 
     ctx = {
         'users': users,
