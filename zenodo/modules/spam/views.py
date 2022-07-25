@@ -219,3 +219,30 @@ def safelist_add_remove(user_id):
         ))
 
     return redirect(request.form['next'])
+
+@blueprint.route('/safelist/add/bulk', methods=['POST'])
+@login_required
+def safelist_bulk_add():
+    """Add uses to the safelist in bulk."""
+    # Only admin can access this view
+    if not Permission(ActionNeed('admin-access')).can():
+        abort(403)
+    for user_id in request.post['user_ids']:
+        user = User.query.get(user_id)
+
+        SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
+            current_user.email, current_user.id))
+
+        rs = RecordsSearch(index='records').filter(
+            'term', owners=user_id).source(False)
+        index_threshold = current_app.config.get(
+            'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
+        if rs.count() < index_threshold:
+            for record in rs.scan():
+                RecordIndexer().index_by_id(record.meta.id)
+        else:
+            RecordIndexer().bulk_index((
+                record.meta.id for record in rs.scan()
+            ))
+
+    return redirect(request.post['next'])

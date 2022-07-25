@@ -243,7 +243,25 @@
       alert('Safelist users')
     })
     $('#delete_bulk_no_external').click(function () {
-      console.log(external_table.rows({selected: true }).data())
+      const data = no_external_table.rows({selected: true}).data().toArray();
+      if (data.length === 0) {
+        console.log('No items selected')
+      }
+
+      let userIds = []
+      data.forEach(row => {
+        userIds.push(row[1])
+      })
+
+      $.post( "{{ url_for('zenodo_spam.safelist_bulk_add') }}",
+        {'user_ids': userIds, 'next': {{ url_for('zenodo_spam.safelist_admin')
+        }} })
+      .done(function() {
+        alert( "processed" );
+      })
+      .fail(function() {
+        alert( "error" );
+      })
     })
     $('#safelist_bulk_no_external').click(function () {
       alert('Safelist users')
