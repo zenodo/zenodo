@@ -254,8 +254,7 @@
       })
 
       $.post( "{{ url_for('zenodo_spam.safelist_bulk_add') }}",
-        {'user_ids': userIds, 'next': {{ url_for('zenodo_spam.safelist_admin')
-        }} })
+        {'user_ids': userIds})
       .done(function() {
         alert( "processed" );
       })
