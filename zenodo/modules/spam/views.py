@@ -105,7 +105,7 @@ def delete(user_id):
         ctx.update(records=records)
         return render_template('zenodo_spam/delete.html', **ctx)
 
-def user_info(owners):
+def expand_users_info(users):
     users = (
         User.query
         .options(db.joinedload(User.profile), db.joinedload(
