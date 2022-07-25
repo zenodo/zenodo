@@ -128,13 +128,7 @@ def user_info(owners):
         # TODO maybe make it more beautiful?
         try:
             if user.external_identifiers:
-                for identifier in user.external_identifiers:
-                    info["external_identifiers"] = (
-                        info["external_identifiers"] + identifier.method + ", "
-                    )
-                info["external_identifiers"] = info["external_identifiers"][
-                    :-2
-                ]
+                info["external_identifiers"] = [i.method for i in user.external_identifiers]
         except Exception:
             pass
 
