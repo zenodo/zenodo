@@ -58,7 +58,8 @@
                   {% if user.external_identifiers %}
                       <tr>
                         <td></td>
-                        <td>{{ user.id }}</td>
+                        <td><a href="{{ url_for('zenodo_spam.delete',
+                        user_id=user.id) }}">{{ user.id }}</a></td>
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.full_name }}</td>
@@ -136,15 +137,15 @@
                   {% if not user.external_identifiers %}
                       <tr>
                         <td></td>
-                        <td>{{ user.id }}</td>
+                        <td><a href="{{ url_for('zenodo_spam.delete',
+                        user_id=user.id) }}">{{ user.id }}</a></td>
                         <td>{{ user.username }}</td>
                         <td>{{ user.email }}</td>
                         <td>{{ user.full_name }}</td>
                         <td>
                             <form action="{{
                                 url_for('zenodo_spam.safelist_add_remove',
-                                user_id=user.id) }}" style="float: right;"
-                                  method="POST"
+                                user_id=user.id) }}" method="POST"
                             >
                                 <input
                                   name="action"
@@ -157,7 +158,6 @@
                                        }}">
                                 <button
                                   class="btn btn-warning"
-                                  style="height: 20px;padding: 2px"
                                   type="submit">
                                   Add
                                 </button>
@@ -233,19 +233,13 @@
     });
 
     $('#delete_bulk_external').click(function () {
-      {# TODO How to access the multi-selected values
-      https://datatables.net/extensions/select/integration #}
-    alert('Delete users')
+      alert('Coming soon')
     })
     $('#safelist_bulk_external').click(function () {
-      {# Suggestion: make safelist_add_remove() also accept list of ids and
-      run according to type #}
-      alert('Safelist users')
-    })
-    $('#delete_bulk_no_external').click(function () {
-      const data = no_external_table.rows({selected: true}).data().toArray();
+      const data = external_table.rows({selected: true}).data().toArray();
       if (data.length === 0) {
-        console.log('No items selected')
+        alert( "No items selected" );
+        return
       }
 
       let userIds = []
@@ -256,14 +250,37 @@
       $.post( "{{ url_for('zenodo_spam.safelist_bulk_add') }}",
         {'user_ids': userIds})
       .done(function() {
-        alert( "processed" );
+        alert( "Users safelisted" );
+        window.location.reload()
       })
       .fail(function() {
         alert( "error" );
       })
     })
+    $('#delete_bulk_no_external').click(function () {
+      alert('Coming soon')
+    })
     $('#safelist_bulk_no_external').click(function () {
-      alert('Safelist users')
+      const data = no_external_table.rows({selected: true}).data().toArray();
+      if (data.length === 0) {
+        alert( "No items selected" );
+        return
+      }
+
+      let userIds = []
+      data.forEach(row => {
+        userIds.push(row[1])
+      })
+
+      $.post( "{{ url_for('zenodo_spam.safelist_bulk_add') }}",
+        {'user_ids': userIds})
+      .done(function() {
+        alert( "Users safelisted" );
+        window.location.reload()
+      })
+      .fail(function() {
+        alert( "error" );
+      })
     })
   });
 

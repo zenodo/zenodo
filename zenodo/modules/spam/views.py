@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import islice
 
 from elasticsearch_dsl import Q
-from flask import Blueprint, abort, current_app, flash, redirect, \
+from flask import Blueprint, Response, abort, current_app, flash, redirect, \
     render_template, request, url_for
 from flask_login import login_required
 from flask_principal import ActionNeed
@@ -105,7 +105,7 @@ def delete(user_id):
         ctx.update(records=records)
         return render_template('zenodo_spam/delete.html', **ctx)
 
-def expand_users_info(users):
+def expand_users_info(owners):
     users = (
         User.query
         .options(db.joinedload(User.profile), db.joinedload(
@@ -128,7 +128,8 @@ def expand_users_info(users):
         # TODO maybe make it more beautiful?
         try:
             if user.external_identifiers:
-                info["external_identifiers"] = [i.method for i in user.external_identifiers]
+                info["external_identifiers"] = \
+                    [i.method for i in user.external_identifiers]
         except Exception:
             pass
 
@@ -172,7 +173,7 @@ def safelist_admin():
         except Exception:
             pass
 
-    users = user_info(owners=owners)
+    users = expand_users_info(owners=owners)
 
     ctx = {
         'users': users,
@@ -221,22 +222,26 @@ def safelist_bulk_add():
     # Only admin can access this view
     if not Permission(ActionNeed('admin-access')).can():
         abort(403)
-    for user_id in request.post['user_ids']:
-        user = User.query.get(user_id)
+    try:
+        for user_id in request.form.to_dict(flat=False)['user_ids[]']:
 
-        SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
-            current_user.email, current_user.id))
+            user = User.query.get(user_id)
 
-        rs = RecordsSearch(index='records').filter(
-            'term', owners=user_id).source(False)
-        index_threshold = current_app.config.get(
-            'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
-        if rs.count() < index_threshold:
-            for record in rs.scan():
-                RecordIndexer().index_by_id(record.meta.id)
-        else:
-            RecordIndexer().bulk_index((
-                record.meta.id for record in rs.scan()
-            ))
+            SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
+                current_user.email, current_user.id))
 
-    return redirect(request.post['next'])
+            rs = RecordsSearch(index='records').filter(
+                'term', owners=user_id).source(False)
+            index_threshold = current_app.config.get(
+                'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
+            if rs.count() < index_threshold:
+                for record in rs.scan():
+                    RecordIndexer().index_by_id(record.meta.id)
+            else:
+                RecordIndexer().bulk_index((
+                    record.meta.id for record in rs.scan()
+                ))
+    except Exception:
+        return Response('An error occurred', status=500)
+
+    return Response('Bulk Safelisted')
