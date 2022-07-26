@@ -51,6 +51,7 @@
                   <th>Name</th>
                   <th>Whitelist</th>
                   <th>Delete</th>
+                  <th style="display: none"></th>
               </tr>
           </thead>
           <tbody>
@@ -94,6 +95,7 @@
                               user_id=user.id)}}"
                             >Delete</a>
                         </td>
+                      <td style="display:none;">{{ user.last_records }}</td>
                     </tr>
                   {% endif %}
               {% endfor %}
@@ -107,6 +109,7 @@
                   <th>Name</th>
                   <th>Whitelist</th>
                   <th>Delete</th>
+                  <th style="display: none"></th>
               </tr>
         </tfoot>
     </table>
@@ -124,12 +127,14 @@
           <thead>
               <tr>
                   <th></th>
+                  <th></th>
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
                   <th>Name</th>
                   <th>Whitelist</th>
                   <th>Delete</th>
+                  <th style="display: none"></th>
               </tr>
           </thead>
           <tbody>
@@ -137,6 +142,7 @@
                   {% if not user.external_identifiers %}
                       <tr>
                         <td></td>
+                        <td class="dt-control"></td>
                         <td><a href="{{ url_for('zenodo_spam.delete',
                         user_id=user.id) }}">{{ user.id }}</a></td>
                         <td>{{ user.username }}</td>
@@ -171,6 +177,7 @@
                               user_id=user.id)}}"
                             >Delete</a>
                         </td>
+                        <td style="display:none;">{{ user.last_records }}</td>
                     </tr>
                   {% endif %}
               {% endfor %}
@@ -178,12 +185,14 @@
           <tfoot>
               <tr>
                   <th></th>
+                  <th></th>
                   <th>ID</th>
                   <th>Username</th>
                   <th>Email</th>
                   <th>Name</th>
                   <th>Whitelist</th>
                   <th>Delete</th>
+                  <th style="display: none"></th>
               </tr>
         </tfoot>
     </table>
@@ -230,6 +239,52 @@
         selector: 'td:first-child'
       },
       order: [[1, 'asc']]
+    });
+
+    /* Formatting function for row details - modify as you need */
+    function extra_info_format(data) {
+        // `d` is the original data object for the row
+        return (
+            '<table style="padding-left:50px;">' +
+            '<tr>' +
+            '<td>Records:</td>' +
+            '<td>' +
+            data +
+            '</td>' +
+            '</table>'
+        );
+    }
+
+    //Event listeners for details
+    $('#external_table tbody').on('click', 'td.dt-control', function () {
+        let tr = $(this).closest('tr');
+        let row = external_table.row(tr);
+
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        } else {
+            // Open this row
+            row.child(extra_info_format(row.data().at(-1))).show();
+            tr.addClass('shown');
+        }
+    });
+
+    $('#no_external_table tbody').on('click', 'td.dt-control', function () {
+        let tr = $(this).closest('tr');
+        let row = no_external_table.row(tr);
+        console.log(row.data())
+
+        if (row.child.isShown()) {
+            // This row is already open - close it
+            row.child.hide();
+            tr.removeClass('shown');
+        } else {
+            // Open this row
+            row.child(extra_info_format(row.data().at(-1))).show();
+            tr.addClass('shown');
+        }
     });
 
     $('#delete_bulk_external').click(function () {
