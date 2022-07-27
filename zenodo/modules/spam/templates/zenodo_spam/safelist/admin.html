@@ -1,0 +1,157 @@
+{#
+# This file is part of Zenodo.
+# Copyright (C) 2017-2022 CERN.
+#
+# Zenodo is free software; you can redistribute it
+# and/or modify it under the terms of the GNU General Public License as
+# published by the Free Software Foundation; either version 2 of the
+# License, or (at your option) any later version.
+#
+# Zenodo is distributed in the hope that it will be
+# useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+# General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Zenodo; if not, write to the
+# Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
+# MA 02111-1307, USA.
+#
+# In applying this license, CERN does not
+# waive the privileges and immunities granted to it by virtue of its status
+# as an Intergovernmental Organization or submit itself to any jurisdiction.
+-#}
+
+{%- extends config.RECORDS_UI_BASE_TEMPLATE %}
+
+{#{% from "invenio_userprofiles/settings/_macros.html" import render_field %}#}
+
+{%- block page_body %}
+<div class="container record-admin">
+  <div class="row">
+    <h1>Safelist admin</h1>
+    <form>
+      <div class="form-group">
+        <div class="input-group">
+          <input type="number" min="1" class="form-control" name="weeks" placeholder="Weeks (default: 4)">
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+        <table id="users-table" class="display stripe row-border compact">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>External</th>
+            <th>Records</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users.values() %}
+            <tr id="{{ user.id }}">
+              <td><a href="{{ url_for('zenodo_spam.delete', user_id=user.id) }}">{{ user.id }}</a></td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.full_name }}</td>
+              <td>{{ user.external | join(', ') }}</td>
+              <td>{{ user.last_records }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>External</th>
+            <th>Records</th>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+</div>
+{%- endblock page_body %}
+
+{%- block css %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css">
+{%- endblock css %}
+
+{%- block javascript %}
+<!-- POC -->
+
+<script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.12.1/api/processing().js"></script>
+<script src="https://cdn.datatables.net/select/1.4.0/js/dataTables.select.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap.min.js"></script>
+<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
+
+
+<script>
+  $(document).ready(function () {
+    var table = $('#users-table').DataTable({
+      dom: 'Blfrtip',
+      processing: true,
+      buttons: [
+        {
+          extend: 'selected',
+          text: 'Safelist selected',
+          action: function (e, dt, button, config) {
+            let rows = dt.rows({ selected: true })
+            dt.processing(true)
+            safelist_selected(rows.ids().toArray())
+            .done(function() {
+              rows.remove().draw()
+            })
+            .fail(function() {
+              alert("error");
+            })
+            .always(function() {
+              dt.processing(false)
+            })
+          }
+        },
+        {
+          text: 'Select page',
+          action: function(e, dt, button, config) {
+            dt.rows({page: 'current'}).select();
+          }
+        },
+        'selectAll',
+        {
+          text: 'Select search',
+          action: function(e, dt, button, config) {
+            dt.rows({search: 'applied'}).select();
+          }
+        },
+        'selectNone',
+      ],
+      select: {style: 'os'},
+      lengthMenu: [10, 20, 50, 75, 100],
+      pageLength: 20,
+      order: [[0, 'asc']],
+    });
+
+    function safelist_selected(userIds) {
+      return $.post("{{ url_for('zenodo_spam.safelist_bulk_add') }}", {'user_ids': userIds})
+    }
+  });
+
+
+</script>
+
+{%- endblock javascript %}
+

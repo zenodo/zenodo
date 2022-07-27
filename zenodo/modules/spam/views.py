@@ -29,14 +29,16 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import islice
 
 from elasticsearch_dsl import Q
-from flask import Blueprint, abort, current_app, flash, redirect, \
+from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
     render_template, request, url_for
 from flask_login import login_required
+from flask_menu import current_menu
 from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access.permissions import Permission
 from invenio_accounts.admin import _datastore
 from invenio_accounts.models import User
+from invenio_admin.views import _has_admin_access
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
@@ -52,6 +54,19 @@ blueprint = Blueprint(
     url_prefix='/spam',
     template_folder='templates',
 )
+
+
+@blueprint.before_app_first_request
+def init_menu():
+    """Initialize menu before first request."""
+    # Register safelisting menu entry
+    item = current_menu.submenu("settings.safelisting")
+    item.register(
+        "zenodo_spam.safelist_admin",
+        '<i class="fa fa-check fa-fw"></i> Safelisting',
+        visible_when=_has_admin_access,
+        order=110,
+    )
 
 
 @blueprint.route('/<int:user_id>/delete/', methods=['GET', 'POST'])
@@ -105,6 +120,74 @@ def delete(user_id):
         ctx.update(records=records)
         return render_template('zenodo_spam/delete.html', **ctx)
 
+
+def _expand_users_info(results):
+    """Return user information."""
+    user_data = (
+        User.query.options(
+            db.joinedload(User.profile),
+            db.joinedload(User.external_identifiers)
+        ).filter(User.id.in_(results.keys()))
+    )
+
+    for user in user_data:
+        r = results[user.id]
+        r.update({
+            "id": user.id,
+            "email": user.email,
+            "external": [i.method for i in (user.external_identifiers or [])]
+        })
+        if user.profile:
+            r.update({
+                "full_name": user.profile.full_name,
+                "username": user.profile.username,
+            })
+
+
+@blueprint.route('/safelist/admin', methods=['GET'])
+@login_required
+def safelist_admin():
+    """Safelist admin."""
+    # Only admin can access this view
+    if not Permission(ActionNeed('admin-access')).can():
+        abort(403)
+
+    weeks = request.args.get('weeks', 4, type=int)
+    # TODO make time range dynamic
+    search = RecordsSearch(index='records').filter(
+        'range' , **{'created': {'gte': 'now-{}w'.format(weeks) , 'lt': 'now'}}
+    ).filter(
+        'term', _safelisted=False,
+    )
+
+    user_agg = search.aggs.bucket('user', 'terms', field='owners', size=1000)
+    user_agg.metric('records', 'top_hits', size=3, _source=['title'])
+    res = search[0:0].execute()
+
+    result = {}
+    for user in res.aggregations.user.buckets:
+        result[user.key] = {
+            'last_records': ", ".join(r.title for r in user.records)
+        }
+    _expand_users_info(result)
+
+    return render_template('zenodo_spam/safelist/admin.html', users=result)
+
+
+def _reindex_user_records(user_id):
+    rs = RecordsSearch(index='records').filter(
+        'term', owners=user_id).source(False)
+    index_threshold = current_app.config.get(
+        'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
+    if rs.count() < index_threshold:
+        for record in rs.scan():
+            RecordIndexer().index_by_id(record.meta.id)
+    else:
+        RecordIndexer().bulk_index((
+            record.meta.id for record in rs.scan()
+        ))
+
+
 @blueprint.route('/<int:user_id>/safelist', methods=['POST'])
 @login_required
 def safelist_add_remove(user_id):
@@ -118,23 +201,26 @@ def safelist_add_remove(user_id):
         # Create safelist entry
         SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
             current_user.email, current_user.id))
-
         flash("Added to safelist", category='success')
     else:
         # Remove safelist entry
         SafelistEntry.remove_by_user_id(user.id)
         flash("Removed from safelist", category='warning')
 
-    rs = RecordsSearch(index='records').filter(
-        'term', owners=user_id).source(False)
-    index_threshold = current_app.config.get(
-        'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
-    if rs.count() < index_threshold:
-        for record in rs.scan():
-            RecordIndexer().index_by_id(record.meta.id)
-    else:
-        RecordIndexer().bulk_index((
-            record.meta.id for record in rs.scan()
-        ))
-
+    _reindex_user_records(user_id)
     return redirect(request.form['next'])
+
+@blueprint.route('/safelist/add/bulk', methods=['POST'])
+@login_required
+def safelist_bulk_add():
+    """Add uses to the safelist in bulk."""
+    # Only admin can access this view
+    if not Permission(ActionNeed('admin-access')).can():
+        abort(403)
+    for user_id in request.form.getlist('user_ids[]'):
+        user = User.query.get(user_id)
+        SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
+            current_user.email, current_user.id))
+        _reindex_user_records(user_id)
+
+    return jsonify({'message': 'Bulk safelisted'})

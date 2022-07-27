@@ -234,7 +234,6 @@ setup(
         'invenio_base.api_blueprints': [
             'zenodo_rest = zenodo.modules.rest.views:blueprint',
             'zenodo_deposit = zenodo.modules.deposit.views_rest:blueprint',
-            'zenodo_spam = zenodo.modules.spam.views:blueprint',
             'zenodo_metrics = zenodo.modules.metrics.views:blueprint',
         ],
         'invenio_base.api_converters': [
