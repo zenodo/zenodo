@@ -1,6 +1,6 @@
 {#
 # This file is part of Zenodo.
-# Copyright (C) 2017 CERN.
+# Copyright (C) 2017-2022 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -29,314 +29,125 @@
 {%- block page_body %}
 <div class="container record-admin">
   <div class="row">
-    <div class="col-xs-12">
-      <h1>Safelist admin</h1>
+    <h1>Safelist admin</h1>
+    <form>
+      <div class="form-group">
+        <div class="input-group">
+          <input type="number" min="1" class="form-control" name="weeks" placeholder="Weeks (default: 4)">
+        </div>
+      </div>
+    </form>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+        <table id="users-table" class="display stripe row-border compact">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>External</th>
+            <th>Records</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for user in users.values() %}
+            <tr id="{{ user.id }}">
+              <td><a href="{{ url_for('zenodo_spam.delete', user_id=user.id) }}">{{ user.id }}</a></td>
+              <td>{{ user.username }}</td>
+              <td>{{ user.email }}</td>
+              <td>{{ user.full_name }}</td>
+              <td>{{ user.external | join(', ') }}</td>
+              <td>{{ user.last_records }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+        <tfoot>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Name</th>
+            <th>External</th>
+            <th>Records</th>
+          </tr>
+        </tfoot>
+      </table>
     </div>
-  </div>
-  <div class="row">
-      <h3>Orcid/GitHub Users:</h3>
-      <a id="safelist_bulk_external" class="btn btn-warning" href="#">Bulk
-        Safelist</a>
-      <a id="delete_bulk_external" class="btn btn-danger" href="#">Bulk
-        Delete</a>
-      <div class="col-md-12">
-          <table id="external_table" class="table table-striped
-          table-bordered" style="width:100%">
-          <thead>
-              <tr>
-                  <th></th>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Whitelist</th>
-                  <th>Delete</th>
-                  <th style="display: none"></th>
-              </tr>
-          </thead>
-          <tbody>
-              {% for user in users.values() %}
-                  {% if user.external_identifiers %}
-                      <tr>
-                        <td></td>
-                        <td><a href="{{ url_for('zenodo_spam.delete',
-                        user_id=user.id) }}">{{ user.id }}</a></td>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.full_name }}</td>
-                        <td>
-                            <form action="{{
-                                url_for('zenodo_spam.safelist_add_remove',
-                                user_id=user.id) }}" style="float: right;"
-                                  method="POST"
-                            >
-                                <input
-                                  name="action"
-                                  type="hidden"
-                                  value="post">
-                                <input name="next" type="hidden"
-                                       value="{{
-                                         url_for('zenodo_spam.safelist_admin',
-                                         user_id=user.id)
-                                       }}">
-                                <button
-                                  class="btn btn-warning"
-                                  style="height: 20px;padding: 2px"
-                                  type="submit">
-                                  Add
-                                </button>
-                            </form>
-                        </td>
-                        <td>
-                            <a
-                              class="btn btn-danger"
-                              href="
-                              {{ url_for('zenodo_spam.delete',
-                              user_id=user.id)}}"
-                            >Delete</a>
-                        </td>
-                      <td style="display:none;">{{ user.last_records }}</td>
-                    </tr>
-                  {% endif %}
-              {% endfor %}
-          </tbody>
-          <tfoot>
-              <tr>
-                  <th></th>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Whitelist</th>
-                  <th>Delete</th>
-                  <th style="display: none"></th>
-              </tr>
-        </tfoot>
-    </table>
-      </div>
-  </div>
-  <div class="row">
-      <h3>No external login:</h3>
-      <a id="safelist_bulk_no_external" class="btn btn-warning" href="#">Bulk
-        Safelist</a>
-      <a id="delete_bulk_no_external" class="btn btn-danger" href="#">Bulk
-        Delete</a>
-      <div class="col-md-12">
-          <table id="no_external_table" class="table table-striped
-          table-bordered" style="width:100%">
-          <thead>
-              <tr>
-                  <th></th>
-                  <th></th>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Whitelist</th>
-                  <th>Delete</th>
-                  <th style="display: none"></th>
-              </tr>
-          </thead>
-          <tbody>
-              {% for user in users.values() %}
-                  {% if not user.external_identifiers %}
-                      <tr>
-                        <td></td>
-                        <td class="dt-control"></td>
-                        <td><a href="{{ url_for('zenodo_spam.delete',
-                        user_id=user.id) }}">{{ user.id }}</a></td>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.full_name }}</td>
-                        <td>
-                            <form action="{{
-                                url_for('zenodo_spam.safelist_add_remove',
-                                user_id=user.id) }}" method="POST"
-                            >
-                                <input
-                                  name="action"
-                                  type="hidden"
-                                  value="post">
-                                <input name="next" type="hidden"
-                                       value="{{
-                                         url_for('zenodo_spam.safelist_admin',
-                                         user_id=user.id)
-                                       }}">
-                                <button
-                                  class="btn btn-warning"
-                                  type="submit">
-                                  Add
-                                </button>
-                            </form>
-                        </td>
-                        <td>
-                            <a
-                              class="btn btn-danger"
-                              href="
-                              {{ url_for('zenodo_spam.delete',
-                              user_id=user.id)}}"
-                            >Delete</a>
-                        </td>
-                        <td style="display:none;">{{ user.last_records }}</td>
-                    </tr>
-                  {% endif %}
-              {% endfor %}
-          </tbody>
-          <tfoot>
-              <tr>
-                  <th></th>
-                  <th></th>
-                  <th>ID</th>
-                  <th>Username</th>
-                  <th>Email</th>
-                  <th>Name</th>
-                  <th>Whitelist</th>
-                  <th>Delete</th>
-                  <th style="display: none"></th>
-              </tr>
-        </tfoot>
-    </table>
-      </div>
   </div>
 </div>
 {%- endblock page_body %}
+
+{%- block css %}
+{{ super() }}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css">
+{%- endblock css %}
 
 {%- block javascript %}
 <!-- POC -->
 
 <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 <script src="https://cdn.datatables.net/1.12.1/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.12.1/api/processing().js"></script>
 <script src="https://cdn.datatables.net/select/1.4.0/js/dataTables.select.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
 <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap.min.js"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
-<link rel="stylesheet" href=https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
+<script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
+
 
 <script>
   $(document).ready(function () {
-    var external_table = $('#external_table').DataTable({
-      columnDefs: [{
-        orderable: false,
-        className: 'select-checkbox',
-        targets: 0
-      }],
-      select: {
-        style: 'os',
-        selector: 'td:first-child'
-      },
-      order: [[1, 'asc']]
+    var table = $('#users-table').DataTable({
+      dom: 'Blfrtip',
+      processing: true,
+      buttons: [
+        {
+          extend: 'selected',
+          text: 'Safelist selected',
+          action: function (e, dt, button, config) {
+            let rows = dt.rows({ selected: true })
+            dt.processing(true)
+            safelist_selected(rows.ids().toArray())
+            .done(function() {
+              rows.remove().draw()
+            })
+            .fail(function() {
+              alert("error");
+            })
+            .always(function() {
+              dt.processing(false)
+            })
+          }
+        },
+        {
+          text: 'Select page',
+          action: function(e, dt, button, config) {
+            dt.rows({page: 'current'}).select();
+          }
+        },
+        'selectAll',
+        {
+          text: 'Select search',
+          action: function(e, dt, button, config) {
+            dt.rows({search: 'applied'}).select();
+          }
+        },
+        'selectNone',
+      ],
+      select: {style: 'os'},
+      lengthMenu: [10, 20, 50, 75, 100],
+      pageLength: 20,
+      order: [[0, 'asc']],
     });
 
-    var no_external_table = $('#no_external_table').DataTable({
-      columnDefs: [{
-        orderable: false,
-        className: 'select-checkbox',
-        targets: 0
-      }],
-      select: {
-        style: 'os',
-        selector: 'td:first-child'
-      },
-      order: [[1, 'asc']]
-    });
-
-    /* Formatting function for row details - modify as you need */
-    function extra_info_format(data) {
-        // `d` is the original data object for the row
-        return (
-            '<table style="padding-left:50px;">' +
-            '<tr>' +
-            '<td>Records:</td>' +
-            '<td>' +
-            data +
-            '</td>' +
-            '</table>'
-        );
+    function safelist_selected(userIds) {
+      return $.post("{{ url_for('zenodo_spam.safelist_bulk_add') }}", {'user_ids': userIds})
     }
-
-    //Event listeners for details
-    $('#external_table tbody').on('click', 'td.dt-control', function () {
-        let tr = $(this).closest('tr');
-        let row = external_table.row(tr);
-
-        if (row.child.isShown()) {
-            // This row is already open - close it
-            row.child.hide();
-            tr.removeClass('shown');
-        } else {
-            // Open this row
-            row.child(extra_info_format(row.data().at(-1))).show();
-            tr.addClass('shown');
-        }
-    });
-
-    $('#no_external_table tbody').on('click', 'td.dt-control', function () {
-        let tr = $(this).closest('tr');
-        let row = no_external_table.row(tr);
-        console.log(row.data())
-
-        if (row.child.isShown()) {
-            // This row is already open - close it
-            row.child.hide();
-            tr.removeClass('shown');
-        } else {
-            // Open this row
-            row.child(extra_info_format(row.data().at(-1))).show();
-            tr.addClass('shown');
-        }
-    });
-
-    $('#delete_bulk_external').click(function () {
-      alert('Coming soon')
-    })
-    $('#safelist_bulk_external').click(function () {
-      const data = external_table.rows({selected: true}).data().toArray();
-      if (data.length === 0) {
-        alert( "No items selected" );
-        return
-      }
-
-      let userIds = []
-      data.forEach(row => {
-        userIds.push(row[1])
-      })
-
-      $.post( "{{ url_for('zenodo_spam.safelist_bulk_add') }}",
-        {'user_ids': userIds})
-      .done(function() {
-        alert( "Users safelisted" );
-        window.location.reload()
-      })
-      .fail(function() {
-        alert( "error" );
-      })
-    })
-    $('#delete_bulk_no_external').click(function () {
-      alert('Coming soon')
-    })
-    $('#safelist_bulk_no_external').click(function () {
-      const data = no_external_table.rows({selected: true}).data().toArray();
-      if (data.length === 0) {
-        alert( "No items selected" );
-        return
-      }
-
-      let userIds = []
-      data.forEach(row => {
-        userIds.push(row[1])
-      })
-
-      $.post( "{{ url_for('zenodo_spam.safelist_bulk_add') }}",
-        {'user_ids': userIds})
-      .done(function() {
-        alert( "Users safelisted" );
-        window.location.reload()
-      })
-      .fail(function() {
-        alert( "error" );
-      })
-    })
   });
 
 
