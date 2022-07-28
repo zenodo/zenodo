@@ -62,7 +62,6 @@ class SafelistEntry(db.Model):
         try:
             entry = cls(user_id=user_id, notes=notes)
             db.session.add(entry)
-            db.session.commit()
             return entry
         except Exception:
             return None
@@ -80,7 +79,6 @@ class SafelistEntry(db.Model):
         try:
             entry = cls.query.filter(cls.user_id == user_id).first()
             db.session.delete(entry)
-            db.session.commit()
         except Exception:
             pass
 

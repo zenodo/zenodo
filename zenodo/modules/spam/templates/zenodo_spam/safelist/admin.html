@@ -40,7 +40,7 @@
   </div>
   <div class="row">
     <div class="col-md-12">
-        <table id="users-table" class="display stripe row-border compact">
+        <table id="users-table" class="display stripe cell-border row-border compact nowrap">
         <thead>
           <tr>
             <th>ID</th>
@@ -85,7 +85,9 @@
 <link rel="stylesheet" href="https://cdn.datatables.net/select/1.4.0/css/select.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/dataTables.bootstrap.min.css">
-<link rel="stylesheet" href="https://cdn.datatables.net/responsive/2.3.0/css/responsive.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.2.3/css/buttons.bootstrap.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/plug-ins/1.12.1/features/searchHighlight/dataTables.searchHighlight.css">
+
 {%- endblock css %}
 
 {%- block javascript %}
@@ -96,23 +98,61 @@
 <script src="https://cdn.datatables.net/plug-ins/1.12.1/api/processing().js"></script>
 <script src="https://cdn.datatables.net/select/1.4.0/js/dataTables.select.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/2.2.3/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/2.2.3/js/buttons.bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/1.12.1/js/dataTables.bootstrap.min.js"></script>
 <script src="https://cdn.datatables.net/responsive/2.3.0/js/dataTables.responsive.min.js"></script>
-
+<script src="https://cdn.datatables.net/plug-ins/1.12.1/dataRender/ellipsis.js"></script>
+<script src="https://cdn.datatables.net/plug-ins/1.12.1/features/searchHighlight/dataTables.searchHighlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery-highlight@3.5.0/jquery.highlight.min.js"></script>
 
 <script>
   $(document).ready(function () {
     var table = $('#users-table').DataTable({
+      searchHighlight: true,
       dom: 'Blfrtip',
       processing: true,
+      columns: [
+        // User ID
+        null,
+        // Username
+        null,
+        // Email
+        null,
+        // Name
+        null,
+        // External
+        null,
+        // Records
+        {width: "70%", render: $.fn.dataTable.render.ellipsis(120)},
+      ],
       buttons: [
         {
           extend: 'selected',
+          className: "btn-primary",
           text: 'Safelist selected',
           action: function (e, dt, button, config) {
             let rows = dt.rows({ selected: true })
             dt.processing(true)
-            safelist_selected(rows.ids().toArray())
+            safelist_users(rows.ids().toArray())
+            .done(function() {
+              rows.remove().draw()
+            })
+            .fail(function() {
+              alert("error");
+            })
+            .always(function() {
+              dt.processing(false)
+            })
+          }
+        },
+        {
+          extend: 'selected',
+          className: "btn-danger",
+          text: 'Mark selected as spam',
+          action: function (e, dt, button, config) {
+            let rows = dt.rows({ selected: true })
+            dt.processing(true)
+            spam_delete_users(rows.ids().toArray())
             .done(function() {
               rows.remove().draw()
             })
@@ -130,9 +170,8 @@
             dt.rows({page: 'current'}).select();
           }
         },
-        'selectAll',
         {
-          text: 'Select search',
+          text: 'Select all',
           action: function(e, dt, button, config) {
             dt.rows({search: 'applied'}).select();
           }
@@ -140,18 +179,21 @@
         'selectNone',
       ],
       select: {style: 'os'},
-      lengthMenu: [10, 20, 50, 75, 100],
-      pageLength: 20,
+      lengthMenu: [10, 25, 50, 75, 100],
+      pageLength: 25,
       order: [[0, 'asc']],
     });
 
-    function safelist_selected(userIds) {
+    function safelist_users(userIds) {
       return $.post("{{ url_for('zenodo_spam.safelist_bulk_add') }}", {'user_ids': userIds})
     }
+    function spam_delete_users(userIds) {
+      return $.post("{{ url_for('zenodo_spam.spam_delete_bulk') }}", {'user_ids': userIds})
+    }
+
   });
 
 
 </script>
 
 {%- endblock javascript %}
-

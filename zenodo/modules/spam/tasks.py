@@ -30,8 +30,14 @@ from celery import shared_task
 from flask import current_app
 from invenio_communities.models import Community
 from invenio_records.models import RecordMetadata
+from invenio_accounts.models import User
+from invenio_search.api import RecordsSearch
+from invenio_accounts.proxies import current_accounts
+from invenio_db import db
+from invenio_indexer.api import RecordIndexer
 
 from zenodo.modules.spam import current_spam
+
 
 
 @shared_task(ignore_result=False)
@@ -49,3 +55,42 @@ def check_metadata_for_spam(community_id=None, dep_id=None):
             [deposit.json['title'] + ' ' + deposit.json['description']])[0][1]
 
     return spam_proba
+
+
+@shared_task(ignore_result=False)
+def delete_spam_user(user_id, deleted_by):
+    """Deletes a user and marks their records and communities as spam."""
+    from zenodo.modules.deposit.utils import delete_record
+
+    user = User.query.get(user_id)
+    communities = Community.query.filter_by(id_user=user.id)
+    rs = RecordsSearch(index='records').filter('term', owners=user.id)
+
+    for c in communities:
+        if not c.deleted_at:
+            if not c.description.startswith('--SPAM--'):
+                c.description = '--SPAM--' + c.description
+            if c.oaiset:
+                db.session.delete(c.oaiset)
+            c.delete()
+    current_accounts.datastore.deactivate_user(user)
+    db.session.commit()
+    for r in rs.scan():
+        delete_record(r.meta.id, 'spam', deleted_by)
+
+
+@shared_task(ignore_result=False)
+def reindex_user_records(user_id):
+    """Reindex a user's records."""
+    rs = RecordsSearch(index='records').filter(
+        'term', owners=user_id).source(False)
+    indexer = RecordIndexer()
+    index_threshold = current_app.config.get(
+        'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
+    if rs.count() < index_threshold:
+        for record in rs.scan():
+            indexer.index_by_id(record.meta.id)
+    else:
+        indexer.bulk_index((
+            record.meta.id for record in rs.scan()
+        ))
