@@ -29,24 +29,24 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import islice
 
 from elasticsearch_dsl import Q
-from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
+from flask import Blueprint, abort, flash, jsonify, redirect, \
     render_template, request, url_for
 from flask_login import login_required
 from flask_menu import current_menu
 from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access.permissions import Permission
-from invenio_accounts.admin import _datastore
 from invenio_accounts.models import User
+from invenio_accounts.proxies import current_accounts
 from invenio_admin.views import _has_admin_access
 from invenio_communities.models import Community
 from invenio_db import db
-from invenio_indexer.api import RecordIndexer
 from invenio_search.api import RecordsSearch
 
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.spam.forms import DeleteSpamForm
 from zenodo.modules.spam.models import SafelistEntry
+from zenodo.modules.spam.tasks import delete_spam_user, reindex_user_records
 
 blueprint = Blueprint(
     'zenodo_spam',
@@ -105,7 +105,7 @@ def delete(user_id):
                     c.delete()
             db.session.commit()
         if deleteform.deactivate_user.data:
-            _datastore.deactivate_user(user)
+            current_accounts.datastore.deactivate_user(user)
             db.session.commit()
         # delete_record function commits the session internally
         # for each deleted record
@@ -174,20 +174,6 @@ def safelist_admin():
     return render_template('zenodo_spam/safelist/admin.html', users=result)
 
 
-def _reindex_user_records(user_id):
-    rs = RecordsSearch(index='records').filter(
-        'term', owners=user_id).source(False)
-    index_threshold = current_app.config.get(
-        'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
-    if rs.count() < index_threshold:
-        for record in rs.scan():
-            RecordIndexer().index_by_id(record.meta.id)
-    else:
-        RecordIndexer().bulk_index((
-            record.meta.id for record in rs.scan()
-        ))
-
-
 @blueprint.route('/<int:user_id>/safelist', methods=['POST'])
 @login_required
 def safelist_add_remove(user_id):
@@ -206,21 +192,39 @@ def safelist_add_remove(user_id):
         # Remove safelist entry
         SafelistEntry.remove_by_user_id(user.id)
         flash("Removed from safelist", category='warning')
+    db.session.commit()
 
-    _reindex_user_records(user_id)
+    reindex_user_records.delay(user_id)
     return redirect(request.form['next'])
 
 @blueprint.route('/safelist/add/bulk', methods=['POST'])
 @login_required
 def safelist_bulk_add():
-    """Add uses to the safelist in bulk."""
+    """Add users to the safelist in bulk."""
     # Only admin can access this view
     if not Permission(ActionNeed('admin-access')).can():
         abort(403)
-    for user_id in request.form.getlist('user_ids[]'):
+
+    user_ids = request.form.getlist('user_ids[]')
+    for user_id in user_ids:
         user = User.query.get(user_id)
         SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
             current_user.email, current_user.id))
-        _reindex_user_records(user_id)
+    db.session.commit()
 
+    for user_id in user_ids:
+        reindex_user_records.delay(user_id)
+
+    return jsonify({'message': 'Bulk safelisted'})
+
+
+@blueprint.route('/delete/bulk', methods=['POST'])
+@login_required
+def spam_delete_bulk():
+    """Delete spam users in bulk."""
+    if not Permission(ActionNeed('admin-access')).can():
+        abort(403)
+
+    for user_id in request.form.getlist('user_ids[]'):
+        delete_spam_user.delay(user_id, int(current_user.id))
     return jsonify({'message': 'Bulk safelisted'})
