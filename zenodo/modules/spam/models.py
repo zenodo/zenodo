@@ -57,6 +57,8 @@ class SafelistEntry(db.Model):
         nullable=False,
     )
 
+    user = db.relationship(User, backref='safelist')
+
     @classmethod
     def create(cls, user_id, notes=None):
         try:

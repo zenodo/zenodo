@@ -30,17 +30,35 @@
 <div class="container record-admin">
   <div class="row">
     <h1>Safelist admin</h1>
-    <form>
+    <form class="form-inline">
       <div class="form-group">
         <div class="input-group">
-          <input type="number" min="1" class="form-control" name="weeks" placeholder="Weeks (default: 4)">
+          <input type="number" min="1" class="form-control" name="from_weeks"
+                 placeholder="From Weeks ago(4)" value="{{ request.args.get
+                 ('from_weeks') }}">
         </div>
       </div>
+      <div class="form-group">
+        <div class="input-group">
+          <input type="number" min="0" class="form-control" name="to_weeks"
+                 placeholder="To Weeks ago (0)" value="{{ request.args.get
+                 ('to_weeks') }}">
+        </div>
+      </div>
+       <div class="form-group">
+        <div class="input-group">
+          <input type="number" min="1" class="form-control" name="max_users"
+                 placeholder="Max users (1000)" value="{{ request.args.get
+                 ('max_users') }}">
+        </div>
+      </div>
+      <input type="submit" style="display:none"/>
     </form>
   </div>
   <div class="row">
     <div class="col-md-12">
-        <table id="users-table" class="display stripe cell-border row-border compact nowrap">
+        <table id="users-table"
+               class="display stripe cell-border row-border compact nowrap">
         <thead>
           <tr>
             <th>ID</th>
@@ -49,17 +67,37 @@
             <th>Name</th>
             <th>External</th>
             <th>Records</th>
+            <th></th>
+            <th>GT</th>
+            <th>Descriptions</th>
           </tr>
         </thead>
         <tbody>
           {% for user in users.values() %}
             <tr id="{{ user.id }}">
-              <td><a href="{{ url_for('zenodo_spam.delete', user_id=user.id) }}">{{ user.id }}</a></td>
-              <td>{{ user.username }}</td>
-              <td>{{ user.email }}</td>
-              <td>{{ user.full_name }}</td>
-              <td>{{ user.external | join(', ') }}</td>
+              <td>
+                <a target="_blank" href="{{ url_for
+                ('zenodo_spam.delete', user_id=user.id) }}">{{ user.id }}</a>
+              </td>
+              <td class="selectable">{{ user.username }}</td>
+              <td class="selectable">{{ user.email }}</td>
+              <td class="selectable">{{ user.full_name }}</td>
+              <td class="selectable">{{ user.external | join(', ') }}</td>
               <td>{{ user.last_records }}</td>
+              <td>
+                <a target="_blank" href="{{ url_for('invenio_records_ui.recid',
+                                 pid_value=user.first_record_id) }}">
+                <span class="glyphicon glyphicon-file"
+                      aria-hidden="true"></span></a>
+              </td>
+              <td>
+                <a href="https://translate.google.com/?sl=auto&tl=en&text=
+                {{ user.last_records.replace(" ", "%20") }}&op=translate"
+                     target="_blank">
+                <span class="glyphicon glyphicon-new-window"
+                      aria-hidden="true"></span></a>
+              </td>
+              <td>{{ user.last_descriptions }}</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -71,6 +109,9 @@
             <th>Name</th>
             <th>External</th>
             <th>Records</th>
+            <th></th>
+            <th>GT</th>
+            <th>Descriptions</th>
           </tr>
         </tfoot>
       </table>
@@ -115,15 +156,21 @@
         // User ID
         null,
         // Username
-        null,
+        {width: "10%", render: $.fn.dataTable.render.ellipsis(10)},
         // Email
         null,
         // Name
-        null,
+        {width: "7%", render: $.fn.dataTable.render.ellipsis(10)},
         // External
         null,
         // Records
-        {width: "70%", render: $.fn.dataTable.render.ellipsis(120)},
+        {width: "40%", render: $.fn.dataTable.render.ellipsis(50)},
+        // Last record
+        {width: "2%"},
+        // GT
+        {width: "1%"},
+        // Descriptions
+        {width: "40%", render: $.fn.dataTable.render.ellipsis(60)}
       ],
       buttons: [
         {
@@ -178,7 +225,7 @@
         },
         'selectNone',
       ],
-      select: {style: 'os'},
+      select: {style: 'os', selector: 'td.selectable'},
       lengthMenu: [10, 25, 50, 75, 100],
       pageLength: 25,
       order: [[0, 'asc']],
