@@ -126,11 +126,16 @@ def _expand_users_info(results):
     user_data = (
         User.query.options(
             db.joinedload(User.profile),
-            db.joinedload(User.external_identifiers)
+            db.joinedload(User.external_identifiers),
+            db.joinedload(User.safelist),
         ).filter(User.id.in_(results.keys()))
     )
 
     for user in user_data:
+        if not user.active or user.safelist:
+            results.pop(user.id)
+            continue
+
         r = results[user.id]
         r.update({
             "id": user.id,
@@ -152,22 +157,32 @@ def safelist_admin():
     if not Permission(ActionNeed('admin-access')).can():
         abort(403)
 
-    weeks = request.args.get('weeks', 4, type=int)
-    # TODO make time range dynamic
+    from_weeks = request.args.get('from_weeks', 4, type=int)
+    to_weeks = request.args.get('to_weeks', 0, type=int)
+    max_users = request.args.get('max_users', 1000, type=int)
+
     search = RecordsSearch(index='records').filter(
-        'range' , **{'created': {'gte': 'now-{}w'.format(weeks) , 'lt': 'now'}}
+        'range' , **{'created': {'gte': 'now-{}w'.format(from_weeks),
+                                 'lt': 'now-{}w'.format(to_weeks)}}
     ).filter(
         'term', _safelisted=False,
     )
 
-    user_agg = search.aggs.bucket('user', 'terms', field='owners', size=1000)
-    user_agg.metric('records', 'top_hits', size=3, _source=['title'])
+
+    user_agg = search.aggs.bucket('user', 'terms', field='owners',
+                                  size=max_users)
+    user_agg.metric('records', 'top_hits', size=3, _source=['title',
+                                                            'description',
+                                                            'recid'])
     res = search[0:0].execute()
 
     result = {}
     for user in res.aggregations.user.buckets:
         result[user.key] = {
-            'last_records': ", ".join(r.title for r in user.records)
+            'last_records': ", ".join(r.title for r in user.records),
+            'last_descriptions': ", ".join(r.description for r in
+                                           user.records),
+            'first_record_id': user.records[0].recid
         }
     _expand_users_info(result)
 
@@ -208,8 +223,11 @@ def safelist_bulk_add():
     user_ids = request.form.getlist('user_ids[]')
     for user_id in user_ids:
         user = User.query.get(user_id)
-        SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'.format(
-            current_user.email, current_user.id))
+        try:
+            SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'
+                                 .format(current_user.email, current_user.id))
+        except Exception:
+            pass
     db.session.commit()
 
     for user_id in user_ids:
@@ -225,6 +243,13 @@ def spam_delete_bulk():
     if not Permission(ActionNeed('admin-access')).can():
         abort(403)
 
-    for user_id in request.form.getlist('user_ids[]'):
+    user_ids = request.form.getlist('user_ids[]')
+    for user_id in user_ids:
+        user = User.query.get(user_id)
+        current_accounts.datastore.deactivate_user(user)
+    db.session.commit()
+
+    for user_id in user_ids:
         delete_spam_user.delay(user_id, int(current_user.id))
+
     return jsonify({'message': 'Bulk safelisted'})

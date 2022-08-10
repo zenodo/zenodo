@@ -175,6 +175,8 @@ CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 CELERY_TASK_ROUTES = {
     'invenio_files_rest.tasks.verify_checksum': {'queue': 'low'},
     'zenodo.modules.sipstore.tasks.archive_sip': {'queue': 'low'},
+    'zenodo.modules.spam.tasks.reindex_user_records': {'queue': 'low'},
+    'zenodo.modules.spam.tasks.delete_spam_user': {'queue': 'low'},
     'zenodo_migrator.tasks.migrate_concept_recid_sips': {'queue': 'low'},
     'invenio_openaire.tasks.register_grant': {'queue': 'low'},
     'invenio_indexer.tasks.process_bulk_queue': {'queue': 'celery-indexer'}
