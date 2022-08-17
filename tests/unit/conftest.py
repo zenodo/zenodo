@@ -148,8 +148,18 @@ def tmp_db_path():
     os.remove(os_path)
 
 
+@pytest.yield_fixture(scope='session')
+def tmp_spam_domains_file():
+    """Temporary spam domains file path."""
+    fp = tempfile.NamedTemporaryFile(mode="wb")
+    fp.write(b"evildomain.org\n")
+    fp.flush()
+    yield fp.name
+    fp.close()
+
+
 @pytest.fixture(scope='session')
-def default_config(tmp_db_path):
+def default_config(tmp_db_path, tmp_spam_domains_file):
     """Default configuration."""
     ZENODO_OPENAIRE_COMMUNITIES = {
         'foo': {
@@ -231,7 +241,7 @@ def default_config(tmp_db_path):
             },
         },
         SEARCH_INDEX_PREFIX='zenodo-test-',
-        ZENODO_BLACKLISTED_EMAIL_DOMAINS=['evildomain.org'],
+        ZENODO_SPAM_DOMAINS_FILEPATH=tmp_spam_domains_file,
     )
 
 
