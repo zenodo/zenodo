@@ -70,5 +70,7 @@ class ZenodoSpam(object):
 @celeryd_init.connect
 def warm_up_cache(instance, **kwargs):
     """Preload the spam model in the celery application."""
-    with instance.app.flask_app.app_context():
-        current_spam.model
+    flask_app = instance.app.flask_app
+    if flask_app.config.get('ZENODO_SPAM_MODEL_PRELOAD'):
+        with flask_app.app_context():
+            current_spam.model

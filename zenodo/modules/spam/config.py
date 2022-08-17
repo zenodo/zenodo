@@ -87,3 +87,6 @@ ZENODO_SPAM_CHECK_TIMEOUT = 8
 
 # Number of valid existing records and communities to skip the spam check
 ZENODO_SPAM_SKIP_CHECK_NUM = 5
+
+# Preload spam model on Celery app initialization
+ZENODO_SPAM_MODEL_PRELOAD = False
