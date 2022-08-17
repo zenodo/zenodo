@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2015, 2019 CERN.
+# Copyright (C) 2022 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,33 +22,30 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Records."""
+"""Test forbidden list."""
 
-from __future__ import absolute_import, print_function
+import os
+import pytest
+import tempfile
 
-from zenodo.modules.deposit.utils import is_user_verified
-
-ZENODO_BUCKET_QUOTA_SIZE = 50 * 1000 * 1000 * 1000  # 50 GB
-"""Maximum quota per bucket."""
-
-ZENODO_EXTRA_FORMATS_BUCKET_QUOTA_SIZE = 100 * 1000 * 1000  # 100 MB
-"""Maximum quota per extra formats bucket."""
-
-ZENODO_MAX_FILE_SIZE = ZENODO_BUCKET_QUOTA_SIZE
-"""Maximum file size accepted."""
-
-ZENODO_USER_BUCKET_QUOTAS = {}
-"""Custom per-user quotas.
-
-A dictionary with user ID as key and their default deposit quotas as values.
-
-.. code-block:: python
-
-    ZENODO_USER_BUCKET_QUOTAS = {
-        12345: (80 * 1000 * 1000 * 1000),  # 80GB
-    }
-"""
+from zenodo.modules.spam.forbiddenlist import DomainForbiddenList
 
 
-ZENODO_DEPOSIT_CREATE_PERMISSION = is_user_verified
-"""Deposit create permission."""
+@pytest.yield_fixture(scope='session')
+def tmp_spam_domains_file():
+    """Temporary spam domains file path."""
+    fp = tempfile.NamedTemporaryFile(mode="wb")
+    fp.write(b"testing.com\n")
+    fp.write(b"some.other.ch\n")
+    fp.flush()
+    yield fp.name
+    fp.close()
+
+
+def test_forbidden_list_search(tmp_spam_domains_file):
+    fl = DomainForbiddenList(tmp_spam_domains_file)
+
+    assert not fl.is_forbidden("test.com")
+    assert not fl.is_forbidden("other.ch")
+    assert fl.is_forbidden("testing.com")
+    assert fl.is_forbidden("some.other.ch")

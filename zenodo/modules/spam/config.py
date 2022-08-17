@@ -90,3 +90,6 @@ ZENODO_SPAM_SKIP_CHECK_NUM = 5
 
 # Preload spam model on Celery app initialization
 ZENODO_SPAM_MODEL_PRELOAD = False
+
+ZENODO_SPAM_DOMAINS_FILEPATH = None
+"""Path to a file with the list of forbidden email domains."""
