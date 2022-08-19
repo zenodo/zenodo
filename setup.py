@@ -115,7 +115,7 @@ install_requires = [
     'invenio-openaire>=1.0.0a15',
     'invenio-opendefinition>=1.0.0a9',
     'invenio-pidrelations==1.0.0a4',  # next versions require upgrades
-    'invenio-pidstore>=1.0.0',
+    'invenio-pidstore>=1.1.1',
     'invenio-previewer>=1.0.0a11',
     'invenio-queues>=1.0.0a2',
     'invenio-records-files>=1.0.0a11.post1',
