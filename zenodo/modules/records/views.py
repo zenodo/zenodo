@@ -462,7 +462,7 @@ def community_curation(record, user):
 
 
 def get_reana_badge(record):
-    """Reana badge creation"""
+    """Get REANA badge information."""
     if not current_app.config["ZENODO_REANA_BADGES_ENABLED"]:
         return None
 

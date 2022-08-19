@@ -22,6 +22,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+"""Configuration for Zenodo Spam."""
+
 from flask import abort, current_app, flash
 from flask_login import logout_user
 from invenio_accounts.models import User

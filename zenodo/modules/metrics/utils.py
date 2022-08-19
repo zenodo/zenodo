@@ -30,6 +30,7 @@ from invenio_cache import current_cache
 
 
 def calculate_metrics(metric_id, cache=True):
+    """Calculate a metric's result."""
     if cache:
         cached_data = current_cache.get(
             'ZENODO_METRICS_CACHE::{}'.format(metric_id))
@@ -50,6 +51,7 @@ def calculate_metrics(metric_id, cache=True):
 
 
 def formatted_response(metrics):
+    """Format metrics into Prometheus format."""
     response = ''
     for metric in metrics:
         response += "# HELP {name} {help}\n# TYPE {name} {type}\n{name} " \
