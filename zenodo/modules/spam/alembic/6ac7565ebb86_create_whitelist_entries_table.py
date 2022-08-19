@@ -37,7 +37,6 @@ depends_on = '9848d0149abd'  # invenio_accounts: create users table
 
 def upgrade():
     """Upgrade database."""
-
     op.create_table(
         'safelist_entries',
         sa.Column('user_id', sa.Integer(), nullable=False),

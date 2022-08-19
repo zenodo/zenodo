@@ -261,6 +261,7 @@ class ObjectType(object):
 
     @classmethod
     def get_cff_type(cls, value):
+        """Get resource type of a CFF type."""
         resource_type_obj = cls.index_internal_id
         for key in resource_type_obj:
             if value == resource_type_obj[key].get('cff'):

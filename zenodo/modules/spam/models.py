@@ -61,6 +61,7 @@ class SafelistEntry(db.Model):
 
     @classmethod
     def create(cls, user_id, notes=None):
+        """Create a safelist entry."""
         try:
             entry = cls(user_id=user_id, notes=notes)
             db.session.add(entry)
@@ -71,7 +72,6 @@ class SafelistEntry(db.Model):
     @classmethod
     def get_by_user_id(cls, user_id):
         """Get entry by user_id."""
-
         entry = cls.query.filter(cls.user_id == user_id).first()
         return entry
 

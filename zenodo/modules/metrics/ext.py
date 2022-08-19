@@ -53,4 +53,5 @@ class ZenodoMetrics(object):
 
     @property
     def metrics_start_date(self):
+        """Get get metrics start date from config."""
         return current_app.config['ZENODO_METRICS_START_DATE']

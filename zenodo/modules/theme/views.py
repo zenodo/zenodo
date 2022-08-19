@@ -69,5 +69,4 @@ def older_than(dt, **timedelta_kwargs):
     :param dt: The datetime to check.
     :param timedelta_kwargs: Passed to ``datetime.timedelta(...)``.
     """
-
     return (datetime.utcnow() - dt) > timedelta(**timedelta_kwargs)

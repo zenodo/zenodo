@@ -31,7 +31,6 @@ from flask import current_app
 @pytest.fixture
 def use_safelist_config(app, api):
     """Activate webhooks config."""
-
     # NOTE: Not optimal for applying the config patch to both apps, but works
     for _app in (app, api):
         old_value_safelist_index = _app.config.pop(

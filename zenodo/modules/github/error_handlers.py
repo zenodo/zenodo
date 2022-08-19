@@ -22,6 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+"""Error handlers for GitHub release exceptions."""
 
 def versioning_files_error(release, ex):
     """Handler for VersioningFileError."""
