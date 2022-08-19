@@ -1185,6 +1185,8 @@ PREVIEWER_BASE_CSS_BUNDLES = ['zenodo_theme_css']
 PREVIEWER_BASE_JS_BUNDLES = ['zenodo_theme_js']
 #: Number of bytes read by CSV previewer to validate the file.
 PREVIEWER_CSV_VALIDATION_BYTES = 2 * 1024
+#: Allowed delimiters when detecting CSV dialect
+PREVIEWER_CSV_SNIFFER_ALLOWED_DELIMITERS = [',', ';', '\t', '|']
 #: Max file size to preview for images
 PREVIEWER_MAX_IMAGE_SIZE_BYTES = 5 * 1024 * 1024
 #: List of previewers (adds IIIF previewer).
