@@ -22,6 +22,13 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+# This is to fix bug https://github.com/zenodo/zenodo/issues/2154. This script
+# fails because npm is not installed. So let's install npm first.
+curl https://nodejs.org/download/release/v7.4.0/node-v7.4.0-linux-x64.tar.gz -o node-v7.4.0-linux-x64.tar.gz
+gunzip node-v7.4.0-linux-x64.tar.gz
+tar xvf node-v7.4.0-linux-x64.tar --strip-components=1 -C /usr/local
+# end of fix
+
 # Checking node version
 node_version="$(node --version)"
 if [[ -z "$node_version" ]]

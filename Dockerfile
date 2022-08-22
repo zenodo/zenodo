@@ -77,6 +77,8 @@ RUN mkdir -p /usr/local/var/data && \
 
 COPY ./docker/docker-entrypoint.sh /
 
+RUN cd /code/zenodo && python setup.py install
+
 USER zenodo
 VOLUME ["/code/zenodo"]
 ENTRYPOINT ["/docker-entrypoint.sh"]
