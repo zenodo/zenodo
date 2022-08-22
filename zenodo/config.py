@@ -173,12 +173,15 @@ CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
 CELERY_ACCEPT_CONTENT = ['json', 'msgpack', 'yaml']
 #: Custom task routing
 CELERY_TASK_ROUTES = {
+    # Low
     'invenio_files_rest.tasks.verify_checksum': {'queue': 'low'},
+    'invenio_github.tasks.sync_account': {'queue': 'low'},
     'zenodo.modules.sipstore.tasks.archive_sip': {'queue': 'low'},
     'zenodo.modules.spam.tasks.reindex_user_records': {'queue': 'low'},
     'zenodo.modules.spam.tasks.delete_spam_user': {'queue': 'low'},
     'zenodo_migrator.tasks.migrate_concept_recid_sips': {'queue': 'low'},
     'invenio_openaire.tasks.register_grant': {'queue': 'low'},
+    # Indexer
     'invenio_indexer.tasks.process_bulk_queue': {'queue': 'celery-indexer'}
 }
 #: Beat schedule
@@ -287,12 +290,6 @@ CELERY_BEAT_SCHEDULE = {
     'github-tokens-refresh': {
         'task': 'invenio_github.tasks.refresh_accounts',
         'schedule': crontab(minute=0, hour=3),
-        'kwargs': {
-            'expiration_threshold': {
-                # TODO: Remove when invenio-github v1.0.0a19 is released
-                'days': 6 * 30,
-            },
-        }
     }
 }
 
