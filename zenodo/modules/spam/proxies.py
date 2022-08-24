@@ -29,6 +29,10 @@ from __future__ import absolute_import, print_function
 from flask import current_app
 from werkzeug.local import LocalProxy
 
-current_domain_forbidden_list = LocalProxy(
-    lambda: current_app.extensions['zenodo-spam'].domain_forbidden_list)
-"""Proxy to the doamin blacklist for user registration."""
+current_domain_forbiddenlist = LocalProxy(
+    lambda: current_app.extensions['zenodo-spam'].domain_forbiddenlist)
+"""Proxy to the domain forbiddenlist for user registration."""
+
+current_domain_safelist = LocalProxy(
+    lambda: current_app.extensions['zenodo-spam'].domain_safelist)
+"""Proxy to the domain safelist for user registration."""

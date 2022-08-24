@@ -52,7 +52,7 @@ from zenodo.modules.openaire.helpers import openaire_datasource_id, \
 from zenodo.modules.openaire.tasks import openaire_delete
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.minters import is_local_doi
-from zenodo.modules.spam.proxies import current_domain_forbidden_list
+from zenodo.modules.spam.proxies import current_domain_forbiddenlist
 
 
 def file_id_to_key(value):
@@ -265,7 +265,7 @@ def is_user_verified():
     """Permission function that evaluates if the user can create a deposit."""
     if current_user.email:
         email_domain = current_user.email.rsplit('@', 1)[-1].lower()
-        if current_domain_forbidden_list.is_forbidden(email_domain):
+        if current_domain_forbiddenlist.matches(email_domain):
             return False, (
                 'You have registered on Zenodo using an email address domain '
                 'that has recently been used to upload spam on Zenodo. If '

@@ -29,7 +29,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from itertools import islice
 
 from elasticsearch_dsl import Q
-from flask import Blueprint, abort, flash, jsonify, redirect, \
+from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
     render_template, request, url_for
 from flask_login import login_required
 from flask_menu import current_menu
@@ -47,6 +47,8 @@ from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.spam.forms import DeleteSpamForm
 from zenodo.modules.spam.models import SafelistEntry
 from zenodo.modules.spam.tasks import delete_spam_user, reindex_user_records
+from zenodo.modules.spam.proxies import current_domain_forbiddenlist, \
+    current_domain_safelist
 
 blueprint = Blueprint(
     'zenodo_spam',
@@ -121,6 +123,15 @@ def delete(user_id):
         return render_template('zenodo_spam/delete.html', **ctx)
 
 
+def _evaluate_user_domain(email):
+    email_domain = email.rsplit('@', 1)[-1].lower()
+    if current_domain_forbiddenlist.matches(email_domain):
+        return 'forbidden'
+    if current_domain_safelist.matches(email_domain):
+        return 'safe'
+    return 'unclear'
+
+
 def _expand_users_info(results):
     """Return user information."""
     user_data = (
@@ -140,12 +151,13 @@ def _expand_users_info(results):
         r.update({
             "id": user.id,
             "email": user.email,
-            "external": [i.method for i in (user.external_identifiers or [])]
+            "external": [i.method for i in (user.external_identifiers or [])],
+            "flag": _evaluate_user_domain(user.email)
         })
         if user.profile:
             r.update({
                 "full_name": user.profile.full_name,
-                "username": user.profile.username,
+                "username": user.profile.username
             })
 
 

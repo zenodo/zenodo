@@ -149,17 +149,31 @@ def tmp_db_path():
 
 
 @pytest.yield_fixture(scope='session')
-def tmp_spam_domains_file():
+def spam_domains_forbidden_list_file():
     """Temporary spam domains file path."""
     fp = tempfile.NamedTemporaryFile(mode="wb")
+    fp.write(b"testing.com\n")
     fp.write(b"evildomain.org\n")
+    fp.write(b"some.other.ch\n")
+    fp.flush()
+    yield fp.name
+    fp.close()
+
+
+@pytest.yield_fixture(scope='session')
+def spam_domains_safelist_file():
+    """Temporary safelisted domains file path."""
+    fp = tempfile.NamedTemporaryFile(mode="wb")
+    fp.write(b"safedomain.org\n")
+    fp.write(b"safe.domain.org\n")
     fp.flush()
     yield fp.name
     fp.close()
 
 
 @pytest.fixture(scope='session')
-def default_config(tmp_db_path, tmp_spam_domains_file):
+def default_config(tmp_db_path, spam_domains_forbidden_list_file,
+                   spam_domains_safelist_file):
     """Default configuration."""
     ZENODO_OPENAIRE_COMMUNITIES = {
         'foo': {
@@ -241,7 +255,8 @@ def default_config(tmp_db_path, tmp_spam_domains_file):
             },
         },
         SEARCH_INDEX_PREFIX='zenodo-test-',
-        ZENODO_SPAM_DOMAINS_FILEPATH=tmp_spam_domains_file,
+        ZENODO_SPAM_DOMAINS_FORBIDDEN_PATH=spam_domains_forbidden_list_file,
+        ZENODO_SPAM_DOMAINS_SAFELIST_PATH=spam_domains_safelist_file
     )
 
 

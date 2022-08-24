@@ -130,3 +130,18 @@ def check_and_handle_spam(community=None, deposit=None, retry=True):
                 'comid': community.id if community else None
             }
         )
+
+class DomainList:
+    """Domain status list."""
+
+    def __init__(self, domains_filepath):
+        """Initialize safelist."""
+        self._index = set()
+        if domains_filepath:
+            with open(domains_filepath) as file:
+                lines = file.readlines()
+                lines = [self._index.add(line.rstrip()) for line in lines]
+
+    def matches(self, domain):
+        """Match a domain against index and return domain record."""
+        return domain in self._index

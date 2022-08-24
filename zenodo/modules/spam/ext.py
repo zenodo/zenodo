@@ -31,7 +31,7 @@ from celery.signals import celeryd_init
 from flask import current_app
 
 from . import config, current_spam
-from .forbiddenlist import DomainForbiddenList
+from .utils import DomainList
 
 
 class ZenodoSpam(object):
@@ -58,8 +58,11 @@ class ZenodoSpam(object):
         """Flask application initialization."""
         self.app = app
         self.init_config(app)
-        self.domain_forbidden_list = DomainForbiddenList(
-            app.config['ZENODO_SPAM_DOMAINS_FILEPATH']
+        self.domain_forbiddenlist = DomainList(
+            app.config['ZENODO_SPAM_DOMAINS_FORBIDDEN_PATH']
+        )
+        self.domain_safelist = DomainList(
+            app.config['ZENODO_SPAM_DOMAINS_SAFELIST_PATH']
         )
         app.extensions['zenodo-spam'] = self
 

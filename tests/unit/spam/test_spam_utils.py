@@ -22,30 +22,25 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Test forbidden list."""
+"""Test utils."""
 
 import os
 import pytest
 import tempfile
 
-from zenodo.modules.spam.forbiddenlist import DomainForbiddenList
+from zenodo.modules.spam.proxies import current_domain_forbiddenlist, \
+    current_domain_safelist
 
 
-@pytest.yield_fixture(scope='session')
-def tmp_spam_domains_file():
-    """Temporary spam domains file path."""
-    fp = tempfile.NamedTemporaryFile(mode="wb")
-    fp.write(b"testing.com\n")
-    fp.write(b"some.other.ch\n")
-    fp.flush()
-    yield fp.name
-    fp.close()
+def test_forbidden_list_search(app):
+    assert not current_domain_forbiddenlist.matches("test.com")
+    assert not current_domain_forbiddenlist.matches("other.ch")
+    assert current_domain_forbiddenlist.matches("testing.com")
+    assert current_domain_forbiddenlist.matches("some.other.ch")
 
 
-def test_forbidden_list_search(tmp_spam_domains_file):
-    fl = DomainForbiddenList(tmp_spam_domains_file)
-
-    assert not fl.is_forbidden("test.com")
-    assert not fl.is_forbidden("other.ch")
-    assert fl.is_forbidden("testing.com")
-    assert fl.is_forbidden("some.other.ch")
+def test_safelist_search(app):
+    assert not current_domain_safelist.matches("test.com")
+    assert not current_domain_safelist.matches("other.ch")
+    assert current_domain_safelist.matches("safedomain.org")
+    assert current_domain_safelist.matches("safe.domain.org")
