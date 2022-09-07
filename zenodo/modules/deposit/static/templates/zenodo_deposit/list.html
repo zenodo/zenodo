@@ -22,7 +22,7 @@
       <div class="col-sm-offset-2 col-sm-4">
         <span class="pull-right">
           <span class="text-muted" ng-show="filesVM.invenioFilesBusy && filesVM.getCompleted().length < filesVM.files.length">
-            <i class="fa fa-spinner"></i>
+            <i class="fa fa-spinner fa-pulse"></i>
           </span>
           <button class="btn btn-xs btn-danger" type="submit" ng-show="filesVM.invenioFilesBusy" ng-click="filesVM.cancel()"><i class="fa fa-times icon-white"></i> Cancel</button>
           <button class="btn btn-xs btn-default"
