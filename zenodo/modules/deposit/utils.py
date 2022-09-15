@@ -261,10 +261,11 @@ def suggest_language(q, limit=5):
     return langs
 
 
-def is_user_verified():
+def is_user_verified(user=None):
     """Permission function that evaluates if the user can create a deposit."""
-    if current_user.email:
-        email_domain = current_user.email.rsplit('@', 1)[-1].lower()
+    user = user or current_user
+    if user.email:
+        email_domain = user.email.rsplit('@', 1)[-1].lower()
         if current_domain_forbiddenlist.matches(email_domain):
             return False, (
                 'You have registered on Zenodo using an email address domain '
@@ -272,12 +273,12 @@ def is_user_verified():
                 'this is not the case please contact us via our support line.'
             )
 
-    if current_user.external_identifiers:
+    if user.external_identifiers:
         return True, ''
 
-    if not current_user.confirmed_at:
+    if not user.confirmed_at:
         return False, (
-            'To create a deposit please verify your email. You can resend the '
+            'To continue please verify your email. You can resend the '
             'verification email from your profile settings. Alternatively you '
             'can link your Zenodo account with either your GitHub or ORCID '
             'account.'
