@@ -46,9 +46,9 @@ from invenio_search.api import RecordsSearch
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.spam.forms import DeleteSpamForm
 from zenodo.modules.spam.models import SafelistEntry
-from zenodo.modules.spam.tasks import delete_spam_user, reindex_user_records
 from zenodo.modules.spam.proxies import current_domain_forbiddenlist, \
     current_domain_safelist
+from zenodo.modules.spam.tasks import delete_spam_user, reindex_user_records
 
 blueprint = Blueprint(
     'zenodo_spam',

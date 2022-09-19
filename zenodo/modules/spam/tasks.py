@@ -28,16 +28,15 @@ from __future__ import absolute_import, print_function
 
 from celery import shared_task
 from flask import current_app
-from invenio_communities.models import Community
-from invenio_records.models import RecordMetadata
 from invenio_accounts.models import User
-from invenio_search.api import RecordsSearch
 from invenio_accounts.proxies import current_accounts
+from invenio_communities.models import Community
 from invenio_db import db
 from invenio_indexer.api import RecordIndexer
+from invenio_records.models import RecordMetadata
+from invenio_search.api import RecordsSearch
 
 from zenodo.modules.spam import current_spam
-
 
 
 @shared_task(ignore_result=False)

@@ -27,7 +27,7 @@
 from __future__ import absolute_import, print_function
 
 from elasticsearch_dsl import Q
-from flask import request, current_app
+from flask import current_app, request
 from invenio_records_rest.query import es_search_factory as _es_search_factory
 
 

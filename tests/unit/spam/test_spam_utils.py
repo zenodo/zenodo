@@ -25,8 +25,9 @@
 """Test utils."""
 
 import os
-import pytest
 import tempfile
+
+import pytest
 
 from zenodo.modules.spam.proxies import current_domain_forbiddenlist, \
     current_domain_safelist

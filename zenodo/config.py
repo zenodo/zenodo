@@ -73,8 +73,8 @@ from invenio_stats.processors import EventsIndexer
 from invenio_stats.queries import ESTermsQuery
 from zenodo_accessrequests.config import ACCESSREQUESTS_RECORDS_UI_ENDPOINTS
 
-from zenodo.modules.github.schemas import CitationMetadataSchema
 from zenodo.modules.deposit.utils import is_user_verified
+from zenodo.modules.github.schemas import CitationMetadataSchema
 from zenodo.modules.records.facets import custom_metadata_filter, \
     geo_bounding_box_filter
 from zenodo.modules.records.permissions import deposit_delete_permission_factory, \

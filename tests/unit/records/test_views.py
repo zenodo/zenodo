@@ -27,6 +27,7 @@
 from __future__ import absolute_import, print_function
 
 import json
+import urlparse
 from datetime import datetime, timedelta
 
 import pytest
@@ -37,12 +38,10 @@ from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_records.api import Record
 from invenio_search import current_search
 from mock import Mock, patch
-
-from zenodo.modules.records.views import zenodo_related_links
-from zenodo.modules.records.views import get_reana_badge
-from zenodo.modules.records.serializers.schemas.common import api_link_for
 from six.moves.urllib.parse import urlencode
-import urlparse
+
+from zenodo.modules.records.serializers.schemas.common import api_link_for
+from zenodo.modules.records.views import get_reana_badge, zenodo_related_links
 
 
 def test_is_valid_access_right(app):

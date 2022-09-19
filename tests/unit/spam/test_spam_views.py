@@ -26,8 +26,9 @@
 
 from flask import url_for
 from helpers import login_user_via_session
-from zenodo.modules.spam.models import SafelistEntry
 from invenio_search.proxies import current_search
+
+from zenodo.modules.spam.models import SafelistEntry
 
 
 def test_safelist_add_remove(

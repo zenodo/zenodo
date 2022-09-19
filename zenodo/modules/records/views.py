@@ -29,14 +29,12 @@ from __future__ import absolute_import, print_function, unicode_literals
 import copy
 import json
 import re
+import urlparse
 from datetime import datetime as dt
 from operator import itemgetter
 
 import idutils
 import six
-from six.moves.urllib.parse import urlencode, urlunparse
-import urlparse
-
 from flask import Blueprint, abort, current_app, render_template, request
 from flask_iiif.restful import IIIFImageAPI
 from flask_principal import ActionNeed
@@ -45,27 +43,28 @@ from invenio_access.permissions import Permission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
-from invenio_iiif.utils import iiif_image_key
 from invenio_iiif.previewer import previewable_extensions as thumbnail_exts
+from invenio_iiif.utils import iiif_image_key
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
+from six.moves.urllib.parse import urlencode, urlunparse
 from werkzeug.utils import import_string
 
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.extra_formats import ExtraFormats
 from zenodo.modules.deposit.views_rest import pass_extra_formats_mimetype
-from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.records.serializers.schemas.common import api_link_for
+from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
 
+from ..spam.models import SafelistEntry
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
 from .proxies import current_custom_metadata
 from .serializers import citeproc_v1
 from .serializers.json import ZenodoJSONSerializer
-from ..spam.models import SafelistEntry
 
 blueprint = Blueprint(
     'zenodo_records',

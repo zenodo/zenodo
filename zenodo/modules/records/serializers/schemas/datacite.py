@@ -27,8 +27,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 import json
-
 import re
+
 import arrow
 import pycountry
 from flask import current_app
