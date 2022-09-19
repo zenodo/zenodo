@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function
 
+from flask import Blueprint
 import joblib
 from celery.signals import celeryd_init
 from flask import current_app
@@ -58,6 +59,13 @@ class ZenodoSpam(object):
         """Flask application initialization."""
         self.app = app
         self.init_config(app)
+
+        # Regsiter email templates
+        app.register_blueprint(Blueprint(
+            "zenodo_spam_email_templates",
+            __name__, template_folder="templates",
+        ))
+
         self.domain_forbiddenlist = DomainList(
             app.config['ZENODO_SPAM_DOMAINS_FORBIDDEN_PATH']
         )
