@@ -264,6 +264,10 @@ def suggest_language(q, limit=5):
 def is_user_verified(user=None):
     """Permission function that evaluates if the user can create a deposit."""
     user = user or current_user
+
+    if user.is_anonymous:
+        return False, ''
+
     if user.email:
         email_domain = user.email.rsplit('@', 1)[-1].lower()
         if current_domain_forbiddenlist.matches(email_domain):
