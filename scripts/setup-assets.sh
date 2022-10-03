@@ -46,6 +46,8 @@ fi
 zenodo npm --pinned-file ${SOURCE}
 cd ${VIRTUAL_ENV}/var/instance/static
 rm -rf gen .webassets-cache
+# Replace "git" with "git+https" protocol for git dependencies
+sed -i 's/git\:\/\/github\.com/git+https\:\/\/github\.com/g' package.json
 npm install
 cd ${CWD}
 zenodo collect -v
