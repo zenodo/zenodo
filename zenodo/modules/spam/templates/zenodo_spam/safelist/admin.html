@@ -52,6 +52,14 @@
                  ('max_users') }}">
         </div>
       </div>
+      <select name="include_pending" class="form-control">
+        <option id="1" {{ "selected" if  request.args.get
+                 ('include_pending') == 'Do not include pending'
+                  else ''}}>Do not include pending</option>
+        <option id="2" {{ "selected" if  request.args.get
+                 ('include_pending') == 'Include pending'
+                 else ''}}>Include pending</option>
+      </select>
       <input class="btn btn-primary" type="submit" value="Apply filters"/>
     </form>
   </div>

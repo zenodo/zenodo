@@ -133,7 +133,7 @@ def _evaluate_user_domain(email):
     return 'unclear'
 
 
-def _expand_users_info(results):
+def _expand_users_info(results, include_pending=False):
     """Return user information."""
     user_data = (
         User.query.options(
@@ -144,7 +144,7 @@ def _expand_users_info(results):
     )
 
     for user in user_data:
-        if not user.active or user.safelist:
+        if not include_pending or not user.active or user.safelist:
             results.pop(user.id)
             continue
 
@@ -153,7 +153,8 @@ def _expand_users_info(results):
             "id": user.id,
             "email": user.email,
             "external": [i.method for i in (user.external_identifiers or [])],
-            "flag": _evaluate_user_domain(user.email)
+            "flag": _evaluate_user_domain(user.email),
+            "user_status": user.active
         })
         if user.profile:
             r.update({
@@ -173,6 +174,9 @@ def safelist_admin():
     from_weeks = request.args.get('from_weeks', 4, type=int)
     to_weeks = request.args.get('to_weeks', 0, type=int)
     max_users = request.args.get('max_users', 1000, type=int)
+    include_pending = request.args.get('include_pending', 'Do not include '
+                                                          'pending',
+                                       type=string) == 'Include pending'
 
     search = RecordsSearch(index='records').filter(
         'range' , **{'created': {'gte': 'now-{}w'.format(from_weeks),
@@ -195,9 +199,10 @@ def safelist_admin():
             'last_records': ", ".join(r.title for r in user.records),
             'last_descriptions': ", ".join(r.description for r in
                                            user.records),
-            'first_record_id': user.records[0].recid
+            'first_record_id': user.records[0].recid,
+            'total_records': user.doc_count()
         }
-    _expand_users_info(result)
+    _expand_users_info(result, include_pending)
 
     return render_template('zenodo_spam/safelist/admin.html', users=result)
 
