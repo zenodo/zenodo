@@ -57,6 +57,11 @@ def check_metadata_for_spam(community_id=None, dep_id=None):
 
 
 @shared_task(ignore_result=False)
+def async_delete_record(record_uuid, reason, user):
+    delete_record(record_uuid, reason, user)
+
+
+@shared_task(ignore_result=False)
 def delete_spam_user(user_id, deleted_by):
     """Deletes a user and marks their records and communities as spam."""
     from zenodo.modules.deposit.utils import delete_record
@@ -74,8 +79,9 @@ def delete_spam_user(user_id, deleted_by):
             c.delete()
     current_accounts.datastore.deactivate_user(user)
     db.session.commit()
-    for r in rs.scan():
-        delete_record(r.meta.id, 'spam', deleted_by)
+    record_ids = [record.meta.id for record in rs.scan()]
+    for record_id in record_ids:
+        async_delete_record(record_id, 'spam', deleted_by)
 
 
 @shared_task(ignore_result=False)
@@ -87,8 +93,9 @@ def reindex_user_records(user_id):
     index_threshold = current_app.config.get(
         'ZENODO_RECORDS_SAFELIST_INDEX_THRESHOLD', 1000)
     if rs.count() < index_threshold:
-        for record in rs.scan():
-            indexer.index_by_id(record.meta.id)
+        record_ids = [record.meta.id for record in rs.scan()]
+        for record_id in record_ids:
+            indexer.index_by_id(record_id)
     else:
         indexer.bulk_index((
             record.meta.id for record in rs.scan()

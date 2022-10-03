@@ -112,8 +112,9 @@ def delete(user_id):
         # delete_record function commits the session internally
         # for each deleted record
         if deleteform.remove_all_records.data:
-            for r in rs.scan():
-                delete_record(r.meta.id, 'spam', int(current_user.get_id()))
+            record_ids = [record.meta.id for record in rs.scan()]
+            for record_id in record_ids:
+                delete_record(record_id, 'spam', int(current_user.get_id()))
 
         flash("Spam removed", category='success')
         return redirect(url_for('.delete', user_id=user.id))
