@@ -42,6 +42,7 @@ from werkzeug.exceptions import HTTPException
 from zenodo.modules.spam.tasks import check_metadata_for_spam
 from zenodo.modules.spam.models import SafelistEntry
 
+
 def is_user_safelisted(user):
     if not SafelistEntry.query.get(user.id):
         return False
@@ -82,8 +83,9 @@ def send_spam_admin_email(user, deposit=None, community=None):
 def check_and_handle_spam(community=None, deposit=None, retry=True):
     """Checks community/deposit metadata for spam."""
     try:
-        if not is_safelisted_user(current_user) or \
-            not Permission(ActionNeed('admin-access')).can():
+        is_safelisted = is_user_safelisted(current_user)
+        is_admin = Permission(ActionNeed('admin-access')).can()
+        if not is_safelisted or not is_admin:
             if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
                 if community:
                     task = check_metadata_for_spam.delay(
