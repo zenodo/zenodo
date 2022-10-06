@@ -1444,7 +1444,7 @@ def sample_identifiers():
         'pmcid': ('PMC2631623',
                   'https://www.ncbi.nlm.nih.gov/pmc/PMC2631623'),
         'pmid': ('pmid:12082125',
-                 'https://www.ncbi.nlm.nih.gov/pubmed/12082125'),
+                 'https://pubmed.ncbi.nlm.nih.gov/12082125'),
         'purl': ('http://purl.oclc.org/foo/bar',
                  'http://purl.oclc.org/foo/bar'),
         'refseq': ('NZ_JXSL01000036.1',
