@@ -112,8 +112,9 @@ def delete(user_id):
         # delete_record function commits the session internally
         # for each deleted record
         if deleteform.remove_all_records.data:
-            for r in rs.scan():
-                delete_record(r.meta.id, 'spam', int(current_user.get_id()))
+            record_ids = [record.meta.id for record in rs.scan()]
+            for record_id in record_ids:
+                delete_record(record_id, 'spam', int(current_user.get_id()))
 
         flash("Spam removed", category='success')
         return redirect(url_for('.delete', user_id=user.id))
@@ -132,7 +133,7 @@ def _evaluate_user_domain(email):
     return 'unclear'
 
 
-def _expand_users_info(results):
+def _expand_users_info(results, include_pending=False):
     """Return user information."""
     user_data = (
         User.query.options(
@@ -143,7 +144,7 @@ def _expand_users_info(results):
     )
 
     for user in user_data:
-        if not user.active or user.safelist:
+        if user.safelist or (not user.active and not include_pending):
             results.pop(user.id)
             continue
 
@@ -152,7 +153,9 @@ def _expand_users_info(results):
             "id": user.id,
             "email": user.email,
             "external": [i.method for i in (user.external_identifiers or [])],
-            "flag": _evaluate_user_domain(user.email)
+            "flag": _evaluate_user_domain(user.email),
+            "active": user.active,
+            "safelist": user.safelist,
         })
         if user.profile:
             r.update({
@@ -172,6 +175,8 @@ def safelist_admin():
     from_weeks = request.args.get('from_weeks', 4, type=int)
     to_weeks = request.args.get('to_weeks', 0, type=int)
     max_users = request.args.get('max_users', 1000, type=int)
+    include_pending = \
+        request.args.get('include_pending', False, type=str) == '1'
 
     search = RecordsSearch(index='records').filter(
         'range' , **{'created': {'gte': 'now-{}w'.format(from_weeks),
@@ -179,7 +184,6 @@ def safelist_admin():
     ).filter(
         'term', _safelisted=False,
     )
-
 
     user_agg = search.aggs.bucket('user', 'terms', field='owners',
                                   size=max_users)
@@ -194,9 +198,10 @@ def safelist_admin():
             'last_records': ", ".join(r.title for r in user.records),
             'last_descriptions': ", ".join(r.description for r in
                                            user.records),
-            'first_record_id': user.records[0].recid
+            'first_record_id': user.records[0].recid,
+            'total_records': user.doc_count
         }
-    _expand_users_info(result)
+    _expand_users_info(result, include_pending)
 
     return render_template('zenodo_spam/safelist/admin.html', users=result)
 

@@ -52,6 +52,14 @@
                  ('max_users') }}">
         </div>
       </div>
+      <select name="include_pending" class="form-control">
+        <option value="0" {{ "selected" if  request.args.get
+                 ('include_pending') == '0'
+                  else ''}}>Do not include pending</option>
+        <option value="1" {{ "selected" if  request.args.get
+                 ('include_pending') == '1'
+                 else ''}}>Include pending</option>
+      </select>
       <input class="btn btn-primary" type="submit" value="Apply filters"/>
     </form>
   </div>
@@ -62,10 +70,11 @@
         <thead>
           <tr>
             <th>ID</th>
+            <th></th>
             <th>Username</th>
             <th>Email</th>
             <th>Name</th>
-            <th>Domain</th>
+            <th></th>
             <th>External</th>
             <th>Records</th>
             <th></th>
@@ -80,19 +89,19 @@
                 <a target="_blank" href="{{ url_for
                 ('zenodo_spam.delete', user_id=user.id) }}">{{ user.id }}</a>
               </td>
+              <td>{{ "✅" if user.active else "🚫"  }}</td>
               <td class="selectable">{{ user.username }}</td>
               <td class="selectable">{{ user.email }}</td>
               <td class="selectable">{{ user.full_name }}</td>
               {% if user.flag == 'safe' %}
-                  {% set flag_class = "success" %}
+                  {% set flag_icon = "👌" %}
               {% elif user.flag == 'forbidden' %}
-                  {% set flag_class = "danger" %}
+                  {% set flag_icon = "👹" %}
               {% else %}
-                  {% set flag_class = "primary" %}
+                  {% set flag_icon = "🕵️" %}
               {% endif %}
-              <td class="selectable">
-                <span class="glyphicon glyphicon-flag text-{{ flag_class }}"
-                      aria-hidden="true"></span> {{ user.flag }}
+              <td title="{{ user.flag }}" class="selectable">
+                {{ flag_icon }}
               </td>
               <td class="selectable">{{ user.external | join(', ') }}</td>
               <td>{{ user.last_records }}</td>
@@ -100,7 +109,7 @@
                 <a target="_blank" href="{{ url_for('invenio_records_ui.recid',
                                  pid_value=user.first_record_id) }}">
                 <span class="glyphicon glyphicon-file"
-                      aria-hidden="true"></span></a>
+                      aria-hidden="true"></span></a> ({{ user.total_records }})
               </td>
               <td>
                 <a href="https://translate.google.com/?sl=auto&tl=en&text=
@@ -116,10 +125,11 @@
         <tfoot>
           <tr>
             <th>ID</th>
+            <th></th>
             <th>Username</th>
             <th>Email</th>
             <th>Name</th>
-            <th>Domain</th>
+            <th></th>
             <th>External</th>
             <th>Records</th>
             <th></th>
@@ -167,6 +177,8 @@
       processing: true,
       columns: [
         // User ID
+        null,
+        // Active
         null,
         // Username
         {width: "10%", render: $.fn.dataTable.render.ellipsis(10)},

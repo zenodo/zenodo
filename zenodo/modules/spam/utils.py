@@ -32,6 +32,7 @@ from flask import current_app, render_template
 from flask_babelex import gettext as _
 from flask_mail import Message
 from flask_principal import ActionNeed
+from flask_security import current_user
 from invenio_access import Permission
 from invenio_communities.models import Community
 from invenio_mail.tasks import send_email
@@ -39,6 +40,13 @@ from invenio_search.api import RecordsSearch
 from werkzeug.exceptions import HTTPException
 
 from zenodo.modules.spam.tasks import check_metadata_for_spam
+from zenodo.modules.spam.models import SafelistEntry
+
+
+def is_user_safelisted(user):
+    if not SafelistEntry.query.get(user.id):
+        return False
+    return True
 
 
 def send_spam_user_email(recipient, deposit=None, community=None):
@@ -75,20 +83,23 @@ def send_spam_admin_email(user, deposit=None, community=None):
 def check_and_handle_spam(community=None, deposit=None, retry=True):
     """Checks community/deposit metadata for spam."""
     try:
-        if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
-            if community:
-                task = check_metadata_for_spam.delay(
-                    community_id=community.id)
-                user_id = community.id_user
-            if deposit:
-                task = check_metadata_for_spam.delay(dep_id=str(deposit.id))
-                user_id = deposit['owners'][0]
-            spam_proba = task.get(timeout=current_app.config[
-                'ZENODO_SPAM_CHECK_TIMEOUT'])
-        else:
-            spam_proba = 0
-        if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
-            if not Permission(ActionNeed('admin-access')).can():
+        is_safelisted = is_user_safelisted(current_user)
+        is_admin = Permission(ActionNeed('admin-access')).can()
+        if not is_safelisted or not is_admin:
+            if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
+                if community:
+                    task = check_metadata_for_spam.delay(
+                        community_id=community.id)
+                    user_id = community.id_user
+                if deposit:
+                    task = check_metadata_for_spam.delay(dep_id=str(deposit.id))
+                    user_id = deposit['owners'][0]
+                spam_proba = task.get(timeout=current_app.config[
+                    'ZENODO_SPAM_CHECK_TIMEOUT'])
+            else:
+                spam_proba = 0
+
+            if spam_proba > current_app.config['ZENODO_SPAM_THRESHOLD']:
                 user_records = RecordsSearch(index='records').query(
                     Q('query_string', query="owners:{}".format(
                         user_id))).count()

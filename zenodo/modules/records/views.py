@@ -59,6 +59,7 @@ from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
 
 from ..spam.models import SafelistEntry
+from ..spam.utils import is_user_safelisted
 from .api import ZenodoRecord
 from .models import AccessRight, ObjectType
 from .permissions import RecordPermission
@@ -107,10 +108,7 @@ def is_safelisted_record(record):
 
 @blueprint.app_template_test('safelisted_user')
 def is_safelisted_user(user):
-    """Check if record creators are safelisted."""
-    if not SafelistEntry.query.get(user.id):
-        return False
-    return True
+    return is_user_safelisted(user)
 
 @blueprint.app_template_filter('pidstatus')
 def pidstatus_title(pid):
