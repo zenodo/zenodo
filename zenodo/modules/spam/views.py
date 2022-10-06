@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from datetime import datetime, timedelta
 from itertools import islice
 
 from elasticsearch_dsl import Q
@@ -176,11 +177,11 @@ def safelist_admin():
     to_weeks = request.args.get('to_weeks', 0, type=int)
     max_users = request.args.get('max_users', 1000, type=int)
     include_pending = \
-        request.args.get('include_pending', False, type=str) == '1'
+        request.args.get('include_pending', 'include', type=str) == 'include'
 
     search = RecordsSearch(index='records').filter(
-        'range' , **{'created': {'gte': 'now-{}w'.format(from_weeks),
-                                 'lt': 'now-{}w'.format(to_weeks)}}
+        'range', **{'created': {'gte': 'now-{}w'.format(from_weeks),
+                                'lt': 'now-{}w'.format(to_weeks)}}
     ).filter(
         'term', _safelisted=False,
     )
@@ -195,12 +196,48 @@ def safelist_admin():
     result = {}
     for user in res.aggregations.user.buckets:
         result[user.key] = {
-            'last_records': ", ".join(r.title for r in user.records),
-            'last_descriptions': ", ".join(r.description for r in
-                                           user.records),
-            'first_record_id': user.records[0].recid,
-            'total_records': user.doc_count
+            'last_content_titles': ", ".join(r.title for r in user.records),
+            'last_content_descriptions': ", ".join(r.description for r in
+                                                   user.records),
+            'first_content_url': url_for('invenio_records_ui.recid',
+                                         pid_value=user.records[0].recid),
+            'total_content': user.doc_count
         }
+
+    from_date = datetime.utcnow() - timedelta(weeks=from_weeks)
+    to_date = datetime.utcnow() - timedelta(weeks=to_weeks)
+
+    import sqlalchemy as sa
+    query = db.session.query(
+        User.id.label('user_id'),
+        sa.func.count(Community.id).label('count'),
+        sa.func.max(Community.id).label('c_id'),
+        sa.func.max(Community.title).label('title'),
+        sa.func.max(Community.description).label('description')
+    ).join(Community).group_by(User.id).filter(
+        Community.created.between(from_date, to_date)
+    ).limit(max_users).all()
+
+    for row in query:
+        user_data = result.get(row.user_id, {
+            'last_content_titles': '',
+            'last_content_descriptions': '',
+            'first_content_url': '',
+            'total_content': 0
+        })
+
+        if user_data['last_content_titles']:
+            user_data['last_content_titles'] += ', '
+        user_data['last_content_titles'] += row.title
+
+        if user_data['last_content_descriptions']:
+            user_data['last_content_descriptions'] += ', '
+        user_data['last_content_descriptions'] += row.description
+
+        user_data['first_content_url'] = url_for('invenio_communities.detail',
+                                                 community_id=row.c_id)
+        user_data['total_content'] += row.count
+        result[row.user_id] = user_data
     _expand_users_info(result, include_pending)
 
     return render_template('zenodo_spam/safelist/admin.html', users=result)
@@ -229,6 +266,7 @@ def safelist_add_remove(user_id):
     reindex_user_records.delay(user_id)
     return redirect(request.form['next'])
 
+
 @blueprint.route('/safelist/add/bulk', methods=['POST'])
 @login_required
 def safelist_bulk_add():
@@ -240,6 +278,7 @@ def safelist_bulk_add():
     user_ids = request.form.getlist('user_ids[]')
     for user_id in user_ids:
         user = User.query.get(user_id)
+        user.active = True
         try:
             SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'
                                  .format(current_user.email, current_user.id))

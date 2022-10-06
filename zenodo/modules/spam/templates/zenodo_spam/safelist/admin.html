@@ -53,12 +53,12 @@
         </div>
       </div>
       <select name="include_pending" class="form-control">
-        <option value="0" {{ "selected" if  request.args.get
-                 ('include_pending') == '0'
-                  else ''}}>Do not include pending</option>
-        <option value="1" {{ "selected" if  request.args.get
-                 ('include_pending') == '1'
-                 else ''}}>Include pending</option>
+        <option value="include" {{ "selected" if  request.args.get
+                 ('include_pending') == 'include'
+                  else ''}}>Include pending</option>
+        <option value="exclude" {{ "selected" if  request.args.get
+                 ('include_pending') == 'exclude'
+                 else ''}}>Do not include pending</option>
       </select>
       <input class="btn btn-primary" type="submit" value="Apply filters"/>
     </form>
@@ -76,7 +76,7 @@
             <th>Name</th>
             <th></th>
             <th>External</th>
-            <th>Records</th>
+            <th>Titles</th>
             <th></th>
             <th>GT</th>
             <th>Descriptions</th>
@@ -104,21 +104,20 @@
                 {{ flag_icon }}
               </td>
               <td class="selectable">{{ user.external | join(', ') }}</td>
-              <td>{{ user.last_records }}</td>
-              <td>
-                <a target="_blank" href="{{ url_for('invenio_records_ui.recid',
-                                 pid_value=user.first_record_id) }}">
+              <td>{{ user.last_content_titles }}</td>
+              <td data-sort={{ user.total_content }}>
+                <a target="_blank" href="{{ user.first_content_url }}">
                 <span class="glyphicon glyphicon-file"
-                      aria-hidden="true"></span></a> ({{ user.total_records }})
+                      aria-hidden="true"></span></a> ({{ user.total_content }})
               </td>
               <td>
                 <a href="https://translate.google.com/?sl=auto&tl=en&text=
-                {{ user.last_records.replace(" ", "%20") }}&op=translate"
+                {{ user.last_content_titles.replace(" ", "%20") }}&op=translate"
                      target="_blank">
                 <span class="glyphicon glyphicon-new-window"
                       aria-hidden="true"></span></a>
               </td>
-              <td>{{ user.last_descriptions }}</td>
+              <td>{{ user.last_content_descriptions }}</td>
             </tr>
           {% endfor %}
         </tbody>
@@ -131,7 +130,7 @@
             <th>Name</th>
             <th></th>
             <th>External</th>
-            <th>Records</th>
+            <th>Titles</th>
             <th></th>
             <th>GT</th>
             <th>Descriptions</th>
@@ -190,7 +189,7 @@
         null,
         // External
         null,
-        // Records
+        // Titles
         {width: "40%", render: $.fn.dataTable.render.ellipsis(50)},
         // Last record
         {width: "2%"},
