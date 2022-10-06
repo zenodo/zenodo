@@ -289,7 +289,10 @@
             "enum": [
               "ads",
               "ark",
+              "arrayexpress_array",
+              "arrayexpress_experiment",
               "arxiv",
+              "ascl",
               "bioproject",
               "biosample",
               "doi",
@@ -297,6 +300,7 @@
               "ean8",
               "ensembl",
               "genome",
+              "geo",
               "gnd",
               "hal",
               "handle",
@@ -310,12 +314,12 @@
               "pmid",
               "purl",
               "refseq",
+              "ror",
               "sra",
+              "swh",
               "uniprot",
               "url",
-              "urn",
-              "swh",
-              "ascl"
+              "urn"
             ],
             "type": "string"
           },
