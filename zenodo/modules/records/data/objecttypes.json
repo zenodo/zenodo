@@ -26,7 +26,8 @@
     {"$ref": "https://zenodo.org/objecttypes/publication/other"},
     {"$ref": "https://zenodo.org/objecttypes/publication/datamanagementplan"},
     {"$ref": "https://zenodo.org/objecttypes/publication/annotationcollection"},
-    {"$ref": "https://zenodo.org/objecttypes/publication/taxonomictreatment"}
+    {"$ref": "https://zenodo.org/objecttypes/publication/taxonomictreatment"},
+    {"$ref": "https://zenodo.org/objecttypes/publication/peerreview"}
   ],
   "openaire": {
     "resourceType": "0001",
@@ -709,6 +710,26 @@
   "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
   "openaire": {
     "resourceType": "0020",
+    "type": "publication"
+  },
+  "csl": "article"
+},
+{
+  "$schema": "https://zenodo.org/schemas/records/objecttype-v1.0.0.json",
+  "internal_id": "publication-peerreview",
+  "id": "https://zenodo.org/objecttypes/publication/peerreview#",
+  "title": {
+    "en": "Peer review"
+  },
+  "title_plural": {
+    "en": "Peer reviews"
+  },
+  "schema.org": "https://schema.org/ScholarlyArticle",
+  "datacite": {"general": "PeerReview"},
+  "eurepo": "info:eu-repo/semantics/review",
+  "parent": {"$ref": "https://zenodo.org/objecttypes/publication"},
+  "openaire": {
+    "resourceType": "0015",
     "type": "publication"
   },
   "csl": "article"
