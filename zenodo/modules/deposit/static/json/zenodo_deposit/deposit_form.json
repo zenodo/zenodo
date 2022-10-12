@@ -156,6 +156,10 @@
             "name": "Working paper"
           },
           {
+            "value": "peerreview",
+            "name": "Peer review"
+          },
+          {
             "value": "other",
             "name": "Other"
           }
