@@ -263,9 +263,9 @@ file accordingly with a new entry:
 - **title**: Title for the type. Example: ``{"en": "Software documentation"}``
 - **title_plural**: Title in plural. Example: ``{"en": "Software documentation"}``
 - **schema.org**: Schema.org DataType, should be CreativeWork or one of its appropriate subtypes (`vocabulary <https://schema.org/CreativeWork#subtypes>`__). Example: ``https://schema.org/CreativeWork``
-- **datacite**: DataCite ResourceType (`vocabulary <https://schema.datacite.org/meta/kernel-4.1/>`__). Example: ``{"general": "Text", "type": "Software documentation"}``
-- **eurepo**: ``info-eu-repo`` type (`vocabulary <https://wiki.surfnet.nl/display/standards/info-eu-repo#info-eu-repo-Publicationtypes>`__). Example: ``info:eu-repo/semantics/technicalDocumentation``
+- **datacite**: DataCite ResourceType (`vocabulary <https://schema.datacite.org/meta/kernel-4.4/doc/DataCite-MetadataKernel_v4.4.pdf>`__). Example: ``{"general": "Text", "type": "Software documentation"}``
+- **eurepo**: ``info-eu-repo`` type (`vocabulary <https://wiki.surfnet.nl/display/standards/info-eu-repo>`__). Example: ``info:eu-repo/semantics/technicalDocumentation``
 - **openaire**: OpenAIRE-specific fields
-    - **resourceType**: OpenAIRE resource type code (`vocabulary <https://issue.openaire.research-infrastructures.eu/issues/2938>`__). Example: ``0009``
+    - **resourceType**: OpenAIRE resource type code (`vocabulary <https://beta.openaire.eu/research-products-and-their-associated-types-in-openaire>`__). Example: ``0009``
     - **type**: OpenAIRE type used for direct indexing. Can be ``publication``, ``dataset``, ``software`` or ``other``
 - **csl**: Citation Style Language type (`vocabulary <http://docs.citationstyles.org/en/stable/specification.html#appendix-iii-types>`__). Example: ``article``
