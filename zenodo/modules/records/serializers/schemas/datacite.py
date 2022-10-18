@@ -525,11 +525,6 @@ class DataCiteSchemaV4(DataCiteSchema):
 
         return items
 
-    FUNDER_PROGRAM_MATCHES = {
-        '10.13039/100010661': ('^H2020$', '^Horizon 2020',),
-        '10.13039/100011102': ('^FP7$',),
-    }
-
     def get_fundingreferences(self, obj):
         """Get funding references."""
         items = []
@@ -539,7 +534,9 @@ class DataCiteSchemaV4(DataCiteSchema):
             funder_identifier = g.get('funder', {}).get('doi')
             award_program = g.get('program')
             if award_program:
-                for funder_id, regexes in self.FUNDER_PROGRAM_MATCHES.items():
+                funder_program_matches = current_app.config.get(
+                    'ZENODO_RECORDS_FUNDER_PROGRAM_MATCHES', {})
+                for funder_id, regexes in funder_program_matches.items():
                     if any(re.match(r, award_program) for r in regexes):
                         funder_identifier = funder_id
 
