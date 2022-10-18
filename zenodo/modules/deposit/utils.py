@@ -133,7 +133,31 @@ def delete_record(record_uuid, reason, user):
     record = ZenodoRecord.get_record(record_uuid)
 
     # Remove the record from versioning and delete the recid
-    recid = PersistentIdentifier.get('recid', record['recid'])
+    try:
+        recid = PersistentIdentifier.get('recid', record['recid'])
+    except KeyError:
+        # Already deleted record is not marked as deleted in ES
+        restored_record = record.revisions[-2]
+        try:
+            RecordIndexer().delete(restored_record)
+        except NotFoundError:
+            pass
+
+        # Also delete from OpenAIRE index
+        original_id = openaire_original_id(restored_record,
+                                           openaire_type(restored_record))[1]
+        datasource_id = openaire_datasource_id(restored_record)
+
+        if current_app.config[
+            'OPENAIRE_DIRECT_INDEXING_ENABLED'] and original_id \
+            and datasource_id:
+            openaire_delete.delay(original_id=original_id,
+                                  datasource_id=datasource_id)
+
+        datacite_inactivate.delay(restored_record['doi'])
+
+        return
+
     pv = PIDVersioning(child=recid)
     pv.remove_child(recid)
     pv.update_redirect()
