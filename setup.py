@@ -108,7 +108,6 @@ install_requires = [
     'invenio-logging>=1.1.1',
     'invenio-mail>=1.0.2',
     'invenio-marc21>=1.0.0a8',
-    'invenio-migrator>=1.0.0a9',
     'invenio-oaiserver>=1.1.1.post1',
     'invenio-oauth2server>=1.0.3',
     'invenio-oauthclient[github]>=1.1.2',
