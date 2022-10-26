@@ -34,7 +34,7 @@ from invenio_db import db
 from invenio_opendefinition.minters import license_minter
 from invenio_opendefinition.resolvers import license_resolver
 from invenio_opendefinition.validators import license_validator
-from invenio_pidstore.errors import PIDDoesNotExistError
+from invenio_pidstore.errors import PIDDoesNotExistError, PIDAlreadyExists
 from invenio_records.api import Record
 
 from .utils import read_json
@@ -158,19 +158,18 @@ def loadlicenses():
     """
     data = read_json('data/licenses.json')
     map_ = read_json('data/licenses_map.json')
-    mapped = [(d, map_[d['id']] if d['id'] in map_ else None) for d in data]
     try:
-        for lic, alt_pid in mapped:
-            if lic['id'] == alt_pid:  # Skip the already-existing licenses
-                continue
-            if alt_pid:
-                try:
-                    pid, record = license_resolver.resolve(alt_pid)
-                    license_minter(record.id, lic)
-                except PIDDoesNotExistError:
-                    create_new_license(lic)
-            else:
+        for lic in data:
+            try:
                 create_new_license(lic)
+            except PIDAlreadyExists:
+                pass
+        for pid, alt_pid in map_.items():
+            try:
+                pid, record = license_resolver.resolve(pid)
+                license_minter(record.id, {'id': alt_pid})
+            except (PIDDoesNotExistError, PIDAlreadyExists):
+                pass
         db.session.commit()
     except Exception:
         db.session.rollback()
