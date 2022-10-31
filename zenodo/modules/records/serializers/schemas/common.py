@@ -253,7 +253,7 @@ class ResourceTypeMixin(object):
     resource_type = fields.Method('dump_resource_type', 'load_resource_type')
 
     def load_resource_type(self, data):
-        """Split the resource type and into seperate keys."""
+        """Split the resource type and into separate keys."""
         if not isinstance(data, string_types):
             raise ValidationError(
                 'Not a string.', field_names=['resource_type'])
