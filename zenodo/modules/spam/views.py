@@ -43,6 +43,7 @@ from invenio_admin.views import _has_admin_access
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_search.api import RecordsSearch
+import sqlalchemy as sa
 
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.spam.forms import DeleteSpamForm
@@ -145,7 +146,7 @@ def _expand_users_info(results, include_pending=False):
     )
 
     for user in user_data:
-        if user.safelist or (not user.active and not include_pending):
+        if (user.safelist or not user.active) and not include_pending:
             results.pop(user.id)
             continue
 
@@ -207,18 +208,18 @@ def safelist_admin():
     from_date = datetime.utcnow() - timedelta(weeks=from_weeks)
     to_date = datetime.utcnow() - timedelta(weeks=to_weeks)
 
-    import sqlalchemy as sa
-    query = db.session.query(
+    community_users = db.session.query(
         User.id.label('user_id'),
         sa.func.count(Community.id).label('count'),
         sa.func.max(Community.id).label('c_id'),
         sa.func.max(Community.title).label('title'),
         sa.func.max(Community.description).label('description')
     ).join(Community).group_by(User.id).filter(
-        Community.created.between(from_date, to_date)
+        Community.created.between(from_date, to_date),
+        Community.deleted_at != None,
     ).limit(max_users)
 
-    for row in query:
+    for row in community_users:
         user_data = result.get(row.user_id, {
             'last_content_titles': '',
             'last_content_descriptions': '',
