@@ -46,6 +46,7 @@ from zenodo.modules.utils import obj_or_import_string
 from .api import ZenodoRecord
 from .models import AccessRight
 from .utils import is_deposit, is_record
+from ..tokens.errors import MissingTokenIDError
 
 
 def get_public_bucket_uuids():
@@ -376,12 +377,17 @@ def has_read_files_permission(user, record):
     # Check for a resource access token
     rat_token = request.args.get('token')
     if rat_token:
-        rat_signer, payload = decode_rat(rat_token)
-        rat_deposit_id = payload.get('deposit_id')
-        rat_access = payload.get('access')
-        deposit_id = record.get('_deposit', {}).get('id')
-        if rat_deposit_id == deposit_id and rat_access == 'read':
-            return has_update_permission(rat_signer, record)
+        try:
+            rat_signer, payload = decode_rat(rat_token)
+            rat_deposit_id = payload.get('deposit_id')
+            rat_access = payload.get('access')
+            deposit_id = record.get('_deposit', {}).get('id')
+            if rat_deposit_id == deposit_id and rat_access == 'read':
+                return has_update_permission(rat_signer, record)
+        except MissingTokenIDError:
+            # The token querystring param is also used for secret link tokens,
+            # they might be misinterpreted as RAT tokens and validation.
+            pass
 
     return has_update_permission(user, record)
 
