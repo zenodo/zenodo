@@ -174,71 +174,79 @@ def safelist_admin():
     if not Permission(ActionNeed('admin-access')).can():
         abort(403)
 
+    data = request.args.get('data', 'all', type=str)
+    data_categories = {
+        'records': data in ('all', 'records'),
+        'communities': data in ('all', 'communities'),
+    }
     from_weeks = request.args.get('from_weeks', 4, type=int)
     to_weeks = request.args.get('to_weeks', 0, type=int)
     max_users = request.args.get('max_users', 1000, type=int)
     include_pending = \
         request.args.get('include_pending', 'include', type=str) == 'include'
 
-    search = RecordsSearch(index='records').filter(
-        'range', **{'created': {'gte': 'now-{}w'.format(from_weeks),
-                                'lt': 'now-{}w'.format(to_weeks)}}
-    ).filter(
-        'term', _safelisted=False,
-    )
-
-    user_agg = search.aggs.bucket('user', 'terms', field='owners',
-                                  size=max_users)
-    user_agg.metric('records', 'top_hits', size=3, _source=['title',
-                                                            'description',
-                                                            'recid'])
-    res = search[0:0].execute()
-
     result = {}
-    for user in res.aggregations.user.buckets:
-        result[user.key] = {
-            'last_content_titles': ", ".join(r.title for r in user.records),
-            'last_content_descriptions': ", ".join(r.description for r in
-                                                   user.records),
-            'first_content_url': url_for('invenio_records_ui.recid',
-                                         pid_value=user.records[0].recid),
-            'total_content': user.doc_count
-        }
+    if data_categories['records']:
+        search = RecordsSearch(index='records').filter(
+            'range', **{'created': {'gte': 'now-{}w'.format(from_weeks),
+                                    'lt': 'now-{}w'.format(to_weeks)}}
+        ).filter(
+            'term', _safelisted=False,
+        )
 
-    from_date = datetime.utcnow() - timedelta(weeks=from_weeks)
-    to_date = datetime.utcnow() - timedelta(weeks=to_weeks)
+        user_agg = search.aggs.bucket('user', 'terms', field='owners',
+                                      size=max_users)
+        user_agg.metric('records', 'top_hits', size=3, _source=['title',
+                                                                'description',
+                                                                'recid'])
+        res = search[0:0].execute()
 
-    community_users = db.session.query(
-        User.id.label('user_id'),
-        sa.func.count(Community.id).label('count'),
-        sa.func.max(Community.id).label('c_id'),
-        sa.func.max(Community.title).label('title'),
-        sa.func.max(Community.description).label('description')
-    ).join(Community).group_by(User.id).filter(
-        Community.created.between(from_date, to_date),
-        Community.deleted_at == None,
-    ).limit(max_users)
+        for user in res.aggregations.user.buckets:
+            result[user.key] = {
+                'last_content_titles': ", ".join(r.title for r in user.records),
+                'last_content_descriptions': ", ".join(r.description for r in
+                                                       user.records),
+                'first_content_url': url_for('invenio_records_ui.recid',
+                                             pid_value=user.records[0].recid),
+                'total_content': user.doc_count
+            }
 
-    for row in community_users:
-        user_data = result.get(row.user_id, {
-            'last_content_titles': '',
-            'last_content_descriptions': '',
-            'first_content_url': '',
-            'total_content': 0
-        })
+    if data_categories['communities']:
+        from_date = datetime.utcnow() - timedelta(weeks=from_weeks)
+        to_date = datetime.utcnow() - timedelta(weeks=to_weeks)
 
-        if user_data['last_content_titles']:
-            user_data['last_content_titles'] += ', '
-        user_data['last_content_titles'] += row.title
+        community_users = db.session.query(
+            User.id.label('user_id'),
+            sa.func.count(Community.id).label('count'),
+            sa.func.max(Community.id).label('c_id'),
+            sa.func.max(Community.title).label('title'),
+            sa.func.max(Community.description).label('description')
+        ).join(Community).group_by(User.id).filter(
+            Community.created.between(from_date, to_date),
+            Community.deleted_at == None,
+        ).limit(max_users)
 
-        if user_data['last_content_descriptions']:
-            user_data['last_content_descriptions'] += ', '
-        user_data['last_content_descriptions'] += row.description
+        for row in community_users:
+            user_data = result.get(row.user_id, {
+                'last_content_titles': '',
+                'last_content_descriptions': '',
+                'first_content_url': '',
+                'total_content': 0
+            })
 
-        user_data['first_content_url'] = url_for('invenio_communities.detail',
-                                                 community_id=row.c_id)
-        user_data['total_content'] += row.count
-        result[row.user_id] = user_data
+            if user_data['last_content_titles']:
+                user_data['last_content_titles'] += ', '
+            user_data['last_content_titles'] += row.title
+
+            if user_data['last_content_descriptions']:
+                user_data['last_content_descriptions'] += ', '
+            user_data['last_content_descriptions'] += row.description
+
+            user_data['first_content_url'] = url_for('invenio_communities.detail',
+                                                     community_id=row.c_id)
+            user_data['total_content'] += row.count
+            result[row.user_id] = user_data
+
     _expand_users_info(result, include_pending)
 
     return render_template('zenodo_spam/safelist/admin.html', users=result)
