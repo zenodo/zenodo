@@ -31,6 +31,17 @@
   <div class="row">
     <h1>Safelist admin</h1>
     <form class="form-inline" style="margin-bottom: 2%">
+      <select name="data" class="form-control">
+        <option value="all" {{ "selected" if  request.args.get
+                 ('data') == 'all'
+                  else ''}}>Records & Communities</option>
+        <option value="records" {{ "selected" if  request.args.get
+                 ('data') == 'records'
+                  else ''}}>Records</option>
+        <option value="communities" {{ "selected" if  request.args.get
+                 ('data') == 'communities'
+                 else ''}}>Communities</option>
+      </select>
       <div class="form-group">
         <div class="input-group">
           <input type="number" min="1" class="form-control" name="from_weeks"
