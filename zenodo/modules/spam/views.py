@@ -216,7 +216,7 @@ def safelist_admin():
         sa.func.max(Community.description).label('description')
     ).join(Community).group_by(User.id).filter(
         Community.created.between(from_date, to_date),
-        Community.deleted_at != None,
+        Community.deleted_at == None,
     ).limit(max_users)
 
     for row in community_users:
