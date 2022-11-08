@@ -26,6 +26,7 @@
 
 from __future__ import absolute_import, print_function, unicode_literals
 
+from collections import Counter
 from datetime import datetime, timedelta
 from itertools import islice
 
@@ -126,13 +127,32 @@ def delete(user_id):
         return render_template('zenodo_spam/delete.html', **ctx)
 
 
-def _evaluate_user_domain(email):
-    email_domain = email.rsplit('@', 1)[-1].lower()
+def normalize_email(email):
+    email = email.lower()
+    username, domain = email.rsplit("@", 1)
+    no_dots_username = username.replace(".", "")
+
+    if domain == "googlemail.com":
+        domain = "gmail.com"
+    return no_dots_username + "@" + domain
+
+
+def get_domain(email):
+    return email[email.index("@") :].lower()
+
+
+def _evaluate_user_domain(email, normalized_emails):
+    is_flagged_domain = get_domain(email) == "@gmail.com"
+    is_above_threshold = normalized_emails.get(normalize_email(email), 0) > 3
+
+    email_domain = email.rsplit("@", 1)[-1].lower()
     if current_domain_forbiddenlist.matches(email_domain):
-        return 'forbidden'
+        return "forbidden"
+    if is_flagged_domain and is_above_threshold:
+        return "forbidden"
     if current_domain_safelist.matches(email_domain):
-        return 'safe'
-    return 'unclear'
+        return "safe"
+    return "unclear"
 
 
 def _expand_users_info(results, include_pending=False):
@@ -145,6 +165,11 @@ def _expand_users_info(results, include_pending=False):
         ).filter(User.id.in_(results.keys()))
     )
 
+    normalized_emails = Counter([
+        normalize_email(user.email)
+        for user in user_data
+    ])
+
     for user in user_data:
         if (user.safelist or not user.active) and not include_pending:
             results.pop(user.id)
@@ -155,7 +180,7 @@ def _expand_users_info(results, include_pending=False):
             "id": user.id,
             "email": user.email,
             "external": [i.method for i in (user.external_identifiers or [])],
-            "flag": _evaluate_user_domain(user.email),
+            "flag": _evaluate_user_domain(user.email, normalized_emails),
             "active": user.active,
             "safelist": user.safelist,
         })
