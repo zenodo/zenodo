@@ -40,45 +40,20 @@
    search-headers='{{ search_headers|tojson }}' >
     <div class="panel panel-default" id="citation">
       <div class="panel-heading">
-        <!-- Beta ribbon -->
-        <div class="row" style="margin-bottom: -15px;">
-          <div class="col-sm-1">
-            <div class="ribbon-wrapper-green">
-              <a href="https://help.zenodo.org/#citations" target="_blank" rel="noopener noreferrer">
-                <div class="corner-ribbon top-left ribbon-green">Beta</div>
-              </a>
-            </div>
-          </div>
-          <div class="col-sm-11" style="margin-top: 5px;">
-            <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
-              {{_('Citations')}}
-            </a>
-            <a href="https://help.zenodo.org/#citations" target="_blank" rel="noopener noreferrer">
-              <i class="fa fa-question-circle"></i>
-            </a>
-            <small class="text-muted">
-              <invenio-search-count template="{{ url_for('static', filename='templates/citations/count.html') }}">
-              </invenio-search-count>
-            </small>
-            <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
-              <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
-              <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
-            </a>
-          </div>
-        </div>
-
-        <!-- Without beta ribbon -->
-        <!--<a class="panel-toggle" data-toggle="collapse" href="#collapseCitations">-->
-          <!--{{_('Citations')}}-->
-          <!--<small class="text-muted">-->
-            <!--<invenio-search-count-->
-            <!--template="{{ url_for('static', filename='templates/citations/count.html') }}">-->
-            <!--</invenio-search-count>-->
-          <!--</small>-->
-          <!--<span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>-->
-          <!--<span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>-->
-        <!--</a>-->
-
+        <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations">
+          {{_('Citations')}}
+        </a>
+        <a href="https://help.zenodo.org/#citations" target="_blank" rel="noopener noreferrer">
+          <i class="fa fa-question-circle"></i>
+        </a>
+        <small class="text-muted">
+          <invenio-search-count template="{{ url_for('static', filename='templates/citations/count.html') }}">
+          </invenio-search-count>
+        </small>
+        <a class="panel-toggle" data-toggle="collapse" href="#collapseCitations" style="margin-left:-25px;">
+          <span class="pull-right show-on-collapsed"><i class="fa fa-chevron-right"></i></span>
+          <span class="pull-right hide-on-collapsed"><i class="fa fa-chevron-down"></i></span>
+        </a>
       </div>
       <div id="collapseCitations" class="collapse in">
         <div class="search-page">
