@@ -52,6 +52,7 @@ from zenodo.modules.spam.models import SafelistEntry
 from zenodo.modules.spam.proxies import current_domain_forbiddenlist, \
     current_domain_safelist
 from zenodo.modules.spam.tasks import delete_spam_user, reindex_user_records
+from zenodo.modules.spam.utils import is_user_safelisted
 
 blueprint = Blueprint(
     'zenodo_spam',
@@ -171,7 +172,9 @@ def _expand_users_info(results, include_pending=False):
     ])
 
     for user in user_data:
-        if (user.safelist or not user.active) and not include_pending:
+        is_safelisted = user.safelist
+        is_inactivated = not user.active
+        if (is_safelisted or is_inactivated) and not include_pending:
             results.pop(user.id)
             continue
 
@@ -248,10 +251,12 @@ def safelist_admin():
             sa.func.max(Community.description).label('description')
         ).join(Community).group_by(User.id).filter(
             Community.created.between(from_date, to_date),
-            Community.deleted_at == None,
+            Community.deleted_at.is_(None),
+            ~User.safelist.any()
         ).limit(max_users)
 
         for row in community_users:
+
             user_data = result.get(row.user_id, {
                 'last_content_titles': '',
                 'last_content_descriptions': '',
@@ -314,8 +319,10 @@ def safelist_bulk_add():
         user = User.query.get(user_id)
         user.active = True
         try:
-            SafelistEntry.create(user_id=user.id, notes=u'Added by {} ({})'
-                                 .format(current_user.email, current_user.id))
+            if not user.safelist:
+                SafelistEntry.create(user_id=user.id,
+                                     notes=u'Added by {} ({})'.format(
+                                         current_user.email, current_user.id))
         except Exception:
             pass
     db.session.commit()
