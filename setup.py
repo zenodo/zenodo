@@ -96,7 +96,7 @@ install_requires = [
     'invenio-communities>=1.0.0a29',
     'invenio-config>=1.0.1',
     'invenio-csl-rest>=1.0.0a1',
-    'invenio-db[postgresql,versioning]>=1.0.4',
+    'invenio-db[postgresql,versioning]>=1.0.9',
     'invenio-deposit>=1.0.0a11',
     'invenio-files-rest>=1.0.0a23.post3',
     'invenio-formatter>=1.0.1',
@@ -112,7 +112,7 @@ install_requires = [
     'invenio-oauth2server>=1.0.3',
     'invenio-oauthclient[github]>=1.1.2',
     'invenio-openaire>=1.0.0a15',
-    'invenio-opendefinition>=1.0.0a9',
+    'invenio-opendefinition>=1.0.0a10',
     'invenio-pidrelations==1.0.0a4',  # next versions require upgrades
     'invenio-pidstore>=1.1.1',
     'invenio-previewer>=1.0.0a11',
