@@ -291,7 +291,11 @@ CELERY_BEAT_SCHEDULE = {
     'github-tokens-refresh': {
         'task': 'invenio_github.tasks.refresh_accounts',
         'schedule': crontab(minute=0, hour=3),
-    }
+    },
+    'openaire-failures-retry': {
+        'task': 'zenodo.modules.openaire.tasks.retry_openaire_failures',
+        'schedule': crontab(minute=0, hour=9),  # Every day at 09:00 UTC
+    },
 }
 
 # Cache

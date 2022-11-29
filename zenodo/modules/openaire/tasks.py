@@ -32,6 +32,7 @@ import requests
 from celery import shared_task
 from flask import current_app
 from invenio_cache import current_cache
+from invenio_pidstore.models import PersistentIdentifier
 
 from zenodo.modules.records.api import ZenodoRecord
 from zenodo.modules.records.serializers import openaire_json_v1
@@ -117,9 +118,17 @@ def openaire_delete(record_uuid=None, original_id=None, datasource_id=None):
     :type datasource_id: str
     """
     try:
+        record = ZenodoRecord.get_record(record_uuid, with_deleted=True)
+        if record and 'resource_type' not in record:
+            # record was deleted, find last revision with metadata
+            record = next(
+                r for r in reversed(record.revisions)
+                if 'resource_type' in r
+            )
+        if not record:
+            raise OpenAIRERequestError('Could not resolve record.')
         # Resolve originalId and datasource if not already available
-        if not (original_id and datasource_id) and record_uuid:
-            record = ZenodoRecord.get_record(record_uuid)
+        if not (original_id and datasource_id):
             original_id = openaire_original_id(
                 record, openaire_type(record))[1]
             datasource_id = openaire_datasource_id(record)
@@ -129,10 +138,38 @@ def openaire_delete(record_uuid=None, original_id=None, datasource_id=None):
         res = req.delete(current_app.config['OPENAIRE_API_URL'], params=params)
         res_beta = None
         if current_app.config['OPENAIRE_API_URL_BETA']:
-            res_beta = req.delete(current_app.config['OPENAIRE_API_URL_BETA'],
-                                  params=params)
+            res_beta = req.delete(
+                current_app.config['OPENAIRE_API_URL_BETA'], params=params)
 
         if not res.ok or (res_beta and not res_beta.ok):
             raise OpenAIRERequestError(res.text)
+
+        # Remove from failures cache
+        current_cache.delete(
+            'openaire_direct_index:{}'.format(record['recid']))
+
     except Exception as exc:
+        current_cache.set(
+            'openaire_direct_index:{}'.format(record['recid']),
+            datetime.now(), timeout=-1)
         openaire_delete.retry(exc=exc)
+
+
+@shared_task
+def retry_openaire_failures():
+    """Retries failed OpenAIRE indexing/deletion operations."""
+    cache = current_cache.cache
+    redis_client = cache._read_clients
+    failed_recids = redis_client.scan_iter(
+        match=(cache.key_prefix + 'openaire_direct_index:*'),
+        count=1000,
+    )
+    for key in failed_recids:
+        recid_value = key.split('openaire_direct_index:')[1]
+        recid = PersistentIdentifier.query.filter_by(
+            pid_type='recid', pid_value=recid_value).one_or_none()
+        record = ZenodoRecord.get_record(recid.object_uuid, with_deleted=True)
+        if 'resource_type' in record:
+            openaire_direct_index.delay(str(record.id), retry=False)
+        else:
+            openaire_delete.delay(str(record.id))

@@ -229,8 +229,11 @@ def delete_record(record_uuid, reason, user):
     # Also delete from OpenAIRE index
     if current_app.config['OPENAIRE_DIRECT_INDEXING_ENABLED'] and original_id \
             and datasource_id:
-        openaire_delete.delay(original_id=original_id,
-                              datasource_id=datasource_id)
+        openaire_delete.delay(
+            record_uuid=str(record.id),
+            original_id=original_id,
+            datasource_id=datasource_id
+        )
 
 
 def suggest_language(q, limit=5):
