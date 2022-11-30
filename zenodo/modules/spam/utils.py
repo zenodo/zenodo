@@ -85,7 +85,7 @@ def check_and_handle_spam(community=None, deposit=None, retry=True):
     try:
         is_safelisted = is_user_safelisted(current_user)
         is_admin = Permission(ActionNeed('admin-access')).can()
-        if not is_safelisted or not is_admin:
+        if not (is_safelisted or is_admin):
             if current_app.config.get('ZENODO_SPAM_MODEL_LOCATION'):
                 if community:
                     task = check_metadata_for_spam.delay(
