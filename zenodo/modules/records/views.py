@@ -31,6 +31,7 @@ import json
 import re
 import urlparse
 from datetime import datetime as dt
+from elasticsearch_dsl import Search
 from operator import itemgetter
 
 import idutils
@@ -40,6 +41,7 @@ from flask_iiif.restful import IIIFImageAPI
 from flask_principal import ActionNeed
 from flask_security import current_user
 from invenio_access.permissions import Permission
+from invenio_accounts.models import User
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
 from invenio_i18n.ext import current_i18n
@@ -48,6 +50,8 @@ from invenio_iiif.utils import iiif_image_key
 from invenio_pidstore.models import PersistentIdentifier, PIDStatus
 from invenio_previewer.proxies import current_previewer
 from invenio_records_ui.signals import record_viewed
+from invenio_search import current_search_client
+from invenio_search.utils import build_alias_name
 from six.moves.urllib.parse import urlencode, urlunparse
 from werkzeug.utils import import_string
 
@@ -109,6 +113,24 @@ def is_safelisted_record(record):
 @blueprint.app_template_test('safelisted_user')
 def is_safelisted_user(user):
     return is_user_safelisted(user)
+
+@blueprint.app_template_filter('safelisted_by')
+def safelisted_by(user):
+    try:
+        return User.query.get(user.safelist[0].notes.split('(')[1][:-1])
+    except Exception:
+        return None
+
+
+@blueprint.app_template_filter('total_file_size')
+def total_file_size(user):
+    search = Search(
+        using=current_search_client,
+        index=build_alias_name('records')
+    ).filter('term', owners=user.id)
+    search.aggs.metric('upload_volume', 'sum', field='size')
+    result = search[:0].execute().aggregations.to_dict()
+    return result.get('upload_volume', {}).get('value', 0)
 
 @blueprint.app_template_filter('pidstatus')
 def pidstatus_title(pid):
