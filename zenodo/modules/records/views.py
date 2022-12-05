@@ -30,15 +30,19 @@ import copy
 import json
 import re
 import urlparse
-from datetime import datetime as dt
+from datetime import datetime as dt, timedelta
 from operator import itemgetter
 
 import idutils
 import six
-from flask import Blueprint, abort, current_app, render_template, request
+from flask import Blueprint, abort, current_app, flash, make_response, \
+    redirect, render_template, request, url_for
 from flask_iiif.restful import IIIFImageAPI
+from flask_babelex import gettext as _
+from flask_login import login_required
 from flask_principal import ActionNeed
 from flask_security import current_user
+from invenio_accounts.models import User
 from invenio_access.permissions import Permission
 from invenio_communities.models import Community
 from invenio_formatter.filters.datetime import from_isodate
@@ -54,9 +58,12 @@ from werkzeug.utils import import_string
 from zenodo.modules.communities.api import ZenodoCommunity
 from zenodo.modules.deposit.extra_formats import ExtraFormats
 from zenodo.modules.deposit.views_rest import pass_extra_formats_mimetype
+from zenodo.modules.records.resolvers import record_resolver
 from zenodo.modules.records.serializers.schemas.common import api_link_for
 from zenodo.modules.records.utils import is_doi_locally_managed
 from zenodo.modules.stats.utils import get_record_stats
+from zenodo.modules.support.utils import send_confirmation_email, \
+    send_support_email
 
 from ..spam.models import SafelistEntry
 from ..spam.utils import is_user_safelisted
@@ -559,3 +566,69 @@ def record_extra_formats(pid, record, mimetype=None, **kwargs):
         fileobj = record.extra_formats[mimetype]
         return fileobj.obj.send_file(trusted=True, as_attachment=True)
     return abort(404, 'No extra format "{}".'.format(mimetype))
+
+@blueprint.route('/record/<int:recid>/request_delete', methods=['POST'])
+@login_required
+def request_record_deletion(recid):
+
+    recid, record = record_resolver.resolve(recid)
+
+    if not RecordPermission.create(record=record, action='update').can():
+        flash(_("You do not have the correct access rights."),
+              category='danger')
+        return redirect(url_for("invenio_records_ui.recid", pid_value=record[
+        'recid']))
+
+    # Validate form data
+    if request.form['expected-doi'] != request.form['record-doi']:
+        flash(_("The DOI you typed did not match the record's DOI."),
+              category='warning')
+        return redirect(url_for("invenio_records_ui.recid", pid_value=record[
+        'recid']))
+
+    record_created = record.created
+    deadline = record_created + timedelta(days=30)
+
+    if dt.utcnow().date() > deadline.date():
+        flash(_("The one-month grace period has passed, please submit a "
+                "request through the regular support form and we will "
+                "evaluate your request."),
+              category='danger')
+        return redirect(url_for("invenio_records_ui.recid", pid_value=record[
+        'recid']))
+
+    #Prepare context
+    user = User.query.get(record['owners'][0])
+
+    context = {
+        'user_id': user.id,
+        'info': {
+            'name': user.profile.full_name,
+            'email': user.email,
+            'include_os_browser': False,
+            'description': '<p>Record request removal '
+                           'for: <a href="{0}"><b>{0}</b></a></p>'
+                           '<p>Created: <b>{1} days</b> ago</p>'.format(
+                    url_for(
+                        'invenio_records_ui.recid',
+                        pid_value=record['recid'], _external=True),
+                        (dt.utcnow().date()- record_created.date()).days
+                ),
+            'issue_category': 'record-inactivation',
+            'subject': '[Record Removal Request]: {0}'.format(record['doi']),
+         }
+    }
+
+    send_support_email(context)
+    send_confirmation_email(context)
+
+    flash(_("Your record deletion request has been submitted. We will keep "
+            "you updated on the process."),
+          category='success')
+    response = make_response(redirect(url_for("invenio_records_ui.recid",
+                                              pid_value=record['recid'])))
+    response.set_cookie('deletionRequest_' + record['doi'], '',
+                        samesite='Strict',
+                        secure=True,
+                        expires=dt.utcnow() + timedelta(days=7))
+    return response

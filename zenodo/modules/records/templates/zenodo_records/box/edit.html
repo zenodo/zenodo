@@ -45,6 +45,53 @@
     </form>
   {%- endif %}
 {%- endif %}
+{%- if current_user|has_record_perm(record, 'update') %}
+  {% set eligible_for_deletion = record.created is not older_than(days=30) %}
+  {% if eligible_for_deletion %}
+    <button class="btn btn-danger btn-block" data-toggle="modal"
+            id="request-record-deletion"
+            data-target="#request-delete-modal">
+      <i class="fa fa-trash"></i> Request record deletion
+    </button>
+
+    <div class="modal fade" id="request-delete-modal" tabindex="-1" role="dialog" aria-labelledby="request-delete-modal" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="requestDeletionModalLabel">Are you sure
+              you want to request deletion of this record?</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            The Zenodo team will receive your request and will keep you updated
+            on the process.<br>
+            Please type the record's DOI (<b>{{ record.doi }}</b>) for
+              confirmation below.
+          </div>
+          <div class="modal-footer">
+              <form method="POST" action="{{ url_for('zenodo_records.request_record_deletion',
+          recid=record.recid) }}">
+                <div class="form-group">
+                  <input class="form-control" id="expected-doi" name="expected-doi"
+                         type="hidden" value="{{ record.doi }}">
+                  <input class="form-control" id="record-doi" name="record-doi"
+                         style="margin-bottom: 3%">
+                  <button type="button" class="btn btn-secondary"
+                          data-dismiss="modal">Cancel</button>
+                  <button id="request-delete-confirm" type="submit"
+                          class="btn btn-danger">
+                    <i class="fa fa-trash"></i> Request deletion
+                  </button>
+                </div>
+              </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
 {# Admin menu #}
 {%- if current_user_is_admin() %}
 <div class="btn-group btn-block">
@@ -109,3 +156,30 @@
   </ul>
 </div>
 {%- endif %}
+
+<script>
+  document.addEventListener("DOMContentLoaded", function(e) {
+
+    function getCookie (name) {
+      let value = `; ${document.cookie}`;
+      let parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+    }
+
+    let deletionRequest = getCookie("deletionRequest_" + "{{ record.doi }}")
+
+    if (deletionRequest !== undefined) {
+      $('#request-record-deletion').prop("disabled", true);
+      console.log(deletionRequest)
+    }
+
+    $('#request-delete-confirm').on('click', (e) => {
+      let expectedDoi = "{{ record.doi }}"
+      let recordDoi = $('#record-doi').val();
+      if (expectedDoi !== recordDoi) {
+        e.preventDefault();
+        alert('The DOI you typed did not match the record\'s DOI.')
+      }
+    });
+  });
+</script>
