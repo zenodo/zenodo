@@ -22,10 +22,9 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 -#}
 
-{% set show_betafeature = 'citations' in session.get('featureFlags', []) or request.args.get('feature') == 'citations' %}
 {% set show_citations = current_user_is_admin() or config['ZENODO_RECORDS_UI_CITATIONS_ENABLE'] %}
 
-{%- if record.doi and (show_citations or show_betafeature) %}
+{%- if record.doi and show_citations %}
 
 {% set search_extra_params = {"page": 1, "size": 10, "group_by": "version", "id": (record.conceptdoi or record.doi)} %}
 {% set search_hidden_params = {"scheme": "doi", "relation": "isCitedBy" } %}
