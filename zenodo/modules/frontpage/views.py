@@ -103,19 +103,3 @@ def favicon():
 def ping():
     """Load balancer ping view."""
     return 'OK'
-
-
-@blueprint.route('/beta-features', methods=['HEAD', 'GET'])
-def feature_flags():
-    """Enable or disable beta features."""
-    features = request.args.getlist('feature')
-    for feature in features:
-        if feature == 'reset' and 'featureFlags' in session:
-            del session['featureFlags']
-
-        if feature in current_app.config.get('ZENODO_FRONTPAGE_BETA_FEATURES'):
-            if 'featureFlags' in session:
-                session['featureFlags'].add(feature)
-            else:
-                session['featureFlags'] = set([feature])
-    return 'OK'
