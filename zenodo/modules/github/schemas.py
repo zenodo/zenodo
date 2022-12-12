@@ -70,24 +70,17 @@ class AuthorSchema(Schema):
 class CitationMetadataSchema(Schema, RefResolverMixin):
     """Citation metadata schema."""
 
-    version = SanitizedUnicode()
     description = SanitizedHTML(load_from='abstract')
     creators = fields.Nested(
         AuthorSchema, many=True, load_from='authors')
     keywords = fields.List(SanitizedUnicode())
     license = SanitizedUnicode()
     title = SanitizedUnicode(required=True, validate=validate.Length(min=3))
-    publication_date = fields.Method(
-        deserialize='load_publicationdate', load_from='date-released')
     notes = SanitizedHTML(load_from='message')
 
     # TODO: Add later
     # alternate_identifiers = fields.Raw(load_from='identifiers')
     # related_identifiers = fields.Raw(load_from='references')
-
-    def load_publicationdate(self, data):
-        """Default publication date."""
-        return arrow.get(data).date().isoformat()
 
     subschema = {
         "audiovisual": "video",
