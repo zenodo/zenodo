@@ -112,6 +112,7 @@ def delete(user_id):
             db.session.commit()
         if deleteform.deactivate_user.data:
             current_accounts.datastore.deactivate_user(user)
+            SafelistEntry.remove_by_user_id(user.id)
             db.session.commit()
         # delete_record function commits the session internally
         # for each deleted record
