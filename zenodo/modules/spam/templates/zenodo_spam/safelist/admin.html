@@ -27,7 +27,7 @@
 {#{% from "invenio_userprofiles/settings/_macros.html" import render_field %}#}
 
 {%- block page_body %}
-<div class="container record-admin">
+<div class="record-admin" style="padding: 2%">
   <div class="row">
     <h1>Safelist admin</h1>
     <form class="form-inline" style="margin-bottom: 2%">
@@ -84,6 +84,8 @@
             <th></th>
             <th>Username</th>
             <th>Email</th>
+            <th>Domain</th>
+            <th>DC(Active/Total)</th>
             <th>Name</th>
             <th></th>
             <th>External</th>
@@ -100,18 +102,25 @@
                 <a target="_blank" href="{{ url_for
                 ('zenodo_spam.delete', user_id=user.id) }}">{{ user.id }}</a>
               </td>
-              <td>{{ "✅" if user.active else "🚫"  }}</td>
+              <td>{{ "✅" if user.active else "🚫" }}</td>
               <td class="selectable">{{ user.username }}</td>
               <td class="selectable">{{ user.email }}</td>
+              <td class="selectable">{{ user.domain_info.domain }}</td>
+              <td class="selectable">
+                <b>{{ user.domain_info.active_count }}/{{
+                  user.domain_info.total_count}}</b> -
+                  {{ 100 - (1.0 * user.domain_info.active_count / user
+                  .domain_info.total_count * 100) | round}}% disabled
+              </td>
               <td class="selectable">{{ user.full_name }}</td>
-              {% if user.flag == 'safe' %}
+              {% if user.domain_info.status == 'safe' %}
                   {% set flag_icon = "👌" %}
-              {% elif user.flag == 'forbidden' %}
+              {% elif user.domain_info.status == 'forbidden' %}
                   {% set flag_icon = "👹" %}
               {% else %}
                   {% set flag_icon = "🕵️" %}
               {% endif %}
-              <td title="{{ user.flag }}" class="selectable">
+              <td title="{{ user.domain_info.status }}" class="selectable">
                 {{ flag_icon }}
               </td>
               <td class="selectable">{{ user.external | join(', ') }}</td>
@@ -138,6 +147,8 @@
             <th></th>
             <th>Username</th>
             <th>Email</th>
+            <th>Domain</th>
+            <th>DC(Active/Total)</th>
             <th>Name</th>
             <th></th>
             <th>External</th>
@@ -191,11 +202,15 @@
         // Active
         null,
         // Username
-        {width: "10%", render: $.fn.dataTable.render.ellipsis(10)},
+        {width: "7%", render: $.fn.dataTable.render.ellipsis(10)},
         // Email
         null,
-        // Name
+        // Domain
         {width: "7%", render: $.fn.dataTable.render.ellipsis(10)},
+        // DC
+        null,
+        // Name
+        {width: "3%", render: $.fn.dataTable.render.ellipsis(10)},
         // Domain status
         null,
         // External
