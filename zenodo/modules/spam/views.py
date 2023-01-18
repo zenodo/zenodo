@@ -143,18 +143,28 @@ def get_domain(email):
     return email[email.index("@") :].lower()
 
 
-def _evaluate_user_domain(email, normalized_emails):
-    is_flagged_domain = get_domain(email) == "@gmail.com"
+def _evaluate_user_domain(email, normalized_emails, email_domain_count):
+    email_domain = get_domain(email)
+    is_flagged_domain = email_domain in ["@gmail.com"]
     is_above_threshold = normalized_emails.get(normalize_email(email), 0) > 3
 
-    email_domain = email.rsplit("@", 1)[-1].lower()
+    domain_counts = email_domain_count[email_domain[1:]]
+    domain_info = {
+        'domain': email_domain[1:],
+        'active_count': domain_counts['active'],
+        'total_count': domain_counts['total'],
+    }
     if current_domain_forbiddenlist.matches(email_domain):
-        return "forbidden"
+        domain_info['status'] = "forbidden"
+        return domain_info
     if is_flagged_domain and is_above_threshold:
-        return "forbidden"
+        domain_info['status'] = "forbidden"
+        return domain_info
     if current_domain_safelist.matches(email_domain):
-        return "safe"
-    return "unclear"
+        domain_info['status'] = "safe"
+        return domain_info
+    domain_info['status'] = "unclear"
+    return domain_info
 
 
 def _expand_users_info(results, include_pending=False):
@@ -172,6 +182,18 @@ def _expand_users_info(results, include_pending=False):
         for user in user_data
     ])
 
+    email_domain_expr = sa.func.split_part(sa.func.lower(User.email), '@', 2)
+    email_domains = db.session.query(
+        email_domain_expr,
+        sa.func.count(User.id),
+        sa.func.count(User.id).filter(User.active == True)
+    ).group_by(email_domain_expr).all()
+
+    email_domain_count = {
+        domain: {'active': active, 'total': total}
+        for domain, active, total in email_domains
+    }
+
     for user in user_data:
         is_safelisted = user.safelist
         is_inactivated = not user.active
@@ -184,7 +206,8 @@ def _expand_users_info(results, include_pending=False):
             "id": user.id,
             "email": user.email,
             "external": [i.method for i in (user.external_identifiers or [])],
-            "flag": _evaluate_user_domain(user.email, normalized_emails),
+            "domain_info": _evaluate_user_domain(user.email, normalized_emails,
+                                          email_domain_count),
             "active": user.active,
             "safelist": user.safelist,
         })
