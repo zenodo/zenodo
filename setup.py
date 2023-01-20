@@ -206,6 +206,8 @@ setup(
             'zenodo_tokens = zenodo.modules.tokens.ext:ResourceAccessTokens',
             'zenodo_spam = zenodo.modules.spam.ext:ZenodoSpam',
             'zenodo_metrics = zenodo.modules.metrics.ext:ZenodoMetrics',
+            'zenodo_notifications = '
+            'zenodo.modules.notifications.ext:ZenodoNotifications',
         ],
         'invenio_base.api_apps': [
             'zenodo_communities = '
@@ -217,6 +219,8 @@ setup(
             'zenodo_tokens = zenodo.modules.tokens.ext:ResourceAccessTokens',
             'zenodo_spam = zenodo.modules.spam.ext:ZenodoSpam',
             'zenodo_metrics = zenodo.modules.metrics.ext:ZenodoMetrics',
+            'zenodo_notifications = '
+            'zenodo.modules.notifications.ext:ZenodoNotifications',
         ],
         'invenio_base.blueprints': [
             'zenodo_communities = zenodo.modules.communities.views:blueprint',
@@ -234,6 +238,8 @@ setup(
             'zenodo_rest = zenodo.modules.rest.views:blueprint',
             'zenodo_deposit = zenodo.modules.deposit.views_rest:blueprint',
             'zenodo_metrics = zenodo.modules.metrics.views:blueprint',
+            'zenodo_notifications = '
+            'zenodo.modules.notifications.views:blueprint',
         ],
         'invenio_base.api_converters': [
             'file_key = zenodo.modules.deposit.utils:FileKeyConverter',
