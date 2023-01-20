@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017-2023 CERN.
+# Copyright (C) 2023 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -22,9 +22,29 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configuration for Zenodo Notifications."""
-
+"""Notifications tasks."""
 from __future__ import absolute_import
 
-ZENODO_NOTIFICATIONS_PROCESS_PEER_REVIEWS=True
-ZENODO_NOTIFICATIONS_PEER_REVIEW_WEBHOOK_RECEIVER_ID='peer_review'
+from celery import shared_task
+from invenio_db import db
+
+from .errors import InvalidSenderError
+from .models import PeerReview, PeerReviewStatus
+from .proxies import current_notifications
+
+@shared_task(ignore_result=True, max_retries=5, default_retry_delay=10 * 60)
+def process_peer_review(notification_id, verify_sender=False):
+    """Process a received PeerReview."""
+    peer_review = PeerReview.query.filter(
+        PeerReview.notification_id == notification_id,
+        PeerReview.status.in_([PeerReviewStatus.RECEIVED,
+                               PeerReviewStatus.FAILED]),
+    ).one()
+
+    if verify_sender and not peer_review.verify_sender():
+        peer_review.status = PeerReviewStatus.FAILED
+        raise InvalidSenderError(
+            event=peer_review.event.id, user=peer_review.event.user_id)
+
+    peer_review.status = PeerReviewStatus.PUBLISHED
+    db.session.commit()

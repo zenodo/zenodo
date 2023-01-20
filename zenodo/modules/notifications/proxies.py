@@ -23,6 +23,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Proxy objects for easier access to application objects."""
+from __future__ import absolute_import
 
 from flask import current_app
 from werkzeug.local import LocalProxy

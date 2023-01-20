@@ -23,6 +23,7 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Zenodo module that adds support for notifications."""
+from __future__ import absolute_import
 
 from flask import Blueprint, Response
 
@@ -34,4 +35,5 @@ blueprint = Blueprint(
 
 @blueprint.route('/notifications', methods=['GET'])
 def test():
+    # TODO Not needed, to remove
     return Response('notifications')
