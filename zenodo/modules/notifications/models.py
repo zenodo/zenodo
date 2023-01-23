@@ -24,13 +24,18 @@
 
 """Notifications models."""
 from __future__ import absolute_import
+import uuid
+from enum import Enum
 
+from flask_babelex import lazy_gettext as _
 from invenio_db import db
-from invenio_webhoks.models import Receiver
+from invenio_records.api import Record
+from invenio_records.models import RecordMetadata
+from invenio_webhooks.models import Event, Receiver
+from sqlalchemy.dialects import postgresql
+from sqlalchemy_utils.types import ChoiceType, JSONType, UUIDType
 
 from .errors import NotificationAlreadyReceivedError, RecordNotFoundError
-
-from sqlalchemy.dialects import mysql
 
 RELEASE_STATUS_TITLES = {
     'RECEIVED': _('Received'),

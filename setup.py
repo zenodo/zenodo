@@ -296,6 +296,10 @@ setup(
              'zenodo.modules.tokens.scopes:tokens_generate_scope'),
 
         ],
+        'invenio_webhooks.receivers': [
+            'peer_review = '
+            'zenodo.modules.notifications.receivers:PeerReviewReceiver',
+        ],
         'dojson.contrib.to_marc21': [
             'zenodo = zenodo.modules.records.serializers.to_marc21.rules',
         ],
