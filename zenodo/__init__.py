@@ -155,7 +155,7 @@ Note, ``{token}`` will be interpolated with the user's OAuth access token.
 GitHub for localhost
 ~~~~~~~~~~~~~~~~~~~~
 
-For development machines runnning Zenodo on localhost and/or behind firewalls,
+For development machines running Zenodo on localhost and/or behind firewalls,
 you also need a public IP address which GitHub can reach you on. You can
 achieve this by using a service such as `ngrok <https://ngrok.com>`_:
 
