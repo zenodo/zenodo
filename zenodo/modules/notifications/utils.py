@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017-2023 CERN.
+# Copyright (C) 2023 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -21,16 +21,31 @@
 # In applying this license, CERN does not
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
+"""Permissions for users using the notifications module."""
 
-"""Proxy objects for easier access to application objects."""
 from __future__ import absolute_import
 
 from flask import current_app
-from werkzeug.local import LocalProxy
+from werkzeug.utils import import_string
 
-current_notifications = LocalProxy(
-    lambda: current_app.extensions['zenodo-notifications'])
+def obj_or_import_string(value, default=None):
+    """Import string or return object.
 
-current_permission_factory = LocalProxy(
-    lambda: current_notifications.permission_factory)
-"""Helper proxy to access to the configured permission factory."""
+    :params value: Import path or class object to instantiate.
+    :params default: Default object to return if the import fails.
+    :returns: The imported object.
+    """
+    if isinstance(value, str):
+        return import_string(value)
+    elif value:
+        return value
+    return default
+
+def load_or_import_from_config(key, app=None, default=None):
+    """Load or import value from config.
+
+    :returns: The loaded value.
+    """
+    app = app or current_app
+    imp = app.config.get(key)
+    return obj_or_import_string(imp, default=default)

@@ -31,6 +31,16 @@ from flask import current_app
 from . import config
 
 
+class _ZenodoNotificationsState(object):
+    def __init__(self, app):
+        """Initialize state."""
+        self.app = app
+
+    def permission_factory(self):
+        """Load default permission factory for Buckets collections."""
+        return load_or_import_from_config("NOTIFICATIONS_PERMISSION_FACTORY",
+                                          app=self.app)
+
 class ZenodoNotifications(object):
     """Zenodo notifications extension."""
 
