@@ -60,7 +60,7 @@ class ZenodoSpam(object):
         self.app = app
         self.init_config(app)
 
-        # Regsiter email templates
+        # Register email templates
         app.register_blueprint(Blueprint(
             "zenodo_spam_email_templates",
             __name__, template_folder="templates",

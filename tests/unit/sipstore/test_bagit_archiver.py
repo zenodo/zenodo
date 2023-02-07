@@ -83,7 +83,7 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
     sip2 = SIP(SIPModel.query.get(sip2_id))
     sip3 = SIP(SIPModel.query.order_by(SIPModel.created.desc()).first())
 
-    # Becase we are using secure_filename when writing SIPFiles we need to
+    # Because we are using secure_filename when writing SIPFiles we need to
     # genenarate the correct names: <SIPFile.id>-<secure_filename>
     s1_file1_fn = '{0}-test.txt'.format(fetch_suff(sip1, 'test.txt').file_id)
     s1_file1_fp = 'data/files/{0}'.format(s1_file1_fn)
@@ -181,7 +181,7 @@ def test_archiving(app, db, deposit, deposit_file, locations, archive_fs):
                                       'data', 'fetch.txt'])
     # Second SIP has written only the metadata,
     # because of that There should be no 'files/', but 'filesnames.txt' should
-    # still be there becasue of the fetch.txt
+    # still be there because of the fetch.txt
     assert set(fs2.listdir('data')) == set(['metadata', 'filenames.txt'])
     assert fs2.listdir('data/metadata') == ['record-json.json', ]
 

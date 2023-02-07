@@ -267,7 +267,7 @@ def createhook(user, repo, skip_email, yes_i_know):
 def removehook(repo, user, skip_email, yes_i_know):
     """Remove the hook from GitHub repository.
 
-    Positional argment REPO can be either the repository name, e.g.
+    Positional argument REPO can be either the repository name, e.g.
     `some-organization/some-repository` or its GitHub ID.
     Option '--user' can be either an email or a user ID.
 

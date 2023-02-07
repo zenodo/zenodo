@@ -160,7 +160,7 @@ def custom_metadata_filter(field):
                     raise RESTValidationError(
                         errors=[
                             FieldError(field, (
-                                'Relatinship terms serach values should '
+                                'Relationship terms search values should '
                                 'follow the format "<sub>:<obj>".'))
                         ])
 

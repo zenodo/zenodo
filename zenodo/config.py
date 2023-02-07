@@ -103,7 +103,7 @@ MAIL_SUPPRESS_SEND = True
 #: Disable Content Security Policy headers.
 APP_DEFAULT_SECURE_HEADERS['content_security_policy'] = {}
 # NOTE: These should be set explicitly inside ``invenio.cfg`` for development,
-# if one wants to run wihtout ``FLASK_DEBUG`` enabled.
+# if one wants to run without ``FLASK_DEBUG`` enabled.
 # APP_DEFAULT_SECURE_HEADERS['force_https'] = False
 # APP_DEFAULT_SECURE_HEADERS['session_cookie_secure'] = False
 
@@ -326,7 +326,7 @@ ACCOUNTS_JWT_ENABLE = False
 CSL_STYLES_API_ENDPOINT = '/api/csl/styles'
 #: Records Endpoint for CSL
 CSL_RECORDS_API_ENDPOINT = '/api/records/'
-#: Template dirrectory for CSL
+#: Template directory for CSL
 CSL_JSTEMPLATE_DIR = 'node_modules/invenio-csl-js/dist/templates/'
 #: Template for CSL citation result
 CSL_JSTEMPLATE_CITEPROC = 'templates/invenio_csl/citeproc.html'
@@ -483,7 +483,7 @@ GITHUB_REMOTE_APP['params']['request_token_params']['scope'] = \
     'user:email,admin:repo_hook,read:org'
 
 
-#: Defintion of OAuth client applications.
+#: Definition of OAuth client applications.
 OAUTHCLIENT_REMOTE_APPS = dict(
     github=GITHUB_REMOTE_APP,
     orcid=ORCID_REMOTE_APP,
@@ -720,7 +720,7 @@ DEPOSIT_REST_ENDPOINTS = dict(
         max_result_window=10000,
     ),
 )
-#: Depoist UI endpoints
+#: Deposit UI endpoints
 DEPOSIT_RECORDS_UI_ENDPOINTS = {
     'depid': {
         'pid_type': 'depid',

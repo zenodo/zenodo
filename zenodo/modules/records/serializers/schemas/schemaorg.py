@@ -99,7 +99,7 @@ class Language(Schema):
             return lang.name
 
     def get_alternate_name(self, obj):
-        """Get the lanugage code."""
+        """Get the language code."""
         return obj
 
 

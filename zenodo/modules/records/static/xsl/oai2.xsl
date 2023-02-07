@@ -39,7 +39,7 @@ Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
   Not Done
     The 'about' section of 'record'
-    The 'compession' part of 'identify'
+    The 'compression' part of 'identify'
     The optional attributes of 'resumptionToken'
     The optional 'setDescription' container of 'set'
 

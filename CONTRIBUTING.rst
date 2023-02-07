@@ -18,7 +18,7 @@ of course).
 
 Help curate Zenodo
 ------------------
-Zenodo is built as a platform for distributed research data curation. We provide CERN's expertise in building/operating large-scale digital repositories as well as big data management and preservation. Zenodo is open to all research, and we therefore need your domain knowledge to help curate content on Zenodo. If you're a publisher, librarian, university, instituion, research group, ... then go create a `Community <http://zenodo.org/communities>`_ and encourage people to submit data to it.
+Zenodo is built as a platform for distributed research data curation. We provide CERN's expertise in building/operating large-scale digital repositories as well as big data management and preservation. Zenodo is open to all research, and we therefore need your domain knowledge to help curate content on Zenodo. If you're a publisher, librarian, university, institution, research group, ... then go create a `Community <http://zenodo.org/communities>`_ and encourage people to submit data to it.
 
 Spread the word
 ---------------

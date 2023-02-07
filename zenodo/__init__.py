@@ -279,7 +279,7 @@ Piwik analytics can be configured with the configuration variable:
 
    THEME_PIWIK_ID = 123
 
-You can add a message to all pages, in order to show that a certain instancen
+You can add a message to all pages, in order to show that a certain instance
 is not a production instance, e.g."
 
 .. code-block:: python
