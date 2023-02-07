@@ -266,7 +266,7 @@ Records integration
 
 While using Queries is enough to fetch individual record statistics, this is
 not an optimal solution for the most common use-cases. Making an Elasticsearch
-query everytime we want to display the total views, downloads, etc. of a record
+query every time we want to display the total views, downloads, etc. of a record
 and all of its versions puts a lot of strain on Elasticsearch.
 
 Another use-case is that we want to sort records by views in search results.

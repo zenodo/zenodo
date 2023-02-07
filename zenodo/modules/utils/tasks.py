@@ -102,7 +102,7 @@ def comm_sets_match(record, cache=None):
 
 
 def requires_sync(record, cache=None):
-    """Determine whether record requries OAI information syncinc."""
+    """Determine whether record requries OAI information syncing."""
     oai = record.get('_oai', {})
     return (not oai.get('id')) or (oai.get('updated') is None) or \
         (not comm_sets_match(record, cache=cache))

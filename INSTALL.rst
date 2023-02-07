@@ -229,7 +229,7 @@ Loading data
 ~~~~~~~~~~~~
 
 Next, let's load some external data (only licenses for the time being). Loading
-of this demo data is done asynchronusly with Celery, but depends on internet
+of this demo data is done asynchronously with Celery, but depends on internet
 access since it involves harvesting external OAI-PMH or REST APIs.
 
 Make sure you keep the session with Celery worker alive. Launch the data

@@ -52,7 +52,7 @@ class SanitizedUnicode(TrimmedString):
         value = super(SanitizedUnicode, self)._deserialize(value, attr, data)
         value = fix_text(value)
 
-        # NOTE: This `join` might be ineffiecient... There's a solution with a
+        # NOTE: This `join` might be inefficient... There's a solution with a
         # large compiled regex lying around, but needs a lot of tweaking.
         value = ''.join(filter(self.is_valid_xml_char, value))
         for char in self.UNWANTED_CHARACTERS:

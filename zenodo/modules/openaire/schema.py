@@ -96,7 +96,7 @@ class RecordSchemaOpenAIREJSON(Schema):
         return missing
 
     def get_datasource_id(self, obj):
-        """Get OpenAIRE datasouce identifier."""
+        """Get OpenAIRE datasource identifier."""
         return openaire_datasource_id(obj.get('metadata')) or missing
 
     def get_communities(self, obj):

@@ -168,7 +168,7 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
             'identifier': '10.5072/zenodo.1',
             'relation': 'isVersionOf'
         }
-        # TODO: serialization of new version realtions is disabled
+        # TODO: serialization of new version relations is disabled
         # {
         #     'scheme': 'doi',
         #     'identifier': '10.5072/zenodo.3',
@@ -184,7 +184,7 @@ def test_related_identifiers_serialization(app, db, deposit, deposit_file):
             'identifier': '10.5072/zenodo.1',
             'relation': 'isVersionOf'
         }
-        # TODO: serialization of new version realtions is disabled
+        # TODO: serialization of new version relations is disabled
         # {
         #     'scheme': 'doi',
         #     'identifier': '10.5072/zenodo.2',

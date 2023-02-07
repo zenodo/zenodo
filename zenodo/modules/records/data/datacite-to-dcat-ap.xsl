@@ -1530,7 +1530,7 @@
                 <dct:contributor><xsl:copy-of select="$agent"/></dct:contributor>
               </xsl:when>
 -->
-<!-- Mapping to be confirmed when the final version of DUV will be realeased -->
+<!-- Mapping to be confirmed when the final version of DUV will be released -->
 
               <xsl:when test="$type = 'distributor'">
                 <duv:hasDistributor><xsl:copy-of select="$agent"/></duv:hasDistributor>

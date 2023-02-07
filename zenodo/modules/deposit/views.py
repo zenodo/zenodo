@@ -175,7 +175,7 @@ def newversion(pid=None, record=None, depid=None, deposit=None):
     # If this is not the latest version, get the latest and extend it
     latest_pid = PIDVersioning(child=pid).last_child
     if pid != latest_pid:
-        # We still want to do a POST, so we specify a 307 reidrect code
+        # We still want to do a POST, so we specify a 307 redirect code
         return redirect(url_for('zenodo_deposit.newversion',
                                 pid_value=latest_pid.pid_value), code=307)
 

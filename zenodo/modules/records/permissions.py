@@ -426,7 +426,7 @@ def has_admin_permission(user, record):
 
 
 class CreatePermissionException(HTTPException):
-    """Exception for users not elligible to create a deposit."""
+    """Exception for users not eligible to create a deposit."""
 
     code = 403
 
