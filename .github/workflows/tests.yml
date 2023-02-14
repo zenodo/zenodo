@@ -88,7 +88,12 @@ jobs:
           pip freeze
           ./scripts/setup-assets.sh
 
-      - name: Run tests
+      - name: Start containers
         run: |
           docker-compose up -d
+
+      - name: Run tests
+        run: |
+          sleep 30
+          curl -XPUT localhost:9200/_cluster/settings -H "Content-Type:application/json" -d "{\"persistent\": {\"compatibility\": {\"override_main_response_version\": \"true\"}}}"
           ./run-tests.sh
