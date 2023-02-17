@@ -22,6 +22,8 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
+curl -XPUT localhost:9200/_cluster/settings -H "Content-Type:application/json" -d "{\"persistent\": {\"compatibility\": {\"override_main_response_version\": \"true\"}}}"
+
 zenodo index destroy --force --yes-i-know
 zenodo index init --force
 zenodo index reindex -t od_lic -t frdoi -t grant -t recid -t depid --yes-i-know

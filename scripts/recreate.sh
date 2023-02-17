@@ -26,6 +26,8 @@ if [ -d "$VIRTUAL_ENV/var/instance/data" ]; then
     rm -Rf $VIRTUAL_ENV/var/instance/data
 fi
 
+curl -XPUT localhost:9200/_cluster/settings -H "Content-Type:application/json" -d "{\"persistent\": {\"compatibility\": {\"override_main_response_version\": \"true\"}}}"
+
 # Remove all data
 zenodo db destroy --yes-i-know
 zenodo db init
