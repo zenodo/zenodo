@@ -11,7 +11,7 @@ services:
       - "INVENIO_CACHE_REDIS_URL=redis://cache:6379/0"
       - "INVENIO_CACHE_TYPE=redis"
       - "INVENIO_CELERY_RESULT_BACKEND=redis://cache:6379/2"
-      - "INVENIO_SEARCH_ELASTIC_HOSTS=['es:9200']"
+      - "INVENIO_SEARCH_ELASTIC_HOSTS=['os:9200']"
       - "INVENIO_SECRET_KEY=CHANGE_ME"
       - "INVENIO_SESSION_COOKIE_SECURE=True"
       - "INVENIO_SQLALCHEMY_DATABASE_URI=postgresql://zenodo:zenodo@db/zenodo"
@@ -48,7 +48,7 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-  es:
+  os:
     image: opensearchproject/opensearch:1.3.5
     restart: "unless-stopped"
     environment:
@@ -72,7 +72,7 @@ services:
     ports:
       - "5601:5601"
     environment:
-      - "ELASTICSEARCH_URL=http://es:9200"
+      - "ELASTICSEARCH_URL=http://os:9200"
   flower:
     image: mher/flower
     command: --broker=amqp://guest:guest@mq:5672// --broker_api=http://guest:guest@mq:15672/api/

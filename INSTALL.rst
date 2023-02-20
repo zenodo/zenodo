@@ -72,7 +72,7 @@ Now visit the following URL in your browser:
 
 You can use the following web interface to inspect Elasticsearch and RabbitMQ:
 
-- Elasticsearch: http://<docker ip>:9200/_plugin/hq/
+- OpenSearch: http://<docker ip>:9200/_plugin/hq/
 - RabbitMQ: http://<docker ip>:15672/ (guest/guest)
 - HAProxy: http://<docker ip>:8080/ (guest/guest)
 
@@ -87,8 +87,8 @@ Also the following ports are exposed on the Docker host:
 - ``5672``: RabbitMQ
 - ``6379``: Redis
 - ``8080``: HAProxy stats
-- ``9200``: Elasticsearch
-- ``9300``: Elasticsearch
+- ``9200``: OpenSearch
+- ``9300``: OpenSearch
 - ``15672``: RabbitMQ management console
 
 
