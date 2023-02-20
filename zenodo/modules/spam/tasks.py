@@ -58,6 +58,7 @@ def check_metadata_for_spam(community_id=None, dep_id=None):
 
 @shared_task(ignore_result=False)
 def delete_record(record_uuid, reason, user):
+    """Run delete_record as a task."""
     from zenodo.modules.deposit import utils as deposit_utils
 
     deposit_utils.delete_record(record_uuid, reason, user)
@@ -66,7 +67,6 @@ def delete_record(record_uuid, reason, user):
 @shared_task(ignore_result=False)
 def delete_spam_user(user_id, deleted_by):
     """Deletes a user and marks their records and communities as spam."""
-
     user = User.query.get(user_id)
     communities = Community.query.filter_by(id_user=user.id)
     rs = RecordsSearch(index='records').filter('term', owners=user.id)
