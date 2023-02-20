@@ -129,7 +129,7 @@ def delete(user_id):
         return render_template('zenodo_spam/delete.html', **ctx)
 
 
-def normalize_email(email):
+def _normalize_email(email):
     email = email.lower()
     username, domain = email.rsplit("@", 1)
     no_dots_username = username.replace(".", "")
@@ -139,14 +139,14 @@ def normalize_email(email):
     return no_dots_username + "@" + domain
 
 
-def get_domain(email):
+def _get_domain(email):
     return email[email.index("@") :].lower()
 
 
 def _evaluate_user_domain(email, normalized_emails, email_domain_count):
-    email_domain = get_domain(email)
+    email_domain = _get_domain(email)
     is_flagged_domain = email_domain in ["@gmail.com"]
-    is_above_threshold = normalized_emails.get(normalize_email(email), 0) > 3
+    is_above_threshold = normalized_emails.get(_normalize_email(email), 0) > 3
 
     domain_counts = email_domain_count[email_domain[1:]]
     domain_info = {
@@ -178,7 +178,7 @@ def _expand_users_info(results, include_pending=False):
     )
 
     normalized_emails = Counter([
-        normalize_email(user.email)
+        _normalize_email(user.email)
         for user in user_data
     ])
 

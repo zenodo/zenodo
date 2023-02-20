@@ -108,6 +108,7 @@ def is_safelisted_record(record):
 
 @blueprint.app_template_test('safelisted_user')
 def is_safelisted_user(user):
+    """Check if a user is safelisted."""
     return is_user_safelisted(user)
 
 @blueprint.app_template_filter('pidstatus')

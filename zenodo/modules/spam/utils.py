@@ -44,6 +44,7 @@ from zenodo.modules.spam.models import SafelistEntry
 
 
 def is_user_safelisted(user):
+    """Check if user is safelisted."""
     if not SafelistEntry.query.get(user.id):
         return False
     return True
