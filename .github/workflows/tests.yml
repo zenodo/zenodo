@@ -94,6 +94,5 @@ jobs:
 
       - name: Run tests
         run: |
-          sleep 30
-          curl -XPUT localhost:9200/_cluster/settings -H "Content-Type:application/json" -d "{\"persistent\": {\"compatibility\": {\"override_main_response_version\": \"true\"}}}"
+          sleep 15
           ./run-tests.sh

@@ -49,7 +49,7 @@ services:
       - "15672:15672"
       - "5672:5672"
   os:
-    image: opensearchproject/opensearch:1.3.5
+    image: opensearchproject/opensearch:2.3.0
     restart: "unless-stopped"
     environment:
       - bootstrap.memory_lock=true

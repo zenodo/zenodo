@@ -149,7 +149,7 @@ invenio-rest==1.1.3
 invenio-search==1.2.3
 invenio-search-ui==1.0.1
 invenio-sipstore==1.0.0a7
-invenio-stats==1.0.0a14.post2
+-e git+https://github.com/inveniosoftware/invenio-stats.git@stats-hotfix#egg=invenio-stats
 invenio-theme==1.0.0
 invenio-userprofiles==1.0.1
 invenio-webhooks==1.0.0a4
