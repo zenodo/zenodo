@@ -110,7 +110,7 @@
                 <b>{{ user.domain_info.active_count }}/{{
                   user.domain_info.total_count}}</b> -
                   {{ 100 - (1.0 * user.domain_info.active_count / user
-                  .domain_info.total_count * 100) | round}}% disabled
+                  .domain_info.total_count * 100) | round}}% 🚫
               </td>
               <td class="selectable">{{ user.full_name }}</td>
               {% if user.domain_info.status == 'safe' %}
