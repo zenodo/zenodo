@@ -83,7 +83,6 @@ def update_record_statistics(start_date=None, end_date=None):
         query = Search(
             using=aggr.client,
             index=aggr.index,
-            doc_type=aggr.doc_type,
         ).filter(
             'range', timestamp={
                 'gte': start_date.replace(microsecond=0).isoformat() + '||/d',

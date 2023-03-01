@@ -108,10 +108,8 @@ def test_large_stats(app, db, es, locations, event_queues, minimal_record):
     # Aggregations indices
     # (4 versions + 1 concept) * 3 records -> 15 documents + 2 bookmarks
     q = search.index(prefix + 'stats-file-download')
-    q = q.doc_type('file-download-day-aggregation')
     assert q.count() == 915  # 61 days * 15 records
     q = search.index(prefix + 'stats-record-view')
-    q = q.doc_type('record-view-day-aggregation')
     assert q.count() == 915  # 61 days * 15 records
 
     # Records index

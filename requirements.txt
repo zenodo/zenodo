@@ -127,7 +127,7 @@ invenio-formatter==1.0.1
 invenio-github==1.0.0a28
 invenio-i18n==1.0.0
 invenio-iiif==1.0.0a5
-invenio-indexer==1.1.1
+invenio-indexer==1.1.4
 invenio-jsonschemas==1.0.0
 invenio-logging==1.1.1
 invenio-mail==1.0.2
@@ -149,7 +149,7 @@ invenio-rest==1.1.3
 invenio-search==1.2.3
 invenio-search-ui==1.0.1
 invenio-sipstore==1.0.0a7
-invenio-stats==1.0.0a14.post2
+invenio-stats==1.0.0a14.post3
 invenio-theme==1.0.0
 invenio-userprofiles==1.0.1
 invenio-webhooks==1.0.0a4

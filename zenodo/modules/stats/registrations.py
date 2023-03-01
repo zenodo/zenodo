@@ -130,7 +130,6 @@ def register_queries():
             permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-file-download',
-                doc_type='file-download-day-aggregation',
                 copy_fields=dict(
                     bucket_id='bucket_id',
                     record_id='record_id',
@@ -158,7 +157,6 @@ def register_queries():
             permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-file-download',
-                doc_type='file-download-day-aggregation',
                 copy_fields=dict(
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',
@@ -185,7 +183,6 @@ def register_queries():
             permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-record-view',
-                doc_type='record-view-day-aggregation',
                 copy_fields=dict(
                     record_id='record_id',
                     recid='recid',
@@ -211,7 +208,6 @@ def register_queries():
             permission_factory=queries_permission_factory,
             query_config=dict(
                 index='stats-record-view',
-                doc_type='record-view-day-aggregation',
                 copy_fields=dict(
                     conceptrecid='conceptrecid',
                     conceptdoi='conceptdoi',

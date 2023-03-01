@@ -115,5 +115,5 @@ def index_versioned_record_siblings(sender, action=None, pid=None,
                      .get('revision_id')) == 0
     if action == "publish" and first_publish:
         recid_pid, _ = deposit.fetch_published()
-        current_app.logger.info(u'indexing siblings of {}', recid_pid)
+        current_app.logger.info(u'indexing siblings of %s', recid_pid)
         index_siblings(recid_pid, neighbors_eager=True)

@@ -124,7 +124,7 @@ def cleanup_indexed_deposits():
     for d in res:
         try:
             es_depids_info.append((d.to_dict()['_deposit']['id'], d.meta.id,
-                                   d.meta.index, d.meta.doc_type))
+                                   d.meta.index))
             es_depids = {p[0] for p in es_depids_info}
         except Exception:
             failed_depids.append(d.meta.id)
@@ -136,11 +136,8 @@ def cleanup_indexed_deposits():
 
     indexer = RecordIndexer()
 
-    for _, deposit_id, index, doc_type in missing_db_depids:
-        indexer.client.delete(
-            id=str(deposit_id),
-            index=index,
-            doc_type=doc_type)
+    for _, deposit_id, index in missing_db_depids:
+        indexer.client.delete(id=str(deposit_id), index=index)
 
     if failed_depids:
         current_app.logger.warning(

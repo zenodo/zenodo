@@ -13,12 +13,12 @@ services:
     extends:
       file: docker-services.yml
       service: mq
-  es:
+  search:
     extends:
       file: docker-services.yml
-      service: es
+      service: search
     volumes:
-    - esdata:/usr/share/elasticsearch/data
+    - search:/usr/share/opensearchdata/data
 volumes:
-  esdata:
+  search:
     driver: local
