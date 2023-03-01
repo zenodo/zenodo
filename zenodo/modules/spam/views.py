@@ -191,7 +191,7 @@ def _expand_users_info(results, include_pending=False):
 
     email_domain_count = {
         domain: {'active': active, 'total': total}
-        for domain, active, total in email_domains
+        for domain, total, active in email_domains
     }
 
     for user in user_data:
