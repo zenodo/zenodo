@@ -83,7 +83,7 @@ install_requires = [
     'Flask>=1.0.2',
     'ftfy>=4.4.3,<5',
     'httpretty>=0.9.6',
-    'idutils>=1.1.5',
+    'idutils>=1.1.14',
     'invenio-access>=1.1.0',
     'invenio-accounts>=1.1.1',
     'invenio-admin>=1.0.1,<1.1.0',
@@ -115,7 +115,7 @@ install_requires = [
     'invenio-opendefinition>=1.0.0a9',
     'invenio-pidrelations==1.0.0a4',  # next versions require upgrades
     'invenio-pidstore>=1.1.1',
-    'invenio-previewer>=1.0.0a11',
+    'invenio-previewer>=1.0.0a13',
     'invenio-queues>=1.0.0a2',
     'invenio-records-files>=1.0.0a11.post1',
     'invenio-records-rest>=1.6.6',
