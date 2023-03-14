@@ -776,10 +776,6 @@ ZENODO_RECORDS_EXPORTFORMATS = {
         title='DataCite XML',
         serializer='zenodo.modules.records.serializers.datacite_v41',
     ),
-    'dcite3': dict(
-        title='DataCite XML',
-        serializer='zenodo.modules.records.serializers.datacite_v31',
-    ),
     'dcite4': dict(
         title='DataCite XML',
         serializer='zenodo.modules.records.serializers.datacite_v41',
@@ -935,7 +931,7 @@ RECORDS_REST_ENDPOINTS = dict(
             'application/x-bibtex': (
                 'zenodo.modules.records.serializers.bibtex_v1_response'),
             'application/x-datacite+xml': (
-                'zenodo.modules.records.serializers.datacite_v31_response'),
+                'zenodo.modules.records.serializers.datacite_v41_response'),
             'application/x-datacite-v41+xml': (
                 'zenodo.modules.records.serializers.datacite_v41_response'),
             'application/x-dc+xml': (
@@ -959,7 +955,7 @@ RECORDS_REST_ENDPOINTS = dict(
             'application/x-bibtex': (
                 'zenodo.modules.records.serializers:bibtex_v1_search'),
             'application/x-datacite+xml': (
-                'zenodo.modules.records.serializers.datacite_v31_search'),
+                'zenodo.modules.records.serializers.datacite_v41_search'),
             'application/x-dc+xml': (
                 'zenodo.modules.records.serializers.dc_v1_search'),
         },
@@ -1265,11 +1261,6 @@ OAISERVER_METADATA_FORMATS = {
         'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v41',
     },
-    'datacite3': {
-        'namespace': 'http://datacite.org/schema/kernel-3',
-        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
-        'serializer': 'zenodo.modules.records.serializers.oaipmh_datacite_v31',
-    },
     'datacite': {
         'namespace': 'http://datacite.org/schema/kernel-4',
         'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
@@ -1282,12 +1273,12 @@ OAISERVER_METADATA_FORMATS = {
     },
     'oai_datacite': {
         'namespace': 'http://datacite.org/schema/kernel-3',
-        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
     },
     'oai_datacite3': {
         'namespace': 'http://datacite.org/schema/kernel-3',
-        'schema': 'http://schema.datacite.org/meta/kernel-3/metadata.xsd',
+        'schema': 'http://schema.datacite.org/meta/kernel-4.1/metadata.xsd',
         'serializer': 'zenodo.modules.records.serializers.oaipmh_oai_datacite',
     },
     'oai_datacite4': {

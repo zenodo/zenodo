@@ -33,8 +33,7 @@ from invenio_records_rest.serializers.response import record_responsify, \
     search_responsify
 
 from zenodo.modules.openaire.schema import RecordSchemaOpenAIREJSON
-from zenodo.modules.records.serializers.datacite import ZenodoDataCite31Serializer, \
-    ZenodoDataCite41Serializer
+from zenodo.modules.records.serializers.datacite import ZenodoDataCite41Serializer
 from zenodo.modules.records.serializers.dc import ZenodoDublinCoreSerializer
 from zenodo.modules.records.serializers.marc21 import ZenodoMARCXMLSerializer
 
@@ -47,7 +46,7 @@ from .json import ZenodoJSONSerializer as JSONSerializer
 from .legacyjson import DepositLegacyJSONSerializer, LegacyJSONSerializer
 from .schemaorg import ZenodoSchemaOrgSerializer
 from .schemas.csl import RecordSchemaCSLJSON
-from .schemas.datacite import DataCiteSchemaV1, DataCiteSchemaV4
+from .schemas.datacite import DataCiteSchemaV4
 from .schemas.dc import DublinCoreV1
 from .schemas.json import DepositSchemaV1, RecordSchemaV1
 from .schemas.legacyjson import DepositFormSchemaV1, FileSchemaV1, \
@@ -78,15 +77,10 @@ marcxml_v1 = ZenodoMARCXMLSerializer(
 #: BibTeX serializer version 1.0.0
 bibtex_v1 = BibTeXSerializer()
 #: DataCite serializers
-datacite_v31 = ZenodoDataCite31Serializer(DataCiteSchemaV1, replace_refs=True)
 datacite_v41 = ZenodoDataCite41Serializer(DataCiteSchemaV4, replace_refs=True)
 #: DCAT serializer
 dcat_v1 = DCATSerializer(datacite_v41)
-#: OAI DataCite serializer
-oai_datacite = OAIDataCiteSerializer(
-    serializer=datacite_v31,
-    datacentre='CERN.ZENODO',
-)
+
 #: OAI DataCite 4.1 serializer
 oai_datacite_v41 = OAIDataCiteSerializer(
     serializer=datacite_v41,
@@ -117,9 +111,6 @@ legacyjson_v1_response = record_responsify(legacyjson_v1, 'application/json')
 marcxml_v1_response = record_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX record serializer for individual records.
 bibtex_v1_response = record_responsify(bibtex_v1, 'application/x-bibtex')
-#: DataCite v3.1 record serializer for individual records.
-datacite_v31_response = record_responsify(
-    datacite_v31, 'application/x-datacite+xml')
 #: DataCite v4.1 record serializer for individual records.
 datacite_v41_response = record_responsify(
     datacite_v41, 'application/x-datacite-v41+xml')
@@ -149,8 +140,8 @@ marcxml_v1_search = search_responsify(marcxml_v1, 'application/marcxml+xml')
 #: BibTeX serializer for search records.
 bibtex_v1_search = search_responsify(bibtex_v1, 'application/x-bibtex')
 #: DataCite v3.1 record serializer for search records.
-datacite_v31_search = search_responsify(
-    datacite_v31, 'application/x-datacite+xml')
+datacite_v41_search = search_responsify(
+    datacite_v41, 'application/x-datacite+xml')
 #: DublinCore record serializer for search records.
 dc_v1_search = search_responsify(dc_v1, 'application/x-dc+xml')
 schemaorg_jsonld_v1_search = record_responsify(
@@ -182,12 +173,8 @@ deposit_json_v1_search = search_responsify(
 oaipmh_marc21_v1 = marcxml_v1.serialize_oaipmh
 #: OAI-PMH DataCite record serializer.
 oaipmh_datacite_v41 = datacite_v41.serialize_oaipmh
-#: OAI-PMH DataCite record serializer.
-oaipmh_datacite_v31 = datacite_v31.serialize_oaipmh
 #: OAI-PMH DCAT record serializer.
 oaipmh_dcat_v1 = dcat_v1.serialize_oaipmh
-#: OAI-PMH OAI DataCite record serializer.
-oaipmh_oai_datacite = oai_datacite.serialize_oaipmh
 #: OAI-PMH OAI DataCite 4.1 record serializer.
 oaipmh_oai_datacite_v41 = oai_datacite_v41.serialize_oaipmh
 #: OAI-PMH OAI Dublin Core record serializer.
