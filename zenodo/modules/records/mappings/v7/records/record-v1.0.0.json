@@ -34,7 +34,12 @@
             "type": "keyword"
           },
           "title": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "acronym": {
             "type": "keyword"
@@ -71,7 +76,7 @@
                 }
               },
               "name": {
-                "type": "text"
+                "type": "keyword"
               },
               "acronyms": {
                 "type": "keyword"
@@ -96,7 +101,7 @@
             }
           },
           "program": {
-            "type": "text"
+            "type": "keyword"
           },
           "remote_modified": {
             "type": "date",
@@ -236,22 +241,47 @@
         "type": "date"
       },
       "title": {
-        "type": "text"
+        "type": "text",
+          "fields": {
+            "keyword": {
+              "type": "keyword"
+            }
+          }
       },
       "creators": {
         "type": "object",
         "properties": {
           "name": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "affiliation": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "familyname": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "givennames": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "gnd": {
             "type": "keyword"
@@ -457,19 +487,44 @@
         "type": "object",
         "properties": {
           "name": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "type": {
-            "type": "keyword"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "affiliation": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "familyname": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "givennames": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "gnd": {
             "type": "keyword"
@@ -494,7 +549,12 @@
             "type": "keyword"
           },
           "title": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "pages": {
             "type": "keyword"
@@ -510,13 +570,23 @@
       "meeting": {
         "properties": {
           "dates": {
-            "type": "text"
+            "type": "keyword"
           },
           "title": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "place": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "session": {
             "type": "keyword"
@@ -537,20 +607,35 @@
         "type": "object",
         "properties": {
           "title": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "pages": {
-            "type": "text"
+            "type": "keyword"
           }
         }
       },
       "imprint": {
         "properties": {
           "publisher": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "place": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "isbn": {
             "type": "keyword"
@@ -561,22 +646,47 @@
         "type": "object",
         "properties": {
           "university": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "supervisors": {
             "type": "object",
             "properties": {
               "name": {
-                "type": "text"
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
               },
               "affiliation": {
-                "type": "text"
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
               },
               "familyname": {
-                "type": "text"
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
               },
               "givennames": {
-                "type": "text"
+                "type": "text",
+                "fields": {
+                  "keyword": {
+                    "type": "keyword"
+                  }
+                }
               },
               "gnd": {
                 "type": "keyword"
@@ -613,6 +723,9 @@
           "type": {
             "type": "keyword",
             "copy_to": "filetype"
+          },
+          "file_id": {
+            "type": "keyword"
           }
         }
       },
@@ -717,7 +830,12 @@
         "type": "object",
         "properties": {
           "place": {
-            "type": "text"
+            "type": "text",
+            "fields": {
+              "keyword": {
+                "type": "keyword"
+              }
+            }
           },
           "description": {
             "type": "text"
