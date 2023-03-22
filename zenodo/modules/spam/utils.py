@@ -39,8 +39,8 @@ from invenio_mail.tasks import send_email
 from invenio_search.api import RecordsSearch
 from werkzeug.exceptions import HTTPException
 
-from zenodo.modules.spam.tasks import check_metadata_for_spam
 from zenodo.modules.spam.models import SafelistEntry
+from zenodo.modules.spam.tasks import check_metadata_for_spam
 
 
 def is_user_safelisted(user):

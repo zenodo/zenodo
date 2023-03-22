@@ -34,7 +34,7 @@ from invenio_db import db
 from invenio_opendefinition.minters import license_minter
 from invenio_opendefinition.resolvers import license_resolver
 from invenio_opendefinition.validators import license_validator
-from invenio_pidstore.errors import PIDDoesNotExistError, PIDAlreadyExists
+from invenio_pidstore.errors import PIDAlreadyExists, PIDDoesNotExistError
 from invenio_records.api import Record
 
 from .utils import read_json

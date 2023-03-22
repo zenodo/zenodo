@@ -29,9 +29,9 @@ from __future__ import absolute_import, print_function
 from flask import url_for
 
 try:
-    from urllib.parse import urlparse, parse_qs
+    from urllib.parse import parse_qs, urlparse
 except ImportError:
-    from urlparse import urlparse, parse_qs
+    from urlparse import parse_qs, urlparse
 
 
 def compare_url(url, expected):

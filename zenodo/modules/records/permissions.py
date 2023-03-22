@@ -43,10 +43,10 @@ from zenodo_accessrequests.models import SecretLink
 from zenodo.modules.tokens import decode_rat
 from zenodo.modules.utils import obj_or_import_string
 
+from ..tokens.errors import MissingTokenIDError
 from .api import ZenodoRecord
 from .models import AccessRight
 from .utils import is_deposit, is_record
-from ..tokens.errors import MissingTokenIDError
 
 
 def get_public_bucket_uuids():

@@ -26,10 +26,9 @@
 
 from __future__ import absolute_import, print_function
 
-from flask import Blueprint
 import joblib
 from celery.signals import celeryd_init
-from flask import current_app
+from flask import Blueprint, current_app
 
 from . import config, current_spam
 from .utils import DomainList

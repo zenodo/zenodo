@@ -30,6 +30,7 @@ from collections import Counter
 from datetime import datetime, timedelta
 from itertools import islice
 
+import sqlalchemy as sa
 from elasticsearch_dsl import Q
 from flask import Blueprint, abort, current_app, flash, jsonify, redirect, \
     render_template, request, url_for
@@ -44,7 +45,6 @@ from invenio_admin.views import _has_admin_access
 from invenio_communities.models import Community
 from invenio_db import db
 from invenio_search.api import RecordsSearch
-import sqlalchemy as sa
 
 from zenodo.modules.deposit.utils import delete_record
 from zenodo.modules.spam.forms import DeleteSpamForm
