@@ -83,7 +83,8 @@ jobs:
         run: |
           export VIRTUAL_ENV=${pythonLocation}
           cat .prod-requirements.txt
-          sudo apt -y install libkrb5-dev
+          sudo apt-get update
+          sudo apt-get -y install libkrb5-dev
           pip install -r .prod-requirements.txt
           pip install -e .[all]
           pip freeze
