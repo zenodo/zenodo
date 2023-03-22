@@ -48,6 +48,20 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
+  es:
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
+    environment:
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    mem_limit: 1g
+    ports:
+      - "9200:9200"
+      - "9300:9300"
   search:
     image: opensearchproject/opensearch:2.2.1
     environment:

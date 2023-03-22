@@ -1,0 +1,24 @@
+version: '2.1'
+services:
+  # Base services
+  cache:
+    extends:
+      file: docker-services.yml
+      service: cache
+  db:
+    extends:
+      file: docker-services.yml
+      service: db
+  mq:
+    extends:
+      file: docker-services.yml
+      service: mq
+  es:
+    extends:
+      file: docker-services.yml
+      service: es
+    volumes:
+    - esdata:/usr/share/elasticsearch/data
+volumes:
+  esdata:
+    driver: local
