@@ -78,7 +78,7 @@ Flask-Assets==0.12
 Flask-BabelEx==0.9.4
 Flask-Breadcrumbs==0.4.0
 Flask-Caching==1.6.0
-Flask-CeleryExt==0.3.2
+Flask-CeleryExt==0.3.4
 Flask-Collect==1.2.2
 Flask-Cors==3.0.9
 Flask-DebugToolbar==0.10.1
@@ -135,8 +135,8 @@ invenio-marc21==1.0.0a9
 invenio-oaiserver==1.1.1.post1
 invenio-oauth2server==1.0.3
 invenio-oauthclient==1.1.2
-invenio-openaire==1.0.0a15
-invenio-opendefinition==1.0.0a9
+invenio-openaire==1.0.0a16
+invenio-opendefinition==1.0.0a12
 invenio-pidrelations==1.0.0a4
 invenio-pidstore==1.1.1
 invenio-previewer==1.0.0a11
