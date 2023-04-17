@@ -61,7 +61,7 @@ def get_public_bucket_uuids():
 def files_permission_factory(obj, action=None):
     """Permission for files are always based on the type of bucket.
 
-    1. Community bucket: Read access for everyone
+    1. Community and exporter buckets: Read access for everyone
     2. Record bucket: Read access only with open and restricted access.
     3. Deposit bucket: Read/update with restricted access.
     4. Any other bucket is restricted to admins only.
@@ -184,7 +184,7 @@ class PublicBucketPermission(object):
 
     def can(self):
         """Check permission."""
-        if self.action == 'object-read':
+        if self.action in ('object-read', 'bucket-read'):
             return True
         else:
             return Permission(ActionNeed('admin-access')).can()
