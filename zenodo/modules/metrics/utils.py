@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017-2021 CERN.
+# Copyright (C) 2017-2023 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -29,23 +29,25 @@ from flask import current_app
 from invenio_cache import current_cache
 
 
+def get_metrics(metric_id):
+    cached_data = current_cache.get('ZENODO_METRICS_CACHE::{}'.format(metric_id))
+    if cached_data is not None:
+        return cached_data
+
+
 def calculate_metrics(metric_id, cache=True):
     """Calculate a metric's result."""
-    if cache:
-        cached_data = current_cache.get(
-            'ZENODO_METRICS_CACHE::{}'.format(metric_id))
-        if cached_data is not None:
-            return cached_data
-
     result = deepcopy(
         current_app.config['ZENODO_METRICS_DATA'][metric_id])
 
     for metric in result:
         metric['value'] = metric['value']()
 
-    current_cache.set('ZENODO_METRICS_CACHE::{}'.format(metric_id), result,
-                      timeout=current_app.config[
-                          'ZENODO_METRICS_CACHE_TIMEOUT'])
+    if cache:
+        current_cache.set(
+            'ZENODO_METRICS_CACHE::{}'.format(metric_id),
+            result, timeout=current_app.config['ZENODO_METRICS_CACHE_TIMEOUT'],
+        )
 
     return result
 

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017-2021 CERN.
+# Copyright (C) 2017-2023 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -23,10 +23,15 @@
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
 """Test Zenodo metrics views."""
-from flask import Response
+
+from invenio_cache import current_cache
+from zenodo.modules.metrics.utils import calculate_metrics
 
 
-def test_metrics(app, db, es, use_metrics_config):
+def test_metrics(api, api_client, db, es, use_metrics_config):
+    # clear any stored cache
+    current_cache.delete("ZENODO_METRICS_CACHE::openaire-nexus")
+
     expected_data = '# HELP zenodo_unique_visitors_web_total Number ' \
                     'of unique visitors in total on Zenodo portal\n' \
                     '# TYPE zenodo_unique_visitors_web_total gauge\n' \
@@ -44,14 +49,22 @@ def test_metrics(app, db, es, use_metrics_config):
                     '# TYPE zenodo_communities_total gauge\n' \
                     'zenodo_communities_total 0\n' \
 
-    with app.test_client() as client:
-        res = client.get("/api/metrics/openaire-nexus")
-        assert res.status_code == 200
-        assert res.get_data() == expected_data
+    # initial request returns a 503, since metrics are not in cache
+    res = api_client.get("/metrics/openaire-nexus")
+    assert res.status_code == 503
+    assert res.headers["Retry-After"] == '1800'
+    assert res.get_data() == \
+        "Metrics not available. Try again after 30 minutes."
+
+    # calculate and cache the metrics
+    calculate_metrics("openaire-nexus")
+
+    res = api_client.get("/metrics/openaire-nexus")
+    assert res.status_code == 200
+    assert res.get_data() == expected_data
 
 
-def test_metrics_invalid_key(app):
-    with app.test_client() as client:
-        res = client.get("/api/metrics/invalid-key")
+def test_metrics_invalid_key(api_client):
+        res = api_client.get("/metrics/invalid-key")
         assert res.status_code == 404
         assert res.get_data() == 'Invalid key'

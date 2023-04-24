@@ -31,7 +31,8 @@ import datetime
 from .api import ZenodoMetric
 
 ZENODO_METRICS_START_DATE = datetime.datetime(2021, 1, 1)
-ZENODO_METRICS_CACHE_TIMEOUT = 3600
+ZENODO_METRICS_CACHE_TIMEOUT = int(datetime.timedelta(hours=1).total_seconds())
+ZENODO_METRICS_CACHE_UPDATE_INTERVAL = datetime.timedelta(minutes=30)
 
 ZENODO_METRICS_UPTIME_ROBOT_METRIC_IDS = {}
 ZENODO_METRICS_UPTIME_ROBOT_URL = 'https://api.uptimerobot.com/v2/getMonitors'

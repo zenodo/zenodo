@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 #
 # This file is part of Zenodo.
-# Copyright (C) 2017-2021 CERN.
+# Copyright (C) 2017-2023 CERN.
 #
 # Zenodo is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
@@ -26,7 +26,7 @@
 from zenodo.modules.metrics.utils import calculate_metrics, formatted_response
 
 
-def test_calculate_metrics(app, db, es, cache, use_metrics_config):
+def test_calculate_metrics(api, db, es, cache, use_metrics_config):
     expected_data = [
         {
             'name': 'zenodo_unique_visitors_web_total',
@@ -61,7 +61,7 @@ def test_calculate_metrics(app, db, es, cache, use_metrics_config):
     assert calculated_metrics == expected_data
 
 
-def test_formatted_response(app, use_metrics_config):
+def test_formatted_response(api, use_metrics_config):
     metrics = [
         {
             'name': 'zenodo_unique_visitors_web_total',

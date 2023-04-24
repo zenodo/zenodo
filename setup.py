@@ -250,6 +250,7 @@ setup(
             'zenodo_exporter = zenodo.modules.exporter.tasks',
             'zenodo_stats = zenodo.modules.stats.tasks',
             'zenodo_communities = zenodo.modules.communities.tasks',
+            'zenodo_metrics = zenodo.modules.metrics.tasks',
         ],
         'invenio_config.module': [
             'zenodo = zenodo.config',

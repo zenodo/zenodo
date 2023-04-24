@@ -82,6 +82,7 @@ from zenodo.modules.records.permissions import deposit_delete_permission_factory
     record_create_permission_factory
 from zenodo.modules.stats import current_stats_search_client
 from zenodo.modules.theme.ext import useragent_and_ip_limit_key
+from zenodo.modules.metrics.config import ZENODO_METRICS_CACHE_UPDATE_INTERVAL
 
 
 def _(x):
@@ -295,6 +296,13 @@ CELERY_BEAT_SCHEDULE = {
     'openaire-failures-retry': {
         'task': 'zenodo.modules.openaire.tasks.retry_openaire_failures',
         'schedule': crontab(minute=0, hour=9),  # Every day at 09:00 UTC
+    },
+    'metrics-calculate': {
+        'task': 'zenodo.modules.metrics.tasks.calculate_metrics',
+        'kwargs': {
+            "metric_id": "openaire-nexus",
+        },
+        'schedule': ZENODO_METRICS_CACHE_UPDATE_INTERVAL,
     },
 }
 

@@ -56,7 +56,7 @@ class ZenodoMetric(object):
             'range', timestamp=time_range,
         ).filter(
             'term', is_parent=False,
-        )
+        ).params(request_timeout=120)
         search.aggs.metric('download_volume', 'sum', field='volume')
         result = search[:0].execute().aggregations.to_dict()
         download_volume = result.get('download_volume', {}).get('value', 0)
@@ -64,7 +64,7 @@ class ZenodoMetric(object):
         search = Search(
             using=current_search_client,
             index=build_alias_name('records')
-        ).filter('range', created=time_range)
+        ).filter('range', created=time_range).params(request_timeout=120)
         search.aggs.metric('upload_volume', 'sum', field='size')
         result = search[:0].execute().aggregations.to_dict()
         upload_volume = result.get('upload_volume', {}).get('value', 0)
@@ -79,7 +79,7 @@ class ZenodoMetric(object):
         search = Search(
             using=current_search_client,
             index=build_alias_name('events-stats-*')
-        ).filter('range', timestamp=time_range)
+        ).filter('range', timestamp=time_range).params(request_timeout=120)
 
         search.aggs.metric(
             'visitors_count', 'cardinality', field='visitor_id'
