@@ -1415,7 +1415,7 @@ THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
 #: Twitter handle.
 THEME_TWITTERHANDLE = "@zenodo_org"
 #: Path to logo file.
-THEME_LOGO = "img/zenodo.svg"
+THEME_LOGO = "img/zenodo-bd-logo.svg"
 #: Google Site Verification ids.
 THEME_GOOGLE_SITE_VERIFICATION = [
     "5fPGCLllnWrvFxH9QWI0l1TadV7byeEvfPcyK2VkS_s",
