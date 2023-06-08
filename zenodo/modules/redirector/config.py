@@ -84,5 +84,4 @@ REDIRECTOR_EXTERNAL_REDIRECTS = [
     ['/terms', 'terms', 'http://about.zenodo.org/terms/'],
     ['/donate', 'donate',
      'https://donate.cernandsocietyfoundation.cern/zenodo/~my-donation?_cv=1'],
-    ['/10years', '10years', 'https://blog.zenodo.org/2023/05/08/2023-05-08-10years/'],
 ]

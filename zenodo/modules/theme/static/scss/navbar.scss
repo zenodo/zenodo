@@ -42,21 +42,8 @@
   font-family: $brand-font-family;
   font-weight: $brand-font-weight;
   font-size: $brand-font-size;
-  // padding: ($navbar-brand-padding-vertical)-4 $navbar-padding-horizontal+10 $navbar-brand-padding-vertical+4 $navbar-padding-horizontal;
-  // Remove everything below to restore normal logo padding/margin
-  padding-top: 0px;
-  padding-bottom: 16px;
-  padding-right: 0px;
-  padding-left: 0px;
-
-  @media (min-width: 768px) {
-    margin-left: -31px !important;
-  }
-
-  margin-right: -13px;
+  padding: ($navbar-brand-padding-vertical)-4 $navbar-padding-horizontal+10 $navbar-brand-padding-vertical+4 $navbar-padding-horizontal;
 }
-
-
 
 .navbar-default {
   @include navbar-gradient();
