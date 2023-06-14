@@ -48,20 +48,6 @@ services:
     ports:
       - "15672:15672"
       - "5672:5672"
-  es:
-    image: docker.elastic.co/elasticsearch/elasticsearch-oss:7.1.1
-    environment:
-      - bootstrap.memory_lock=true
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
-    mem_limit: 1g
-    ports:
-      - "9200:9200"
-      - "9300:9300"
   search:
     image: opensearchproject/opensearch:2.2.1
     environment:
@@ -79,12 +65,15 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
-  kibana:
-    image: docker.elastic.co/kibana/kibana-oss:7.1.1
+  search-dashboards:
+    image: opensearchproject/opensearch-dashboards:2.2.1
     ports:
       - "5601:5601"
+    expose:
+      - "5601"
     environment:
-      - "ELASTICSEARCH_URL=http://es:9200"
+      - "OPENSEARCH_HOSTS=http://search:9200"
+      - "DISABLE_SECURITY_DASHBOARDS_PLUGIN=true"
   flower:
     image: mher/flower
     command: --broker=amqp://guest:guest@mq:5672// --broker_api=http://guest:guest@mq:15672/api/
