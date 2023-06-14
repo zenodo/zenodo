@@ -25,7 +25,7 @@ services:
       - "5000:5000"
     links:
       - cache
-      - es
+      - search
       - mq
       - db
     volumes_from:
@@ -38,7 +38,7 @@ services:
     command: "celery worker -A zenodo.celery --loglevel=INFO"
     links:
       - cache
-      - es
+      - search
       - mq
       - db
     volumes_from:
@@ -62,12 +62,12 @@ services:
       service: flower
     links:
       - mq
-  kibana:
+  search-dashboards:
     extends:
       file: docker-services.yml
-      service: kibana
+      service: search-dashboards
     links:
-      - es
+      - search
   # Base services
   cache:
     extends:
@@ -81,7 +81,7 @@ services:
     extends:
       file: docker-services.yml
       service: mq
-  es:
+  search:
     extends:
       file: docker-services.yml
-      service: es
+      service: search
