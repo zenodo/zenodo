@@ -129,10 +129,7 @@ class RecordSchemaOpenAIREJSON(Schema):
         for grant in grants:
             eurepo = grant.get('identifiers', {}).get('eurepo', '')
             if eurepo:
-                links.append(u'{eurepo}/{title}/{acronym}'.format(
-                    eurepo=eurepo,
-                    title=grant.get('title', '').replace('/', '%2F'),
-                    acronym=grant.get('acronym', '')))
+                links.append(eurepo)
         return links or missing
 
     def get_pids(self, obj):
