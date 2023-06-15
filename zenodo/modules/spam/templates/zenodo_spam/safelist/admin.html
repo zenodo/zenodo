@@ -131,7 +131,7 @@
                 {% if 'github' in user.external %}
                   <i class="fa fa-github"></i>
                 {% endif %}
-                {% if user.external == 'orcid' %}
+                {% if 'orcid' in user.external %}
                   <img class="inline-orcid" src="{{ url_for('static', filename='img/orcid.png')}}">
                 {% endif %}
               </td>
