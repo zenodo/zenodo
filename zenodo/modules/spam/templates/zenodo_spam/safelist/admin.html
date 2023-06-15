@@ -111,7 +111,7 @@
                 data-sort="{{ inactive_percentage }}"
                 class="selectable"
               >
-                {{ inactive_percentage | round }}%
+                {{ "%.2f" | format(inactive_percentage) }}%
               </td>
               {# Full name #}
               <td class="selectable">{{ user.full_name }}</td>
