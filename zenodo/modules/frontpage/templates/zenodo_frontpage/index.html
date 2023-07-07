@@ -246,18 +246,12 @@
         <h4>Why use {{config.THEME_SITENAME}}?</h4>
         {% include "zenodo_frontpage/benefits.html" %}
       </div>
-
-      <div class="hidden-xs">
-        <a class="twitter-timeline" data-lang="en" data-width="360" data-height="600" data-dnt="true"
-           href="https://twitter.com/ZENODO_ORG"></a>
-      </div>
     </div>
   </div>
 </div>
 {%- endblock page_body %}
 
 {% block javascript %}
-<script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
 {{ super() }}
 <script type="text/javascript">
 $(function () {

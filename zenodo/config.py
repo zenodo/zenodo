@@ -1412,8 +1412,6 @@ THEME_SITENAME = _("Zenodo")
 THEME_SITEURL = "http://localhost:5000"
 #: Endpoint for breadcrumb root.
 THEME_BREADCRUMB_ROOT_ENDPOINT = 'zenodo_frontpage.index'
-#: Twitter handle.
-THEME_TWITTERHANDLE = "@zenodo_org"
 #: Path to logo file.
 THEME_LOGO = "img/zenodo.svg"
 #: Google Site Verification ids.
