@@ -161,7 +161,7 @@ SUPPORT_ISSUE_CATEGORIES = [
         'key': 'tech-support',
         'title': 'Security issue, bug or spam report',
         'description': (
-            'Report a technical issue or a spam content on Zenodo.'
+            'Report a technical issue or a spam content on Zenodo. '
             'Please provide details on how to reproduce the bug. '
             'Upload any screenshots or files which are relevant to the issue '
             'or to means of reproducing it. Include error messages and '
