@@ -1,4 +1,5 @@
 [codespell]
-skip = .git,*.pdf,*.svg
-#
-# ignore-words-list =
+skip = .git,*.pdf,*.svg,*.cfg
+# ignore lines with names, and long line with all kinds of abbreviations
+ignore-regex = AES256-SHA256:DHE-DSS-AES256-SHA:.*|"name": ".*
+ignore-words-list = millepede,theses
