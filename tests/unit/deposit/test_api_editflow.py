@@ -553,7 +553,7 @@ def test_delete_draft(api, api_client, db, es, locations, json_auth_headers,
     current_search.flush_and_refresh(index='deposits')
     response = client.delete(links['self'], headers=auth_headers)
     assert response.status_code == 204
-    # 'recid' PID shuld be removed, while 'depid' should have status deleted.
+    # 'recid' PID should be removed, while 'depid' should have status deleted.
     # No 'doi' PIDs should be created without publishing
     assert PersistentIdentifier.query.filter_by(pid_type='recid').count() == 0
     depid = PersistentIdentifier.query.filter_by(pid_type='depid').one()

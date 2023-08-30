@@ -176,11 +176,11 @@ class ZenodoGitHubRelease(GitHubRelease):
             RecordIndexer().index_by_id(record_id)
         except Exception:
             db.session.rollback()
-            # Remove deposit from index since it was not commited.
+            # Remove deposit from index since it was not committed.
             if deposit and deposit.id:
                 try:
                     RecordIndexer().delete(deposit)
                 except Exception:
                     current_app.logger.exception(
-                        "Failed to remove uncommited deposit from index.")
+                        "Failed to remove uncommitted deposit from index.")
             raise

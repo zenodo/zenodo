@@ -270,7 +270,7 @@ def delete(pid=None, record=None, depid=None, deposit=None):
 
 @blueprint.app_context_processor
 def current_datetime():
-    """Template contex processor which adds current datetime to the context."""
+    """Template context processor which adds current datetime to the context."""
     now = datetime.utcnow()
     return {
         'current_datetime': now,

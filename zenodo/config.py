@@ -167,7 +167,7 @@ I18N_LANGUAGES = []
 
 # Celery
 # ======
-#: Default broker (RabbitMQ on locahost).
+#: Default broker (RabbitMQ on localhost).
 CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672//"
 #: Default Celery result backend.
 CELERY_RESULT_BACKEND = "redis://localhost:6379/1"

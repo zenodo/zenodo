@@ -49,7 +49,7 @@ def test_basic_workflow(app, db, users, deposit):
         assert sip.sip_files[0].sip_id == sip.id
         assert sip.sip_files[1].sip_id == sip.id
 
-        # Publishing the second time shuld create a new SIP and new RecordSIP
+        # Publishing the second time should create a new SIP and new RecordSIP
         # but no new SIPFiles. This is under assumption that users cannot
         # upload new files to the already published deposit.
         deposit = deposit.edit()
