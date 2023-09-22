@@ -171,13 +171,13 @@ def test_cleanup_indexed_deposits(app, db, es, locations, users,
     db.session.remove()
     current_search.flush_and_refresh(index='deposits')
 
-    # Deposit has been indexed in ES, but not commited in DB
+    # Deposit has been indexed in ES, but not committed in DB
     assert PersistentIdentifier.query.filter(
         PersistentIdentifier.pid_type == second_depid.pid_type,
         PersistentIdentifier.pid_value == second_depid.pid_value).count() == 0
     assert (RecordsSearch(index='deposits').get_record(second_id_).execute()[0]
             ._deposit.id == second_depid.pid_value)
-    # Deposit has been indexed in ES and is also commited in DB
+    # Deposit has been indexed in ES and is also committed in DB
     assert PersistentIdentifier.query.filter(
         PersistentIdentifier.pid_type == depid_type,
         PersistentIdentifier.pid_value == depid_value).count() == 1

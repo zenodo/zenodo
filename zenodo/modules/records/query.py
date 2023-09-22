@@ -22,7 +22,7 @@
 # waive the privileges and immunities granted to it by virtue of its status
 # as an Intergovernmental Organization or submit itself to any jurisdiction.
 
-"""Configruation for Zenodo Records search."""
+"""Configuration for Zenodo Records search."""
 
 from __future__ import absolute_import, print_function
 

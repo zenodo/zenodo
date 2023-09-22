@@ -670,7 +670,7 @@ class ZenodoDeposit(Deposit, ZenodoFilesMixin):
             depid.delete()
 
         # NOTE: We call the parent of Deposit, invenio_records.api.Record since
-        # we need to completely override eveything that the Deposit.delete
+        # we need to completely override everything that the Deposit.delete
         # method does.
         return super(Deposit, self).delete(*args, **kwargs)
 

@@ -93,7 +93,7 @@
 } %}
 
 
-{# Show banner alert if there's a new verion draft #}
+{# Show banner alert if there's a new version draft #}
 {%- if pid_versioning and pid_versioning.exists and pid_versioning.draft_child_deposit and pid_versioning.draft_child_deposit != pid %}
   {%- set draft_deposit_url = url_for('invenio_deposit_ui.depid', pid_value=pid_versioning.draft_child_deposit.pid_value) %}
   {%- set draft_deposit_msg %}

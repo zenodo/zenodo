@@ -167,7 +167,7 @@ I18N_LANGUAGES = []
 
 # Celery
 # ======
-#: Default broker (RabbitMQ on locahost).
+#: Default broker (RabbitMQ on localhost).
 CELERY_BROKER_URL = "amqp://guest:guest@localhost:5672//"
 #: Default Celery result backend.
 CELERY_RESULT_BACKEND = "redis://localhost:6379/1"
@@ -1360,7 +1360,7 @@ ACCOUNTS_USERINFO_HEADERS = True
 # ======
 #: Default API endpoint for search UI.
 SEARCH_UI_SEARCH_API = "/api/records/"
-#: Accept header fro search-js
+#: Accept header for search-js
 SEARCH_UI_SEARCH_MIMETYPE = "application/vnd.zenodo.v1+json"
 #: Default template for search UI.
 SEARCH_UI_SEARCH_TEMPLATE = "zenodo_search_ui/search.html"
