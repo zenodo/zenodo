@@ -1,5 +1,5 @@
 [codespell]
 skip = .git,*.pdf,*.svg,*.cfg,funders.json
 # ignore lines with names, and long line with all kinds of abbreviations
-ignore-regex = AES256-SHA256:DHE-DSS-AES256-SHA:.*|"name": ".*
+ignore-regex = AES256-SHA256:DHE-DSS-AES256-SHA:.*|"name": ".*|.*codespell-ignore.*
 ignore-words-list = millepede,theses

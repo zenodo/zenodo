@@ -44,7 +44,7 @@ def test_invalid_create(api_client, es, json_auth_headers, deposit_url,
     # Invalid deposits.
     cases = [
         dict(unknownkey='data', metadata={}),
-        dict(metadat={}),
+        dict(metadat={}),  # pragma: codespell-ignore
     ]
 
     for case in cases:
