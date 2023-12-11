@@ -1,5 +1,11 @@
 blank_issues_enabled: true
 contact_links:
+  - name: Bug report 🐛
+    url: https://zenodo.org/support
+    about: Found an error or some unexpected behavior? Send us a bug report
+  - name: Feature request ☝️
+    url: https://zenodo.org/support
+    about: Do you have a suggestion for making Zenodo better? Tell us more about it
   - name: Frequently asked questions 📃
     url: https://help.zenodo.org
     about: Questions regarding Zenodo? Take a look at our FAQs
