@@ -458,7 +458,7 @@ def test_versioning_rest_flow(mocker, api, api_client, db, es, locations,
     )
     assert response.status_code == 201
 
-    # Publish new verision
+    # Publish new version
     response = client.post(links['publish'], headers=auth_headers)
     assert response.status_code == 202
 

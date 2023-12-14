@@ -8,7 +8,7 @@ Security issues
 ---------------
 If you discover any security issue, please report it
 directly to info@zenodo.org (specifically **do not** report it to our GitHub
-repository). Please include the the word ``SECURITY`` in all-caps in the email
+repository). Please include the word ``SECURITY`` in all-caps in the email
 subject line. We will acknowledge the issue as fast as possible, and keep you
 updated on the progress of fixing the issue. We additional ask you
 to not publicise the issue until after we have fixed it. After we have fixed
