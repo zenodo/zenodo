@@ -32,7 +32,7 @@ from sqlalchemy.dialects import mysql
 
 
 class SafelistEntry(db.Model):
-    """Defines a message to show to users."""
+    """Defines an entry in the safelist."""
 
     __tablename__ = "safelist_entries"
     __versioned__ = {"versioning": False}
