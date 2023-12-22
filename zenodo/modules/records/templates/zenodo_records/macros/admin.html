@@ -39,6 +39,25 @@
   <strong>Active?:</strong> {{user.profile and user.active}}
 </div>
 <div class="list-group-item col-sm-6">
+  <strong>Linked accounts:</strong>
+  {% for ext_id in user.external_identifiers %}
+  {% if ext_id.method == 'orcid' %}
+    <img class="inline-orcid"
+         src="{{ url_for('static', filename='img/orcid.png')}}"
+    />
+    <a target="_blank"
+       href="{{ext_id.id | pid_url(scheme='orcid', url_scheme='https')}}">
+      {{ ext_id.id }}
+    </a>
+  {% elif ext_id.method == 'github' %}
+      <i class="fa fa-github"></i>
+    <a target="_blank" href="https://api.github.com/user/{{ext_id.id}}">
+      {{ ext_id.id }}
+    </a>
+  {% endif %}
+  {% endfor %}
+</div>
+<div class="list-group-item col-sm-6">
   <strong>Confirmation Date:</strong> {{user.confirmed_at}}
 </div>
 <div class="list-group-item col-sm-6">
@@ -57,6 +76,11 @@
   <strong>Login count:</strong> {{user.login_count}}
 </div>
 <div class="list-group-item col-sm-6">
+  {% set total_quota = user | total_file_size %}
+  <strong>Total quota:</strong> <span title="{{ total_quota }} Bytes">
+  {{total_quota | filesizeformat }}</span>
+</div>
+<div class="list-group-item col-sm-6">
     <strong style="float: left">Safelisted: </strong>
   <div class="col-sm-8">
     {{ safelist_action( user,
@@ -67,7 +91,14 @@
 {%- endmacro %}
 
 {%- macro safelist_action(user, action) %}
-  {{user is safelisted_user}}
+  {% if user is safelisted_user %}
+    {% set safelister = user | safelisted_by %}
+    {% set safelisted_on = user.safelist[0].created.date() %}
+    {{ safelisted_on }} by {{ (safelister.profile.full_name if safelister
+    .profile.full_name else safelister.email) if safelister else 'Unknown'}}
+  {% else %}
+    {{ user is safelisted_user }}
+  {% endif %}
   <form action="{{ url_for('zenodo_spam.safelist_add_remove',
       user_id=user.id) }}" style="float: right;" method="POST">
     <input name="action" type="hidden" value="{{ action }}">
