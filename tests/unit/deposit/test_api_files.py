@@ -305,3 +305,99 @@ def test_rat_deposit_files_access(
     assert res.status_code == 404
     res = client.get(file_url, query_string={'token': rat_token})
     assert res.status_code == 404
+
+
+def test_deposit_duplicate_version_files(
+        app, db, api_client, deposit, deposit_file, deposit_url,
+        json_auth_headers, auth_headers, license_record):
+    """Test deposit duplicate files over different versions."""
+    client = api_client
+    depid = deposit['_deposit']['id']
+
+    raw_files = {
+        'foo.txt': BytesIO(b'foo'),
+        'bar.txt': BytesIO(b'bar'),
+        # MD5 hash collisions
+        'apollo.txt': BytesIO(
+            b'4dc968ff0ee35c209572d4777b721587d36fa7b21bdc56b74a3dc0783e7b9518'
+            b'afbfa200a8284bf36e8e4b55b35f427593d849676da0d1555d8360fb5f07fea2'
+        ),
+        'artemis.txt': BytesIO(
+            b'4dc968ff0ee35c209572d4777b721587d36fa7b21bdc56b74a3dc0783e7b9518'
+            b'afbfa202a8284bf36e8e4b55b35f427593d849676da0d1d55d8360fb5f07fea2'
+        ),
+    }
+
+    version_links = {}
+    version_links[0] = {
+        'self': '{}/{}'.format(deposit_url, depid),
+        'bucket': '/files/{}'.format(deposit['_buckets']['deposit']),
+        'publish': '{}/{}/actions/publish'.format(deposit_url, depid),
+        'newversion': '{}/{}/actions/newversion'.format(deposit_url, depid),
+    }
+
+    # Upload files
+    for key, raw_key in (
+        ('1.txt', 'foo.txt'),
+        ('2.txt', 'foo.txt'),
+        ('3.txt', 'bar.txt'),
+        ('c1.txt', 'apollo.txt'),
+        ('c2.txt', 'artemis.txt'),
+    ):
+        res = client.put(
+            '{}/{}'.format(version_links[0]['bucket'], key),
+            input_stream=raw_files[raw_key],
+            headers=auth_headers,
+        )
+        assert res.status_code == 200
+
+    # Check md5 checksums
+    res = client.get(
+        version_links[0]['bucket'],
+        headers=json_auth_headers,
+    )
+    assert res.status_code == 200
+    res_files = {f['key']: f for f in res.json}
+    assert res_files['1.txt']['checksum'] == res_files['2.txt']['checksum']
+    assert res_files['c1.txt']['checksum'] == res_files['c2.txt']['checksum']
+
+    # Publish the first version
+    res = client.post(
+        version_links[0]['publish'],
+        headers=json_auth_headers,
+    )
+    assert res.status_code == 200
+
+    # Create the second version
+    res = client.post(
+        version_links[0]['newversion'],
+        headers=json_auth_headers,
+    )
+    assert res.status_code == 200
+
+    # Publish the second version without file changes
+    res = client.post(
+        version_links[0]['publish'],
+        headers=json_auth_headers,
+    )
+    assert res.status_code == 400
+
+    # "Rename" 1.txt to 1.md
+    res = client.delete(
+        '{}/{}'.format(version_links[1]['bucket'], '1.txt'),
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
+    res = client.put(
+        '{}/{}'.format(version_links[1]['bucket'], '1.md'),
+        input_stream=raw_files['foo.txt'],
+        headers=auth_headers,
+    )
+    assert res.status_code == 200
+
+    # Publish the second version with a renamed file
+    res = client.post(
+        version_links[1]['publish'],
+        headers=json_auth_headers,
+    )
+    assert res.status_code == 200
