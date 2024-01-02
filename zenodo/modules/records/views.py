@@ -200,10 +200,13 @@ def zenodo_related_links(record, communities):
         return rs
 
     ret = []
+    duplicate = [] #Removing duplicate GitHub or other related identifier banners
     for item in record.get('related_identifiers', []):
-        for r in match_rules(item):
-            ret.append(apply_rule(item, r))
 
+        for r in match_rules(item):
+            if(r['prefix']) not in duplicate:
+                duplicate.append(r['prefix'])
+                ret.append(apply_rule(item, r))
     return ret
 
 
