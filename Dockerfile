@@ -58,6 +58,7 @@ RUN pip install -e .[postgresql,elasticsearch2,all] \
     && python -O -m compileall .
 
 # Install npm dependencies and build assets.
+RUN git config --global url."https://".insteadOf git://
 RUN zenodo npm --pinned-file /code/zenodo/package.pinned.json \
     && cd ${INVENIO_INSTANCE_PATH}/static \
     && npm install \
