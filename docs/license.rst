@@ -30,7 +30,7 @@ submit itself to any jurisdiction.
 Documentation
 -------------
 The Zenodo source code documentation as displayed on
-http://zenodo.readthedocs.io/ is licensed under `Creative Commons Attribution
+https://developers.zenodo.org/ is licensed under `Creative Commons Attribution
 4.0 International (CC-BY) <https://creativecommons.org/licenses/by/4.0/>`_
 
 Logos
