@@ -57,7 +57,7 @@ See `INSTALL.rst <https://github.com/zenodo/zenodo/blob/master/INSTALL.rst>`_
 
 Developer documentation
 =======================
-See https://zenodo.readthedocs.io/
+See https://developers.zenodo.org/
 
 
 License
