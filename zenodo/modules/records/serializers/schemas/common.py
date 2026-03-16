@@ -150,8 +150,9 @@ class RefResolverMixin(object):
 class PersonSchemaV1(Schema, StrictKeysMixin):
     """Schema for a person."""
 
-    name = SanitizedUnicode(required=True)
-    affiliation = SanitizedUnicode()
+    name = SanitizedUnicode(
+        required=True, validate=validate.Length(max=256))
+    affiliation = SanitizedUnicode(validate=validate.Length(max=256))
     gnd = PersistentId(scheme='GND')
     orcid = PersistentId(scheme='ORCID')
 
@@ -316,8 +317,9 @@ class LocationSchemaV1(Schema):
 
     lat = fields.Float()
     lon = fields.Float()
-    place = SanitizedUnicode(required=True)
-    description = SanitizedUnicode()
+    place = SanitizedUnicode(
+        required=True, validate=validate.Length(max=256))
+    description = SanitizedUnicode(validate=validate.Length(max=512))
 
     @validates('lat')
     def validate_latitude(self, value):
@@ -341,19 +343,21 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
 
     doi = DOIField(missing='')
     publication_date = DateString(required=True)
-    title = SanitizedUnicode(required=True, validate=validate.Length(min=3))
+    title = SanitizedUnicode(
+        required=True, validate=validate.Length(min=3, max=128))
     creators = fields.Nested(
-        PersonSchemaV1, many=True, validate=validate.Length(min=1))
+        PersonSchemaV1, many=True, validate=validate.Length(min=1, max=64))
     dates = fields.List(
-        fields.Nested(DateSchemaV1), validate=validate.Length(min=1))
+        fields.Nested(DateSchemaV1), validate=validate.Length(min=1,max=32))
     description = SanitizedHTML(
         required=True, validate=validate.Length(min=3))
-    keywords = fields.List(SanitizedUnicode())
+    keywords = fields.List(SanitizedUnicode(validate=validate.Length(max=256)))
     locations = fields.List(
-        fields.Nested(LocationSchemaV1), validate=validate.Length(min=1))
-    notes = SanitizedHTML()
-    version = SanitizedUnicode()
-    language = SanitizedUnicode()
+        fields.Nested(
+            LocationSchemaV1), validate=validate.Length(min=1, max=64))
+    notes = SanitizedHTML(validate=validate.Length(max=512))
+    version = SanitizedUnicode(validate=validate.Length(max=32))
+    language = SanitizedUnicode(validate=validate.Length(max=64))
     access_right = fields.Str(validate=validate.OneOf(
         choices=[
             AccessRight.OPEN,
@@ -363,10 +367,11 @@ class CommonMetadataSchemaV1(Schema, StrictKeysMixin, RefResolverMixin):
         ],
     ))
     embargo_date = DateString()
-    access_conditions = SanitizedHTML()
+    access_conditions = SanitizedHTML(validate=validate.Length(max=512))
     subjects = fields.Nested(SubjectSchemaV1, many=True)
     contributors = fields.List(fields.Nested(ContributorSchemaV1))
-    references = fields.List(SanitizedUnicode(attribute='raw_reference'))
+    references = fields.List(SanitizedUnicode(attribute='raw_reference',
+        validate=validate.Length(max=64)))
     related_identifiers = fields.Nested(
         RelatedIdentifierSchemaV1, many=True)
     alternate_identifiers = fields.Nested(
